@@ -7,7 +7,7 @@ import os
 import random
 import shutil
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from glob import glob
 from os import rmdir
@@ -414,7 +414,7 @@ def test_save_without_valid_channel(tmp_path: Path):
 
 
 @contextmanager
-def temp_dataset_dir(create: bool = False) -> Iterator[str]:
+def temp_dataset_dir(create: bool = False) -> Generator[str, None, None]:
     with tempfile.TemporaryDirectory() as dirname:
         if not create:
             rmdir(dirname)
@@ -439,7 +439,7 @@ def create_temp_dataset(dirname: Path | str, n_tables: int | None = None) -> Dat
 
 
 @contextmanager
-def mock_dataset(**kwargs: Any) -> Iterator[Dataset]:
+def mock_dataset(**kwargs: Any) -> Generator[Dataset, None, None]:
     with temp_dataset_dir() as dirname:
         d = create_temp_dataset(dirname, **kwargs)
         yield d

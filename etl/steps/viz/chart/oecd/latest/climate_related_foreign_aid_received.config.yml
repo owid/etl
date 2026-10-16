@@ -1,0 +1,11 @@
+chart_config_id: 01a139ce-1f54-7b6b-9a89-fb9e43bbdeec
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_recipient#climate_related"

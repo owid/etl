@@ -181,7 +181,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 .venv/bin/etl pr "Update dataset" data
 
 # 2. Stage and commit
-git add .
+git add <changed files>   # explicit paths: another session may share this worktree
 git commit -m "🔨🤖 Description"
 
 # 3. Push

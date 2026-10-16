@@ -24,23 +24,20 @@ Usage:
 """
 
 import asyncio
+import hashlib
 import json
 import os
 import sys
 import tempfile
 from pathlib import Path
 
+import anthropic
 import click
 import httpx
-from dotenv import load_dotenv  # ty: ignore
-from google import genai  # ty: ignore
-from google.genai import types as genai_types  # ty: ignore
-from google.genai import errors as genai_errors  # ty: ignore
+from genai_prices import Usage, calc_price
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from owid.catalog import s3_utils  # ty: ignore
 
 from coverage_model import (  # ty: ignore
     DEFAULT_VIEWS_COLUMN,
@@ -59,32 +56,45 @@ from coverage_report import (  # ty: ignore
     render_run_summary,
     render_topic_table,
 )
+from owid.catalog import s3_utils  # ty: ignore
+
+from apps.utils.llms.claude import text_of  # ty: ignore
+from etl import config  # ty: ignore
 from etl.config import OWID_ENV  # ty: ignore
+from etl.paths import CACHE_DIR  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
-DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_MODEL = "claude-sonnet-5-5"
 
-# Ask for the same candidates every time. Left at the model's defaults, two runs
-# of identical code disagreed on almost every topic — Gender Ratio came back
-# covering 30% of its traffic in one run and 79% in the next — which makes a
-# prompt improvement indistinguishable from luck, and this prompt has been
-# iterated on a lot. Deterministic sampling doesn't make the candidates better,
-# it makes a change in them attributable.
-#
-# The seed alone does this. Gemini has ignored `temperature` since 3.6 Flash and
-# upcoming models reject it (as they will `top_p` and `top_k`), so don't add it
-# back: on gemini-3.8-flash, repeated calls with this seed return identical text,
-# with or without temperature 0.
-LLM_SAMPLING = {"seed": 1}
+# Reuse the answer for an identical request. Left alone, two runs of identical code
+# disagreed on almost every topic — Gender Ratio came back covering 30% of its
+# traffic in one run and 79% in the next — which makes a prompt improvement
+# indistinguishable from luck, and this prompt has been iterated on a lot. The
+# model can't be made to sample deterministically, so a topic whose prompt (its
+# chart list included) and model are unchanged gets its earlier answer back: a
+# change in the candidates is then attributable to a change in the inputs. Delete
+# the file to sample afresh.
+LLM_CACHE_FILE = CACHE_DIR / "vocabulary_llm_answers.json"
 
-# A whole-vocabulary run fires one request per topic at once, which draws the
-# occasional 503/429 out of the API. Those are transient, but a topic that
-# gives up is a topic missing from the upload, so retry each one a few times
-# before letting it fail.
-LLM_MAX_ATTEMPTS = 4
-LLM_RETRY_BACKOFF_SECONDS = 4
+# A whole-vocabulary run asks about every topic, which draws the occasional 429/5xx
+# out of the API. Those are transient, but a topic that gives up is a topic missing
+# from the upload, so the client retries each one a few times (with backoff) before
+# letting it fail, and only a few run at once, so they don't all hit the rate limit together.
+LLM_MAX_RETRIES = 3
+LLM_CONCURRENCY = 8
+
+# Structured output: the answer is exactly this JSON, with nothing before or after it.
+KEYWORDS_SCHEMA = {
+    "type": "json_schema",
+    "schema": {
+        "type": "object",
+        "properties": {"keywords": {"type": "array", "items": {"type": "string"}}},
+        "required": ["keywords"],
+        "additionalProperties": False,
+    },
+}
 
 # How many topics' record sets to fetch at once.
 SEARCH_CONCURRENCY = 8
@@ -97,16 +107,6 @@ DEFAULT_MAX_TERMS = 8
 # five slots on a single line. Terms just below it are reported as near misses so
 # the floor can be judged from the output.
 DEFAULT_MIN_MARGINAL_SHARE = 0.01
-
-# Gemini pricing per million tokens, for the cost estimate the CLI prints.
-# Models absent from here still run; their cost is simply reported as unknown,
-# so this list going out of date can't stop a regeneration (the whole run costs
-# a couple of cents either way).
-PRICING = {
-    "gemini-2.5-flash-lite": {"input": 0.015, "output": 0.06},
-    # Doubles to 1.50 / 7.50 on 2027-01-01.
-    "gemini-3.8-flash": {"input": 0.75, "output": 3.75},
-}
 
 
 def get_all_topic_slugs() -> list[str]:
@@ -172,15 +172,20 @@ def texts_for_prompt(universe: WeightedUniverse, limit: int = 200) -> list[str]:
             break
     return texts[:limit]
 
+
 async def extract_keywords_with_llm(
-    topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = DEFAULT_MODEL
+    topic_slug: str,
+    topic_name: str,
+    texts: list[str],
+    client: anthropic.AsyncAnthropic,
+    cache: dict[str, str],
+    semaphore: asyncio.Semaphore,
+    model_id: str = DEFAULT_MODEL,
 ) -> dict:
-    """Use Gemini to extract good keywords/phrases from chart texts.
+    """Use an LLM to extract good keywords/phrases from chart texts.
 
-    Returns: dict with topic info, keywords, and token usage
+    Returns: dict with topic info, keywords, and token usage (zero when the answer came from the cache)
     """
-    client = genai.Client(api_key=api_key)
-
     # Combine all texts
     combined_text = "\n".join(texts)
 
@@ -259,52 +264,28 @@ never pad the list with variations to reach a number):
 }}"""
 
     try:
-        response = None
-        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
-            try:
-                response = await client.aio.models.generate_content(
+        cache_key = hashlib.sha256(f"{model_id}\n{json.dumps(KEYWORDS_SCHEMA)}\n{prompt}".encode()).hexdigest()
+        input_tokens = output_tokens = 0
+        if cache_key in cache:
+            result_text = cache[cache_key]
+        else:
+            async with semaphore:
+                response = await client.messages.create(
                     model=model_id,
-                    contents=prompt,
-                    config=genai_types.GenerateContentConfig(**LLM_SAMPLING),
+                    max_tokens=16000,
+                    messages=[{"role": "user", "content": prompt}],
+                    output_config={"format": KEYWORDS_SCHEMA},
                 )
-                break
-            except (genai_errors.ServerError, genai_errors.ClientError) as e:
-                # 429 (rate limited) and 5xx are worth another go; anything else
-                # (a bad model id, a rejected prompt) will fail again identically.
-                retriable = getattr(e, "code", None) == 429 or isinstance(e, genai_errors.ServerError)
-                if not retriable or attempt == LLM_MAX_ATTEMPTS:
-                    raise
-                delay = LLM_RETRY_BACKOFF_SECONDS * attempt
-                click.secho(
-                    f"  {topic_name}: {getattr(e, 'code', '?')} from the API, retrying in {delay}s "
-                    f"(attempt {attempt}/{LLM_MAX_ATTEMPTS - 1})",
-                    fg="yellow",
-                )
-                await asyncio.sleep(delay)
-        assert response is not None
-        result_text = response.text.strip()
-
-        # Extract token counts
-        usage = response.usage_metadata
-        input_tokens: int = (
-            int(usage.prompt_token_count)
-            if hasattr(usage, "prompt_token_count") and usage.prompt_token_count is not None
-            else 0
-        )
-        output_tokens: int = (
-            int(usage.candidates_token_count)
-            if hasattr(usage, "candidates_token_count") and usage.candidates_token_count is not None
-            else 0
-        )
-
-        # Extract JSON
-        if "```json" in result_text:
-            result_text = result_text.split("```json")[1].split("```")[0].strip()
-        elif "```" in result_text:
-            result_text = result_text.split("```")[1].split("```")[0].strip()
+            if response.stop_reason != "end_turn":
+                raise RuntimeError(f"the model stopped early ({response.stop_reason})")
+            result_text = text_of(response)
+            # Thinking tokens are billed as output and included in output_tokens.
+            input_tokens, output_tokens = response.usage.input_tokens, response.usage.output_tokens
 
         result = json.loads(result_text)
         keywords = result.get("keywords", [])
+        # Only an answer that parsed is worth reusing.
+        cache[cache_key] = result_text
 
         return {
             "topic_slug": topic_slug,
@@ -339,7 +320,6 @@ async def build_topic_universe(
 
 async def process_topics(
     topic_slugs: list[str],
-    api_key: str,
     model: str,
     weighting: str,
     views_column: str,
@@ -389,17 +369,18 @@ async def process_topics(
 
     click.echo(f"\nFetching the chart list for {len(topic_slugs)} topics...")
     async with httpx.AsyncClient() as client:
+
         async def load(topic_slug: str):
             topic_name = names_by_slug.get(topic_slug)
             if not topic_name:
                 raise ValueError(f"no tag named for topic '{topic_slug}'")
-            return topic_slug, topic_name, await build_topic_universe(
-                client, topic_slug, topic_name, analytics, mdim_config_ids, semaphore
+            return (
+                topic_slug,
+                topic_name,
+                await build_topic_universe(client, topic_slug, topic_name, analytics, mdim_config_ids, semaphore),
             )
 
-        for outcome in await asyncio.gather(
-            *(load(slug) for slug in topic_slugs), return_exceptions=True
-        ):
+        for outcome in await asyncio.gather(*(load(slug) for slug in topic_slugs), return_exceptions=True):
             if isinstance(outcome, BaseException):
                 click.secho(f"✗ {outcome}", fg="red")
                 continue
@@ -407,8 +388,7 @@ async def process_topics(
             universes[topic_name] = universe
             prompt_inputs.append((topic_slug, topic_name, texts_for_prompt(universe)))
             click.secho(
-                f"✓ {topic_name}: {len(universe.records)} records, "
-                f"{universe.total_weight:,.0f} views",
+                f"✓ {topic_name}: {len(universe.records)} records, {universe.total_weight:,.0f} views",
                 fg="green",
             )
 
@@ -420,20 +400,32 @@ async def process_topics(
         return [], failed, universes, []
 
     click.echo(f"\nAsking for candidate terms for {len(prompt_inputs)} topics...")
-    candidate_results = await asyncio.gather(
-        *(
-            extract_keywords_with_llm(topic_slug, topic_name, texts, api_key, model)
-            for topic_slug, topic_name, texts in prompt_inputs
-        ),
-        return_exceptions=True,
-    )
+    client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=LLM_MAX_RETRIES)
+    try:
+        cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
+    except json.JSONDecodeError:
+        click.secho(f"  Ignoring an unreadable answer cache at {LLM_CACHE_FILE}", fg="yellow")
+        cache = {}
+    llm_semaphore = asyncio.Semaphore(LLM_CONCURRENCY)
+    try:
+        candidate_results = await asyncio.gather(
+            *(
+                extract_keywords_with_llm(topic_slug, topic_name, texts, client, cache, llm_semaphore, model)
+                for topic_slug, topic_name, texts in prompt_inputs
+            ),
+            return_exceptions=True,
+        )
+    finally:
+        # Saved even if the run is interrupted, so the answers already paid for aren't asked for again.
+        LLM_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        tmp_file = LLM_CACHE_FILE.with_suffix(".tmp")
+        tmp_file.write_text(json.dumps(cache))
+        tmp_file.replace(LLM_CACHE_FILE)  # atomic, so an interrupted write can't leave a broken cache
 
     click.echo("\nChoosing the terms that cover the most of each topic...")
     results: list[dict] = []
     selections: list[TopicSelection] = []
-    for (topic_slug, topic_name, _), candidates in zip(
-        prompt_inputs, candidate_results, strict=True
-    ):
+    for (topic_slug, topic_name, _), candidates in zip(prompt_inputs, candidate_results, strict=True):
         if isinstance(candidates, BaseException):
             click.secho(f"✗ {topic_slug}: {candidates}", fg="red")
             failed.append(topic_slug)
@@ -456,12 +448,9 @@ async def process_topics(
                 "num_keywords": len(selection.selected),
                 "num_candidates": len(offered),
                 "num_records": selection.total_count,
-                "weighted_coverage": round(
-                    selection.covered_weight / total if total else 0.0, 4
-                ),
+                "weighted_coverage": round(selection.covered_weight / total if total else 0.0, 4),
                 "chart_coverage": round(
-                    (selection.total_count - len(selection.uncovered))
-                    / selection.total_count
+                    (selection.total_count - len(selection.uncovered)) / selection.total_count
                     if selection.total_count
                     else 0.0,
                     4,
@@ -509,7 +498,7 @@ async def process_topics(
 @click.option(
     "--model",
     default=DEFAULT_MODEL,
-    help=f"Gemini model to use (default: {DEFAULT_MODEL}). Any model id the API accepts works.",
+    help=f"Claude model to use (default: {DEFAULT_MODEL}). Any model id the API accepts works.",
 )
 @click.option(
     "--upload-path",
@@ -573,15 +562,8 @@ def main(
     and then picks the terms covering the most of that list — most-revealing
     first, each next one adding the most that is still uncovered.
     """
-    # Load .env file from project root
-    env_path = Path(__file__).parent.parent.parent / ".env"
-    load_dotenv(env_path)
-
-    # Load API key
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        click.secho("✗ GOOGLE_API_KEY not found in environment", fg="red")
-        click.echo(f"  Looked in: {env_path}")
+    if not config.ANTHROPIC_API_KEY:
+        click.secho("✗ ANTHROPIC_API_KEY not set (in .env or the environment)", fg="red")
         sys.exit(1)
 
     # Determine which topics to process
@@ -615,9 +597,7 @@ def main(
     click.echo("OWID TOPIC VOCABULARY")
     click.echo(f"Topics:    {len(topic_slugs)}")
     click.echo(f"Model:     {model}")
-    click.echo(
-        f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}"
-    )
+    click.echo(f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}")
     click.echo(f"Terms:     at most {max_terms}, stopping below {min_marginal_share:.1%}")
     upload_target = "skipped" if no_upload else f"s3://{S3_BUCKET_NAME}/{upload_path}"
     click.echo(f"Upload:    {upload_target}")
@@ -628,7 +608,6 @@ def main(
         results, failed_slugs, universes, selections = asyncio.run(
             process_topics(
                 topic_slugs,
-                api_key,
                 model,
                 weighting=weighting,
                 views_column=views_column,
@@ -645,21 +624,31 @@ def main(
         click.secho("\n✗ No results generated", fg="red")
         sys.exit(1)
 
-    # Calculate total costs
-    pricing = PRICING.get(model)
+    # Calculate total costs, pricing each topic's request on its own: long-context tiers
+    # apply per request, so pricing the summed tokens could put a whole run in the
+    # expensive tier. A model genai-prices doesn't know still runs; its cost is simply
+    # reported as unknown (the whole run costs a couple of cents either way).
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
-    if pricing:
-        total_input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
-        total_output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
-        total_cost = total_input_cost + total_output_cost
+    try:
+        prices = [
+            calc_price(
+                Usage(input_tokens=r["stats"]["input_tokens"], output_tokens=r["stats"]["output_tokens"]),
+                model,
+                provider_id="anthropic",
+            )
+            for r in results
+        ]
+    except LookupError:
+        prices = None
+    if prices:
+        total_input_cost = float(sum(p.input_price for p in prices))
+        total_output_cost = float(sum(p.output_price for p in prices))
+        total_cost = float(sum(p.total_price for p in prices))
 
         # Add cost to each result
-        for result in results:
-            stats = result["stats"]
-            input_cost = (stats["input_tokens"] / 1_000_000) * pricing["input"]
-            output_cost = (stats["output_tokens"] / 1_000_000) * pricing["output"]
-            stats["total_cost_usd"] = round(input_cost + output_cost, 6)
+        for result, price in zip(results, prices):
+            result["stats"]["total_cost_usd"] = round(float(price.total_price), 6)
 
     # Output results
     click.echo()
@@ -696,12 +685,15 @@ def main(
     click.echo(f"Output tokens: {total_output_tokens:,}")
     click.echo(f"Total tokens:  {total_input_tokens + total_output_tokens:,}")
     click.echo()
-    if pricing:
+    if prices:
         click.echo(f"Input cost:  ${total_input_cost:.6f}")
         click.echo(f"Output cost: ${total_output_cost:.6f}")
         click.echo(f"Total cost:  ${total_cost:.6f}")
     else:
-        click.secho(f"Cost: unknown — no pricing recorded for {model} (add it to PRICING)", fg="yellow")
+        click.secho(
+            f"Cost: unknown — no price for {model} in genai-prices (try `uv lock --upgrade-package genai-prices`)",
+            fg="yellow",
+        )
 
     # Always keyed by topic slug, single-topic runs included: the site reads the
     # file as a mapping of topics, and a bare entry object indexes to nothing at

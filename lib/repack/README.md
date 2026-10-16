@@ -64,6 +64,10 @@ The `repack_frame()` method simply does this across every column in your DataFra
 
 ## Releases
 
+- `0.1.13`:
+    - Dev tooling only (ruff 0.16.10, ty 0.0.85); no code changes
+- `0.1.12`:
+    - Support pandas 3 (`pandas>=2.2.3,<4`); `str` columns are repacked like object columns
 - `0.1.3`:
     - Improve performance on float dtypes
 - `0.1.2`:

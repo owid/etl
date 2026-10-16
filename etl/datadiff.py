@@ -1223,7 +1223,7 @@ def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Seri
     # align tables by index
     table_a["_x"] = 1
     table_b["_x"] = 1
-    table_a, table_b = table_a.align(table_b, join="outer", copy=False)
+    table_a, table_b = table_a.align(table_b, join="outer")
 
     new_index = table_a["_x"].isnull()
     removed_index = table_b["_x"].isnull()

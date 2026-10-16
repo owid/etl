@@ -109,9 +109,8 @@ def test_build_feed_metadata(table):
 
     # Grapher's `BespokeMetadata` fields, at the top level.
     assert metadata["title"] == "Causes of death"
-    # The source line grapher would put under a chart built on this column, rather than a string
-    # typed into the step.
-    assert metadata["attribution"] == "IHME, Global Burden of Disease (2024)"
+    # With no custom source line, grapher builds it from the origins, as under a chart.
+    assert "attribution" not in metadata
     assert metadata["origins"][0]["producer"] == "IHME, Global Burden of Disease"
     assert metadata["updatePeriodDays"] == 1460
     # A single-column feed also gets the column's description and unit.
@@ -139,6 +138,33 @@ def test_build_feed_metadata_of_several_columns(table):
     assert "descriptionShort" not in metadata
     # The processing level combines: one minor column and one without a level is minor.
     assert metadata["processingLevel"] == "minor"
+
+
+def test_build_feed_metadata_keeps_a_custom_source_line(table):
+    table._fields["value"].presentation.attribution = "Our World in Data based on IHME (2024)"
+
+    metadata = bespoke.build_feed_metadata("Causes of death", {"Deaths": table["value"]})
+
+    assert metadata["attribution"] == "Our World in Data based on IHME (2024)"
+
+
+def test_build_feed_metadata_combines_a_custom_source_line_with_other_columns(table):
+    """As grapher does for a chart: the custom line, then the other columns' sources, each listed once."""
+    table._fields["value"].presentation.attribution = "Our World in Data based on IHME (2024)"
+    other = Origin(producer="Other producer", title="Other data", date_published="2023-01-01")
+    table["population"] = 67e6
+    table._fields["population"] = VariableMeta(title="Population", unit="people", origins=[ORIGIN, other])
+    table["births"] = 7e5
+    table._fields["births"] = VariableMeta(title="Births", unit="births", origins=[other])
+
+    metadata = bespoke.build_feed_metadata(
+        title="Causes of death",
+        columns={"Deaths": table["value"], "Population": table["population"], "Births": table["births"]},
+    )
+
+    assert metadata["attribution"] == (
+        "Our World in Data based on IHME (2024); IHME, Global Burden of Disease (2024); Other producer (2023)"
+    )
 
 
 def test_build_feed_metadata_keeps_a_license_without_url(table):

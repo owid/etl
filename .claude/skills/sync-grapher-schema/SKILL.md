@@ -107,7 +107,7 @@ Hand-written types (e.g. `GroupViewsConfig`) live in `etl/viz/chart/model/params
 make check
 ```
 
-`test_grapher_config_schema_sync` pinpoints any enum value or property still missing from the embedded block (exact JSON path in the failure message) — iterate on step 3 until green.
+`test_grapher_config_schema_sync` pinpoints anything upstream accepts that the embedded block would reject — a missing enum value, a missing property at any depth, or a `required` key upstream dropped — with the exact JSON path in the failure message. Iterate on step 3 until green.
 
 ### 6. Commit & PR description
 

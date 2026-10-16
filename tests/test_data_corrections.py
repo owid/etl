@@ -421,3 +421,35 @@ def test_load_corrections_rejects_both_entity_and_match(tmp_path):
     )
     with pytest.raises(AssertionError, match="exactly one of"):
         load_corrections(p)
+
+
+def test_load_corrections_expands_indicator_list(tmp_path):
+    p = tmp_path / "x.corrections.yml"
+    p.write_text(
+        "- indicator: [a, b]\n"
+        "  entity: Panama\n"
+        "  years: all\n"
+        "  action: override\n"
+        "  value: null\n"
+        "  expect: {gt: 0}\n"
+        "  reason: r\n"
+        "  producer: p\n"
+        "  status: open\n"
+    )
+    corrections = load_corrections(p)
+    # One entry per column, each keeping every other field (including its own `expect` guard).
+    assert [c["indicator"] for c in corrections] == ["a", "b"]
+    assert all(c["expect"] == {"gt": 0} and c["entity"] == "Panama" for c in corrections)
+
+    tb = Table({"country": ["Panama", "France"], "year": [2020, 2020], "a": [1.0, 2.0], "b": [3.0, 4.0]})
+    out = apply_corrections(tb, corrections)
+    assert out["a"].isna().tolist() == [True, False]
+    assert out["b"].isna().tolist() == [True, False]
+
+
+@pytest.mark.parametrize("indicator", [[], ["a", ""], ["a", "a"], [1]])
+def test_validate_rejects_malformed_indicator_list(indicator):
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="'indicator'"):
+        _validate_correction(_correction(indicator=indicator, entity="Panama", years="all"), "x.yml")

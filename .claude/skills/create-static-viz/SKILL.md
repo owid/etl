@@ -230,10 +230,12 @@ wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 If neither resolves it, ask. Guessing which dataset an old hand-drawn image was built from is how
 you rebuild the wrong chart.
 
-The project tracks which viz is claimed, parked or already done in a shared tracker, and this
-skill deliberately does not read or write it — **ask instead**. If the user has not already said
-where this viz stands, ask before doing any work: a viz someone else is mid-way through, or one
-already finished, is worth an interruption rather than a duplicate.
+The project tracks which viz is claimed, parked or already done in a shared tracker — the
+**Tracker** column of the [static viz popularity report](https://claude.ai/code/artifact/03d7947f-9c7e-450e-a81b-ee0c68509af9)
+— and this skill deliberately does not read or write it — **ask instead**. If the user has not
+already said where this viz stands, ask before doing any work, and give them that link so they can
+check: a viz someone else is mid-way through, or one already finished, is worth an interruption
+rather than a duplicate.
 
 **Read [reference/GOTCHAS.md](reference/GOTCHAS.md) → Data before you use a single column.** Those
 checks are pre-flight, not post-mortem: a column whose name means something other than what it
@@ -351,10 +353,15 @@ Then, in this order:
 
    ```bash
    .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py <step-dir> \
-       --template <name> --expect-gid <data-layer> [--expect-gid <data-layer> ...]
+       --template <name> --require-named-marks --expect-gid <data-layer> [--expect-gid <data-layer> ...]
    ```
 2. **Read the PNG.** The verifier cannot see a collision, a widow, or a label sitting on a curve.
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
+3. **Check every reader-facing string before the Figma handoff**:
+   `.venv/bin/codespell --ignore-words=.codespell-ignore.txt <step-dir>`,
+   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note.
+   Each wording fix after the import costs a re-import, the colour bindings again and a full Step 8c
+   pass.
 
 ## Step 6 — Iterate with the user
 
@@ -390,6 +397,14 @@ must be exact and `margins` must pass — a failure there is real, not this rout
 footer frame's top, which a band derived from line-box arithmetic misses by a few px, so a page
 asserting a 14 px inset can read a few px above the 12–16 target. Report both numbers and
 name the datum the step used — [TEMPLATES.md](TEMPLATES.md) has the measurements and which to prefer.
+To make it exact rather than explained, reserve each block that opens or closes the band from its ink
+(WRITING-THE-STEP.md → Anchor and baseline). The crop takes a text node's top and bottom from its ink
+too, so the frame's box then is the ink.
+
+**On a refresh whose geometry changed, re-import with the job's `inheritStyles: true`.** The script then
+binds every colour to the style the existing frame bound it to, renamed and new nodes included, and
+refuses any colour the old frame never used. No hand-kept table of style ids is needed in the step's
+docstring. A step whose docstring gives its own repaint recipe follows that recipe instead.
 
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
 checks key off them and skip when they are absent.** On a correct frame drawn by a local generator
@@ -479,7 +494,13 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 Report which of these are done and which are outstanding — the surrounding prose in particular
 tends to be forgotten, and a corrected chart under an uncorrected caption is worse than neither.
 
-Finally, **remind the user to set the viz's status in the tracker themselves**, and give them the
-PR link to record against it. This skill never reads or writes the tracker — it is a shared team
-database, the person running the refresh knows the state of their own queue, and a status is a
-claim about human intent that an automated flow should not be making.
+Finally, **remind the user to set the viz's status in the tracker themselves.** Give them the
+[report link](https://claude.ai/code/artifact/03d7947f-9c7e-450e-a81b-ee0c68509af9)
+and the PR link, and tell them to find the viz's row and, in its **Tracker** column, pick a status
+(Propose, Tackle, On the bench, Blocked, Done) and add a comment with the PR link and where the
+refresh stands. The column reads and writes through the viewer's own Notion connector, so the
+first edit asks them to connect Notion in claude.ai. Skip the reminder when the user is this
+skill's `metadata.owner`, who keeps the tracker current through their own flow. This skill never
+reads or writes the tracker — it is a shared team database, the person running the refresh knows
+the state of their own queue, and a status is a claim about human intent that an automated flow
+should not be making.
