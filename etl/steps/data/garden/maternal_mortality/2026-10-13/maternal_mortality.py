@@ -103,7 +103,7 @@ def run(dest_dir: str) -> None:
     tb_wpp_births = ds_wpp.read("births", safe_types=False)
 
     # calculate maternal mortality ratio/ rate out of WHO mortality database and UN WPP
-    tb_who_mortality = tb_who_mortality.rename(columns={"number": "maternal_deaths"})[
+    tb_who_mortality = tb_who_mortality.rename(columns={"deaths": "maternal_deaths"})[
         ["country", "year", "maternal_deaths"]
     ]
     tb_who_mortality = tb_who_mortality[tb_who_mortality["year"] <= LATEST_YEAR]

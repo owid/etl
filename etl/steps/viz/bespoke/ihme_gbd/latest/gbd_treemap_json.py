@@ -29,7 +29,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def create_metadata_json(tb_filtered: Table, source: str) -> tuple[dict, dict]:
+def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
     """Create the metadata JSON structure."""
     # Get unique values for mappings
     countries = sorted(tb_filtered["country"].unique())
@@ -137,7 +137,6 @@ def create_metadata_json(tb_filtered: Table, source: str) -> tuple[dict, dict]:
     # Create metadata JSON
     metadata = {
         "timeRange": {"start": int(tb_filtered["year"].min()), "end": int(tb_filtered["year"].max())},
-        "source": source,
         "categories": categories_list,
         "dimensions": {"entities": entities, "ageGroups": age_groups, "sexes": sex_list, "variables": variables},
     }
@@ -218,7 +217,7 @@ def run() -> None:
     )
 
     # Create metadata
-    metadata, mappings = create_metadata_json(tb_filtered, source=feed_metadata["attribution"])
+    metadata, mappings = create_metadata_json(tb_filtered)
 
     #
     # Write the JSON files. The framework syncs the output folder to R2 afterwards.

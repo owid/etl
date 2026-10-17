@@ -9,7 +9,7 @@ tags:
 
     Hence, we do not recommend using `ENV_FILE` unless you are aware of what it comprises. -->
 
-In ETL, we often have to interact with a external services (including some of ours), such as our database, OpenAI models, cloud buckets, APIs, etc.
+In ETL, we often have to interact with a external services (including some of ours), such as our database, LLM APIs, cloud buckets, APIs, etc.
 
 To this end, we work with `.env` files, where we define all the required environment variables. An example template is available in the root directory of the repository (see [:fontawesome-brands-github: .env.example](https://github.com/owid/etl/blob/master/.env.example)). Based on this file, staff members create their own `.env` file.
 
@@ -133,7 +133,8 @@ for instance
 
 `.env` files can have some of the following variables defined in them:
 
-- `OPENAI_API_KEY`: OpenAI API key. Used to access OpenAI's models.
+- `ANTHROPIC_API_KEY`: Anthropic API key. Used by the wizard's AI summaries, `etl pr` branch names, `etl inspector`, `etl chart-critic` and `scripts/vocabulary` (see `.env.example`).
+- `OPENAI_API_KEY`: OpenAI API key. Only used by the WDI metadata updater (`update_wdi_metadata.py`).
 - `R2_*`: Variables used to access our cloud bucket.
 - `DATA_API_ENV`: The environment where the data API is running.
 - `DEBUG`: Set to `1` to enable debug mode (faster local development).

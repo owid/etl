@@ -59,11 +59,10 @@ def clean_who_mortality_data(tb: Table, cause: str) -> Table:
             "sex",
             "age_group",
             "cause",
-            "percentage_of_cause_specific_deaths_out_of_total_deaths",
-            "age_standardized_death_rate_per_100_000_standard_population",
-            "death_rate_per_100_000_population",
+            "share_of_deaths",
+            "death_rate_age_standardized",
+            "death_rate",
         ]
     )
-    tb = tb.rename(columns={"number": "deaths"})
 
     return tb

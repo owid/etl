@@ -12,8 +12,8 @@ etl chart-critic --sample 20
 # the 50 most-viewed charts, with an HTML report
 etl chart-critic --top 50 --output /tmp/critic.html
 
-# cheapest tier, no renders, and see the bill before spending it
-etl chart-critic --sample 100 --cheap --no-image --dry-run
+# no renders, and see the bill before spending it
+etl chart-critic --sample 100 --no-image --dry-run
 ```
 
 Roughly $0.04 per chart with the render attached on the default model at the default three passes,
@@ -39,7 +39,6 @@ from rich.table import Table
 from apps.chart_critic import cache, digest, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
-    CHEAP_MODEL,
     DEFAULT_MODEL,
     build_agent,
     claim_tokens,
@@ -389,7 +388,6 @@ def _review_one(
 )
 @click.option("--seed", type=int, default=0, show_default=True, help="Sampling seed, so a run is reproducible.")
 @click.option("--model", type=str, default=DEFAULT_MODEL, show_default=True, help="Model to review with.")
-@click.option("--cheap", is_flag=True, help=f"Use {CHEAP_MODEL} instead — an order of magnitude cheaper.")
 @click.option("--no-image", is_flag=True, help="Send metadata and numbers only, without the chart render.")
 @click.option(
     "--repeat",
@@ -493,7 +491,6 @@ def cli(
     min_views: int,
     seed: int,
     model: str,
-    cheap: bool,
     no_image: bool,
     repeat: int,
     views: int,
@@ -515,9 +512,6 @@ def cli(
         removed, freed = cache.clear()
         console.print(f"Cleared {removed} cached files ({freed:.1f} MB) from {cache.CRITIC_CACHE_DIR}")
         return
-
-    if cheap:
-        model = CHEAP_MODEL
 
     cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
 

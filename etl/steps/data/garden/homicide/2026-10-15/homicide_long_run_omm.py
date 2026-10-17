@@ -53,6 +53,8 @@ def get_who_mortality_db() -> Table:
     # Database as a drill-down inside Intentional injuries.
     ds_who_db = paths.load_dataset("mortality_database")
     tb_who = ds_who_db.read("intentional_injuries")
+    # The merged dataset names the metric `death_rate`; this step keeps the longer name its own indicators are built on.
+    tb_who = tb_who.rename(columns={"death_rate": "death_rate_per_100_000_population"}, errors="raise")
     # Just pull out the rows for violence, all ages and both sexes
     tb_who = tb_who[
         (tb_who["cause"] == "Violence") & (tb_who["age_group"] == "all ages") & (tb_who["sex"] == "Both sexes")
