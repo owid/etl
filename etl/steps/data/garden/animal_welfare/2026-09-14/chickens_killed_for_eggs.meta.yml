@@ -1,0 +1,92 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+    processing_level: major
+    description_processing: |-
+      FAOSTAT has no data for some countries in some years. Those gaps are filled by repeating the latest reported value, for at most five years.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  chickens_killed_for_eggs:
+    title: Chickens killed for eggs
+    variables:
+      laying_hens:
+        title: Number of laying hens
+        unit: hens
+        short_unit: ""
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      eggs_produced:
+        title: Number of eggs produced
+        unit: eggs
+        short_unit: ""
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      hens_killed:
+        title: Estimated number of hens killed to produce eggs
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      male_chickens_killed:
+        title: Estimated number of male chickens killed to produce eggs
+        unit: chickens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      chickens_killed:
+        title: Estimated number of chickens killed to produce eggs
+        unit: chickens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      male_embryos_removed:
+        title: Estimated number of male embryos removed before hatching
+        unit: embryos
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      share_of_males_spared:
+        title: Share of male chicks spared by in-ovo sexing
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      chickens_killed_per_1000_eggs:
+        title: Estimated number of chickens killed to produce eggs per 1,000 eggs
+        unit: chickens per 1,000 eggs
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      hens_killed_per_capita:
+        title: Estimated number of hens killed to produce eggs per person
+        unit: hens per person
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+      male_chickens_killed_per_capita:
+        title: Estimated number of male chickens killed to produce eggs per person
+        unit: chickens per person
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+      chickens_killed_per_capita:
+        title: Estimated number of chickens killed to produce eggs per person
+        unit: chickens per person
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+      male_embryos_removed_per_capita:
+        title: Estimated number of male embryos removed before hatching per person
+        unit: embryos per person
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
