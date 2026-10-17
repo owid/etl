@@ -123,6 +123,9 @@ def update_metadata_from_dict(
             # NOTE: this could be further flattened if we run into it
             assert all(isinstance(x, str) for x in meta_dict["description_key"])
 
+        for annotation in meta_dict.get("annotations") or []:
+            _validate_annotation_dict(annotation, v_short_name)
+
         # convert to objects
         tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
 
@@ -263,6 +266,14 @@ def _validate_variables_all_miss(t_annot: dict, tb: Table) -> None:
             f"neither exactly nor as a long-format prefix of a pivoted column. "
             f"This usually means the YAML keys are wrong — for grapher overrides, "
             f"remember that long_to_wide adds dimension suffixes like `__sex_both_sexes`."
+        )
+
+
+def _validate_annotation_dict(annotation: dict[str, Any], variable: str) -> None:
+    """Catch a string in `entities`, which converting the annotation to an object would split into letters."""
+    if isinstance(annotation.get("entities"), str):
+        raise TypeError(
+            f"Annotation of variable {variable} must list its entities, e.g. `entities: [{annotation['entities']}]`."
         )
 
 
