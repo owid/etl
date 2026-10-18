@@ -113,12 +113,20 @@ steps:
     - data://garden/faostat/2026-02-25/faostat_qcl
     - data://garden/regions/2023-01-01/regions
   #
+  # USDA NASS - Laying hens and egg-type chicks in the United States (Quick Stats).
+  #
+  data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks:
+    - snapshot://usda_nass/2026-10-18/us_laying_hens_and_chicks.csv
+  data://garden/usda_nass/2026-10-18/us_laying_hens_and_chicks:
+    - data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks
+  #
   # Chickens killed for eggs (OWID estimate based on FAOSTAT and in-ovo sexing market penetration).
   #
   data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs:
     - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs:
       - data://garden/faostat/2026-02-25/faostat_qcl
       - data://garden/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration
+      - data://garden/usda_nass/2026-10-18/us_laying_hens_and_chicks
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population

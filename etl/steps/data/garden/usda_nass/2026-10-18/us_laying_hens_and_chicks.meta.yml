@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  us_laying_hens_and_chicks:
+    variables:
+      layers_sold_for_slaughter:
+        title: Layers sold for slaughter
+        unit: hens
+        description_short: Number of laying hens sold for slaughter during the year.
+        description_processing: We add up USDA's monthly figures from December of the previous year through November, which is the period of USDA's annual estimates for layers.
+      layers_lost:
+        title: Layers rendered, died, destroyed, composted, or disappeared
+        unit: hens
+        description_short: Number of laying hens that were rendered, died, were destroyed, composted, or disappeared for any reason other than being sold, during the year.
+        description_processing: We add up USDA's monthly figures from December of the previous year through November, which is the period of USDA's annual estimates for layers.
+      egg_type_chicks_hatched:
+        title: Egg-type chicks hatched
+        unit: chicks
+        description_short: Number of egg-type chicks hatched during the calendar year.
+        description_processing: We add up USDA's monthly figures from January through December.
+      average_layers:
+        title: Average number of layers
+        unit: hens
+        description_short: Average number of laying hens on hand during the year.
+      young_chickens_slaughtered:
+        title: Young chickens slaughtered
+        unit: chickens
+        description_short: Number of young chickens (broilers and fryers) slaughtered in federally inspected plants during the calendar year.
+      mature_chickens_slaughtered:
+        title: Mature chickens slaughtered
+        unit: chickens
+        description_short: Number of mature chickens (light and heavy fowl, that is, spent laying and breeding hens) slaughtered in federally inspected plants during the calendar year.
+      chickens_slaughtered:
+        title: Chickens slaughtered
+        unit: chickens
+        description_short: Number of chickens, young and mature, slaughtered in federally inspected plants during the calendar year.
