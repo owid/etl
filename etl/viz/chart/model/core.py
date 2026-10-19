@@ -909,8 +909,8 @@ class Chart(MDIMBase):
         """Fail when an mdim or single chart pins no schema version.
 
         The pin has to live in the config, because it is the only record of what the view configs
-        were authored against: without one, the version Grapher is told about is whatever this repo
-        vendors on the day the step runs, which (a) claims the config is already current, so a
+        were authored against: without one, the version Grapher is told about is whatever
+        `DEFAULT_GRAPHER_SCHEMA` is on the day the step runs, which (a) claims the config is already current, so a
         config written against an older schema skips migration, and (b) silently changes the next
         time the step runs after a version bump. `multidim-schema.json` requires the field, which
         catches every authored config; this re-check covers charts built without schema

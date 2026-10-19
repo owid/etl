@@ -71,7 +71,7 @@
             "requirement_level": "required",
             "guidelines": [
                 [
-                    "Pin the version explicitly — ETL fails without it. There is no fallback on purpose: an unpinned config would resolve to whatever version the repo vendors on the day the step runs, which both claims the config is already current (so a breaking schema change skips the migration) and silently changes on the next run after a version bump."
+                    "Pin the version explicitly — ETL fails without it. There is no fallback on purpose: an unpinned config would resolve to whatever `DEFAULT_GRAPHER_SCHEMA` is on the day the step runs, which both claims the config is already current (so a breaking schema change skips the migration) and silently changes on the next run after a version bump."
                 ],
                 [
                     "Two forms are accepted: the short three-digit version (`\"011\"`) or the full schema URL."
@@ -905,8 +905,18 @@
                     ]
                 },
                 "display": {
+                    "title": "Display configuration",
                     "type": "object",
-                    "description": "Overrides the display settings for the indicator. Validated by the grapher admin API when the config is upserted, not here. See the [grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.latest.json) for the available fields.",
+                    "description": "Display settings that override the indicator's default configuration. Neither ETL nor grapher validates them, so check spelling against `dimensions[].display` in the [grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.latest.json).",
+                    "requirement_level": "optional",
+                    "guidelines": [
+                        [
+                            "Only specify display options that need to be overridden."
+                        ],
+                        [
+                            "Common overrides include name, unit, and color settings."
+                        ]
+                    ],
                     "additionalProperties": true
                 }
             },

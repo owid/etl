@@ -231,7 +231,7 @@
                     },
                     "config": {
                         "type": "object",
-                        "description": "A subset of the grapher config. Validated by the grapher admin API when the config is upserted, not here. See the [grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.latest.json) for the available fields.",
+                        "description": "A subset of the grapher config. Neither ETL nor grapher validates it (explorers are upserted as TSV), so check spelling against the [grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.latest.json) for the available fields.",
                         "additionalProperties": true
                     },
                     "metadata": {

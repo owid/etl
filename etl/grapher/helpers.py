@@ -15,7 +15,6 @@ from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.db import get_engine, read_sql
 from etl.files import yaml_dump
 from etl.grapher.io import add_entity_code_and_name, trim_long_variable_name
@@ -733,7 +732,6 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             assert tab[col].m.origins, f"Column `{col}` must have at least one origin"
 
             _validate_ordinal_variables(tab, col)
-            _stamp_grapher_config_schema(tab, col)
             _validate_time_interval(tab, col)
 
             # Data Page title uses the following fallback
@@ -795,17 +793,6 @@ def _validate_time_interval(tab: Table, col: str) -> None:
         assert time_interval in TIME_INTERVALS, (
             f"Column `{col}` has display.timeInterval='{time_interval}', which is not one of {sorted(TIME_INTERVALS)}."
         )
-
-
-def _stamp_grapher_config_schema(tab: Table, col: str) -> None:
-    """Stamp `$schema` on an indicator's grapher config if it doesn't carry one.
-
-    Grapher keys its config migrations on this version and rejects a config without it.
-    The config's *structure* is validated by the grapher admin API on upsert, not here.
-    """
-    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
-    if grapher_config:
-        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:

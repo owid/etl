@@ -48,7 +48,7 @@ def resolve_grapher_schema(value: str | int | None) -> str:
     - full:  `grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json`
 
     `None` is rejected. There is deliberately no fallback: resolving an unpinned chart to
-    whatever version the repo happens to vendor today would tell Grapher the config is already
+    whatever `DEFAULT_GRAPHER_SCHEMA` happens to be today would tell Grapher the config is already
     current, so a config authored against an older schema would skip migration — and the same
     config would resolve to a *different* version the next time the step runs. The pin has to be
     recorded in the config itself.

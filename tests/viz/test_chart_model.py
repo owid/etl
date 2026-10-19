@@ -2457,8 +2457,8 @@ def test_validate_grapher_schema_pinned():
     """
     Test Chart.validate_grapher_schema_pinned - an unpinned mdim fails, an explorer doesn't.
 
-    There is no default on purpose: an unpinned config would resolve to whatever version the repo
-    vendors on the day the step runs, so it both claims to be current and changes meaning after the
+    There is no default on purpose: an unpinned config would resolve to whatever `DEFAULT_GRAPHER_SCHEMA`
+    is on the day the step runs, so it both claims to be current and changes meaning after the
     next version bump. Explorers are exempt — the legacy TSV path has no `grapherConfigSchema`, and
     `Explorer.__post_init__` rejects the field outright.
     """

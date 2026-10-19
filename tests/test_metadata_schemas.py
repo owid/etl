@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 from pathlib import Path
@@ -66,15 +67,13 @@ def _strip_jinja_templated_values(obj):
 
 
 def _strip_jinja_from_typed_blocks(ind):
-    """Strip Jinja templates from the two blocks of an indicator that hold typed fields.
+    """Strip Jinja templates from an indicator's `display` block, which holds typed fields.
 
-    `display` (numDecimalPlaces, timeInterval, …) and
-    `presentation.grapher_config` (yAxis.min/max, yEquals, …) declare enums and
-    numbers, which a Jinja template never satisfies statically. Those validate
-    at runtime once the dimensions are known — `_expand_jinja` renders them, and the
-    grapher admin API validates grapher_config when the indicator is upserted.
-    Every other field (description_short, title_public, …) is typed
-    `string` in the schema, so a Jinja template passes and keeps its coverage.
+    `display` (numDecimalPlaces, timeInterval, …) declares enums and numbers, which a Jinja
+    template never satisfies statically. Those validate at runtime once the dimensions are
+    known, when `_expand_jinja` renders them. Every other field (description_short,
+    title_public, …) is typed `string` in the schema, so a Jinja template passes and keeps its
+    coverage. `presentation.grapher_config` is an open object here, so it needs no stripping.
 
     Applied to each indicator *and* to `definitions.common`, which the schema
     `$ref`s to the very same indicator definition (#6674).
@@ -82,9 +81,6 @@ def _strip_jinja_from_typed_blocks(ind):
     if not isinstance(ind, dict):
         return
     _strip_jinja_templated_values(ind.get("display"))
-    presentation = ind.get("presentation")
-    if isinstance(presentation, dict):
-        _strip_jinja_templated_values(presentation.get("grapher_config"))
 
 
 def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
@@ -238,11 +234,10 @@ def test_dataset_schemas():
 def test_jinja_in_typed_fields_is_stripped_from_definitions_common():
     """A Jinja-templated enum/numeric field must be skipped in `definitions.common` too.
 
-    `definitions.common` `$ref`s the indicator definition, so its `display` and
-    `presentation.grapher_config` carry the same enums and numbers a template can't
-    satisfy statically. Only `tables.*.variables.*` used to be sanitized, so the
-    first such template on master (`timeInterval` in covid/2024-11-05/github_stats,
-    #6613) broke every build until #6674.
+    `definitions.common` `$ref`s the indicator definition, so its `display` carries the
+    same enums and numbers a template can't satisfy statically. Only
+    `tables.*.variables.*` used to be sanitized, so the first such template on master (`timeInterval` in
+    covid/2024-11-05/github_stats, #6613) broke every build until #6674.
     """
     data = {
         "definitions": {
@@ -402,3 +397,23 @@ def test_no_newer_grapher_schema_version():
         f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
         "Bump DEFAULT_GRAPHER_SCHEMA in etl/config.py once grapher renders the new version."
     )
+
+
+def test_schemas_have_no_duplicate_keys():
+    """`json.load` silently keeps the last of two same-named keys, so a stale duplicate block
+    (e.g. a property pasted twice) would hide the copy that actually gets edited."""
+
+    def _reject_duplicates(pairs):
+        keys = [k for k, _ in pairs]
+        dupes = sorted({k for k in keys if keys.count(k) > 1})
+        if dupes:
+            raise ValueError(f"duplicate keys {dupes}")
+        return dict(pairs)
+
+    broken = []
+    for path in sorted(SCHEMAS_DIR.glob("*.json")):
+        try:
+            json.loads(path.read_text(), object_pairs_hook=_reject_duplicates)
+        except ValueError as e:
+            broken.append(f"{path.name}: {e}")
+    assert not broken, "Schemas with duplicate keys:\n  " + "\n  ".join(broken)
