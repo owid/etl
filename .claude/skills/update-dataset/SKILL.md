@@ -42,6 +42,7 @@ Assumptions:
 - [ ] Detect any `sanity_checks` functions and their log-control flags; append to `notes_to_check.md`
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
+- [ ] Find the producer's latest documentation for the new release (dataset page, methodology, codebook, main report, what's new); ask the user for anything missing, insufficient or inaccessible (see 3)
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Surface new indicators: check meadow + garden diffs (and snapshot columns when meadow hardcodes a column subset) for new-version columns absent from the old; warn user + PR body, flag new-but-dropped columns, route rename pairs to the step-7 mapping
@@ -83,6 +84,7 @@ Persistence:
 - Country harmonization has new unmatched countries that need manual decisions
 - The snapshot requires a manual download or credentials you don't have
 - Indicator upgrade had imperfect matches (< 100% similarity) that need human review
+- The producer's documentation for the new release is missing, insufficient or inaccessible (`.claude/rules/producer-documentation.md`)
 - Anything that could silently break charts or lose data
 
 **Don't stop for:**
@@ -208,6 +210,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
 3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
+
+   **Producer documentation for the new release.** While the snapshot runs, find the producer's latest documentation per `.claude/rules/producer-documentation.md`. The links carried over in the `.dvc` and `.meta.yml` point at the previous edition, so search for the current one. The what's-new notes tell you which changes to expect in the snapshot, meadow and garden diffs, and they feed the changelog. The methodology is what §6b contrasts the carried-over text against.
 
    **Hand-maintained snapshots + editorial data edits.** Some snapshots have no `url_download` — the `.py` prompts for `--path-to-file` and the docstring says the data was "provided by email" / curated by hand. When the update is a small editorial correction (the user gives you the facts directly, e.g. "country X did Y in year Z"), you can produce the new snapshot yourself: copy the *previous* version's data file (`data/snapshots/<ns>/<old_version>/<file>`), change only the specific cells, and **assert in a quick script exactly which rows/cells changed** (and that all others are byte-identical) before running `etls ... --path-to-file <edited>`. Then update the `.py` docstring to document the edit and bump the `.dvc` `date_published` / `citation_full` year (ask the user whether it's a new producer release or an OWID-applied edit — see step 6c). **Verify the user's stated facts against the existing data first** — some may already be encoded from a prior release. Tell the user what's already present rather than blindly re-adding it.
 
@@ -463,6 +467,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
    - **Jinja spacing and style guide** — `/check-metadata-style` on the grapher step. A mechanical pass first catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering; then it audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is usually needed — the skill checks the file's `Last synced from Notion` date and refreshes it from Notion (in a separate PR) when it is more than two months old.
    - **Clarity for a general audience** — read every user-facing field with non-specialist eyes. The other two skills enforce structure and style; this one judges whether the text is *understandable*.
+   - **Contrast the carried-over text with the new documentation** — `etl update` copies every `.meta.yml` and `.dvc` field verbatim, so read each indicator's text against the documentation found in step 3 (methodology, what's new) and propose a fix, citing the passage, for each claim that is wrong, stale or missing a caveat (`.claude/rules/producer-documentation.md`, "Contrast what's already written").
    - **Dimension sweep** (dimensional indicators only) — a sentence written for one breakdown renders on all the sibling views, where the view's own filtering can make it false: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Render the text per dimension value (the grapher channel already has it flattened) and read each output as a reader of that chart. Prefer qualifying the wording so it holds everywhere over adding a Jinja branch. Full version: check 5 of the canonical suite in `/generate-metadata`.
 
    ### Clarity checklist (do manually, no skill yet)

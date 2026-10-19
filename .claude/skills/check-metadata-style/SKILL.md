@@ -237,6 +237,8 @@ Match the pattern in [check-metadata-typos](../check-metadata-typos/SKILL.md) §
 - **Review each** — step through one at a time, user confirms/rejects/edits each.
 - **Cancel** — exit without changes.
 
+A fix that changes what the text claims, not just how it is worded, has to rest on the producer's documentation (`.claude/rules/producer-documentation.md`). Check it there before applying it, and ask the user when the documentation is missing or inaccessible.
+
 Apply fixes to the `.meta.yml` file with `ruamel_load` / `ruamel_dump` so comments and key ordering are preserved (see `CLAUDE.md` → *YAML Editing*):
 
 ```python

@@ -333,11 +333,11 @@ def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
         for label, bands in groups.items():
             tb_bands = tb[tb["cause"].isin(causes) & tb["age_group"].isin(bands)]
             tb_bands = pr.merge(tb_bands, tb_population, on=["country", "year", "sex", "age_group"], how="left")
-            grouped = tb_bands.groupby(keys, observed=True)[["number", "population"]]
+            grouped = tb_bands.groupby(keys, observed=True)[["deaths", "population"]]
             # count() ignores NaN, so requiring one contribution per band rejects any group where a band is
             # absent, reports no deaths, or has no recoverable population.
             tb_group = grouped.sum(min_count=1).where(grouped.count() == len(bands)).reset_index()
-            tb_group["death_rate_per_100_000_population"] = tb_group["number"] / tb_group["population"] * 100_000
+            tb_group["death_rate"] = tb_group["deaths"] / tb_group["population"] * 100_000
             tb_group["age_group"] = label
             tb_group = tb_group.drop(columns=["population"])
             _validate_derived_age_group(tb_group, label)
@@ -356,16 +356,14 @@ def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
 def _implied_population(tb: Table) -> Table:
     """The population WHO divided by, per country, year, sex and age band, recovered from All Causes.
 
-    WHO publishes a death rate next to every death count, so its denominator is `number / death_rate x
+    WHO publishes a death rate next to every death count, so its denominator is `deaths / death_rate x
     100,000`. It describes the population, not the cause, and All Causes reports at least one death in nearly
     every cell, so reading it there recovers it almost everywhere; reading it from a rare cause would not.
     """
-    tb_all = tb[tb["cause"] == "All Causes"][
-        ["country", "year", "sex", "age_group", "number", "death_rate_per_100_000_population"]
-    ]
-    rate = tb_all["death_rate_per_100_000_population"]
+    tb_all = tb[tb["cause"] == "All Causes"][["country", "year", "sex", "age_group", "deaths", "death_rate"]]
+    rate = tb_all["death_rate"]
     # A zero or missing rate carries no information about the population size.
-    tb_all["population"] = tb_all["number"] / rate.where(rate > 0) * 100_000
+    tb_all["population"] = tb_all["deaths"] / rate.where(rate > 0) * 100_000
     tb_all = tb_all.dropna(subset=["population"])[["country", "year", "sex", "age_group", "population"]]
     assert not tb_all.duplicated(subset=["country", "year", "sex", "age_group"]).any(), (
         "All Causes is not unique per cell"
@@ -375,7 +373,7 @@ def _implied_population(tb: Table) -> Table:
 
 def _validate_derived_age_group(tb_group: Table, label: str) -> None:
     """A rate of exactly zero must mean zero deaths, never an unknown denominator."""
-    deaths, rate = tb_group["number"], tb_group["death_rate_per_100_000_population"]
+    deaths, rate = tb_group["deaths"], tb_group["death_rate"]
     fabricated = tb_group[(rate == 0) & (deaths > 0)]
     assert len(fabricated) == 0, f"{label}: {len(fabricated)} rows report a death rate of 0 despite recording deaths"
     assert len(tb_group) > 0, f"{label}: no rows derived"
@@ -395,7 +393,7 @@ def build_most_common_cancer(tb: Table, tb_causes: Table) -> Table:
     the way the step this replaces wrote it: without the word "cancer(s)", commas read as "and". Ties keep
     the first type in the data's order, as before; their number is logged.
     """
-    rate = "age_standardized_death_rate_per_100_000_standard_population"
+    rate = "death_rate_age_standardized"
     cancers = set(tb_causes.loc[tb_causes["parent_cause"] == MALIGNANT, "cause"])
     tb_cancers = tb[tb["cause"].isin(cancers)]
     assert tb_cancers.loc[tb_cancers["age_group"] != "all ages", rate].isna().all(), (
@@ -474,12 +472,12 @@ def build_causes_table(tb: Table) -> Table:
 def _validate_input(tb: Table) -> None:
     """The meadow table is what the snapshot promises: unique keys, WHO's codes, non-negative counts."""
     assert len(tb) > 0, "Dataset is empty"
-    required = ["country", "year", "sex", "age_group", "cause", "icd10_codes", "number"]
+    required = ["country", "year", "sex", "age_group", "cause", "icd10_codes", "deaths"]
     missing = [column for column in required if column not in tb.columns]
     assert not missing, f"Missing columns: {missing}"
     assert not tb.duplicated(subset=["country", "year", "sex", "age_group", "cause"]).any(), "Duplicate rows"
     assert pd.api.types.is_integer_dtype(tb["year"]), "Year should be an integer"
-    assert (tb["number"].dropna() >= 0).all(), "Negative death counts"
+    assert (tb["deaths"].dropna() >= 0).all(), "Negative death counts"
     unexpected_sex = set(tb["sex"].unique()) - set(SEX_RENAMES)
     assert not unexpected_sex, f"Unexpected sex codes: {unexpected_sex}"
     unexpected_age = set(tb["age_group"].unique()) - set(AGE_GROUP_RENAMES)
@@ -503,8 +501,8 @@ def _validate_processed(tb: Table) -> None:
     for cause, sex in SEX_SPECIFIC_CAUSES.items():
         cause_data = tb[(tb["cause"] == cause) & (tb["age_group"] == "all ages")]
         other_sex = "Females" if sex == "Males" else "Males"
-        in_other_sex = cause_data.loc[cause_data["sex"] == other_sex, "number"].sum()
-        total = cause_data.loc[cause_data["sex"] == "Both sexes", "number"].sum()
+        in_other_sex = cause_data.loc[cause_data["sex"] == other_sex, "deaths"].sum()
+        total = cause_data.loc[cause_data["sex"] == "Both sexes", "deaths"].sum()
         share = float(in_other_sex) / float(total) if total else 0.0
         assert share <= MAX_SHARE_IN_OTHER_SEX, f"{cause}: {share:.2%} of deaths recorded in {other_sex.lower()}"
         if in_other_sex > 0:
@@ -548,12 +546,12 @@ def _partition_cells(tb: Table, tb_causes: Table) -> Table:
     known age band, because WHO allocates deaths of unknown age inconsistently across groups.
     """
     keys = ["country", "year", "sex", "age_group"]
-    total = tb.loc[tb["cause"] == "All Causes", keys + ["number", "death_rate_per_100_000_population"]].rename(
-        columns={"number": "total", "death_rate_per_100_000_population": "total_rate"}
+    total = tb.loc[tb["cause"] == "All Causes", keys + ["deaths", "death_rate"]].rename(
+        columns={"deaths": "total", "death_rate": "total_rate"}
     )
     parts = tb[tb["cause"].isin(_partition_groups(tb_causes))]
     summary = parts.groupby(keys, observed=True).agg(
-        parts=("number", lambda values: values.sum(min_count=1)), n_groups=("cause", "nunique")
+        parts=("deaths", lambda values: values.sum(min_count=1)), n_groups=("cause", "nunique")
     )
     required = (
         parts[["sex", "age_group", "cause"]]
@@ -634,7 +632,7 @@ def correct_unintentional_injuries(tb: Table, tb_causes: Table) -> Table:
 
     tb = pr.merge(tb, fix, on=keys, how="left")
     target = (tb["cause"] == CORRECTED_CAUSE) & tb["excess"].notna()
-    corrected = tb.loc[target, "number"].astype(float) - tb.loc[target, "excess"]
+    corrected = tb.loc[target, "deaths"].astype(float) - tb.loc[target, "excess"]
     # A cell whose Unintentional injuries count is smaller than the gap does not fit the mechanism: leave it.
     misfit = corrected < 0
     if misfit.any():
@@ -644,10 +642,10 @@ def correct_unintentional_injuries(tb: Table, tb_causes: Table) -> Table:
 
     total = tb.loc[target, "total"].astype(float)
     population = (total / tb.loc[target, "total_rate"].astype(float) * 100_000).where(tb.loc[target, "total_rate"] > 0)
-    tb.loc[target, "number"] = corrected.round().astype(tb["number"].dtype)
-    tb.loc[target, "percentage_of_cause_specific_deaths_out_of_total_deaths"] = corrected / total * 100
-    tb.loc[target, "death_rate_per_100_000_population"] = corrected / population * 100_000
-    tb.loc[target, "age_standardized_death_rate_per_100_000_standard_population"] = np.nan
+    tb.loc[target, "deaths"] = corrected.round().astype(tb["deaths"].dtype)
+    tb.loc[target, "share_of_deaths"] = corrected / total * 100
+    tb.loc[target, "death_rate"] = corrected / population * 100_000
+    tb.loc[target, "death_rate_age_standardized"] = np.nan
 
     # Rows of the group in affected country-years that the check could not see (incomplete or unknown-age cells).
     in_affected = pr.merge(tb.loc[tb["cause"] == CORRECTED_CAUSE, keys], affected, on=["country", "year"])
@@ -674,4 +672,4 @@ def _describe_correction(tb: Table, target: pd.Series, country: str, year: int) 
     if row.empty:
         return f"{country} {year}: not corrected"
     r = row.iloc[0]
-    return f"{country} {year}: {r['number'] + r['excess']:,.0f} -> {r['number']:,.0f} deaths (All Causes {r['total']:,.0f})"
+    return f"{country} {year}: {r['deaths'] + r['excess']:,.0f} -> {r['deaths']:,.0f} deaths (All Causes {r['total']:,.0f})"

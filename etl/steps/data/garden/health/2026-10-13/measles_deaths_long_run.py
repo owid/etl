@@ -31,8 +31,7 @@ def run() -> None:
         & (tb_pres["country"] == "United States")
         & (tb_pres["sex"] == "Both sexes")
     ]
-    tb_pres = tb_pres[["country", "year", "number"]]
-    tb_pres = tb_pres.rename(columns={"number": "deaths"})
+    tb_pres = tb_pres[["country", "year", "deaths"]]
     # Combine the historical and present data.
     tb = pr.concat([tb_phr, tb_cb, tb_pres], short_name="measles_deaths_long_run", ignore_index=True)
 
