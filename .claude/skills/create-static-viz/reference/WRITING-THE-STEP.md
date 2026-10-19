@@ -206,6 +206,15 @@ Then check which font `findfont` actually returned before trusting the per-face 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette
   position** (`palette[0]`, `palette[1]`) rather than pinned hexes, so the chart moves with the
   shared palette. seaborn is a `dev` dependency.
+- **Every stroke width in whole template pixels, written as `px * 0.72` points** — 3px for a series
+  line, 2px for a secondary or dashed one, 1px for gridlines, ticks and leaders. A width chosen in
+  points lands fractional in Figma (`linewidth=1.0` is a 1.39px gridline, 2.6pt a 3.61px line), and the
+  design team snaps them by hand. A dash is in multiples of the width, so a whole-pixel width with
+  integer dash multiples (a 1px gridline at `(4, 4)`) keeps the dash on whole pixels; a dash fixed in
+  points, divided by the width, stays fractional.
+- **A band shaded around a line is the line's own colour with `alpha`, not a tint blended toward
+  white.** Figma can then bind the band to the line's library style at reduced node opacity (the design
+  team uses 0.2), which a hand-mixed hex cannot be.
 ### Borrow grapher's design language, read from its source
 
 A static chart should read like our interactive ones, so take the axis, tick, facet and reference-line
@@ -408,6 +417,12 @@ header's last line. So after **any** change to a title, subtitle or note, re-rea
 template slot's height in Figma rather than trusting the step's own wrap, and check the header
 clearance on the frame.
 
+The firmer fix, once the frame exists: read where the Figma header ends off the frame and place the
+plot against that (`chart_area_top`, and the footer's first row below), with the house gap on each
+side, rather than against the step's own header. Then break the step's title and subtitle where the
+frame does, so the step's PNG shows the spacing that ships instead of the extra gap its narrower faces
+leave.
+
 Two things make that cheap. The step should reserve the *larger* of the two counts where they differ,
 so the failure mode is a generous gap rather than an overlap. And an orphan — a last line holding a
 word or two — is worth removing at the same time, because it is both a copy defect in its own right
@@ -507,6 +522,25 @@ step's own render:
   centring on each other *and* on whatever they label as soon as the font changes — the one case the
   anchor rule above cannot rescue, because there is no anchor to preserve. Grep an emitted SVG for
   `text-anchor` and any label missing one is this.
+- **Space a wrapped label's lines at Figma's own pitch.** A label typed in Figma in 14px Lato runs at
+  17px a line (line height AUTO), while matplotlib's default line spacing lands imported lines about
+  15px apart, so a re-import never matches a designer's typed label. With one call per line (above),
+  place the lines 17px apart.
+
+### Porting a designer's rework
+
+A designer who reworks the Figma frame has edited a copy the next re-import will overwrite, so each
+decision has to move into the step or its docstring:
+
+1. Diff their copy against your frame with `/owid-staff:create-figma-chart`'s `scripts/diff_frames.js`
+   (`referenceId` their copy, `frameId` yours) to list the decisions.
+2. Port each one: geometry, weights, sizes and wraps into the step; bindings, halos and house arrows
+   into the docstring's Figma recipe.
+3. Re-render, re-import and diff again, until only the deltas you chose remain. Record those in the
+   docstring.
+
+Compare ink, not boxes. Uneven visible gaps over an evenly placed chart group are padding left inside
+the group, not a spacing choice; keep the house spacing and ask the designer before porting them.
 
 ### Size a value column from its content, not from a round number
 

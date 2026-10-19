@@ -460,6 +460,10 @@ a defect.
 Write it in the imperative, as the step's own reference. If you catch yourself writing "we changed X",
 rewrite it as "set X to Y, because Z": the reader wants to reproduce the state, not the history.
 
+**A designer's rework of the frame goes back into the step, not only into the frame**, or the next
+re-import undoes it: [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) → *Porting a
+designer's rework* has the round trip.
+
 ## Step 9 — PR and the review chain
 
 The branch, worktree and draft PR already exist from Step 4. **Let the pre-commit hook run `make check`
