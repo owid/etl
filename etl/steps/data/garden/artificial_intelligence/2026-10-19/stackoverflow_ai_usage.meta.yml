@@ -23,7 +23,7 @@ tables:
         title: Share of professional software developers using AI tools
         unit: "%"
         short_unit: "%"
-        description_short: Share of professional developers who said they use AI tools in their work, in the annual Stack Overflow Developer Survey.
+        description_short: Share of professional developers who said they use AI tools in their work in the annual Stack Overflow Developer Survey.
         description_key:
           - Respondents chose to take part in the survey, which Stack Overflow promotes mainly through its own website, blog, and email list. They are not a random sample: people who use Stack Overflow often are more likely to see the survey, so the results may not represent all developers worldwide.
           - From 2023 to 2025, the survey asked “Do you currently use AI tools in your development process?” In 2025, the “yes” answer was split by how often people use AI tools (daily, weekly, or monthly or less often); we count all of them as using AI tools.
