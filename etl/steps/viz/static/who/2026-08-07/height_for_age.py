@@ -195,9 +195,9 @@ curvy arrow (`/create-figma-chart` -> `reference/ANNOTATIONS-AND-ARROWS.md`): a 
 filled dart, both bound to `Data Insights/Annotations` (`setStrokeStyleIdAsync` on the curve,
 `setFillStyleIdAsync` on the dart). Lay its tail and tip on the step's arrow, then delete the step's:
 
-- band: tail ~9px right of the end of the label's last line, at mid-height; curving clockwise, out to the
-  right then down, to a tip midway between the median and the band's top edge at
-  `band_label_target_age`;
+- band: tail ~6px right of the end of the label's last line (5.9px desktop, 6.6px mobile; the copy
+  keeps 6), at mid-height; curving clockwise, out to the right then down, to a tip midway between the
+  median and the band's top edge at `band_label_target_age`;
 - stunting: tail ~8px left of "Stunting cutoff:" (7.7px desktop, 7.3px mobile; the copy keeps 7.9), at
   mid-height; curving clockwise, out to the left then up, to a tip 3-7px under the dashed line at
   `stunting_label_age`.
@@ -433,9 +433,11 @@ LEADER_WIDTH = 1 * POINTS_PER_PIXEL
 # A filled dart about 8px long and 7px across, the house arrowhead's size, in points (the arrow is drawn
 # with `mutation_scale=1`, so these are not multiples of the font size).
 LEADER_HEAD = "-|>,head_length=5.8,head_width=2.5"
-# Air between an arrow's tail and its label, along the arc, in template px. The stunting arrow leaves its
-# label at a slant, so it needs more along the arc to keep the ~8px the design team's copy has across.
-LEADER_TAIL_CLEARANCE_PX = {"within-2-sd": 4, "stunting-cutoff": 9}
+# Air between an arrow's tail and its label, along the arc, in template px, set so each tail lands where
+# the design team's copy has it: ~6px past the band label's last line, ~8px before "Stunting cutoff:".
+# The band's is small because `line_end`'s Lato allowance overshoots on that line; the stunting arrow
+# leaves at a slant, so it needs more along the arc to keep its distance across.
+LEADER_TAIL_CLEARANCE_PX = {"within-2-sd": 0.5, "stunting-cutoff": 9}
 
 # Percentiles drawn as lines on top of the band, as (column, line width), so a specific centile
 # can be read off rather than only a range. Labelled directly in the Boys panel.
