@@ -17,7 +17,6 @@ dataset:
 
   owners:
     - Edouard Mathieu
-    - Pablo Arriagada
 tables:
   stackoverflow_ai_usage:
     variables:
@@ -27,11 +26,10 @@ tables:
         short_unit: "%"
         description_short: Share of professional developers who said they use AI tools in their work, in the annual Stack Overflow Developer Survey.
         description_key:
-          - Respondents chose to take part in the survey, and most found it through Stack Overflow's website, blog, and email list. They are not a random sample, so the results may not represent all developers worldwide.
-          - From 2023 to 2025, the survey asked "Do you currently use AI tools in your development process?". In 2025, the "yes" answer was split by how often people use AI tools (daily, weekly, or monthly or less often); we count all of them as using AI tools.
-          - In 2026, the question became "Do you currently use AI tools or AI agents in your role at work?", and respondents ticked the kinds of AI tools they use (such as coding assistants or chat tools) or "I don't use AI tools". We count everyone who ticked at least one kind of tool as using AI tools.
-          - From 2023 to 2025, professional developers are respondents who described themselves as "a developer by profession". The 2026 survey no longer asked this, so for 2026 we use respondents who said they "create code as a primary part of [their] job".
-          - The number of professional developers who answered the question ranges from {response_range}, depending on the year.
+          - Respondents chose to take part in the survey, and most found it through Stack Overflow’s website, blog, and email list. They are not a random sample, so the results may not represent all developers worldwide.
+          - From 2023 to 2025, the survey asked “Do you currently use AI tools in your development process?” In 2025, the “yes” answer was split by how often people use AI tools (daily, weekly, or monthly or less often); we count all of them as using AI tools.
+          - In 2026, the question became “Do you currently use AI tools or AI agents in your role at work?”, and respondents ticked the kinds of AI tools they use (such as coding assistants or chat tools) or “I don’t use AI tools”. We count everyone who ticked at least one kind of tool as using AI tools.
+          - From 2023 to 2025, professional developers are respondents who described themselves as “a developer by profession”. The 2026 survey no longer asked this, so for 2026 we use respondents who said they “create code as a primary part of [their] job”.
         description_processing: |-
           We calculate the share from the answers of each respondent, which Stack Overflow publishes. For each year, we keep the professional developers who answered the question, and divide the number who use AI tools by the total.
 
