@@ -192,10 +192,14 @@ The rhythm reproduces both templates exactly, which is the check that matters:
 > the logo's bottom edge, so `/owid-staff:create-figma-chart` crops its box to end **24 px** left of the
 > logo: **731** on the 850-wide pair, **420** on mobile. Wrap the step's own subtitle at that width
 > and count its lines there for `subtitle_lines`, because the narrower box can add a line and move
-> `band_top` by 19 px:
+> `band_top` by 19 px. Key the crop on the **template's** title count, not the step's: the two fonts
+> can disagree on a title near one line. Until the frame exists, wrap at the cropped width, which
+> reserves the larger count:
 >
 > ```python
-> subtitle_slot_px = logo_x - 24 - margin if title_lines == 1 else content_w  # logo_x: 771 / 460
+> # template_title_lines: the Figma title's line count, None until the frame exists
+> cropped = template_title_lines in (None, 1)
+> subtitle_slot_px = logo_x - 24 - margin if cropped else content_w  # logo_x: 771 / 460
 > ```
 >
 > Under a two-line title the subtitle keeps the full content width.

@@ -416,7 +416,8 @@ the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide
 differently, so the line counts can differ, and the step is reserving the chart area against the wrong
 one. It cannot be fixed from the step: it deliberately sets no fonts, so it cannot measure Lato.
 The slot's width matters as much as its size: under a one-line title the subtitle slot is cropped to
-clear the logo (731 / 420 px, TEMPLATES.md), so wrap at that width, not the content width.
+clear the logo (731 / 420 px, TEMPLATES.md), so wrap at that width, not the content width. Count the
+title's lines in the template, not the step, and wrap at the cropped width until that count is known.
 
 What this costs is a surprise on the *next copy edit*, not on the first build. Adding a single
 character — an Oxford comma, say — can tip a mobile subtitle from three lines to four in the
