@@ -63,16 +63,15 @@ https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25524-5
   Dated when the page was first placed, not when it was last refreshed, and it sits among the dated
   chart pages after the divider.
-- Frames **`how-do-people-spend-their-time-new`**, `29442:11` (850x1162), and
-  **`how-do-people-spend-their-time-mobile-new`**, `29442:520` (540x884), in the second row at
-  x=1930 and x=2850 — https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29442-11
-  This render, beside the design team's rework it replicates (the frame
-  `29148:1078`, x=1000). Each is a clone of the previous frame below, run taller with its footer
-  re-pinned to the bottom margin.
-- The previous render, frames **`how-do-people-spend-their-time`** (`26879:11`, x=1000) and
-  **`how-do-people-spend-their-time-mobile`** (`27518:8`, x=2550), on the first row, each with its
-  unstyled import parked to its left. Clones of `Static Chart Template_Vertical` (`5332:93`) and
-  `Static Chart Template_Mobile (example 2)` (`24590:32`).
+- Frame **`how-do-people-spend-their-time`**, `29442:11` (850x1162) —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29442-11
+  A clone of `Static Chart Template_Vertical` (`5332:93`, 850x1095) run 67px taller with its footer
+  re-pinned to the bottom margin, at x=1000, with its unstyled import parked at x=70 to the LEFT so the
+  page reads original then edited.
+- Frame **`how-do-people-spend-their-time-mobile`**, `29442:520` (540x884) —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29442-520
+  A clone of `Static Chart Template_Mobile (example 2)` (`24590:32`, 540x824) run 60px taller, at
+  x=2550, its own unstyled import parked at x=1930. The published 2023 image sits leftmost, at x=-860.
 
 **The node ids are a convenience; the frame NAME is the durable join.** It is the kebab-case slug the
 website exports the PNG by, so it is the one string shared by the layer panel, the exported file and
@@ -215,17 +214,31 @@ refuses. Run it with `inheritStyles: false` and `families: []` instead (country 
 the body style through `bodyTextParent`), then bind each palette hex to its `Default Palette/*` style,
 moving the SVG's paint opacity onto the node first, and the in-band Note to `Text/Gray 70`.
 
-**Then rebuild the desktop key as containers**, which an SVG cannot carry: per category, join the
-`key__<slug>-members` line nodes into one text (12px, 16px line height) and the `category__<slug>` lines
-into another (14px bold, auto line height), and stack them in a vertical auto-layout frame named
-`key__<slug>` inside `chart` — `itemSpacing` 3, no padding, both texts `FILL`, counter-axis aligned
-`MIN` (`MAX` for the right-aligned last block) — keeping each block's bottom edge and aligned side where
-the import put them. Rebind each text's fill style from the node it replaces. On mobile, move each
-row's chip, name and list into a horizontal auto-layout row `legend__<column>` (`itemSpacing` 5,
-centred) whose name and list sit in a nested row (`itemSpacing` 8, `LEGEND_NAME_GAP`), and stack the four
-rows in a vertical `legend` frame at the import's row pitch. That also fixes the name-to-list gap, which
-the import lays out in this step's wider font. A re-import replaces `chart`, so it replaces these too;
-re-run this after it.
+**Then rebuild the key as auto-layout containers**, which an SVG cannot carry, with
+`/owid-staff:create-figma-chart`'s `scripts/group_text_blocks.js`, run after the restyle and again after
+every re-import (it replaces `chart`, and the containers with it). Desktop, one block per category:
+
+    {"name": "key__<slug>", "direction": "VERTICAL", "itemSpacing": 3, "align": "MIN", "anchorY": "bottom",
+     "children": [{"merge": "key__<slug>-members", "lineHeight": 16}, {"merge": "category__<slug>", "lineHeight": null}]}
+
+with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile, one `legend` block stacking a
+row per category at the import's own pitch:
+
+    {"name": "legend", "direction": "VERTICAL", "itemSpacing": "keep", "align": "MIN", "anchorY": "top",
+     "children": [{"block": {"name": "legend__<column>", "direction": "HORIZONTAL", "itemSpacing": 5, "align": "CENTER",
+       "children": [{"node": "legend__<column>-chip"}, {"block": {"name": "legend__<column>-labels",
+         "direction": "HORIZONTAL", "itemSpacing": 8, "align": "CENTER",
+         "children": [{"merge": "legend__<column>", "lineHeight": null}, {"merge": "legend__<column>-members", "lineHeight": null}]}}]}}]}
+
+The nested row also fixes the name-to-list gap, which the import lays out in this step's wider font.
+
+**The gate's standing findings**, each accepted rather than open: the template's own 11px tagline and
+licence rows (`text-floor`, desktop); the desktop key rising beside the subtitle's shorter lines (`gap`
+top ~3.5px, the design team's layout); the mobile Note drawn in the band (`gap` bottom ~4.4px); the
+two-author licence run (`diff_against_template`, mobile). `color_audit.py --separated` on the four
+composited fills fails under red-green colour-blindness (closest: Paid work against Unpaid work, dE 8.2
+for protanopia). Every segment sits in a fixed position under its own key block, so position rather than
+hue carries the category; the palette is the design team's call.
 """
 
 import logging
