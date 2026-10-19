@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 import pytest
 from owid.catalog import (
+    Annotation,
     DatasetMeta,
+    Origin,
     Table,
     TableMeta,
     VariableMeta,
@@ -266,3 +268,90 @@ def test_grapher_checks_rejects_missing_date():
 
     with pytest.raises(AssertionError, match="1 row\\(s\\) with a missing `date`"):
         gh.grapher_checks(_FakeDataset([tb]))
+
+
+def _long_table_with_annotations(annotations: list[Annotation]) -> Table:
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France", "Spain", "Spain"],
+            "year": [2000, 2000, 2000, 2000],
+            "cause": ["A", "B", "A", "B"],
+            "deaths": [1, 2, 3, 4],
+        }
+    )
+    tb = Table(df.set_index(["country", "year", "cause"]))
+    tb.deaths.metadata = VariableMeta(title="Deaths", unit="deaths", annotations=annotations)  # ty: ignore[unresolved-attribute]
+    return tb
+
+
+def test_long_to_wide_keeps_annotations_of_matching_dimensions():
+    tb = _long_table_with_annotations(
+        [Annotation(text="Only cause A.", dimensions={"cause": "A"}), Annotation(text="Cause << cause >>.")]
+    )
+    wide = gh.long_to_wide(tb)
+    assert wide["deaths__cause_a"].m.annotations == [Annotation(text="Only cause A."), Annotation(text="Cause A.")]
+    assert wide["deaths__cause_b"].m.annotations == [Annotation(text="Cause B.")]
+
+
+@pytest.mark.parametrize(
+    "dimensions, error",
+    [({"sex": "female"}, "which the table does not have"), ({"cause": "C"}, "which match no data")],
+)
+def test_long_to_wide_rejects_annotations_scoped_to_missing_dimensions(dimensions, error):
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions=dimensions)])
+    with pytest.raises(ValueError, match=error):
+        gh.long_to_wide(tb)
+
+
+def _annotated_table(annotation: Annotation, display: dict | None = None) -> Table:
+    df = pd.DataFrame({"country": ["France", "France", "Spain"], "year": [2000, 2010, 2000], "value": [1.0, 2.0, None]})
+    tb = Table(df.set_index(["country", "year"]), short_name="tb")
+    tb["value"].metadata = VariableMeta(  # ty: ignore[unresolved-attribute]
+        title="Value", unit="", origins=[Origin(producer="P", title="T")], annotations=[annotation], display=display
+    )
+    return tb
+
+
+def test_grapher_checks_accepts_valid_annotations():
+    annotation = Annotation(text="Note.", entities=["France"], time=2000, time_end=2010)
+    gh.grapher_checks(_FakeDataset([_annotated_table(annotation)]))
+
+
+@pytest.mark.parametrize(
+    "annotation, display, error",
+    [
+        (Annotation(text="Note.", entities=["Spain"]), None, "entities without data \\['Spain'\\]"),
+        (Annotation(text="Note.", time=1990), None, "outside the column's data \\(2000 to 2010\\)"),
+        (Annotation(text="Note.", time="2000-01-01"), None, "must give its time as a year"),
+        (Annotation(text="Note."), {"entityAnnotationsMap": "France: Note."}, "sets both"),
+        (Annotation(text="Note.", dimensions={"cause": "A"}), None, "but the column has none"),
+    ],
+)
+def test_grapher_checks_rejects_invalid_annotations(annotation, display, error):
+    with pytest.raises(AssertionError, match=error):
+        gh.grapher_checks(_FakeDataset([_annotated_table(annotation, display)]))
+
+
+def _daily_table(annotation: Annotation, days_since_zero_day: bool) -> Table:
+    df = pd.DataFrame({"country": ["France", "France"], "date": ["2020-03-01", "2020-03-31"], "value": [1.0, 2.0]})
+    tb = Table(df)
+    tb["value"].metadata = VariableMeta(  # ty: ignore[unresolved-attribute]
+        title="Value", unit="", origins=[Origin(producer="P", title="T")], annotations=[annotation]
+    )
+    if days_since_zero_day:
+        tb = gh.adapt_table_with_dates_to_grapher(tb)
+        return tb.set_index(["country", "year"])
+    return tb.set_index(["country", "date"])
+
+
+@pytest.mark.parametrize("days_since_zero_day", [False, True])
+def test_grapher_checks_daily_annotations(days_since_zero_day):
+    valid = Annotation(text="Note.", time="2020-03-01", time_end="2020-03-31")
+    gh.grapher_checks(_FakeDataset([_daily_table(valid, days_since_zero_day)]))
+
+    for annotation, error in [
+        (Annotation(text="Note.", time="2020-04-01"), "outside the column's data \\(2020-03-01 to 2020-03-31\\)"),
+        (Annotation(text="Note.", time=2020), "must give its time as a YYYY-MM-DD date"),
+    ]:
+        with pytest.raises(AssertionError, match=error):
+            gh.grapher_checks(_FakeDataset([_daily_table(annotation, days_since_zero_day)]))
