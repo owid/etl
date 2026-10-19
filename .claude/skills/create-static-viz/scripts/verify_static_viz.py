@@ -20,12 +20,15 @@ plausible, and the problem only shows up once a designer opens the SVG:
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
   so the two can be saved with different arguments and only one of them end up cropped — and the SVG
-  is the file Figma consumes.
+  is the file Figma consumes. A layout that deliberately runs shorter or taller than its template
+  declares its own size with ``--size <stem>=<W>x<H>``, which replaces the template's ratio for that
+  frame.
 
 Usage:
     verify_static_viz.py <step-dir-or-file-stem> [--template horizontal|vertical|mobile|mobile-square]
     verify_static_viz.py <step-dir> --template horizontal --expect-gid boys__median
     verify_static_viz.py <step-dir> --require-named-marks
+    verify_static_viz.py <step-dir> --template horizontal --size height_for_age=850x615
 
 A step directory is scanned for every ``<name>.svg`` with a sibling ``<name>.png``; a file stem
 checks just that pair. Exits non-zero on the first failing pair, listing every failure for it.
@@ -100,15 +103,36 @@ def template_for(stem: str, default: str | None) -> str | None:
     return default
 
 
-def frame_failures(kind: str, width: float, height: float, template: str) -> list[str]:
-    """Return a failure if one saved frame's proportions do not match the template it targets."""
-    target_w, target_h = TEMPLATE_RATIOS[template]
-    actual, target = width / height, target_w / target_h
-    if abs(actual - target) > TOLERANCE:
+def parse_size(value: str) -> tuple[str, tuple[int, int]]:
+    """Parse a `--size <stem>=<W>x<H>` argument into the stem and its declared frame size."""
+    stem, sep, size = value.partition("=")
+    width, x, height = size.partition("x")
+    if not (sep and x and stem and width.isdigit() and height.isdigit() and int(width) and int(height)):
+        raise argparse.ArgumentTypeError(f"expected <stem>=<W>x<H>, e.g. height_for_age=850x615; got {value!r}")
+    return stem, (int(width), int(height))
+
+
+def frame_target(
+    stem: str, template: str | None, sizes: dict[str, tuple[int, int]]
+) -> tuple[str, tuple[int, int]] | None:
+    """What one frame's proportions should match, and what to call it: a declared size wins over a template."""
+    if stem in sizes:
+        return "declared", sizes[stem]
+    if template is not None:
+        return f"{template} template", TEMPLATE_RATIOS[template]
+    return None
+
+
+def frame_failures(kind: str, width: float, height: float, target: tuple[str, tuple[int, int]]) -> list[str]:
+    """Return a failure if one saved frame's proportions do not match the size it targets."""
+    name, (target_w, target_h) = target
+    actual, ratio = width / height, target_w / target_h
+    if abs(actual - ratio) > TOLERANCE:
         return [
-            f"{kind} frame is {width:g}x{height:g} (ratio {actual:.4f}) but the {template} template "
-            f"is {target_w}x{target_h} (ratio {target:.4f}). Something cropped the canvas — most "
-            'likely bbox_inches="tight" was passed to export_fig.'
+            f"{kind} frame is {width:g}x{height:g} (ratio {actual:.4f}) but the {name} size "
+            f"is {target_w}x{target_h} (ratio {ratio:.4f}). Something cropped the canvas — most "
+            'likely bbox_inches="tight" was passed to export_fig. A layout sized off the template on '
+            "purpose declares its size with --size <stem>=<W>x<H>."
         ]
     return []
 
@@ -180,7 +204,10 @@ def unnamed_marks(svg: str) -> dict[str, int]:
 
 
 def check_svg(
-    path: Path, expected_gids: list[str], template: str | None, require_named_marks: bool = False
+    path: Path,
+    expected_gids: list[str],
+    target: tuple[str, tuple[int, int]] | None,
+    require_named_marks: bool = False,
 ) -> list[str]:
     """Return a list of contract failures for one SVG."""
     svg = path.read_text()
@@ -244,7 +271,7 @@ def check_svg(
                 "A gid= passed to ax.bar lands on every bar; set one per bar from the returned container."
             )
 
-    if template is not None:
+    if target is not None:
         size = svg_frame_size(svg)
         if size is None:
             failures.append(
@@ -252,14 +279,14 @@ def check_svg(
                 "proportion could not be checked"
             )
         else:
-            failures += frame_failures("SVG", size[0], size[1], template)
+            failures += frame_failures("SVG", size[0], size[1], target)
 
     return failures
 
 
-def check_png(path: Path, template: str | None) -> list[str]:
+def check_png(path: Path, target: tuple[str, tuple[int, int]] | None) -> list[str]:
     """Return a list of contract failures for one PNG."""
-    if template is None:
+    if target is None:
         return []
     try:
         from PIL import Image
@@ -267,7 +294,7 @@ def check_png(path: Path, template: str | None) -> list[str]:
         return ["Pillow is not available, so the PNG frame proportion could not be checked"]
 
     width, height = Image.open(path).size
-    return frame_failures("PNG", width, height, template)
+    return frame_failures("PNG", width, height, target)
 
 
 def main() -> int:
@@ -280,6 +307,18 @@ def main() -> int:
             "template whose proportions both saved formats must match. A filename suffix (_mobile, "
             "_vertical, _square) wins over this, so a directory holding several frames checks each "
             "correctly; omit to skip the frame check entirely."
+        ),
+    )
+    parser.add_argument(
+        "--size",
+        action="append",
+        default=[],
+        type=parse_size,
+        metavar="STEM=WxH",
+        help=(
+            "the declared frame size of one output, by file stem, for a layout that runs shorter or "
+            "taller than its template on purpose (height_for_age=850x615); repeatable. Wins over both "
+            "--template and the filename suffix for that frame."
         ),
     )
     parser.add_argument(
@@ -319,13 +358,19 @@ def main() -> int:
         print(f"No SVG found for {args.target}", file=sys.stderr)
         return 2
 
+    sizes = dict(args.size)
+    unknown = sorted(set(sizes) - {svg.stem for svg in svgs})
+    if unknown:
+        print(f"--size names no output here: {', '.join(unknown)}", file=sys.stderr)
+        return 2
+
     failed = False
     for svg in svgs:
-        template = template_for(svg.stem, args.template)
-        failures = check_svg(svg, args.expect_gid, template, args.require_named_marks)
+        target = frame_target(svg.stem, template_for(svg.stem, args.template), sizes)
+        failures = check_svg(svg, args.expect_gid, target, args.require_named_marks)
         png = svg.with_suffix(".png")
         if png.exists():
-            failures += check_png(png, template)
+            failures += check_png(png, target)
         else:
             failures.append(f"no sibling PNG at {png.name} — export_fig should emit both formats")
 
@@ -335,7 +380,7 @@ def main() -> int:
             for failure in failures:
                 print(f"  - {failure}")
         else:
-            extra = f", frame matches {template}" if template else ""
+            extra = f", frame matches {target[0]} {target[1][0]}x{target[1][1]}" if target else ""
             text = svg.read_text()
             named = len({i for i in re.findall(r'\bid="([^"]+)"', text) if not GENERATED_ID.match(i)})
             unnamed = sum(unnamed_marks(text).values())

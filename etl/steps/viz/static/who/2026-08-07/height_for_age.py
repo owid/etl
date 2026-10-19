@@ -195,11 +195,12 @@ curvy arrow (`/create-figma-chart` -> `reference/ANNOTATIONS-AND-ARROWS.md`): a 
 filled dart, both bound to `Data Insights/Annotations` (`setStrokeStyleIdAsync` on the curve,
 `setFillStyleIdAsync` on the dart). Lay its tail and tip on the step's arrow, then delete the step's:
 
-- band: tail ~4px right of the end of the label's last line, at mid-height; curving clockwise, out to the
+- band: tail ~9px right of the end of the label's last line, at mid-height; curving clockwise, out to the
   right then down, to a tip midway between the median and the band's top edge at
   `band_label_target_age`;
-- stunting: tail ~7px left of "Stunting cutoff:", at mid-height; curving clockwise, out to the left then
-  up, to a tip 3-7px under the dashed line at `stunting_label_age`.
+- stunting: tail ~8px left of "Stunting cutoff:" (7.7px desktop, 7.3px mobile; the copy keeps 7.9), at
+  mid-height; curving clockwise, out to the left then up, to a tip 3-7px under the dashed line at
+  `stunting_label_age`.
 
 The house arrows to clone are the design team's own, in their copy of the desktop frame
 (`29144:824`): curves `Arrow 4` (band) / `Arrow 3` (stunting), `29146:1057` / `29146:1063`, and their
@@ -262,7 +263,7 @@ bands against each other (dE ~15 once composited); that is accepted, because eac
 titled panel and the lines carry the colour.
 
 The stunting arrow is the one arrow ending on a line, so it gets the four-render pixel probe
-(`measure_pixels.py arrow-gap`): 4.2px on desktop and 5.6px on mobile, zero touching. On mobile the
+(`measure_pixels.py arrow-gap`): 4.3px on desktop and 5.5px on mobile, zero touching. On mobile the
 dashed line climbs steeply, so the arrow is aimed at age 8.5, where it meets the line head-on, and
 keeps 6px of clearance; aimed further right it ran alongside the line and crossed it.
 
@@ -432,6 +433,9 @@ LEADER_WIDTH = 1 * POINTS_PER_PIXEL
 # A filled dart about 8px long and 7px across, the house arrowhead's size, in points (the arrow is drawn
 # with `mutation_scale=1`, so these are not multiples of the font size).
 LEADER_HEAD = "-|>,head_length=5.8,head_width=2.5"
+# Air between an arrow's tail and its label, along the arc, in template px. The stunting arrow leaves its
+# label at a slant, so it needs more along the arc to keep the ~8px the design team's copy has across.
+LEADER_TAIL_CLEARANCE_PX = {"within-2-sd": 4, "stunting-cutoff": 9}
 
 # Percentiles drawn as lines on top of the band, as (column, line width), so a specific centile
 # can be read off rather than only a range. Labelled directly in the Boys panel.
@@ -849,7 +853,11 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         color=TEXT_COLOR,
         zorder=6,
         gid="label__within-2-sd",
-        arrowprops=arrow_props(*line_end(band_text, label_fontsize, row=-1, side="right"), rad=-0.35, clearance_px=0),
+        arrowprops=arrow_props(
+            *line_end(band_text, label_fontsize, row=-1, side="right", clearance_px=LEADER_TAIL_CLEARANCE_PX["within-2-sd"]),
+            rad=-0.35,
+            clearance_px=0,
+        ),
     )
     assert band_label.arrow_patch is not None
     band_label.arrow_patch.set_gid("leader__within-2-sd")
@@ -870,7 +878,9 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         zorder=6,
         gid="label__stunting-cutoff",
         arrowprops=arrow_props(
-            *line_end(stunting_text, label_fontsize, row=0, side="left"),
+            *line_end(
+                stunting_text, label_fontsize, row=0, side="left", clearance_px=LEADER_TAIL_CLEARANCE_PX["stunting-cutoff"]
+            ),
             rad=-0.35,
             clearance_px=layout["stunting_arrow_clearance_px"],
         ),
@@ -902,12 +912,14 @@ def arrow_props(origin: tuple[float, float], gap: float, rad: float, clearance_p
     }
 
 
-def line_end(text: str, fontsize: float, row: int, side: str) -> tuple[tuple[float, float], float]:
+def line_end(
+    text: str, fontsize: float, row: int, side: str, clearance_px: float
+) -> tuple[tuple[float, float], float]:
     """Where an arrow leaves a wrapped label: beside one of its lines, as a `relpos` fraction of the box.
 
     `row` picks the line and `side` which end of it, "right" for a left-aligned label (the end of the
     line) and "left" for a right-aligned one (its start). Returns the point at mid-height of that line,
-    and the gap to leave from it, in points: a few pixels of clearance plus what the line grows by once
+    and the gap to leave from it, in points: `clearance_px` of air plus what the line grows by once
     Figma sets it in Lato, which runs wider than the face measured here. A label grows away from its
     anchored edge, so all of that growth lands on the free end, where the arrow is.
     """
@@ -918,7 +930,7 @@ def line_end(text: str, fontsize: float, row: int, side: str) -> tuple[tuple[flo
     row = row % len(lines)
     x = widths[row] / widest if side == "right" else 1 - widths[row] / widest
     y = (len(lines) - row - 0.5) / len(lines)
-    gap = 4 * POINTS_PER_PIXEL + (LATO_OVER_MEASURED_ADVANCE - 1) * widths[row]
+    gap = clearance_px * POINTS_PER_PIXEL + (LATO_OVER_MEASURED_ADVANCE - 1) * widths[row]
     return (x, y), gap
 
 

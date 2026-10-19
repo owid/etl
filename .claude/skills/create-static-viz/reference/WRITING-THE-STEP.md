@@ -75,7 +75,8 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   when the house gaps would stretch the plot taller than the data needs, trim the frame rather than the
   gaps. Keep the template's width, change the height by tens of pixels rather than hundreds, and say why
   in the layout's comment. `export_frame`'s `template=` check covers only the template's own size, so
-  pass it there and `None` otherwise.
+  pass it there and `None` otherwise, and declare the size to the verifier instead with
+  `--size <stem>=<W>x<H>` (SKILL.md Step 5).
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
