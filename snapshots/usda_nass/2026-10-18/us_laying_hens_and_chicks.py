@@ -33,10 +33,18 @@ DATA_ITEMS = [
     "CHICKENS, CHICKS, EGG TYPE - HATCHED, MEASURED IN HEAD",
     # Average number of layers on hand during the month, and during the year (December through November).
     "CHICKENS, LAYERS - INVENTORY, AVG, MEASURED IN HEAD",
+    # Average number of layers on hand during the month, by type: table egg layers, and hatching egg layers of broiler
+    # type (broiler breeders) and of egg type (layer breeders).
+    "CHICKENS, LAYERS, TABLE - INVENTORY, AVG, MEASURED IN HEAD",
+    "CHICKENS, LAYERS, HATCHING, BROILER TYPE - INVENTORY, AVG, MEASURED IN HEAD",
+    "CHICKENS, LAYERS, HATCHING, EGG TYPE - INVENTORY, AVG, MEASURED IN HEAD",
     # Chickens slaughtered in federally inspected plants: young chickens (broilers), mature chickens (spent laying and
-    # breeding hens), and all chickens.
+    # breeding hens, split into light type, i.e. spent egg-type hens, and heavy type, i.e. spent broiler breeders), and
+    # all chickens.
     "CHICKENS, YOUNG, SLAUGHTER, FI - SLAUGHTERED, MEASURED IN HEAD",
     "CHICKENS, MATURE, SLAUGHTER, FI - SLAUGHTERED, MEASURED IN HEAD",
+    "CHICKENS, MATURE, LIGHT, SLAUGHTER, FI - SLAUGHTERED, MEASURED IN HEAD",
+    "CHICKENS, MATURE, HEAVY, SLAUGHTER, FI - SLAUGHTERED, MEASURED IN HEAD",
     "CHICKENS, SLAUGHTER, FI - SLAUGHTERED, MEASURED IN HEAD",
 ]
 
