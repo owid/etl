@@ -119,9 +119,13 @@ def update_metadata_from_dict(
             # we allow `- *descriptions` which needs to be flattened
             meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
-            # make sure all elements are strings
-            # NOTE: this could be further flattened if we run into it
-            assert all(isinstance(x, str) for x in meta_dict["description_key"])
+            # make sure all elements are strings (a plain item containing ": " parses as a mapping)
+            not_strings = [x for x in meta_dict["description_key"] if not isinstance(x, str)]
+            if not_strings:
+                raise ValueError(
+                    f"description_key of '{v_short_name}' has items that are not strings: {not_strings}. "
+                    "A YAML list item containing ': ' is parsed as a mapping; quote the item."
+                )
 
         # convert to objects
         tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
@@ -266,6 +270,6 @@ def _validate_variables_all_miss(t_annot: dict, tb: Table) -> None:
         )
 
 
-def _flatten(lst: list[Any]) -> list[str]:
-    """Flatten list that contains either strings or lists."""
-    return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]
+def _flatten(lst: list[Any]) -> list[Any]:
+    """Flatten nested lists (from `- *anchor` items) by one level; other items are kept as they are."""
+    return [item for sublist in lst for item in (sublist if isinstance(sublist, list) else [sublist])]
