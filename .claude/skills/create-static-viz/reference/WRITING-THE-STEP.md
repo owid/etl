@@ -441,8 +441,10 @@ and the state one character away from adding a line: measure it by cloning the s
 **Break a wrapped subtitle into lines of about equal length, and give the frame the same breaks.** Wrap
 to the fewest lines the slot allows, then narrow the wrap width as far as that line count holds. A
 greedy fill leaves a long first line over a short last one; even lines read as one block and leave room
-beside them for a key to rise into. Set the frame's subtitle to the same text with explicit `\n`, so
-Figma's own wrap cannot move the breaks.
+beside them for a key to rise into. A sentence boundary outranks balance: when a subtitle holds two
+sentences, start the second on a new line wherever that costs no extra line ("…according to the World
+Health Organization. / Children more than 2 standard deviations…", not "…Organization. Children / …").
+Set the frame's subtitle to the same text with explicit `\n`, so Figma's own wrap cannot move the breaks.
 
 ### Derive every string from the data
 
