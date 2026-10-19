@@ -39,8 +39,9 @@ There is no legend in either version.
 
 Two versions are emitted, following the static-chart templates:
 
-- desktop, 850x638: panels side by side, direct labels in the Boys panel, footer carrying Note, Data
-  source, the OurWorldinData.org tagline and the license line.
+- desktop, 850x615 (the horizontal template, 23px shorter so the panels keep their proportions): panels
+  side by side, direct labels in the Boys panel, footer carrying Note, Data source, the
+  OurWorldinData.org tagline and the license line.
 - mobile, 540x824: panels side by side in the portrait frame, the same direct labels placed for its
   217px panels, footer reduced to Data source plus the license, which is all that template has room
   for. It has no Note slot, so its subtitle adds a sentence defining stunting in standard deviations
@@ -72,7 +73,7 @@ as the "before" (`create-static-viz`'s `scripts/fetch_original_image.py` fetches
 
 | Frame | Node | Open it | Cloned from | Size |
 |---|---|---|---|---|
-| `expected-height-boys-girls` | `26869:1501` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1501) | `5332:75` Static Chart Template_Horizontal | 850x638 |
+| `expected-height-boys-girls` | `26869:1501` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1501) | `5332:75` Static Chart Template_Horizontal | 850x615 (template 850x638) |
 | `expected-height-boys-girls-mobile` | `26869:1515` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1515) | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
 
 The node ids are a convenience, not the join: they die if anyone rebuilds a frame from the template
@@ -122,8 +123,9 @@ two-line title and a two-line subtitle:
 - Both headers (`Frame 20` desktop, `Frame 26` mobile) are now vertical auto-layout frames, so the
   subtitle follows the title by itself, 6px under it.
 - Desktop's footer, `Frame 22`, hugs its rows and is pinned at its top, so a shorter note pulls the
-  source row up. Re-pin it after setting the note: `footer.y = 638 - 16 - footer.height`, which puts
-  the two-line note at the template's own y=559. Mobile's footer has no note and needs nothing.
+  source row up. Shorten the frame to 615 (`resizeWithoutConstraints(850, 615)`), then re-pin the
+  footer after setting the note: `footer.y = 615 - 16 - footer.height`, which puts the two-line note at
+  y=536, the step's `chart_bottom_y`. Mobile's footer has no note and needs nothing.
 
 **Colors.** Bind each panel's median, its threshold *and its band* to the library style. The gid names a
 group, so descend to its `VECTOR` children before calling the setter.
@@ -247,9 +249,8 @@ Then diff the desktop frame against the design team's copy with `/create-figma-c
 `scripts/diff_frames.js` (`referenceId` `29144:824`, `frameId` `26869:1501`). Expect every node paired
 and only these deltas: the two wrapped labels as one TEXT node there and one per line here (with the
 alignment that comes with it), the explanatory labels' halos on the frame's canvas style rather than
-the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, the gridlines, the
-two arrows within a few px of the copy's, and the copy's shorter 850x615 frame, which drops the room
-its first version had padded inside the chart group. Anything else is drift from the design.
+the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, the gridlines, and
+the two arrows within a few px of the copy's. Anything else is drift from the design.
 
 Run `verify_page.js` with `shadedAreas: "within-2-sd"`, which exempts the two bands the arrows point
 into, and the default gap target. One row then fails by design: desktop `text-floor` flags the
@@ -261,7 +262,7 @@ bands against each other (dE ~15 once composited); that is accepted, because eac
 titled panel and the lines carry the colour.
 
 The stunting arrow is the one arrow ending on a line, so it gets the four-render pixel probe
-(`measure_pixels.py arrow-gap`): 4.9px on desktop and 5.6px on mobile, zero touching. On mobile the
+(`measure_pixels.py arrow-gap`): 4.2px on desktop and 5.6px on mobile, zero touching. On mobile the
 dashed line climbs steeply, so the arrow is aimed at age 8.5, where it meets the line head-on, and
 keeps 6px of clearance; aimed further right it ran alongside the line and crossed it.
 
@@ -285,7 +286,7 @@ from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
-from etl.viz.static import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, source_citation
+from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, apply_svg_rcparams, export_frame, source_citation
 
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()
@@ -514,18 +515,20 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 # template: a template px is 0.72pt, and a line of text occupies about 1.8x its point size.
 LAYOUTS = {
     "height_for_age": {
-        "size": (850, 638),
+        # 23px shorter than the template's 850x638, as the design team set it: at the full height the
+        # house gaps stretch the two panels taller than the curves need, so the frame loses the slack
+        # instead and the plot keeps its proportions.
+        "size": (850, 615),
         "template": "horizontal",
         "margin": 16,
         "title_y": 16,
-        # The three footer rows of `Static Chart Template_Horizontal`, measured 2026-08-27 after the
-        # design team rebuilt it: Note at 559, Data source at 591, and the tagline/licence row at 609,
-        # inside a `Frame 22` that starts at 559 and is 63 tall. `chart_bottom_y` is the Note's top
-        # for a two-line note, which is the shape the template ships. The previous values (556 / 589)
-        # came from the template's earlier build and left every row about 2px high.
-        "chart_bottom_y": 559,
-        "source_y": 591,
-        "footer_y": 609,
+        # The three footer rows of `Static Chart Template_Horizontal` (Note, Data source, then the
+        # tagline/licence row, 32 and 18px apart, inside a 63-tall `Frame 22` 16px above the frame's
+        # bottom), moved up with the shorter frame. `chart_bottom_y` is the Note's top for a two-line
+        # note, which is the shape the template ships.
+        "chart_bottom_y": 536,
+        "source_y": 568,
+        "footer_y": 586,
         "nrows": 1,
         "ncols": 2,
         "full_footer": True,
@@ -661,7 +664,12 @@ def run() -> None:
         # transparent-SVG split, and the template-aspect assertion. `template` is a check, not a
         # setting -- it fails the run if this layout's figsize has drifted off the frame it is
         # laid out against.
-        export_frame(paths, fig, short_name, template=layout["template"])
+        # A layout may run a little shorter or taller than its template, which its comment explains;
+        # the width never changes, and the template-size check applies only at the template's own size.
+        template = TEMPLATES[layout["template"]]
+        assert layout["size"][0] == template.width_px, f"{short_name} is not {template.width_px} wide"
+        at_template_size = layout["size"] == (template.width_px, template.height_px)
+        export_frame(paths, fig, short_name, template=layout["template"] if at_template_size else None)
         plt.close(fig)
 
 

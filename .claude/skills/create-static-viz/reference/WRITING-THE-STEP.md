@@ -71,6 +71,11 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already
   injects `metadata={"Date": None}` on the SVG pass for reproducible diffs.
+- **Lay out at the template's size, unless a slightly shorter or taller frame helps the chart** — say,
+  when the house gaps would stretch the plot taller than the data needs, trim the frame rather than the
+  gaps. Keep the template's width, change the height by tens of pixels rather than hundreds, and say why
+  in the layout's comment. `export_frame`'s `template=` check covers only the template's own size, so
+  pass it there and `None` otherwise.
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
