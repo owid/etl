@@ -221,6 +221,11 @@ Then check which font `findfont` actually returned before trusting the per-face 
 - **A band shaded around a line is the line's own colour with `alpha`, not a tint blended toward
   white.** Figma can then bind the band to the line's library style at reduced node opacity (the design
   team uses 0.2), which a hand-mixed hex cannot be.
+- **Draw every label at full opacity, even where its marks take `alpha`.** Bars may run at grapher's
+  0.8, but a name set in its category's colour has far less surface area than its bar, so the same
+  reduction costs it legibility. Give `alpha` to the fills only, and measure a label's contrast against
+  its own, unreduced colour.
+
 ### Borrow grapher's design language, read from its source
 
 A static chart should read like our interactive ones, so take the axis, tick, facet and reference-line
