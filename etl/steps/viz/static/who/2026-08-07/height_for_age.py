@@ -107,7 +107,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | Slot | Content | Weights |
 |---|---|---|
 | Title | `TITLE`; on mobile, break the line after "curves" (a line separator), or "girls" is left alone on the second line | template's Playfair |
-| Subtitle | `SUBTITLE` on desktop, `MOBILE_SUBTITLE` on mobile (three lines; it carries the stunting definition) | Lato Regular |
+| Subtitle | `SUBTITLE` on desktop, `MOBILE_SUBTITLE` on mobile (three lines; it carries the stunting definition). On mobile, the second sentence starts its own line: break after "Organization." and "the median" with explicit line breaks (the design team's frame narrows the box to 421px to the same effect) | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
@@ -592,9 +592,10 @@ LAYOUTS = {
         # The words each header line ends on in that frame. The step's own faces are narrower and would
         # set the header on one title line and two subtitle lines, which leaves a gap of ~70px above the
         # chart in this step's PNG that the Figma frame does not have. Breaking where Figma does makes
-        # the PNG's header end at `chart_area_top` too.
+        # the PNG's header end at `chart_area_top` too. The subtitle's second sentence starts a line of
+        # its own, as the design team set it.
         "title_breaks_after": ["curves"],
-        "subtitle_breaks_after": ["Organization. Children", "for their age"],
+        "subtitle_breaks_after": ["Organization.", "the median"],
         # Narrow, at six lines, because the band rises steeply through the panel's top-left: at four
         # lines the wider rows run into the shading.
         "band_label_xy": (1.4, 158),
