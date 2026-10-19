@@ -46,7 +46,8 @@ def improve_metadata(tb: Table) -> Table:
 
     # Gather years in the data, and assign colors to them.
     colors = {}
-    columns = [str(year) for year in set(tb["country"])]
+    # Sorted, so the chart lists them chronologically and the order is stable across builds.
+    columns = sorted(str(year) for year in set(tb["country"]))
     years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
     for year, column in zip(years, columns):
         if 1980 <= year < 1990:
