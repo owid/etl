@@ -32,6 +32,27 @@ tables:
     assert t.a.metadata.description_key == ["Text 1", "Text 2", "Text 2", "Text 3"]
 
 
+def test_update_metadata_from_yaml_description_key_item_parsed_as_mapping(tmp_path):
+    """An unquoted item containing ': ' parses as a mapping and must fail, not be cut at the colon."""
+    yaml_text = """
+tables:
+  test:
+    variables:
+      a:
+        description_key:
+          - Text 1
+          - They are not a random sample: results may not be representative.
+""".strip()
+
+    path = tmp_path / "test.yaml"
+    with open(path, "w") as f:
+        f.write(yaml_text)
+
+    t = Table({"a": [1, 2, 3]})
+    with pytest.raises(ValueError, match="not strings"):
+        ym.update_metadata_from_yaml(t, path, "test")
+
+
 def test_update_metadata_from_yaml_description_key_string(tmp_path):
     """A bare (multiline) string is used as-is and rendered as free-form markdown."""
     yaml_text = """
