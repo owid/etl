@@ -460,6 +460,14 @@ a defect.
 Write it in the imperative, as the step's own reference. If you catch yourself writing "we changed X",
 rewrite it as "set X to Y, because Z": the reader wants to reproduce the state, not the history.
 
+**A designer's rework of the frame goes back into the step, not only into the frame**, or the next
+re-import undoes it. Diff their copy against your frame with `/owid-staff:create-figma-chart`'s
+`scripts/diff_frames.js` to list the decisions; port each one into the step (the step's geometry,
+weights, sizes and wraps) or into the docstring's Figma recipe (bindings, halos, house arrows); then
+re-import and diff again until only the deltas you chose remain, and record those in the docstring.
+Compare ink, not boxes: uneven visible gaps over an evenly placed chart group are padding left inside
+the group, so keep the house spacing and ask the designer before porting them.
+
 ## Step 9 — PR and the review chain
 
 The branch, worktree and draft PR already exist from Step 4. **Let the pre-commit hook run `make check`

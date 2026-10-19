@@ -206,6 +206,14 @@ Then check which font `findfont` actually returned before trusting the per-face 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette
   position** (`palette[0]`, `palette[1]`) rather than pinned hexes, so the chart moves with the
   shared palette. seaborn is a `dev` dependency.
+- **Every stroke width in whole template pixels, written as `px * 0.72` points** — 3px for a series
+  line, 2px for a secondary or dashed one, 1px for gridlines, ticks and leaders. A width chosen in
+  points lands fractional in Figma (`linewidth=1.0` is a 1.39px gridline, 2.6pt a 3.61px line), and the
+  design team snaps them by hand. A dash is in multiples of the width, so a whole-pixel width keeps the
+  dash on whole pixels too.
+- **A band shaded around a line is the line's own colour with `alpha`, not a tint blended toward
+  white.** Figma can then bind the band to the line's library style at reduced node opacity (the design
+  team uses 0.2), which a hand-mixed hex cannot be.
 ### Borrow grapher's design language, read from its source
 
 A static chart should read like our interactive ones, so take the axis, tick, facet and reference-line
@@ -408,6 +416,12 @@ header's last line. So after **any** change to a title, subtitle or note, re-rea
 template slot's height in Figma rather than trusting the step's own wrap, and check the header
 clearance on the frame.
 
+The firmer fix, once the frame exists: read where the Figma header ends off the frame and place the
+plot against that (`chart_area_top`, and the footer's first row below), with the house gap on each
+side, rather than against the step's own header. Then break the step's title and subtitle where the
+frame does, so the step's PNG shows the spacing that ships instead of the extra gap its narrower faces
+leave.
+
 Two things make that cheap. The step should reserve the *larger* of the two counts where they differ,
 so the failure mode is a generous gap rather than an overlap. And an orphan — a last line holding a
 word or two — is worth removing at the same time, because it is both a copy defect in its own right
@@ -507,6 +521,10 @@ step's own render:
   centring on each other *and* on whatever they label as soon as the font changes — the one case the
   anchor rule above cannot rescue, because there is no anchor to preserve. Grep an emitted SVG for
   `text-anchor` and any label missing one is this.
+- **Space a wrapped label's lines at Figma's own pitch.** A label typed in Figma in 14px Lato runs at
+  17px a line (line height AUTO); matplotlib's default `linespacing=1.2` lands imported lines about 15px
+  apart, so a re-import never matches a designer's typed label. Set the spacing from the ratio
+  (`linespacing=1.36` at 14px), or place one call per line at the 17px pitch.
 
 ### Size a value column from its content, not from a round number
 
