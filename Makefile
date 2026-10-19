@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree editor-schema
 
 include default.mk
 
@@ -34,6 +34,7 @@ help:
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
 	@echo '  make setup.worktree	Give this worktree the main checkout .env + a copy-on-write clone of data/ (auto-runs with make .venv)'
+	@echo '  make editor-schema	Rebuild the editor-only grapher config schema from the published one (auto-runs with make .venv)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
@@ -356,8 +357,12 @@ setup.worktree:
 		fi; \
 	fi
 
-.venv: .venv-default install-hooks setup.worktree
+.venv: .venv-default install-hooks setup.worktree editor-schema
 	@true
+
+# Editor-only grapher config schema for linting .meta.yml and viz://chart configs (see scripts/build_editor_schema.py)
+editor-schema: .venv-default
+	@.venv/bin/python scripts/build_editor_schema.py
 
 # Backward-compatible alias
 install-vscode-extensions: vsce-sync

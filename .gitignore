@@ -75,3 +75,6 @@ docs/api/chart-api.md
 docs/guides/analytics-events.md
 
 .auto-claude/
+
+# Editor-only grapher config schema, built from the published one by `make .venv`
+schemas/editor/grapher-config.json

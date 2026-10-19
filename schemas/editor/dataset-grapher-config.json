@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Editor-only overlay for *.meta.yml: lints each indicator's presentation.grapher_config against the grapher schema built by `make .venv` (scripts/build_editor_schema.py). ETL itself does not validate grapher configs; the grapher admin API does on upsert.",
+    "properties": {
+        "tables": {
+            "additionalProperties": {
+                "properties": {
+                    "variables": {
+                        "additionalProperties": {
+                            "$ref": "#/$defs/indicator"
+                        }
+                    }
+                }
+            }
+        },
+        "definitions": {
+            "properties": {
+                "common": {
+                    "$ref": "#/$defs/indicator"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "indicator": {
+            "properties": {
+                "presentation": {
+                    "properties": {
+                        "grapher_config": {
+                            "$ref": "grapher-config.json"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

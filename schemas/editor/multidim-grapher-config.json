@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Editor-only overlay for viz://chart *.config.yml: lints view `config` blocks and indicator `display` overrides against the grapher schema built by `make .venv` (scripts/build_editor_schema.py). ETL itself does not validate them; the grapher admin API validates view configs on upsert.",
+    "properties": {
+        "views": {
+            "items": {
+                "properties": {
+                    "config": {
+                        "$ref": "grapher-config.json"
+                    },
+                    "indicators": {
+                        "additionalProperties": {
+                            "$ref": "#/$defs/indicatorSlot"
+                        }
+                    }
+                }
+            }
+        },
+        "definitions": {
+            "properties": {
+                "common_views": {
+                    "items": {
+                        "properties": {
+                            "config": {
+                                "$ref": "grapher-config.json"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "indicator": {
+            "properties": {
+                "display": {
+                    "$ref": "grapher-config.json#/$defs/dimensionDisplay"
+                }
+            }
+        },
+        "indicatorSlot": {
+            "description": "A catalog path, an indicator object, or a list of either. `properties` and `items` only apply to objects and lists, so strings pass through.",
+            "allOf": [
+                {
+                    "$ref": "#/$defs/indicator"
+                }
+            ],
+            "items": {
+                "$ref": "#/$defs/indicator"
+            }
+        }
+    }
+}
