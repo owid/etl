@@ -51,6 +51,8 @@ TEMPLATE_RATIOS = {
     "mobile-square": (540, 540),
 }
 TOLERANCE = 0.002
+# Template px per inch the steps lay out at (etl.viz.static.PIXELS_PER_INCH), to judge an SVG's scale.
+PIXELS_PER_INCH = 100
 
 # matplotlib names its own nodes, and those names must not count toward the gid check — otherwise
 # an SVG with no deliberate gid at all still looks "named" and passes. Three families, all
@@ -280,8 +282,34 @@ def check_svg(
             )
         else:
             failures += frame_failures("SVG", size[0], size[1], target)
+        failures += scale_failures(svg, target)
 
     return failures
+
+
+def scale_failures(svg: str, target: tuple[str, tuple[int, int]]) -> list[str]:
+    """Return a failure if a matplotlib SVG's canvas is at the right ratio but the wrong scale.
+
+    matplotlib writes the canvas in points, at 72 per inch, and the step lays out at
+    PIXELS_PER_INCH template px per inch, so a frame W px wide is W * 0.72pt. A canvas at the right
+    ratio but another scale needs a uniform rescale into the frame, which shrinks or grows every
+    font size with it. Only a width in pt is judged: without the unit, the scale is unknown.
+    """
+    root = SVG_ROOT.search(svg)
+    width = re.search(r'\bwidth="([0-9.]+)pt"', root.group()) if root else None
+    if width is None:
+        return []
+    name, (target_w, _) = target
+    want = target_w * 72 / PIXELS_PER_INCH
+    got = float(width.group(1))
+    if abs(got - want) / want > TOLERANCE:
+        return [
+            f"SVG canvas is {got:g}pt wide but the {name} size of {target_w}px needs {want:g}pt "
+            f"(at {PIXELS_PER_INCH}px per inch), so the scale is {got / want:.3g}x and every font size "
+            "moves with it on the way into Figma. Build the figure at "
+            f"figsize = px / {PIXELS_PER_INCH}."
+        ]
+    return []
 
 
 def check_png(path: Path, target: tuple[str, tuple[int, int]] | None) -> list[str]:

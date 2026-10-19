@@ -171,12 +171,13 @@ def test_a_shared_gid_fails_only_when_required(tmp_path):
 # --- verify_static_viz.py: declared frame size -------------------------------------------------------
 
 
-def write_sized_frame(tmp_path: Path, width: int, height: int) -> Path:
-    """A named SVG and its sibling PNG at a given frame size."""
+def write_sized_frame(tmp_path: Path, width: int, height: int, unit: str = "") -> Path:
+    """A named SVG and its sibling PNG at a given frame size, in `unit` on the SVG root."""
     from PIL import Image
 
     stem = tmp_path / "frame"
-    head = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">'
+    w, h = (round(width * 0.72, 2), round(height * 0.72, 2)) if unit == "pt" else (width, height)
+    head = f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}{unit}" height="{h}{unit}">'
     stem.with_suffix(".svg").write_text(f'{head}<g id="title"><text>Title</text></g></svg>')
     Image.new("RGB", (width * 3, height * 3), "white").save(stem.with_suffix(".png"))
     return stem
@@ -195,6 +196,15 @@ def test_a_declared_size_still_catches_a_crop(tmp_path):
     stem = write_sized_frame(tmp_path, 850, 600)
     result = run(VERIFY, stem, "--size", "frame=850x615")
     assert result.returncode == 1 and "declared size is 850x615" in result.stdout, result.stdout
+
+
+def test_a_canvas_at_the_right_ratio_but_twice_the_scale_fails(tmp_path):
+    # matplotlib writes points, so an 850px frame is 612pt; at 1224pt every font would halve in Figma.
+    assert run(VERIFY, write_sized_frame(tmp_path, 850, 615, "pt"), "--size", "frame=850x615").returncode == 0
+    doubled = write_sized_frame(tmp_path, 1700, 1230, "pt")
+    for args in (["--size", "frame=850x615"], ["--template", "horizontal", "--size", "frame=850x615"]):
+        result = run(VERIFY, doubled, *args)
+        assert result.returncode == 1 and "the scale is 2x" in result.stdout, result.stdout
 
 
 @pytest.mark.parametrize("size", ["frame=850", "frame=850x0", "850x615", "frame=wxh"])

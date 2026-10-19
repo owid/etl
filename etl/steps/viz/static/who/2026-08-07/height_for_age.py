@@ -287,7 +287,7 @@ from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
-from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, apply_svg_rcparams, export_frame, source_citation
+from etl.viz.static import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, source_citation
 
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()
@@ -668,12 +668,9 @@ def run() -> None:
         # transparent-SVG split, and the template-aspect assertion. `template` is a check, not a
         # setting -- it fails the run if this layout's figsize has drifted off the frame it is
         # laid out against.
-        # A layout may run a little shorter or taller than its template, which its comment explains;
-        # the width never changes, and the template-size check applies only at the template's own size.
-        template = TEMPLATES[layout["template"]]
-        assert layout["size"][0] == template.width_px, f"{short_name} is not {template.width_px} wide"
-        at_template_size = layout["size"] == (template.width_px, template.height_px)
-        export_frame(paths, fig, short_name, template=layout["template"] if at_template_size else None)
+        # A layout may run a little shorter or taller than its template, which its comment explains:
+        # `height_px` holds it to the template's width at its own height.
+        export_frame(paths, fig, short_name, template=layout["template"], height_px=layout["size"][1])
         plt.close(fig)
 
 
