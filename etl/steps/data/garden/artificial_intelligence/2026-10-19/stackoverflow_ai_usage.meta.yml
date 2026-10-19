@@ -1,4 +1,3 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     processing_level: major
@@ -7,7 +6,7 @@ definitions:
         - Artificial Intelligence
       attribution_short: Stack Overflow
       grapher_config:
-        note: Based on survey responses from {response_range} professional developers, depending on the year. We set a baseline at 0% in 2020, as the first mainstream AI coding assistants were not available to developers until 2021.
+        note: Based on survey responses from {response_range} professional developers, depending on the year.
     display:
       roundingMode: significantFigures
       numSignificantFigures: 2
@@ -32,5 +31,3 @@ tables:
           - From 2023 to 2025, professional developers are respondents who described themselves as “a developer by profession”. The 2026 survey no longer asked this, so for 2026 we use respondents who said they “create code as a primary part of [their] job”.
         description_processing: |-
           We calculate the share from the answers of each respondent, which Stack Overflow publishes. For each year, we keep the professional developers who answered the question, and divide the number who use AI tools by the total.
-
-          We set the value for 2020 to 0%, as the first mainstream AI coding assistants were not available to developers until 2021.

@@ -14,7 +14,6 @@ The survey changed over time, so both the definition of a professional developer
 These definitions reproduce the shares Stack Overflow published for professional developers in 2023–2025.
 """
 
-import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -45,9 +44,6 @@ TOOLS_2026 = {
     "Internal AI tools built by my company",
 }
 NO_2026 = "I don’t use AI tools"
-
-# Year before the first mainstream AI coding assistants, used as a 0% baseline.
-BASELINE_YEAR = 2020
 
 
 def run() -> None:
@@ -83,13 +79,8 @@ def run() -> None:
     )
     tb["yes_overall"] = (tb["yes_overall"] * 100).round(2)
 
-    # Step 4: Add a 0% baseline, as the first mainstream AI coding assistants were not available until 2021.
-    tb_baseline = Table({"year": [BASELINE_YEAR], "yes_overall": [0.0]}, like=tb)
-    tb = pr.concat([tb_baseline, tb], ignore_index=True)
-
-    # Step 5: Describe the range of respondents per year in the metadata, then drop the respondent counts.
-    n_respondents = tb["n_respondents"].dropna()
-    response_range = f"{n_respondents.min():,.0f} to {n_respondents.max():,.0f}"
+    # Step 4: Describe the range of respondents per year in the metadata, then drop the respondent counts.
+    response_range = f"{tb['n_respondents'].min():,.0f} to {tb['n_respondents'].max():,.0f}"
     tb = tb.drop(columns=["n_respondents"])
 
     tb["country"] = "World"
@@ -125,6 +116,6 @@ def sanity_check_inputs(tb: Table) -> None:
 
 def sanity_check_outputs(tb: Table) -> None:
     years = tb.index.get_level_values("year")
-    assert sorted(years) == [BASELINE_YEAR] + YEARS, f"Unexpected years in output: {sorted(years)}"
+    assert sorted(years) == YEARS, f"Unexpected years in output: {sorted(years)}"
     assert tb["yes_overall"].notna().all(), "Missing share of AI tool users."
     assert tb["yes_overall"].between(0, 100).all(), "Share of AI tool users outside [0, 100]."
