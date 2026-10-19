@@ -500,7 +500,9 @@ Four decisions, each settled by measuring rather than by taste:
   ("TV") keep their capitals in either.
 - **Separate stacked segments with a 1px gap of canvas.** The gap carries the boundary, so neighbouring
   fills no longer need to differ in lightness, and a grayscale-seam floor applies only where segments
-  touch. Shorten every segment but the last by the gap, so each still starts at its true value.
+  touch. Shorten every segment but the last by the gap, so each still starts at its true value. Skip
+  a segment narrower than the gap plus 1px (a zero, say): shortened, it gets a negative width and
+  Matplotlib draws it backwards over its neighbour.
 - **Align in-segment values to the segment's start, not its centre.** Left-aligned at a fixed inset
   (8px on the 850-wide templates, scaled with the frame's width on narrower ones), and the last
   segment's right-aligned at the bar's end, the values form a column per category. Centred values
