@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Stack Overflow
+    title: Stack Overflow Developer Survey 2024
+    description: |-
+      The Stack Overflow Developer Survey is an annual online survey of people who write code, run by Stack Overflow since 2011. It asks about the tools people use, how they learn, how they work, and, since 2023, whether and how they use AI tools.
+
+      Anyone can take part, and Stack Overflow promotes the survey mainly through its own website, blog, and email list. Respondents are therefore people who chose to answer, not a random sample of developers worldwide.
+
+      Stack Overflow publishes the answers of each respondent, without identifying information, alongside summary results on its website.
+    citation_full: Stack Overflow Developer Survey 2024, Stack Exchange Inc. https://survey.stackoverflow.co/
+    attribution_short: Stack Overflow
+    url_main: https://survey.stackoverflow.co/
+    url_download: https://media.githubusercontent.com/media/StackExchange/Survey/main/packages/archive/2024/results.csv
+    date_accessed: '2026-10-19'
+    date_published: '2026-05-08'
+    license:
+      name: ODbL 1.0
+      url: https://github.com/StackExchange/Survey/tree/main/packages/archive#licence
+outs:
+  - md5: 6725066b9acee18651836c7f9d175b45
+    size: 159525875
+    path: stackoverflow_developer_survey_2024.csv

@@ -79,7 +79,8 @@ def run() -> None:
     )
     tb["yes_overall"] = (tb["yes_overall"] * 100).round(2)
 
-    # Step 4: Describe the range of respondents per year in the metadata, then drop the respondent counts.
+    # Step 4: Describe the survey years and the range of respondents per year in the metadata, then drop the counts.
+    survey_years = f"{tb['year'].min()}–{tb['year'].max()}"
     response_range = f"{tb['n_respondents'].min():,.0f} to {tb['n_respondents'].max():,.0f}"
     tb = tb.drop(columns=["n_respondents"])
 
@@ -91,7 +92,9 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb], yaml_params={"response_range": response_range})
+    ds_garden = paths.create_dataset(
+        tables=[tb], yaml_params={"response_range": response_range, "survey_years": survey_years}
+    )
     ds_garden.save()
 
 

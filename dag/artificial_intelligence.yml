@@ -10,7 +10,10 @@ steps:
   data://grapher/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
     - data://garden/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
       - data://meadow/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
-        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_ai_usage.parquet
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2023.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2024.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2025.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2026.csv
 
   # Main EPOCH dataset
   data://meadow/artificial_intelligence/2025-03-12/epoch:

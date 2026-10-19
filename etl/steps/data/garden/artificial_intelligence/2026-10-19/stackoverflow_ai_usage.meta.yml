@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
+      attribution: Stack Overflow ({survey_years})
       attribution_short: Stack Overflow
       grapher_config:
         note: Based on survey responses from {response_range} professional developers, depending on the year.
@@ -12,6 +13,7 @@ definitions:
       numSignificantFigures: 2
 
 dataset:
+  title: Stack Overflow Developer Survey – AI tool usage
   update_period_days: 365
 
   owners:
