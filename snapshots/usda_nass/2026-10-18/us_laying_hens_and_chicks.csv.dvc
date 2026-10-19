@@ -17,6 +17,6 @@ meta:
       name: Public domain
       url: https://www.nass.usda.gov/Data_and_Statistics/Citation_Request/index.php
 outs:
-  - md5: 1d2a2bdbc1eae0fa70572eeb7e9ea1eb
-    size: 1111564
+  - md5: 806626f2eed73921c72037b7fbfced1a
+    size: 1574997
     path: us_laying_hens_and_chicks.csv
