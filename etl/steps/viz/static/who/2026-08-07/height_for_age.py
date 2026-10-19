@@ -854,7 +854,9 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         zorder=6,
         gid="label__within-2-sd",
         arrowprops=arrow_props(
-            *line_end(band_text, label_fontsize, row=-1, side="right", clearance_px=LEADER_TAIL_CLEARANCE_PX["within-2-sd"]),
+            *line_end(
+                band_text, label_fontsize, row=-1, side="right", clearance_px=LEADER_TAIL_CLEARANCE_PX["within-2-sd"]
+            ),
             rad=-0.35,
             clearance_px=0,
         ),
@@ -879,7 +881,11 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         gid="label__stunting-cutoff",
         arrowprops=arrow_props(
             *line_end(
-                stunting_text, label_fontsize, row=0, side="left", clearance_px=LEADER_TAIL_CLEARANCE_PX["stunting-cutoff"]
+                stunting_text,
+                label_fontsize,
+                row=0,
+                side="left",
+                clearance_px=LEADER_TAIL_CLEARANCE_PX["stunting-cutoff"],
             ),
             rad=-0.35,
             clearance_px=layout["stunting_arrow_clearance_px"],
@@ -912,9 +918,7 @@ def arrow_props(origin: tuple[float, float], gap: float, rad: float, clearance_p
     }
 
 
-def line_end(
-    text: str, fontsize: float, row: int, side: str, clearance_px: float
-) -> tuple[tuple[float, float], float]:
+def line_end(text: str, fontsize: float, row: int, side: str, clearance_px: float) -> tuple[tuple[float, float], float]:
     """Where an arrow leaves a wrapped label: beside one of its lines, as a `relpos` fraction of the box.
 
     `row` picks the line and `side` which end of it, "right" for a left-aligned label (the end of the
