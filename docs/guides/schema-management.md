@@ -13,6 +13,8 @@ This guide covers how to manage schema updates in the ETL system, particularly f
 
 ETL does not vendor the grapher chart-config schema, and its steps do not validate the chart configs they write against it. The grapher admin API validates indicator configs, chart configs and multidim view configs on upsert and rejects a bad one, so a typo in one of those fails the `grapher://` or `viz://` step that pushes it, not the local build. Grapher does not check explorer view configs or the per-indicator `display` overrides in a multidim. What ETL keeps is the *version*, because grapher keys its config migrations on it.
 
+Editors still lint these blocks. `make .venv` builds `schemas/editor/grapher-config.json` (gitignored) from the published schema at `DEFAULT_GRAPHER_SCHEMA`, with `$schema` no longer required and templates (Jinja, `{definitions…}`) accepted in typed fields. The overlays next to it are mapped in `.vscode/settings.json` alongside the ETL schemas, so a misspelled key in `presentation.grapher_config` or in a multidim view `config` or `display` block is underlined. Nothing in ETL reads the file: it is editor feedback, not validation. Run `make editor-schema` to rebuild it on its own; a "Problems loading reference" warning in a `.meta.yml` means it hasn't been built yet.
+
 That version lives in exactly one place, `etl/config.py`:
 
 ```python

@@ -12,7 +12,12 @@
       "**/*.meta.yml",
       "**/*.meta.override.yml"
     ],
+    "schemas/editor/dataset-grapher-config.json": [
+      "**/*.meta.yml",
+      "**/*.meta.override.yml"
+    ],
     "schemas/multidim-schema.json": "etl/steps/viz/chart/**/*.config.yml",
+    "schemas/editor/multidim-grapher-config.json": "etl/steps/viz/chart/**/*.config.yml",
     "schemas/explorer-schema.json": "etl/steps/viz/explorer/**/*.config.yml",
     "schemas/corrections-schema.json": "**/*.corrections.yml"
   },
