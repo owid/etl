@@ -46,6 +46,9 @@ def run() -> None:
     # Add percentage change
     tb_pct = make_tb_pct_change(tb)
 
+    # Sanity-check the rounded counts against the unrounded ones.
+    sanity_check_outputs(tb)
+
     # Improve table format.
     tables = [
         tb.format(["country", "year", "religion"]),
@@ -87,7 +90,7 @@ def add_owid_regions(tb):
     mask = tb["count"].isna()
     assert set(tb.loc[mask, "country"].unique()) == set(regions), "Unexpected missing shares after region aggregation!"
     ## Estimate `count` column based on unrounded counts
-    x = (tb.loc[mask, "count_unrounded"] / 10000).round().astype(int).astype("string")
+    x = ((tb.loc[mask, "count_unrounded"] / 10000).round() * 10000).astype(int).astype("string")
     mask_2 = tb.loc[mask, "count_unrounded"] < 10000
     x[mask_2] = UNDER_10K
     tb.loc[mask, "count"] = x
@@ -159,3 +162,12 @@ def make_tb_pct_change(tb):
     tb_pct["year"] = 2020
     tb_pct = tb_pct[["country", "year", "religion", "share_change_2010_2020"]]
     return tb_pct
+
+
+def sanity_check_outputs(tb):
+    # Rounded counts (to the nearest 10,000) must be within 5,000 of the unrounded counts, in every row.
+    mask = ~tb["count"].isin([UNDER_10K, UNDER_10K.replace(",", "")])
+    diff = (tb.loc[mask, "count"].astype(int) - tb.loc[mask, "count_unrounded"]).abs()
+    assert (diff <= 5000).all(), (
+        f"Rounded counts don't match unrounded counts for: {sorted(tb.loc[mask].loc[diff > 5000, 'country'].unique())}"
+    )
