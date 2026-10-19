@@ -64,6 +64,8 @@ The `repack_frame()` method simply does this across every column in your DataFra
 
 ## Releases
 
+- `0.2.0`:
+    - `to_safe_types` converts categorical, object and string columns to pandas' default `str` dtype (pyarrow-backed, `NaN` for missing values) instead of `string[pyarrow]` (`pd.NA` for missing values), so strings read from a dataset match the ones pandas 3 creates. Code that checks for `pd.NA` in those columns should use `pd.isna()`
 - `0.1.13`:
     - Dev tooling only (ruff 0.16.10, ty 0.0.85); no code changes
 - `0.1.12`:
