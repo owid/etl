@@ -157,3 +157,10 @@ steps:
       - data://garden/bls/2026-03-20/us_consumer_prices
       - data://meadow/artificial_intelligence/2026-04-27/cset:
         - snapshot://artificial_intelligence/2026-04-27/cset.zip
+  data://meadow/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+    - snapshot://artificial_intelligence/2026-10-19/stackoverflow_ai_usage.parquet
+  data://garden/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+    - data://meadow/artificial_intelligence/2026-10-19/stackoverflow_ai_usage
+  # Stack Overflow Developer Survey – AI tool usage
+  data://grapher/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+    - data://garden/artificial_intelligence/2026-10-19/stackoverflow_ai_usage
