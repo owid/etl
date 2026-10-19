@@ -68,8 +68,8 @@ fills these same slots when the SVG is imported.
 | Slot | y | Width | Height | Size |
 |---|---|---|---|---|
 | Title | 16.22 | 737.84 | 58 (**two lines**) | 25 |
-| Logo | 16 | 64 | 35 (top-right, x=770) | — |
-| Subtitle | 80 | 818 | 38 (two lines) | 16 |
+| Logo | 16 | 63 | 35 (top-right, x=771) | — |
+| Subtitle | 80 | 818 (731 under a one-line title, see below) | 38 (two lines) | 16 |
 | *chart area* | *118 → 558.6* | 818 | ~440 | — |
 | `Note:` | 558.62 | 818 | 28 (two lines) | **12** |
 | `Data source:` | 590.62 | 818 | 14 | **12** |
@@ -114,7 +114,7 @@ are stacked and full width, so the same string has 508 px to itself.
 | Slot | y (540×540) | y (540×824) | Width | Size |
 |---|---|---|---|---|
 | Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) | 25 |
-| Subtitle | 80 | 80 | 508 | 16 |
+| Subtitle | 80 | 80 | 508 (420 under a one-line title) | 16 |
 | *chart area* | *118 → 486* | *118 → 770* | 508 | — |
 | `Data source:` | 486 | 770 | 508 | 14 |
 | License | 507 | 791 | 508 | 14 |
@@ -187,6 +187,18 @@ The rhythm reproduces both templates exactly, which is the check that matters:
 > shrink the header by a line, and there is no logo surplus to land between the title and the subtitle.
 > The logo constrains **width** instead: the title node is sized narrower than the content box to clear
 > it — 737.84 against 818 on the 850-wide pair, 428 against 508 on mobile.
+>
+> **Under a one-line title the logo constrains the subtitle too.** The subtitle then starts level with
+> the logo's bottom edge, so `/owid-staff:create-figma-chart` crops its box to end **24 px** left of the
+> logo: **731** on the 850-wide pair, **420** on mobile. Wrap the step's own subtitle at that width
+> and count its lines there for `subtitle_lines`, because the narrower box can add a line and move
+> `band_top` by 19 px:
+>
+> ```python
+> subtitle_slot_px = logo_x - 24 - margin if title_lines == 1 else content_w  # logo_x: 771 / 460
+> ```
+>
+> Under a two-line title the subtitle keeps the full content width.
 >
 > The **superseded nested-logo generation** lives in
 > [reference/SUPERSEDED-LOGO-GENERATION.md](reference/SUPERSEDED-LOGO-GENERATION.md), kept only so a
