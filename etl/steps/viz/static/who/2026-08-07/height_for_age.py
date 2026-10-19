@@ -19,7 +19,9 @@ same Figma page): whole-pixel line weights (3px median, 2px threshold), 14px exp
 a halo, curved house arrows instead of straight leaders, the facet titles inside the panels, the
 stunting label right-aligned with "Stunting cutoff:" on a line of its own, a 13px "Median" with a halo,
 a translucent band and a single "Age in years" label. Mobile takes the same treatment, placed for its
-narrower panels.
+narrower panels. The space around the chart is the house one, equal above and below: the copy's first
+version showed more only because its chart group carried internal padding, which the design team
+confirmed was unintended and removed.
 
 The title says "expected growth curves", not "expected healthy growth curves" as the replaced image
 did. Only the under-fives standards rest on children selected for good health and nutrition; the 5-19
@@ -218,10 +220,9 @@ On desktop the house arrows need only a ~0.9-1.05 scale and under a degree of ro
 chords are shorter and steeper (scale 0.58 / 0.69, rotation 21 / 34 degrees).
 
 **Fit.** Crop the `chart` frame to its ink (text by its render bounds vertically), then set its box to
-the content column (`resizeWithoutConstraints(header.width, h)`, `x = header.x`). Do NOT re-centre it
-vertically: the step already places the plot against the Figma header and footer with the design
-team's uneven gaps (`CHART_TOP_GAP`, `CHART_BOTTOM_GAP`), and centring would even them out. Never
-`rescale` here, which would move every font off its rank.
+the content column (`resizeWithoutConstraints(header.width, h)`, `x = header.x`). It needs no vertical
+move: the step already places the plot against the Figma header and footer with equal gaps
+(`CHART_TOP_GAP`, `CHART_BOTTOM_GAP`). Never `rescale` here, which would move every font off its rank.
 
 The column snap is not optional, and the restyle script's own crop does not land it. That crop pads
 every stroke by half its weight on all four sides, caps or not, so the 3px median makes it report
@@ -237,29 +238,30 @@ a few tenths of a pixel.
 *both thresholds* and both bands reporting a bound style -- and each threshold and band reporting the
 same colour as its own median, which is the check that catches a stale band or threshold selector --
 both bands at opacity 0.2, the three labels in the Boys panel carrying their halos, no ink outside
-16..W-16, and ink gaps of 28.9 above the chart and 21.9 below it on both layouts, with each header
-ending at its layout's `chart_area_top`. A top gap off by more than a pixel means `chart_area_top` no
-longer matches the Figma header: re-measure it rather than moving the chart by hand.
+16..W-16, gridlines at 1px with a 4/4 dash, and ink gaps of 13.9 above and below the chart on both
+layouts, with each header ending at its layout's `chart_area_top`. A top gap off by more than a pixel
+means `chart_area_top` no longer matches the Figma header: re-measure it rather than moving the chart
+by hand.
 
 Then diff the desktop frame against the design team's copy with `/create-figma-chart`'s
 `scripts/diff_frames.js` (`referenceId` `29144:824`, `frameId` `26869:1501`). Expect every node paired
 and only these deltas: the two wrapped labels as one TEXT node there and one per line here (with the
 alignment that comes with it), the explanatory labels' halos on the frame's canvas style rather than
-the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, and the two arrows
-within ~3px of the copy's. Anything else is drift from the design.
+the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, the gridlines, the
+two arrows within a few px of the copy's, and the copy's shorter 850x615 frame, which drops the room
+its first version had padded inside the chart group. Anything else is drift from the design.
 
-Run `verify_page.js` with `gapTarget: { top: [28, 30], bottom: [21, 23] }`, the design team's uneven
-pair; the default symmetric 12-16 target fails it by construction. One row then fails by design:
-desktop `text-floor` flags the template's own tagline and license row, which ships at 11px.
-`annotation-overlap` passes because both arrows sit on the translucent band, which the row does not
-judge. The series, furniture and colour rows SKIP, because they key on grapher's layer names
+Run `verify_page.js` with `shadedAreas: "within-2-sd"`, which exempts the two bands the arrows point
+into, and the default gap target. One row then fails by design: desktop `text-floor` flags the
+template's own tagline and license row, which ships at 11px. The series, furniture and colour rows
+SKIP, because they key on grapher's layer names
 (`line__*`, `horizontal-grid-lines`), which this step does not emit, and `off-palette` asks for review
 of the unbound #5b5b5b text, as the design team's copy also leaves it. `color_audit.py` fails the two
 bands against each other (dE ~15 once composited); that is accepted, because each sits in its own
 titled panel and the lines carry the colour.
 
 The stunting arrow is the one arrow ending on a line, so it gets the four-render pixel probe
-(`measure_pixels.py arrow-gap`): 4.3px on desktop and 5.7px on mobile, zero touching. On mobile the
+(`measure_pixels.py arrow-gap`): 4.9px on desktop and 5.6px on mobile, zero touching. On mobile the
 dashed line climbs steeply, so the arrow is aimed at age 8.5, where it meets the line head-on, and
 keeps 6px of clearance; aimed further right it ran alongside the line and crossed it.
 
@@ -444,9 +446,12 @@ STUNTING_COLUMN = "height_sd_minus_2"
 # packages/@ourworldindata/grapher/src/axis/AxisViews.tsx, GRAPHER_DARK_TEXT (= GRAY_80) in
 # .../color/ColorConstants.ts. Grapher dashes its gridlines rather than drawing them solid and
 # labels axes in bold. The y axis carries no line: its gridlines carry the reading.
+# Grapher's gridline is 1px with a 4px dash and 4px gap. The width is written in template pixels and the
+# dash in multiples of it (matplotlib scales a dash by the linewidth), so both land on whole pixels; 1.0pt
+# here once came out 1.39px with a 5.6px dash.
 GRID_COLOR = "#ddd"
 GRID_DASHES = (0, (4, 4))
-GRID_LINEWIDTH = 1.0
+GRID_LINEWIDTH = 1 * POINTS_PER_PIXEL
 
 # Height gridline spacing, in cm. The y limits are snapped out to whole steps of this, so the
 # outermost gridlines land exactly on the plot's edges -- see where the limits are set.
@@ -627,11 +632,10 @@ TITLE_SUBTITLE_GAP = 6
 SUBTITLE_GAP = 0.15
 
 # The space between the chart's ink and the Figma header above it and the footer below it, in template
-# pixels, as the design team set it: 29 from the subtitle down to the top of the "200 cm" label, and 22
-# from the bottom of "Age in years" down to the footer's first row. More air above than below, and more
-# than the 12-16px the chart would get if it were simply centred in its band.
-CHART_TOP_GAP = 29
-CHART_BOTTOM_GAP = 22
+# pixels: the same above and below, inside the house 12-16px band, measured on what the reader sees
+# (the top of the "200 cm" label, the bottom of "Age in years"), not on the chart group's box.
+CHART_TOP_GAP = 14
+CHART_BOTTOM_GAP = 14
 
 # How far the top y tick label's ink rises above the top gridline, in template px, measured in Figma. The
 # plot's top edge is that gridline, so it starts this much below where the ink may start.
