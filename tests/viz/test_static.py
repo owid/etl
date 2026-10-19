@@ -143,6 +143,8 @@ def test_templates_agree_with_the_verifier_ratios():
         "mobile-square": (540, 540),
     }
     assert {k: (v.width_px, v.height_px) for k, v in TEMPLATES.items()} == expected
+    # The verifier judges an SVG's scale at this same 100px per inch.
+    assert PIXELS_PER_INCH == 100
 
 
 def test_unclip_turns_clipping_off_everywhere():
@@ -306,6 +308,30 @@ def test_export_frame_accepts_the_exact_template_figsize(tmp_path):
         export_frame(paths, fig, "chart", template=key)
         plt.close(fig)
         assert len(paths.calls) == 2, key
+
+
+def test_export_frame_holds_a_declared_height_at_the_template_width_and_scale(tmp_path):
+    t = TEMPLATES["horizontal"]
+    fig = plt.figure(figsize=(t.figsize[0], 6.15))
+    paths = _Paths(tmp_path)
+    export_frame(paths, fig, "chart", template="horizontal", height_px=615)
+    plt.close(fig)
+    assert len(paths.calls) == 2
+    # The same aspect at twice the scale, and the template's own height, both fail.
+    for figsize, height_px in (((t.figsize[0] * 2, 12.3), 615), ((t.figsize[0], 6.15), t.height_px)):
+        paths = _Paths(tmp_path)
+        fig = plt.figure(figsize=figsize)
+        with pytest.raises(AssertionError, match="does not match template"):
+            export_frame(paths, fig, "chart", template="horizontal", height_px=height_px)
+        plt.close(fig)
+        assert paths.calls == []
+
+
+def test_export_frame_needs_a_template_for_a_declared_height(tmp_path):
+    fig = plt.figure(figsize=(8.5, 6.15))
+    with pytest.raises(ValueError, match="needs template"):
+        export_frame(_Paths(tmp_path), fig, "chart", height_px=615)
+    plt.close(fig)
 
 
 def test_export_frame_rejects_an_unknown_template(tmp_path):

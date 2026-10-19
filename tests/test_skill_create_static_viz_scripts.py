@@ -168,6 +168,59 @@ def test_a_shared_gid_fails_only_when_required(tmp_path):
     assert strict.returncode == 1 and "series__same" in strict.stdout, strict.stdout
 
 
+# --- verify_static_viz.py: declared frame size -------------------------------------------------------
+
+
+def write_sized_frame(tmp_path: Path, width: int, height: int, unit: str = "") -> Path:
+    """A named SVG and its sibling PNG at a given frame size, in `unit` on the SVG root."""
+    from PIL import Image
+
+    stem = tmp_path / "frame"
+    w, h = (round(width * 0.72, 2), round(height * 0.72, 2)) if unit == "pt" else (width, height)
+    head = f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}{unit}" height="{h}{unit}">'
+    stem.with_suffix(".svg").write_text(f'{head}<g id="title"><text>Title</text></g></svg>')
+    Image.new("RGB", (width * 3, height * 3), "white").save(stem.with_suffix(".png"))
+    return stem
+
+
+def test_a_declared_size_replaces_the_template_ratio(tmp_path):
+    # A layout trimmed off its template on purpose fails the template check, and passes once declared.
+    stem = write_sized_frame(tmp_path, 850, 615)
+    template_only = run(VERIFY, stem, "--template", "horizontal")
+    assert template_only.returncode == 1 and "--size" in template_only.stdout, template_only.stdout
+    declared = run(VERIFY, stem, "--template", "horizontal", "--size", "frame=850x615")
+    assert declared.returncode == 0 and "frame matches declared 850x615" in declared.stdout, declared.stdout
+
+
+def test_a_declared_size_still_catches_a_crop(tmp_path):
+    stem = write_sized_frame(tmp_path, 850, 600)
+    result = run(VERIFY, stem, "--size", "frame=850x615")
+    assert result.returncode == 1 and "declared size is 850x615" in result.stdout, result.stdout
+
+
+def test_a_canvas_at_the_right_ratio_but_twice_the_scale_fails(tmp_path):
+    # matplotlib writes points, so an 850px frame is 612pt; at 1224pt every font would halve in Figma.
+    assert run(VERIFY, write_sized_frame(tmp_path, 850, 615, "pt"), "--size", "frame=850x615").returncode == 0
+    doubled = write_sized_frame(tmp_path, 1700, 1230, "pt")
+    for args in (["--size", "frame=850x615"], ["--template", "horizontal", "--size", "frame=850x615"]):
+        result = run(VERIFY, doubled, *args)
+        assert result.returncode == 1 and "the scale is 2x" in result.stdout, result.stdout
+
+
+@pytest.mark.parametrize("size", ["frame=850", "frame=850x0", "850x615", "frame=wxh"])
+def test_a_malformed_size_is_refused(tmp_path, size):
+    stem = write_sized_frame(tmp_path, 850, 615)
+    assert run(VERIFY, stem, "--size", size).returncode == 2
+
+
+def test_a_size_for_a_missing_output_is_refused(tmp_path):
+    # A typo in the stem would otherwise fall back to the template check without a word.
+    stem = write_sized_frame(tmp_path, 850, 615)
+    result = run(VERIFY, tmp_path, "--size", "fram=850x615")
+    assert result.returncode == 2 and "fram" in result.stderr, result.stderr
+    assert stem.with_suffix(".svg").exists()
+
+
 def test_scaffold_carries_the_promotion_markers(sketch):
     source = (sketch / "sketch.py").read_text()
     assert source.count("paths = SketchPaths(__file__)") == 1

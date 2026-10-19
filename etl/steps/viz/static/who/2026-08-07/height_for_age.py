@@ -39,8 +39,9 @@ There is no legend in either version.
 
 Two versions are emitted, following the static-chart templates:
 
-- desktop, 850x638: panels side by side, direct labels in the Boys panel, footer carrying Note, Data
-  source, the OurWorldinData.org tagline and the license line.
+- desktop, 850x615 (the horizontal template, 23px shorter so the panels keep their proportions): panels
+  side by side, direct labels in the Boys panel, footer carrying Note, Data source, the
+  OurWorldinData.org tagline and the license line.
 - mobile, 540x824: panels side by side in the portrait frame, the same direct labels placed for its
   217px panels, footer reduced to Data source plus the license, which is all that template has room
   for. It has no Note slot, so its subtitle adds a sentence defining stunting in standard deviations
@@ -72,7 +73,7 @@ as the "before" (`create-static-viz`'s `scripts/fetch_original_image.py` fetches
 
 | Frame | Node | Open it | Cloned from | Size |
 |---|---|---|---|---|
-| `expected-height-boys-girls` | `26869:1501` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1501) | `5332:75` Static Chart Template_Horizontal | 850x638 |
+| `expected-height-boys-girls` | `26869:1501` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1501) | `5332:75` Static Chart Template_Horizontal | 850x615 (template 850x638) |
 | `expected-height-boys-girls-mobile` | `26869:1515` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1515) | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
 
 The node ids are a convenience, not the join: they die if anyone rebuilds a frame from the template
@@ -122,8 +123,9 @@ two-line title and a two-line subtitle:
 - Both headers (`Frame 20` desktop, `Frame 26` mobile) are now vertical auto-layout frames, so the
   subtitle follows the title by itself, 6px under it.
 - Desktop's footer, `Frame 22`, hugs its rows and is pinned at its top, so a shorter note pulls the
-  source row up. Re-pin it after setting the note: `footer.y = 638 - 16 - footer.height`, which puts
-  the two-line note at the template's own y=559. Mobile's footer has no note and needs nothing.
+  source row up. Shorten the frame to 615 (`resizeWithoutConstraints(850, 615)`), then re-pin the
+  footer after setting the note: `footer.y = 615 - 16 - footer.height`, which puts the two-line note at
+  y=536, the step's `chart_bottom_y`. Mobile's footer has no note and needs nothing.
 
 **Colors.** Bind each panel's median, its threshold *and its band* to the library style. The gid names a
 group, so descend to its `VECTOR` children before calling the setter.
@@ -193,11 +195,12 @@ curvy arrow (`/create-figma-chart` -> `reference/ANNOTATIONS-AND-ARROWS.md`): a 
 filled dart, both bound to `Data Insights/Annotations` (`setStrokeStyleIdAsync` on the curve,
 `setFillStyleIdAsync` on the dart). Lay its tail and tip on the step's arrow, then delete the step's:
 
-- band: tail ~4px right of the end of the label's last line, at mid-height; curving clockwise, out to the
+- band: tail ~9px right of the end of the label's last line, at mid-height; curving clockwise, out to the
   right then down, to a tip midway between the median and the band's top edge at
   `band_label_target_age`;
-- stunting: tail ~7px left of "Stunting cutoff:", at mid-height; curving clockwise, out to the left then
-  up, to a tip 3-7px under the dashed line at `stunting_label_age`.
+- stunting: tail ~8px left of "Stunting cutoff:" (7.7px desktop, 7.3px mobile; the copy keeps 7.9), at
+  mid-height; curving clockwise, out to the left then up, to a tip 3-7px under the dashed line at
+  `stunting_label_age`.
 
 The house arrows to clone are the design team's own, in their copy of the desktop frame
 (`29144:824`): curves `Arrow 4` (band) / `Arrow 3` (stunting), `29146:1057` / `29146:1063`, and their
@@ -247,9 +250,8 @@ Then diff the desktop frame against the design team's copy with `/create-figma-c
 `scripts/diff_frames.js` (`referenceId` `29144:824`, `frameId` `26869:1501`). Expect every node paired
 and only these deltas: the two wrapped labels as one TEXT node there and one per line here (with the
 alignment that comes with it), the explanatory labels' halos on the frame's canvas style rather than
-the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, the gridlines, the
-two arrows within a few px of the copy's, and the copy's shorter 850x615 frame, which drops the room
-its first version had padded inside the chart group. Anything else is drift from the design.
+the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, the gridlines, and
+the two arrows within a few px of the copy's. Anything else is drift from the design.
 
 Run `verify_page.js` with `shadedAreas: "within-2-sd"`, which exempts the two bands the arrows point
 into, and the default gap target. One row then fails by design: desktop `text-floor` flags the
@@ -261,7 +263,7 @@ bands against each other (dE ~15 once composited); that is accepted, because eac
 titled panel and the lines carry the colour.
 
 The stunting arrow is the one arrow ending on a line, so it gets the four-render pixel probe
-(`measure_pixels.py arrow-gap`): 4.9px on desktop and 5.6px on mobile, zero touching. On mobile the
+(`measure_pixels.py arrow-gap`): 4.3px on desktop and 5.5px on mobile, zero touching. On mobile the
 dashed line climbs steeply, so the arrow is aimed at age 8.5, where it meets the line head-on, and
 keeps 6px of clearance; aimed further right it ran alongside the line and crossed it.
 
@@ -431,6 +433,9 @@ LEADER_WIDTH = 1 * POINTS_PER_PIXEL
 # A filled dart about 8px long and 7px across, the house arrowhead's size, in points (the arrow is drawn
 # with `mutation_scale=1`, so these are not multiples of the font size).
 LEADER_HEAD = "-|>,head_length=5.8,head_width=2.5"
+# Air between an arrow's tail and its label, along the arc, in template px. The stunting arrow leaves its
+# label at a slant, so it needs more along the arc to keep the ~8px the design team's copy has across.
+LEADER_TAIL_CLEARANCE_PX = {"within-2-sd": 4, "stunting-cutoff": 9}
 
 # Percentiles drawn as lines on top of the band, as (column, line width), so a specific centile
 # can be read off rather than only a range. Labelled directly in the Boys panel.
@@ -514,18 +519,20 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 # template: a template px is 0.72pt, and a line of text occupies about 1.8x its point size.
 LAYOUTS = {
     "height_for_age": {
-        "size": (850, 638),
+        # 23px shorter than the template's 850x638, as the design team set it: at the full height the
+        # house gaps stretch the two panels taller than the curves need, so the frame loses the slack
+        # instead and the plot keeps its proportions.
+        "size": (850, 615),
         "template": "horizontal",
         "margin": 16,
         "title_y": 16,
-        # The three footer rows of `Static Chart Template_Horizontal`, measured 2026-08-27 after the
-        # design team rebuilt it: Note at 559, Data source at 591, and the tagline/licence row at 609,
-        # inside a `Frame 22` that starts at 559 and is 63 tall. `chart_bottom_y` is the Note's top
-        # for a two-line note, which is the shape the template ships. The previous values (556 / 589)
-        # came from the template's earlier build and left every row about 2px high.
-        "chart_bottom_y": 559,
-        "source_y": 591,
-        "footer_y": 609,
+        # The three footer rows of `Static Chart Template_Horizontal` (Note, Data source, then the
+        # tagline/licence row, 32 and 18px apart, inside a 63-tall `Frame 22` 16px above the frame's
+        # bottom), moved up with the shorter frame. `chart_bottom_y` is the Note's top for a two-line
+        # note, which is the shape the template ships.
+        "chart_bottom_y": 536,
+        "source_y": 568,
+        "footer_y": 586,
         "nrows": 1,
         "ncols": 2,
         "full_footer": True,
@@ -661,7 +668,9 @@ def run() -> None:
         # transparent-SVG split, and the template-aspect assertion. `template` is a check, not a
         # setting -- it fails the run if this layout's figsize has drifted off the frame it is
         # laid out against.
-        export_frame(paths, fig, short_name, template=layout["template"])
+        # A layout may run a little shorter or taller than its template, which its comment explains:
+        # `height_px` holds it to the template's width at its own height.
+        export_frame(paths, fig, short_name, template=layout["template"], height_px=layout["size"][1])
         plt.close(fig)
 
 
@@ -841,7 +850,13 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         color=TEXT_COLOR,
         zorder=6,
         gid="label__within-2-sd",
-        arrowprops=arrow_props(*line_end(band_text, label_fontsize, row=-1, side="right"), rad=-0.35, clearance_px=0),
+        arrowprops=arrow_props(
+            *line_end(
+                band_text, label_fontsize, row=-1, side="right", clearance_px=LEADER_TAIL_CLEARANCE_PX["within-2-sd"]
+            ),
+            rad=-0.35,
+            clearance_px=0,
+        ),
     )
     assert band_label.arrow_patch is not None
     band_label.arrow_patch.set_gid("leader__within-2-sd")
@@ -862,7 +877,13 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         zorder=6,
         gid="label__stunting-cutoff",
         arrowprops=arrow_props(
-            *line_end(stunting_text, label_fontsize, row=0, side="left"),
+            *line_end(
+                stunting_text,
+                label_fontsize,
+                row=0,
+                side="left",
+                clearance_px=LEADER_TAIL_CLEARANCE_PX["stunting-cutoff"],
+            ),
             rad=-0.35,
             clearance_px=layout["stunting_arrow_clearance_px"],
         ),
@@ -894,12 +915,12 @@ def arrow_props(origin: tuple[float, float], gap: float, rad: float, clearance_p
     }
 
 
-def line_end(text: str, fontsize: float, row: int, side: str) -> tuple[tuple[float, float], float]:
+def line_end(text: str, fontsize: float, row: int, side: str, clearance_px: float) -> tuple[tuple[float, float], float]:
     """Where an arrow leaves a wrapped label: beside one of its lines, as a `relpos` fraction of the box.
 
     `row` picks the line and `side` which end of it, "right" for a left-aligned label (the end of the
     line) and "left" for a right-aligned one (its start). Returns the point at mid-height of that line,
-    and the gap to leave from it, in points: a few pixels of clearance plus what the line grows by once
+    and the gap to leave from it, in points: `clearance_px` of air plus what the line grows by once
     Figma sets it in Lato, which runs wider than the face measured here. A label grows away from its
     anchored edge, so all of that growth lands on the free end, where the arrow is.
     """
@@ -910,7 +931,7 @@ def line_end(text: str, fontsize: float, row: int, side: str) -> tuple[tuple[flo
     row = row % len(lines)
     x = widths[row] / widest if side == "right" else 1 - widths[row] / widest
     y = (len(lines) - row - 0.5) / len(lines)
-    gap = 4 * POINTS_PER_PIXEL + (LATO_OVER_MEASURED_ADVANCE - 1) * widths[row]
+    gap = clearance_px * POINTS_PER_PIXEL + (LATO_OVER_MEASURED_ADVANCE - 1) * widths[row]
     return (x, y), gap
 
 

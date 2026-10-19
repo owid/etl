@@ -71,6 +71,12 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already
   injects `metadata={"Date": None}` on the SVG pass for reproducible diffs.
+- **Lay out at the template's size, unless a slightly shorter or taller frame helps the chart** — say,
+  when the house gaps would stretch the plot taller than the data needs, trim the frame rather than the
+  gaps. Keep the template's width, change the height by tens of pixels rather than hundreds, and say why
+  in the layout's comment. Declare the height in both checks: `export_frame(..., template=<name>,
+  height_px=<H>)`, which holds the figure to the template's width and scale at that height, and
+  `--size <stem>=<W>x<H>` for the verifier (SKILL.md Step 5).
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
@@ -409,6 +415,9 @@ that reserves the space.** The step measures its own type — 10.5pt, say — wh
 the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide templates. Those wrap
 differently, so the line counts can differ, and the step is reserving the chart area against the wrong
 one. It cannot be fixed from the step: it deliberately sets no fonts, so it cannot measure Lato.
+The slot's width matters as much as its size: under a one-line title the subtitle slot is cropped to
+clear the logo (731 / 420 px, TEMPLATES.md), so wrap at that width, not the content width. Count the
+title's lines in the template, not the step, and wrap at the cropped width until that count is known.
 
 What this costs is a surprise on the *next copy edit*, not on the first build. Adding a single
 character — an Oxford comma, say — can tip a mobile subtitle from three lines to four in the
