@@ -257,6 +257,7 @@ def export_frame(
     short_name: str,
     *,
     template: str | None = None,
+    height_px: int | None = None,
     dpi: int = 300,
     unclip_first: bool = True,
     name_furniture_first: bool = True,
@@ -276,6 +277,8 @@ def export_frame(
 
     `template` is optional and only validates: it asserts the figure's `figsize` matches that
     template, catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.
+    `height_px` is for a layout that runs a little shorter or taller than its template on purpose: the
+    check then expects the template's width at that height, with the scale held just as strictly.
 
     The axes' own furniture is named first (`name_furniture`), so the only marks a step still has
     to give a gid are the ones it draws itself; `verify_static_viz.py --require-named-marks` lists
@@ -287,10 +290,14 @@ def export_frame(
     if unclip_first:
         unclip(fig)
 
+    if height_px is not None and template is None:
+        raise ValueError("height_px adjusts a template's height, so it needs template= too")
     if template is not None:
         if template not in TEMPLATES:
             raise ValueError(f"unknown template {template!r}; expected one of {sorted(TEMPLATES)}")
         want = TEMPLATES[template].figsize
+        if height_px is not None:
+            want = (want[0], height_px / PIXELS_PER_INCH)
         got = (fig.get_figwidth(), fig.get_figheight())
         # Both dimensions, not just their ratio: a figure at the template's aspect but twice its
         # scale needs a uniform rescale on the way into the frame, and that divides every
@@ -300,7 +307,8 @@ def export_frame(
         # check the thing that actually has to hold. Tolerance matches the verifier's 0.002.
         if any(abs(g - w) / w > 0.002 for g, w in zip(got, want)):
             raise AssertionError(
-                f"figure size {got[0]:.4f}x{got[1]:.4f} does not match template {template!r}. "
+                f"figure size {got[0]:.4f}x{got[1]:.4f} does not match template {template!r}"
+                f"{f' at {height_px}px tall' if height_px is not None else ''}. "
                 f"Expected figsize {want} — the aspect and the scale both have to match, because "
                 f"the figure is built at {PIXELS_PER_INCH} template px per inch. "
                 'A `bbox_inches="tight"` on save also breaks this — it crops to the ink.'
