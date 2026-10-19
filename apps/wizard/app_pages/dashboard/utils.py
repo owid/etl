@@ -194,7 +194,7 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
         ]
     ]
 
-    dtypes_new = df.dtypes.replace("object", "string[pyarrow]")
+    dtypes_new = df.dtypes.replace("object", "str")
     df = df.astype(dtypes_new)
     df["date_of_next_update"] = pd.to_datetime(df["date_of_next_update"], errors="coerce")
     return df

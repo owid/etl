@@ -199,7 +199,7 @@ def add_regime_category(tb: Table) -> Table:
 def harmonize_country_names(tb: Table) -> Table:
     """Harmonize country names, including former state corrections."""
     ## Fix Pakistan entity (ccode = 769 is actually 'Pakistan (former)')
-    tb["country"] = tb["country"].astype("string")
+    tb["country"] = tb["country"].astype("str")
     tb.loc[tb["ccode"] == 769, "country"] = "Pakistan (former)"
 
     ## Fix Sudan: remove former country for 2011 (already have north/south sudan data that year)
@@ -254,7 +254,7 @@ def add_age_and_experience(tb: Table) -> Table:
         # The column mixes ages and labels until it is cast to string below (pandas 3 no longer upcasts silently).
         tb[col_age] = tb[col_age].astype(object)
         tb.loc[mask, col_age] = tb.loc[mask, col[0]].replace(mapping)
-        tb[col_age] = tb[col_age].astype("string")
+        tb[col_age] = tb[col_age].astype("str")
 
     return tb
 

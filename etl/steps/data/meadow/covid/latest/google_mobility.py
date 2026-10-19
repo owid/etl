@@ -63,5 +63,5 @@ def set_dtypes(tb: Table) -> Table:
         "metro_area",
         "iso_3166_2_code",
     ]
-    tb[col_str] = tb[col_str].astype("string")
+    tb[col_str] = tb[col_str].astype("str")
     return tb

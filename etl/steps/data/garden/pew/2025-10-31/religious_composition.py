@@ -90,7 +90,7 @@ def add_owid_regions(tb):
     mask = tb["count"].isna()
     assert set(tb.loc[mask, "country"].unique()) == set(regions), "Unexpected missing shares after region aggregation!"
     ## Estimate `count` column based on unrounded counts
-    x = ((tb.loc[mask, "count_unrounded"] / 10000).round() * 10000).astype(int).astype("string")
+    x = ((tb.loc[mask, "count_unrounded"] / 10000).round() * 10000).astype(int).astype("str")
     mask_2 = tb.loc[mask, "count_unrounded"] < 10000
     x[mask_2] = UNDER_10K
     tb.loc[mask, "count"] = x
@@ -121,7 +121,7 @@ def add_any_religion(tb):
     tb_religion = tb_religion.groupby(["country", "year"], as_index=False)[["share", "count_unrounded"]].sum()
 
     # Estimate `count` column
-    tb_religion["count"] = ((tb_religion["count_unrounded"] / 10000).round() * 10000).astype(int).astype("string")
+    tb_religion["count"] = ((tb_religion["count_unrounded"] / 10000).round() * 10000).astype(int).astype("str")
     mask = tb_religion["count_unrounded"] <= 10000
     tb_religion.loc[mask, "count"] = UNDER_10K
 

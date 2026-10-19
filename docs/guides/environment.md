@@ -88,10 +88,18 @@ These servers are useful to share your changes with other members of the team, a
 To refresh the MySQL database on the staging server, use the following command:
 
 ```sh
-ssh owid@staging-site-yourname 'cd owid-grapher && make refresh'
+ssh owid@staging-site-yourname 'cd owid-grapher && make refresh.atomic'
 ```
 
-then push an empty commit to trigger a new rebuild
+Use `refresh.atomic`, not `refresh`: it also imports the private tables, including the admin API keys that ETL authenticates with. After a plain `make refresh` the staging build fails with 401 errors from the admin API until you run `make refresh.private`.
+
+Then purge the server's indicator files from R2, since the refreshed database reuses variable IDs that earlier staging builds wrote files for:
+
+```sh
+rclone purge r2:owid-api-staging/staging-site-yourname --fast-list --transfers 64 --checkers 64
+```
+
+and push an empty commit to trigger a new rebuild
 
 ```sh
 git commit -m ":honeybee: trigger rebuild" --allow-empty && git push

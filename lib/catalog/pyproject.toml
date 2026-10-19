@@ -101,3 +101,8 @@ Documentation = "https://docs.owid.io/projects/etl/libraries/catalog/"
 Repository = "https://github.com/owid/etl"
 Issues = "https://github.com/owid/etl/issues"
 Changelog = "https://github.com/owid/etl/releases"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: calls live OWID services (deselect with '-m \"not integration\"')",
+]

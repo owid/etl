@@ -37,27 +37,32 @@ def load_catalog() -> ETLCatalog:
     return _catalog
 
 
+@pytest.mark.integration
 def test_remote_catalog_loads():
     load_catalog()
 
 
+@pytest.mark.integration
 def test_remote_find_returns_all():
     c = load_catalog()
     assert len(c.find()) == len(c.frame)
 
 
+@pytest.mark.integration
 def test_remote_find_one():
     c = load_catalog()
     t = c.find_one("population_density", dataset="key_indicators", namespace="owid")
     assert isinstance(t, Table)
 
 
+@pytest.mark.integration
 def test_remote_getitem():
     c = load_catalog()
     t = c["garden/owid/latest/key_indicators/population_density"]
     assert isinstance(t, Table)
 
 
+@pytest.mark.integration
 def test_remote_default_channel():
     c = load_catalog()
     assert set(c.frame.channel) == {"garden"}

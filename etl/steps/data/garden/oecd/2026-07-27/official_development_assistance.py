@@ -331,7 +331,7 @@ def reformat_table_and_make_it_wide(
         tb = tb[tb[column].isin(CATEGORIES[short_name][column].keys())].reset_index(drop=True)
 
         # Make columns string
-        tb[column] = tb[column].astype("string")
+        tb[column] = tb[column].astype("str")
 
         for category, config in CATEGORIES[short_name][column].items():
             # Rename categories
