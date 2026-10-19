@@ -8703,9 +8703,9 @@ L 377.28 204.506193
    <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #111111" transform="translate(11.52 40.317)">for boys and girls</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 64.784225)">Height by age, according to the World Health Organization. Children</text>
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 75.71126)">more than 2 standard deviations below the median height for their age</text>
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 86.490875)">are considered stunted.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 64.784225)">Height by age, according to the World Health Organization.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 75.56384)">Children more than 2 standard deviations below the median</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 86.37275)">height for their age are considered stunted.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="560.775195" transform="rotate(-0 11.52 560.775195)">Data source: World Health Organization (2006; 2007)</text>
