@@ -30,7 +30,7 @@ def run() -> None:
     tables = []
     for year, columns in COLUMNS.items():
         snap = paths.load_snapshot(f"stackoverflow_developer_survey_{year}.csv")
-        tb_year = snap.read_csv(usecols=columns, encoding="utf-8-sig", dtype="string")
+        tb_year = snap.read_csv(usecols=columns, encoding="utf-8-sig", dtype="str")
         tb_year["year"] = year
         tables.append(tb_year)
 
