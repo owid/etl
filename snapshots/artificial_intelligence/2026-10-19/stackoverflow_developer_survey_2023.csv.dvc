@@ -13,7 +13,7 @@ meta:
     url_main: https://survey.stackoverflow.co/
     url_download: https://media.githubusercontent.com/media/StackExchange/Survey/main/packages/archive/2023/results.csv
     date_accessed: '2026-10-19'
-    date_published: '2026-05-08'
+    date_published: '2023-06-13'
     license:
       name: ODbL 1.0
       url: https://github.com/StackExchange/Survey/tree/main/packages/archive#licence
