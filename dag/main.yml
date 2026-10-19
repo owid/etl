@@ -201,9 +201,9 @@ steps:
           - data://garden/regions/2023-01-01/regions
 
   # Missing Data - Suicides
-  data://grapher/missing_data/2024-03-26/who_md_suicides:
-    - data://garden/missing_data/2024-03-26/who_md_suicides:
-      - data://garden/who/2024-03-24/self_inflicted_injuries
+  data://grapher/missing_data/2026-10-14/who_md_suicides:
+    - data://garden/missing_data/2026-10-14/who_md_suicides:
+      - data://garden/who/2026-10-13/mortality_database
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2023-03-31/population
@@ -245,10 +245,10 @@ steps:
       - data://garden/worldbank_wdi/2026-07-27/wdi
 
   # Homicide - OMM
-  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
-    - data://garden/homicide/2024-07-30/homicide_long_run_omm:
+  data://grapher/homicide/2026-10-15/homicide_long_run_omm:
+    - data://garden/homicide/2026-10-15/homicide_long_run_omm:
       - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-      - data://garden/homicide/2025-08-06/who_mort_db
+      - data://garden/who/2026-10-13/mortality_database
 
   # Child Mortality Estimates - UN IGME
   data://meadow/un/2026-06-09/igme:
@@ -436,13 +436,6 @@ steps:
       - data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today:
         - snapshot-private://happiness/2025-07-22/life_in_five_years_and_life_today.xlsx
 
-  # WHO Mort DB Homicides
-  data://garden/homicide/2025-08-06/who_mort_db:
-    - data://garden/un/2024-07-12/un_wpp
-    - data://meadow/homicide/2025-08-06/who_mort_db:
-      - snapshot://homicide/2025-08-06/who_mort_db.csv
-  data://grapher/homicide/2025-08-06/who_mort_db:
-    - data://garden/homicide/2025-08-06/who_mort_db
 
   # Ethnologue
   data-private://grapher/language/2025-09-03/ethnologue:
@@ -510,6 +503,32 @@ steps:
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
+
+  # OECD Climate-related official development assistance (RioMarkers)
+  data://grapher/oecd/2026-10-07/climate_related_official_development_assistance:
+    - data://garden/oecd/2026-10-07/climate_related_official_development_assistance:
+      - data://meadow/oecd/2026-10-07/climate_related_official_development_assistance:
+        - snapshot://oecd/2026-10-07/climate_related_official_development_assistance.zip
+        - snapshot://oecd/2026-10-07/bilateral_official_development_assistance_commitments.csv
+      - data://garden/demography/2024-07-15/population
+
+  #
+  # Climate-related ODA charts — authored in ETL.
+  #
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_mitigation_and_adaptation:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_foreign_aid_given_by_sector:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_foreign_aid_received:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_foreign_aid_received_per_capita:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_foreign_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
 
   #
   # CORE Econ - Growth rate of GDP per capita and productivity

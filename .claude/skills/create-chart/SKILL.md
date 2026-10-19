@@ -222,6 +222,7 @@ views:
     indicators:
       y:
         - catalogPath: "<dataset_short_name>#<indicator_short_name>"
+    # Single-indicator chart: leave `config` out and set these in garden (see below).
     config:
       title: "Your chart title"
       subtitle: "One-line context for the chart."
@@ -252,6 +253,26 @@ Key fields:
   while being far less visible (ETL warns when it does).
 - No top-level `title:`, `default_selection:` or `default_dimensions:` block — those exist only for multidim
   pages and are ignored for single charts.
+- **Single-indicator chart: configure it in garden, not here.** A chart that shows one indicator inherits
+  every field of that indicator's `presentation.grapher_config`, except `$schema`, `id`, `slug`, `version` and
+  `isPublished`. So put its FAUST (`title`, `subtitle`, `note`) and its settings (`originUrl`, `hasMapTab`,
+  `tab`, `chartTypes`, `map` with its `colorScale`, `yAxis`, `selectedEntityNames`, `selectedFacetStrategy`,
+  `addCountryMode`…) there, and leave `views[0].config` empty. These become the indicator's defaults, so any
+  other chart, multidim or explorer on it gets them too: if the indicator is already shown elsewhere and a
+  setting is only for this chart, keep that setting in `views[0].config`. Later edits to an existing chart go
+  through `edit-faust-metadata`, which reports the other surfaces first.
+  - Put settings shared by all indicators, such as `originUrl`, once in
+    `definitions.common.presentation.grapher_config`: it merges into each indicator's own `grapher_config`.
+    But a variable's `map` block replaces the common one instead of merging into it.
+  - A field set in the chart config overrides the inherited one, so keep only what is specific to this chart.
+  - When `title_public` isn't set, `grapher_config.title` also becomes the indicator's data page title.
+  - Grapher only inherits from a chart's single y-indicator (`getParentVariableIdFromChartConfig`): a chart
+    with several y-indicators, or a scatter plot, has nothing to inherit from, whatever its
+    `charts.isInheritanceEnabled` says. So does any chart whose `isInheritanceEnabled` is 0, such as some
+    charts adopted from the admin. Their FAUST and settings stay in the chart config.
+  - To check, read `charts.isInheritanceEnabled` and the chart's own layers on staging (the `chart_configs`
+    rows named by `charts.patchConfigIdETL` and `charts.patchConfigId`), not the rendered config, where an
+    override looks the same as an inherited value.
 
 ## Config YAML: multidim
 
@@ -425,6 +446,16 @@ Key fields for `config` in views or `common_views`:
 | Hide map timeline | `map.hideTimeline: true` | For point-in-time map charts |
 
 For the authoritative list, see the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
+
+### Map palettes
+
+Common practice in OWID charts, not a hard rule:
+
+- **Set `baseColorScheme` explicitly** on every numeric map. Without it, grapher picks a default, which may not suit the indicator.
+- **Match the palette to whether more is good or bad.** Use blues and greens when a higher value is good, such as aid received or vaccination coverage. Use reds, oranges and browns when it's bad, such as deaths or emissions. Purples work for either.
+- **Give each indicator its own palette** when several maps sit together, e.g. charts from the same dataset or for the same article. Then readers can tell the maps apart at a glance.
+
+[`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the other scheme families (diverging, perceptual, binary, categorical, `SingleColorGradient*`) are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
 
 ## Common dimension patterns
 

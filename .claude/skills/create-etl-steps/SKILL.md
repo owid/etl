@@ -169,6 +169,8 @@ So report the checks the person will need once the steps do something, rather th
 - `/check-metadata-style` — user-facing text against the Writing and Style Guide, and Jinja rendering artifacts once the metadata uses templates
 - `/check-metadata-typos` — spelling
 
+Before anyone fills in the `.meta.yml`, they need the producer's latest documentation (`.claude/rules/producer-documentation.md`); say so in the report.
+
 Also flag `.claude/rules/sanity-checks.md` if the garden step will do more than load-and-format: assertions are expected in the step, and the scaffold has none.
 
 ### 7. Report to the user

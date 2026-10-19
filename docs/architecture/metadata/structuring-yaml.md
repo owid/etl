@@ -287,6 +287,7 @@ The most straightforward way to check your metadata is in Admin, although that m
 
 ```python
 import etl.grapher.helpers as gh
+
 dim_dict = {"age_group": "YEARS0-4", "sex": "Male", "cause": "Drug use disorders"}
 d = gh.render_yaml_file("ghe.meta.yml", dim_dict=dim_dict)
 d["tables"]["ghe"]["variables"]["death_count"]
@@ -299,8 +300,8 @@ from owid.catalog import Dataset
 from etl import paths
 
 ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
-tb = ds['ceds_air_pollutants']
-tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
+tb = ds["ceds_air_pollutants"]
+tb.emissions.m.render({"pollutant": "CO", "sector": "Transport"})
 ```
 
 ### Jinja Macros
@@ -376,9 +377,7 @@ In some cases, you may need to programmatically modify metadata after creating a
 
 ```python
 # Create a new grapher dataset
-ds_grapher = create_dataset(
-    dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-)
+ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
 # Retrieve the table from the created dataset for metadata modification
 tb = ds_grapher["my_table"]

@@ -12,7 +12,7 @@ import shutil
 import string
 import sys
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
@@ -128,7 +128,7 @@ def test_data_step_becomes_dirty_when_pandas_version_changes():
 
 
 @contextmanager
-def temporary_step() -> Iterator[str]:
+def temporary_step() -> Generator[str, None, None]:
     "Make a step in the etl/ directory, but clean up afterwards."
     name = "".join(random.choice(string.ascii_lowercase) for i in range(10))
     try:
@@ -252,6 +252,14 @@ def test_dependency_filtering_empty_includes_with_excludes():
 class DummyStep(Step):
     def __init__(self, name: str):
         self.path = name
+
+    def run(self) -> None: ...
+
+    def is_dirty(self) -> bool:
+        return False
+
+    def checksum_output(self) -> str:
+        return ""
 
     def __str__(self):
         return self.path

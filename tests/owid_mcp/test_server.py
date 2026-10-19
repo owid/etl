@@ -4,9 +4,10 @@ import pandas as pd
 import pytest
 from fastmcp import Client
 from fastmcp.exceptions import ToolError
+from fastmcp.server.middleware import MiddlewareContext
 from mcp.types import TextContent
 
-from owid_mcp.server import mcp
+from owid_mcp.server import RequestLoggingMiddleware, mcp
 
 
 @pytest.mark.asyncio
@@ -533,3 +534,14 @@ async def test_connect_time_methods_succeed():
         assert await client.list_resources() == []
         assert await client.list_resource_templates() == []
         assert await client.list_prompts() == []
+
+
+@pytest.mark.asyncio
+async def test_request_logging_accepts_initialize_without_params():
+    """An initialize sent without params reaches the middleware with message=None."""
+    context = MiddlewareContext(message=None, method="initialize")
+
+    async def call_next(ctx):
+        return "ok"
+
+    assert await RequestLoggingMiddleware().on_message(context, call_next) == "ok"

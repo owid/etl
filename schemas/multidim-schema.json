@@ -509,7 +509,10 @@
                             "Income level"
                         ],
                         "examples_bad": [
-                            "Metric",
+                            "metric",
+                            "age group",
+                            "gender",
+                            "income level",
                             "AgeGroup",
                             "GENDER",
                             "IncomeLevel"

@@ -181,7 +181,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 .venv/bin/etl pr "Update dataset" data
 
 # 2. Stage and commit
-git add .
+git add <changed files>   # explicit paths: another session may share this worktree
 git commit -m "🔨🤖 Description"
 
 # 3. Push
@@ -295,6 +295,8 @@ with open(file_path, 'w') as f:
 ### Writing origin / metadata fields
 
 **Consult the reference first.** Before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields. Each field has one job — don't fold content that belongs in one field into another. Don't infer field usage by copying other `.dvc` files; they may use optional fields for reasons that don't apply to your snapshot.
+
+**Read the producer's latest documentation too** — the dataset page, methodology, codebook, main report and what's new — both to fill the fields and to check the text already written against it. Ask the user when it is missing, insufficient or inaccessible. The procedure is `.claude/rules/producer-documentation.md`.
 
 Mistakes the reference already covers but that keep happening:
 

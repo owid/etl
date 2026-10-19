@@ -84,6 +84,7 @@ steps:
   # Deforestation embedded in trade (DeDuCE physical trade model), for the bespoke deforestation sankey.
   data://meadow/forests/2026-09-29/deforestation_embedded_in_trade:
     - snapshot://forests/2026-09-29/deforestation_embedded_in_trade.csv
+    - snapshot://forests/2026-09-29/deforestation_commodity_lookup.xlsx
   data://garden/forests/2026-09-29/deforestation_embedded_in_trade:
     - data://meadow/forests/2026-09-29/deforestation_embedded_in_trade
   # Files read by the bespoke viz: a metadata JSON plus one JSON per country, synced to the environment's v1/bespoke path.

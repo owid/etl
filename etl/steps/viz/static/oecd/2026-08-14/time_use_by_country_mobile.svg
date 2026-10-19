@@ -25,1251 +25,1204 @@ z
   </g>
   <g id="axes_1">
    <g id="japan__main-paid-work-or-study">
-    <path d="M 94.592138 130.052571 
-L 166.834591 130.052571 
-L 166.834591 141.737143 
-L 94.592138 141.737143 
+    <path d="M 95.698125 141.067446 
+L 167.657938 141.067446 
+L 167.657938 153.193012 
+L 95.698125 153.193012 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="japan__main-personal-care">
-    <path d="M 166.834591 130.052571 
-L 292.473641 130.052571 
-L 292.473641 141.737143 
-L 166.834591 141.737143 
+    <path d="M 167.657938 141.067446 
+L 292.805438 141.067446 
+L 292.805438 153.193012 
+L 167.657938 153.193012 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="japan__main-unpaid-work-and-other">
-    <path d="M 292.473641 130.052571 
-L 324.276026 130.052571 
-L 324.276026 141.737143 
-L 292.473641 141.737143 
+    <path d="M 292.805438 141.067446 
+L 324.483398 141.067446 
+L 324.483398 153.193012 
+L 292.805438 153.193012 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="japan__main-leisure">
-    <path d="M 324.276026 130.052571 
-L 377.083689 130.052571 
-L 377.083689 141.737143 
-L 324.276026 141.737143 
-z
-" style="fill: #883039; opacity: 0.8"/>
-   </g>
-   <g id="mexico__main-paid-work-or-study">
-    <path d="M 94.592138 144.658286 
-L 163.085565 144.658286 
-L 163.085565 156.342857 
-L 94.592138 156.342857 
-z
-" style="fill: #bc8e5a; opacity: 0.8"/>
-   </g>
-   <g id="mexico__main-personal-care">
-    <path d="M 163.085565 144.658286 
-L 282.063388 144.658286 
-L 282.063388 156.342857 
-L 163.085565 156.342857 
-z
-" style="fill: #00295b; opacity: 0.8"/>
-   </g>
-   <g id="mexico__main-unpaid-work-and-other">
-    <path d="M 282.063388 144.658286 
-L 337.461467 144.658286 
-L 337.461467 156.342857 
-L 282.063388 156.342857 
-z
-" style="fill: #58ac8c; opacity: 0.8"/>
-   </g>
-   <g id="mexico__main-leisure">
-    <path d="M 337.461467 144.658286 
-L 377.279998 144.658286 
-L 377.279998 156.342857 
-L 337.461467 156.342857 
+    <path d="M 324.483398 141.067446 
+L 377.084457 141.067446 
+L 377.084457 153.193012 
+L 324.483398 153.193012 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="south-korea__main-paid-work-or-study">
-    <path d="M 94.592138 159.264 
-L 162.211931 159.264 
-L 162.211931 170.948571 
-L 94.592138 170.948571 
+    <path d="M 95.698125 156.224404 
+L 163.053362 156.224404 
+L 163.053362 168.34997 
+L 95.698125 168.34997 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="south-korea__main-personal-care">
-    <path d="M 162.211931 159.264 
-L 295.280844 159.264 
-L 295.280844 170.948571 
-L 162.211931 170.948571 
+    <path d="M 163.053362 156.224404 
+L 295.601658 156.224404 
+L 295.601658 168.34997 
+L 163.053362 168.34997 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="south-korea__main-unpaid-work-and-other">
-    <path d="M 295.280844 159.264 
-L 326.580673 159.264 
-L 326.580673 170.948571 
-L 295.280844 170.948571 
+    <path d="M 295.601658 156.224404 
+L 326.779029 156.224404 
+L 326.779029 168.34997 
+L 295.601658 168.34997 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="south-korea__main-leisure">
-    <path d="M 326.580673 159.264 
-L 377.279994 159.264 
-L 377.279994 170.948571 
-L 326.580673 170.948571 
+    <path d="M 326.779029 156.224404 
+L 377.279994 156.224404 
+L 377.279994 168.34997 
+L 326.779029 168.34997 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="canada__main-paid-work-or-study">
-    <path d="M 94.592138 173.869714 
-L 160.740628 173.869714 
-L 160.740628 185.554286 
-L 94.592138 185.554286 
+    <path d="M 95.698125 171.381361 
+L 161.587817 171.381361 
+L 161.587817 183.506928 
+L 95.698125 183.506928 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="canada__main-personal-care">
-    <path d="M 160.740628 173.869714 
-L 289.51283 173.869714 
-L 289.51283 185.554286 
-L 160.740628 185.554286 
+    <path d="M 161.587817 171.381361 
+L 289.856211 171.381361 
+L 289.856211 183.506928 
+L 161.587817 183.506928 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="canada__main-unpaid-work-and-other">
-    <path d="M 289.51283 173.869714 
-L 335.805025 173.869714 
-L 335.805025 185.554286 
-L 289.51283 185.554286 
+    <path d="M 289.856211 171.381361 
+L 335.967292 171.381361 
+L 335.967292 183.506928 
+L 289.856211 183.506928 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="canada__main-leisure">
-    <path d="M 335.805025 173.869714 
-L 377.280011 173.869714 
-L 377.280011 185.554286 
-L 335.805025 185.554286 
+    <path d="M 335.967292 171.381361 
+L 377.280011 171.381361 
+L 377.280011 183.506928 
+L 335.967292 183.506928 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="croatia__main-paid-work-or-study">
-    <path d="M 94.592138 188.475429 
-L 157.69779 188.475429 
-L 157.69779 200.16 
-L 94.592138 200.16 
+    <path d="M 95.698125 186.538319 
+L 158.556883 186.538319 
+L 158.556883 198.663886 
+L 95.698125 198.663886 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="croatia__main-personal-care">
-    <path d="M 157.69779 188.475429 
-L 286.239017 188.475429 
-L 286.239017 200.16 
-L 157.69779 200.16 
+    <path d="M 158.556883 186.538319 
+L 286.595206 186.538319 
+L 286.595206 198.663886 
+L 158.556883 198.663886 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="croatia__main-unpaid-work-and-other">
-    <path d="M 286.239017 188.475429 
-L 328.09057 188.475429 
-L 328.09057 200.16 
-L 286.239017 200.16 
+    <path d="M 286.595206 186.538319 
+L 328.283019 186.538319 
+L 328.283019 198.663886 
+L 286.595206 198.663886 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="croatia__main-leisure">
-    <path d="M 328.09057 188.475429 
-L 377.279989 188.475429 
-L 377.279989 200.16 
-L 328.09057 200.16 
+    <path d="M 328.283019 186.538319 
+L 377.279989 186.538319 
+L 377.279989 198.663886 
+L 328.283019 198.663886 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="sweden__main-paid-work-or-study">
-    <path d="M 94.592138 203.081143 
-L 152.191136 203.081143 
-L 152.191136 214.765714 
-L 94.592138 214.765714 
+    <path d="M 95.698125 201.695277 
+L 153.071774 201.695277 
+L 153.071774 213.820843 
+L 95.698125 213.820843 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="sweden__main-personal-care">
-    <path d="M 152.191136 203.081143 
-L 274.388765 203.081143 
-L 274.388765 214.765714 
-L 152.191136 214.765714 
+    <path d="M 153.071774 201.695277 
+L 274.791316 201.695277 
+L 274.791316 213.820843 
+L 153.071774 213.820843 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="sweden__main-unpaid-work-and-other">
-    <path d="M 274.388765 203.081143 
-L 314.169039 203.081143 
-L 314.169039 214.765714 
-L 274.388765 214.765714 
+    <path d="M 274.791316 201.695277 
+L 314.415954 201.695277 
+L 314.415954 213.820843 
+L 274.791316 213.820843 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="sweden__main-leisure">
-    <path d="M 314.169039 203.081143 
-L 377.279999 203.081143 
-L 377.279999 214.765714 
-L 314.169039 214.765714 
+    <path d="M 314.415954 201.695277 
+L 377.279999 201.695277 
+L 377.279999 213.820843 
+L 314.415954 213.820843 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="estonia__main-paid-work-or-study">
-    <path d="M 94.592138 217.686857 
-L 152.123385 217.686857 
-L 152.123385 229.371429 
-L 94.592138 229.371429 
+    <path d="M 95.698125 216.852235 
+L 153.004287 216.852235 
+L 153.004287 228.977801 
+L 95.698125 228.977801 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="estonia__main-personal-care">
-    <path d="M 152.123385 217.686857 
-L 280.475718 217.686857 
-L 280.475718 229.371429 
-L 152.123385 229.371429 
+    <path d="M 153.004287 216.852235 
+L 280.854455 216.852235 
+L 280.854455 228.977801 
+L 153.004287 228.977801 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="estonia__main-unpaid-work-and-other">
-    <path d="M 280.475718 217.686857 
-L 318.160131 217.686857 
-L 318.160131 229.371429 
-L 280.475718 229.371429 
+    <path d="M 280.854455 216.852235 
+L 318.391431 216.852235 
+L 318.391431 228.977801 
+L 280.854455 228.977801 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="estonia__main-leisure">
-    <path d="M 318.160131 217.686857 
-L 377.279989 217.686857 
-L 377.279989 229.371429 
-L 318.160131 229.371429 
+    <path d="M 318.391431 216.852235 
+L 377.279989 216.852235 
+L 377.279989 228.977801 
+L 318.391431 228.977801 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="luxembourg__main-paid-work-or-study">
-    <path d="M 94.592138 232.292571 
-L 150.479556 232.292571 
-L 150.479556 243.977143 
-L 94.592138 243.977143 
+    <path d="M 95.698125 232.009193 
+L 151.366889 232.009193 
+L 151.366889 244.134759 
+L 95.698125 244.134759 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="luxembourg__main-personal-care">
-    <path d="M 150.479556 232.292571 
-L 285.083779 232.292571 
-L 285.083779 243.977143 
-L 150.479556 243.977143 
+    <path d="M 151.366889 232.009193 
+L 285.444487 232.009193 
+L 285.444487 244.134759 
+L 151.366889 244.134759 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="luxembourg__main-unpaid-work-and-other">
-    <path d="M 285.083779 232.292571 
-L 323.014802 232.292571 
-L 323.014802 243.977143 
-L 285.083779 243.977143 
+    <path d="M 285.444487 232.009193 
+L 323.227109 232.009193 
+L 323.227109 244.134759 
+L 285.444487 244.134759 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="luxembourg__main-leisure">
-    <path d="M 323.014802 232.292571 
-L 377.272362 232.292571 
-L 377.272362 243.977143 
-L 323.014802 243.977143 
+    <path d="M 323.227109 232.009193 
+L 377.272392 232.009193 
+L 377.272392 244.134759 
+L 323.227109 244.134759 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="bulgaria__main-paid-work-or-study">
-    <path d="M 94.592138 246.898286 
-L 149.936909 246.898286 
-L 149.936909 258.582857 
-L 94.592138 258.582857 
+    <path d="M 95.698125 247.166151 
+L 150.826365 247.166151 
+L 150.826365 259.291717 
+L 95.698125 259.291717 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="bulgaria__main-personal-care">
-    <path d="M 149.936909 246.898286 
-L 291.880161 246.898286 
-L 291.880161 258.582857 
-L 149.936909 258.582857 
+    <path d="M 150.826365 247.166151 
+L 292.214279 247.166151 
+L 292.214279 259.291717 
+L 150.826365 259.291717 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="bulgaria__main-unpaid-work-and-other">
-    <path d="M 291.880161 246.898286 
-L 329.973947 246.898286 
-L 329.973947 258.582857 
-L 291.880161 258.582857 
+    <path d="M 292.214279 247.166151 
+L 330.159027 247.166151 
+L 330.159027 259.291717 
+L 292.214279 259.291717 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="bulgaria__main-leisure">
-    <path d="M 329.973947 246.898286 
-L 377.279992 246.898286 
-L 377.279992 258.582857 
-L 329.973947 258.582857 
+    <path d="M 330.159027 247.166151 
+L 377.279992 247.166151 
+L 377.279992 259.291717 
+L 330.159027 259.291717 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="united-states__main-paid-work-or-study">
-    <path d="M 94.592138 261.504 
-L 149.207254 261.504 
-L 149.207254 273.188571 
-L 94.592138 273.188571 
+    <path d="M 95.698125 262.323108 
+L 150.099566 262.323108 
+L 150.099566 274.448675 
+L 95.698125 274.448675 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="united-states__main-personal-care">
-    <path d="M 149.207254 261.504 
-L 279.566539 261.504 
-L 279.566539 273.188571 
-L 149.207254 273.188571 
+    <path d="M 150.099566 262.323108 
+L 279.948833 262.323108 
+L 279.948833 274.448675 
+L 150.099566 274.448675 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="united-states__main-unpaid-work-and-other">
-    <path d="M 279.566539 261.504 
-L 322.341035 261.504 
-L 322.341035 273.188571 
-L 279.566539 273.188571 
+    <path d="M 279.948833 262.323108 
+L 322.555978 262.323108 
+L 322.555978 274.448675 
+L 279.948833 274.448675 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="united-states__main-leisure">
-    <path d="M 322.341035 261.504 
-L 377.279998 261.504 
-L 377.279998 273.188571 
-L 322.341035 273.188571 
+    <path d="M 322.555978 262.323108 
+L 377.279998 262.323108 
+L 377.279998 274.448675 
+L 322.555978 274.448675 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="norway__main-paid-work-or-study">
-    <path d="M 94.592138 276.109714 
-L 148.656981 276.109714 
-L 148.656981 287.794286 
-L 94.592138 287.794286 
+    <path d="M 95.698125 277.480066 
+L 149.551445 277.480066 
+L 149.551445 289.605633 
+L 95.698125 289.605633 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="norway__main-personal-care">
-    <path d="M 148.656981 276.109714 
-L 269.061162 276.109714 
-L 269.061162 287.794286 
-L 148.656981 287.794286 
+    <path d="M 149.551445 277.480066 
+L 269.484557 277.480066 
+L 269.484557 289.605633 
+L 149.551445 289.605633 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="norway__main-unpaid-work-and-other">
-    <path d="M 269.061162 276.109714 
-L 307.792246 276.109714 
-L 307.792246 287.794286 
-L 269.061162 287.794286 
+    <path d="M 269.484557 277.480066 
+L 308.06411 277.480066 
+L 308.06411 289.605633 
+L 269.484557 289.605633 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="norway__main-leisure">
-    <path d="M 307.792246 276.109714 
-L 377.280013 276.109714 
-L 377.280013 287.794286 
-L 307.792246 287.794286 
+    <path d="M 308.06411 277.480066 
+L 377.280013 277.480066 
+L 377.280013 289.605633 
+L 308.06411 289.605633 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="new-zealand__main-paid-work-or-study">
-    <path d="M 94.592138 290.715429 
-L 147.596112 290.715429 
-L 147.596112 302.4 
-L 94.592138 302.4 
+    <path d="M 95.698125 292.637024 
+L 148.494727 292.637024 
+L 148.494727 304.76259 
+L 95.698125 304.76259 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="new-zealand__main-personal-care">
-    <path d="M 147.596112 290.715429 
-L 274.80565 290.715429 
-L 274.80565 302.4 
-L 147.596112 302.4 
+    <path d="M 148.494727 292.637024 
+L 275.20657 292.637024 
+L 275.20657 304.76259 
+L 148.494727 304.76259 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="new-zealand__main-unpaid-work-and-other">
-    <path d="M 274.80565 290.715429 
-L 318.190384 290.715429 
-L 318.190384 302.4 
-L 274.80565 302.4 
+    <path d="M 275.20657 292.637024 
+L 318.421566 292.637024 
+L 318.421566 304.76259 
+L 275.20657 304.76259 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="new-zealand__main-leisure">
-    <path d="M 318.190384 290.715429 
-L 377.28 290.715429 
-L 377.28 302.4 
-L 318.190384 302.4 
+    <path d="M 318.421566 292.637024 
+L 377.28 292.637024 
+L 377.28 304.76259 
+L 318.421566 304.76259 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="austria__main-paid-work-or-study">
-    <path d="M 94.592138 305.321143 
-L 146.740264 305.321143 
-L 146.740264 317.005714 
-L 94.592138 317.005714 
+    <path d="M 95.698125 307.793982 
+L 147.642228 307.793982 
+L 147.642228 319.919548 
+L 95.698125 319.919548 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="austria__main-personal-care">
-    <path d="M 146.740264 305.321143 
-L 277.809631 305.321143 
-L 277.809631 317.005714 
-L 146.740264 317.005714 
+    <path d="M 147.642228 307.793982 
+L 278.198799 307.793982 
+L 278.198799 319.919548 
+L 147.642228 319.919548 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="austria__main-unpaid-work-and-other">
-    <path d="M 277.809631 305.321143 
-L 317.03782 305.321143 
-L 317.03782 317.005714 
-L 277.809631 317.005714 
+    <path d="M 278.198799 307.793982 
+L 317.273511 307.793982 
+L 317.273511 319.919548 
+L 278.198799 319.919548 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="austria__main-leisure">
-    <path d="M 317.03782 305.321143 
-L 377.280002 305.321143 
-L 377.280002 317.005714 
-L 317.03782 317.005714 
+    <path d="M 317.273511 307.793982 
+L 377.280002 307.793982 
+L 377.280002 319.919548 
+L 317.273511 319.919548 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__main-paid-work-or-study">
-    <path d="M 94.592138 319.926857 
-L 146.077631 319.926857 
-L 146.077631 331.611429 
-L 94.592138 331.611429 
+    <path d="M 95.698125 322.95094 
+L 146.982187 322.95094 
+L 146.982187 335.076506 
+L 95.698125 335.076506 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__main-personal-care">
-    <path d="M 146.077631 319.926857 
-L 272.738351 319.926857 
-L 272.738351 331.611429 
-L 146.077631 331.611429 
+    <path d="M 146.982187 322.95094 
+L 273.14736 322.95094 
+L 273.14736 335.076506 
+L 146.982187 335.076506 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__main-unpaid-work-and-other">
-    <path d="M 272.738351 319.926857 
-L 317.300907 319.926857 
-L 317.300907 331.611429 
-L 272.738351 331.611429 
+    <path d="M 273.14736 322.95094 
+L 317.535569 322.95094 
+L 317.535569 335.076506 
+L 273.14736 335.076506 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__main-leisure">
-    <path d="M 317.300907 319.926857 
-L 377.279997 319.926857 
-L 377.279997 331.611429 
-L 317.300907 331.611429 
+    <path d="M 317.535569 322.95094 
+L 377.279997 322.95094 
+L 377.279997 335.076506 
+L 317.535569 335.076506 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="turkey__main-paid-work-or-study">
-    <path d="M 94.592138 334.532571 
-L 142.94668 334.532571 
-L 142.94668 346.217143 
-L 94.592138 346.217143 
+    <path d="M 95.698125 338.107898 
+L 143.863486 338.107898 
+L 143.863486 350.233464 
+L 95.698125 350.233464 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="turkey__main-personal-care">
-    <path d="M 142.94668 334.532571 
-L 276.790882 334.532571 
-L 276.790882 346.217143 
-L 142.94668 346.217143 
+    <path d="M 143.863486 338.107898 
+L 277.184035 338.107898 
+L 277.184035 350.233464 
+L 143.863486 350.233464 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="turkey__main-unpaid-work-and-other">
-    <path d="M 276.790882 334.532571 
-L 321.193735 334.532571 
-L 321.193735 346.217143 
-L 276.790882 346.217143 
+    <path d="M 277.184035 338.107898 
+L 321.413166 338.107898 
+L 321.413166 350.233464 
+L 277.184035 350.233464 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="turkey__main-leisure">
-    <path d="M 321.193735 334.532571 
-L 377.285827 334.532571 
-L 377.285827 346.217143 
-L 321.193735 346.217143 
+    <path d="M 321.413166 338.107898 
+L 377.285804 338.107898 
+L 377.285804 350.233464 
+L 321.413166 350.233464 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="germany__main-paid-work-or-study">
-    <path d="M 94.592138 349.138286 
-L 142.501299 349.138286 
-L 142.501299 360.822857 
-L 94.592138 360.822857 
+    <path d="M 95.698125 353.264855 
+L 143.419847 353.264855 
+L 143.419847 365.390422 
+L 95.698125 365.390422 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="germany__main-personal-care">
-    <path d="M 142.501299 349.138286 
-L 271.595898 349.138286 
-L 271.595898 360.822857 
-L 142.501299 360.822857 
+    <path d="M 143.419847 353.264855 
+L 272.009376 353.264855 
+L 272.009376 365.390422 
+L 143.419847 365.390422 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="germany__main-unpaid-work-and-other">
-    <path d="M 271.595898 349.138286 
-L 310.360932 349.138286 
-L 310.360932 360.822857 
-L 271.595898 360.822857 
+    <path d="M 272.009376 353.264855 
+L 310.622746 353.264855 
+L 310.622746 365.390422 
+L 272.009376 365.390422 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="germany__main-leisure">
-    <path d="M 310.360932 349.138286 
-L 377.279989 349.138286 
-L 377.279989 360.822857 
-L 310.360932 360.822857 
+    <path d="M 310.622746 353.264855 
+L 377.279989 353.264855 
+L 377.279989 365.390422 
+L 310.622746 365.390422 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="netherlands__main-paid-work-or-study">
-    <path d="M 94.592138 363.744 
-L 142.253907 363.744 
-L 142.253907 375.428571 
-L 94.592138 375.428571 
+    <path d="M 95.698125 368.421813 
+L 143.173422 368.421813 
+L 143.173422 380.54738 
+L 95.698125 380.54738 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="netherlands__main-personal-care">
-    <path d="M 142.253907 363.744 
-L 276.057657 363.744 
-L 276.057657 375.428571 
-L 142.253907 375.428571 
+    <path d="M 143.173422 368.421813 
+L 276.453679 368.421813 
+L 276.453679 380.54738 
+L 143.173422 380.54738 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="netherlands__main-unpaid-work-and-other">
-    <path d="M 276.057657 363.744 
-L 315.488303 363.744 
-L 315.488303 375.428571 
-L 276.057657 375.428571 
+    <path d="M 276.453679 368.421813 
+L 315.730056 368.421813 
+L 315.730056 380.54738 
+L 276.453679 380.54738 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="netherlands__main-leisure">
-    <path d="M 315.488303 363.744 
-L 377.279945 363.744 
-L 377.279945 375.428571 
-L 315.488303 375.428571 
+    <path d="M 315.730056 368.421813 
+L 377.279945 368.421813 
+L 377.279945 380.54738 
+L 315.730056 380.54738 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="south-africa__main-paid-work-or-study">
-    <path d="M 94.592138 378.349714 
-L 141.819869 378.349714 
-L 141.819869 390.034286 
-L 94.592138 390.034286 
+    <path d="M 95.698125 383.578771 
+L 142.741083 383.578771 
+L 142.741083 395.704337 
+L 95.698125 395.704337 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="south-africa__main-personal-care">
-    <path d="M 141.819869 378.349714 
-L 278.271506 378.349714 
-L 278.271506 390.034286 
-L 141.819869 390.034286 
+    <path d="M 142.741083 383.578771 
+L 278.658866 383.578771 
+L 278.658866 395.704337 
+L 142.741083 395.704337 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="south-africa__main-unpaid-work-and-other">
-    <path d="M 278.271506 378.349714 
-L 317.228822 378.349714 
-L 317.228822 390.034286 
-L 278.271506 390.034286 
+    <path d="M 278.658866 383.578771 
+L 317.463766 383.578771 
+L 317.463766 395.704337 
+L 278.658866 395.704337 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="south-africa__main-leisure">
-    <path d="M 317.228822 378.349714 
-L 377.280007 378.349714 
-L 377.280007 390.034286 
-L 317.228822 390.034286 
+    <path d="M 317.463766 383.578771 
+L 377.280007 383.578771 
+L 377.280007 395.704337 
+L 317.463766 395.704337 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="finland__main-paid-work-or-study">
-    <path d="M 94.592138 392.955429 
-L 141.727896 392.955429 
-L 141.727896 404.64 
-L 94.592138 404.64 
+    <path d="M 95.698125 398.735729 
+L 142.64947 398.735729 
+L 142.64947 410.861295 
+L 95.698125 410.861295 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="finland__main-personal-care">
-    <path d="M 141.727896 392.955429 
-L 268.288508 392.955429 
-L 268.288508 404.64 
-L 141.727896 404.64 
+    <path d="M 142.64947 398.735729 
+L 268.714926 398.735729 
+L 268.714926 410.861295 
+L 142.64947 410.861295 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="finland__main-unpaid-work-and-other">
-    <path d="M 268.288508 392.955429 
-L 312.535332 392.955429 
-L 312.535332 404.64 
-L 268.288508 404.64 
+    <path d="M 268.714926 398.735729 
+L 312.788639 398.735729 
+L 312.788639 410.861295 
+L 268.714926 410.861295 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="finland__main-leisure">
-    <path d="M 312.535332 392.955429 
-L 377.280003 392.955429 
-L 377.280003 404.64 
-L 312.535332 404.64 
+    <path d="M 312.788639 398.735729 
+L 377.280003 398.735729 
+L 377.280003 410.861295 
+L 312.788639 410.861295 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="hungary__main-paid-work-or-study">
-    <path d="M 94.592138 407.561143 
-L 141.238383 407.561143 
-L 141.238383 419.245714 
-L 94.592138 419.245714 
+    <path d="M 95.698125 413.892687 
+L 142.161872 413.892687 
+L 142.161872 426.018253 
+L 95.698125 426.018253 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="hungary__main-personal-care">
-    <path d="M 141.238383 407.561143 
-L 275.346125 407.561143 
-L 275.346125 419.245714 
-L 141.238383 419.245714 
+    <path d="M 142.161872 413.892687 
+L 275.744931 413.892687 
+L 275.744931 426.018253 
+L 142.161872 426.018253 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="hungary__main-unpaid-work-and-other">
-    <path d="M 275.346125 407.561143 
-L 322.047954 407.561143 
-L 322.047954 419.245714 
-L 275.346125 419.245714 
+    <path d="M 275.744931 413.892687 
+L 322.264044 413.892687 
+L 322.264044 426.018253 
+L 275.744931 426.018253 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="hungary__main-leisure">
-    <path d="M 322.047954 407.561143 
-L 377.279999 407.561143 
-L 377.279999 419.245714 
-L 322.047954 419.245714 
+    <path d="M 322.264044 413.892687 
+L 377.279999 413.892687 
+L 377.279999 426.018253 
+L 322.264044 426.018253 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="belgium__main-paid-work-or-study">
-    <path d="M 94.592138 422.166857 
-L 140.873169 422.166857 
-L 140.873169 433.851429 
-L 94.592138 433.851429 
+    <path d="M 95.698125 429.049645 
+L 141.798087 429.049645 
+L 141.798087 441.175211 
+L 95.698125 441.175211 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="belgium__main-personal-care">
-    <path d="M 140.873169 422.166857 
-L 271.232778 422.166857 
-L 271.232778 433.851429 
-L 140.873169 433.851429 
+    <path d="M 141.798087 429.049645 
+L 271.647677 429.049645 
+L 271.647677 441.175211 
+L 141.798087 441.175211 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="belgium__main-unpaid-work-and-other">
-    <path d="M 271.232778 422.166857 
-L 310.699427 422.166857 
-L 310.699427 433.851429 
-L 271.232778 433.851429 
+    <path d="M 271.647677 429.049645 
+L 310.959917 429.049645 
+L 310.959917 441.175211 
+L 271.647677 441.175211 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="belgium__main-leisure">
-    <path d="M 310.699427 422.166857 
-L 377.317602 422.166857 
-L 377.317602 433.851429 
-L 310.699427 433.851429 
+    <path d="M 310.959917 429.049645 
+L 377.317454 429.049645 
+L 377.317454 441.175211 
+L 310.959917 441.175211 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="greece__main-paid-work-or-study">
-    <path d="M 94.592138 436.772571 
-L 139.743671 436.772571 
-L 139.743671 448.457143 
-L 94.592138 448.457143 
+    <path d="M 95.698125 444.206602 
+L 140.673008 444.206602 
+L 140.673008 456.332169 
+L 95.698125 456.332169 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="greece__main-personal-care">
-    <path d="M 139.743671 436.772571 
-L 274.216717 436.772571 
-L 274.216717 448.457143 
-L 139.743671 448.457143 
+    <path d="M 140.673008 444.206602 
+L 274.619941 444.206602 
+L 274.619941 456.332169 
+L 140.673008 456.332169 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="greece__main-unpaid-work-and-other">
-    <path d="M 274.216717 436.772571 
-L 311.51581 436.772571 
-L 311.51581 448.457143 
-L 274.216717 448.457143 
+    <path d="M 274.619941 444.206602 
+L 311.773105 444.206602 
+L 311.773105 456.332169 
+L 274.619941 456.332169 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="greece__main-leisure">
-    <path d="M 311.51581 436.772571 
-L 377.28 436.772571 
-L 377.28 448.457143 
-L 311.51581 448.457143 
+    <path d="M 311.773105 444.206602 
+L 377.28 444.206602 
+L 377.28 456.332169 
+L 311.773105 456.332169 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="poland__main-paid-work-or-study">
-    <path d="M 94.592138 451.378286 
-L 136.602695 451.378286 
-L 136.602695 463.062857 
-L 94.592138 463.062857 
+    <path d="M 95.698125 459.36356 
+L 137.54432 459.36356 
+L 137.54432 471.489127 
+L 95.698125 471.489127 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="poland__main-personal-care">
-    <path d="M 136.602695 451.378286 
-L 270.486807 451.378286 
-L 270.486807 463.062857 
-L 136.602695 463.062857 
+    <path d="M 137.54432 459.36356 
+L 270.904625 459.36356 
+L 270.904625 471.489127 
+L 137.54432 471.489127 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="poland__main-unpaid-work-and-other">
-    <path d="M 270.486807 451.378286 
-L 326.042825 451.378286 
-L 326.042825 463.062857 
-L 270.486807 463.062857 
+    <path d="M 270.904625 459.36356 
+L 326.243285 459.36356 
+L 326.243285 471.489127 
+L 270.904625 471.489127 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="poland__main-leisure">
-    <path d="M 326.042825 451.378286 
-L 377.28 451.378286 
-L 377.28 463.062857 
-L 326.042825 463.062857 
+    <path d="M 326.243285 459.36356 
+L 377.28 459.36356 
+L 377.28 471.489127 
+L 326.243285 471.489127 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="france__main-paid-work-or-study">
-    <path d="M 94.592138 465.984 
-L 134.672005 465.984 
-L 134.672005 477.668571 
-L 94.592138 477.668571 
+    <path d="M 95.698125 474.520518 
+L 135.621184 474.520518 
+L 135.621184 486.646084 
+L 95.698125 486.646084 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="france__main-personal-care">
-    <path d="M 134.672005 465.984 
-L 282.346283 465.984 
-L 282.346283 477.668571 
-L 134.672005 477.668571 
+    <path d="M 135.621184 474.520518 
+L 282.717702 474.520518 
+L 282.717702 486.646084 
+L 135.621184 486.646084 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="france__main-unpaid-work-and-other">
-    <path d="M 282.346283 465.984 
-L 319.654342 465.984 
-L 319.654342 477.668571 
-L 282.346283 477.668571 
+    <path d="M 282.717702 474.520518 
+L 319.879796 474.520518 
+L 319.879796 486.646084 
+L 282.717702 486.646084 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="france__main-leisure">
-    <path d="M 319.654342 465.984 
-L 377.279994 465.984 
-L 377.279994 477.668571 
-L 319.654342 477.668571 
+    <path d="M 319.879796 474.520518 
+L 377.279994 474.520518 
+L 377.279994 486.646084 
+L 319.879796 486.646084 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="spain__main-paid-work-or-study">
-    <path d="M 94.592138 480.589714 
-L 134.247891 480.589714 
-L 134.247891 492.274286 
-L 94.592138 492.274286 
+    <path d="M 95.698125 489.677476 
+L 135.19873 489.677476 
+L 135.19873 501.803042 
+L 95.698125 501.803042 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="spain__main-personal-care">
-    <path d="M 134.247891 480.589714 
-L 270.054364 480.589714 
-L 270.054364 492.274286 
-L 134.247891 492.274286 
+    <path d="M 135.19873 489.677476 
+L 270.473873 489.677476 
+L 270.473873 501.803042 
+L 135.19873 501.803042 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="spain__main-unpaid-work-and-other">
-    <path d="M 270.054364 480.589714 
-L 315.236074 480.589714 
-L 315.236074 492.274286 
-L 270.054364 492.274286 
+    <path d="M 270.473873 489.677476 
+L 315.478815 489.677476 
+L 315.478815 501.803042 
+L 270.473873 501.803042 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="spain__main-leisure">
-    <path d="M 315.236074 480.589714 
-L 377.280024 480.589714 
-L 377.280024 492.274286 
-L 315.236074 492.274286 
+    <path d="M 315.478815 489.677476 
+L 377.280024 489.677476 
+L 377.280024 501.803042 
+L 315.478815 501.803042 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="italy__main-paid-work-or-study">
-    <path d="M 94.592138 495.195429 
-L 129.282073 495.195429 
-L 129.282073 506.88 
-L 94.592138 506.88 
+    <path d="M 95.698125 504.834434 
+L 130.252339 504.834434 
+L 130.252339 516.96 
+L 95.698125 516.96 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
    </g>
    <g id="italy__main-personal-care">
-    <path d="M 129.282073 495.195429 
-L 268.232625 495.195429 
-L 268.232625 506.88 
-L 129.282073 506.88 
+    <path d="M 130.252339 504.834434 
+L 268.659261 504.834434 
+L 268.659261 516.96 
+L 130.252339 516.96 
 z
 " style="fill: #00295b; opacity: 0.8"/>
    </g>
    <g id="italy__main-unpaid-work-and-other">
-    <path d="M 268.232625 495.195429 
-L 313.820774 495.195429 
-L 313.820774 506.88 
-L 268.232625 506.88 
+    <path d="M 268.659261 504.834434 
+L 314.069052 504.834434 
+L 314.069052 516.96 
+L 268.659261 516.96 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
    </g>
    <g id="italy__main-leisure">
-    <path d="M 313.820774 495.195429 
-L 377.28 495.195429 
-L 377.28 506.88 
-L 313.820774 506.88 
+    <path d="M 314.069052 504.834434 
+L 377.28 504.834434 
+L 377.28 516.96 
+L 314.069052 516.96 
 z
 " style="fill: #883039; opacity: 0.8"/>
    </g>
    <g id="japan__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="138.999857" transform="rotate(-0 88.832138 138.999857)">Japan (2021)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="150.235229" transform="rotate(-0 89.938125 150.235229)">Japan (2021)</text>
    </g>
    <g id="japan__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="130.713364" y="138.999857" transform="rotate(-0 130.713364 138.999857)">6h 8m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="131.678031" y="150.235229" transform="rotate(-0 131.678031 150.235229)">6h 8m</text>
    </g>
    <g id="japan__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="229.654116" y="138.999857" transform="rotate(-0 229.654116 138.999857)">10h 40m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="230.231688" y="150.235229" transform="rotate(-0 230.231688 150.235229)">10h 40m</text>
    </g>
    <g id="japan__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="350.679857" y="138.999857" transform="rotate(-0 350.679857 138.999857)">4h 29m</text>
-   </g>
-   <g id="mexico__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="153.605571" transform="rotate(-0 88.832138 153.605571)">Mexico (2024)</text>
-   </g>
-   <g id="mexico__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.838851" y="153.605571" transform="rotate(-0 128.838851 153.605571)">5h 49m</text>
-   </g>
-   <g id="mexico__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="222.574477" y="153.605571" transform="rotate(-0 222.574477 153.605571)">10h 6m</text>
-   </g>
-   <g id="mexico__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="309.762428" y="153.605571" transform="rotate(-0 309.762428 153.605571)">4h 42m</text>
-   </g>
-   <g id="mexico__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="357.370733" y="153.605571" transform="rotate(-0 357.370733 153.605571)">3h 23m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="350.783928" y="150.235229" transform="rotate(-0 350.783928 150.235229)">4h 29m</text>
    </g>
    <g id="south-korea__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="168.211286" transform="rotate(-0 88.832138 168.211286)">South Korea (2014)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="165.392187" transform="rotate(-0 89.938125 165.392187)">South Korea (2014)</text>
    </g>
    <g id="south-korea__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.402034" y="168.211286" transform="rotate(-0 128.402034 168.211286)">5h 44m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="129.375744" y="165.392187" transform="rotate(-0 129.375744 165.392187)">5h 44m</text>
    </g>
    <g id="south-korea__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="228.746387" y="168.211286" transform="rotate(-0 228.746387 168.211286)">11h 18m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="229.32751" y="165.392187" transform="rotate(-0 229.32751 165.392187)">11h 18m</text>
    </g>
    <g id="south-korea__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="351.930333" y="168.211286" transform="rotate(-0 351.930333 168.211286)">4h 18m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="352.029511" y="165.392187" transform="rotate(-0 352.029511 165.392187)">4h 18m</text>
    </g>
    <g id="canada__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="182.817" transform="rotate(-0 88.832138 182.817)">Canada (2022)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="180.549145" transform="rotate(-0 89.938125 180.549145)">Canada (2022)</text>
    </g>
    <g id="canada__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="127.666383" y="182.817" transform="rotate(-0 127.666383 182.817)">5h 37m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.642971" y="180.549145" transform="rotate(-0 128.642971 180.549145)">5h 37m</text>
    </g>
    <g id="canada__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="225.126729" y="182.817" transform="rotate(-0 225.126729 182.817)">10h 56m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="225.722014" y="180.549145" transform="rotate(-0 225.722014 180.549145)">10h 56m</text>
    </g>
    <g id="canada__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="312.658928" y="182.817" transform="rotate(-0 312.658928 182.817)">3h 56m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="312.911751" y="180.549145" transform="rotate(-0 312.911751 180.549145)">3h 56m</text>
    </g>
    <g id="canada__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="356.542518" y="182.817" transform="rotate(-0 356.542518 182.817)">3h 31m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="356.623651" y="180.549145" transform="rotate(-0 356.623651 180.549145)">3h 31m</text>
    </g>
    <g id="croatia__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="197.422714" transform="rotate(-0 88.832138 197.422714)">Croatia (2023)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="195.706102" transform="rotate(-0 89.938125 195.706102)">Croatia (2023)</text>
    </g>
    <g id="croatia__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="126.144964" y="197.422714" transform="rotate(-0 126.144964 197.422714)">5h 21m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="127.127504" y="195.706102" transform="rotate(-0 127.127504 195.706102)">5h 21m</text>
    </g>
    <g id="croatia__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="221.968403" y="197.422714" transform="rotate(-0 221.968403 197.422714)">10h 55m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="222.576044" y="195.706102" transform="rotate(-0 222.576044 195.706102)">10h 55m</text>
    </g>
    <g id="croatia__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="307.164794" y="197.422714" transform="rotate(-0 307.164794 197.422714)">3h 33m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="307.439112" y="195.706102" transform="rotate(-0 307.439112 195.706102)">3h 33m</text>
    </g>
    <g id="croatia__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="352.685279" y="197.422714" transform="rotate(-0 352.685279 197.422714)">4h 11m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="352.781504" y="195.706102" transform="rotate(-0 352.781504 195.706102)">4h 11m</text>
    </g>
    <g id="sweden__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="212.028429" transform="rotate(-0 88.832138 212.028429)">Sweden (2010)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="210.86306" transform="rotate(-0 89.938125 210.86306)">Sweden (2010)</text>
    </g>
    <g id="sweden__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="123.391637" y="212.028429" transform="rotate(-0 123.391637 212.028429)">4h 53m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="124.384949" y="210.86306" transform="rotate(-0 124.384949 210.86306)">4h 53m</text>
    </g>
    <g id="sweden__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="213.28995" y="212.028429" transform="rotate(-0 213.28995 212.028429)">10h 22m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="213.931545" y="210.86306" transform="rotate(-0 213.931545 210.86306)">10h 22m</text>
    </g>
    <g id="sweden__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="294.278902" y="212.028429" transform="rotate(-0 294.278902 212.028429)">3h 23m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="294.603635" y="210.86306" transform="rotate(-0 294.603635 210.86306)">3h 23m</text>
    </g>
    <g id="sweden__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="345.724519" y="212.028429" transform="rotate(-0 345.724519 212.028429)">5h 21m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="345.847976" y="210.86306" transform="rotate(-0 345.847976 210.86306)">5h 21m</text>
    </g>
    <g id="estonia__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="226.634143" transform="rotate(-0 88.832138 226.634143)">Estonia (2021)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="226.020018" transform="rotate(-0 89.938125 226.020018)">Estonia (2021)</text>
    </g>
    <g id="estonia__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="123.357761" y="226.634143" transform="rotate(-0 123.357761 226.634143)">4h 53m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="124.351206" y="226.020018" transform="rotate(-0 124.351206 226.020018)">4h 53m</text>
    </g>
    <g id="estonia__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="216.299551" y="226.634143" transform="rotate(-0 216.299551 226.634143)">10h 54m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="216.929371" y="226.020018" transform="rotate(-0 216.929371 226.020018)">10h 54m</text>
    </g>
    <g id="estonia__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="299.317924" y="226.634143" transform="rotate(-0 299.317924 226.634143)">3h 12m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="299.622943" y="226.020018" transform="rotate(-0 299.622943 226.020018)">3h 12m</text>
    </g>
    <g id="estonia__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.72006" y="226.634143" transform="rotate(-0 347.72006 226.634143)">5h 1m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.83571" y="226.020018" transform="rotate(-0 347.83571 226.020018)">5h 1m</text>
    </g>
    <g id="luxembourg__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="241.239857" transform="rotate(-0 88.832138 241.239857)">Luxembourg (2013)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="241.176976" transform="rotate(-0 89.938125 241.176976)">Luxembourg (2013)</text>
    </g>
    <g id="luxembourg__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="122.535847" y="241.239857" transform="rotate(-0 122.535847 241.239857)">4h 45m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="123.532507" y="241.176976" transform="rotate(-0 123.532507 241.176976)">4h 45m</text>
    </g>
    <g id="luxembourg__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="217.781667" y="241.239857" transform="rotate(-0 217.781667 241.239857)">11h 26m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="218.405688" y="241.176976" transform="rotate(-0 218.405688 241.176976)">11h 26m</text>
    </g>
    <g id="luxembourg__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="304.04929" y="241.239857" transform="rotate(-0 304.04929 241.239857)">3h 13m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="304.335798" y="241.176976" transform="rotate(-0 304.335798 241.176976)">3h 13m</text>
    </g>
    <g id="luxembourg__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="350.143582" y="241.239857" transform="rotate(-0 350.143582 241.239857)">4h 36m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="350.249751" y="241.176976" transform="rotate(-0 350.249751 241.176976)">4h 36m</text>
    </g>
    <g id="bulgaria__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="255.845571" transform="rotate(-0 88.832138 255.845571)">Bulgaria (2020)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="256.333934" transform="rotate(-0 89.938125 256.333934)">Bulgaria (2020)</text>
    </g>
    <g id="bulgaria__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="122.264523" y="255.845571" transform="rotate(-0 122.264523 255.845571)">4h 42m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="123.262245" y="256.333934" transform="rotate(-0 123.262245 256.333934)">4h 42m</text>
    </g>
    <g id="bulgaria__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="220.908535" y="255.845571" transform="rotate(-0 220.908535 255.845571)">12h 3m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="221.520322" y="256.333934" transform="rotate(-0 221.520322 256.333934)">12h 3m</text>
    </g>
    <g id="bulgaria__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="310.927054" y="255.845571" transform="rotate(-0 310.927054 255.845571)">3h 14m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="311.186653" y="256.333934" transform="rotate(-0 311.186653 256.333934)">3h 14m</text>
    </g>
    <g id="bulgaria__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="353.62697" y="255.845571" transform="rotate(-0 353.62697 255.845571)">4h 1m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="353.71951" y="256.333934" transform="rotate(-0 353.71951 256.333934)">4h 1m</text>
    </g>
    <g id="united-states__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="270.451286" transform="rotate(-0 88.832138 270.451286)">US (2024)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="271.490892" transform="rotate(-0 89.938125 271.490892)">US (2024)</text>
    </g>
    <g id="united-states__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="121.899696" y="270.451286" transform="rotate(-0 121.899696 270.451286)">4h 38m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="122.898845" y="271.490892" transform="rotate(-0 122.898845 271.490892)">4h 38m</text>
    </g>
    <g id="united-states__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="214.386897" y="270.451286" transform="rotate(-0 214.386897 270.451286)">11h 4m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="215.0242" y="271.490892" transform="rotate(-0 215.0242 271.490892)">11h 4m</text>
    </g>
    <g id="united-states__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="300.953787" y="270.451286" transform="rotate(-0 300.953787 270.451286)">3h 38m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="301.252406" y="271.490892" transform="rotate(-0 301.252406 271.490892)">3h 38m</text>
    </g>
    <g id="united-states__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="349.810517" y="270.451286" transform="rotate(-0 349.810517 270.451286)">4h 40m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="349.917988" y="271.490892" transform="rotate(-0 349.917988 271.490892)">4h 40m</text>
    </g>
    <g id="norway__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="285.057" transform="rotate(-0 88.832138 285.057)">Norway (2022)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="286.647849" transform="rotate(-0 89.938125 286.647849)">Norway (2022)</text>
    </g>
    <g id="norway__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="121.624559" y="285.057" transform="rotate(-0 121.624559 285.057)">4h 35m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="122.624785" y="286.647849" transform="rotate(-0 122.624785 286.647849)">4h 35m</text>
    </g>
    <g id="norway__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="208.859072" y="285.057" transform="rotate(-0 208.859072 285.057)">10h 13m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="209.518001" y="286.647849" transform="rotate(-0 209.518001 286.647849)">10h 13m</text>
    </g>
    <g id="norway__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="288.426704" y="285.057" transform="rotate(-0 288.426704 285.057)">3h 17m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="288.774334" y="286.647849" transform="rotate(-0 288.774334 286.647849)">3h 17m</text>
    </g>
    <g id="norway__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="342.53613" y="285.057" transform="rotate(-0 342.53613 285.057)">5h 54m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="342.672062" y="286.647849" transform="rotate(-0 342.672062 286.647849)">5h 54m</text>
    </g>
    <g id="new-zealand__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="299.662714" transform="rotate(-0 88.832138 299.662714)">New Zealand (2010)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="301.804807" transform="rotate(-0 89.938125 301.804807)">New Zealand (2010)</text>
    </g>
    <g id="new-zealand__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="121.094125" y="299.662714" transform="rotate(-0 121.094125 299.662714)">4h 30m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="122.096426" y="301.804807" transform="rotate(-0 122.096426 301.804807)">4h 30m</text>
    </g>
    <g id="new-zealand__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="211.200881" y="299.662714" transform="rotate(-0 211.200881 299.662714)">10h 48m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="211.850648" y="301.804807" transform="rotate(-0 211.850648 301.804807)">10h 48m</text>
    </g>
    <g id="new-zealand__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="296.498017" y="299.662714" transform="rotate(-0 296.498017 299.662714)">3h 41m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="296.814068" y="301.804807" transform="rotate(-0 296.814068 301.804807)">3h 41m</text>
    </g>
    <g id="new-zealand__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.735192" y="299.662714" transform="rotate(-0 347.735192 299.662714)">5h 1m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.850783" y="301.804807" transform="rotate(-0 347.850783 301.804807)">5h 1m</text>
    </g>
    <g id="austria__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="314.268429" transform="rotate(-0 88.832138 314.268429)">Austria (2022)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="316.961765" transform="rotate(-0 89.938125 316.961765)">Austria (2022)</text>
    </g>
    <g id="austria__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="120.666201" y="314.268429" transform="rotate(-0 120.666201 314.268429)">4h 26m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="121.670176" y="316.961765" transform="rotate(-0 121.670176 316.961765)">4h 26m</text>
    </g>
    <g id="austria__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="212.274948" y="314.268429" transform="rotate(-0 212.274948 314.268429)">11h 8m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="212.920513" y="316.961765" transform="rotate(-0 212.920513 316.961765)">11h 8m</text>
    </g>
    <g id="austria__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="297.423726" y="314.268429" transform="rotate(-0 297.423726 314.268429)">3h 20m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="297.736155" y="316.961765" transform="rotate(-0 297.736155 316.961765)">3h 20m</text>
    </g>
    <g id="austria__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.158911" y="314.268429" transform="rotate(-0 347.158911 314.268429)">5h 7m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.276757" y="316.961765" transform="rotate(-0 347.276757 316.961765)">5h 7m</text>
    </g>
    <g id="united-kingdom__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="328.874143" transform="rotate(-0 88.832138 328.874143)">UK (2015)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="332.118723" transform="rotate(-0 89.938125 332.118723)">UK (2015)</text>
    </g>
    <g id="united-kingdom__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="120.334884" y="328.874143" transform="rotate(-0 120.334884 328.874143)">4h 22m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="121.340156" y="332.118723" transform="rotate(-0 121.340156 332.118723)">4h 22m</text>
    </g>
    <g id="united-kingdom__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="209.407991" y="328.874143" transform="rotate(-0 209.407991 328.874143)">10h 45m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="210.064773" y="332.118723" transform="rotate(-0 210.064773 332.118723)">10h 45m</text>
    </g>
    <g id="united-kingdom__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="295.019629" y="328.874143" transform="rotate(-0 295.019629 328.874143)">3h 47m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="295.341464" y="332.118723" transform="rotate(-0 295.341464 332.118723)">3h 47m</text>
    </g>
    <g id="united-kingdom__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.290452" y="328.874143" transform="rotate(-0 347.290452 328.874143)">5h 6m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.407783" y="332.118723" transform="rotate(-0 347.407783 332.118723)">5h 6m</text>
    </g>
    <g id="turkey__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="343.479857" transform="rotate(-0 88.832138 343.479857)">Turkey (2015)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="347.275681" transform="rotate(-0 89.938125 347.275681)">Turkey (2015)</text>
    </g>
    <g id="turkey__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.769409" y="343.479857" transform="rotate(-0 118.769409 343.479857)">4h 6m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="119.780805" y="347.275681" transform="rotate(-0 119.780805 347.275681)">4h 6m</text>
    </g>
    <g id="turkey__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="209.868781" y="343.479857" transform="rotate(-0 209.868781 343.479857)">11h 22m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="210.52376" y="347.275681" transform="rotate(-0 210.52376 347.275681)">11h 22m</text>
    </g>
    <g id="turkey__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="298.992308" y="343.479857" transform="rotate(-0 298.992308 343.479857)">3h 46m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="299.298601" y="347.275681" transform="rotate(-0 299.298601 347.275681)">3h 46m</text>
    </g>
    <g id="turkey__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="349.239781" y="343.479857" transform="rotate(-0 349.239781 343.479857)">4h 46m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="349.349485" y="347.275681" transform="rotate(-0 349.349485 347.275681)">4h 46m</text>
    </g>
    <g id="germany__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="358.085571" transform="rotate(-0 88.832138 358.085571)">Germany (2022)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="362.432639" transform="rotate(-0 89.938125 362.432639)">Germany (2022)</text>
    </g>
    <g id="germany__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.546718" y="358.085571" transform="rotate(-0 118.546718 358.085571)">4h 4m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="119.558986" y="362.432639" transform="rotate(-0 119.558986 362.432639)">4h 4m</text>
    </g>
    <g id="germany__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="207.048598" y="358.085571" transform="rotate(-0 207.048598 358.085571)">10h 58m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="207.714611" y="362.432639" transform="rotate(-0 207.714611 362.432639)">10h 58m</text>
    </g>
    <g id="germany__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="290.978415" y="358.085571" transform="rotate(-0 290.978415 358.085571)">3h 17m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="291.316061" y="362.432639" transform="rotate(-0 291.316061 362.432639)">3h 17m</text>
    </g>
    <g id="germany__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="343.82046" y="358.085571" transform="rotate(-0 343.82046 358.085571)">5h 41m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="343.951367" y="362.432639" transform="rotate(-0 343.951367 362.432639)">5h 41m</text>
    </g>
    <g id="netherlands__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="372.691286" transform="rotate(-0 88.832138 372.691286)">Netherlands (2016)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="377.589596" transform="rotate(-0 89.938125 377.589596)">Netherlands (2016)</text>
    </g>
    <g id="netherlands__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.423022" y="372.691286" transform="rotate(-0 118.423022 372.691286)">4h 3m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="119.435774" y="377.589596" transform="rotate(-0 119.435774 377.589596)">4h 3m</text>
    </g>
    <g id="netherlands__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="209.155782" y="372.691286" transform="rotate(-0 209.155782 372.691286)">11h 22m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="209.813551" y="377.589596" transform="rotate(-0 209.813551 377.589596)">11h 22m</text>
    </g>
    <g id="netherlands__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="295.77298" y="372.691286" transform="rotate(-0 295.77298 372.691286)">3h 21m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="296.091868" y="377.589596" transform="rotate(-0 296.091868 377.589596)">3h 21m</text>
    </g>
    <g id="netherlands__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="346.384124" y="372.691286" transform="rotate(-0 346.384124 372.691286)">5h 15m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="346.505001" y="377.589596" transform="rotate(-0 346.505001 377.589596)">5h 15m</text>
    </g>
    <g id="south-africa__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="387.297" transform="rotate(-0 88.832138 387.297)">South Africa (2010)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="392.746554" transform="rotate(-0 89.938125 392.746554)">South Africa (2010)</text>
    </g>
    <g id="south-africa__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.206003" y="387.297" transform="rotate(-0 118.206003 387.297)">4h 1m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="119.219604" y="392.746554" transform="rotate(-0 119.219604 392.746554)">4h 1m</text>
    </g>
    <g id="south-africa__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="210.045687" y="387.297" transform="rotate(-0 210.045687 387.297)">11h 35m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="210.699975" y="392.746554" transform="rotate(-0 210.699975 392.746554)">11h 35m</text>
    </g>
    <g id="south-africa__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="297.750164" y="387.297" transform="rotate(-0 297.750164 387.297)">3h 18m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="298.061316" y="392.746554" transform="rotate(-0 298.061316 392.746554)">3h 18m</text>
    </g>
    <g id="south-africa__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.254415" y="387.297" transform="rotate(-0 347.254415 387.297)">5h 6m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="347.371887" y="392.746554" transform="rotate(-0 347.371887 392.746554)">5h 6m</text>
    </g>
    <g id="finland__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="401.902714" transform="rotate(-0 88.832138 401.902714)">Finland (2021)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="407.903512" transform="rotate(-0 89.938125 407.903512)">Finland (2021)</text>
    </g>
    <g id="finland__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.160017" y="401.902714" transform="rotate(-0 118.160017 401.902714)">4h</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="119.173797" y="407.903512" transform="rotate(-0 119.173797 407.903512)">4h</text>
    </g>
    <g id="finland__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="205.008202" y="401.902714" transform="rotate(-0 205.008202 401.902714)">10h 45m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="205.682198" y="407.903512" transform="rotate(-0 205.682198 407.903512)">10h 45m</text>
    </g>
    <g id="finland__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="290.41192" y="401.902714" transform="rotate(-0 290.41192 401.902714)">3h 45m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="290.751783" y="407.903512" transform="rotate(-0 290.751783 407.903512)">3h 45m</text>
    </g>
    <g id="finland__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="344.907668" y="401.902714" transform="rotate(-0 344.907668 401.902714)">5h 30m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="345.034321" y="407.903512" transform="rotate(-0 345.034321 407.903512)">5h 30m</text>
    </g>
    <g id="hungary__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="416.508429" transform="rotate(-0 88.832138 416.508429)">Hungary (2010)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="423.06047" transform="rotate(-0 89.938125 423.06047)">Hungary (2010)</text>
    </g>
    <g id="hungary__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="117.91526" y="416.508429" transform="rotate(-0 117.91526 416.508429)">3h 58m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.929998" y="423.06047" transform="rotate(-0 118.929998 423.06047)">3h 58m</text>
    </g>
    <g id="hungary__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="208.292254" y="416.508429" transform="rotate(-0 208.292254 416.508429)">11h 23m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="208.953401" y="423.06047" transform="rotate(-0 208.953401 423.06047)">11h 23m</text>
    </g>
    <g id="hungary__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="298.69704" y="416.508429" transform="rotate(-0 298.69704 416.508429)">3h 58m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="299.004487" y="423.06047" transform="rotate(-0 299.004487 423.06047)">3h 58m</text>
    </g>
    <g id="hungary__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="349.663977" y="416.508429" transform="rotate(-0 349.663977 416.508429)">4h 41m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="349.772022" y="423.06047" transform="rotate(-0 349.772022 423.06047)">4h 41m</text>
    </g>
    <g id="belgium__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="431.114143" transform="rotate(-0 88.832138 431.114143)">Belgium (2013)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="438.217428" transform="rotate(-0 89.938125 438.217428)">Belgium (2013)</text>
    </g>
    <g id="belgium__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="117.732653" y="431.114143" transform="rotate(-0 117.732653 431.114143)">3h 56m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.748106" y="438.217428" transform="rotate(-0 118.748106 438.217428)">3h 56m</text>
    </g>
    <g id="belgium__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="206.052974" y="431.114143" transform="rotate(-0 206.052974 431.114143)">11h 4m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="206.722882" y="438.217428" transform="rotate(-0 206.722882 438.217428)">11h 4m</text>
    </g>
    <g id="belgium__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="290.966103" y="431.114143" transform="rotate(-0 290.966103 431.114143)">3h 21m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="291.303797" y="438.217428" transform="rotate(-0 291.303797 438.217428)">3h 21m</text>
    </g>
    <g id="belgium__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="344.008514" y="431.114143" transform="rotate(-0 344.008514 431.114143)">5h 39m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="344.138686" y="438.217428" transform="rotate(-0 344.138686 438.217428)">5h 39m</text>
    </g>
    <g id="greece__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="445.719857" transform="rotate(-0 88.832138 445.719857)">Greece (2014)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="453.374386" transform="rotate(-0 89.938125 453.374386)">Greece (2014)</text>
    </g>
    <g id="greece__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="117.167904" y="445.719857" transform="rotate(-0 117.167904 445.719857)">3h 50m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="118.185566" y="453.374386" transform="rotate(-0 118.185566 453.374386)">3h 50m</text>
    </g>
    <g id="greece__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="206.980194" y="445.719857" transform="rotate(-0 206.980194 445.719857)">11h 25m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="207.646475" y="453.374386" transform="rotate(-0 207.646475 453.374386)">11h 25m</text>
    </g>
    <g id="greece__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.866263" y="445.719857" transform="rotate(-0 292.866263 445.719857)">3h 10m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="293.196523" y="453.374386" transform="rotate(-0 293.196523 453.374386)">3h 10m</text>
    </g>
    <g id="greece__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="344.397905" y="445.719857" transform="rotate(-0 344.397905 445.719857)">5h 35m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="344.526553" y="453.374386" transform="rotate(-0 344.526553 453.374386)">5h 35m</text>
    </g>
    <g id="poland__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="460.325571" transform="rotate(-0 88.832138 460.325571)">Poland (2023)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="468.531343" transform="rotate(-0 89.938125 468.531343)">Poland (2023)</text>
    </g>
    <g id="poland__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="115.597416" y="460.325571" transform="rotate(-0 115.597416 460.325571)">3h 34m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="116.621223" y="468.531343" transform="rotate(-0 116.621223 468.531343)">3h 34m</text>
    </g>
    <g id="poland__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="203.544751" y="460.325571" transform="rotate(-0 203.544751 460.325571)">11h 22m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="204.224473" y="468.531343" transform="rotate(-0 204.224473 468.531343)">11h 22m</text>
    </g>
    <g id="poland__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="298.264816" y="460.325571" transform="rotate(-0 298.264816 460.325571)">4h 43m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="298.573955" y="468.531343" transform="rotate(-0 298.573955 468.531343)">4h 43m</text>
    </g>
    <g id="poland__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="351.661412" y="460.325571" transform="rotate(-0 351.661412 460.325571)">4h 21m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="351.761643" y="468.531343" transform="rotate(-0 351.761643 468.531343)">4h 21m</text>
    </g>
    <g id="france__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="474.931286" transform="rotate(-0 88.832138 474.931286)">France (2010)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="483.688301" transform="rotate(-0 89.938125 483.688301)">France (2010)</text>
    </g>
    <g id="france__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="114.632071" y="474.931286" transform="rotate(-0 114.632071 474.931286)">3h 24m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="115.659654" y="483.688301" transform="rotate(-0 115.659654 483.688301)">3h 24m</text>
    </g>
    <g id="france__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="208.509144" y="474.931286" transform="rotate(-0 208.509144 474.931286)">12h 32m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="209.169443" y="483.688301" transform="rotate(-0 209.169443 483.688301)">12h 32m</text>
    </g>
    <g id="france__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="301.000313" y="474.931286" transform="rotate(-0 301.000313 474.931286)">3h 10m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="301.298749" y="483.688301" transform="rotate(-0 301.298749 483.688301)">3h 10m</text>
    </g>
    <g id="france__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="348.467168" y="474.931286" transform="rotate(-0 348.467168 474.931286)">4h 54m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="348.579895" y="483.688301" transform="rotate(-0 348.579895 483.688301)">4h 54m</text>
    </g>
    <g id="spain__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="489.537" transform="rotate(-0 88.832138 489.537)">Spain (2010)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="498.845259" transform="rotate(-0 89.938125 498.845259)">Spain (2010)</text>
    </g>
    <g id="spain__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="114.420014" y="489.537" transform="rotate(-0 114.420014 489.537)">3h 22m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="115.448427" y="498.845259" transform="rotate(-0 115.448427 498.845259)">3h 22m</text>
    </g>
    <g id="spain__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="202.151127" y="489.537" transform="rotate(-0 202.151127 489.537)">11h 32m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="202.836301" y="498.845259" transform="rotate(-0 202.836301 498.845259)">11h 32m</text>
    </g>
    <g id="spain__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.645219" y="489.537" transform="rotate(-0 292.645219 489.537)">3h 50m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.976344" y="498.845259" transform="rotate(-0 292.976344 498.845259)">3h 50m</text>
    </g>
    <g id="spain__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="346.258049" y="489.537" transform="rotate(-0 346.258049 489.537)">5h 16m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="346.379419" y="498.845259" transform="rotate(-0 346.379419 498.845259)">5h 16m</text>
    </g>
    <g id="italy__label">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="88.832138" y="504.142714" transform="rotate(-0 88.832138 504.142714)">Italy (2014)</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="89.938125" y="514.002217" transform="rotate(-0 89.938125 514.002217)">Italy (2014)</text>
    </g>
    <g id="italy__main-paid-work-or-study-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="111.937105" y="504.142714" transform="rotate(-0 111.937105 504.142714)">2h 57m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="112.975232" y="514.002217" transform="rotate(-0 112.975232 514.002217)">2h 57m</text>
    </g>
    <g id="italy__main-personal-care-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="198.757349" y="504.142714" transform="rotate(-0 198.757349 504.142714)">11h 48m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="199.4558" y="514.002217" transform="rotate(-0 199.4558 514.002217)">11h 48m</text>
    </g>
    <g id="italy__main-unpaid-work-and-other-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="291.0267" y="504.142714" transform="rotate(-0 291.0267 504.142714)">3h 52m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2d2e2d" x="291.364157" y="514.002217" transform="rotate(-0 291.364157 514.002217)">3h 52m</text>
    </g>
    <g id="italy__main-leisure-value">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="345.550387" y="504.142714" transform="rotate(-0 345.550387 504.142714)">5h 23m</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #ffffff" x="345.674526" y="514.002217" transform="rotate(-0 345.674526 514.002217)">5h 23m</text>
    </g>
   </g>
   <g id="legend__main-paid-work-or-study-chip">
-   <path d="M 11.52 83.484 
-L 18 83.484 
-L 18 77.004 
-L 11.52 77.004 
+   <path d="M 11.52 94.44375 
+L 18 94.44375 
+L 18 87.96375 
+L 11.52 87.96375 
 z
 " style="fill: #bc8e5a; opacity: 0.8"/>
   </g>
   <g id="legend__main-personal-care-chip">
-   <path d="M 11.52 95.652 
-L 18 95.652 
-L 18 89.172 
-L 11.52 89.172 
+   <path d="M 11.52 106.61175 
+L 18 106.61175 
+L 18 100.13175 
+L 11.52 100.13175 
 z
 " style="fill: #00295b; opacity: 0.8"/>
   </g>
   <g id="legend__main-unpaid-work-and-other-chip">
-   <path d="M 11.52 107.82 
-L 18 107.82 
-L 18 101.34 
-L 11.52 101.34 
+   <path d="M 11.52 118.77975 
+L 18 118.77975 
+L 18 112.29975 
+L 11.52 112.29975 
 z
 " style="fill: #58ac8c; opacity: 0.8"/>
   </g>
   <g id="legend__main-leisure-chip">
-   <path d="M 11.52 119.988 
-L 18 119.988 
-L 18 113.508 
-L 11.52 113.508 
+   <path d="M 11.52 130.94775 
+L 18 130.94775 
+L 18 124.46775 
+L 11.52 124.46775 
 z
 " style="fill: #883039; opacity: 0.8"/>
   </g>
@@ -1277,11 +1230,12 @@ z
    <text style="font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="24.623438" transform="rotate(-0 11.52 24.623438)">How do people spend their time?</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(11.52 45.1062)">Average hours and minutes in a 24-hour day, from surveys run between</text>
-   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(11.52 57.489413)">2010 and 2024, for people aged 15 to 64.</text>
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(11.52 45)">Average time spent in a 24-hour day by people aged 15 to 64. Based on</text>
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(11.52 57.391763)">each country's most recent time-use survey in the OECD data, from</text>
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(11.52 69.60825)">2010 to 2024.</text>
   </g>
   <g id="data-source">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="561.744225" transform="rotate(-0 11.52 561.744225)">Data source: OECD (2026)</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="561.744225" transform="rotate(-0 11.52 561.744225)">Data source: OECD Time Use Database (2026)</text>
   </g>
   <g id="license-0">
    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="46.079142" y="576.735075" transform="rotate(-0 46.079142 576.735075)">Licensed under</text>
@@ -1302,39 +1256,38 @@ z
    <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="296.223497" y="576.735075" transform="rotate(-0 296.223497 576.735075)">Pablo Arriagada</text>
   </g>
   <g id="legend__main-paid-work-or-study">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #996d39" x="63.530058" y="83.60775" transform="rotate(-0 63.530058 83.60775)">Paid work or study</text>
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #996d39" x="62.229804" y="94.5675" transform="rotate(-0 62.229804 94.5675)">Paid work &amp; study</text>
   </g>
   <g id="legend__main-paid-work-or-study-members">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #996d39" x="222.607955" y="83.60775" transform="rotate(-0 222.607955 83.60775)">Paid work, Commuting, School or classes, Homework</text>
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="217.409224" y="94.5675" transform="rotate(-0 217.409224 94.5675)">Paid work, commuting, school or classes, homework</text>
   </g>
   <g id="legend__main-personal-care">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #00295b" x="52.360214" y="95.77575" transform="rotate(-0 52.360214 95.77575)">Personal care</text>
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #00295b" x="52.360214" y="106.7355" transform="rotate(-0 52.360214 106.7355)">Personal care</text>
   </g>
   <g id="legend__main-personal-care-members">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #00295b" x="180.67287" y="95.77575" transform="rotate(-0 180.67287 95.77575)">Sleep, Eating &amp; drinking, Grooming &amp; health</text>
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="179.116678" y="106.7355" transform="rotate(-0 179.116678 106.7355)">Sleep, eating &amp; drinking, grooming &amp; health</text>
   </g>
   <g id="legend__main-unpaid-work-and-other">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2c8465" x="67.429083" y="107.94375" transform="rotate(-0 67.429083 107.94375)">Unpaid work &amp; other</text>
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2c8465" x="67.429083" y="118.9035" transform="rotate(-0 67.429083 118.9035)">Unpaid work &amp; other</text>
   </g>
   <g id="legend__main-unpaid-work-and-other-members">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #2c8465" x="216.880805" y="107.94375" transform="rotate(-0 216.880805 107.94375)">Housework, Childcare, Shopping, Travel, Other</text>
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="222.352931" y="118.9035" transform="rotate(-0 222.352931 118.9035)">Housework, childcare, shopping, household travel</text>
   </g>
   <g id="legend__main-leisure">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #883039" x="38.290507" y="120.11175" transform="rotate(-0 38.290507 120.11175)">Leisure</text>
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #883039" x="38.290507" y="131.0715" transform="rotate(-0 38.290507 131.0715)">Leisure</text>
   </g>
   <g id="legend__main-leisure-members">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #883039" x="184.884778" y="120.11175" transform="rotate(-0 184.884778 120.11175)">TV &amp; radio, Seeing friends, Sports, Events, Hobbies &amp; other</text>
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="182.026048" y="131.0715" transform="rotate(-0 182.026048 131.0715)">TV &amp; radio, seeing friends, sports, events, hobbies &amp; other</text>
   </g>
-  <g id="chart-note">
-   <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="22.608984" y="520.26435" transform="rotate(-0 22.608984 520.26435)">Note:</text>
+  <g id="chart__note">
+   <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="22.608984" y="530.34435" transform="rotate(-0 22.608984 530.34435)">Note:</text>
   </g>
-  <g id="chart-note--rest">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="520.37505" transform="rotate(-0 36.098438 520.37505)">The chart covers every country whose most recent survey in the OECD database is from</text>
+  <g id="chart__note--rest">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="530.37" transform="rotate(-0 36.098438 530.37)">Figures are averaged across everyone aged 15 to 64, including people who don't work or</text>
   </g>
-  <g id="chart-note--tail">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 530.45505)">2010 onwards; that survey's year is in brackets. The OECD flags Mexico's estimates as not fully</text>
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 539.611425)">comparable, because it measures time use differently. In Japan, travel other than commuting</text>
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 548.64495)">counts as unpaid work.</text>
+  <g id="chart__note--tail">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 540.53505)">study, and across all days of the week. The OECD groups each country's survey activities into</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 549.691425)">common categories, but differences between the surveys can still affect comparisons.</text>
   </g>
  </g>
 </svg>
