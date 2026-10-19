@@ -14,14 +14,15 @@ of its own. Standard deviations are not labelled in the plot, where "-2 SD" woul
 stunting definition in those terms goes in the Note on desktop and in a second subtitle sentence on
 mobile, which has no Note.
 
-The styling follows the design team's pass on the desktop frame (its copy, node `29144:824`, on the
-same Figma page): whole-pixel line weights (3px median, 2px threshold), 14px explanatory labels with
+The styling follows the design team's pass on a copy of the desktop frame, deleted once it was ported:
+whole-pixel line weights (3px median, 2px threshold), 14px explanatory labels with
 a halo, curved house arrows instead of straight leaders, the facet titles inside the panels, the
 stunting label right-aligned with "Stunting cutoff:" on a line of its own, a 13px "Median" with a halo,
 a translucent band and a single "Age in years" label. Mobile takes the same treatment, placed for its
 narrower panels. The space around the chart is the house one, equal above and below: the copy's first
 version showed more only because its chart group carried internal padding, which the design team
-confirmed was unintended and removed.
+confirmed was unintended and removed. Its final version still sat the chart ~2px lower (16px above,
+12px below); the step keeps the even 13.9 / 13.9.
 
 The title says "expected growth curves", not "expected healthy growth curves" as the replaced image
 did. Only the under-fives standards rest on children selected for good health and nutrition; the 5-19
@@ -186,7 +187,7 @@ readable where it crosses a gridline or the band:
 
 | Text | Halo |
 |---|---|
-| `label__within-2-sd`, `label__stunting-cutoff` | 3px, `setStrokeStyleIdAsync` -> the frame's own canvas style, `Website/Background/Beige` (`#fffbf5`). The design team's copy binds `Instagram/Beige Background` (`#fbf9f3`), another template family's canvas; the house rule is the frame's own, and the two cannot be told apart on screen |
+| `label__within-2-sd`, `label__stunting-cutoff` | 3px, `setStrokeStyleIdAsync` -> the frame's own canvas style, `Website/Background/Beige` (`#fffbf5`). The design team's copy bound `Instagram/Beige Background` (`#fbf9f3`), another template family's canvas; the house rule is the frame's own, and the two cannot be told apart on screen |
 | `label__median` | 2px, the band's colour composited on the canvas -- Denim at 20% on `#fffbf5` is `#dbdee3` -- unbound, since the library has no such style |
 
 **Arrows.** The step's `leader__within-2-sd` and `leader__stunting-cutoff` are matplotlib arcs that
@@ -195,18 +196,20 @@ curvy arrow (`/create-figma-chart` -> `reference/ANNOTATIONS-AND-ARROWS.md`): a 
 filled dart, both bound to `Data Insights/Annotations` (`setStrokeStyleIdAsync` on the curve,
 `setFillStyleIdAsync` on the dart). Lay its tail and tip on the step's arrow, then delete the step's:
 
-- band: tail ~9px right of the end of the label's last line, at mid-height; curving clockwise, out to the
-  right then down, to a tip midway between the median and the band's top edge at
-  `band_label_target_age`;
-- stunting: tail ~8px left of "Stunting cutoff:" (7.7px desktop, 7.3px mobile; the copy keeps 7.9), at
-  mid-height; curving clockwise, out to the left then up, to a tip 3-7px under the dashed line at
-  `stunting_label_age`.
+- band: tail ~6px right of the end of the label's last line (5.9px desktop, 6.6px mobile, as the
+  design team set it), at mid-height; curving clockwise, out to the right then down, to a tip midway
+  between the median and the band's top edge at `band_label_target_age`;
+- stunting: tail ~8px left of "Stunting cutoff:" (7.7px desktop, 7.3px mobile, as the design team set
+  it), at mid-height; curving clockwise, out to the left then up, to a tip 3-7px under the dashed line
+  at `stunting_label_age`.
 
-The house arrows to clone are the design team's own, in their copy of the desktop frame
-(`29144:824`): curves `Arrow 4` (band) / `Arrow 3` (stunting), `29146:1057` / `29146:1063`, and their
-darts `29146:1058` / `29146:1064`, with tails at (232, 189) / (336, 315) and tips at (281, 225) /
-(286, 276) in frame coordinates. Clone curve and dart separately and fit each to the step's arrow, read
-off the curve VECTOR of `leader__<role>` (its first vertex is the tail, its last the tip):
+The house arrows are already in each frame, as `annotation__arrow-within-2-sd` and
+`annotation__arrow-stunting-cutoff` (a `curve` and a `dart` each), and a re-import leaves them alone,
+since they sit in the frame rather than in `chart`. Keep them and refit each to the step's new arrow,
+read off the curve VECTOR of `leader__<role>` (its first vertex is the tail, its last the tip). On
+desktop the tails sit at (231.9, 172.6) / (336.4, 301.1) and the tips at (280.7, 208.3) /
+(288.6, 260.2) in frame coordinates. For a frame without them, clone the desktop frame's pair and fit
+it the same way:
 
 1. rotate the dart rigidly by the angle between the house chord (tail to tip) and the step's, and put
    its tip on the step's tip;
@@ -219,8 +222,9 @@ off the curve VECTOR of `leader__<role>` (its first vertex is the tail, its last
    as data marks. Add them after the fit's crop, or measure the crop on `chart` alone, so they never
    widen it.
 
-On desktop the house arrows need only a ~0.9-1.05 scale and under a degree of rotation; on mobile the
-chords are shorter and steeper (scale 0.58 / 0.69, rotation 21 / 34 degrees).
+Rewriting each VECTOR's `vectorNetwork` through the same rotation and scale (vertices and tangents)
+does steps 1-2 in place on a kept pair, and keeps the 1px stroke too. A refit after a small change in
+the step needs a few degrees of rotation and a scale within ~15% of the arrow's current one.
 
 **Fit.** Crop the `chart` frame to its ink (text by its render bounds vertically), then set its box to
 the content column (`resizeWithoutConstraints(header.width, h)`, `x = header.x`). It needs no vertical
@@ -246,31 +250,39 @@ layouts, with each header ending at its layout's `chart_area_top`. A top gap off
 means `chart_area_top` no longer matches the Figma header: re-measure it rather than moving the chart
 by hand.
 
-Then diff the desktop frame against the design team's copy with `/create-figma-chart`'s
-`scripts/diff_frames.js` (`referenceId` `29144:824`, `frameId` `26869:1501`). Expect every node paired
-and only these deltas: the two wrapped labels as one TEXT node there and one per line here (with the
-alignment that comes with it), the explanatory labels' halos on the frame's canvas style rather than
-the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, the gridlines, and
-the two arrows within a few px of the copy's. Anything else is drift from the design.
+The design team's copy is gone, so there is nothing to `diff_frames.js` against any more. Before it was
+deleted, the desktop frame paired 72 of 72 of its nodes, and the only deltas were by design: the two
+wrapped labels as one TEXT node there and one per line here (with the alignment that comes with it),
+the labels' halos on the frame's canvas style, the Note's 818px box against the copy's 729, the
+gridlines at 1px with a 4/4 dash, the chart ~2px higher (the even house gaps), and "Age in years"
+inside `chart` here.
 
-Run `verify_page.js` with `shadedAreas: "within-2-sd"`, which exempts the two bands the arrows point
-into, and the default gap target. One row then fails by design: desktop `text-floor` flags the
-template's own tagline and license row, which ships at 11px. The series, furniture and colour rows
-SKIP, because they key on grapher's layer names
-(`line__*`, `horizontal-grid-lines`), which this step does not emit, and `off-palette` asks for review
-of the unbound #5b5b5b text, as the design team's copy also leaves it. `color_audit.py` fails the two
-bands against each other (dE ~15 once composited); that is accepted, because each sits in its own
-titled panel and the lines carry the colour.
+Run `verify_page.js` on both frames (`frameIds`) with `shadedAreas: "within-2-sd"`, which exempts the
+two bands the arrows point into, and the default gap target. One row then fails by design: desktop
+`text-floor` flags the template's own tagline and license row, which ships at 11px. The series,
+furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
+`horizontal-grid-lines`), which this step does not emit; so do `polylines`, `annotation-overlap` and
+`annotation-knockout`, and `annotation-ladder` and `named-styles` skip because the labels are
+`label__*`, not `annotation__*`. That leaves the label halos and sizes to the audit above. `off-palette`
+asks for review of the unbound #5b5b5b text, which the design team's copy also left unbound.
+`color_audit.py` (fed the two bands composited over the canvas, and the two medians as lines) fails the
+bands against each other (dE ~15) and passes the lines (dE 70); the band result is accepted, because
+each band sits in its own titled panel and the lines carry the colour.
 
 The stunting arrow is the one arrow ending on a line, so it gets the four-render pixel probe
-(`measure_pixels.py arrow-gap`): 4.3px on desktop and 5.5px on mobile, zero touching. On mobile the
+(`measure_pixels.py arrow-gap`): 4.3px on desktop and 5.5px on mobile, zero touching. On desktop the
+probe reports UNMEASURABLE over two stray pixels on the dashed line above the tip, which change between
+the disposable renders; held to the arrow's own bounding box, the gap measures 4.3px. On mobile the
 dashed line climbs steeply, so the arrow is aimed at age 8.5, where it meets the line head-on, and
 keeps 6px of clearance; aimed further right it ran alongside the line and crossed it.
 
-`diff_against_template.js` should report only the footer's first row, which differs from the
-template's by the one space after its bold prefix: the desktop template sets the space after `Note:`
-in Lato Medium, and the mobile one bolds the space after `Data source:`. Pass those in `expected`. Any other footer drift is real: the license row's plain runs are Lato Regular, not
-Medium.
+`diff_against_template.js` should report the footer's first row, which differs from the template's by
+the one space after its bold prefix: the desktop template sets the space after `Note:` in Lato Medium,
+and the mobile one bolds the space after `Data source:`. Pass those in `expected`. On desktop it also
+reports the frame's 850x615 against the template's 850x638 and the footer's bottom at 599 against 622:
+both are the shorter frame, with the footer still 16px off the bottom edge, so ignore its re-pin
+advice. Any other drift is real: the license row's plain runs are Lato Regular, not Medium, and the
+mobile subtitle FILLs its header like the template's, with explicit line breaks.
 """
 
 import logging
@@ -433,9 +445,11 @@ LEADER_WIDTH = 1 * POINTS_PER_PIXEL
 # A filled dart about 8px long and 7px across, the house arrowhead's size, in points (the arrow is drawn
 # with `mutation_scale=1`, so these are not multiples of the font size).
 LEADER_HEAD = "-|>,head_length=5.8,head_width=2.5"
-# Air between an arrow's tail and its label, along the arc, in template px. The stunting arrow leaves its
-# label at a slant, so it needs more along the arc to keep the ~8px the design team's copy has across.
-LEADER_TAIL_CLEARANCE_PX = {"within-2-sd": 4, "stunting-cutoff": 9}
+# Air between an arrow's tail and its label, along the arc, in template px, set so each tail lands where
+# the design team set it: ~6px past the band label's last line, ~8px before "Stunting cutoff:".
+# The band's is small because `line_end`'s Lato allowance overshoots on that line; the stunting arrow
+# leaves at a slant, so it needs more along the arc to keep its distance across.
+LEADER_TAIL_CLEARANCE_PX = {"within-2-sd": 0.5, "stunting-cutoff": 9}
 
 # Percentiles drawn as lines on top of the band, as (column, line width), so a specific centile
 # can be read off rather than only a range. Labelled directly in the Boys panel.
