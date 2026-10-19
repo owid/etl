@@ -188,9 +188,7 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 
 ## Step 6: Run and verify
 
-**Always run the step after creating it** — schema validation only happens at runtime, so errors (like
-invalid fields in `config`, or a missing `chart_config_id`) won't surface until the step is executed. CI
-will catch these, but fix them locally first.
+**Always run the step after creating it, with `--grapher`** — ETL checks only its own structure (dimensions, views, a missing `chart_config_id`); the view `config` blocks are validated by the grapher admin API on upsert. A run without `--grapher` therefore passes a misspelled or invalid `config` field, and the upsert is where it fails, with a 400 naming the path (e.g. `/titel: must NOT have additional properties`). Valid fields and values are in the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
 ```bash
 # Chart steps write to the grapher DB, so they need the --grapher flag
