@@ -190,6 +190,14 @@ dataset:
   update_period_days: 365
   owners:
     - Pablo Arriagada
+  changelog:
+    - date: 2026-07-15
+      changes:
+        - Updated to Version 3.0 of the LGBTI National Policy Dataset (October 2026), which revises the coding of many countries and cites the sources behind each one. It covers 195 countries from 1991 to 2025.
+        - Added the LGBTI Composite Policy Index, with its progressive and regressive scores and population-weighted averages for world regions and income groups. It extends the index to 2025; the earlier LGBTI Policy Index, from Velasco's 2023 paper, ended in 2019.
+        - A country now counts as banning same-sex marriage only if its definition of marriage as a union of a man and a woman is in a law that applies to everyone. Countries whose marriage laws differ by religious community move from "Banned" to "No legal provisions".
+        - A law now counts as not enforced only when a source documents that it isn't applied, or in the years before it takes effect. Far fewer countries show as "Criminalized but not enforced".
+        - Added the categories "Court order required" and "Legally possible, requirement unknown" for legal change of gender marker, and "Varies by region" for blood donation by men who have sex with men.
 
 tables:
   lgbti_national_policy_dataset:
@@ -3840,7 +3848,7 @@ tables:
           Sum of a country's progressive LGBTI-related policy scores, across 23 policy-status combinations.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Progressive policies include marriage equality, civil unions, joint adoption, protections from discrimination, hate-crime laws, legal gender recognition, and related rights. Each policy scores between 0 and 1: the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is enforced, and, where they apply, whether it covers all genders and how easy the right is to use.
+          - Progressive policies include marriage equality, civil unions, joint adoption, protections from discrimination, hate-crime laws, legal gender recognition, and related rights. Each policy scores between 0 and 1, calculated as the share of the population it covers multiplied by the average of its other features — how broad it is, whether it is enforced, and, where they apply, whether it covers all genders and how easy the right is to use.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -3855,7 +3863,7 @@ tables:
           Sum of a country's regressive LGBTI-related policy scores, across 12 policy-status combinations.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Regressive policies include the criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, marriage bans, restrictions on gender-affirming care, restrictions on blood donation by men who have sex with men, and bans on military service. Each policy scores between 0 and 1: the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is actually enforced, and, where they apply, whether it covers all genders, how severe its punishments are, and how long a blood-donation deferral lasts.
+          - Regressive policies include the criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, marriage bans, restrictions on gender-affirming care, restrictions on blood donation by men who have sex with men, and bans on military service. Each policy scores between 0 and 1, calculated as the share of the population it covers multiplied by the average of its other features — how broad it is, whether it is actually enforced, and, where they apply, whether it covers all genders, how severe its punishments are, and how long a blood-donation deferral lasts.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
