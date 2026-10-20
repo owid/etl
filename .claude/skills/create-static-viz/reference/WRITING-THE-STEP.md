@@ -71,6 +71,12 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already
   injects `metadata={"Date": None}` on the SVG pass for reproducible diffs.
+- **Lay out at the template's size, unless a slightly shorter or taller frame helps the chart** — say,
+  when the house gaps would stretch the plot taller than the data needs, trim the frame rather than the
+  gaps. Keep the template's width, change the height by tens of pixels rather than hundreds, and say why
+  in the layout's comment. Declare the height in both checks: `export_frame(..., template=<name>,
+  height_px=<H>)`, which holds the figure to the template's width and scale at that height, and
+  `--size <stem>=<W>x<H>` for the verifier (SKILL.md Step 5).
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
@@ -206,6 +212,20 @@ Then check which font `findfont` actually returned before trusting the per-face 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette
   position** (`palette[0]`, `palette[1]`) rather than pinned hexes, so the chart moves with the
   shared palette. seaborn is a `dev` dependency.
+- **Every stroke width in whole template pixels, written as `px * 0.72` points** — 3px for a series
+  line, 2px for a secondary or dashed one, 1px for gridlines, ticks and leaders. A width chosen in
+  points lands fractional in Figma (`linewidth=1.0` is a 1.39px gridline, 2.6pt a 3.61px line), and the
+  design team snaps them by hand. A dash is in multiples of the width, so a whole-pixel width with
+  integer dash multiples (a 1px gridline at `(4, 4)`) keeps the dash on whole pixels; a dash fixed in
+  points, divided by the width, stays fractional.
+- **A band shaded around a line is the line's own colour with `alpha`, not a tint blended toward
+  white.** Figma can then bind the band to the line's library style at reduced node opacity (the design
+  team uses 0.2), which a hand-mixed hex cannot be.
+- **Draw every label at full opacity, even where its marks take `alpha`.** Bars may run at grapher's
+  0.8, but a name set in its category's colour has far less surface area than its bar, so the same
+  reduction costs it legibility. Give `alpha` to the fills only, and measure a label's contrast against
+  its own, unreduced colour.
+
 ### Borrow grapher's design language, read from its source
 
 A static chart should read like our interactive ones, so take the axis, tick, facet and reference-line
@@ -400,6 +420,9 @@ that reserves the space.** The step measures its own type — 10.5pt, say — wh
 the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide templates. Those wrap
 differently, so the line counts can differ, and the step is reserving the chart area against the wrong
 one. It cannot be fixed from the step: it deliberately sets no fonts, so it cannot measure Lato.
+The slot's width matters as much as its size: under a one-line title the subtitle slot is cropped to
+clear the logo (731 / 420 px, TEMPLATES.md), so wrap at that width, not the content width. Count the
+title's lines in the template, not the step, and wrap at the cropped width until that count is known.
 
 What this costs is a surprise on the *next copy edit*, not on the first build. Adding a single
 character — an Oxford comma, say — can tip a mobile subtitle from three lines to four in the
@@ -408,11 +431,25 @@ header's last line. So after **any** change to a title, subtitle or note, re-rea
 template slot's height in Figma rather than trusting the step's own wrap, and check the header
 clearance on the frame.
 
+The firmer fix, once the frame exists: read where the Figma header ends off the frame and place the
+plot against that (`chart_area_top`, and the footer's first row below), with the house gap on each
+side, rather than against the step's own header. Then break the step's title and subtitle where the
+frame does, so the step's PNG shows the spacing that ships instead of the extra gap its narrower faces
+leave.
+
 Two things make that cheap. The step should reserve the *larger* of the two counts where they differ,
 so the failure mode is a generous gap rather than an overlap. And an orphan — a last line holding a
 word or two — is worth removing at the same time, because it is both a copy defect in its own right
 and the state one character away from adding a line: measure it by cloning the slot, setting
 `textAutoResize = "WIDTH_AND_HEIGHT"` to get the unwrapped width, and comparing against the slot's.
+
+**Break a wrapped subtitle into lines of about equal length, and give the frame the same breaks.** Wrap
+to the fewest lines the slot allows, then narrow the wrap width as far as that line count holds. A
+greedy fill leaves a long first line over a short last one; even lines read as one block and leave room
+beside them for a key to rise into. A sentence boundary outranks balance: when a subtitle holds two
+sentences, start the second on a new line wherever that costs no extra line ("…according to the World
+Health Organization. / Children more than 2 standard deviations…", not "…Organization. Children / …").
+Set the frame's subtitle to the same text with explicit `\n`, so Figma's own wrap cannot move the breaks.
 
 ### Derive every string from the data
 
@@ -445,24 +482,43 @@ Four decisions, each settled by measuring rather than by taste:
   categories that fit on only a few rows read as facts about *those* rows rather than as "the others
   were too narrow". Draw a category's values only where some share of rows can hold one, and otherwise
   none of them. Measure the share per frame — a narrower frame drops more categories.
-- **Put each category's names inside its own bracket, one per line.** Every name then sits over the run
-  it belongs to, and a residual bucket can shorten to `Other` because the bracket already supplies the
-  category. Derive that short form rather than renaming the groups, so the full name survives for
-  layouts where a group stands alone. Stack them all even where one would fit on a single line; a
-  mixture reads as several different treatments. Keep it to one `Other` per key, though: two, under
-  different categories, read as the same bucket. Where a category's own name already says "& other",
-  drop its residual from the list rather than renaming the other category's.
+- **Over a stacked bar, set each category's members as one run-in list above its name, with the name
+  nearest the bars.** The name, in its category's colour, is what ties the block to its segment, so it
+  sits closest to it, and the list above reads as its gloss. Anchor each block where that segment's
+  values are anchored (at the segment's start plus the value inset; the last block right-aligned at the
+  bar's end), so the key and the values line up in one column per category. Keep a designer's line
+  breaks as data in the step and assert that they still spell out the members, rather than re-wrapping
+  them. Keep it to one `Other` per key, though: two, under different categories, read as the same
+  bucket. Where a category's own name already says "& other", drop its residual from the list rather
+  than renaming the other category's.
 - **Size a header band by its tallest block, not by adding the maxima of its parts.** Where each
   category's name sits on its own list, bottom-aligned over the bars, the band is the largest
   list-plus-name of any one category. Adding the deepest list to the tallest name counts two
   different categories as soon as those maxima fall in different blocks, which an edit that shortens
   one list (dropping a member) brings about without anything else changing, and the band then carries
-  a line of air above every heading.
+  a line of air above every heading. A block that clears the subtitle sideways may rise to the header's
+  bottom edge, beside the subtitle's shorter lines, instead of starting below the band's inset.
 - **Set an inline member list in sentence case, and keep a capital per line in a stacked one.** A list
   run together after its category name ("Paid work, commuting, homework") is a phrase, and the style
   guide sets phrases in sentence case. Stacked one per line, each name is a label and keeps its
   capital. So a desktop key and its mobile row legend can differ here, by design. Abbreviations
   ("TV") keep their capitals in either.
+- **Separate stacked segments with a 1px gap of canvas.** The gap carries the boundary, so neighbouring
+  fills no longer need to differ in lightness, and a grayscale-seam floor applies only where segments
+  touch. Shorten every segment but the last by the gap, so each still starts at its true value. Skip
+  a segment narrower than the gap plus 1px (a zero, say): shortened, it gets a negative width and
+  Matplotlib draws it backwards over its neighbour.
+- **Align in-segment values to the segment's start, not its centre.** Left-aligned at a fixed inset
+  (8px on the 850-wide templates, scaled with the frame's width on narrower ones), and the last
+  segment's right-aligned at the bar's end, the values form a column per category. Centred values
+  wander with each segment's width. Test the fit against the segment minus the inset.
+- **Leave more air between bars than a tight stack, and buy it with height, not with thinner bars.**
+  Bars at about 70% of their pitch read as separate rows. Run the frame taller (`export_frame`'s
+  `height_px`, see the Figma handoff contract above) so the bars keep the thickness their in-bar values need.
+- **Set a row label that carries a year as the name in bold and the year in regular.** Where a row's
+  pitch holds two label lines, put the year under the name: the label column then sizes to the wider of
+  the two, which widens the plot. On one line, drop the brackets: the weight already separates the two,
+  and right-aligned, the years line up in a column.
 - **Labelling every segment in place, with leaders, is rarely worth what it costs — and whether it is
   even possible is a property of the data.** The row you point at decides it, and no amount of vertical
   room rescues a row whose narrowest segment leaves no corridor, because the obstruction is horizontal.
@@ -483,7 +539,8 @@ step's own render:
 - **Anchor a label where it must stay, never where it happens to start.** `text-anchor: middle` and
   `end` survive the re-render; a left-anchored run does not — its box keeps its x while the glyphs
   shrink, so the label creeps out of the thing it labels and the gaps after it grow. Centre what is
-  centred (a value in its segment, a name over its bracket), right-anchor what lines up on an edge.
+  centred, right-anchor what ends on an edge, and left-anchor only what starts on one (a value at its
+  segment's start, where keeping its x is the point).
   The step draws them in the same place either way, so this costs nothing at the time and is
   invisible until someone re-renders.
 - **A run's trailing space belongs to the layout, not to its glyphs.** Advance the cursor by the full
@@ -506,7 +563,32 @@ step's own render:
   it, using its own metrics. So the lines arrive as independent left-anchored boxes that lose their
   centring on each other *and* on whatever they label as soon as the font changes — the one case the
   anchor rule above cannot rescue, because there is no anchor to preserve. Grep an emitted SVG for
-  `text-anchor` and any label missing one is this.
+  `text-anchor` and any label missing one is this. Name the lines `<gid>`, `<gid>-line1`, … so the frame
+  can join them back into one text: `/owid-staff:create-figma-chart`'s `group_text_blocks.js` does
+  that after the import.
+- **Space a wrapped label's lines at Figma's own pitch.** A label typed in Figma in 14px Lato runs at
+  17px a line (line height AUTO), while matplotlib's default line spacing lands imported lines about
+  15px apart, so a re-import never matches a designer's typed label. With one call per line (above),
+  place the lines 17px apart.
+
+### Porting a designer's rework
+
+A designer who reworks the Figma frame has edited a copy the next re-import will overwrite, so each
+decision has to move into the step or its docstring:
+
+1. Diff their copy against your frame with `/owid-staff:create-figma-chart`'s `scripts/diff_frames.js`
+   (`referenceId` their copy, `frameId` yours) to list the decisions.
+2. Port each one: geometry, weights, sizes and wraps into the step; bindings, halos and house arrows
+   into the docstring's Figma recipe.
+3. Re-render, re-import and diff again, until only the deltas you chose remain. Record those in the
+   docstring.
+
+What the step cannot emit goes in the docstring's Figma recipe, not in a note to redo it by hand. Text a
+designer grouped into auto-layout frames (a list and its name, a legend row) is one such case: record
+it as a `group_text_blocks.js` CONFIG, run after every re-import.
+
+Compare ink, not boxes. Uneven visible gaps over an evenly placed chart group are padding left inside
+the group, not a spacing choice; keep the house spacing and ask the designer before porting them.
 
 ### Size a value column from its content, not from a round number
 

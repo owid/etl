@@ -499,7 +499,7 @@ def _update_choice_slugs_in_views(choice_slug_changes, charts_by_id) -> Mapping[
         df_views_dimensions = pd.DataFrame([view.dimensions for view in chart.views])
 
         # FUTURE: this needs to change in order to support checkboxes
-        df_views_dimensions = df_views_dimensions.astype("string")
+        df_views_dimensions = df_views_dimensions.astype("str")
 
         # Process views
         df_views_dimensions = df_views_dimensions.replace(change)
@@ -526,7 +526,7 @@ def _build_df_choices(charts_by_id: Mapping[str, Chart | Explorer]) -> tuple[pd.
                     }
                 )
     # This needs to change to support checkboxes
-    df_choices = pd.DataFrame(records).astype("string")
+    df_choices = pd.DataFrame(records).astype("str")
 
     # Get column names of fields from choice objects
     cols_choices = [col for col in df_choices.columns if col not in ["slug", "chart_id", "dimension_slug"]]
@@ -541,7 +541,7 @@ def _build_df_choices(charts_by_id: Mapping[str, Chart | Explorer]) -> tuple[pd.
             ),
             include_groups=False,
         )
-        .astype("string")
+        .astype("str")
     )
     # Mark choice slugs as "in conflict": A choice slug maps to different names (or descriptions) across explorers
     df_choices["in_conflict"] = (

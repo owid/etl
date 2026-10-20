@@ -142,7 +142,7 @@ def assign_unique_year_for_columns(tb: Table) -> Table:
     tb = tb.copy()
 
     # Make all columns string
-    tb[DATA_COLUMNS] = tb[DATA_COLUMNS].astype("string")
+    tb[DATA_COLUMNS] = tb[DATA_COLUMNS].astype("str")
 
     # When last_decriminalization is "never was illegal", replace value with START_YEAR
     tb.loc[tb["last_decriminalization"] == "never was illegal", "last_decriminalization"] = f"{START_YEAR}"

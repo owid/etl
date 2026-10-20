@@ -74,8 +74,7 @@ def sanity_check_outputs(tb) -> None:
 
 # Define the custom function to apply to each row using string comparisons
 def categorize_schedule(row):
-    # Explicit NA checks: schedulercode_* columns can be pd.NA (string[pyarrow]), and
-    # `pd.NA == "IPV"` returns pd.NA rather than False, which breaks the `if` below.
+    # Explicit NA checks: schedulercode_* columns can be missing, and a missing value must count as "not this vaccine".
     has_ipv_or_ipvf = (pd.notna(row["schedulercode_ipv"]) and row["schedulercode_ipv"] == "IPV") or (
         pd.notna(row["schedulercode_ipvf"]) and row["schedulercode_ipvf"] == "IPVf"
     )

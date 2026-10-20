@@ -88,6 +88,11 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.3.0`
+- **`Dataset.read()` returns strings as pandas' default `str` dtype** (pyarrow-backed, `NaN` for missing values) instead of `string[pyarrow]` (`pd.NA` for missing values), through `owid-repack>=0.2.0`. Strings read from a dataset now behave like strings pandas 3 creates: merging on them no longer turns the key into `object`, and comparisons give `False` rather than `<NA>` for missing values. Check for missing values with `pd.isna()`, not `is pd.NA`. `ds[...]` and `read(safe_types=False)` are unchanged
+- `description_key` items that YAML parses as mappings (a plain item containing `: `) raise a `ValueError` that names the indicator and says to quote the item, instead of a bare assertion
+- Tests that call live services (the catalog, ourworldindata.org, Datasette) are marked `integration`: `make unittest` skips them and `make test-integration` runs them
+
 ### `v1.2.9`
 - `ResponseSet(_ui_advanced=True)` keeps the flag: Pydantic dropped constructor arguments for private attributes, so search results never got the advanced display
 - Dev tooling: ruff 0.16.10, ty 0.0.85
