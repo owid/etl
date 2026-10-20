@@ -84,23 +84,48 @@ Detects calls that set the index manually before `create_dataset`:
 
 **Recommended alternative:** Use `tb.format()`, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`
 
+### 12. `@click` decorators in Snapshots
+Detects the `@click.command` decorator on a snapshot script's entry point.
+
+**Scope:** Only applies to files in `snapshots/**`
+
+**Recommended action:** Remove the whole decorator stack and leave a plain `def run(upload: bool = True) -> None:`. `etls` imports the module and calls `run()` itself.
+
+### 13. Reading a table by Dataset subscript
+Detects table reads written as a subscript on a Dataset:
+- `tb = ds_meadow["table"]` or `ds_meadow["table"].reset_index()`, where `ds_meadow = paths.load_dataset(...)`
+- `paths.load_dataset("x")["table"]`
+- `ds["table"]` inside a function whose parameter is annotated `ds: Dataset`
+
+This rule is stateful rather than a per-line regex: it tracks which variables currently hold a Dataset, so column access on a Table (`tb["col"]`) is never flagged.
+
+**Recommended alternative:** `ds.read("table")`. It already resets the index, so drop a trailing `.reset_index()`; use `ds.read("table", reset_index=False)` where the index must be kept (e.g. in a grapher step).
+
+## Command-line checker
+
+The same rules run outside VS Code, which is what the `/check-outdated-practices` skill uses:
+
+```bash
+node vscode_extensions/detect-outdated-practices/src/cli.mts etl/steps/data/garden/<ns>/<version>/ [more paths...] [--json]
+```
+
+Paths can be files or directories (searched recursively for `.py` files). It prints `file:line:column: problem`, and `--json` adds the full fix guidance for each finding. It runs on Node's built-in TypeScript support (Node 22.18 or later), so it needs no build step and no `npm install`.
+
 ## Adding New Patterns
 
-To add new patterns, edit `src/extension.ts` and add entries to the `OUTDATED_PATTERNS` array:
+To add new patterns, edit `src/detector.mts` and add entries to the `OUTDATED_PATTERNS` array. Both the extension and the command-line checker read rules from there, so a rule added in one place is enforced in both. Rules that need more than a per-line regex (like #13) go in `detect()` in the same file.
 
 ```typescript
 const OUTDATED_PATTERNS: OutdatedPattern[] = [
     {
         pattern: /\bdest_dir\b/,
         message: 'Use of "dest_dir" is outdated. Please use the recommended alternative.',
-        severity: vscode.DiagnosticSeverity.Warning,
         scope: 'etl/steps/data/**'  // Optional: restrict to specific paths
     },
     // Add more patterns here
     {
         pattern: /\bold_function\b/,
-        message: 'old_function is deprecated, use new_function instead',
-        severity: vscode.DiagnosticSeverity.Warning
+        message: 'old_function is deprecated, use new_function instead'
         // No scope = applies to all Python files
     }
 ];
@@ -165,15 +190,10 @@ make vsce-sync
 
 ## Pattern Configuration
 
-Each pattern can specify:
+Each pattern can specify (every finding is shown as a warning):
 
 - **pattern**: A string or RegExp to match against code
 - **message**: The warning message to display
-- **severity**: The diagnostic severity level:
-  - `vscode.DiagnosticSeverity.Error` (red squiggles)
-  - `vscode.DiagnosticSeverity.Warning` (yellow squiggles)
-  - `vscode.DiagnosticSeverity.Information` (blue squiggles)
-  - `vscode.DiagnosticSeverity.Hint` (gray dots)
 - **scope**: Optional path restriction (glob pattern or array of patterns)
 
 ## Testing the Scope Feature

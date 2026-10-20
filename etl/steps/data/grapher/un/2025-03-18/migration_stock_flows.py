@@ -45,11 +45,20 @@ def run() -> None:
     tb = tb[tb["country_select"].isin(countries)]
     tb = tb.sort_values(by=["country_select"], ascending=True)
 
-    # Add rows for country and country select being equal
-    tb = add_same_country_rows(tb)
-
-    # convert column to string and set unit
-    tb["migrants"] = tb["migrants"].astype(str).copy_metadata(tb["migrants"])
+    # No row is added for country == country_select: that flow is inapplicable by construction
+    # (e.g. "Afghans who emigrated to Afghanistan"). Mark the country_select entity as
+    # inapplicable on the indicator itself (rather than per chart/explorer view), so every
+    # view built from this indicator inherits it. Jinja renders per dimension combination
+    # when the table is pivoted to wide format below.
+    tb["migrants"].metadata.presentation.grapher_config = {
+        "inapplicableEntityNames": ["<< country_select >>"],
+        "map": {
+            "colorScale": {
+                "customCategoryColors": {"Not applicable": "#D94C3F"},
+                "customCategoryLabels": {"Not applicable": "Selected country"},
+            },
+        },
+    }
 
     tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
@@ -58,18 +67,3 @@ def run() -> None:
 
     # Save grapher dataset.
     ds_grapher.save()
-
-
-def add_same_country_rows(tb):
-    """Create rows for countries where country and country select are the same and set value to "Selected country"."""
-    # Get dataframe with same-country rows
-    tb_same = tb[["country_select", "year", "gender", "metric"]].drop_duplicates()
-    tb_same.loc[:, ["migrants"]] = "Selected country"
-    tb_same["country"] = tb_same["country_select"]
-
-    # Add to main table
-    tb = pr.concat([tb, tb_same])
-
-    # Ensure typing
-    tb["migrants"] = tb["migrants"].astype("string")
-    return tb

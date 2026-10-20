@@ -119,7 +119,7 @@ def load_steps_df(reload_key: int) -> tuple[pd.DataFrame, dict[str, Any]]:
     # So this is a workaround to allows to have both clickable cells with names, and "group by".
     steps_df["db_dataset_name_and_url"] = [
         f"[{row['db_dataset_name']}]({OWID_ENV.dataset_admin_site(int(row['db_dataset_id']))})"
-        if row["db_dataset_name"]
+        if pd.notna(row["db_dataset_name"])
         else None
         for row in steps_df.to_dict(orient="records")
     ]
@@ -194,7 +194,7 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
         ]
     ]
 
-    dtypes_new = df.dtypes.replace("object", "string[pyarrow]")
+    dtypes_new = df.dtypes.replace("object", "str")
     df = df.astype(dtypes_new)
     df["date_of_next_update"] = pd.to_datetime(df["date_of_next_update"], errors="coerce")
     return df

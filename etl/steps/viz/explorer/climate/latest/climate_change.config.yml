@@ -9,6 +9,7 @@ config:
   originUrl: https://ourworldindata.org/climate-change
   isPublished: true
   entityType: region
+  entityTypePlural: regions
   explorerSubtitle: Explore the impacts of global climate change.
   selection:
     - World

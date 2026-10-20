@@ -95,7 +95,7 @@ tb = paths.regions.add_aggregates(
         },
         "High-income countries": {},
     },
-    aggregations={"population": "sum", "gdp": "mean_weighted_by_population"}
+    aggregations={"population": "sum", "gdp": "mean_weighted_by_population"},
 )
 ```
 
@@ -113,11 +113,7 @@ tb = paths.regions.add_per_capita(tb)
 tb = paths.regions.add_per_capita(tb, columns=["gdp", "co2_emissions"])
 
 # Only include countries that have data (useful for regional aggregates)
-tb = paths.regions.add_per_capita(
-    tb,
-    columns=["gdp"],
-    only_informed_countries_in_regions=True
-)
+tb = paths.regions.add_per_capita(tb, columns=["gdp"], only_informed_countries_in_regions=True)
 ```
 
 ### Multi-operation workflows

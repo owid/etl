@@ -279,6 +279,7 @@ def mock_table() -> Table:
     return t
 
 
+@pytest.mark.integration
 def test_load_csv_table_over_http() -> None:
     Table.read_csv("https://catalog.ourworldindata.org/reference/countries_regions.csv")
 
@@ -1243,6 +1244,25 @@ def test_bfill_with_number(table_1) -> None:
 def test_fillna_error(table_1: Table) -> None:
     with pytest.raises(ValueError):
         table_1["a"].fillna()
+
+
+def test_replace_categorical_renames_categories() -> None:
+    tb = Table({"c": pd.Categorical(["a", "b", "a", None, "c"]), "n": [1, 2, 3, 4, 5]})
+    tb["c"].metadata.title = "Title of c"
+
+    # A new value renames the category, an existing one merges into it, and NaN removes it.
+    out = tb["c"].replace({"a": "x", "b": "c"})
+    assert out.tolist()[:3] == ["x", "c", "x"]
+    assert list(out.cat.categories) == ["x", "c"]
+    assert out.metadata.title == "Title of c"
+    assert list(tb["c"].replace({"b": np.nan}).cat.categories) == ["a", "c"]
+
+    # The same through Table.replace, both per column and for all columns.
+    assert list(tb.replace({"c": {"a": "x"}})["c"].cat.categories) == ["x", "b", "c"]
+    out = tb.replace({"a": "x", 1: 10})
+    assert list(out["c"].cat.categories) == ["x", "b", "c"]
+    assert out["n"].tolist() == [10, 2, 3, 4, 5]
+    assert list(out.columns) == ["c", "n"]
 
 
 def test_keep_metadata_dataframe(table_1: Table) -> None:

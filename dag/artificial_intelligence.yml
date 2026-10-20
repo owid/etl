@@ -7,10 +7,13 @@ steps:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
 
   # Stack Overflow Developer Survey – AI tool usage
-  data://grapher/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
-    - data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
-      - data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
-        - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
+  data://grapher/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+    - data://garden/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+      - data://meadow/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2023.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2024.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2025.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2026.csv
 
   # Main EPOCH dataset
   data://meadow/artificial_intelligence/2025-03-12/epoch:
@@ -73,11 +76,11 @@ steps:
 
 
   # Datacenter construction spending (U.S. Census Bureau)
-  data://grapher/us_census_bureau/2026-08-18/datacenter_construction:
-    - data://garden/us_census_bureau/2026-08-18/datacenter_construction:
-      - data://garden/bls/2026-08-18/us_ppi_construction
-      - data://meadow/us_census_bureau/2026-08-18/datacenter_construction:
-        - snapshot://us_census_bureau/2026-08-18/datacenter_construction.xlsx
+  data://grapher/us_census_bureau/2026-10-02/datacenter_construction:
+    - data://garden/us_census_bureau/2026-10-02/datacenter_construction:
+      - data://garden/bls/2026-10-02/us_ppi_construction
+      - data://meadow/us_census_bureau/2026-10-02/datacenter_construction:
+        - snapshot://us_census_bureau/2026-10-02/datacenter_construction.xlsx
 
   # TSMC operating data
   data://grapher/tsmc/2025-11-10/operating_data:
