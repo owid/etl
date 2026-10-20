@@ -137,6 +137,10 @@ steps:
     - data://garden/gallup/2026-07-15/ai_indicator:
       - data://meadow/gallup/2026-07-15/ai_indicator:
         - snapshot://gallup/2026-07-15/ai_indicator.csv
+  data://grapher/gallup/2026-10-20/ai_indicator:
+    - data://garden/gallup/2026-10-20/ai_indicator:
+      - data://meadow/gallup/2026-10-20/ai_indicator:
+        - snapshot://gallup/2026-10-20/ai_indicator.csv
   ########################
   # AI Index Report 2026
   ############################
