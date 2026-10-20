@@ -90,32 +90,34 @@ steps:
   viz://chart/migration/latest/remittances:
     - data://grapher/worldbank_wdi/2026-07-27/wdi
 
-  #Refugee, Asylum and Migration Explorer (2026 Jan update):
-  viz://explorer/migration/2026-01-27/migration:
-    # UNICEF child migration data (up to 2024)
-    - data://grapher/unicef/2026-01-07/child_migration:
-        - data://garden/unicef/2026-01-07/child_migration:
-            - data://meadow/unicef/2026-01-07/child_migration:
-                - snapshot://unicef/2026-01-07/child_migration.csv
-            - data://garden/demography/2024-07-15/population
-            - data://garden/regions/2023-01-01/regions
-    # UNHCR refugee data (2025)
-    - data://grapher/un/2025-07-03/refugee_data:
-        - data://garden/un/2025-07-03/refugee_data:
-            - data://meadow/un/2025-07-03/refugee_data:
-                - snapshot://un/2025-07-03/refugee_data.zip
-            - data://garden/demography/2024-07-15/population
-    - data://grapher/un/2025-03-12/migrant_stock:
-        - data://garden/un/2025-03-12/migrant_stock
-    - data://grapher/un/2024-07-12/un_wpp
-    - data://grapher/worldbank_wdi/2026-07-27/wdi
-    # IDMC Internal Displacement Data (2025 update)
-    - data://grapher/idmc/2026-01-19/internal_displacement:
-        - data://garden/idmc/2026-01-19/internal_displacement:
-            - data://meadow/idmc/2026-01-19/internal_displacement:
-                - snapshot://idmc/2026-01-19/internal_displacement.csv
-            - data://garden/demography/2024-07-15/population
+  # UNICEF child migration data (up to 2024). Used by the asylum_seekers_and_refugees and
+  # internal_displacement MDIMs (the migration explorer this fed is retired).
+  data://grapher/unicef/2026-01-07/child_migration:
+    - data://garden/unicef/2026-01-07/child_migration:
+        - data://meadow/unicef/2026-01-07/child_migration:
+            - snapshot://unicef/2026-01-07/child_migration.csv
+        - data://garden/demography/2024-07-15/population
+        - data://garden/regions/2023-01-01/regions
 
+  # UNHCR refugee data (2025). Used by the asylum_seekers_and_refugees and internal_displacement
+  # MDIMs (the migration explorer this fed is retired).
+  data://grapher/un/2025-07-03/refugee_data:
+    - data://garden/un/2025-07-03/refugee_data:
+        - data://meadow/un/2025-07-03/refugee_data:
+            - snapshot://un/2025-07-03/refugee_data.zip
+        - data://garden/demography/2024-07-15/population
+
+  # Used by the migrant_populations MDIM (the migration explorer this fed is retired).
+  data://grapher/un/2025-03-12/migrant_stock:
+    - data://garden/un/2025-03-12/migrant_stock
+
+  # IDMC Internal Displacement Data (2025 update). Used by the internal_displacement MDIM (the
+  # migration explorer this fed is retired).
+  data://grapher/idmc/2026-01-19/internal_displacement:
+    - data://garden/idmc/2026-01-19/internal_displacement:
+        - data://meadow/idmc/2026-01-19/internal_displacement:
+            - snapshot://idmc/2026-01-19/internal_displacement.csv
+        - data://garden/demography/2024-07-15/population
 
   #
   # Average annual change in the US foreign-born population, by decade — chart authored in ETL.
