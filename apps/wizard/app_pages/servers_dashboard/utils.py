@@ -50,14 +50,18 @@ def _call_api(method: str, path: str, timeout: tuple[float, float] = REQUEST_TIM
     except requests.RequestException as e:
         log.error("Staging API unreachable", url=url, error=str(e))
         return None, f"Staging API unreachable ({url}): {e}"
+    try:
+        body = resp.json()
+    except ValueError:
+        body = None
     if not resp.ok:
-        try:
-            detail = resp.json().get("detail", resp.text)
-        except ValueError:
-            detail = resp.text
+        detail = body.get("detail", resp.text) if isinstance(body, dict) else resp.text
         log.error("Staging API error", url=url, status=resp.status_code, detail=detail)
         return None, f"Staging API returned {resp.status_code}: {detail}"
-    return resp.json(), None
+    if body is None:
+        log.error("Staging API answered without JSON", url=url, preview=resp.text[:200])
+        return None, f"Staging API answered without JSON ({url})"
+    return body, None
 
 
 @st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
@@ -496,18 +500,6 @@ def _server_path(server_name: str) -> str:
     return f"/servers/{quote(server_name, safe='')}"
 
 
-def _woken(server_name: str, result: dict) -> tuple[bool, str]:
-    # The API checks that the container rejoined the tailnet: the Tailscale login on wake can
-    # fail silently, leaving it Running but unreachable by hostname (admin/SSH won't work).
-    if result["on_tailnet"]:
-        return True, f"Server {server_name} is awake and on the tailnet."
-    return False, (
-        f"Server {server_name} started, but it is NOT on the Tailscale network, so it's "
-        "unreachable by hostname (admin/SSH won't work). Tailscale failed to re-authenticate on "
-        "wake. Try waking it again; if it keeps failing, Tailscale must be re-authenticated on the host."
-    )
-
-
 def start_server(server_name: str) -> tuple[bool, str]:
     """
     Wake up an idle (stopped) staging server.
@@ -516,10 +508,12 @@ def start_server(server_name: str) -> tuple[bool, str]:
     server back in seconds — no commit or rebuild needed. This replaces the obscure
     "push an empty commit" trick for idle servers.
     """
-    result, error = _call_api("POST", f"{_server_path(server_name)}/start")
+    # the API's start also logs the server in to Tailscale and fails if that fails, so a
+    # success means it's reachable by hostname
+    _, error = _call_api("POST", f"{_server_path(server_name)}/start")
     if error:
         return False, error
-    return _woken(server_name, result)
+    return True, f"Server {server_name} is awake and on the tailnet."
 
 
 def stop_server(server_name: str) -> tuple[bool, str]:
@@ -538,10 +532,10 @@ def stop_server(server_name: str) -> tuple[bool, str]:
 
 def restart_server(server_name: str) -> tuple[bool, str]:
     """Restart a running staging server (stop, then start)."""
-    result, error = _call_api("POST", f"{_server_path(server_name)}/restart")
+    _, error = _call_api("POST", f"{_server_path(server_name)}/restart")
     if error:
         return False, error
-    return _woken(server_name, result)
+    return True, f"Server {server_name} restarted and is on the tailnet."
 
 
 def destroy_server(server_name: str) -> tuple[bool, str]:
