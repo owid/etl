@@ -20,7 +20,7 @@ definitions:
   description_key_gdp_growth_calculation: "Growth is calculated as the year-on-year percent change in inflation-adjusted (real) GDP: if a country’s real GDP in one year is 2% higher than in the previous year, growth is 2%."
   description_key_unemployment_labor_force: "The labor force is everyone who is either employed or unemployed. People who are neither working nor looking for work, such as many students and retirees, are not part of it."
   description_key_unemployment_definitions: "Depending on the country, the IMF reports unemployment using the national definition, the International Labour Organization (ILO) harmonized definition, or the OECD harmonized definition. Because these definitions differ, comparisons between countries may be limited."
-  description_key_imf_projections: "The International Monetary Fund’s projections are produced country by country by its desk officers, in consultation with national authorities, using shared global assumptions about exchange rates, commodity prices, and the policy stance of major economies. The IMF revises them at each World Economic Outlook release (in April, and in September or October), and they can change substantially as new data and shocks emerge — they are central estimates, not firm predictions."
+  description_key_imf_projections: "The International Monetary Fund’s projections are produced country by country by IMF staff teams and then combined into regional and global figures. They rest on shared assumptions about exchange rates, oil prices, and interest rates, and assume that each country’s current policies continue. The IMF revises them at each World Economic Outlook release (in April, and in September or October), and they can change substantially as new data and shocks emerge — they are central estimates, not firm predictions."
   description_processing_split: |-
     For each country, the IMF reports the last year for which it has actual data. We show the years up to and including that year as observations, and the later years as projections. For some countries, these later years include recent past years for which the IMF has only its own estimates, because official data isn’t available yet.
 
@@ -62,7 +62,7 @@ tables:
         title: Gross domestic product, constant prices - Percent change - Forecasts
         unit: "%"
         short_unit: "%"
-        description_short: "Near-term projections of the annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_short: "IMF projections and estimates of the annual percent change in gross domestic product, for years after the latest official data. This data is adjusted for inflation."
         description_key:
           - "{definitions.description_key_gdp_introduction}"
           - "{definitions.description_key_gdp_definition}"
@@ -95,7 +95,7 @@ tables:
         title: Unemployment rate - Percent of total labor force - Forecasts
         unit: "%"
         short_unit: "%"
-        description_short: "Near-term projections. Unemployment refers to the share of the labor force that is without work but available for and seeking employment."
+        description_short: "IMF projections and estimates, for years after the latest official data. Unemployment refers to the share of the labor force that is without work but available for and seeking employment."
         description_key:
           - "{definitions.description_key_unemployment_labor_force}"
           - "{definitions.description_key_unemployment_definitions}"
