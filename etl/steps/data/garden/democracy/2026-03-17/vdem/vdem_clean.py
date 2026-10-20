@@ -317,46 +317,15 @@ def estimate_hos_indicators(tb: Table) -> Table:
 
 def estimate_hog_indicators(tb: Table) -> Table:
     """Create indicators for multi-party head of government elections with imputed values between election-years."""
-    tb["v2elmulpar_osp_hog"] = 0
-    tb.loc[tb["v2x_elecreg"].isna(), "v2elmulpar_osp_hog"] = np.nan
-
-    # Define mask
-    mask = (
-        (
-            # If head of government is directly elected, elections for executive must be multi-party
-            (tb["v2expathhs"] == 8)
-            & (tb["v2xex_elecreg"] == 1)
-            & (tb["v2elmulpar_osp_ex"] > 1)
-            & (tb["v2elmulpar_osp_ex"].notna())
-        )
-        | (
-            # If head of government is appointed by legislature, elections for legislature must be multi-party.
-            (tb["v2expathhs"] == 7)
-            & (tb["v2xex_elecreg"] == 1)
-            & (tb["v2elmulpar_osp_leg"] > 1)
-            & (tb["v2elmulpar_osp_leg"].notna())
-        )
-        | (
-            # If head of government is appointed by the head of state, elections for the head of state must be multi-party
-            (tb["v2expathhs"] == 6) & (tb["v2elmulpar_osp_hos"] == 1)
-        )
-    )
-    tb.loc[mask, "v2elmulpar_osp_hog"] = 1
-
-    ## If head of government is appointed otherwise, but approval by the legislature is necessary, elections for legislature must be multi-party
-    tb.loc[
-        (tb["v2ex_legconhog"] == 1)
-        & (tb["v2xlg_elecreg"] == 1)
-        & (tb["v2elmulpar_osp_leg"] > 1)
-        & tb["v2elmulpar_osp_leg"].notna(),
-        "v2elmulpar_osp_hog",
-    ] = 1
 
     def _set_mulpar_hog(tb: Table, column_new: str, column_ex: str, column_leg: str, column_hos: str) -> Table:
-        # Iniitalize new column
+        # Initialize new column
         tb[column_new] = 0
         tb.loc[tb["v2x_elecreg"].isna(), column_new] = np.nan
         # Define mask
+        # NOTE: every branch below asks how the head of GOVERNMENT came to office, so it reads
+        # `v2expathhg`. Until 2026 these branches read `v2expathhs`, the head of state's route,
+        # which is what the head-of-state function above legitimately uses.
         mask = (
             (
                 # If head of government is directly elected, elections for executive must be multi-party.
@@ -364,11 +333,11 @@ def estimate_hog_indicators(tb: Table) -> Table:
             )
             | (
                 # If head of government is appointed by legislature, elections for legislature must be multi-party.
-                (tb["v2expathhs"] == 7) & (tb["v2xlg_elecreg"] == 1) & (tb[column_leg] > 1) & (tb[column_leg].notna())
+                (tb["v2expathhg"] == 7) & (tb["v2xlg_elecreg"] == 1) & (tb[column_leg] > 1) & (tb[column_leg].notna())
             )
             | (
                 # If head of government is appointed by the head of state, elections for the head of state must be multi-party.
-                (tb["v2expathhs"] == 6) & (tb[column_hos] == 1)
+                (tb["v2expathhg"] == 6) & (tb[column_hos] == 1)
             )
             |
             # If head of government is appointed otherwise, but approval by the legislature is necessary, elections for legislature must be multi-party.
@@ -377,8 +346,16 @@ def estimate_hog_indicators(tb: Table) -> Table:
         # Set 1 when mask is True
         tb.loc[mask, column_new] = 1
 
+        # Where one person is both head of state and head of government, V-Dem leaves every
+        # head-of-government column empty, so `v2expathhg` is missing and none of the branches above
+        # can fire. That person is the head of government, so carry their head-of-state value over —
+        # the same thing the chief-executive indicator below does for this case.
+        mask_same_person = (tb["v2exhoshog"] == 1) & (tb[column_hos].notna())
+        tb.loc[mask_same_person, column_new] = tb.loc[mask_same_person, column_hos]
+
         return tb
 
+    tb = _set_mulpar_hog(tb, "v2elmulpar_osp_hog", "v2elmulpar_osp_ex", "v2elmulpar_osp_leg", "v2elmulpar_osp_hos")
     tb = _set_mulpar_hog(
         tb, "v2elmulpar_osp_hog_high", "v2elmulpar_osp_ex_high", "v2elmulpar_osp_leg_high", "v2elmulpar_osp_hos_high"
     )
@@ -560,6 +537,13 @@ def estimate_row_indicators(tb: Table) -> Table:
         column_new,
     ] = 1
 
+    # Without regularly scheduled legislative elections on course, there are no multi-party elections for the legislature, which makes a country a closed autocracy (as V-Dem's codebook defines RoW). This holds even where other criteria are missing, and even where V-Dem's released data says otherwise.
+    mask_no_leg_elections = tb["v2xlg_elecreg"] == 0
+    assert not tb.loc[mask_no_leg_elections, column_new].isin([2, 3]).any(), (
+        "Some democracies have no legislative elections on course; decide which criterion should win."
+    )
+    tb.loc[mask_no_leg_elections, column_new] = 0
+
     return tb
 
 
@@ -582,15 +566,16 @@ def compare_with_row_coding(tb: Table) -> Table:
         == 0
     )
 
-    # 17 observations own classification identifies as closed autocracies, whereas RoW does not provide data
+    # 49 observations own classification identifies as closed autocracies, whereas RoW does not provide data
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 0) & (tb["v2x_regime"].isna()) & (tb["year"] > 1900),
             ["country", "year", "v2x_polyarchy"],
         ].shape[0]
-        == 17  # NOTE: went from 18 (2024) to 17 (2025)
+        == 49  # NOTE: went from 18 (2024) to 17 (2025); 17 -> 49 on coding countries without legislative elections on course as closed autocracies
     )
     # Libya in 1911, 1914, and 1922-1933 can be coded because I use information from v2exhoshog in addition to information from v2ex_hosw to identify head of the executive
+    # Albania 1912-1913, Lebanon 1918, Libya 1912-1921, Montenegro 1918, Republic of Vietnam 1901, Slovakia 1939-1944, Tanzania 1914, and Uzbekistan 1901-1911 can be coded because they had no legislative elections on course (v2xlg_elecreg == 0)
     # Honduras in 1934 and 1935, Kazakhstan in 1990, and Turkmenistan in 1990 can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
     # 13 observations own classification identifies as electoral autocracies, whereas RoW does not provide data
@@ -603,16 +588,16 @@ def compare_with_row_coding(tb: Table) -> Table:
     )
     # Observations can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
-    # 137 bservations own classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
+    # Observations our classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
     assert (
-        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 139
-    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026)
+        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 238
+    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026); 139 -> 143 on fixing the head-of-government election path; 143 -> 238 on coding countries without legislative elections on course as closed autocracies
 
     # Belgium in 1919 is hard-recoded in RoW code, though Marcus Tannenberg does not know why that happens even if the errors in a previous version of the V-Dem dataset should by now be remedied; it only continues to make a difference for Belgium in 1919; I keep the recode.
     # replace regime_row_owid = 1 if country_name == "Belgium" & year == 1919
     tb.loc[(tb["country"] == "Belgium") & (tb["year"] == 1919), "regime_row_owid"] = 1
 
-    # 105 observations with multi-party elections for legislature and executive (hence the RoW coding); but which had chief executive which were heads of state that were neither directly or indirectly chosen through multiparty elections, nor were they accountable to a legislature chosen through multi-party elections; I therefore do not recode them.
+    # 179 observations with chief executives that were heads of state, which RoW codes higher than we do. Most had multi-party elections for legislature and executive (hence the RoW coding); but their chief executive was neither directly or indirectly chosen through multiparty elections, nor accountable to a legislature chosen through multi-party elections. The rest had no legislative elections on course (v2xlg_elecreg == 0). I therefore do not recode them.
     assert (
         tb.loc[
             (tb["regime_row_owid"] < tb["v2x_regime"])
@@ -621,11 +606,11 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] > 0.5),
             ["country", "year", "v2exnamhos"],
         ].shape[0]
-        == 106  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026)
+        == 179  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026); 106 -> 179 on coding countries without legislative elections on course as closed autocracies
     )
     # Examples include many prominent heads of state which came to office in coup d'etats or rebellions, such as Boumedienne (Algeria 1965), Anez (Bolivia 2019), Buyoya (Burundi 1987), Batista (Cuba 1952), Ankrah (Ghana 1966), Khomeini (Iran 1980), Buhari (Nigeria 1983), Jammeh (The Gambia 1994), and Eyadema (1967 Togo)
 
-    # 8 observations which had multi-party elections for legislature and executive (hence the RoW coding); but which had chief executives which were heads of government that were neither directly or indirectly chosen through multiparty elections, nor were they accountable to a legislature chosen through multi-party elections:
+    # 34 observations which had multi-party elections for legislature and executive (hence the RoW coding); but which had chief executives which were heads of government that were neither directly or indirectly chosen through multiparty elections, nor were they accountable to a legislature chosen through multi-party elections:
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 0)
@@ -634,29 +619,24 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] <= 0.5),
             ["country", "year", "v2elmulpar_osp_exleg", "v2expathhg", "v2ex_legconhog", "v2expathhs", "v2ex_legconhos"],
         ].shape[0]
-        == 8
+        == 34  # NOTE: went from 8 to 34 on fixing the head-of-government election path
     )
     # Examples include prominent heads of government which came to office in a rebellion or were appointed by a foreign power, such as Castro (Cuba 1959)
 
     # NOTE: 3 (2023) -> 21 (2024) observations coded differently because I use v2ex_legconhog above for consistency, while RoW uses v2exaphogp instead. I defer to RoW coding in these cases. It may be that their data pipeline uses date-specific data which are superior to the year-end data used here.
     # NOTE: Then up to 23 in 2025
-    assert (
-        tb.loc[
-            (tb["regime_row_owid"] == 0)
-            & (tb["v2x_regime"] == 1)
-            & (tb["v2elmulpar_osp_exleg"] == 0)
-            & (tb["v2ex_hosw"] <= 0.5),
-            ["country", "year", "v2expathhg", "v2ex_legconhog", "v2exaphogp"],
-        ].shape[0]
-        == 24  # NOTE: went from 21 (2024) to 23 (2025) to 24 (2026)
-    )
-    tb.loc[
+    # Where there are no legislative elections on course (v2xlg_elecreg == 0), I do not defer and keep our closed autocracy instead (see estimate_row_indicators).
+    mask_defer = (
         (tb["regime_row_owid"] == 0)
         & (tb["v2x_regime"] == 1)
         & (tb["v2elmulpar_osp_exleg"] == 0)
-        & (tb["v2ex_hosw"] <= 0.5),
-        "regime_row_owid",
-    ] = 1
+        & (tb["v2ex_hosw"] <= 0.5)
+    )
+    mask_no_leg_elections = tb["v2xlg_elecreg"] == 0
+    # NOTE: went from 21 (2024) to 23 (2025) to 24 (2026); 24 -> 2 on fixing the head-of-government election path
+    assert (mask_defer & ~mask_no_leg_elections).sum() == 2
+    assert (mask_defer & mask_no_leg_elections).sum() == 22
+    tb.loc[mask_defer & ~mask_no_leg_elections, "regime_row_owid"] = 1
 
     # NOTE: 136 -> 270 bservations own classification identifies as electoral autocracies, whereas RoW identifies them as closed autocracies:
     # tb.loc[(tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0), ["country", "year"]]
@@ -675,11 +655,11 @@ def compare_with_row_coding(tb: Table) -> Table:
             (tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0) & (tb["v2ex_hosw"] <= 0.5),
             ["v2elmulpar_osp_leg", "v2elmulpar_osp_hoe", "v2elmulpar_osp", "v2xlg_elecreg"],
         ].shape[0]
-        == 81  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026)
+        == 16  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026); 81 -> 16 on fixing the head-of-government election path
     )
 
-    # 43 observations which RoW identifies as electoral autocracies, but which own classification identifies as missing:
-    # All observations have missing values for multi-party legislative elections, sometimes also for free and fair as well as multi-party elections in general. One could say that if v2x_elecreg == 0 — or v2eltype_0/1/4/5 are all zero — this means that were no (multi-party legislative) elections - but this would make these regimes closed autocracies, not electoral autociraces. So this better stay as is.
+    # No observations which RoW identifies as electoral autocracies, but which own classification identifies as missing:
+    # The observations that used to be here had missing values for multi-party legislative elections because there were no legislative elections on course (v2xlg_elecreg == 0). That makes them closed autocracies according to V-Dem's codebook, even though V-Dem's data codes them as electoral autocracies. We follow the codebook (see estimate_row_indicators).
     assert (
         tb.loc[
             (tb["regime_row_owid"].isna()) & (tb["v2x_regime"] == 1),
@@ -698,11 +678,11 @@ def compare_with_row_coding(tb: Table) -> Table:
                 "v2eltype_5",
             ],
         ].shape[0]
-        == 43  # NOTE: went from 34 (2024) to 43 (2025)
+        == 0  # NOTE: went from 34 (2024) to 43 (2025); 43 -> 63 on fixing the head-of-government election path; 63 -> 0 on coding countries without legislative elections on course as closed autocracies
     )
 
-    # 5 observation which RoW identifies as closed autocracy, but which own classification identifies as missing:
-    # Slovakia in 1993 had not held legislative elections yet. This can stay as is.
+    # No observations which RoW identifies as closed autocracy, but which own classification identifies as missing:
+    # The five that used to be here (Democratic Republic of Congo 1993-1996, and Slovakia in 1993, which had not held legislative elections yet) had no legislative elections on course, and are now closed autocracies as well.
     assert (
         tb.loc[
             (tb["regime_row_owid"].isna()) & (tb["v2x_regime"] == 0),
@@ -716,7 +696,7 @@ def compare_with_row_coding(tb: Table) -> Table:
                 "v2elmulpar_osp_leg_dich",
             ],
         ].shape[0]
-        == 5
+        == 0  # NOTE: 5 -> 0 on coding countries without legislative elections on course as closed autocracies
     )
 
     # 1 observation which RoW identifies as electoral democracy, but which own classification identifies as missing:
