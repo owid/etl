@@ -119,3 +119,8 @@ steps:
       - data://meadow/wb/2026-07-02/wdi_employment_by_sector_archive:
         - snapshot://wb/2026-07-02/wdi_employment_by_sector_archive.csv
       - data://garden/worldbank_wdi/2026-07-27/wdi
+  # IMF World Economic Outlook
+  data://grapher/imf/2026-10-20/world_economic_outlook:
+    - data://garden/imf/2026-10-20/world_economic_outlook:
+      - data://meadow/imf/2026-10-20/world_economic_outlook:
+        - snapshot://imf/2026-10-20/world_economic_outlook.csv
