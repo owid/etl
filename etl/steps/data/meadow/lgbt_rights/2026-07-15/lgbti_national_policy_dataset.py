@@ -47,7 +47,9 @@ COLUMN_RENAME = {
     "Source_12": "source_12",
     "data_confidence": "data_confidence",
     "row_type": "row_type",
-    "Scope_Detail": "scope_detail",
+    # Columns added in Version 3.0 (Policy_Scope replaces Scope_Detail).
+    "Policy_Scope": "policy_scope",
+    "confidence_note": "confidence_note",
 }
 
 # Normalize the 27 Law values to snake_case (explicit for stability across releases).
@@ -125,7 +127,8 @@ def run() -> None:
         "gender_change_requirement",
         "data_confidence",
         "row_type",
-        "scope_detail",
+        "policy_scope",
+        "confidence_note",
         *[f"source_{i}" for i in range(1, 13)],
     ]
     for col in mixed_object_cols:
@@ -134,8 +137,8 @@ def run() -> None:
     # 4-component index. The natural key is (country, year, law, status).
     tb = tb.format(["country", "year", "law", "status"], sort_columns=True)
 
-    # Companion composite-index file (added in the producer's 2026-06-12 revision): pre-built
-    # country-year index panel with progressive/regressive scores and the two indices.
+    # Companion composite-index file: pre-built country-year index panel. Version 3.0 renamed its columns and
+    # added a factor-analytic variant (cfa_index) next to the producer's preferred additive_index.
     snap_index = paths.load_snapshot("lgbti_composite_index.csv")
     tb_index = snap_index.read(safe_types=False)
     tb_index = tb_index.rename(
@@ -143,10 +146,11 @@ def run() -> None:
             "Country": "country",
             "ISO": "iso3",
             "Year": "year",
-            "Progressive_Score": "progressive_score",
-            "Regressive_Score": "regressive_score",
-            "Composite_Index": "composite_index",
-            "Unweighted_Index": "unweighted_index",
+            "progressive_index": "progressive_index",
+            "regressive_index": "regressive_index",
+            "additive_index": "additive_index",
+            "national_index": "national_index",
+            "cfa_index": "cfa_index",
         },
         errors="raise",
     )

@@ -15,10 +15,10 @@ definitions:
     This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 195 countries, with annual data starting in 1991.
 
   description_key_binding_instrument: |-
-    The dataset counts policies established by binding legal instruments — statutes, constitutional provisions, decrees and regulations with the force of law, and binding court rulings. Non-binding guidance and policies operating only in practice are not counted, with narrow exceptions such as health-authority rules that determine public funding of gender-affirming care.
+    The dataset counts policies established by binding legal instruments — statutes, constitutional provisions, decrees and regulations with the force of law, and binding court rulings. Where no law governs a policy, a written rule that does can count too, such as a health-authority guideline, a blood service's donor questionnaire or a religious ruling. Bills, ministerial statements and non-binding declarations are not counted.
 
   proportion_methodology: |-
-    The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by constant 2000/2001 Census population shares so that changes over time reflect policy shifts rather than demographic change.
+    The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by population shares from one census per country, held constant so that changes over time reflect policy shifts rather than demographic change.
 
   description_regions_processing: |-
     Regional aggregates are computed from country-level data using [Our World in Data's region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). A country is counted as having full implementation when the policy proportion equals 1.
@@ -30,7 +30,7 @@ definitions:
   derivation_age_of_consent: |-
     From the original dataset, we combined two indicators — age of consent equal and age of consent unequal — into a single categorical indicator (Equal, Varies by region, No legal provisions, Unequal) based on the proportion scores of both directions. Country-years where either direction shows partial subnational implementation are classified as "Varies by region".
   derivation_marriage: |-
-    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. a marriage statute, family code, or constitution that explicitly defines marriage as a union of a man and a woman), and civil unions — into a single categorical indicator (Legal, Civil unions only, Varies by region, No legal provisions, Banned) based on the proportion scores of all three. Country-years where marriage equality, the ban, or civil unions are only partially in effect across subnational jurisdictions are classified as "Varies by region"; country-years where a national civil union or registered partnership is recognized but same-sex marriage is not are classified as "Civil unions only".
+    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. a law that defines marriage as a union of a man and a woman), and civil unions — into a single categorical indicator (Legal, Civil unions only, Varies by region, No legal provisions, Banned) based on the proportion scores of all three. Country-years where marriage equality, the ban, or civil unions are only partially in effect across subnational jurisdictions are classified as "Varies by region"; country-years where a national civil union or registered partnership is recognized but same-sex marriage is not are classified as "Civil unions only".
   derivation_lgb_military_join: |-
     From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
 
@@ -316,7 +316,8 @@ tables:
           Whether same-sex couples can legally marry, whether civil unions or registered partnerships are recognized instead, or whether same-sex marriage is banned.
         description_key:
           - "{definitions.description_key_dataset}"
-          - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Civil unions only_** (a national civil union or registered partnership is recognized, but same-sex marriage is not), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (national law neither allows same-sex marriage or civil unions nor explicitly defines marriage as a union of a man and a woman) and **_Banned_** (the national marriage law, family code, or constitution explicitly defines marriage as a union of a man and a woman, and there are no civil unions)."
+          - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Civil unions only_** (a national civil union or registered partnership is recognized, but same-sex marriage is not), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (the law neither allows same-sex marriage or civil unions nor defines marriage as a union of a man and a woman) and **_Banned_** (the law defines marriage as a union of a man and a woman, and there are no civil unions)."
+          - "A definition of marriage counts only if it is in a constitution, family code or marriage law that applies to everyone. In countries where each religious community has its own marriage law, such as Kuwait, Morocco or Qatar, and not every one of those laws defines the spouses' sexes, marriage is classified as **_No legal provisions_**."
           - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: "{definitions.derivation_marriage}"
@@ -384,7 +385,7 @@ tables:
           Whether men who have sex with men may donate blood without restriction. Any deferral or lifetime ban is coded as a restriction.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No MSM restrictions_** (men who have sex with men may donate blood without specific restriction), **_No policy_** (no national rule on blood donation by men who have sex with men) and **_Deferral or ban_** (men who have sex with men face a deferral period or a lifetime ban on blood donation).'
+          - 'The indicator is coded as follows: **_No MSM restrictions_** (men who have sex with men may donate blood without specific restriction), **_Varies by region_** (rules differ between subnational jurisdictions), **_No policy_** (no national rule on blood donation by men who have sex with men) and **_Deferral or ban_** (men who have sex with men face a deferral period or a lifetime ban on blood donation).'
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -394,6 +395,7 @@ tables:
         type: ordinal
         sort:
           - No MSM restrictions
+          - Varies by region
           - No policy
           - Deferral or ban
         processing_level: major
@@ -677,7 +679,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Banned_** (conversion therapy is banned by law, executive order, or judicial ruling), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on conversion therapy).'
-          - 'A ban of any scope counts as **_Banned_**: bans that apply to everyone, bans that protect only minors, bans that bind only licensed health professionals (including indirect bans through mental-health laws that prohibit treating homosexuality as an illness), and partial bans such as bans on advertising conversion therapy.'
+          - 'A ban of any scope counts as **_Banned_**: bans that apply to everyone, bans that protect only minors, bans that bind only licensed health professionals (including indirect bans through mental-health laws that prohibit treating homosexuality as an illness), and bans that apply only in one kind of place, such as Ecuador’s ban in rehabilitation centers.'
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -721,7 +723,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_No death penalty_** (no binding legal instrument makes same-sex sexual acts punishable by death), **_Varies by region_** (application differs between subnational jurisdictions) and **_Death penalty applies_** (the death penalty is a codified punishment for same-sex sexual acts).'
           - "{definitions.description_key_binding_instrument}"
-          - Countries where a death penalty operates only through uncodified religious law, or where it is a contested legal possibility without a citable binding instrument (for example Pakistan, Somalia, and the United Arab Emirates as of 2025), are counted as not having the death penalty.
+          - A country counts as having the death penalty when a legal basis makes death available for consensual same-sex acts — a penal-code article, a religious (sharia) provision applied to such acts, whether written into a code or not (as in Saudi Arabia), a state penal code in a federal country (as in parts of Nigeria), or a decree. Capital provisions that apply only to acts committed by force, bills never enacted and statements by officials don't count. Pakistan, Somalia and the United Arab Emirates are counted as not having the death penalty as of 2025.
         unit: ""
         short_unit: ""
         display:
@@ -1152,7 +1154,7 @@ tables:
       marriage_no_legal_provisions_count:
         title: Marriage equality — No legal provisions (number of countries)
         description_short: |-
-          Number of countries where national law neither allows same-sex marriage or civil unions nor explicitly defines marriage as a union of a man and a woman.
+          Number of countries where the law neither allows same-sex marriage or civil unions nor defines marriage as a union of a man and a woman.
         processing_level: major
         description_processing: |-
           {definitions.derivation_marriage} We then counted the countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
@@ -1165,7 +1167,7 @@ tables:
       marriage_banned_count:
         title: Marriage equality — Banned (number of countries)
         description_short: |-
-          Number of countries where the national marriage law, family code, or constitution explicitly defines marriage as a union of a man and a woman, and there are no civil unions.
+          Number of countries where the law defines marriage as a union of a man and a woman, and there are no civil unions.
         processing_level: major
         description_processing: |-
           {definitions.derivation_marriage} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}
@@ -1218,7 +1220,7 @@ tables:
       marriage_no_legal_provisions_pop:
         title: Marriage equality — No legal provisions (population)
         description_short: |-
-          Total population of countries where national law neither allows same-sex marriage or civil unions nor explicitly defines marriage as a union of a man and a woman.
+          Total population of countries where the law neither allows same-sex marriage or civil unions nor defines marriage as a union of a man and a woman.
         processing_level: major
         description_processing: |-
           {definitions.derivation_marriage} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
@@ -1231,7 +1233,7 @@ tables:
       marriage_banned_pop:
         title: Marriage equality — Banned (population)
         description_short: |-
-          Total population of countries where the national marriage law, family code, or constitution explicitly defines marriage as a union of a man and a woman, and there are no civil unions.
+          Total population of countries where the law defines marriage as a union of a man and a woman, and there are no civil unions.
         processing_level: major
         description_processing: |-
           {definitions.derivation_marriage} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}
@@ -1321,7 +1323,7 @@ tables:
           name: Banned
           numDecimalPlaces: 0
 
-      # ── New combined-region indicators added in this PR ────────
+      # ── Combined-region indicators for the remaining combined categoricals ────────
       same_sex_acts_no_legal_provisions_count:
         title: Same-sex sexual acts — No legal provisions (number of countries)
         description_short: Number of countries classified as "No legal provisions" on the indicator on consensual same-sex sexual acts.
@@ -1452,6 +1454,28 @@ tables:
         short_unit: ""
         display:
           name: No policy
+          numDecimalPlaces: 0
+
+      blood_donations_varies_by_region_count:
+        title: Blood donations by men who have sex with men — Varies by region (number of countries)
+        description_short: Number of countries classified as "Varies by region" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Varies by region
+          numDecimalPlaces: 0
+
+      blood_donations_varies_by_region_pop:
+        title: Blood donations by men who have sex with men — Varies by region (population)
+        description_short: Total population of countries classified as "Varies by region" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Varies by region
           numDecimalPlaces: 0
 
       blood_donations_no_msm_restrictions_count:
@@ -3240,12 +3264,9 @@ tables:
 
 
       # ── Gender marker change regional aggregates ─────────────────────────────────
-      # NOTE: the producer's 2026-07-24 (v2.1) revision added the "Court Order" requirement (only
-      # Lithuania) and left no legal country with an unrecorded requirement, so the regional columns
-      # for "Legally possible, requirement unknown" are no longer generated and its blocks were
-      # removed here. The country-level `gender_marker_change` sort keeps that label because the
-      # classification can still produce it if a future release ships a legal country with a blank
-      # requirement — re-add the regional blocks below if that category reappears.
+      # NOTE: "Legally possible, requirement unknown" only gets regional columns when some country has
+      # legal change fully in effect with no requirement recorded (Bosnia and Herzegovina, Moldova and
+      # Montenegro in Version 3.0). If a release has none, its two blocks below go unused.
       gender_marker_change_court_order_required_count:
         title: Legal change of gender marker — Court order required (number of countries)
         description_short: Number of countries classified as "Court order required" on the indicator on legal change of gender marker.
@@ -3354,6 +3375,28 @@ tables:
         short_unit: ""
         display:
           name: Varies by region
+          numDecimalPlaces: 0
+
+      gender_marker_change_legally_possible__requirement_unknown_count:
+        title: Legal change of gender marker — Legally possible, requirement unknown (number of countries)
+        description_short: Number of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Legally possible, requirement unknown
+          numDecimalPlaces: 0
+
+      gender_marker_change_legally_possible__requirement_unknown_pop:
+        title: Legal change of gender marker — Legally possible, requirement unknown (population)
+        description_short: Total population of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Legally possible, requirement unknown
           numDecimalPlaces: 0
 
       gender_marker_change_surgery_and_sterilization_required_count:
@@ -3757,16 +3800,16 @@ tables:
       composite_index:
         title: LGBTI Composite Policy Index
         description_short: |-
-          Summary measure of a country's LGBTI-related laws, calculated by subtracting the weighted sum of regressive policy scores from the weighted sum of progressive policy scores.
+          Summary measure of a country's LGBTI-related laws, calculated by subtracting the sum of its regressive policy scores from the sum of its progressive policy scores.
         processing_level: major
         description_processing: |-
           Values for world regions are population-weighted averages of the countries in each region, computed by Our World in Data using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). Country values come directly from the producer.
         description_key:
           - "{definitions.description_key_dataset}"
-          - The index combines 33 policies — 23 that expand rights (such as marriage equality, protections from discrimination, or legal gender recognition) and 10 that restrict them (such as the criminalization of same-sex acts, the death penalty, or "propaganda" laws). Policies that expand rights add to the score; policies that restrict them subtract from it.
-          - Each policy counts for more or less depending on how strongly it operates in practice — how much of the country it covers, whether it applies to all genders, how severe its punishments are, whether it is actually enforced, and how easy the right is to use. Rather than fixing these weights by hand, the producer uses a statistical method (factor analysis) that gives more weight to the aspects that best distinguish countries from each other.
+          - The index combines 35 policies — 23 that expand rights (such as marriage equality, protections from discrimination, or legal gender recognition) and 12 that restrict them (such as the criminalization of same-sex acts, the death penalty, "propaganda" laws, or military service bans). Policies that expand rights add to the score; policies that restrict them subtract from it.
+          - Each policy scores between 0 and 1, depending on how strongly it operates in practice. Its score is the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is actually enforced, and, where they apply, whether it covers all genders, how severe its punishments are, and how easy the right is to use.
           - In practice this means a law that exists on paper but is never enforced counts less than one that is actively applied, and a right that requires surgery counts less than one available by self-declaration.
-          - Higher values indicate more rights-affirming legal environments; negative values indicate that restrictive laws dominate. Values range from about -4.3 to +18.7.
+          - Higher values indicate more rights-affirming legal environments; negative values indicate that restrictive laws dominate. Values range from about -4.5 to +20.3.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -3781,8 +3824,8 @@ tables:
           Number of progressive LGBTI-related national laws fully in force minus the number of regressive ones.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Each of 23 progressive policy-status combinations contributes +1 when fully in force at the national level, and each of 10 regressive combinations contributes -1. Policies only partially in force (for example, in some subnational jurisdictions) contribute 0.
-          - This raw count takes no account of policy scope, penalty severity, or enforcement — the LGBTI Composite Policy Index is the weighted counterpart. The producer describes this unweighted count as the closest analog to Version 1.0's additive policy index.
+          - Each of 23 progressive policy-status combinations contributes +1 when fully in force at the national level, and each of 12 regressive combinations contributes -1. Policies only partially in force (for example, in some subnational jurisdictions) contribute 0.
+          - This raw count takes no account of policy scope, penalty severity, or enforcement — the LGBTI Composite Policy Index is the weighted counterpart.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -3794,10 +3837,10 @@ tables:
       progressive_score:
         title: Progressive policy score
         description_short: |-
-          Weighted sum of a country's progressive LGBTI-related policy scores, across 23 policy-status combinations.
+          Sum of a country's progressive LGBTI-related policy scores, across 23 policy-status combinations.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Progressive policies include marriage equality, civil unions, joint adoption, protections from discrimination, hate-crime laws, legal gender recognition, and related rights. Each policy counts for more or less depending on how strongly it operates in practice — its coverage, whether it applies to all genders, whether it is enforced, and how easy the right is to use — with weights set by a statistical method (factor analysis).
+          - Progressive policies include marriage equality, civil unions, joint adoption, protections from discrimination, hate-crime laws, legal gender recognition, and related rights. Each policy scores between 0 and 1: the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is enforced, and, where they apply, whether it covers all genders and how easy the right is to use.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -3809,10 +3852,10 @@ tables:
       regressive_score:
         title: Regressive policy score
         description_short: |-
-          Weighted sum of a country's regressive LGBTI-related policy scores, across 10 policy-status combinations.
+          Sum of a country's regressive LGBTI-related policy scores, across 12 policy-status combinations.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Regressive policies include the criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, and marriage bans. Each policy counts for more or less depending on how strongly it operates in practice — its coverage, whether it applies to all genders, how severe its punishments are, and whether it is actually enforced — with weights set by a statistical method (factor analysis).
+          - Regressive policies include the criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, marriage bans, restrictions on gender-affirming care, restrictions on blood donation by men who have sex with men, and bans on military service. Each policy scores between 0 and 1: the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is actually enforced, and, where they apply, whether it covers all genders, how severe its punishments are, and how long a blood-donation deferral lasts.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
