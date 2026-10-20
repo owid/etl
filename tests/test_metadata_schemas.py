@@ -412,12 +412,17 @@ def _local_enum_values(node) -> set | None:
     return values if has_enum_branch else None
 
 
-def _find_enum_drift(upstream_node, local_node, path="grapher_config") -> list[str]:
-    """Recursively compare enums between the upstream grapher schema and the local copy.
+def _find_schema_drift(upstream_node, local_node, path="grapher_config") -> list[str]:
+    """Recursively compare the upstream grapher schema with the local copy.
 
-    Returns drift messages for every upstream enum value that the local schema would reject.
-    Local relaxations (e.g. a field loosened to plain `string`) are skipped, and the local
-    schema is allowed to accept extra values (e.g. `WorldMap` in chartTypes).
+    Returns a drift message for everything upstream accepts that the local copy would reject:
+    - an upstream enum value missing from the local enum,
+    - an upstream nested property missing from a local object that lists its own properties,
+    - a key the local copy requires but upstream doesn't (e.g. upstream relaxing `variableId`).
+
+    Local relaxations are skipped: a node loosened to a plain type or swapped for a `$ref`
+    (no `properties`/`enum` of its own) isn't descended into. The local copy may also accept
+    more than upstream (extra enum values like `WorldMap`, extra properties).
     """
     errors = []
     if not isinstance(upstream_node, dict) or not isinstance(local_node, dict):
@@ -430,13 +435,21 @@ def _find_enum_drift(upstream_node, local_node, path="grapher_config") -> list[s
             if missing:
                 errors.append(f"{path}: local enum is missing upstream values {sorted(missing)}")
 
+    extra_required = set(local_node.get("required", [])) - set(upstream_node.get("required", []))
+    if extra_required:
+        errors.append(f"{path}: local copy requires {sorted(extra_required)}, upstream doesn't")
+
+    local_props = local_node.get("properties")
     for key, up_child in upstream_node.get("properties", {}).items():
-        loc_child = local_node.get("properties", {}).get(key)
-        if loc_child is not None:
-            errors += _find_enum_drift(up_child, loc_child, f"{path}.{key}")
+        if local_props is None:
+            break
+        if key not in local_props:
+            errors.append(f"{path}.{key}: upstream property missing from the local copy")
+        else:
+            errors += _find_schema_drift(up_child, local_props[key], f"{path}.{key}")
 
     if "items" in upstream_node and "items" in local_node:
-        errors += _find_enum_drift(upstream_node["items"], local_node["items"], f"{path}[]")
+        errors += _find_schema_drift(upstream_node["items"], local_node["items"], f"{path}[]")
 
     return errors
 
@@ -451,8 +464,9 @@ def _load_embedded_grapher_config() -> dict:
 
 def test_grapher_config_schema_sync():
     """Verify that the grapher_config block embedded in dataset-schema.json stays in sync with
-    the vendored grapher schema. Detects new properties we're missing and (recursively) enum
-    values the embedded copy would reject — e.g. a new chart type added upstream.
+    the vendored grapher schema. Detects new properties we're missing and, recursively, enum
+    values, nested properties and `required` keys the embedded copy would reject — e.g. a new
+    chart type added upstream.
 
     We maintain a local copy of grapher_config properties (rather than using $ref)
     because our meta.yml files use Jinja templates and {definitions...} references
@@ -494,18 +508,19 @@ def test_grapher_config_schema_sync():
             "from upstream, add it to LOCAL_ONLY_PROPERTIES in this test file."
         )
 
-    # Check that enum values inside shared properties haven't drifted (e.g. a new chart type
-    # added to `tab` or `sortBy` upstream that the embedded copy would reject).
+    # Check that shared properties haven't drifted below the top level: new enum values (e.g. a
+    # new chart type in `tab`), new nested properties (e.g. `map.globe`), or upstream dropping a
+    # `required` key the embedded copy still enforces.
     drift = []
     for prop, up_node in upstream["properties"].items():
         loc_node = local_gc["properties"].get(prop)
         if loc_node is not None:
-            drift += _find_enum_drift(up_node, loc_node, f"grapher_config.{prop}")
+            drift += _find_schema_drift(up_node, loc_node, f"grapher_config.{prop}")
     assert not drift, (
-        "Enum values in schemas/dataset-schema.json → grapher_config have drifted from the\n"
+        "schemas/dataset-schema.json → grapher_config has drifted from the\n"
         f"vendored grapher schema ({VENDORED_GRAPHER_SCHEMA.name}):\n  "
         + "\n  ".join(drift)
-        + "\n\nSync the listed enums (see the /sync-grapher-schema skill)."
+        + "\n\nMirror the listed upstream changes (see the /sync-grapher-schema skill)."
     )
 
     # Check for local properties removed from upstream (excluding known local-only ones)
@@ -515,6 +530,26 @@ def test_grapher_config_schema_sync():
             "Local grapher_config has properties not in upstream schema (may be deprecated)",
             properties=sorted(removed),
         )
+
+
+def test_schemas_have_no_duplicate_keys():
+    """`json.load` silently keeps the last of two same-named keys, so a stale duplicate block
+    (e.g. a property pasted twice while syncing) would hide the copy that actually gets edited."""
+
+    def _reject_duplicates(pairs):
+        keys = [k for k, _ in pairs]
+        dupes = sorted({k for k in keys if keys.count(k) > 1})
+        if dupes:
+            raise ValueError(f"duplicate keys {dupes}")
+        return dict(pairs)
+
+    broken = []
+    for path in sorted(SCHEMAS_DIR.glob("*.json")):
+        try:
+            json.loads(path.read_text(), object_pairs_hook=_reject_duplicates)
+        except ValueError as e:
+            broken.append(f"{path.name}: {e}")
+    assert not broken, "Schemas with duplicate keys:\n  " + "\n  ".join(broken)
 
 
 @pytest.mark.integration

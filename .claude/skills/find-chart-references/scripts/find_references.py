@@ -273,6 +273,10 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
     referencing the name does not affect readers but does affect the operator: it is the thing
     that surprises you at delete time, and it is carried with `published` so a consumer can rank
     it below the live ones rather than confuse the two.
+
+    A data insight can also place a narrative chart through its front matter
+    (`content->>'$."narrative-chart"'`), which writes no `posts_gdocs_links` row, so that key is
+    read too. Missing it hid the insight carrying a narrative chart's own title claim.
     """
     names = sorted({str(f["where"]) for f in findings if f["surface"] == "narrative chart" and f.get("where")})
     if not names:
@@ -284,9 +288,32 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
         "WHERE pgl.linkType = 'narrative-chart' AND pgl.target IN %(n)s ORDER BY pgl.target, pg.slug",
         params={"n": tuple(names)},
     )
+    # The front-matter value is usually the name, but authors also paste the admin edit URL
+    # (`.../admin/narrative-charts/<id>/edit`), so match the id in a URL to the name as well.
+    name_by_id = {
+        str(f["surface_id"]): str(f["where"])
+        for f in findings
+        if f["surface"] == "narrative chart" and f.get("where")
+    }
+    df_front_matter = OWID_ENV.read_sql(
+        "SELECT pg.content->>'$.\"narrative-chart\"' AS target, pg.id AS gdoc_id, pg.slug AS post_slug,"
+        "       pg.type AS post_type, pg.published, '' AS queryString "
+        "FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
+        "  AND pg.content->>'$.\"narrative-chart\"' IS NOT NULL AND pg.content->>'$.\"narrative-chart\"' <> ''",
+    )
+    # Keep what the doc actually holds: when it is a URL, that URL (not the name) is what an
+    # operator has to search for in the doc.
+    df_front_matter["raw_target"] = df_front_matter["target"]
+    url_id = df_front_matter["target"].str.extract(r"/narrative-charts/(\d+)", expand=False)
+    df_front_matter["target"] = url_id.map(name_by_id).fillna(df_front_matter["target"])
+    df_front_matter = df_front_matter[df_front_matter["target"].isin(names)].sort_values(["target", "post_slug"])
+    seen = {(r["target"], r["gdoc_id"]) for r in df.to_dict("records")}
+    rows = df.to_dict("records") + [
+        r for r in df_front_matter.to_dict("records") if (r["target"], r["gdoc_id"]) not in seen
+    ]
     by_name = {str(f["where"]): f for f in findings if f["surface"] == "narrative chart"}
     out = []
-    for r in df.to_dict("records"):
+    for r in rows:
         parent = by_name[r["target"]]
         out.append(
             rec(
@@ -308,8 +335,10 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
                 query_string=r["queryString"],
                 # Deliberately left empty even when the column has something: a block placement
                 # has no visible anchor text, so `find_in_doc` must fall through to the name,
-                # which is what the ArchieML block actually spells out.
-                text="",
+                # which is what the ArchieML block actually spells out. The exception is a data
+                # insight whose front matter holds the admin URL instead of the name: the URL is
+                # what the doc contains, so it is the search string.
+                text=r["raw_target"] if r.get("raw_target") and r["raw_target"] != r["target"] else "",
                 published=r["published"],
             )  # fmt: skip
         )
@@ -1414,7 +1443,7 @@ NOT_SEARCHED = [
     "Indicator-level `presentation.grapher_config`, which lives in garden/grapher `.meta.yml` "
     "rather than the DB — invisible here, and it fans out to every thin MDIM/explorer view that "
     "inherits it. Needs a repo grep.",
-    "Data insights that record the reference somewhere other than `grapher-url`.",
+    "Data insights that record the reference somewhere other than `grapher-url` or `narrative-chart`.",
     "Charts nested inside article layout containers, which may produce no `posts_gdocs_links` row at all.",
 ]
 

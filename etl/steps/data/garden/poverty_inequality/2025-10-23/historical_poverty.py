@@ -609,7 +609,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
                             data={
                                 "country": [successor],
                                 "year": [LATEST_YEAR],
-                                "gdp_per_capita": [pd.NA],
+                                "gdp_per_capita": [
+                                    np.nan
+                                ],  # pandas 3 concat no longer ignores all-NA object columns when picking the dtype
                                 "region": [region],
                             }
                         )
@@ -2238,7 +2240,8 @@ def safe_log(values: pd.Series | np.ndarray) -> np.ndarray:
     """
     # Convert to float array
     if isinstance(values, pd.Series):
-        arr = values.values.astype(float)
+        # na_value is needed for nullable dtypes, whose pd.NA can't be cast to float directly in pandas 3.
+        arr = values.to_numpy(dtype=float, na_value=np.nan, copy=True)
     else:
         arr = np.asarray(values, dtype=float).copy()
 
@@ -2265,7 +2268,8 @@ def safe_exp(values: pd.Series | np.ndarray) -> np.ndarray:
     """
     # Convert to float array
     if isinstance(values, pd.Series):
-        arr = values.values.astype(float)
+        # na_value is needed for nullable dtypes, whose pd.NA can't be cast to float directly in pandas 3.
+        arr = values.to_numpy(dtype=float, na_value=np.nan, copy=True)
     else:
         arr = np.asarray(values, dtype=float).copy()
 

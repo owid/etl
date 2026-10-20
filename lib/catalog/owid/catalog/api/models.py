@@ -40,6 +40,11 @@ class ResponseSet(BaseModel, Generic[T]):
     # Tweak this to have a more advanced display
     _ui_advanced: bool = False
 
+    def __init__(self, _ui_advanced: bool = False, **data: Any) -> None:
+        # Pydantic drops constructor arguments for private attributes, so set it after init.
+        super().__init__(**data)
+        self._ui_advanced = _ui_advanced
+
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
         if not self.items:
@@ -99,7 +104,7 @@ class ResponseSet(BaseModel, Generic[T]):
         """Truncate all string values in DataFrame for display."""
         df = df.copy()
         for col in df.columns:
-            if df[col].dtype == object:
+            if pd.api.types.is_string_dtype(df[col].dtype):
                 df[col] = df[col].apply(lambda x: self._truncate_string(x, self._MAX_STR_LENGTH))
         return df
 

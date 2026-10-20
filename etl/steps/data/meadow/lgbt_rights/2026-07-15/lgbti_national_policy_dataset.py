@@ -132,7 +132,7 @@ def run() -> None:
         *[f"source_{i}" for i in range(1, 13)],
     ]
     for col in mixed_object_cols:
-        tb[col] = tb[col].astype("string")
+        tb[col] = tb[col].astype("str")
 
     # 4-component index. The natural key is (country, year, law, status).
     tb = tb.format(["country", "year", "law", "status"], sort_columns=True)

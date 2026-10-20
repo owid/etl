@@ -142,7 +142,7 @@ def assign_unique_year_for_columns(tb: Table) -> Table:
     tb = tb.copy()
 
     # Make all columns string
-    tb[DATA_COLUMNS] = tb[DATA_COLUMNS].astype("string")
+    tb[DATA_COLUMNS] = tb[DATA_COLUMNS].astype("str")
 
     # When last_decriminalization is "never was illegal", replace value with START_YEAR
     tb.loc[tb["last_decriminalization"] == "never was illegal", "last_decriminalization"] = f"{START_YEAR}"
@@ -184,7 +184,8 @@ def assign_unique_year_for_columns(tb: Table) -> Table:
         "former_criminalizations1",
         "former_criminalizations2",
     ]:
-        tb[col] = tb[col].astype("Int64")
+        # Strip whitespace (e.g. " 1822" after splitting on ";"), which pandas 3 no longer tolerates when casting to int.
+        tb[col] = tb[col].str.strip().astype("Int64")
 
     return tb
 
@@ -321,6 +322,9 @@ def fill_countries_to_start_year(tb: Table) -> Table:
 
     # Concatenate the two tables
     tb = pr.concat([tb, tb_], ignore_index=True)
+
+    # Concatenating with the all-NA status column gives object dtype, where pandas 3 comparisons with pd.NA raise.
+    tb["status"] = tb["status"].astype("str")
 
     return tb
 

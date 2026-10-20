@@ -24,7 +24,7 @@ datasets, [`/update-dataset`](../update-dataset/SKILL.md) for the generic update
 
 | Step | Path |
 |---|---|
-| snapshot | `climate/<version>/weekly_wildfires.csv` (EFFIS API, ~24k requests, ~6 min) |
+| snapshot | `climate/<version>/weekly_wildfires.csv` (EFFIS API, ~24k requests) |
 | meadow | `climate/<version>/weekly_wildfires` |
 | garden | `climate/<version>/weekly_wildfires` (+ regions, + `faostat_rl` for land area) |
 | grapher | `weekly_wildfires`, `wildfires_by_year`, `wildfires_by_week`, `wildfires_by_week_average` |
@@ -125,8 +125,8 @@ STAGING=1 .venv/bin/etl indicator-upgrade upgrade --dry-run
 STAGING=1 .venv/bin/etl indicator-upgrade upgrade
 ```
 
-Expected output: names are identical across versions, so every old indicator gets a perfect
-match (68 mappings in total for the 2026-08-01 run, across 14 charts and 2 narrative charts).
+Expected output: names are identical across versions, so every old indicator used in a chart or
+narrative chart gets a perfect match.
 Two normal-looking warnings that are **not** problems:
 
 - *"N unmatched variables in new dataset"* — `match` only considers old variables that at least
@@ -207,20 +207,17 @@ GWIS reports 7-day bins anchored at 1 January, **labelled by their last day**: b
 ### The last point is provisional
 
 A closed bin keeps being revised **upwards** for one to two weeks as burnt-area detections are
-reprocessed. Measured on the 2026 season:
+reprocessed. Typical shortfalls against a later read of the same bin:
 
-| Bin read | Age at read | Shortfall vs value at a later read |
-|---|---|---|
-| closing 07-08, read 07-10 | 2 days | −5.2% |
-| closing 07-22, read 07-27 | 5 days | −8.6% |
-| closing 08-05, read 08-14 | 9 days | −9.2% |
-| closing 07-29, read 08-07 | 16 days | −2.8% |
-| closing 07-22, read 08-07 | 23 days | −2.5% |
-| closing 07-15 and earlier, read 08-14 | ≥30 days | 0.0% (identical across reads) |
+| Age at read | Shortfall vs value at a later read |
+|---|---|
+| 2–9 days | about −5% to −9% |
+| 16–23 days | about −2.5% to −3% |
+| ≥30 days | 0.0% (identical across reads) |
 
 Don't read the older rows as a settled floor: they are lower bounds against the *next* read, not
-against a final value, and each was still moving. Three-plus weeks is the first age at which a bin
-has been observed not to move at all.
+against a final value, and those bins are still moving. Bins 30 days or older have not been seen
+to move.
 
 So the newest point on every wildfire chart is an undercount of roughly 5-10% until a later
 update fills it in. **Never quote the latest week as a finished number** in an announcement, a
@@ -228,7 +225,7 @@ footnote, or a reply to a journalist: this is precisely the mechanism behind lea
 readings of a record-quiet fire season.
 
 Waiting longer trades staleness for accuracy but never removes the effect. A closed bin is in the
-API within 2 days (observed on the 2026-06-19 and 2026-07-10 runs); there is no
+API within 2 days; there is no
 `Last-Modified` header and no timestamp in the payload, so the exact publication moment is
 unknown. Hence the reminder runs 2 days after the bin closes, and no day of the week yields a
 settled latest point.

@@ -2,12 +2,13 @@ definitions:
   common:
     processing_level: major
     description_processing: |-
-      The source reports flows for individual commodities. We sum them into the source's commodity groups.
+      The source reports flows for individual commodities. Some flows appear more than once, under different commodity names that refer to the same FAOSTAT item and carry identical values. We remove these repeated rows so that each flow is counted once. We then sum the commodities into the source's commodity groups.
 
 dataset:
   update_period_days: 365
   owners:
     - Pablo Rosado
+    - Hannah Ritchie
 
 tables:
   deforestation_embedded_in_trade:

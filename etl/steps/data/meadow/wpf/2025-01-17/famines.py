@@ -3,6 +3,7 @@
 import re
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -202,7 +203,7 @@ def combine_entries(tb: Table) -> Table:
     }
 
     # Add new combined entry
-    tb = tb._append(new_entry, ignore_index=True)
+    tb = pr.concat([tb, Table([new_entry])], ignore_index=True)
     tb = tb.drop(rows_to_combine.index)
 
     return tb

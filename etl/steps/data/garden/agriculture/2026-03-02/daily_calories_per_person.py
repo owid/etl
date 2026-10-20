@@ -62,8 +62,9 @@ def run() -> None:
     # Load inputs.
     #
     # Load FAOSTAT FBSC dataset and read its main table.
+    # NOTE: Keep categoricals (safe_types=False); converting this ~37M-row table to strings needs ~35 GB of memory.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
-    tb_fbsc = ds_fbsc.read("faostat_fbsc")
+    tb_fbsc = ds_fbsc.read("faostat_fbsc", safe_types=False)
 
     # Load Harris et al. (2015) dataset and read its main table.
     ds_harris = paths.load_dataset("harris_et_al_2015")

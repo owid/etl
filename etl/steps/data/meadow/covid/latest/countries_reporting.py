@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     # Dtypes
     tb = tb.astype(
         {
-            "country": "string",
+            "country": "str",
             "date": "datetime64[ns]",
             "date_first_reported": "datetime64[ns]",
             "date_first_value": "datetime64[ns]",

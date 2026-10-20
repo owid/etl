@@ -72,7 +72,7 @@ def run() -> None:
     )
 
     # Separate flags from values.
-    tb["flag"] = tb["hicp"].astype("string").str.extract(r"([a-z]+)", expand=False)
+    tb["flag"] = tb["hicp"].astype("str").str.extract(r"([a-z]+)", expand=False)
     tb["flag"] = tb["flag"].map(FLAGS).fillna("")
     tb["hicp"] = tb["hicp"].str.replace(r"[a-z]", "", regex=True).str.strip().astype("Float64")
 

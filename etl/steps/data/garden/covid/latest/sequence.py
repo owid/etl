@@ -75,14 +75,20 @@ VARIANTS_DETAILS = {
     "recombinant": {"rename": "Recombinant", "relevant": False},
 }
 VARIANTS_MAPPING = {k: v["rename"] for k, v in VARIANTS_DETAILS.items()}
-VARIANTS_RELEVANT = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["relevant"]))
-VARIANTS_NON_RELEVANT = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if not v["relevant"]))
-VARIANTS_OMICRON_BA = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (BA")))
-VARIANTS_OMICRON_XBB = list(
+VARIANTS_RELEVANT = sorted(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["relevant"]))
+VARIANTS_NON_RELEVANT = sorted(set(v["rename"] for v in VARIANTS_DETAILS.values() if not v["relevant"]))
+VARIANTS_OMICRON_BA = sorted(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (BA"))
+)
+VARIANTS_OMICRON_XBB = sorted(
     set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (XBB"))
 )
-VARIANTS_OMICRON_JN = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN")))
-VARIANTS_OMICRON_KP = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (KP")))
+VARIANTS_OMICRON_JN = sorted(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN"))
+)
+VARIANTS_OMICRON_KP = sorted(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (KP"))
+)
 
 COUNTRY_MAPPING = {
     "USA": "United States",
@@ -138,7 +144,7 @@ def run(dest_dir: str) -> None:
     tb = filter_by_num_sequences(tb, col_total="num_sequences_total")
 
     # Second table: Sequencing
-    tb_seq = tb.astype({"country": "string", "variant": "string"}).copy()
+    tb_seq = tb.astype({"country": "str", "variant": "str"}).copy()
     tb_seq = add_variant_dominant(tb_seq)
     tb_seq = add_variant_totals(tb_seq)
     tb_seq = add_per_capita(tb_seq, ds_population)
@@ -224,8 +230,8 @@ def check_variants(tb: Table) -> Table:
 def clean_date(tb: Table) -> Table:
     """Clean date column."""
     # Get date of report
-    tb["date"] = pd.to_datetime(tb["week"].astype("string"), format="%Y-%m-%d") + timedelta(days=14)
-    tb["date"] = tb["date"].astype("string")
+    tb["date"] = pd.to_datetime(tb["week"].astype("str"), format="%Y-%m-%d") + timedelta(days=14)
+    tb["date"] = tb["date"].astype("str")
     # Get date of publication of latest available file
     last_update = tb.date.m.origins[0].date_published
     tb["date"] = tb["date"].apply(lambda x: min(x, last_update))
@@ -245,7 +251,7 @@ def add_category_others(tb: Table) -> Table:
     # Get total sequences per country and date
     tb_b = (
         tb.groupby(["date", "country"], as_index=False, observed=True)
-        .agg({"num_sequences": sum})
+        .agg({"num_sequences": "sum"})
         .rename(columns={"num_sequences": "num_sequences_categorised"})
     )
     tb_c = tb_a.merge(tb_b, on=["date", "country"])
