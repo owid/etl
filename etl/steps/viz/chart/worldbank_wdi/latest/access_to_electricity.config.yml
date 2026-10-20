@@ -62,7 +62,7 @@ views:
     config:
       map:
         colorScale:
-          baseColorScheme: "Greens"
+          baseColorScheme: "Oranges"
           binningStrategy: "equalSizeBins-few-bins"
   - dimensions:
       metric: share_of_population
