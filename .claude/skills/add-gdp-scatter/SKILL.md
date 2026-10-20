@@ -23,11 +23,11 @@ https://admin.owid.io/admin/charts/6305/edit	https://admin.owid.io/admin/charts/
 - `chart_admin_url` — the existing reference scatter chart used as the source of parity hints (yAxis log, y `display.name`, color/size override, tolerance, exclusions).
 - `target_chart_admin_url` — the chart the user wants to gain a scatter view.
 - `gdp_source` — one of (case-insensitive, substring matches accepted):
-  - `World Bank` / `WDI` → variableId `1294305` (WDI 2026-07-27)
+  - `World Bank` / `WDI` → variableId `1294305`
   - `Maddison` / `Maddison Project Database` → `900793`
   - `PWT` / `Penn World Table` → `1108541`
 
-  `GDP_SOURCES` in the script is the authority on these ids; the WDI one goes stale on every WDI update — see the version check below.
+  `GDP_SOURCES` in the script is the authority on these ids — see the version check below.
 
 The admin host that gets written to is `OWID_ENV.admin_api`, which auto-resolves to `staging-site-<branch>` on a feature branch. Confirm the branch before running.
 
@@ -35,7 +35,7 @@ The admin host that gets written to is `OWID_ENV.admin_api`, which auto-resolves
 
 Before processing any rows, the script queries `variables` for the latest id matching each canonical GDP-per-capita `catalogPath` pattern (`worldbank_wdi/.../ny_gdp_pcap_pp_kd`, `ggdc/.../maddison_project_database#gdp_per_capita`, `ggdc/.../penn_world_table#rgdpo_pc`). If the latest id differs from the one hardcoded in `GDP_SOURCES`, a `WARN` is printed at the top of stdout with the newer id and catalogPath. The script does NOT auto-switch — update `GDP_SOURCES` (and the `feedback_scatter_gdp_picker` memory) deliberately if the new version is the one we want.
 
-**Read that WARN before the run, not after.** These ids go stale on every WDI update, and the "target already has `x` → leave it" guard means a re-run will **not** repair a target that already received the stale variable — the `x` dimension has to be rewritten directly, chart by chart. Cross-check against the id the source scatters actually plot: if the sources are on a newer version than `GDP_SOURCES`, the newer one is what you want, and bumping first saves a repair pass. (2026-08-04: every source plotted WDI 2026-07-27 `1294305` while the script was still pinned to 2026-02-27 `1204826`.)
+**Read that WARN before the run, not after.** These ids go stale on every WDI update, and the "target already has `x` → leave it" guard means a re-run will **not** repair a target that already received the stale variable — the `x` dimension has to be rewritten directly, chart by chart. Cross-check against the id the source scatters actually plot: if the sources are on a newer version than `GDP_SOURCES`, the newer one is what you want, and bumping first saves a repair pass.
 
 ## What the script does (per row)
 
@@ -47,9 +47,9 @@ Mirrors the admin's `applyDefaultsForScatter` and the extra moves we agreed on:
    - **size**: the rule is *always use the default `Population` indicator (`POPULATION_ID=953899`) for any population-type size*. If the source sizes by any population variant (regular, historical, WPP, …), the target gets the default Population. A genuinely **non-population** size (e.g. GDP, area) is mirrored as-is **but raises a `WARN`** so the bubble sizing gets a manual review. **If the source has no `size` dim at all, the target also gets none** — the script won't add sizing the curator deliberately omitted. Population variants are detected by the variable's name starting with "Population" or its catalogPath living under a `/population/` dataset; the action note records any normalization.
 3. Sets `matchingEntitiesOnly: true`.
 4. Sets `xAxis` to `scaleType: log` + `canChangeScaleType: true`.
-5. **Y-axis log toggle (not forced):** when the source scatter is `scaleType: log`, only enable the toggle (`canChangeScaleType: true`) and leave the default **linear**. `yAxis` is shared across all views, so forcing log would flip the line/bar views too. **Mirrors explicit `yAxis` min/max bounds** the source sets (each bound copied independently) — **except a non-zero `min` is NOT mirrored when the target has a `Marimekko` or `Stacked*` view**, because those draw from a baseline and a scatter-tuned non-zero min would make them start above zero (misleading). **`DiscreteBar` is not in that set**: `DiscreteBarChart.yAxisConfig` hardcodes `min: undefined` and anchors at zero, so it ignores `yAxis.min` outright — withholding the min from a DiscreteBar target protects nothing and costs the scatter a well-fitted axis. A degenerate `min: 0` + `max: 0` (collapsed axis) has its `max` stripped. Note: y-axis bounds affect all views, not just scatter.
+5. **Y-axis log toggle (not forced):** when the source scatter is `scaleType: log`, only enable the toggle (`canChangeScaleType: true`) and leave the default **linear**. `yAxis` is shared across all views, so forcing log would flip the line/bar views too. **Mirrors explicit `yAxis` min/max bounds** the source sets (each bound copied independently) — **except a non-zero `min` is NOT mirrored when the target has a `Marimekko` or `Stacked*` view**, because those draw from a baseline and a scatter-tuned non-zero min would make them start above zero (misleading). **`DiscreteBar` is not in that set**: `DiscreteBarChart.yAxisConfig` hardcodes `min: undefined` and anchors at zero, so it ignores `yAxis.min` outright — withholding the min from a DiscreteBar target protects nothing and costs the scatter a well-fitted axis. A degenerate `min: 0` + `max: 0` (collapsed axis) has its `max` stripped.
 
-   **On y-axis bounds, prefer removing to pinning.** `Axis.updateDomainPreservingUserSettings` takes `min(config.min, data.min)` and `max(config.max, data.max)`, so an authored `min` is a hard floor across every view — which is why `{min: 0, max: 0}` renders identically to `{min: 0}` (the data max always wins) and is *not* the inert junk it looks like. When a reviewer says the scatter's axis is wasting space at zero, **dropping `min` usually beats mirroring the source's**: each view then fits its own data, and mirroring a non-zero min can clip a LineChart whose series run below it. (2026-08-04, chart 2201: source min was 5, but the line data reaches 0.92; dropping `min` gave the scatter 6.94–13.97 while the line chart moved only 0 → 0.92, and the DiscreteBar was unaffected either way.)
+   **On y-axis bounds, prefer removing to pinning.** `Axis.updateDomainPreservingUserSettings` takes `min(config.min, data.min)` and `max(config.max, data.max)`, so an authored `min` is a hard floor across every view — which is why `{min: 0, max: 0}` renders identically to `{min: 0}` (the data max always wins) and is *not* the inert junk it looks like. When a reviewer says the scatter's axis is wasting space at zero, **dropping `min` usually beats mirroring the source's**: each view then fits its own data, and mirroring a non-zero min can clip a LineChart whose series run below it.
 
 ### The scatter's single-year default needs no config (usually)
 
@@ -61,7 +61,7 @@ Grapher handles it at runtime instead. `checkSingleTimeSelectionPreferred` retur
 
 **But it only fires when the reader CLICKS the tab** — see the shared caveat below.
 
-Also: **`hideTimeline: true` breaks it even on a tab click.** With a hidden timeline, `timelineHandleTimeBounds` reads the **authored** `minTime`/`maxTime` on every chart tab and ignores the runtime handles, so the collapse never takes effect — and the reader has no slider to fix it. Authored `minTime == maxTime` is then the only fix, and it is only safe when every other tab is single-time anyway (`DiscreteBar`/`StackedDiscreteBar`/`Marimekko`). With a `LineChart`, `SlopeChart` or single-indicator `Dumbbell` in the mix, one global time cannot serve both — un-hide the timeline or accept the range. The script emits a `WARN` for each case. (2026-08-04: chart 1253, `DiscreteBar` + `hideTimeline`, needed `minTime`/`maxTime` = `latest`; the other 16 targets in that batch needed nothing.)
+Also: **`hideTimeline: true` breaks it even on a tab click.** With a hidden timeline, `timelineHandleTimeBounds` reads the **authored** `minTime`/`maxTime` on every chart tab and ignores the runtime handles, so the collapse never takes effect — and the reader has no slider to fix it. Authored `minTime == maxTime` is then the only fix, and it is only safe when every other tab is single-time anyway (`DiscreteBar`/`StackedDiscreteBar`/`Marimekko`). With a `LineChart`, `SlopeChart` or single-indicator `Dumbbell` in the mix, one global time cannot serve both — un-hide the timeline or accept the range. The script emits a `WARN` for each case.
 
 ### `adjustStateForTab` fires on a tab CLICK only — not on a direct URL load
 
@@ -77,8 +77,8 @@ if (!this.isEditor) {
 So they always happen together, or not at all. `adjustStateForTab` has exactly one production caller, `onTabChange`, which in turn has exactly one: the `ContentSwitchers` tab control. A tab supplied in the URL takes a different path — `populateFromQueryParams` → `setTab`, which only assigns `this.tab`. Three consequences:
 
 - **Clicking the scatter tab**: time collapses to the latest year *and* the selection is cleared. The scatter matches the old standalone chart.
-- **Landing directly on `?tab=scatter`**: neither happens. The scatter opens on the authored time range with the authored entities highlighted — **unless the URL says otherwise**. This is the path **Part 2's redirect uses**, which is why every part of its stored `tab=scatter&time=latest&country=` is load-bearing: each param hand-supplies one adjustment the click would have made. `time=latest` stands in for `ensureTimeHandlesAreSensibleForTab`, and `country=` (present, empty) for `ensureEntitySelectionIsSensibleForTab` — `parseCountryParam` returns `valid([])` for an empty value and `setSelectedEntities([])` clears, so the scatter shows every entity unhighlighted. **Whenever a new tab-click adjustment is added upstream, a matching param has to be added here** or the two paths drift apart again. `country=` has not yet been exercised through a live redirect — confirm in a browser on the first `--apply` run (see "Verifying Part 2").
-- **The admin editor shows neither**, because of the `isEditor` guard — deliberate, so switching tabs cannot mutate the authored config on save (grapher #6794). A scatter that looks wrong in `/admin/charts/<id>/edit` may be fine for readers. Verify on the chart page.
+- **Landing directly on `?tab=scatter`**: neither happens. The scatter opens on the authored time range with the authored entities highlighted — **unless the URL says otherwise**. This is the path **Part 2's redirect uses**, which is why every part of its stored `tab=scatter&time=latest&country=` is load-bearing: each param hand-supplies one adjustment the click would have made. `time=latest` stands in for `ensureTimeHandlesAreSensibleForTab`, and `country=` (present, empty) for `ensureEntitySelectionIsSensibleForTab` — `parseCountryParam` returns `valid([])` for an empty value and `setSelectedEntities([])` clears, so the scatter shows every entity unhighlighted. **Whenever a new tab-click adjustment is added upstream, a matching param has to be added here** or the two paths drift apart again. Confirm in a browser after an `--apply` run that `country=` cleared the selection (see "Verifying Part 2").
+- **The admin editor shows neither**, because of the `isEditor` guard — deliberate, so switching tabs cannot mutate the authored config on save. A scatter that looks wrong in `/admin/charts/<id>/edit` may be fine for readers. Verify on the chart page.
 
 ### The target's entity selection highlights the scatter, it does not filter it
 
@@ -86,9 +86,7 @@ Targets normally carry a `selectedEntityNames` list for their line/bar view (4�
 
 - `ScatterPlotChartState.seriesNamesToHighlight` uses the selection to **highlight** only; every entity is still plotted.
 - Axis domains narrow to the selection only via `pointsForAxisDomains`, and only when **`zoomToSelection`** is set. Check that field — with it, a scatter's axes really would zoom to the highlighted subset.
-- On a **tab click**, `ensureEntitySelectionIsSensibleForTab` clears the selection entirely (`CHART_TYPES_THAT_SHOW_ALL_ENTITIES` is `[ScatterPlot, Marimekko]`) so long as it is still the authored one — the scatter then looks exactly like the old standalone chart. On a **direct URL load it does not**, for the reason in the section above; the authored entities render highlighted.
-
-That second case is what **Part 2's redirect produces**, so a reader arriving by a retired scatter's URL sees the same data and axes but with a few countries emphasized — visually unlike the chart they used to get, and unlike what a reader who clicks the tab gets. Decide per batch whether that is acceptable, and see the `country=` note above for the fix.
+- On a **tab click**, `ensureEntitySelectionIsSensibleForTab` clears the selection entirely (`CHART_TYPES_THAT_SHOW_ALL_ENTITIES` is `[ScatterPlot, Marimekko]`) so long as it is still the authored one — the scatter then looks exactly like the old standalone chart. On a **direct URL load it does not**, for the reason in the section above; the authored entities render highlighted unless the URL carries `country=`.
 
 ### Cross-view safety (which fields are global)
 
@@ -98,10 +96,10 @@ That second case is what **Part 2's redirect produces**, so a reader arriving by
 7. Emits warnings (no action) for:
    - Target has no `selectedEntityNames` — line/bar/slope views will fall back to Grapher defaults.
    - Target `stackMode: relative` — on scatter this is the "Display average annual change" mode; we want the toggle available but **off by default**, so a relative default is flagged for review.
-   - Source `excludedEntityNames` — never applied to the target (they would hide the entity from all views, not just the scatter), so each one **reappears** on the migrated scatter. Graded per entity by `classify_exclusions` into `y-OUTLIER` / `aggregate` / `high-GDP-material` / `unclear` / `ungradeable` (a decision is needed) vs `high-GDP` / `no data` (benign), with the numbers in the **EXCLUDED ENTITIES** table. Only the first group makes the note a `WARN` — the group *is* `EXCLUSION_WARN_CLASSES`, which the table's own footer prints, so the two cannot drift. Note that a high GDP per capita is benign only while it stays inside `X_MATERIAL_DECADES`; past that it grades `high-GDP-material` and warns like the rest.
+   - Source `excludedEntityNames` — never applied to the target, so each one **reappears** on the migrated scatter (see "A log y axis and an exclusion list are the two things the migration cannot carry"). Graded per entity by `classify_exclusions` into `y-OUTLIER` / `aggregate` / `high-GDP-material` / `unclear` / `ungradeable` (a decision is needed) vs `high-GDP` / `no data` (benign), with the numbers in the **EXCLUDED ENTITIES** table. Only the first group makes the note a `WARN` — the group *is* `EXCLUSION_WARN_CLASSES`, which the table's own footer prints, so the two cannot drift. Note that a high GDP per capita is benign only while it stays inside `X_MATERIAL_DECADES`; past that it grades `high-GDP-material` and warns like the rest.
    - Source y axis is **log** — the target's scatter tab opens linear, and only a URL carrying `yScale=log` restores it. See "A log y axis and an exclusion list are the two things the migration cannot carry".
-   - GDP coverage mismatch — if y-indicator's earliest year predates the chosen GDP's coverage (WDI≈1990, PWT≈1950, Maddison≈year 1), suggest a deeper-history alternative.
-   - Few entities on default scatter view — counts entities with both a y- and an x-value within tolerance at the default time; if fewer than ~15 AND source uses higher tolerance, recommends bumping target's y `display.tolerance`.
+   - GDP coverage mismatch — if y-indicator's earliest year predates the chosen GDP's coverage (WDI≈1990, PWT≈1950, Maddison≈year 1), suggest a deeper-history alternative. The user picks per chart whether to switch sources.
+   - Few entities on default scatter view — counts entities with both a y- and an x-value within tolerance at the default time; if fewer than ~15 AND source uses higher tolerance, recommends bumping target's y `display.tolerance`. Tolerance affects all views, not just scatter.
 
 Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
 
@@ -121,9 +119,7 @@ a query string:
 The surfaces with no query string are what decide whether the retirement is worth doing, and
 there are three:
 
-- a **key-chart slot** has nowhere to put one — `GdocPost.loadRelatedCharts` selects only
-  `chartId, slug, title, variantName, keyChartLevel`, and `RelatedCharts` renders
-  `<GrapherWithFallback slug={activeChartSlug}>`;
+- a **key-chart slot** has nowhere to put one (see "Key-chart slots");
 - a gdoc **embed** resolves the chart itself and renders its default tab
   (`makeGrapherLinkedChart` builds no query string);
 - a **featured metric** is worse still: it names a chart, an MDIM view or an explorer view and
@@ -175,7 +171,7 @@ than the entity. The measured year is printed whenever it is not the default.
 That fallback year honours the target's **tolerance**, and is not a raw-year intersection: at a
 non-zero tolerance Grapher pairs a y value with a GDP value from a neighbouring year, so an entity
 whose two observations never share a year can still be a point the reader meets by dragging the
-timeline. Requiring the same year graded it a benign `no data` and dropped it out of the warning
+timeline. Requiring the same year would grade it a benign `no data` and drop it out of the warning
 altogether. The value is then read back at that same tolerance, since the observation itself may
 sit a year or two off the timeline year it was found under.
 
@@ -183,19 +179,18 @@ The candidates for that year are **every year the two variables cover**, not jus
 observation years, because the year that pairs them can be one where the entity has neither: y in
 2000 and GDP in 2002 at tolerance 1 meet at **2001**, a year on the timeline because other entities
 have data there and a year the reader reaches by dragging the handle. Searching only the entity's
-own years missed it and sent the entity back as a benign `no data`.
+own years would miss it and send the entity back as a benign `no data`.
 
 `no data` is also checked **before** the `OWID_` code, so an excluded aggregate that has no
 pairable year is `no data` rather than `aggregate`. The `aggregate` note claims the entity "renders
 as one point among the countries"; an entity with no pair renders nowhere, since
-`matchingEntitiesOnly` hides it. Testing the code first raised a warning — and a `RECONSIDER` row —
-on the strength of a sentence that was not true of that entity.
+`matchingEntitiesOnly` hides it. Testing the code first would raise a warning — and a `RECONSIDER` row —
+on the strength of a sentence that is not true of that entity.
 
-(2026-08-19, production: of 22 published GDP scatters carrying `excludedEntityNames`, 8 exclude
-`World` or another OWID aggregate — the single commonest case, which is why `aggregate` is its
-own class, detected by the `OWID_` prefix on `entityCode` rather than by a name list. Charts 1131
-and 5029, both of which exclude a genuine y outlier, are **also key charts** on their topic pages
-— the compound case where the loss lands where no query string reaches.)
+Excluding `World` or another OWID aggregate is the single commonest case, which is why `aggregate`
+is its own class, detected by the `OWID_` prefix on `entityCode` rather than by a name list. A
+source that excludes a genuine y outlier can **also be a key chart** on its topic page — the
+compound case where the loss lands where no query string reaches.
 
 ## Run this as a checklist in the chat
 
@@ -214,10 +209,10 @@ The canonical items, in order:
 7. Build the review HTML (`build_review.py`) and hand it to the topic owner.
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
-10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
-11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart and featured-metric traps below. Settle the ⭐ featured-metric rows in the same pass: they are the only ones that cannot be repaired after the unpublish.
+10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. Check production directly rather than inferring it from the merge.
+11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything (see "Re-point every reference at the new scatter view"). **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart and featured-metric traps below. Settle the ⭐ featured-metric rows in the same pass: they are the only ones that cannot be repaired after the unpublish.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
-13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict, **and resolve every `RECONSIDER` row with the topic owner before item 14**. That block is the one verdict here that does not block on its own (a lossy retirement is an editorial call, not a broken page), so it is the one that gets applied past if nobody answers it.
+13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict, **and resolve every `RECONSIDER` row with the topic owner before item 14**. That block does not block on its own (see "RECONSIDER"), so it is the one that gets applied past if nobody answers it.
 14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
 15. Part 2 `--apply --allow-production` once the scatter views are live on production, then the same checks against the live site.
 
@@ -262,7 +257,7 @@ Keep the list alive across turns: carry the untouched items forward rather than 
 
 ## Edge cases
 
-- **Stacked-family chartTypes** (`StackedArea` / `StackedBar` / `StackedDiscreteBar`) without any line-family entry → `SKIPPED`. The user must redesign the chart manually. (Example from session: chart 3547.)
+- **Stacked-family chartTypes** (`StackedArea` / `StackedBar` / `StackedDiscreteBar`) without any line-family entry → `SKIPPED`. The user must redesign the chart manually.
 - **Target already has `x`/`color`/`size`** → leave it, like the admin's `if (!hasX)` does. The script will not overwrite an existing dimension.
 - **Target is itself already a `ScatterPlot`** → the row is worthless and can be actively harmful, so **screen these out of the input before running**. A chart config holds exactly one `x` dimension, so a chart already scattering against some other variable can never also plot GDP: the guard above leaves `x` alone, the row still reports `OK`, and no GDP dimension is added. Worse, if the target's y differs from the source's, step 7 stamps the source's y `display.name` onto a different indicator. This is not a status the script reports — verify it yourself.
 
@@ -273,7 +268,7 @@ A valid target is a **published, non-scatter, single-y-indicator chart that plot
 - **on `y`, not just present** — matching the indicator anywhere in the target's dimensions pulls in scatter twins where it is the `x` (e.g. `cereal-yield-vs-extreme-poverty-scatter` instead of `cereal-yield-vs-extreme-poverty`).
 - **not a `ScatterPlot`** — see the edge case above.
 - **not stacked-family** — the script `SKIPPED`s those.
-- **exactly one `y` indicator** — a scatter plots one y series, so a multi-series line/bar chart is ambiguous (an 11- or 22-series cause-of-death chart is a nonsense target). In `prod_semantic`, `is_single_indicator` is exactly `COUNT(DISTINCT y indicator) = 1`, verified with zero disagreements.
+- **exactly one `y` indicator** — a scatter plots one y series, so a multi-series line/bar chart is ambiguous (an 11- or 22-series cause-of-death chart is a nonsense target). In `prod_semantic`, `is_single_indicator` is exactly `COUNT(DISTINCT y indicator) = 1`.
 
 Two things to expect from a correctly filtered list: **fewer rows**, and some sources with **no target at all** — that is the honest answer when the indicator is only ever plotted by scatters, and it is better than a fallback. Also beware `coalesce(type, 'LineChart')`: `type` is NULL for the charts that never set `chartTypes`, so a bare `type != 'ScatterPlot'` evaluates to NULL and silently drops exactly the plain line charts that make the best targets.
 
@@ -285,11 +280,7 @@ from etl.analytics.data import read_analytics
 print(read_analytics(open('.claude/skills/add-gdp-scatter/scripts/find_targets.sql').read()).to_csv(index=False))"
 ```
 
-It uses `/* */` comments deliberately: `read_analytics` flattens the SQL onto one line, where a `--` comment would swallow the rest of the query and fail with a misleading `Unexpected end of statement`. As of 2026-08-04 it returns 167 GDP scatters — 124 with a target, 43 without.
-- **Source has `excludedEntityNames`** → warning only, and graded: exclusions on the target would also hide those entities from line/bar/map views, which is rarely intended, so each excluded entity comes back on the scatter and the skill says whether that matters.
-- **Source y axis is log** → warning only; the target keeps a linear default, because `yAxis` is global.
-- **GDP coverage mismatch** → warning only; the user picks per chart whether to switch sources.
-- **Sparse scatter view** → warning only; tolerance affects all views, not just scatter.
+It uses `/* */` comments deliberately: `read_analytics` flattens the SQL onto one line, where a `--` comment would swallow the rest of the query and fail with a misleading `Unexpected end of statement`.
 
 ## What this skill explicitly does NOT do
 
@@ -318,7 +309,7 @@ The right pane toggles (or press `v`) between the two states a URL can produce:
 - **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader following the retired slug gets, `&yScale=log` included on a log row. The query comes from `redirect_to_scatter.row_query`, the function that writes it, rather than a constant of its own — one part of it is per-row, so a local copy would put a view nobody gets in front of the reviewer.
 - **Default view** — what a reader opening the target sees first.
 
-The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live. On a **log row the two differ by design** — the click leaves the target's linear `yAxis` alone while the redirect forces `log` — so the pane's own hint says so rather than letting a correct row read as a defect.
+The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click. On a **log row the two differ by design** — the click leaves the target's linear `yAxis` alone while the redirect forces `log` — so the pane's own hint says so rather than letting a correct row read as a defect.
 
 Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, an exclusion whose return actually changes the chart, and the log-axis question. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
 
@@ -336,18 +327,18 @@ Decisions are fingerprinted on both configs' `configMd5` plus the GDP variable i
 
 ### An admin write drops an empty `colorScale`, which chart-diff then reports
 
-`configs_are_equal` compares the whole config minus `id`, `isPublished`, `bakedGrapherURL`, `adminBaseUrl`, `dataApiUrl` and `version` — so **`colorScale` is compared**. The admin API normalizes an empty `colorScale: {}` to null and drops the key on *any* write, and pushing `{}` back does not stick (verified — it re-normalizes). A target whose production config has `colorScale: {}` therefore shows an extra "colorScale removed" line in its chart-diff forever after being touched.
+`configs_are_equal` compares the whole config minus `id`, `isPublished`, `bakedGrapherURL`, `adminBaseUrl`, `dataApiUrl` and `version` — so **`colorScale` is compared**. The admin API normalizes an empty `colorScale: {}` to null and drops the key on *any* write, and pushing `{}` back does not stick (it re-normalizes). A target whose production config has `colorScale: {}` therefore shows an extra "colorScale removed" line in its chart-diff forever after being touched.
 
 Two consequences worth knowing before someone reports it as a bug:
 
-- It is cosmetic. Nothing renders differently, and **`colorScale` with real content is preserved** — e.g. `customHiddenCategories` survived intact on a Marimekko target.
+- It is cosmetic. Nothing renders differently, and **`colorScale` with real content is preserved** — e.g. `customHiddenCategories` survives intact on a Marimekko target.
 - **Reverting a chart on staging does not remove it from chart-diff.** The revert is itself an admin write, so a chart restored to its exact production config still appears, differing only by the dropped `colorScale`. If a reverted chart shows up with no visible change, this is why — check `colorScale` before hunting for a real difference.
 
 ## Part 2: retire the old standalone scatter charts
 
 Once the targets have their scatter view, each old standalone "X vs. GDP per capita" chart is retired by registering **its slug as a chart redirect on the target chart** carrying `?tab=scatter&time=latest&country=`, then unpublishing it. Use `scripts/redirect_to_scatter.py`.
 
-That is the same thing as opening the target chart's admin editor, going to **Refs → "Alternative URLs for this chart"**, and filling in both fields: the old slug under **URL**, and `tab=scatter&time=latest&country=` under **Target query params (optional)**. That second field is new (grapher #6674, Jul 2026) and is what makes this possible — before it, `chart_slug_redirects` could only map slug → chart id, so this skill had to use the site `redirects` table instead.
+That is the same thing as opening the target chart's admin editor, going to **Refs → "Alternative URLs for this chart"**, and filling in both fields: the old slug under **URL**, and `tab=scatter&time=latest&country=` under **Target query params (optional)**. That second field is what makes this possible.
 
 Input: JSON list of `{grapher_url, target_chart_url}` (public `ourworldindata.org/grapher/<slug>` URLs).
 
@@ -359,7 +350,7 @@ echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect
 echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --apply
 ```
 
-Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited, and any source that still has one is `BLOCKED`, because the unpublish would delete it), `--allow-manual-refs` (apply a row whose source an explorer / data insight / static viz references — only once those are re-pointed), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
+Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited; see `BLOCKED` below), `--allow-manual-refs` (apply a row whose source an explorer / data insight / static viz references — only once those are re-pointed), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
 
 ### Pre-checks
 
@@ -377,7 +368,7 @@ All read-only, so the audit reports the verdict `--apply` will act on:
 
 ### References audit of the OLD chart
 
-`get_chart_references` counts (`wp/gdoc/expl/narr/ins/sviz`), flagging `MANUAL` when explorers / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). Those rows are turned into `BLOCKED` **before** the apply loop runs, so `--apply` cannot unpublish them: the loop gates purely on `status`, and leaving a MANUAL row at `CREATE` meant the audit flagged the breakage and then caused it anyway. Re-point the dependents, then re-run with `--allow-manual-refs`.
+`get_chart_references` counts (`wp/gdoc/expl/narr/ins/sviz`), flagging `MANUAL` when explorers / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). Those rows are turned into `BLOCKED` **before** the apply loop runs, so `--apply` cannot unpublish them: the loop gates purely on `status`, and leaving a MANUAL row at `CREATE` would mean the audit flags the breakage and then causes it anyway.
 
 Two columns come from outside `get_chart_references`, because it cannot see either:
 
@@ -438,7 +429,7 @@ A `MANUAL` reference is turned into `BLOCKED` because the unpublish would *break
 a data insight, and no editorial view changes that. A lossy retirement breaks nothing — the chart
 still renders, on a linear axis, with an extra dot on it — so whether it is acceptable is a
 judgment about the chart, not a fact about the database. Roughly a fifth of a batch is
-logarithmic (2026-08-14, batch 1: 3 of 14), so blocking those would mean a waiver flag on every
+typically logarithmic, so blocking those would mean a waiver flag on every
 run, and a flag passed every run stops being read. Hence: the verdict gets its own printed block
 **and** a `[RECONSIDER: …]` suffix on the row's note in the PLAN table, and checklist item 13
 requires each one to be answered before the apply — but `--apply` will not stop for it.
@@ -454,7 +445,7 @@ retirement in it is a faithful swap, which is worth saying in the report.
 /grapher/<target-slug>?tab=scatter&time=latest&country=
 ```
 
-merged with whatever query string the reference already carries (its own params win, same rule as the redirect — so a reference with `tab=` or `time=` of its own needs a decision, not a blind merge). Two reasons it can't wait: an **embed** never gets fixed by a redirect at all (it resolves the chart itself and renders the target's default tab), and a **link** works but sends readers through an extra hop that will outlive everyone's memory of why it exists.
+merged with whatever query string the reference already carries (its own params win, same rule as the redirect — so a reference with `tab=` or `time=` of its own needs a decision, not a blind merge). Two reasons it can't wait: an **embed** never gets fixed by a redirect at all (see "References audit of the OLD chart"), and a **link** works but sends readers through an extra hop that will outlive everyone's memory of why it exists.
 
 The script's own table covers only gdoc links and embeds — enough to spot the param collisions, not a full sweep. For the complete surface list use the shared **`find-chart-references`** skill, which is what `/map-charts-to-mdim` does for the same problem (see `scripts/audit_references.py` there: it calls `run_sweep` from `find-chart-references/scripts/reference_report.py` and adds only the replacement URL, which is the workflow-specific part):
 
@@ -488,15 +479,15 @@ Those aids are the difference between a row someone can fix and a row that names
 - **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). A long one is cut short but **stays literal** — no `…`, which is not a character in the document and would make the paste find nothing.
 - **Its params** — the query string the reference already carries. Both consumers follow the same rule: the **replacement URL** merges it over the proposed params with **the reference's values winning** — an editorial choice: an article that pinned a country or a year meant to, and a paste should not silently discard that — and the **redirect** merges the same way, key by key (see "A reference's own params override the redirect's, key by key" below). So the cell grades collisions only: ⚠️ names the proposed keys the reference overrides — a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and that row needs a decision rather than a paste — while a non-colliding query merges in with the proposed view intact.
 
-**`yScale=log` when the retiring chart had a log y axis.** The applier never forces `yAxis.scaleType: log` on a target — `yAxis` is global, so it would flip the line/bar views too — it only enables the toggle and leaves the default **linear**. A source authored on a log y axis therefore becomes a *linear* scatter on the target, and its shape changes: the author chose log because that is the shape the relationship has. So the replacement link proposes `yScale=log` for exactly those rows, restoring it for that view alone, on the same principle as `time=latest` and `country=` — each stands in for something a URL-supplied tab does not get. That is the whole recovery channel, though: it only reaches surfaces that have a URL, which is why a log row is also a `RECONSIDER` row rather than a solved problem.
+**`yScale=log` when the retiring chart had a log y axis.** The applier leaves the target's y axis **linear** (step 5), so a source authored on a log y axis becomes a *linear* scatter on the target, and its shape changes: the author chose log because that is the shape the relationship has. So the replacement link proposes `yScale=log` for exactly those rows, restoring it for that view alone, on the same principle as `time=latest` and `country=` — each stands in for something a URL-supplied tab does not get. That is the whole recovery channel, though: it only reaches surfaces that have a URL, which is why a log row is also a `RECONSIDER` row rather than a solved problem.
 
-Read the flag from the **source**, never the target: the target's `yAxis.scaleType` is deliberately left linear, so it cannot tell you what the retiring chart looked like. Because the param is per-row, the ⚠️ collision check is against *that row's* proposal rather than a shared constant — so a reference's own `yScale=linear` is an override on a log row and merely its own setting everywhere else. (2026-08-14, batch 1: 3 of 14 sources were log — 6045, 663, 3740 — and one article link on 663 already carried `yScale=linear`, which wins and is flagged.)
+Read the flag from the **source**, never the target: the target's `yAxis.scaleType` is deliberately left linear, so it cannot tell you what the retiring chart looked like. Because the param is per-row, the ⚠️ collision check is against *that row's* proposal rather than a shared constant — so a reference's own `yScale=linear` is an override on a log row and merely its own setting everywhere else.
 
 **The Part 2 redirect carries it too**, so the two paths agree *for a bare slug*: a reader arriving at a retired slug with no query string gets the same log scatter as someone following a hand-updated article link. (A query string keeps every stored key it doesn't override — see the next section.) `chart_slug_redirects.target_query_param` is per-row, so `redirect_to_scatter.py` appends `yScale=log` to that row's stored query — the one part of `TARGET_QUERY` that varies by row. Everything Part 2 prints about that row quotes the same per-row query rather than the constant: the collision grading, and the narrative-chart "reproduce this view" URL (so a replacement built for a log source keeps the log axis).
 
 ### A reference's own params override the redirect's, key by key
 
-The production redirect **MERGES** the visitor's query over `target_query_param`, the visitor winning per key. Establishing this needs a *distinguishing* pair: a test whose query sets a stored key (`?tab=map` against stored `tab=line`) produces the same URL under merge and under wholesale replacement, and this section shipped a wrong "wholesale" conclusion for a day on exactly that evidence. The case that separates the models is a query that does NOT mention a stored key (production, 2026-08-14, `global-forestry-area-1958-2014` → `forest-area-km?tab=line`):
+The production redirect **MERGES** the visitor's query over `target_query_param`, the visitor winning per key. Establishing this needs a *distinguishing* pair: a test whose query sets a stored key (`?tab=map` against stored `tab=line`) produces the same URL under merge and under wholesale replacement. The case that separates the models is a query that does NOT mention a stored key (e.g. on production, `global-forestry-area-1958-2014` → `forest-area-km?tab=line`):
 
 ```
 ?country=~FRA          ->  /grapher/forest-area-km?tab=line&country=%7EFRA   (tab=line SURVIVES)
@@ -508,10 +499,10 @@ Consequences to carry into every report:
 
 - A reference's params cost the reader exactly the stored keys they collide with: a link carrying only `country=~FRA` keeps `tab=scatter&time=latest` (and a log row's `yScale=log`) and just pins the country. `params_cell` flags ⚠️ with the overridden keys and prints a non-colliding query as fine.
 - Hand-updating a link still matters when its params override `tab` or `time` — those land the reader off the scatter view.
-- This describes the PRODUCTION 404→301 function. Two other layers behave differently, and both the same way: **staging's** serving layer and a fresh row's first-week static **302** (`_redirects`) each answer with the stored query and drop the visitor's params entirely (staging: batch-1 staging apply, 2026-08-14; the 302: verified on production right after the batch-1 apply, same day, held to this section's own standard — non-colliding `?foo=bar` and `?xScale=log` were dropped, which a stored-side-wins merge would have kept, and colliding `?country=~CHL` / `?tab=chart` landed on the stored query too, on a log and a plain row both). So for its first week a fresh redirect sends every arrival to the stored view; the per-key merge only starts once the 302 expires and the 301 function takes over. Neither layer can validate this section's merge claim.
+- This describes the PRODUCTION 404→301 function. Two other layers behave differently, and both the same way: **staging's** serving layer and a fresh row's first-week static **302** (`_redirects`) each answer with the stored query and drop the visitor's params entirely — non-colliding params (`?foo=bar`, `?xScale=log`) as well as colliding ones (`?country=~CHL`, `?tab=chart`). So for its first week a fresh redirect sends every arrival to the stored view; the per-key merge only starts once the 302 expires and the 301 function takes over. Neither layer can validate this section's merge claim.
 - Re-verify with a distinguishing pair (a query that *omits* a stored key) if grapher changes how chart redirects are baked or served. `functions/_common/redirectTools.ts`'s explorer path also merges per key but with the TARGET winning — a different code path; don't generalize from it in either direction.
 
-All three consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. It is now a one-line wrapper over **`source_lossiness`**, which reads the log flag and `excludedEntityNames` off the same single config query so Part 2 can grade a retirement without fetching every source config a second time; take the log set from the wrapper and the pair of losses from `source_lossiness`, never by re-reading `yAxis.scaleType` locally. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is exactly how this went wrong once.
+All three consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. It is a one-line wrapper over **`source_lossiness`**, which reads the log flag and `excludedEntityNames` off the same single config query so Part 2 can grade a retirement without fetching every source config a second time; take the log set from the wrapper and the pair of losses from `source_lossiness`, never by re-reading `yAxis.scaleType` locally. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is an easy mistake.
 
 One limit remains: a reference that forces a **non-scatter** tab still receives the proposal, since the source's log was a global setting — but it is being applied to a view the author's choice was not about, so treat those rows as a judgment call.
 
@@ -525,13 +516,13 @@ The narrative-chart section is the one place a **placement** table appears: `gdo
 
 ### Key-chart slots — no query string reaches them
 
-`get_chart_references` counts `postsWordpress`, `postsGdocs`, `explorers`, `narrativeCharts`, `dataInsights` and `staticViz`. **Key charts are none of those** — a key chart is a chart↔tag association (`chart_tags.keyChartLevel`), not a row in any reference table. `redirect_to_scatter.py` therefore queries `chart_tags` itself (`key_chart_slots`) for its `keych` column; before it did, its verdicts looked clean while topic pages quietly depended on the chart being unpublished.
+`get_chart_references` counts `postsWordpress`, `postsGdocs`, `explorers`, `narrativeCharts`, `dataInsights` and `staticViz`. **Key charts are none of those** — a key chart is a chart↔tag association (`chart_tags.keyChartLevel`), not a row in any reference table. `redirect_to_scatter.py` therefore queries `chart_tags` itself (`key_chart_slots`) for its `keych` column; without it, its verdicts would look clean while topic pages quietly depend on the chart being unpublished.
 
 Unpublishing the source does not break a link here; it removes the chart from the topic page's key-chart list. So the loss is silent, on pages nobody is looking at during the migration. **Move each association to the target chart** (same tag, same `keyChartLevel`) as part of step 11.
 
 **But a moved slot renders the target's DEFAULT view, not the scatter.** `GdocPost.loadRelatedCharts` selects only `chartId, slug, title, variantName, keyChartLevel`, and `RelatedCharts` renders `<GrapherWithFallback slug={activeChartSlug}>` — there is nowhere to put a query string, so neither `tab=scatter` nor a log row's `yScale=log` can travel here. Where the page was featuring the chart *because* it was a scatter, moving the association is not an equivalent swap; that is what makes a key-chart slot the surface that can turn a `RECONSIDER` row into "keep the standalone chart". Tell the topic owner rather than moving it quietly.
 
-Step 11 still says not to trust a quiet Part 2 audit, because the `keych` column counts slots and the full sweep *locates* them: on 2026-08-04 the audit's own tables held 6 embeds + 3 links, while the sweep found **15 key-chart slots across 13 topic pages** — the largest single category.
+Step 11 still says not to trust a quiet Part 2 audit, because the `keych` column counts slots and the full sweep *locates* them: key-chart slots can outnumber the embeds and links in the audit's own tables and be the largest single category.
 
 ### Featured metrics — the scatter view cannot hold one
 
@@ -547,13 +538,13 @@ So each row is an editorial decision, not a swap: feature the **target chart's d
 
 What the redirect does **not** guarantee is delivering the scatter to it — see "A reference's own params override the redirect's, key by key" below. A narrative chart always has params, and they routinely include `tab` (its own view's tab), which overrides the stored `tab=scatter`; stored keys its params don't mention survive the hop.
 
-**Do not tell anyone to use the chart's "Create narrative chart" control — a plain chart has no such control.** An earlier version of this skill did, and it is wrong in a way that is easy to believe because MDIMs *do* have it:
+**Do not tell anyone to use the chart's "Create narrative chart" control — a plain chart has no such control.** It is wrong in a way that is easy to believe because MDIMs *do* have it:
 
 - `CreateNarrativeChartEditorPage` returns `NotFoundPage` unless `type === "multiDim"`, so `/admin/narrative-charts/create` cannot be reached for a chart parent at all.
 - The site-side affordance is gated on `manager.adminCreateNarrativeChartPath` (`GrapherState.createNarrativeChartUrl`), and only `site/multiDim/MultiDim.tsx` and `MultiDimDataPageContent.tsx` ever set it. Not the share menu, not the chart page, nowhere.
 - The POST route *does* accept `{"type": "chart", "parentChartId": …}` (`createNarrativeChartFromChart`), so the capability exists with no click-path to it.
 
-Since every target in this migration is a plain chart, the API is the **only** way to create a replacement. Re-pointing is not an alternative: `updateNarrativeChart` reads both parent columns off the existing row, so they are INSERT-only and always will be (owid/owid-grapher#6872, closed as not-planned).
+Since every target in this migration is a plain chart, the API is the **only** way to create a replacement. Re-pointing is not an alternative: `updateNarrativeChart` reads both parent columns off the existing row, so they are INSERT-only.
 
 So present three options and let the curator choose, rather than prescribing a rebuild:
 
@@ -561,7 +552,7 @@ So present three options and let the curator choose, rather than prescribing a r
 2. **Ask a developer** to create the replacement via the API.
 3. **Wait for the target to become an MDIM**, then use the MDIM's own control, which does exist.
 
-**Keep the handoff's narrative section short.** The mechanism above is for you, not the curator: the handoff states only which narrative chart to replace and how, and the how is keyed by what the target is — a plain chart (developer/API, or leave it) vs. an MDIM (the target view's own "Create narrative chart" control). `narrative_chart_mechanism()` is that intro; don't grow it back into the citations.
+**Keep the handoff's narrative section short.** The mechanism above is for you, not the curator: the handoff states only which narrative chart to replace and how, and the how is keyed by what the target is — a plain chart (developer/API, or leave it) vs. an MDIM (the target view's own "Create narrative chart" control). `narrative_chart_mechanism()` is that intro; don't expand it into the citations.
 
 If they choose to replace it, order matters — `create` rejects a duplicate name, `delete` is refused while a **published** post references the name, and `update` writes only query params, so there is no rename:
 
@@ -577,7 +568,7 @@ The order is forced by which calls trigger a bake:
 
 1. **Create** (or delete-then-recreate) the redirect on the target. There is no update endpoint, so wrong query params mean delete + create; if the create fails the original row is put back, and if that restore also fails the row reports `CRITICAL` with the repair.
 2. **Re-point the source's own old slugs** at the target. Unpublishing a chart deletes every `chart_slug_redirects` row pointing at it, so without this step those URLs become hard 404s. Each alias is deleted and re-created on the target — the UNIQUE constraint on `slug` leaves no other way. An alias's own query params are *not* carried over (they were written for the old chart) but are reported.
-3. **Settle any featured-metric slots** the handoff's ⭐ section lists, at `/admin/featured-metrics`. Last chance: step 4 unpublishes the source, and a featured metric can only be added for a *published* slug. See "Featured metrics" above — the scatter view itself cannot be featured, so this is a decision for the topic's owner rather than a swap.
+3. **Settle any featured-metric slots** the handoff's ⭐ section lists, at `/admin/featured-metrics`. Last chance: step 4 unpublishes the source (see "Featured metrics" above).
 4. **Unpublish the source.** This is both what makes the redirect fire (it only resolves on a 404) and what triggers the static build.
 
 Both failure directions are handled so no URL is ever left unserved. If any alias fails to move, it is restored on the source and **the unpublish is skipped** — otherwise the unpublish would delete the restored row and create exactly the 404 step 2 exists to prevent. If the unpublish itself fails, the source is likewise left published. Either way the row reports `CRITICAL` with what to do.
@@ -588,7 +579,7 @@ Both failure directions are handled so no URL is ever left unserved. If any alia
 
 - `?tab=scatter` is the valid scatter tab query param (`GRAPHER_TAB_CONFIG_OPTIONS.scatter`); it is stored without the leading `?`.
 - **Resolution is 404-only** at the edge, then a **301** with `max-age=86400`. A fresh row additionally gets a static **302** in `_redirects` for one week, listed ahead of the site redirects, to defeat the CDN cache.
-- **The stored params are only a base**: the visitor's own query params override them key by key. Good for `?country=`/`?region=` links, which keep their selection through the hop.
+- **The stored params are only a base** (see "A reference's own params override the redirect's, key by key"). Good for `?country=`/`?region=` links, which keep their selection through the hop.
 - `POST /charts/<id>/redirects/new` triggers **no** static build (the delete and the unpublish do), and validates nothing — no duplicate, chain or self-redirect check. Hence the pre-checks above.
 - **A source that is already unpublished bakes nothing**, so the redirect would serve nothing until an unrelated mutation happened to bake the site. When a row hits that combination — `CREATE` *or* `EXISTS`, with no aliases to re-point — the script asks for a deploy itself (`PUT /deploy`, the admin's "Manually triggered deploy"), once per run however many rows needed it, and reports `DEPLOY FAILED` with the manual repair if the call fails. `EXISTS` is included deliberately: a row can be there and still have never been baked, because a previous run's deploy failed or because someone added the alternative URL in the chart editor, which bakes nothing either. Every other path already has a delete or an unpublish doing it.
 - `chart_slug_redirects` is **per-environment** and is **not** synced staging→production by chart-diff. Run on staging to test, then re-run `--apply --allow-production` against production `admin.owid.io` once the scatter views are live there.

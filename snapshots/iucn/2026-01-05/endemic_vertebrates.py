@@ -51,7 +51,12 @@ def _row_has_number(row):
     return any(any(ch.isdigit() for ch in str(x)) for x in row)
 
 
-def _clean_table(df):
+def _clean_table(df, prev_headers):
+    """Turn one raw pdfplumber table into a typed, wide DataFrame for 8a.
+
+    A page that starts straight with data rows, without repeating the column header, reuses the header of the
+    previous page, provided it has the same number of columns. Returns the cleaned table and the headers used.
+    """
     df = df.copy().fillna("")
     header_row_idx = None
     for i in range(min(6, len(df))):
@@ -59,16 +64,22 @@ def _clean_table(df):
         if any("Mammals" in x for x in row) and any("Birds" in x for x in row):
             header_row_idx = i
             break
-    if header_row_idx is None:
-        return pd.DataFrame()
-
-    group_row = df.iloc[header_row_idx].tolist()
-    sub_row = df.iloc[header_row_idx + 1].tolist()
-    headers = _make_headers(group_row, sub_row)
-    headers[0] = "region_or_country"
+    if header_row_idx is not None:
+        group_row = df.iloc[header_row_idx].tolist()
+        sub_row = df.iloc[header_row_idx + 1].tolist()
+        headers = _make_headers(group_row, sub_row)
+        headers[0] = "region_or_country"
+        first_data_row = header_row_idx + 2
+    elif prev_headers is not None and len(prev_headers) == df.shape[1]:
+        headers = prev_headers
+        first_data_row = 0
+    else:
+        raise ValueError(
+            f"Table with {df.shape[1]} columns has no header row and no previous header to reuse. First row: {df.iloc[0].tolist()}"
+        )
 
     df.columns = headers
-    df = df.iloc[header_row_idx + 2 :].reset_index(drop=True)
+    df = df.iloc[first_data_row:].reset_index(drop=True)
 
     # Drop empty rows and section titles
     df = df[df["region_or_country"].str.strip() != ""]
@@ -78,7 +89,7 @@ def _clean_table(df):
     for c in num_cols:
         df[c] = pd.to_numeric(df[c].replace({"": None}), errors="coerce").astype("Int64")
 
-    return df
+    return df, headers
 
 
 def extract_table8a(source: str | Path) -> pd.DataFrame:
@@ -95,9 +106,11 @@ def extract_table8a(source: str | Path) -> pd.DataFrame:
     else:
         filelike = Path(source)
 
-    tables = []
+    cleaned = []
+    headers = None
     with pdfplumber.open(filelike) as pdf:
-        for page in pdf.pages:
+        for page_number, page in enumerate(pdf.pages, start=1):
+            tables = []
             # Try line-based extraction
             t = page.extract_table(
                 {
@@ -115,14 +128,13 @@ def extract_table8a(source: str | Path) -> pd.DataFrame:
                 if tt and len(tt[0]) >= 10:
                     tables.append(pd.DataFrame(tt))
 
-    cleaned = []
-    for t in tables:
-        c = _clean_table(t)
-        if not c.empty:
-            cleaned.append(c)
-
-    if not cleaned:
-        raise ValueError("No tables matched the expected Table 8a structure.")
+            page_tables = []
+            for raw in tables:
+                c, headers = _clean_table(raw, prev_headers=headers)
+                page_tables.append(c)
+            # Every page of Table 8a holds country rows, so a page without any means the parser missed it.
+            assert any(not c.empty for c in page_tables), f"Page {page_number} of Table 8a yielded no data rows."
+            cleaned.extend(page_tables)
 
     return pd.concat(cleaned, ignore_index=True)
 

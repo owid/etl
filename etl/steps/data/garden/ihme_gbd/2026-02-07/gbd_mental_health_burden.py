@@ -25,6 +25,10 @@ def run() -> None:
     tb = add_share_population(tb)
     #
     tb_daly = tb.query("measure == 'DALYs (Disability-Adjusted Life Years)'").drop(columns="measure")
+    # Drop the Share metric: it's a Rate/1000 rescaling, not a real share of total DALYs (DALYs measure
+    # life-years, not people, so "share of population" never applies here) - same fix already applied
+    # to diseases_as_entities() below, extended here for consistency.
+    tb_daly = tb_daly[tb_daly["metric"] != "Share"]
     tb_daly = tb_daly.format(["country", "year", "cause", "metric", "age"], short_name="gbd_mental_health_burden_dalys")
 
     tb_entities = diseases_as_entities(tb)

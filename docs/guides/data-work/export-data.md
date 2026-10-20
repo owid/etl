@@ -107,7 +107,6 @@ def run() -> None:
     #
     mdim = paths.create_chart(config=config)
     mdim.save()
-
 ```
 
 To see the multi-dimensional indicator in Admin, run

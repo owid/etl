@@ -315,7 +315,7 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
         on=["country", "year", "counterpart_country"],
         how="left",
     )
-    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype("string")
+    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype("str")
 
     # Create China rows for each year with china_imports_share_of_gdp = -1
     china_years = tb[tb["counterpart_country"] == "World"]["year"].unique()

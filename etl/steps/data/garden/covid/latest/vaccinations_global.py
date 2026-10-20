@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     # Dtypes
     tb = tb.astype(
         {
-            "country": "string",
+            "country": "str",
             "total_vaccinations": float,
             "people_vaccinated": float,
             "people_fully_vaccinated": float,
@@ -239,7 +239,7 @@ def _prepare_table_for_aggregates(tb: Table) -> Table:
         "new_people_vaccinated_smoothed",
     ]
     tb_agg_2 = tb_agg[cols_0fill + cols_index]
-    tb_agg_2.loc[:, cols_0fill] = tb_agg_2.groupby("country")[cols_0fill].fillna(0)
+    tb_agg_2.loc[:, cols_0fill] = tb_agg_2[cols_0fill].fillna(0)
 
     # population
     tb_agg_3 = tb_agg[["population_2022"] + cols_index]

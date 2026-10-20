@@ -12,12 +12,13 @@ etl chart-critic --sample 20
 # the 50 most-viewed charts, with an HTML report
 etl chart-critic --top 50 --output /tmp/critic.html
 
-# cheapest tier, no renders, and see the bill before spending it
-etl chart-critic --sample 100 --cheap --no-image --dry-run
+# no renders, and see the bill before spending it
+etl chart-critic --sample 100 --no-image --dry-run
 ```
 
-Roughly $0.003 per chart with the render attached on the default model, so a pass over every
-published chart is a few dollars. The binding constraint is not the bill — it is how many
+Roughly $0.04 per chart with the render attached on the default model at the default three passes,
+with prompt caching across the passes, so a pass over every published chart is under two hundred
+dollars. The binding constraint is not the bill — it is how many
 findings a human will read, which is why an empty result is a first-class outcome here.
 """
 
@@ -31,15 +32,14 @@ from pathlib import Path
 from typing import Any
 
 import rich_click as click
+from genai_prices import Usage
 from rich.console import Console
 from rich.table import Table
 
 from apps.chart_critic import cache, digest, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
-    CHEAP_MODEL,
     DEFAULT_MODEL,
-    FALLBACK_PRICES,
     build_agent,
     claim_tokens,
     format_views,
@@ -171,13 +171,24 @@ def _select(
     return [(r.slug, int(r.views), r.params) for r in picked.itertuples()]
 
 
-def _cost(model: str, input_tokens: int, output_tokens: int) -> float:
-    """Price a call, falling back to published rates for models genai_prices does not know."""
+def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
+    """Price a call; a model genai-prices does not know counts as $0, with a warning, so the review is kept.
+
+    ``input_tokens`` includes the cached ones.
+    """
+    usage = Usage(
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        cache_read_tokens=cache_read,
+        cache_write_tokens=cache_write,
+    )
     try:
-        return estimate_llm_cost(model, input_tokens=input_tokens, output_tokens=output_tokens)
-    except (KeyError, ValueError, LookupError):
-        rate_in, rate_out = FALLBACK_PRICES.get(model, (0.0, 0.0))
-        return input_tokens / 1e6 * rate_in + output_tokens / 1e6 * rate_out
+        return estimate_llm_cost(model, usage=usage)
+    except LookupError:
+        console.print(
+            f"[yellow]No price for {model} in genai-prices; its calls are left out of the cost total[/yellow]"
+        )
+        return 0.0
 
 
 def chart_link(slug: str, params: str = "", extra_keys: set[str] | None = None) -> str:
@@ -234,14 +245,14 @@ def _resolve_cache_ttl(cache_ttl: float | None, changed_since: int | None) -> fl
     """How long a cached bundle stays fresh, when the caller did not say.
 
     A ``--changed-since`` sweep must not replay a cached bundle, and the reason is that
-    selection's whole premise: a chart is in it *because* its configuration changed inside the
+    selection's whole premise: a chart is in it *because* someone edited it inside the
     window, so a bundle fetched inside that same window describes the chart as it was *before*
     the change. With a daily cron and a 24-hour TTL the previous run's bundle is always a few
     minutes inside the TTL, so it is not an edge case but the normal path — every finding a
     report on yesterday's chart. It reached the channel: a subtitle fixed during the day was
     flagged again the next morning, on a chart whose fix is what nominated it for review.
 
-    It is ~17 charts a day, so re-fetching them costs nothing worth saving. Any explicit
+    It is a few dozen charts a day, so re-fetching them costs nothing worth saving. Any explicit
     ``--cache-ttl`` still wins, including for a sweep of a hand-picked list.
     """
     if cache_ttl is not None:
@@ -309,10 +320,10 @@ def _review_one(
     agent = build_agent(model)
     parts = prompt_parts(bundle, extra_views)
     found: list[dict[str, Any]] = []
-    in_tokens = out_tokens = 0
+    in_tokens = out_tokens = cache_read = cache_write = 0
 
-    # The model is not reproducible even at temperature 0: on repeated passes over the same
-    # chart it raises a genuine finding on some and not others. Measured on three charts with
+    # The model is not reproducible: on repeated passes over the same chart it raises a
+    # genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
     bundle_hash = cache.content_hash(bundle.summary, bundle.png, *(png for _, png in extra_views))
@@ -350,13 +361,15 @@ def _review_one(
         usage = run.usage
         in_tokens += usage.input_tokens or 0
         out_tokens += usage.output_tokens or 0
+        cache_read += usage.cache_read_tokens or 0
+        cache_write += usage.cache_write_tokens or 0
 
     result["issues"] = sorted(found, key=lambda i: (-i["passes"], i["severity"]))
     result["passes"] = max(max(repeat, 1), len(already))
     result["bundle_cached"] = bundle.from_cache
     result["views_reviewed"] = 1 + len(extra_views)
     result["input_tokens"], result["output_tokens"] = in_tokens, out_tokens
-    result["cost"] = _cost(model, in_tokens, out_tokens)
+    result["cost"] = _cost(model, in_tokens, out_tokens, cache_read, cache_write)
     return result
 
 
@@ -375,7 +388,6 @@ def _review_one(
 )
 @click.option("--seed", type=int, default=0, show_default=True, help="Sampling seed, so a run is reproducible.")
 @click.option("--model", type=str, default=DEFAULT_MODEL, show_default=True, help="Model to review with.")
-@click.option("--cheap", is_flag=True, help=f"Use {CHEAP_MODEL} instead — roughly 15x cheaper.")
 @click.option("--no-image", is_flag=True, help="Send metadata and numbers only, without the chart render.")
 @click.option(
     "--repeat",
@@ -392,7 +404,7 @@ def _review_one(
     "--changed-since",
     type=int,
     default=None,
-    help="Review the published charts whose configuration changed in the last N days, most-read first.",
+    help="Review the published charts someone edited in the last N days, most-read first.",
 )
 @click.option(
     "--include-data-updates",
@@ -479,7 +491,6 @@ def cli(
     min_views: int,
     seed: int,
     model: str,
-    cheap: bool,
     no_image: bool,
     repeat: int,
     views: int,
@@ -501,9 +512,6 @@ def cli(
         removed, freed = cache.clear()
         console.print(f"Cleared {removed} cached files ({freed:.1f} MB) from {cache.CRITIC_CACHE_DIR}")
         return
-
-    if cheap:
-        model = CHEAP_MODEL
 
     cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
 
@@ -543,13 +551,13 @@ def cli(
                 slug,
                 chart_pageviews,
                 model,
-                not no_image,
-                dry_run,
-                repeat,
-                use_cache,
-                cache_ttl,
-                views,
-                target_params,
+                with_image=not no_image,
+                dry_run=dry_run,
+                repeat=repeat,
+                use_cache=use_cache,
+                ttl_hours=cache_ttl,
+                views=views,
+                params=target_params,
             )
             for slug, chart_pageviews, target_params in targets
         ]
@@ -656,13 +664,30 @@ def _post_digest(messages: list[digest.DigestMessage]) -> None:
             time.sleep(POST_INTERVAL_SECONDS)
         # Slack keys a thread on its parent's own timestamp, so a reply needs the response of the
         # message just posted — there is nothing to thread against before it exists.
-        parent = send_slack_message(digest.SLACK_CHANNEL, message.text)
+        parent = _post_blocks(send_slack_message, message)
         posted += 1
         for reply in message.thread:
             time.sleep(POST_INTERVAL_SECONDS)
             send_slack_message(digest.SLACK_CHANNEL, reply, thread_ts=parent["ts"])
             posted += 1
     console.print(f"[green]posted {posted} message(s) to {digest.SLACK_CHANNEL}[/green]")
+
+
+def _post_blocks(send_slack_message: Any, message: digest.DigestMessage) -> Any:
+    """Post a message in its block layout, falling back to it without the chart image.
+
+    Slack fetches an image block's URL itself and rejects the whole message when it can't, and the
+    thumbnail endpoint renders on demand, so a slow render must cost the picture, not the post.
+    """
+    from slack_sdk.errors import SlackApiError
+
+    if not message.blocks:
+        return send_slack_message(digest.SLACK_CHANNEL, message.text)
+    try:
+        return send_slack_message(digest.SLACK_CHANNEL, message.text, blocks=message.blocks)
+    except SlackApiError:
+        blocks = [b for b in message.blocks if b["type"] != "image"]
+        return send_slack_message(digest.SLACK_CHANNEL, message.text, blocks=blocks)
 
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> bool:

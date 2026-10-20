@@ -72,9 +72,11 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
         JWT token
     """
     now = int(time.time())
+    # GitHub rejects the JWT with a 422 if `iat` is in its future or `exp` is more than 10 minutes
+    # after its clock, so backdate `iat` and keep `exp` under the limit to tolerate clock drift.
     payload = {
-        "iat": now,
-        "exp": now + (10 * 60),  # JWT expiration time (10 minutes)
+        "iat": now - 60,
+        "exp": now + (9 * 60),
         "iss": client_id,
     }
     with open(private_key_path) as key_file:
@@ -355,25 +357,18 @@ class GithubApiRepo:
 
         return active_prs
 
-    def get_comment_from_pr(self, pr: PullRequest, username: str = "owidbot") -> Any | None:
-        """Get a comment from a PR by username.
+    def get_comments_from_pr(self, pr: PullRequest, username: str = "owidbot") -> list[Any]:
+        """Get all comments on a PR by username, oldest first.
 
         Args:
             pr: Pull request object
             username: Username of the commenter
 
         Returns:
-            Comment object or None
+            List of comment objects (empty if there are none)
         """
-        comments = pr.get_issue_comments()
-        matching_comments = [comment for comment in comments if comment.user.login == username]
-
-        if len(matching_comments) == 0:
-            return None
-        elif len(matching_comments) == 1:
-            return matching_comments[0]
-        else:
-            raise AssertionError(f"More than one {username} comment found.")
+        # GitHub returns issue comments in ascending order of creation.
+        return [comment for comment in pr.get_issue_comments() if comment.user.login == username]
 
     def get_master_commit_sha(self) -> str:
         """Get the latest commit SHA on master branch.

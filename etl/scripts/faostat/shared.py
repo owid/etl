@@ -139,7 +139,7 @@ ADDITIONAL_FILES_TO_COPY = [
     "custom_datasets.csv",
     "custom_elements_and_units.csv",
     "custom_items.csv",
-    "detected_anomalies.py",
+    "shared_detected_anomalies.py",
     "value_amendments.csv",
 ]
 # Note: Further custom rules are applied to the list of steps to run.
