@@ -67,8 +67,6 @@ steps:
   # UN DESA multidim migration flows (2024)
   viz://chart/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
-  viz://explorer/migration/latest/migration_flows:
-    - data://grapher/un/2025-03-18/migration_stock_flows
 
   # Migration multidims
   viz://chart/migration/latest/migrant_populations:
