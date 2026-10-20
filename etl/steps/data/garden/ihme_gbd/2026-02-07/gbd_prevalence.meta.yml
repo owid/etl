@@ -12,6 +12,16 @@ definitions:
     In high-burden areas, some people get malaria more than once a year, so this metric can read higher than the true share of the population infected.
     <%- endif -%>
 
+  # Unlike gbd_prevalence (a point-in-time stock - someone either currently has the condition or
+  # doesn't, so it can't double-count), gbd_incidence's Share metric counts new-case events over a
+  # year, and the same person can contribute more than one event for repeatable-infection causes
+  # (malaria, STIs). So only this table drops the "%" short_unit the shared default gives Share.
+  short_unit_incidence: |-
+    <%- if metric == "Percent" -%>
+    %
+    <%- elif metric == "Share" or metric == "Rate" or metric == "Number" -%>
+    <%- endif %>
+
 macros: |-
   <% macro title(metric, age, cause, unit) %>
     <% if metric == "Number" %>
@@ -108,7 +118,7 @@ tables:
           {macros}
           << format_unit(metric, 'new cases') >>
         short_unit: |-
-          {definitions.short_unit}
+          {definitions.short_unit_incidence}
         description_short: |-
           {macros}
           << description_short(metric, age, format_cause(cause), 'new cases') >>

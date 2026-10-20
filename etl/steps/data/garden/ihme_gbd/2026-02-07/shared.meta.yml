@@ -112,9 +112,11 @@ macros: |-
 
 definitions:
   short_unit: |-
-    <%- if metric == "Percent" -%>
+    <%- if metric == "Share" -%>
     %
-    <%- elif metric == "Share" or metric == "Rate" or metric == "Number" -%>
+    <%- elif metric == "Percent" -%>
+    %
+    <%- elif metric == "Rate" or metric == "Number" -%>
     <%- endif %>
 
   footnote: |-

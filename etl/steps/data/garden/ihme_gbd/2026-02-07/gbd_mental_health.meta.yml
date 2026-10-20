@@ -9,6 +9,7 @@ definitions:
     <% if metric == "Number" %>
     <%- elif metric == "Rate" %>
     <%- elif metric == "Share" %>
+    %
     <%- endif %>
 
 macros: |-
@@ -87,7 +88,7 @@ tables:
           <%- elif metric == "Rate" %>
             cases per 100,000 people
           <%- elif metric == "Share" %>
-            cases per 100 people
+            %
           <%- endif %>
         short_unit: |-
           {definitions.short_unit}
