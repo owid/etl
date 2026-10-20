@@ -35,11 +35,18 @@ PERSISTENT_CONTAINERS = {"staging-site-master"}
 COMMIT_LOOKUP_FAILED = "Unable to retrieve"
 
 
-def _call_api(method: str, path: str, timeout: float) -> tuple[Any, str | None]:
+# (connect, read). The API bounds every step it runs and answers 504 when one hangs, so the
+# read timeout is only a backstop for a request that never returns; connecting fails fast.
+REQUEST_TIMEOUT = (10, 600)
+
+
+def _call_api(method: str, path: str, timeout: tuple[float, float] = REQUEST_TIMEOUT) -> tuple[Any, str | None]:
     """Call the staging API. Returns (JSON body, None), or (None, an error message for the UI)."""
     url = f"{STAGING_API_URL}{path}"
+    log.info("Staging API call", method=method, path=path)
     try:
-        resp = http_session.request(method, url, timeout=timeout)
+        # the API refuses changes without this header (it keeps cross-site pages out)
+        resp = http_session.request(method, url, timeout=timeout, headers={"X-Staging-Client": "wizard"})
     except requests.RequestException as e:
         log.error("Staging API unreachable", url=url, error=str(e))
         return None, f"Staging API unreachable ({url}): {e}"
@@ -56,14 +63,13 @@ def _call_api(method: str, path: str, timeout: float) -> tuple[Any, str | None]:
 @st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
 def fetch_host_memory_stats() -> tuple[dict | None, str | None]:
     """Memory and swap of the LXC host the staging servers live on, in GB and percent."""
-    return _call_api("GET", "/host/memory", timeout=20)
+    return _call_api("GET", "/host/memory")
 
 
 @st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
 def fetch_lxc_servers_data() -> tuple[pd.DataFrame | None, str | None]:
     """Every staging server, as `owid-lxc info --json` reports it, processed for display."""
-    # the API reads each container's git commits, which takes a while with ~200 of them
-    data, error = _call_api("GET", "/servers", timeout=120)
+    data, error = _call_api("GET", "/servers")
     if error:
         return None, error
 
@@ -486,10 +492,8 @@ def reset_mysql_database(server_name: str) -> tuple[bool, str]:
         return False, error_msg
 
 
-def _server_action(method: str, server_name: str, action: str, timeout: float) -> tuple[Any, str | None]:
-    path = f"/servers/{quote(server_name, safe='')}" + (f"/{action}" if method == "POST" else "")
-    log.info(f"Staging API: {action}", server=server_name)
-    return _call_api(method, path, timeout=timeout)
+def _server_path(server_name: str) -> str:
+    return f"/servers/{quote(server_name, safe='')}"
 
 
 def _woken(server_name: str, result: dict) -> tuple[bool, str]:
@@ -512,8 +516,7 @@ def start_server(server_name: str) -> tuple[bool, str]:
     server back in seconds — no commit or rebuild needed. This replaces the obscure
     "push an empty commit" trick for idle servers.
     """
-    # starting also logs the container in to Tailscale and checks it rejoined, so allow time
-    result, error = _server_action("POST", server_name, "start", timeout=300)
+    result, error = _call_api("POST", f"{_server_path(server_name)}/start")
     if error:
         return False, error
     return _woken(server_name, result)
@@ -527,7 +530,7 @@ def stop_server(server_name: str) -> tuple[bool, str]:
     server if the snapshot fails. The data is preserved and the server can be woken later
     with :func:`start_server`.
     """
-    _, error = _server_action("POST", server_name, "stop", timeout=260)
+    _, error = _call_api("POST", f"{_server_path(server_name)}/stop")
     if error:
         return False, error
     return True, f"Server {server_name} stop completed successfully"
@@ -535,7 +538,7 @@ def stop_server(server_name: str) -> tuple[bool, str]:
 
 def restart_server(server_name: str) -> tuple[bool, str]:
     """Restart a running staging server (stop, then start)."""
-    result, error = _server_action("POST", server_name, "restart", timeout=420)
+    result, error = _call_api("POST", f"{_server_path(server_name)}/restart")
     if error:
         return False, error
     return _woken(server_name, result)
@@ -543,7 +546,7 @@ def restart_server(server_name: str) -> tuple[bool, str]:
 
 def destroy_server(server_name: str) -> tuple[bool, str]:
     """Destroy a staging server completely. Locked servers are refused."""
-    _, error = _server_action("DELETE", server_name, "destroy", timeout=150)
+    _, error = _call_api("DELETE", _server_path(server_name))
     if error:
         return False, error
     return True, f"Server {server_name} successfully destroyed"
