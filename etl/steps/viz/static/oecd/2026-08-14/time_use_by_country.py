@@ -28,28 +28,27 @@ Mexico is dropped here, not in garden, because it is a presentation call for one
 estimates as not fully comparable, it is the only charted country so flagged, and it would otherwise rank
 second on the leading segment with a footnote attached (see `NOT_COMPARABLE`).
 
-Values are written inside segments wide enough to hold them, in hours and minutes. Survey years differ
-by country, so each country label carries its year — the original's surveys spanned a narrower window
-and it named none of them.
+Values are written inside segments wide enough to hold them, in hours and minutes, left-aligned at each
+segment's start (the last segment's right-aligned at the bar's end), with a 1px gap of canvas between
+segments. Survey years differ by country, so each country label carries its year — the original's
+surveys spanned a narrower window and it named none of them. On desktop the name and the year take a
+line each, the name in bold.
 
-The header sits above the bars and points at the top row: each category's name over the segment it
-names, with the activities that category holds listed under it, one per line, bottom-aligned so every
-list ends level with the plot and the air falls under the heading. A name wider than its own segment is
-wrapped to it, and `blocks_collide` asserts that no block reaches into its neighbour's, since wrapping
-cannot save a single word wider than its span. Labelling each activity over its own segment, with a
-leader back to it, was tried and dropped: threading names past each other needed elbow leaders and a
-crossing budget, for a header no easier to read.
+The desktop key sits above the bars and points at the top row: over each segment, the activities that
+category holds as one run-in list, and under it, nearest the bars, the category's name in its colour.
+Each block is aligned with the values under it — left at its segment's start, the last one right at the
+bar's end — and its line breaks are the design team's (`key_lines`, `label_lines`). A block that clears
+the subtitle sideways may rise beside it, which is what lets the four-line lists sit right of a
+subtitle balanced over two shorter lines (`key_header_px`); `key_blocks_collide` asserts that no block
+reaches into its neighbour's. The mobile frame is too narrow for that and keeps a row legend instead.
 
-Nothing draws each block's *extent*, only its centre, so how wide a category is has to be read off the
-bars. A 1px rule under each name, spanning that category's own segment, was built and rendered (the
-`bracket` span on every placement is what it needs) and is an open question for design rather than a
-decision taken here: it does say which segment a block belongs to and how wide it is, but the rules
-follow their own lists' depths, so four of them stagger across the band, and the two narrow ones very
-nearly meet. The header lost its bracket rules on purpose when each category became a single segment,
-and putting one back is that call being revisited.
+This layout is the design team's rework of the frame, replicated here: their palette, the key's order
+and alignment, the two-line country labels, the segment gaps, the wider bar spacing and the taller
+desktop frame.
 
-One frame is emitted, 850x1095, following the vertical static-chart template. Fonts and the logo come
-from that template and are deliberately not set here. Colors *are* set here, unlike the retired
+Two frames are emitted: 850x1162 desktop, from the vertical static-chart template run 67px taller, and
+a mobile frame from the mobile template, also run taller, so the wider bar spacing does not thin the
+bars. Fonts and the logo come from the templates and are deliberately not set here. Colors *are* set here, unlike the retired
 ten-group charts, which left them to Figma as seaborn placeholders: the reason for a placeholder is
 that a font cannot be reproduced on this machine, and a color can, so naming the library colors makes
 the render a true preview of the frame (see `MAIN_CATEGORY_GROUPS`). What this step fixes is the data,
@@ -64,15 +63,15 @@ https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25524-5
   Dated when the page was first placed, not when it was last refreshed, and it sits among the dated
   chart pages after the divider.
-- Frame **`how-do-people-spend-their-time`**, `26879:11` —
-  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26879-11
-  A clone of `Static Chart Template_Vertical` (`5332:93`, 850x1095), at x=1000, with its unstyled
-  import parked at x=70 to the LEFT so the page reads original then edited.
-- Frame **`how-do-people-spend-their-time-mobile`**, `27518:8` —
-  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=27518-8
-  A clone of `Static Chart Template_Mobile (example 2)` (`24590:32`, 540x824), at x=2550, its own
-  unstyled import parked at x=1930. So the page reads as two original-then-edited pairs, left to
-  right, and the mobile pair is far enough right that its reference copy clears the desktop frame.
+- Frame **`how-do-people-spend-their-time`**, `29442:11` (850x1162) —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29442-11
+  A clone of `Static Chart Template_Vertical` (`5332:93`, 850x1095) run 67px taller with its footer
+  re-pinned to the bottom margin, at x=1000, with its unstyled import parked at x=70 to the LEFT so the
+  page reads original then edited.
+- Frame **`how-do-people-spend-their-time-mobile`**, `29442:520` (540x884) —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29442-520
+  A clone of `Static Chart Template_Mobile (example 2)` (`24590:32`, 540x824) run 60px taller, at
+  x=2550, its own unstyled import parked at x=1930. The published 2023 image sits leftmost, at x=-860.
 
 **The node ids are a convenience; the frame NAME is the durable join.** It is the kebab-case slug the
 website exports the PNG by, so it is the one string shared by the layer panel, the exported file and
@@ -194,15 +193,12 @@ stack did not survive to the file, and then the old recipe applies (record each 
 the middle step invalidates the first). The 25 country labels and the four member lists take
 `Text/Gray 80`.
 
-**Colors**, bound as library styles rather than pasted as hexes: `Default Palette/Denim`
-`e1538d93...`, `Camel` `45161823...` with `Line and Slope Charts/Camel` `c17ca762...` for its category name,
-`Rusty Orange` `65bab597...`, and `Light Teal` `9a2854bc...` with `Line and Slope Charts/Light Teal`
-`a07c1354...`. Bars carry `SEGMENT_ALPHA` as *node* opacity, not paint opacity, so the binding
-survives. Value labels: white on Rusty Orange only, and `Text/Gray 100` on the other three, which is what
-`value_label_color` picks measured against the composited fill at `SEGMENT_ALPHA`. This line used to
-say white on Denim too, and the frame was styled that way; at 0.8 that is the WORSE of the two (dark
-reaches 3.74:1 there and white less), so bind whatever hex the SVG carries rather than a colour named
-here — the step measures it and this comment cannot.
+**Colors**, bound as library styles rather than pasted as hexes: `Default Palette/Dark Copper`,
+`Midnight Blue`, `Dark Olive Green` and `Maroon`, for the bars, the legend chips and the category names
+alike. Bars carry `SEGMENT_ALPHA` as *node* opacity, not paint opacity, so the binding survives; the
+names are full strength. Value labels are white on all four, which is what `value_label_color` picks
+measured against the composited fill at `SEGMENT_ALPHA`, and they stay unbound. Bind whatever hex the
+SVG carries rather than a colour named here — the step measures it and this comment cannot.
 
 **Re-import with `/create-figma-chart`'s `restyle_static_import.js`, one job per frame with
 `inheritStyles: true` and `reflowLegend: false`, and `families: []`.** It binds every colour in the new
@@ -213,6 +209,36 @@ pairs above that the script's `families` model has no place for. Its report must
 (doubled separators, overlapping names) where the step already spaced them by measured advance. Desktop
 and mobile go in one call, since they share a page; it also replaces each frame's parked reference copy.
 The template text slots are not touched by it, so a copy change still means editing them in the frame.
+A render that CHANGES a colour cannot inherit: the old chart never bound the new hex, and the script
+refuses. Run it with `inheritStyles: false` and `families: []` instead (country labels and lists go to
+the body style through `bodyTextParent`), then bind each palette hex to its `Default Palette/*` style,
+moving the SVG's paint opacity onto the node first, and the in-band Note to `Text/Gray 70`.
+
+**Then rebuild the key as auto-layout containers**, which an SVG cannot carry, with
+`/owid-staff:create-figma-chart`'s `scripts/group_text_blocks.js`, run after the restyle and again after
+every re-import (it replaces `chart`, and the containers with it). Desktop, one block per category:
+
+    {"name": "key__<slug>", "direction": "VERTICAL", "itemSpacing": 3, "align": "MIN", "anchorY": "bottom",
+     "children": [{"merge": "key__<slug>-members", "lineHeight": 16}, {"merge": "category__<slug>", "lineHeight": null}]}
+
+with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile, one `legend` block stacking a
+row per category at the import's own pitch:
+
+    {"name": "legend", "direction": "VERTICAL", "itemSpacing": "keep", "align": "MIN", "anchorY": "top",
+     "children": [{"block": {"name": "legend__<column>", "direction": "HORIZONTAL", "itemSpacing": 5, "align": "CENTER",
+       "children": [{"node": "legend__<column>-chip"}, {"block": {"name": "legend__<column>-labels",
+         "direction": "HORIZONTAL", "itemSpacing": 8, "align": "CENTER",
+         "children": [{"merge": "legend__<column>", "lineHeight": null}, {"merge": "legend__<column>-members", "lineHeight": null}]}}]}}]}
+
+The nested row also fixes the name-to-list gap, which the import lays out in this step's wider font.
+
+**The gate's standing findings**, each accepted rather than open: the template's own 11px tagline and
+licence rows (`text-floor`, desktop); the desktop key rising beside the subtitle's shorter lines (`gap`
+top ~3.5px, the design team's layout); the mobile Note drawn in the band (`gap` bottom ~4.4px); the
+two-author licence run (`diff_against_template`, mobile). `color_audit.py --separated` on the four
+composited fills fails under red-green colour-blindness (closest: Paid work against Unpaid work, dE 8.2
+for protanopia). Every segment sits in a fixed position under its own key block, so position rather than
+hue carries the category; the palette is the design team's call.
 """
 
 import logging
@@ -261,56 +287,22 @@ VALUE_LABEL_COVERAGE = 0.75
 # at that level is where each survey drew its coding lines rather than how people differ. Aggregating
 # takes the mean coefficient of variation across the segments from 0.22 to 0.12.
 #
-# These four name Chart colors library colors outright rather than the seaborn placeholders the
-# ten-group version used: the reason for a placeholder is that a font cannot be reproduced here and a
-# color can, so a render that shows the real ones is simply a truer preview of the frame. Figma still
-# binds each to its library style — the hex is the preview, the binding is the artifact.
+# These four name Chart colors library colors outright rather than seaborn placeholders: the reason for a
+# placeholder is that a font cannot be reproduced here and a color can, so a render that shows the real
+# ones is simply a truer preview of the frame. Figma still binds each to its library style — the hex is
+# the preview, the binding is the artifact.
 #
-# Why not the detailed chart's Coral, Denim, Copper and Dark Olive Green: both of that set's problems
-# appear only once ten segments become four. Its neighbours merge in grayscale without the tints that
-# used to sit between them (1.21:1 and 1.20:1 against a 1.6:1 floor), and Coral and Copper are the two
-# most saturated entries in the palette, which is loud across segments this wide.
+# The palette is the design team's: Default Palette's Dark Copper, Midnight Blue, Dark Olive Green and
+# Maroon, all dark enough to carry WHITE values on every segment and to set each category's name in its
+# own fill. Two things follow from it:
+#   - Neighbouring segments no longer differ in lightness (Midnight Blue against Dark Olive Green is
+#     close in grayscale), so the boundary between them is carried by a 1px gap of canvas instead
+#     (`SEGMENT_GAP_PX`). That is why `check_contrast` holds the seam floors only where segments touch.
+#   - White on Dark Copper measures under WCAG's 4.5:1 for body text at `SEGMENT_ALPHA`; it is pinned in
+#     `CONTRAST_ALLOWANCES`, so the shortfall is re-measured on every build rather than recorded here.
 #
-# Two constraints shape what is left, and the second one is easy to miss:
-#   - Touching fills need a grayscale seam of 1.6:1, which forces the stack to alternate light and dark.
-#     No all-light set exists: everything light in the palette sits at L 60-65, where two of them have
-#     no seam at all.
-#   - A category's color is also the color its legend name and member list are printed in, at 11px on
-#     cream. Camel, Turquoise and Light Teal — the colors a reader would call soft — measure under 3:1
-#     as text. The library's answer is its "Line and Slope Charts" group, a darker variant of each light
-#     fill for thin marks; every one of them measures exactly 4.4:1 on this cream, which is the tier to
-#     hold text to. So a light fill is fine as long as its name is set in that variant, which is the
-#     three-part color spec below.
-# The Default Palette's first four — Denim, Rusty Orange, Camel, Light Teal — with the middle two
-# swapped so that touching segments differ in lightness. The library's own order puts two same-lightness
-# pairs side by side (Denim beside Rusty Orange at 1.14:1, Camel beside Light Teal at 1.08:1, against a
-# 1.6:1 floor), which reads fine in color and vanishes in black and white; swapping costs no color and
-# takes the opaque seams to 1.86 / 2.12 / 2.28. Which category carries which color is free — the CVD
-# numbers are identical for any arrangement of the same four.
-#
-# TWO ACCEPTED DEVIATIONS, both about colour-blindness and both re-measured on every build via
-# `CONTRAST_ALLOWANCES`, so neither can go stale the way this comment once did. Everything the step
-# holds a hard floor to — the grayscale seams, the in-bar labels, the legend text — this palette clears
-# outright at 0.8, with no allowance:
-#   - Light Teal beside Maroon: the grayscale seam is a healthy 2.34, but under dichromacy it falls to
-#     1.13. That boundary is carried by HUE rather than tone for a colour-blind reader: the two simulate
-#     to dE 32 apart, which is a clear difference, just not a difference in lightness. A grayscale print
-#     is unaffected — that is the 2.34. The other two seams hold under simulation at 4.56 and 3.22.
-#   - The closest pair under dichromacy is Camel against Maroon at dE 18.1, just under a 20 floor. They
-#     sit at opposite ends of the bar and never touch, so no boundary depends on it; it is about telling
-#     them apart across the chart, and 18 is close enough to 20 to accept rather than spend a colour on.
-#
-# What the palette was chosen against, in case it is revisited: of the 10,626 four-colour sets in the
-# library, 72 clear every floor at 0.8 and only 9 also hold a seam under dichromacy — and none of those
-# 9 separates as strongly as this one, which reaches dE 56 on its weakest touching pair against 21-42
-# for them. The trade taken here is that one boundary leans on hue. `ai/palette-options/` has the
-# renders, and the search is reproducible from the palette in owid-grapher's `CustomSchemes.ts`.
-#
-# Which category carries which colour is NOT free, and that is the other half of the decision: the four
-# segments differ hugely in width, so the most advancing colour must not land on the widest. Personal
-# care is 44% of every bar, so it takes the recessive Midnight Blue; Light Teal, which reads as the most
-# forward of the four, sits on Unpaid work at 11%. Reversing those two measures identically and looks
-# markedly busier.
+# Which category carries which colour still follows width: Personal care is 44% of every bar, so it takes
+# the recessive Midnight Blue.
 # `members` names what each category holds, in the source's own terms and ordered by the minutes each
 # takes. Two of them are worth not "correcting" back to "Other": the OECD's 3.3 is labelled *personal,
 # household, and medical services + travel related to personal care* — grooming and health, 61 min/day,
@@ -331,9 +323,12 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         # "&", not the source's "or": the segment is the sum of the two, and it matches "Unpaid work & other".
         "label": "Paid work & study",
-        # Camel, with the library's darker Camel for the name: the fill measures 2.8:1 as text.
-        "color": ("hex", "#bc8e5a", "#996d39"),
+        # Dark Copper.
+        "color": ("hex", "#9a5129"),
         "as_hours": True,
+        # The desktop key's line breaks, from the design team's frame. Asserted to spell out
+        # `run_in_list(members)`, so they cannot drift from the members.
+        "key_lines": ["Paid work, commuting, school", "or classes, homework"],
     },
     {
         "column": "main_personal_care",
@@ -341,10 +336,10 @@ MAIN_CATEGORY_GROUPS = [
         "source_columns": ["personal_care"],
         "members": ["Sleep", "Eating & drinking", "Grooming & health"],
         "label": "Personal care",
-        # Midnight Blue, legible as its own text at 13.9:1 — and recessive, which is why it takes
-        # the widest segment.
+        # Midnight Blue, recessive, which is why it takes the widest segment.
         "color": ("hex", "#00295b"),
         "as_hours": True,
+        "key_lines": ["Sleep, eating & drinking,", "grooming & health"],
         # Compact like the rest, though it has room for the spelled-out form. One category set
         # differently from its neighbours reads as a difference in kind, and the only difference is
         # that this segment is wider.
@@ -365,9 +360,11 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         "as_hours": True,
         "label": "Unpaid work & other",
-        # Light Teal, with the library's darker Light Teal for the name: the fill measures 2.6:1
-        # as text. On the narrowest segment on purpose.
-        "color": ("hex", "#58ac8c", "#2c8465"),
+        # Dark Olive Green.
+        "color": ("hex", "#18470f"),
+        "key_lines": ["Housework,", "childcare,", "shopping,", "household travel"],
+        # The narrowest segment, so its name takes two lines.
+        "label_lines": ["Unpaid work", "& other"],
     },
     {
         "column": "main_leisure",
@@ -377,8 +374,9 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         "as_hours": True,
         "label": "Leisure",
-        # Maroon, legible as its own text at 8.1:1.
+        # Maroon.
         "color": ("hex", "#883039"),
+        "key_lines": ["TV & radio,", "seeing friends,", "sports, events,", "hobbies & other"],
     },
 ]
 
@@ -434,15 +432,16 @@ KEY_MEMBER_COLUMNS = {
     },
 }
 
-# One category per segment, so the header machinery names each segment instead of bracketing a run.
+# One category per segment, so the key names each segment.
 MAIN_CATEGORIES = [
     {
         "name": group["label"],
         "color": group["color"],
         "columns": [group["column"]],  # one drawn segment per category
-        # What the segment holds, listed under its name — the same names the detailed chart sets inside
-        # each bracket, so a reader moving between the two versions recognises them.
+        # What the segment holds, listed over its name.
         "members": group["members"],
+        "key_lines": group["key_lines"],
+        "label_lines": group.get("label_lines", [group["label"]]),
     }
     for group in MAIN_CATEGORY_GROUPS
 ]
@@ -480,11 +479,9 @@ FOOTER_COLOR = "#858585"
 # the library hex — see `composite_on_background`, which is what the label colours and the recorded
 # seams are measured against.
 #
-# It also costs two contrast floors, and that is a deliberate trade rather than an oversight: matching
-# grapher's stacked bars is worth more here than clearing them. Both shortfalls are pinned in
-# `CONTRAST_ALLOWANCES`, so they are checked on every build instead of recorded in prose — the comment
-# they replace claimed 0.9 would fix the labels, and it does not (Denim's best colour there is white at
-# 4.44:1, still short of 4.5). Only full opacity clears everything.
+# It costs white-on-Dark-Copper its 4.5:1, a deliberate trade rather than an oversight: matching
+# grapher's stacked bars is worth more here than clearing it. The shortfall is pinned in
+# `CONTRAST_ALLOWANCES`, so it is checked on every build instead of recorded in prose.
 SEGMENT_ALPHA = 0.8
 
 # In-bar values are white on saturated fills and dark on light ones, whichever reads better *measured*
@@ -493,7 +490,7 @@ SEGMENT_ALPHA = 0.8
 # style the frame binds them to, so the render and the frame agree.
 DARK_VALUE_COLOR = "#2d2e2d"
 
-# The activities listed under each category name, in the body gray (`Text/Gray 80` in the frame) rather
+# The activities listed over each category name, in the body gray (`Text/Gray 80` in the frame) rather
 # than the category's colour. With both in colour the name and its list differed only by size and
 # weight, and the four names did not read as headings; the name keeps the colour that ties it to its bar.
 MEMBER_TEXT_COLOR = TEXT_COLOR
@@ -518,10 +515,10 @@ DICHROMACY_MATRICES = {
 # a regression and fails, a shortfall with no entry fails, and a value that has climbed back over its
 # floor fails too, so a fix cannot quietly leave a stale allowance behind.
 #
-# Both entries are colour-blindness only — see the palette notes above. Nothing here is a shortfall in
-# what a full-colour or grayscale reader sees.
+# One entry: white values on Dark Copper, the design team's choice so that every segment carries white
+# text (the dark alternative measures lower still, 3.49:1).
 CONTRAST_ALLOWANCES = {
-    ("cvd-seam", "Unpaid work & other", "Leisure"): 1.13,
+    ("value", "Paid work & study"): 3.90,
 }
 # Ratios are compared to their allowance at this tolerance, so a font or palette change that moves a
 # number in the third decimal does not fail the build.
@@ -535,13 +532,7 @@ BACKGROUND_COLOR = "#fffbf5"
 # A fill lighter than that is darkened for text here, which is the same pairing, derived rather than
 # hardcoded: the frame binds the library's variant, and this keeps the local render showing the same
 # relationship instead of printing a name nobody could read.
-#
-# ACCEPTED DEVIATION: measured in the frame, Camel* and Light Teal* come to 4.43:1 at 13.19px regular,
-# which is 0.07 under WCAG's 4.5 for body text — so `/create-figma-chart`'s label-contrast row fails on
-# the ten legend names set in them. Accepted because the variant IS the design system's answer for text
-# in a category colour, and the alternatives are worse: darkening past it leaves the library, and setting
-# those names in the body gray drops the colour that ties each name to its segment. The other three
-# measure 5.29 (Denim), 6.02 (Rusty Orange) and 6.59 (the country labels in Text/Gray 80).
+# The current palette is dark enough that every category name is set in its own fill.
 TEXT_CONTRAST_MIN = 4.4
 
 # A template pixel in points (100 template px per inch over 72 points per inch).
@@ -642,41 +633,28 @@ LATO_BOLD_SLOT_SLACK = 1.066
 # other line heights are per-slot.
 TEMPLATE_TITLE_LINE_PX = 29
 
-# Horizontal breathing room, in template pixels: between a country label and its bar, and inside a
-# segment around its value.
+# The gap the templates leave between a cropped subtitle's box and the logo, under a one-line title.
+SUBTITLE_LOGO_GAP = 24
+
+# Horizontal breathing room, in template pixels: between a country label and its bar, and the least room a
+# value leaves at its segment's far end. The inset between a segment's edge and its value is per layout
+# (`value_inset_px`).
 COUNTRY_LABEL_PAD = 8
 VALUE_PAD = 3
 
-# Header geometry, in template pixels. A tier holds one line of header text, which is what a wrapped
-# category name stacks in; `LEADER_GAP` is the clearance between the header and the bars, and
-# `HEADER_MIN_GAP` the least space two neighbouring names may leave between them.
-TIER_HEIGHT = 15
-LEADER_GAP = 3
+# The gap of canvas between neighbouring segments of a bar, in template pixels. It is what separates the
+# categories now that the palette's neighbours no longer differ in lightness.
+SEGMENT_GAP_PX = 1
+
+# A desktop country label is two lines — the name in bold, the year under it — at this line height,
+# centred on its bar.
+COUNTRY_LINE_PX = 14
+
+# The desktop key, in template pixels: the least space two neighbouring blocks may leave between them, the
+# gap between a list and the category name under it, and the air between the name and the first bar's ink.
 HEADER_MIN_GAP = 8
-
-# Category bracket: the gap above the tallest group label, the bracket's end ticks, and the gap
-# between the bracket and its name.
-CATEGORY_GAP = 7
-CATEGORY_TICK = 4
-CATEGORY_LABEL_GAP = 3
-
-# The share of a category name's top line box that its ink does NOT fill, so the band can be inset
-# from the name's ink rather than from its box. It is what the FRAME measures — Figma's box for an
-# imported text node — and NOT `cap_height_px`, which is a digit's ink at 0.72 of the size and
-# over-reclaims by 3.7px. Measured with `verify_page.js`'s `gap` row as the instrument: 4.44px on a 14px
-# name (18.44px of air against a 14px inset), then re-measured at 16px, where the 0.317 that fitted 14px
-# left 17.68px — an extra 3.68px, because the model's line boxes outgrow the frame's as the size rises.
-# So it is an empirical correction for this size rather than a font metric: re-measure it whenever the
-# name's size changes.
-CATEGORY_NAME_BOX_SLACK = 0.547
-
-# Extra air between a category's name and the list under it, where the name sits directly on its own
-# list rather than above a bracket rule. In lines of that list: half a line, which in the frame leaves
-# ~9px of air against the ~7.5px between the list's own lines. The name already differs from its list by
-# colour, size and weight, so the gap only has to group the two; at three quarters (13px) the heading sat
-# twice as far from its list as the list's items from each other and read as detached. Don't go below
-# the list's own leading, or the name crowds its first item.
-CATEGORY_NAME_GAP_LINES = 0.5
+KEY_NAME_GAP = 3
+KEY_BAR_GAP = 10
 
 # The row legend, which is what a frame too narrow to name its own segments gets instead: the
 # colour chip, the gap after it, the gap between a category's name and its member list, and the air
@@ -696,8 +674,10 @@ NOTE_BAND_GAP = 10
 # run, and the run `draw_note` draws.
 NOTE_LEAD = "Note:"
 
-# Bars fill this share of a row's pitch.
-BAR_FRACTION = 0.8
+# Bars fill this share of a row's pitch: the design team's spacing, 25px bars on a 35px pitch on desktop
+# where it was 25 on 31.5. The frames are run taller to make room (`height_px`), so the bars keep their
+# thickness and only the air between them grows.
+BAR_FRACTION = 0.716
 
 # The two frames this step draws, cloned from "Static Chart Template_Vertical" (850x1095, node
 # `5332:93`) and "Static Chart Template_Mobile (example 2)" (540x824, node `24590:32`) and measured
@@ -709,10 +689,16 @@ BAR_FRACTION = 0.8
 # footer is two rows (`Data source:` and the license, no Note and no tagline), and its content is
 # 508px against the desktop's 818. The first is why the Note is drawn inside the band there; the
 # second is why the key becomes a block of rows above the plot instead of names over the segments.
+#
+# Both frames run taller than their templates, by `*_EXTRA_PX`: the desktop by the 67px the design
+# team's rework added, the mobile frame by enough to keep its bars at the thickness they had before the
+# wider spacing. The footers are bottom-anchored, so every footer row moves down by that much.
+DESKTOP_EXTRA_PX = 67
+MOBILE_EXTRA_PX = 60
 LAYOUTS = {
     "time_use_by_country": {
         "template": "vertical",
-        "size": (TEMPLATES["vertical"].width_px, TEMPLATES["vertical"].height_px),
+        "size": (TEMPLATES["vertical"].width_px, TEMPLATES["vertical"].height_px + DESKTOP_EXTRA_PX),
         # 16, not the 16.216 an earlier generation of these templates measured: the design team's
         # 2026-08 rebuild dropped the header wrappers' inner padding, and both frames' header nodes
         # now read 16..834 and 16..524 — margin 16, content 818 and 508. The stale figure cost 0.43px
@@ -739,13 +725,12 @@ LAYOUTS = {
             # `logo_px` is 0 and there is no `max(title, logo)` cap: a one-line title genuinely shrinks
             # the header by a line, taking this frame's band top from 82.5 to 70.
             #
-            # It also removes the collision the previous generation had. There the logo sat at y=22.3
-            # and ran to 57.5, into the subtitle's own line box at 51.2, so a subtitle wide enough to
-            # reach x=770 printed under it — which the four-category subtitle did, at 801px. Now the
-            # logo occupies exactly a title line plus the gap (16 to 51, h=35), so the subtitle clears
-            # it by construction and needs no width reserved.
+            # The logo occupies a title line plus the gap (16 to 51), so under a one-line title the
+            # subtitle starts level with its bottom edge, and the template crops the subtitle's box to
+            # end 24px short of it (`subtitle_box_px`).
             "origin_y": 16,
             "logo_px": 0,
+            "logo_x": 771,
             "title_slot_px": 737.84,
             "title_px": 25,
             "header_gap_px": 6,
@@ -762,64 +747,53 @@ LAYOUTS = {
             "note_px": 12,
             "note_line_px": 14,
             "note_slot_px": 818,
-            "note_bottom_px": 1043.81,
-            "source_y": 1047.81,
+            "note_bottom_px": 1043.81 + DESKTOP_EXTRA_PX,
+            "source_y": 1047.81 + DESKTOP_EXTRA_PX,
             "source_px": 12,
-            "tagline_y": 1065.81,
+            "tagline_y": 1065.81 + DESKTOP_EXTRA_PX,
             "tagline_slot_px": 467,
-            "license_y": 1065.81,
+            "license_y": 1065.81 + DESKTOP_EXTRA_PX,
             "license_px": 11,
         },
-        # In whole template pixels, like the template's own slots: the category names at 16, their
-        # member lists at 13, the in-bar values at 13 and the row labels at 12.
+        # In whole template pixels, like the template's own slots: the in-bar values at 13, the row
+        # labels at 12, and in the key the run-in lists at 12 on a 16px line and the bold category names
+        # at 14 on a 17px one — the design team's sizes.
         "country_font_px": 12,
         "value_font_px": 13,
-        "header_font_px": 13,
-        # The bold category name, three pixels up on the gray member list under it — the subtitle's own
-        # size, so it reads as a heading without competing with the title. At 14 it sat too close to its
-        # list. It feeds the wrap and collision solver as well as the drawing, so a name that no longer
-        # fits its own segment at this size gets wrapped (or, if a single word overhangs, fails
-        # `solve_category_layout`).
-        "category_font_px": 16,
+        # The design team's inset between a segment's edge and its value, which the key shares, so each
+        # key block lines up with the values under it.
+        "value_inset_px": 8,
+        "key_font_px": 12,
+        "key_line_px": 16,
+        "key_name_font_px": 14,
+        "key_name_line_px": 17,
+        # The country's name and its survey year on a line each.
+        "country_two_lines": True,
         # Whether a value reads "4h 29m" rather than "4 hours 29 mins" when the long form does not fit.
         "with_mins_suffix": True,
-        # Where each half of the header goes. The category brackets span the top row from above, and
-        # each category's own member names are stacked inside its bracket, one per line
-        # ("bracketed") — so the header reads category, then its members, then the data, with every
-        # name over the run of bars it belongs to.
-        # Both keys are asserted single-valued below: the other placements went with the other charts.
-        "category_side": "above",
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
-        "group_labels": "bracketed",
-        # A member name may reach past its own segment, as long as `blocks_collide` still clears it from
-        # its neighbours: "Household travel" overhangs the narrowest segment by 8px a side, and wrapping it
-        # to fit made "travel" read as an item of its own.
-        "member_names_overhang": True,
+        # The key over the top row, each block aligned with the values under it.
+        "group_labels": "aligned",
         # The age group first, since it is what a reader needs to interpret any bar, then the survey
         # scope, which is why the Note no longer carries it. "in a 24-hour day" earns its words: every bar
         # is the same length, and nothing else on the frame says that the length is a whole day. "from X
         # to Y", not "conducted between": the years are the ones the row labels show, and a survey labelled
         # 2010 (France, Spain, New Zealand) ran over 2009/10.
         "subtitle": SUBTITLE,
-        # With one segment per category, a name that overhangs its own bar reads as pointing at its
-        # neighbour too — so wrap it rather than only wrapping to avoid a collision.
-        "wrap_overhanging_names": True,
-        # Hang each category's list off the bars rather than off the top of the band, so a short list
-        # does not end two lines short of the plot.
-        "names_bottom_aligned": True,
     },
     "time_use_by_country_mobile": {
         "template": "mobile",
-        "size": (TEMPLATES["mobile"].width_px, TEMPLATES["mobile"].height_px),
+        "size": (TEMPLATES["mobile"].width_px, TEMPLATES["mobile"].height_px + MOBILE_EXTRA_PX),
         "margin": 16,
         "template_text": {
             # The 540-wide set's title node is 428 wide against a 508 content box, which is the orphan
             # guard the design team builds in — so the title is measured against 428, not against the
             # content. It fits on one line there, which puts the subtitle at 51 rather than the
-            # placeholder's 80 and the band top at 89 rather than 118: 29px of chart, for free.
+            # placeholder's 80, beside the logo — so the subtitle's box is cropped to clear it.
             "origin_y": 16,
             "logo_px": 0,
+            "logo_x": 460,
             "title_slot_px": 428,
             "title_px": 25,
             "header_gap_px": 6,
@@ -830,10 +804,10 @@ LAYOUTS = {
             # nothing else — no Note slot and no tagline. So `footer_top_px` is where the band stops,
             # `note_in_band` moves the Note into the band's foot, and the absence of `tagline_y` is
             # what tells `draw_footer` the license has a row to itself.
-            "footer_top_px": 770,
-            "source_y": 770,
+            "footer_top_px": 770 + MOBILE_EXTRA_PX,
+            "source_y": 770 + MOBILE_EXTRA_PX,
             "source_px": 14,
-            "license_y": 791,
+            "license_y": 791 + MOBILE_EXTRA_PX,
             "license_px": 14,
             # Drawn inside the band, so a line costs a line of chart rather than the frame's bottom
             # margin — which is why the cap is four here and two on the desktop frame. At 12px the Note
@@ -856,15 +830,17 @@ LAYOUTS = {
             # once already, by 2px, when the lead-in went bold: the Note is drawn as a one-line object
             # plus a block of the rest, and those two do not compose their vertical metrics the way a
             # single four-line block did.
-            "note_bottom_px": 770,
+            "note_bottom_px": 770 + MOBILE_EXTRA_PX,
         },
         # The same point sizes as the desktop frame, deliberately: on a frame 0.64x as wide they read
         # half again as large, which is the direction the template itself goes (its own source and
-        # license rows are 14px against the desktop's 12 and 11). Every value still fits its segment on
-        # 26 of 26 rows at this scale — the country column takes 120px of the 508, leaving 388px of plot
-        # at 0.27px per minute, and the narrowest segment on the narrowest row still holds "2h 42m".
+        # license rows are 14px against the desktop's 12 and 11). 98 of the 100 values fit their segments
+        # at this scale; the two that do not are the narrowest unpaid-work segments (Japan, South Korea).
         "country_font_px": 12,
         "value_font_px": 12,
+        # The desktop's 8px scaled to this frame's width, which keeps the values on the two narrowest
+        # segments that the full inset would push out.
+        "value_inset_px": 5,
         "legend_font_px": 13,
         "with_mins_suffix": True,
         "groups": MAIN_CATEGORY_GROUPS,
@@ -884,6 +860,7 @@ LAYOUTS = {
 def run() -> None:
     """Load data, render and save the chart."""
     check_contrast()
+    check_key_lines()
     tb, ages = load_chart_groups()
     tb = add_main_category_totals(tb)
     paths.log.info(f"Loaded {len(tb)} countries, surveys {tb['year'].min()}-{tb['year'].max()}")
@@ -898,8 +875,8 @@ def run() -> None:
         # check is what stands behind a hand-measured `size`: the registry carries the design team's
         # own numbers, so a typo in one is caught by the other. The filename suffix is the registry key
         # too, which is how `/create-static-viz`'s `verify_static_viz.py` knows which template to hold
-        # `..._mobile.svg` against.
-        export_frame(paths, fig, short_name, template=layout["template"])
+        # `..._mobile.svg` against. Both frames run taller than their templates, so the height is passed.
+        export_frame(paths, fig, short_name, template=layout["template"], height_px=layout["size"][1])
         plt.close(fig)
 
 
@@ -1005,9 +982,8 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     """Build one version of the stacked-bar chart.
 
     Layout notes:
-    - One axes carries the bars; x is minutes of the day (0-1440) plus a text column for total
-      leisure, y is one unit per country row, row 0 at the top. The header and the country
-      labels are drawn outside the axes box (clipping is off).
+    - One axes carries the bars; x is minutes of the day (0-1440), y is one unit per country row, row 0
+      at the top. The key and the country labels are drawn outside the axes box (clipping is off).
     - Values are written inside segments wide enough to hold them at the layout's type size.
     """
     sns.set_style("ticks")
@@ -1030,10 +1006,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     fig = plt.figure(figsize=(width_px / PIXELS_PER_INCH, height_px / PIXELS_PER_INCH))
     fig.patch.set_facecolor("white")
 
-    # --- header: the template's title row, then its subtitle ---
+    # Step 1: Header — the template's title row, then its subtitle.
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], PLAYFAIR_SLOT_SLACK)
     subtitle_text = layout["subtitle"].format(first=tb["year"].min(), last=tb["year"].max())
-    subtitle = wrap_to_slot(subtitle_text, template["subtitle_slot_px"], template["subtitle_px"])
+    subtitle = wrap_balanced(
+        subtitle_text, subtitle_box_px(template, margin_px, lines_in(title)), template["subtitle_px"]
+    )
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
 
@@ -1051,138 +1029,78 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         color=TEXT_COLOR,
     )
 
-    # --- footer, in the slots the static-chart templates define ---
-    # A frame with no Note slot draws its Note at the foot of the chart band instead, and the footer is
-    # told there is none.
+    # Step 2: Footer, in the slots the static-chart templates define. A frame with no Note slot draws its
+    # Note at the foot of the chart band instead, and the footer is told there is none.
     note = build_note(ages, layout)
     band_note = note if layout.get("note_in_band") else None
     draw_footer(fig, None if band_note else note, source_citation, layout, fx, fy)
 
-    # --- the chart band: the category header, then the bar rows ---
-    country_labels = [
-        f"{SHORT_COUNTRY_NAMES.get(country, country)} ({year})"
-        for country, year in zip(tb["country"].tolist(), tb["year"].tolist())
-    ]
-    # The ADVANCE, not the ink: a text node's box spans its side bearings too, so a column sized to
-    # the ink leaves the widest right-aligned label's box sticking past the frame margin.
-    country_space_px = (
-        max(text_advance_px(label, font_pt(layout, "country_font_px")) for label in country_labels) + COUNTRY_LABEL_PAD
-    )
-
-    plot_left_px = margin_px + country_space_px
+    # Step 3: The plot's horizontal extent, set by the country label column.
+    countries = [str(SHORT_COUNTRY_NAMES.get(country, country)) for country in tb["country"].tolist()]
+    years = [str(year) for year in tb["year"].tolist()]
+    country_font = font_pt(layout, "country_font_px")
+    if layout.get("country_two_lines"):
+        # The ADVANCE, not the ink: a text node's box spans its side bearings too, so a column sized to
+        # the ink leaves the widest right-aligned label's box sticking past the frame margin.
+        label_px = max(
+            max(text_advance_px(name, country_font, bold=True), text_advance_px(year, country_font))
+            for name, year in zip(countries, years)
+        )
+    else:
+        label_px = max(
+            run_row_width([(f"{name} ", True), (year, False)], layout["country_font_px"])
+            for name, year in zip(countries, years)
+        )
+    plot_left_px = margin_px + label_px + COUNTRY_LABEL_PAD
     plot_width_px = (width_px - margin_px) - plot_left_px
     px_per_min = plot_width_px / MINUTES_PER_DAY
 
-    # Where the key goes: attached to the segments ("bracketed") or in its own block above them
-    # ("rows"). Attached, it points at the row it touches, which is the top one.
+    # Step 4: The band between the subtitle's ink and the footer's, and the key's room in it.
     label_mode = layout["group_labels"]
-    assert label_mode in {"bracketed", "rows"}, f"Unknown group_labels {label_mode!r}."
-    category_at = layout.get("category_side")
-    category_placements: list[dict] | None = None
-    bracketed_blocks: list[dict] = []
-    category_base_px = 0.0
-
-    if label_mode == "bracketed":
-        # Both halves of the header point at the top row: the category name over its segment, and its
-        # member names stacked under it.
-        assert category_at == "above", f"Unknown category_side {category_at!r}."
-        top_spans = segment_spans(tb.iloc[0], px_per_min, layout["groups"])
-        category_placements = solve_category_layout(top_spans, layout)
-
-        # The member names drawn inside each bracket sit between the rule and the bars, so the rule
-        # moves out by their height: category first, its own members under it, then the data.
-        bracketed_blocks = layout_bracketed_names(top_spans, layout)
-        collision = blocks_collide(bracketed_blocks, layout)
-        assert not collision, (
-            f"The names inside the {collision} brackets would touch. Their category spans this row too "
-            f"narrowly to hold them."
-        )
-        deepest = max(len(block["lines"]) for block in bracketed_blocks)
-        category_base_px = LEADER_GAP + deepest * line_px(font_pt(layout, "header_font_px"))
-
-    def band_px(side: str) -> float:
-        """The room the header needs on one side of the bars.
-
-        This has to be what the header *draws*, term for term, or the difference is air: measured in the
-        frame, the topmost ink sat 29.35px inside a band inset by 14, because this still reserved the
-        `CATEGORY_GAP`, `LEADER_GAP` and `CATEGORY_TICK` that the bracket rule needed — and the rule went
-        when each category became a single segment. The terms below are exactly the ones
-        `draw_bracketed_names` and `draw_category_name` use: the deepest member list, then the gap under
-        the heading, then the tallest name.
-        """
-        room = 0.0
-        if category_at == side and category_placements is not None:
-            # The tallest name decides the band: its row, plus however many lines it wrapped onto —
-            # measured to its INK, not to its line boxes. `draw_category_name` sets each line
-            # `va="bottom"`, so the top of the topmost line box is empty; reserving the whole box put
-            # the frame's topmost ink 4.44px inside a band meant to be inset by 14, which
-            # `verify_page.js`'s `gap` row reads as 18.44.
-            name_pt = font_pt(layout, "category_font_px")
-            member_line = line_px(font_pt(layout, "header_font_px"))
-
-            def name_px(placement: dict) -> float:
-                return len(placement["lines"]) * line_px(name_pt) - CATEGORY_NAME_BOX_SLACK * layout["category_font_px"]
-
-            if layout.get("names_bottom_aligned"):
-                # Each name sits on its OWN list, so the band is the tallest list-plus-name, not the
-                # deepest list plus the tallest name: those are different categories here (Leisure has
-                # the longest list, Unpaid work the two-line name), and adding them reserved a line of
-                # air above every heading.
-                depths = {block["name"]: len(block["lines"]) * member_line for block in bracketed_blocks}
-                name_gap = CATEGORY_NAME_GAP_LINES * member_line
-                room = max(
-                    room,
-                    max(
-                        LEADER_GAP + depths[placement["name"]] + CATEGORY_LABEL_GAP + name_gap + name_px(placement)
-                        for placement in category_placements
-                    ),
-                )
-            else:
-                tallest = max(placement["row"] * TIER_HEIGHT + name_px(placement) for placement in category_placements)
-                room = max(room, category_base_px + CATEGORY_LABEL_GAP + tallest)
-        return room
-
-    if label_mode == "rows":
-        # The key is its own block, so the room it needs is the block plus the air under it.
-        header_px = legend_block_px(layout) + LEGEND_BLOCK_GAP
-        below_px = 0.0
-    else:
-        header_px = band_px("above")
-        below_px = band_px("below")
-
-    # The plot sits between the subtitle's ink and the footer's, inset by BAND_INSET at each end.
-    # Both are ink rather than frame edges: the footer frame already starts 16px above its Note, so
-    # insetting from the frame would inset twice.
+    assert label_mode in {"aligned", "rows"}, f"Unknown group_labels {label_mode!r}."
     band_top = subtitle_y + lines_in(subtitle) * template["subtitle_line_px"]
     band_bottom = (
         template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
         if band_note is None
         else template["footer_top_px"]
     )
-    # A Note with no slot of its own comes out of the band, so the bars stop above it.
-    # The band's foot is BAND_INSET of air — unless a Note is drawn there, in which case the Note IS
-    # the foot: it sits the footer's own row gap above the "Data source:" row, so the three read as
-    # three evenly spaced footer rows, with NOTE_BAND_GAP of air above it holding it off the last bar.
+    # The band's foot is BAND_INSET of air — unless a Note is drawn there, in which case the Note IS the
+    # foot: it sits the footer's own row gap above the "Data source:" row, so the three read as three
+    # evenly spaced footer rows, with NOTE_BAND_GAP of air above it holding it off the last bar.
     if band_note is None:
         note_top_px = None
         foot_px = BAND_INSET
     else:
         note_top_px = template["note_bottom_px"] - lines_in(band_note) * template["note_line_px"]
         foot_px = band_bottom - note_top_px + NOTE_BAND_GAP
-    content_top_px = band_top + BAND_INSET
-    chart_top_px = content_top_px + header_px
-    # Where the last bar's INK has to stop — the same "measure the ink" rule as the header above. A bar
-    # fills BAR_FRACTION of its row, centred, so it stops half an inter-bar gap short of the axes' own
-    # bottom edge; insetting the axes instead left 17.01px of visible air against the 14 the top now
-    # holds, which is the asymmetry `verify_page.js` reported.
-    ink_bottom_px = band_bottom - below_px - foot_px
-    # That slack is a share of the row PITCH, and the pitch is what is being solved for — so it is one
-    # equation rather than an iteration: `n_rows` pitches reach the axes edge and `n_rows - bar_foot`
-    # of them reach the ink.
-    bar_foot_rows = (1 - BAR_FRACTION) / 2
+    # Where the last bar's INK has to stop. A bar fills BAR_FRACTION of its row, centred, so it stops half
+    # an inter-bar gap short of the axes' own bottom edge, and starts the same share below its top.
+    ink_bottom_px = band_bottom - foot_px
+    bar_head_rows = (1 - BAR_FRACTION) / 2
     n_rows = len(tb)
-    row_pitch_px = (ink_bottom_px - chart_top_px) / (n_rows - bar_foot_rows)
+
+    key = []
+    if label_mode == "aligned":
+        key = key_blocks(segment_spans(tb.iloc[0], px_per_min, layout["groups"]), layout)
+        collision = key_blocks_collide(key)
+        assert not collision, f"The key blocks for {collision} would touch. Re-break their `key_lines`."
+        # Where the first bar's ink has to start so every block fits above it, then the axes top that puts
+        # it there: the pitch is solved from the axes top, so the two are one equation, not an iteration.
+        subtitle_right_px = margin_px + max(
+            text_width_px(line, template["subtitle_px"] * POINTS_PER_PIXEL) for line in subtitle.split("\n")
+        )
+        bars_top_px = key_header_px(key, plot_left_px, band_top, subtitle_right_px)
+        share = bar_head_rows / (n_rows - bar_head_rows)
+        chart_top_px = (bars_top_px - share * ink_bottom_px) / (1 - share)
+    else:
+        # The key is its own block above the plot, so the room it needs is the block plus the air under it.
+        chart_top_px = band_top + BAND_INSET + legend_block_px(layout) + LEGEND_BLOCK_GAP
+    row_pitch_px = (ink_bottom_px - chart_top_px) / (n_rows - bar_head_rows)
     chart_bottom_px = chart_top_px + n_rows * row_pitch_px
+    paths.log.info(
+        f"{layout['template']}: bars {BAR_FRACTION * row_pitch_px:.2f}px on a {row_pitch_px:.2f}px pitch, "
+        f"first bar at {chart_top_px + bar_head_rows * row_pitch_px:.1f}px."
+    )
 
     ax = fig.add_axes(
         (
@@ -1195,22 +1113,15 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     ax.set_axis_off()
     ax.patch.set_visible(False)
     ax.set_xlim(0, plot_width_px / px_per_min)
-    ax.set_ylim(n_rows, 0)  # row 0 at the top; the header lives above it, at negative y
+    ax.set_ylim(n_rows, 0)  # row 0 at the top; the key lives above it
 
-    def rows_above(px_above: float) -> float:
-        """A height above the axes' top edge, in row units (negative y on this axes)."""
-        return -px_above / row_pitch_px
-
-    def rows_below(px_below: float) -> float:
-        """A depth below the axes' bottom edge, in row units."""
-        return n_rows + px_below / row_pitch_px
-
+    # Step 5: The bars, their values and the country labels.
     group_colors = {group["column"]: resolve_color(group["color"], palette) for group in layout["groups"]}
-
     draw_bars(
         ax,
         tb,
-        country_labels,
+        countries,
+        years,
         group_colors,
         px_per_min,
         row_pitch_px,
@@ -1218,34 +1129,11 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         value_label_columns(tb, px_per_min, layout),
     )
 
+    # Step 6: The key.
     if label_mode == "rows":
-        draw_row_legend(fig, layout, palette, content_top_px, fx, fy)
+        draw_row_legend(fig, layout, palette, band_top + BAND_INSET, fx, fy)
     else:
-        assert category_placements is not None
-        rows_out = rows_above if category_at == "above" else rows_below
-        # Each category's own list depth, so a name can follow its list rather than sit at the band's top.
-        block_depths = (
-            {
-                block["name"]: len(block["lines"]) * line_px(font_pt(layout, "header_font_px"))
-                for block in bracketed_blocks
-            }
-            if layout.get("names_bottom_aligned")
-            else None
-        )
-        draw_category_brackets(
-            ax,
-            category_placements,
-            palette,
-            px_per_min,
-            rows_out,
-            layout,
-            category_at,
-            category_base_px,
-            block_depths,
-        )
-        draw_bracketed_names(
-            ax, bracketed_blocks, palette, px_per_min, rows_above, layout, category_base_px - LEADER_GAP
-        )
+        draw_key(fig, key, plot_left_px, chart_top_px + bar_head_rows * row_pitch_px, layout, palette, fx, fy)
 
     if band_note is not None:
         assert note_top_px is not None
@@ -1259,6 +1147,36 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     # Clipping is swept in `export_frame`, on the way out, which is what lets the labels drawn
     # outside the axes box survive into the SVG whole.
     return fig
+
+
+def subtitle_box_px(template: dict, margin_px: float, title_lines: int) -> float:
+    """The subtitle's box width: cropped to end 24px short of the logo under a one-line title.
+
+    A one-line title brings the subtitle up level with the logo's bottom edge, so the templates crop
+    its box to clear it (`/owid-staff:create-figma-chart`, TEXTS.md). The title's line count is this
+    step's own, which can disagree with Figma's on a title near one line; this one is far from it.
+    """
+    if title_lines == 1:
+        return template["logo_x"] - SUBTITLE_LOGO_GAP - margin_px
+    return template["subtitle_slot_px"]
+
+
+def wrap_balanced(text: str, slot_px: float, size_px: float) -> str:
+    """Wrap into the fewest lines the slot allows, then as evenly as those lines allow.
+
+    The design team breaks the subtitle into lines of about equal length rather than filling the first
+    one, which also leaves the desktop key room to rise beside its shorter lines. The breaks are
+    explicit, so the frame's subtitle takes the same text with the same `\\n`.
+    """
+    fewest = lines_in(wrap_to_slot(text, slot_px, size_px))
+    low, high = 0.0, slot_px
+    for _ in range(30):
+        mid = (low + high) / 2
+        if lines_in(wrap_to_slot(text, mid, size_px)) <= fewest:
+            high = mid
+        else:
+            low = mid
+    return wrap_to_slot(text, high, size_px)
 
 
 def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str, int]:
@@ -1278,7 +1196,7 @@ def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str,
             fits = sum(
                 1
                 for minutes in tb[column].astype(float)
-                if value_label(group, minutes, index, minutes * px_per_min, layout)
+                if value_label(group, minutes, index, segment_px(minutes, px_per_min), layout)
             )
             if fits >= VALUE_LABEL_COVERAGE * len(tb):
                 labelled[column] = index
@@ -1295,52 +1213,94 @@ def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str,
     return labelled
 
 
+def segment_px(minutes: float, px_per_min: float) -> float:
+    """A segment's drawn width: its share of the day, less the gap that separates it from the next."""
+    return minutes * px_per_min - SEGMENT_GAP_PX
+
+
 def draw_bars(
     ax,
     tb: Table,
-    country_labels: list[str],
+    countries: list[str],
+    years: list[str],
     group_colors: dict,
     px_per_min: float,
     row_pitch_px: float,
     layout: dict,
     value_columns: dict[str, int],
 ) -> None:
-    """One stacked row per country: the country label and its four segments."""
+    """One stacked row per country: the country label and its four segments, a gap of canvas apart."""
 
-    def baseline(fontsize: float) -> float:
-        """Where to put a row's baseline so its ink is centred on the bar, in row units.
+    def baseline(fontsize: float, offset_px: float = 0.0) -> float:
+        """Where to put a line's baseline so its ink is centred `offset_px` below the bar's centre.
 
         `va="center"` centres the font's whole line box, which reserves room for descenders the
         digits never use — so a value label sits a tenth of a bar high, and text with descenders
         ("Japan") lands on a different baseline from text without ("269 mins"). Placing the baseline
-        explicitly at half a cap-height below the bar's centre fixes both.
+        explicitly at half a cap-height below the line's centre fixes both.
         """
-        return 0.5 + cap_height_px(fontsize) / 2 / row_pitch_px
+        return 0.5 + (offset_px + cap_height_px(fontsize) / 2) / row_pitch_px
 
+    country_font = font_pt(layout, "country_font_px")
+    label_x = -COUNTRY_LABEL_PAD / px_per_min
+    inset = layout["value_inset_px"]
+    last_column = layout["groups"][-1]["column"]
     for row in range(len(tb)):
         country_row = tb.iloc[row]
         slug = slugify(str(country_row["country"]))
-        y_center = row + 0.5
 
-        ax.text(
-            -COUNTRY_LABEL_PAD / px_per_min,
-            row + baseline(font_pt(layout, "country_font_px")),
-            country_labels[row],
-            ha="right",
-            va="baseline",
-            fontsize=font_pt(layout, "country_font_px"),
-            color=TEXT_COLOR,
-            gid=f"{slug}__label",
-        )
+        # The country's name in bold and its survey year in regular: a line each on desktop, centred on
+        # the bar, or one right-aligned line where the rows are too tight for two. No brackets on that line:
+        # the weight separates the two, and right-aligned, the years already form a column.
+        if layout.get("country_two_lines"):
+            for text, offset, bold, gid in (
+                (countries[row], -COUNTRY_LINE_PX / 2, True, f"{slug}__label"),
+                (years[row], COUNTRY_LINE_PX / 2, False, f"{slug}__label-year"),
+            ):
+                ax.text(
+                    label_x,
+                    row + baseline(country_font, offset),
+                    text,
+                    ha="right",
+                    va="baseline",
+                    fontsize=country_font,
+                    fontweight="bold" if bold else "normal",
+                    color=TEXT_COLOR,
+                    gid=gid,
+                )
+        else:
+            name_run, year_run = f"{countries[row]} ", years[row]
+            name, name_ink, name_step = place_run(name_run, country_font, bold=True)
+            year, year_ink, _ = place_run(year_run, country_font)
+            # Laid out left to right from where the row has to start, each run anchored on its ink
+            # centre — the anchor that survives Figma's narrower face (see `draw_run_row`).
+            start_px = -COUNTRY_LABEL_PAD - (name_step + year_ink)
+            for text, centre_px, bold, gid in (
+                (name, start_px + name_ink / 2, True, f"{slug}__label"),
+                (year, start_px + name_step + year_ink / 2, False, f"{slug}__label-year"),
+            ):
+                ax.text(
+                    centre_px / px_per_min,
+                    row + baseline(country_font),
+                    text,
+                    ha="center",
+                    va="baseline",
+                    fontsize=country_font,
+                    fontweight="bold" if bold else "normal",
+                    color=TEXT_COLOR,
+                    gid=gid,
+                )
 
         left = 0.0
         for group in layout["groups"]:
             column = group["column"]
             minutes = float(country_row[column])
             color = group_colors[column]
+            last = column == last_column
+            # Every segment but the last stops short by the gap, so its start stays at its true minute.
             ax.barh(
-                y_center,
-                minutes,
+                row + 0.5,
+                minutes if last else segment_px(minutes, px_per_min) / px_per_min,
                 left=left,
                 height=BAR_FRACTION,
                 color=color,
@@ -1349,16 +1309,18 @@ def draw_bars(
                 gid=f"{slug}__{slugify(column)}",
             )
             label = (
-                value_label(group, minutes, value_columns[column], minutes * px_per_min, layout)
+                value_label(group, minutes, value_columns[column], segment_px(minutes, px_per_min), layout)
                 if column in value_columns
                 else None
             )
             if label:
+                # Left at the segment's start, and the last one right at the bar's end, so the values line
+                # up down each column with the key over them.
                 ax.text(
-                    left + minutes / 2,
+                    left + minutes - inset / px_per_min if last else left + inset / px_per_min,
                     row + baseline(font_pt(layout, "value_font_px")),
                     label,
-                    ha="center",
+                    ha="right" if last else "left",
                     va="baseline",
                     fontsize=font_pt(layout, "value_font_px"),
                     color=value_label_color(composite_on_background(color)),
@@ -1367,110 +1329,123 @@ def draw_bars(
             left += minutes
 
 
-def draw_category_brackets(
-    ax,
-    category_placements: list[dict],
-    palette,
-    px_per_min: float,
-    rows_out,
-    layout,
-    side: str,
-    base_px: float,
-    block_depths: dict[str, float] | None = None,
-) -> None:
-    """Bracket each category's run of bars, with its name beside the bracket.
+def key_blocks(spans: dict, layout: dict) -> list[dict]:
+    """Measure the desktop key: per category, its list over its name, aligned with the values under it.
 
-    Mirrors like the group labels: `rows_out` measures distance out from the bars, so the end ticks
-    turn back towards the segments they enclose on either side, and only the name's stacking flips.
-    `base_px` is how far out the bracket rule sits, which grows when the group names are listed
-    between the brackets and the bars.
+    Each block is anchored where the top row's value sits — left at its segment's start plus
+    `value_inset_px`, and the last one right at the bar's end — and is as wide as its widest line.
     """
-    rule_px = base_px
-    for placement in category_placements:
-        # Each category is a single segment, so its name stands over the run it names on its own: no
-        # bracket, no stem, no rule. (Both were drawn here while the ten-group version existed, where
-        # a category spanned several segments and needed a span mark to group them.)
-        label_px = rule_px + CATEGORY_LABEL_GAP + placement["row"] * TIER_HEIGHT
-        depth_px = block_depths.get(placement["name"]) if block_depths else None
-        draw_category_name(ax, placement, palette, px_per_min, rows_out, layout, side, label_px, depth_px)
-
-
-def draw_category_name(
-    ax, placement, palette, px_per_min, rows_out, layout, side: str, label_px: float, depth_px: float | None = None
-) -> None:
-    """A category's name, stacked away from the bars, with no rule under it.
-
-    `depth_px` is how deep this category's own list reaches. Passed, the name sits directly above that
-    list rather than at the band's top, so a short list keeps its heading and the four names end up
-    bottom-aligned as a group.
-    """
-    if depth_px is not None:
-        label_px = depth_px + CATEGORY_LABEL_GAP + CATEGORY_NAME_GAP_LINES * line_px(font_pt(layout, "header_font_px"))
-    for index, line in enumerate(placement["lines"]):
-        offset = len(placement["lines"]) - 1 - index if side == "above" else index
-        ax.text(
-            placement["center"] / px_per_min,
-            rows_out(label_px + offset * line_px(font_pt(layout, "category_font_px"))),
-            line,
-            ha="center",
-            va="bottom" if side == "above" else "top",
-            fontsize=font_pt(layout, "category_font_px"),
-            fontweight="bold",
-            color=header_text_color(placement["color"], palette),
-            gid=f"category__{slugify(placement['name'])}"
-            if index == 0
-            else f"category__{slugify(placement['name'])}-line{index}",
+    plot_end = spans[layout["groups"][-1]["column"]][1]
+    list_font, name_font = font_pt(layout, "key_font_px"), font_pt(layout, "key_name_font_px")
+    blocks = []
+    for index, category in enumerate(layout["categories"]):
+        last = index == len(layout["categories"]) - 1
+        start = spans[category["columns"][0]][0]
+        anchor = plot_end - layout["value_inset_px"] if last else start + layout["value_inset_px"]
+        width = max(
+            *(text_advance_px(line, list_font) for line in category["key_lines"]),
+            *(text_advance_px(line, name_font, bold=True) for line in category["label_lines"]),
         )
+        blocks.append(
+            {
+                "category": category,
+                "anchor": anchor,
+                "align": "right" if last else "left",
+                "extent": (anchor - width, anchor) if last else (anchor, anchor + width),
+                # The block's box, from the bars up: the air over the bar, the name, the gap, the list.
+                "height": KEY_BAR_GAP
+                + len(category["label_lines"]) * layout["key_name_line_px"]
+                + KEY_NAME_GAP
+                + len(category["key_lines"]) * layout["key_line_px"],
+            }
+        )
+    return blocks
 
 
-def draw_bracketed_names(
-    ax, blocks: list[dict], palette, px_per_min: float, rows_out, layout: dict, height_px: float
-) -> None:
-    """Draw each category's member names inside its bracket, centred and reading top-down.
+def key_blocks_collide(blocks: list[dict]) -> str | None:
+    """The first pair of neighbouring key blocks that touch, or None if they all clear each other."""
+    for left, right in zip(blocks, blocks[1:]):
+        if overlaps(left["extent"], right["extent"], HEADER_MIN_GAP):
+            return f"{left['category']['name']} and {right['category']['name']}"
+    return None
 
-    Every block starts at the same distance out from the bars — directly under the bracket rule — so
-    the four of them line up however many lines each one needed.
 
-    Each run is anchored on the centre of its own slot rather than on its left edge. It draws in the
-    same place either way, but the anchor is what survives Figma: a left-anchored run re-rendered in
-    the template's narrower font shrinks away from its centre and pushes nothing back, so a line of
-    them creeps out of its bracket. One name per line is the normal case, and a middle anchor pins
-    it to the bracket's centre exactly.
+def key_header_px(blocks: list[dict], plot_left_px: float, band_top: float, subtitle_right_px: float) -> float:
+    """Where the first bar's ink has to start so that every key block fits above it, in frame px.
+
+    A block under the subtitle has to clear it by `BAND_INSET`, like any plot ink. One that clears the
+    subtitle SIDEWAYS may rise to the header's bottom edge instead, beside the subtitle's shorter lines —
+    which is where the design team put the two four-line lists.
     """
-    fontsize = font_pt(layout, "header_font_px")
+    needed = []
     for block in blocks:
-        start, end = block["span"]
-        centre = (start + end) / 2
-        # Top-aligned, every list starts level with the deepest one and a short list ends well short of
-        # the bars — two lines of air under "Personal care" while "Leisure" reaches down to them.
-        # Bottom-aligned, every list ends the same distance above the bars and the air moves under the
-        # category name, where it reads as space beneath a heading instead of a detached list.
-        #
-        # Putting the four category NAMES on one baseline instead — bottom-aligned lists, one header
-        # row above them — was tried and dropped. It does tidy the top of the band, where the names
-        # otherwise land on four baselines up to 51px apart (the blank above the first line of text is
-        # 26px over "Unpaid work & other" and 77px over "Personal care", the widest and so emptiest
-        # column). But it re-opens the gap this bottom-alignment exists to close: with a 3-name list,
-        # "Personal care" ends up two lines clear of "Sleep" and stops reading as its heading. It buys
-        # no height either — `band_px` sizes the band from the deepest list plus the tallest name, which
-        # neither choice changes, so it only ever moved names through space already reserved.
-        depth_px = len(block["lines"]) * line_px(fontsize) if layout.get("names_bottom_aligned") else height_px
-        for index, line in enumerate(block["lines"]):
-            width = sum(text_advance_px(text, fontsize) for text, _ in line)
-            offset = centre - width / 2
-            for text, group in line:
-                drawn, ink_px, step_px = place_run(text, fontsize)
-                ax.text(
-                    (offset + ink_px / 2) / px_per_min,
-                    rows_out(LEADER_GAP + depth_px - index * line_px(fontsize)),
-                    drawn,
-                    ha="center",
-                    va="top",
-                    fontsize=fontsize,
-                    color=MEMBER_TEXT_COLOR,
-                    gid=f"header__{slugify(group['column'])}",
-                )
-                offset += step_px
+        start, end = (plot_left_px + x for x in block["extent"])
+        beside = start >= subtitle_right_px + HEADER_MIN_GAP
+        needed.append((band_top if beside else band_top + BAND_INSET) + block["height"])
+    return max(needed)
+
+
+def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, layout: dict, palette, fx, fy) -> None:
+    """Draw the desktop key: each category's run-in list, and under it, nearest the bars, its name.
+
+    One text node per line, each placed on its own baseline with its ink centred in its line box, as
+    the bars' values are; the line breaks are the design team's.
+    """
+    list_font, name_font = font_pt(layout, "key_font_px"), font_pt(layout, "key_name_font_px")
+    for block in blocks:
+        category = block["category"]
+        slug = slugify(category["name"])
+        x = fx(plot_left_px + block["anchor"])
+        name_top = bars_top_px - KEY_BAR_GAP - len(category["label_lines"]) * layout["key_name_line_px"]
+        list_top = name_top - KEY_NAME_GAP - len(category["key_lines"]) * layout["key_line_px"]
+        rows = [
+            (
+                line,
+                list_top + index * layout["key_line_px"],
+                layout["key_line_px"],
+                list_font,
+                False,
+                f"key__{slug}-members",
+            )
+            for index, line in enumerate(category["key_lines"])
+        ] + [
+            (
+                line,
+                name_top + index * layout["key_name_line_px"],
+                layout["key_name_line_px"],
+                name_font,
+                True,
+                f"category__{slug}",
+            )
+            for index, line in enumerate(category["label_lines"])
+        ]
+        seen: dict[str, int] = {}
+        for text, top, line, fontsize, bold, gid in rows:
+            count = seen.get(gid, 0)
+            seen[gid] = count + 1
+            fig.text(
+                x,
+                fy(top + line / 2 + cap_height_px(fontsize) / 2),
+                text,
+                ha=block["align"],
+                va="baseline",
+                fontsize=fontsize,
+                fontweight="bold" if bold else "normal",
+                color=header_text_color(category["color"], palette) if bold else MEMBER_TEXT_COLOR,
+                gid=gid if count == 0 else f"{gid}-line{count}",
+            )
+
+
+def check_key_lines() -> None:
+    """Assert each category's key lines spell out its members, so a designer's breaks cannot drift."""
+    for category in MAIN_CATEGORIES:
+        assert " ".join(category["key_lines"]) == run_in_list(category["members"]), (
+            f"The key lines for {category['name']} no longer spell out its members: re-break "
+            f"{run_in_list(category['members'])!r}."
+        )
+        assert " ".join(category["label_lines"]) == category["name"], (
+            f"The name lines for {category['name']} no longer spell out its name."
+        )
 
 
 def layout_row_legend(layout: dict) -> list[dict]:
@@ -1542,7 +1517,7 @@ def draw_row_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
     name by more than they cover, and a name that overhangs points at its neighbour too. The chip
     carries the link to the bar instead, at the bar's own fill and opacity.
 
-    Drawn in figure coordinates rather than on the axes, because unlike the bracketed header it is
+    Drawn in figure coordinates rather than on the axes, because unlike the desktop key it is
     positioned by the frame's margin rather than by any segment.
     """
     fontsize = font_pt(layout, "legend_font_px")
@@ -1672,7 +1647,7 @@ def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, f
 
 
 # ---------------------------------------------------------------------------
-# Header layout
+# Key layout
 # ---------------------------------------------------------------------------
 
 
@@ -1685,168 +1660,6 @@ def segment_spans(row, px_per_min: float, groups: list[dict]) -> dict[str, tuple
         spans[group["column"]] = (cumulative * px_per_min, (cumulative + minutes) * px_per_min)
         cumulative += minutes
     return spans
-
-
-def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
-    """Place the category names over their brackets, wrapping before stacking.
-
-    A category name is often wider than the run of bars it covers — "Unpaid work & other" spans
-    67px of a desktop frame — so a name that would crowd its neighbour wraps onto a second line
-    first, and only takes a row of its own if wrapping is not enough. Wrapping keeps every name
-    beside its own bracket; stacking pushes one away from the bars and needs a stem to explain
-    which bracket it belongs to.
-
-    A name is only allowed a wide form if the narrowest form of every category still to its right
-    would still fit beside it. Without that one-step lookahead the widest name takes the room and
-    its neighbour is the one that gets bumped, which is the wrong way round: the wide name is the
-    one that should give.
-    """
-    right_edge = spans[layout["groups"][-1]["column"]][1]
-
-    def geometry(category: dict, lines: list[str]) -> tuple[float, tuple[float, float]]:
-        start = spans[category["columns"][0]][0]
-        end = spans[category["columns"][-1]][1]
-        width = max(text_width_px(line, font_pt(layout, "category_font_px"), bold=True) for line in lines)
-        center = min(max((start + end) / 2, width / 2), right_edge - width / 2)
-        return center, (center - width / 2, center + width / 2)
-
-    placed: list[tuple[tuple[float, float], int]] = []
-    placements = []
-    for index, category in enumerate(layout["categories"]):
-        variants = category_variants(category["name"], layout)
-        if layout.get("wrap_overhanging_names"):
-            # Collision with a neighbour is not the only reason to wrap. Where each category is a
-            # single segment, a name can clear its neighbours and still overhang its own bar by half
-            # its length, which reads as pointing at both. So rank the forms by how far each one
-            # overhangs the span it names, least first; `sorted` is stable, so the widest-first order
-            # survives among forms that overhang equally (every form that fits is 0).
-            #
-            # By how MUCH, not whether it fits: a boolean key ties whenever no form fits, and a tie
-            # hands the row to the widest form, which is the worst one. "Unpaid work & other" over a
-            # 79px segment is the case — one line overhangs by 63px, two by 8px — and it wrapped only
-            # for as long as the two-line form happened to fit, which it stopped doing when this name
-            # went up a pixel.
-            span_px = spans[category["columns"][-1]][1] - spans[category["columns"][0]][0]
-            variants = sorted(
-                variants,
-                key=lambda lines: max(
-                    0.0,
-                    max(text_width_px(line, font_pt(layout, "category_font_px"), bold=True) for line in lines)
-                    - span_px,
-                ),
-            )
-        remaining = layout["categories"][index + 1 :]
-        placement = None
-        for row in range(3):
-            for lines in variants:
-                center, label_span = geometry(category, lines)
-                if any(other_row == row and overlaps(label_span, other, HEADER_MIN_GAP) for other, other_row in placed):
-                    continue
-                # Would this form leave a later category nowhere to sit on this row?
-                if row == 0 and any(
-                    overlaps(
-                        label_span, geometry(later, category_variants(later["name"], layout)[-1])[1], HEADER_MIN_GAP
-                    )
-                    for later in remaining
-                ):
-                    continue
-                placement = {"lines": lines, "center": center, "row": row}
-                break
-            if placement:
-                break
-        assert placement, f"Could not place the category name {category['name']}."
-
-        placed.append((geometry(category, placement["lines"])[1], placement["row"]))
-        placements.append(
-            {
-                "name": category["name"],
-                "lines": placement["lines"],
-                "color": category["color"],
-                "bracket": (spans[category["columns"][0]][0], spans[category["columns"][-1]][1]),
-                "center": placement["center"],
-                "row": placement["row"],
-            }
-        )
-    # Say which names still reach past the segment they name, and by how much. There is no threshold
-    # worth asserting — "Unpaid work & other" legitimately overhangs its 79px segment by 8 at the size
-    # this chart sets — but the one form that reads as pointing at two segments at once got chosen
-    # silently before the ranking above was fixed, and a font change is exactly when that recurs.
-    for placement in placements:
-        start, end = placement["bracket"]
-        widest = max(text_width_px(line, font_pt(layout, "category_font_px"), bold=True) for line in placement["lines"])
-        if widest > end - start:
-            paths.log.info(
-                f"Category name overhangs its segment: {placement['name']} is {widest:.1f}px over a "
-                f"{end - start:.1f}px span, on {len(placement['lines'])} line(s)."
-            )
-    return placements
-
-
-def category_variants(name: str, layout: dict) -> list[list[str]]:
-    """A category name on one line, then wrapped over two — widest form first."""
-    variants = [[name]]
-    words = name.split()
-    if len(words) > 1:
-        best = min(
-            range(1, len(words)),
-            key=lambda i: abs(
-                text_width_px(" ".join(words[:i]), font_pt(layout, "category_font_px"), bold=True)
-                - text_width_px(" ".join(words[i:]), font_pt(layout, "category_font_px"), bold=True)
-            ),
-        )
-        variants.append([" ".join(words[:best]), " ".join(words[best:])])
-    return variants
-
-
-def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
-    """Each category's member names laid out inside its own bracket's span, one per line.
-
-    All four brackets stack their names, rather than setting the ones that would fit on a single line
-    horizontally: a mixture reads as four different treatments, and only the two widest brackets
-    could have taken a row anyway. A name wider than its span is wrapped to it, so a block never
-    spills into the neighbouring category's; `blocks_collide` checks what is left.
-
-    Returns one block per category: lines of (text, group) runs, and the span to centre them in.
-    """
-    fontsize = font_pt(layout, "header_font_px")
-    blocks = []
-    for category in layout["categories"]:
-        start = spans[category["columns"][0]][0]
-        end = spans[category["columns"][-1]][1]
-        if len(category["columns"]) == 1 and category.get("members"):
-            # One segment per category: the members are names rather than groups, and they all take the
-            # category's own color — there are no tints here to match them to.
-            members = [
-                {"column": slugify(name), "label": name, "color": category["color"]} for name in category["members"]
-            ]
-        else:
-            members = [group for group in layout["groups"] if group["column"] in category["columns"]]
-        # Wrapped to the segment, unless the layout lets a name overhang it (still checked against its
-        # neighbours by `blocks_collide`).
-        wrap_px = float("inf") if layout.get("member_names_overhang") else end - start
-        lines = [
-            [(text, group)]
-            for group in members
-            for text in wrap_to_width(group["label"], wrap_px, fontsize).split("\n")
-        ]
-        blocks.append({"name": category["name"], "lines": lines, "span": (start, end)})
-    return blocks
-
-
-def blocks_collide(blocks: list[dict], layout: dict) -> str | None:
-    """The first pair of neighbouring name blocks that touch, or None if they all clear each other."""
-    extents = []
-    for block in blocks:
-        start, end = block["span"]
-        widest = max(
-            sum(text_advance_px(text, font_pt(layout, "header_font_px")) for text, _ in line) for line in block["lines"]
-        )
-        centre = (start + end) / 2
-        extents.append((block["name"], (centre - widest / 2, centre + widest / 2)))
-    for (left_name, left), (right_name, right) in zip(extents, extents[1:]):
-        if overlaps(left, right, HEADER_MIN_GAP):
-            return f"{left_name} and {right_name}"
-    return None
 
 
 # ---------------------------------------------------------------------------
@@ -1944,9 +1757,10 @@ def check_contrast() -> None:
     composited = [composite_on_background(fill) for fill in fills]
 
     # Touching fills need a lightness gap, or the stack merges into one block in grayscale — and the
-    # same gap has to survive dichromacy, which redistributes lightness. Checking only the first would
-    # have passed a boundary that falls to 1.13:1 for a red-green colour-blind reader.
-    for (fill, name), (next_fill, next_name) in zip(zip(composited, names), list(zip(composited, names))[1:]):
+    # same gap has to survive dichromacy, which redistributes lightness. Segments separated by a gap of
+    # canvas do not touch, so the gap carries the boundary and these floors do not apply.
+    seams = list(zip(zip(composited, names), list(zip(composited, names))[1:])) if SEGMENT_GAP_PX == 0 else []
+    for (fill, name), (next_fill, next_name) in seams:
         hold_contrast(
             ("seam", name, next_name),
             contrast_ratio(fill, next_fill),
@@ -2321,13 +2135,15 @@ def value_label(group: dict, minutes: float, form: int, available_px: float, lay
     still visibly adds to a day.
     """
     candidates = value_candidates(group, minutes, layout["with_mins_suffix"])
-    return fit_text(candidates[form : form + 1], available_px, font_pt(layout, "value_font_px"))
+    return fit_text(
+        candidates[form : form + 1], available_px - layout["value_inset_px"], font_pt(layout, "value_font_px")
+    )
 
 
 def fit_text(candidates: list[str], available_px: float, fontsize: float) -> str | None:
-    """The longest candidate that fits the available width, or None."""
+    """The longest candidate that fits the available width once the frame sets it in Lato, or None."""
     for candidate in candidates:
-        if text_width_px(candidate, fontsize) + 2 * VALUE_PAD <= available_px:
+        if fits_slot(text_width_px(candidate, fontsize) + VALUE_PAD, available_px):
             return candidate
     return None
 

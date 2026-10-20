@@ -184,7 +184,6 @@ def run() -> None:
     manifest = {
         "meta": {
             "title": FEED_TITLE,
-            "source": feed_metadata["attribution"],
             "unit": "persons",
             "note": FEED_NOTE,
         },

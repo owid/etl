@@ -144,7 +144,7 @@ def run(dest_dir: str) -> None:
     tb = filter_by_num_sequences(tb, col_total="num_sequences_total")
 
     # Second table: Sequencing
-    tb_seq = tb.astype({"country": "string", "variant": "string"}).copy()
+    tb_seq = tb.astype({"country": "str", "variant": "str"}).copy()
     tb_seq = add_variant_dominant(tb_seq)
     tb_seq = add_variant_totals(tb_seq)
     tb_seq = add_per_capita(tb_seq, ds_population)
@@ -230,8 +230,8 @@ def check_variants(tb: Table) -> Table:
 def clean_date(tb: Table) -> Table:
     """Clean date column."""
     # Get date of report
-    tb["date"] = pd.to_datetime(tb["week"].astype("string"), format="%Y-%m-%d") + timedelta(days=14)
-    tb["date"] = tb["date"].astype("string")
+    tb["date"] = pd.to_datetime(tb["week"].astype("str"), format="%Y-%m-%d") + timedelta(days=14)
+    tb["date"] = tb["date"].astype("str")
     # Get date of publication of latest available file
     last_update = tb.date.m.origins[0].date_published
     tb["date"] = tb["date"].apply(lambda x: min(x, last_update))

@@ -224,7 +224,7 @@ class Dataset:
             reset_index: If True, don't set primary keys. This can make loading
                 large multi-index datasets much faster. Default is True.
             safe_types: If True, convert numeric columns to nullable types
-                (Float64, Int64) and categorical to string[pyarrow]. This increases
+                (Float64, Int64) and categorical to pandas' `str` dtype. This increases
                 memory usage but prevents type issues. Default is True.
             reset_metadata: Controls variable metadata reset behavior:
                 - "keep": Leave metadata unchanged (default)

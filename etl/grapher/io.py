@@ -317,7 +317,7 @@ def variable_data_df_from_s3(
 
     # we work with strings and convert to specific types later
     if value_as_str:
-        df["value"] = df["value"].astype("string")
+        df["value"] = df["value"].astype("str")
 
     with Session(engine) as session:
         res = add_entity_code_and_name(session, df)

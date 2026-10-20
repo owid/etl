@@ -245,10 +245,10 @@ steps:
       - data://garden/worldbank_wdi/2026-07-27/wdi
 
   # Homicide - OMM
-  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
-    - data://garden/homicide/2024-07-30/homicide_long_run_omm:
+  data://grapher/homicide/2026-10-15/homicide_long_run_omm:
+    - data://garden/homicide/2026-10-15/homicide_long_run_omm:
       - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-      - data://garden/homicide/2025-08-06/who_mort_db
+      - data://garden/who/2026-10-13/mortality_database
 
   # Child Mortality Estimates - UN IGME
   data://meadow/un/2026-06-09/igme:
@@ -436,13 +436,6 @@ steps:
       - data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today:
         - snapshot-private://happiness/2025-07-22/life_in_five_years_and_life_today.xlsx
 
-  # WHO Mort DB Homicides
-  data://garden/homicide/2025-08-06/who_mort_db:
-    - data://garden/un/2024-07-12/un_wpp
-    - data://meadow/homicide/2025-08-06/who_mort_db:
-      - snapshot://homicide/2025-08-06/who_mort_db.csv
-  data://grapher/homicide/2025-08-06/who_mort_db:
-    - data://garden/homicide/2025-08-06/who_mort_db
 
   # Ethnologue
   data-private://grapher/language/2025-09-03/ethnologue:

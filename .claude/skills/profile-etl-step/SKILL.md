@@ -86,7 +86,7 @@ tb = tb.format(index_columns, short_name="table_name")
 tb = ds_meadow.read("table_name", safe_types=False)
 ```
 
-`safe_types=True` (the default) converts categoricals back to `string[pyarrow]`, losing all the savings.
+`safe_types=True` (the default) converts categoricals back to `str`, losing all the savings.
 
 **Impact**: Typically 90-99% memory reduction and 5-30x faster reads for tables with >1M rows.
 

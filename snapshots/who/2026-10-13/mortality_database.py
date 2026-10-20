@@ -83,8 +83,9 @@ CAUSES = {
     "Tetanus": "CG0160",
     "Hepatitis B": "CG0180",
     "Japanese encephalitis": "CG0300",
-    # Drill-down inside "Intentional injuries", formerly the self_inflicted_injuries dataset.
+    # Drill-downs inside "Intentional injuries", formerly the self_inflicted_injuries and homicide/who_mort_db datasets.
     "Self-inflicted injuries": "CG1570",
+    "Violence": "CG1580",
     # Drill-downs inside "Malignant neoplasms", formerly the mortality_database_cancer dataset.
     "Mouth and oropharynx cancers": "CG0610",
     "Oesophagus cancer": "CG0620",

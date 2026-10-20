@@ -72,9 +72,9 @@ def get_session(**kwargs) -> Session:
 
 
 @functools.cache
-def _get_engine_cached(cf: Any, pid: int) -> Engine:
+def _get_engine_cached(user: str, password: str, host: str, port: str, db_name: str, pid: int) -> Engine:
     return create_engine(
-        f"mysql+pymysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
+        f"mysql+pymysql://{user}:{quote(password)}@{host}:{port}/{db_name}",
         pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
         max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
     )
@@ -82,9 +82,11 @@ def _get_engine_cached(cf: Any, pid: int) -> Engine:
 
 def get_engine(conf: dict[str, Any] | None = None) -> Engine:
     cf: Any = dict_to_object(d=conf) if conf else config
+    # Memoize on the connection parameters, not on `cf`: `dict_to_object` returns a new object on every call, so
+    # keying on it created (and kept alive forever) a new Engine, with its own pool of open connections, per call.
     # pid in memoization makes sure every process gets its own Engine
     pid = os.getpid()
-    return _get_engine_cached(cf, pid)
+    return _get_engine_cached(cf.DB_USER, cf.DB_PASS, cf.DB_HOST, str(cf.DB_PORT), cf.DB_NAME, pid)
 
 
 def dict_to_object(d):

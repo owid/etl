@@ -81,13 +81,13 @@ def run() -> None:
     tb["employment"] = tb["employment_thousands"].astype("Int64") * 1000
 
     # Harmonize FAO's region names to their OWID entity names (see the .countries.json mapping).
-    tb["region"] = tb["region"].astype("string")
+    tb["region"] = tb["region"].astype("str")
     tb = tb.rename(columns={"region": "country"})
     tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
     # Relabel periods and subsectors (key columns, not indicators).
-    tb["year"] = tb["period"].astype("string").map(PERIOD_TO_YEAR).astype(int)
-    tb["subsector"] = tb["subsector"].astype("string").map(SUBSECTOR_TO_COLUMN)
+    tb["year"] = tb["period"].astype("str").map(PERIOD_TO_YEAR).astype(int)
+    tb["subsector"] = tb["subsector"].astype("str").map(SUBSECTOR_TO_COLUMN)
 
     # Reshape so each subsector becomes its own indicator.
     tb = tb.pivot(index=["country", "year"], columns="subsector", values="employment", join_column_levels_with="_")

@@ -431,7 +431,7 @@ def add_last12m_values(tb: Table) -> Table:
 def set_dtypes(tb: Table) -> Table:
     """Set Dtypes for the table."""
     dtypes = {
-        "country": "string",
+        "country": "str",
         "date": "datetime64[ns]",
         **{
             col: "Int64"
