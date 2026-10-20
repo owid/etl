@@ -21,7 +21,7 @@ definitions:
     The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by population shares from one census per country, held constant so that changes over time reflect policy shifts rather than demographic change.
 
   description_regions_processing: |-
-    Regional aggregates are computed from country-level data using [Our World in Data's region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). A country is counted as having full implementation when the policy proportion equals 1.
+    We calculate regional totals from the country data, using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and, for population totals, our [consolidated population data](https://ourworldindata.org/population-sources).
 
   description_key_full_implementation: |-
     A country is counted as having full implementation when the policy score equals 1. Subnational adoption (scores below 1 in countries with federal or decentralized systems such as the United States, Australia, Canada, Mexico, Brazil, or the United Kingdom) is treated as not fully implemented.
@@ -41,12 +41,12 @@ definitions:
   derivation_single_direction: |-
     From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Varies by region"), or no policy in effect.
   derivation_so_gi_pair: |-
-    From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Varies by region" (any partial subnational coverage in either dimension).
+    The original dataset has separate indicators for sexual orientation and for gender identity. We combined them into one indicator that shows whether national law covers both grounds, only one, or neither. When either ground is covered in only part of the country, we classify the country as "Varies by region".
 
   description_key_so_gi_partial_note: |-
     "Varies by region" also covers asymmetric cases where one dimension is fully unprotected and the other is partially protected across subnational jurisdictions — e.g. a federal country where some states or provinces protect sexual orientation but none protect gender identity.
   derivation_gac: |-
-    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The salient national policy states keep their own category, while the rarer one-group-only states are merged into "Covered for adults or minors only" and "Restricted for adults or minors only"; only country-years with subnational variation or contradictory same-year coding are grouped as "Varies by region or other".
+    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common combinations keep their own category, and the rarer cases where only one of the two groups has a policy are grouped into "Covered for adults or minors only". Years in which rules differ between subnational jurisdictions, or in which care for the same group is recorded as both funded and restricted, are classified as "Varies by region or other".
   derivation_gmc: |-
     From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration is enough", "Court order required", "Diagnosis required", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
 
@@ -63,9 +63,9 @@ definitions:
     <% elif law == "constitutional_protections_sexual_orientation" %>
     Whether sexual orientation is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
     <% elif law == "conversion_therapies" %>
-    Whether conversion therapy is banned by law, executive order, or judicial ruling.
+    Whether conversion therapy (practices that try to change a person's sexual orientation or gender identity) is banned, fully or in part, by law, executive order, or court ruling.
     <% elif law == "death_penalty" %>
-    Whether the death penalty is a legally codified punishment for same-sex sexual acts.
+    Whether the law makes consensual same-sex sexual acts punishable by death.
     <% elif law == "employment_discrimination_gender_identity" %>
     Whether national law prohibits employment discrimination based on gender identity.
     <% elif law == "employment_discrimination_sexual_orientation" %>
@@ -196,8 +196,9 @@ dataset:
         - Updated to Version 3.0 of the LGBTI National Policy Dataset (October 2026), which revises the coding of many countries and cites the sources behind each one. It covers 195 countries from 1991 to 2025.
         - Added the LGBTI Composite Policy Index, with its progressive and regressive scores and population-weighted averages for world regions and income groups. It extends the index to 2025; the earlier LGBTI Policy Index, from Velasco's 2023 paper, ended in 2019.
         - A country now counts as banning same-sex marriage only if its definition of marriage as a union of a man and a woman is in a law that applies to everyone. Countries whose marriage laws differ by religious community move from "Banned" to "No legal provisions".
+        - Marriage bans are now dated from the earliest law that defines marriage as a union of a man and a woman, so many more countries count as having a ban from 1991, and the number of countries with a ban stays roughly flat over time.
         - A law now counts as not enforced only when a source documents that it isn't applied, or in the years before it takes effect. Far fewer countries show as "Criminalized but not enforced".
-        - Added the categories "Court order required" and "Legally possible, requirement unknown" for legal change of gender marker, and "Varies by region" for blood donation by men who have sex with men.
+        - Some indicators have new categories, such as a separate category for countries where changing the gender marker requires a court order.
 
 tables:
   lgbti_national_policy_dataset:
@@ -683,7 +684,7 @@ tables:
       conversion_therapies:
         title: Conversion therapy
         description_short: |-
-          Whether conversion therapy is banned by law, executive order, or judicial ruling.
+          Whether conversion therapy (practices that try to change a person's sexual orientation or gender identity) is banned, fully or in part, by law, executive order, or court ruling.
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Banned_** (conversion therapy is banned by law, executive order, or judicial ruling), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on conversion therapy).'
@@ -726,12 +727,12 @@ tables:
       death_penalty:
         title: Death penalty for same-sex acts
         description_short: |-
-          Whether the death penalty is a legally codified punishment for same-sex sexual acts.
+          Whether the law makes consensual same-sex sexual acts punishable by death.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No death penalty_** (no binding legal instrument makes same-sex sexual acts punishable by death), **_Varies by region_** (application differs between subnational jurisdictions) and **_Death penalty applies_** (the death penalty is a codified punishment for same-sex sexual acts).'
+          - 'The indicator is coded as follows: **_No death penalty_** (no law makes consensual same-sex sexual acts punishable by death), **_Varies by region_** (application differs between subnational jurisdictions) and **_Death penalty applies_** (a law makes consensual same-sex sexual acts punishable by death).'
           - "{definitions.description_key_binding_instrument}"
-          - A country counts as having the death penalty when a legal basis makes death available for consensual same-sex acts — a penal-code article, a religious (sharia) provision applied to such acts, whether written into a code or not (as in Saudi Arabia), a state penal code in a federal country (as in parts of Nigeria), or a decree. Capital provisions that apply only to acts committed by force, bills never enacted and statements by officials don't count. Pakistan, Somalia and the United Arab Emirates are counted as not having the death penalty as of 2025.
+          - In this data, a country has the death penalty for consensual same-sex acts when a penal-code article, a decree, or a religious (sharia) provision makes them punishable by death, whether or not that provision is written into a code (as in Saudi Arabia). Where only some states' penal codes allow it, as in parts of Nigeria, the country is classified as **_Varies by region_**. Death-penalty provisions that apply only to acts committed by force, bills that never became law, and statements by officials don't count. Pakistan, Somalia, and the United Arab Emirates are classified as having no death penalty in 2025.
         unit: ""
         short_unit: ""
         display:
@@ -890,7 +891,6 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
-          - "{definitions.description_key_so_gi_partial_note}"
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -910,10 +910,10 @@ tables:
       gender_affirming_care:
         title: Gender-affirming care (adults and minors)
         description_short: |-
-          Interventions that help transgender and non-binary people align their bodies with their gender identity — such as hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
+          Whether gender-affirming care is publicly funded or restricted by national law, for adults and for minors. This care helps transgender and non-binary people align their bodies with their gender identity, for example through hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults or minors only_** (gender-affirming healthcare is publicly funded for one of the two groups, with no national policy for the other), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or both coverage and restriction are recorded in the same year because of a mid-year policy change) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
+          - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults or minors only_** (gender-affirming healthcare is publicly funded for one of the two groups, with no national policy for the other), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or the dataset records care for the same group as both publicly funded and restricted in the same year, as for minors in Sweden since 2022) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -1686,7 +1686,7 @@ tables:
 
       joint_adoption_varies_by_region_count:
         title: Joint adoption by same-sex couples — Varies by region (number of countries)
-        description_short: Number of countries classified as "Varies by region" on the indicator on joint adoption by same-sex couples.
+        description_short: Number of countries where joint adoption by same-sex couples is allowed in some parts of the country but not others.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -1697,7 +1697,7 @@ tables:
 
       joint_adoption_varies_by_region_pop:
         title: Joint adoption by same-sex couples — Varies by region (population)
-        description_short: Total population of countries classified as "Varies by region" on the indicator on joint adoption by same-sex couples.
+        description_short: Total population of countries where joint adoption by same-sex couples is allowed in some parts of the country but not others.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -2038,7 +2038,7 @@ tables:
 
       third_gender_recognition_varies_by_region_count:
         title: Legal recognition of a third gender — Varies by region (number of countries)
-        description_short: Number of countries classified as "Varies by region" on the indicator on legal recognition of a third gender.
+        description_short: Number of countries where a third gender marker or non-binary category is legally recognized on identity documents in some parts of the country but not others.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -2049,7 +2049,7 @@ tables:
 
       third_gender_recognition_varies_by_region_pop:
         title: Legal recognition of a third gender — Varies by region (population)
-        description_short: Total population of countries classified as "Varies by region" on the indicator on legal recognition of a third gender.
+        description_short: Total population of countries where a third gender marker or non-binary category is legally recognized on identity documents in some parts of the country but not others.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -3365,7 +3365,7 @@ tables:
 
       gender_marker_change_varies_by_region_count:
         title: Legal change of gender marker — Varies by region (number of countries)
-        description_short: Number of countries classified as "Varies by region" on the indicator on legal change of gender marker.
+        description_short: Number of countries where legal change of the gender marker is possible in some parts of the country but not others.
         processing_level: major
         description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -3376,7 +3376,7 @@ tables:
 
       gender_marker_change_varies_by_region_pop:
         title: Legal change of gender marker — Varies by region (population)
-        description_short: Total population of countries classified as "Varies by region" on the indicator on legal change of gender marker.
+        description_short: Total population of countries where legal change of the gender marker is possible in some parts of the country but not others.
         processing_level: major
         description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -3814,10 +3814,10 @@ tables:
           Values for world regions are population-weighted averages of the countries in each region, computed by Our World in Data using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). Country values come directly from the producer.
         description_key:
           - "{definitions.description_key_dataset}"
-          - The index combines 35 policies — 23 that expand rights (such as marriage equality, protections from discrimination, or legal gender recognition) and 12 that restrict them (such as the criminalization of same-sex acts, the death penalty, "propaganda" laws, or military service bans). Policies that expand rights add to the score; policies that restrict them subtract from it.
-          - Each policy scores between 0 and 1, depending on how strongly it operates in practice. Its score is the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is actually enforced, and, where they apply, whether it covers all genders, how severe its punishments are, and how easy the right is to use.
+          - The index combines 35 measures drawn from the dataset's 27 policy areas — 23 that expand rights (such as marriage equality, protections from discrimination, or legal gender recognition) and 12 that restrict them (such as the criminalization of same-sex acts, the death penalty, "propaganda" laws, or military service bans). Measures that expand rights add to the score; measures that restrict them subtract from it.
+          - Each measure scores between 0 and 1, depending on how strongly it operates in practice. Its score is the share of the population it covers, multiplied by the average of its other features — how broad it is, whether it is actually enforced, and, where they apply, whether it covers all genders, how severe its punishments are, and how easy the right is to use.
           - In practice this means a law that exists on paper but is never enforced counts less than one that is actively applied, and a right that requires surgery counts less than one available by self-declaration.
-          - Higher values indicate more rights-affirming legal environments; negative values indicate that restrictive laws dominate. Values range from about -4.5 to +20.3.
+          - Higher values indicate more rights-affirming legal environments; negative values indicate that restrictive laws dominate. In 2025, country values range from about −4.5 (Uganda) to 20.3 (Malta).
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
