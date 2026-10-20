@@ -109,7 +109,7 @@ def run() -> None:
             {
                 "year": int,
                 "population": "uint64",
-                "source": "string",
+                "source": "str",
             }
         )
         .pipe(add_regions, ds_regions, ds_income_groups)
@@ -258,8 +258,8 @@ def format_wpp(tb: Table, column_indicator: str, indicator_dtype: str) -> Table:
         .assign(source="unwpp")
         .astype(
             {
-                "source": "string",
-                "country": "string",
+                "source": "str",
+                "country": "str",
                 column_indicator: indicator_dtype,
                 "year": "uint64",
             }

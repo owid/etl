@@ -201,3 +201,58 @@
     since the correct figure is not published. Recheck next update.
   producer: World Bank
   status: open
+
+# Kazakhstan 2022 and Grenada 2013-2015 national-estimate employment-to-population ratios hold the *employed share of the
+# labor force* (100% minus the unemployment rate) instead of employment as a share of the population.
+# Each matches 100 - SL.UEM.TOTL.*.NE.ZS exactly; a sweep of every country-year found no other case.
+- indicator: sl_emp_totl_sp_fe_ne_zs
+  entity: Kazakhstan
+  years: [2022]
+  action: override
+  value: null
+  expect: {gt: 90}
+  reason: >-
+    The World Bank publishes 94.5% for Kazakhstan in 2022, up from 60.3% in 2020 and against a 60-62%
+    range over 2008-2020. It equals 100% minus the female unemployment rate for the same year (5.5%,
+    SL.UEM.TOTL.FE.NE.ZS), i.e. the employed share of the labor force rather than of the population,
+    and exceeds the female labor force participation rate (63.3%, SL.TLF.CACT.FE.NE.ZS). The modeled
+    ILO series (SL.EMP.TOTL.SP.FE.ZS) gives 61.2%. Nulled rather than replaced, since the correct
+    national figure is not published. Recheck next update.
+  producer: World Bank
+  status: open
+- indicator: sl_emp_totl_sp_ma_ne_zs
+  entity: Kazakhstan
+  years: [2022]
+  action: override
+  value: null
+  expect: {gt: 90}
+  reason: >-
+    Same error as the female series: 95.7% for 2022 (72.1% in 2020) equals 100% minus the male
+    unemployment rate (4.3%, SL.UEM.TOTL.MA.NE.ZS) and exceeds male labor force participation (74.6%).
+  producer: World Bank
+  status: open
+- indicator: sl_emp_totl_sp_ne_zs
+  entity: Kazakhstan
+  years: [2022]
+  action: override
+  value: null
+  expect: {gt: 90}
+  reason: >-
+    Same error as the female series: 95.1% for 2022 (65.9% in 2020) equals 100% minus the total
+    unemployment rate (4.9%, SL.UEM.TOTL.NE.ZS) and exceeds total labor force participation (68.7%).
+  producer: World Bank
+  status: open
+- indicator: sl_emp_totl_sp_ne_zs
+  entity: Grenada
+  years: [2013, 2014, 2015]
+  action: override
+  value: null
+  expect: {gt: 70}
+  reason: >-
+    Same error as Kazakhstan 2022: the World Bank publishes 75.8%, 75.5% and 77.1% for 2013-2015,
+    against 46-58% in every other year of the series (1988-2023). Each equals 100% minus the
+    unemployment rate for the same year (24.2%, 24.5%, 22.9%; SL.UEM.TOTL.NE.ZS) and exceeds the labor
+    force participation rate (67.3-71.2%, SL.TLF.CACT.NE.ZS). Nulled, since the correct figure is not
+    published.
+  producer: World Bank
+  status: open

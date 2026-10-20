@@ -55,7 +55,7 @@ def run() -> None:
 
     # So I will fill nans with "Very acceptable".
     for column in COLUMNS:
-        tb[column] = tb[column].astype("string").fillna("Very acceptable")
+        tb[column] = tb[column].astype("str").fillna("Very acceptable")
 
     # Improve table format.
     tb = tb.format(["response_id"])

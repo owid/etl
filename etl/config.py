@@ -104,8 +104,6 @@ def enable_structlog_filtering() -> None:
     structlog.configure(**kwargs)
 
 
-pd.set_option("future.no_silent_downcasting", True)
-
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
@@ -287,7 +285,7 @@ SUBSET = env.get("SUBSET", None)
 MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 5
+ETL_EPOCH = 6
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
@@ -311,11 +309,13 @@ TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 
 SENTRY_DSN = env.get("SENTRY_DSN")
 
-OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
-ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
-# NOTE: Nothing imports this constant, but the env var is read straight from the environment by
-# pydantic-ai's Google provider (chart-critic defaults to a Gemini model) and by scripts/vocabulary.
-GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
+# The wizard's AI summaries and `etl pr` use ANTHROPIC_API_KEY, which is also what local .env files
+# carry. The inspector and the chart critic can each have their own key, so their spend shows up
+# separately and a leaked key can be revoked without taking the others down; both fall back to
+# ANTHROPIC_API_KEY.
+ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY")
+ANTHROPIC_API_KEY_INSPECTOR = env.get("ANTHROPIC_API_KEY_INSPECTOR") or ANTHROPIC_API_KEY
+ANTHROPIC_API_KEY_CHART_CRITIC = env.get("ANTHROPIC_API_KEY_CHART_CRITIC") or ANTHROPIC_API_KEY
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 

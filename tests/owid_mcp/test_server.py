@@ -4,9 +4,14 @@ import pandas as pd
 import pytest
 from fastmcp import Client
 from fastmcp.exceptions import ToolError
+from fastmcp.server.middleware import MiddlewareContext
 from mcp.types import TextContent
 
-from owid_mcp.server import mcp
+from owid_mcp.server import RequestLoggingMiddleware, mcp
+
+# These tests call live services (Datasette, the indicators API, search.owid.io), so a blip there fails CI. Run them
+# with `make test-integration`; the whole module goes away with owid_mcp after its shutdown (#6921).
+pytestmark = pytest.mark.integration
 
 
 @pytest.mark.asyncio
@@ -51,7 +56,7 @@ async def test_fetch_indicator_data_tool():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -89,7 +94,7 @@ async def test_fetch_indicator_data_tool_for_entity():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118, "entity": "USA"})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -115,7 +120,7 @@ async def test_fetch_indicator_metadata_tool():
         result = await client.call_tool("fetch_indicator_metadata", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -479,3 +484,68 @@ async def test_fetch_chart_image_unknown_slug():
             await client.call_tool("fetch_chart_image", {"id": "this-chart-slug-does-not-exist"})
 
         assert "search_chart" in str(exc_info.value)
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_non_redistributable():
+    """Test that a chart whose data grapher refuses to share returns grapher's reason, not a masked error."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_data", {"id": "annual-number-of-deaths-by-cause"})
+
+        message = str(exc_info.value)
+        assert "non-redistributable" in message
+        assert "https://ourworldindata.org/grapher/annual-number-of-deaths-by-cause" in message
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_follows_redirect():
+    """Test that a renamed chart slug is followed to its new location."""
+    async with Client(mcp) as client:
+        output = await client.call_tool(
+            "fetch_chart_data", {"id": "share-electricity-renewables", "time": "2020..2020", "countries": "DEU"}
+        )
+        assert output.structured_content["metadata"]["rows"] > 0  # ty: ignore
+
+
+@pytest.mark.asyncio
+async def test_tool_results_carry_shutdown_notice():
+    """Test that every tool result tells the caller about the shutdown exactly once, even on cache hits."""
+    async with Client(mcp) as client:
+        assert "github.com/owid/skills" in (client.instructions or "")
+        for _ in range(2):  # the second call is served from the response cache
+            output = await client.call_tool("search_chart", {"query": "population"})
+            notices = [c for c in output.content if isinstance(c, TextContent) and "github.com/owid/skills" in c.text]
+            assert len(notices) == 1
+
+
+@pytest.mark.asyncio
+async def test_tool_errors_carry_shutdown_notice():
+    """Test that a failing tool call also tells the caller about the shutdown, exactly once."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("run_sql", {"query": "DELETE FROM charts"})
+        assert "Only SELECT statements are allowed" in str(exc_info.value)
+        assert str(exc_info.value).count("github.com/owid/skills") == 1
+
+
+@pytest.mark.asyncio
+async def test_connect_time_methods_succeed():
+    """Test the requests clients send on connect, whose middleware message is a plain dict rather than a model."""
+    # Connect the way today's clients do: the legacy initialize handshake, where ping exists.
+    async with Client(mcp, mode="legacy") as client:
+        assert await client.ping()
+        assert await client.list_resources() == []
+        assert await client.list_resource_templates() == []
+        assert await client.list_prompts() == []
+
+
+@pytest.mark.asyncio
+async def test_request_logging_accepts_initialize_without_params():
+    """An initialize sent without params reaches the middleware with message=None."""
+    context = MiddlewareContext(message=None, method="initialize")
+
+    async def call_next(ctx):
+        return "ok"
+
+    assert await RequestLoggingMiddleware().on_message(context, call_next) == "ok"

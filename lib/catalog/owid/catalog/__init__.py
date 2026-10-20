@@ -6,6 +6,7 @@ from owid.catalog.core import processing, tables, utils
 from owid.catalog.core.datasets import CHANNEL, Dataset
 from owid.catalog.core.indicators import Indicator, Variable
 from owid.catalog.core.meta import (
+    ChangelogEntry,
     DatasetMeta,
     License,
     Origin,
@@ -28,6 +29,7 @@ __all__ = [
     "Indicator",
     # Metadata classes
     "DatasetMeta",
+    "ChangelogEntry",
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",

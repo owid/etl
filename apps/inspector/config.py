@@ -1,10 +1,5 @@
 """Configuration for the inspector app."""
 
-from etl.paths import BASE_DIR
-
-# Path to shared model pricing configuration
-MODELS_YAML_PATH = BASE_DIR / "apps" / "utils" / "llms" / "models.yml"
-
 # Claude model configuration
 # Choose model based on speed vs quality tradeoff:
 # - Haiku: Fastest and cheapest, but misses too many semantic issues to be the default
@@ -13,7 +8,7 @@ MODELS_YAML_PATH = BASE_DIR / "apps" / "utils" / "llms" / "models.yml"
 # - Opus: Highest quality, noticeably slower and more expensive. Reach for it on
 #   high-stakes audits where you can absorb the cost.
 
-# Mapping from YAML model names to Anthropic API model names
+# Mapping from pydantic-ai model names to Anthropic API model names
 MODEL_API_NAMES = {
     "anthropic:claude-haiku-4-5": "claude-haiku-4-5-20251001",
     "anthropic:claude-sonnet-4-6": "claude-sonnet-4-6",
@@ -44,40 +39,6 @@ INSTRUCTION_BUFFER_TOKENS = 5_000  # Buffer for prompt instructions
 CONTEXT_LENGTH_SHORT = 200  # Short context for issue display
 CONTEXT_LENGTH_MEDIUM = 300  # Medium context for grouping
 CONTEXT_LENGTH_LONG = 500  # Long context for debugging
-
-
-def _load_model_pricing() -> dict[str, dict[str, float]]:
-    """Load model pricing from the wizard YAML configuration.
-
-    Returns:
-        Dictionary mapping API model names to pricing info with 'input' and 'output' keys.
-        For models with tiered pricing, uses the first tier (lowest price).
-    """
-    from apps.utils.llms import LLM_MODELS_COST
-
-    def _parse_cost(cost):
-        if isinstance(cost, (int, float)):
-            return float(cost)
-        elif isinstance(cost, dict) and "value" in cost and "brackets" in cost:
-            return float(cost["value"][0])  # Return the lowest tier price
-        else:
-            raise ValueError("Invalid cost format")
-        return cost
-
-    pricing = {
-        MODEL_API_NAMES.get(k, k): {
-            "input": _parse_cost(v["in"]),
-            "output": _parse_cost(v["out"]),
-        }
-        for k, v in LLM_MODELS_COST.items()
-    }
-
-    return pricing
-
-
-# Model pricing (USD per million tokens)
-# Loaded from apps/utils/llms/models.yml
-MODEL_PRICING = _load_model_pricing()
 
 # Fields to inspect for typos and semantic issues
 # Both codespell and Claude AI will check these fields

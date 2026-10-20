@@ -43,8 +43,8 @@ def run(dest_dir: str) -> None:
 
     # Dtypes
     str_types = ["sourcelong", "tname", "GMI", "country", "type", "source"]
-    tb_counts = tb_counts.astype({col: "string" for col in str_types})
-    tb_rates = tb_rates.astype({col: "string" for col in str_types})
+    tb_counts = tb_counts.astype({col: "str" for col in str_types})
+    tb_rates = tb_rates.astype({col: "str" for col in str_types})
 
     # Drop spurious data
     tb_counts = tb_counts.loc[tb_counts["source"] != "True"]

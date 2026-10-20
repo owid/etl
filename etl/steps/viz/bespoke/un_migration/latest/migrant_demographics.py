@@ -5,8 +5,8 @@ The feed is built from the `migrant_stock_age_sex` garden dataset, and comes out
 visualization shows, and every entity with the code naming its file, plus one
 `migrant-demographics.<code>.json` per entity holding that entity's migrant stock by sex and
 five-year age band (`m`/`f`) alongside the resident population on the same bands (`pm`/`pf`), which
-the visualization subtracts one from the other to get the population born in the country. Alongside
-them goes `metadata.json`, the feed's provenance derived from the garden columns
+the visualization subtracts one from the other to get the population born in the country. The
+metadata JSON also carries the feed's provenance derived from the garden columns
 (see `etl.viz.bespoke`).
 
 Entities are named by their UN M49 location code rather than by a slug, because that is the file
@@ -30,7 +30,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -172,27 +172,29 @@ def run() -> None:
             "Migrant stock": metadata_column(tb, "migrant_stock"),
             "Resident population": metadata_column(tb, "population"),
         },
-        update_period_days=ds_garden.metadata.update_period_days,
+        # The UN's latest release (2024) dropped the age-and-sex breakdowns, which is why this feed
+        # still uses the 2020 one, and it is unclear whether the next release will bring them back.
+        # So we publish no update schedule for this feed.
+        update_period_days=None,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
+    # For the same reason, leave out when the data was last fetched.
+    for origin in feed_metadata["origins"]:
+        origin.pop("dateAccessed", None)
 
-    save_json(
-        {
-            "meta": {
-                "title": FEED_TITLE,
-                "source": feed_metadata["feed"]["citation"],
-                "unit": "persons",
-                "note": FEED_NOTE,
-            },
-            "ageBands": AGE_GROUPS,
-            "years": years,
-            "entities": [
-                {"code": int(code), "name": country}
-                for code, country in zip(entities["location_code"], entities["country"])
-            ],
+    manifest = {
+        "meta": {
+            "title": FEED_TITLE,
+            "unit": "persons",
+            "note": FEED_NOTE,
         },
-        INDEX_FILENAME,
-    )
+        "ageBands": AGE_GROUPS,
+        "years": years,
+        "entities": [
+            {"code": int(code), "name": country}
+            for code, country in zip(entities["location_code"], entities["country"])
+        ],
+    }
+    save_json(add_feed_metadata(manifest, feed_metadata), INDEX_FILENAME)
 
     for code, country in tqdm(
         zip(entities["location_code"], entities["country"]), total=len(entities), desc="Writing entity files"
@@ -202,7 +204,7 @@ def run() -> None:
 
     log.info(
         "migrant_demographics.written",
-        n_files=len(entities) + 2,
+        n_files=len(entities) + 1,
         n_entities=len(entities),
         dest=str(paths.output_dir),
     )

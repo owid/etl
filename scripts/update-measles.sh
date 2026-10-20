@@ -2,10 +2,12 @@
 #
 #  update-measles.sh
 #
-#  Update wildfires dataset data://garden/health/latest/measles_long_run
+#  Update measles dataset data://garden/health/latest/measles_long_run
 #
 
 set -e
+
+source "$(dirname "$0")/commit-snapshots.sh"
 
 start_time=$(date +%s)
 
@@ -14,9 +16,7 @@ cd /home/owid/etl
 
 uv run etls cdc/latest/measles_cases
 
-# Files this job owns. Several update-*.sh jobs run concurrently against this same
-# checkout, so we only ever stage and commit these - `git add .` would sweep in another
-# job's half-written snapshots.
+# Files this job owns. commit_and_push_snapshots refuses to push a change to anything else.
 snapshot_files=(
     snapshots/cdc/latest/measles_cases.json.dvc
 )
@@ -24,9 +24,7 @@ snapshot_files=(
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'
 
-git add "${snapshot_files[@]}"
-git commit -m ":robot: automatic measles update" -- "${snapshot_files[@]}" || true
-git push origin master -q || true
+commit_and_push_snapshots ":robot: automatic measles update" "${snapshot_files[@]}"
 
 end_time=$(date +%s)
 

@@ -282,7 +282,7 @@ uv build
 # Package will be in dist/ directory
 ```
 
-Releases are **not** automatic: the version in `pyproject.toml` is bumped by hand, and pushing that bump to `master` is what triggers the PyPI publish. See [`DEVELOPMENT.md`](DEVELOPMENT.md) for the release checklist, versioning practice, and which checks actually cover this directory (the repo-root pre-commit hook does not).
+Releases are **not** automatic: the version in `pyproject.toml` is bumped by hand, and pushing that bump to `master` is what triggers the PyPI publish. So a PR that changes `owid/` or `pyproject.toml` bumps the version itself — an edit to `pyproject.toml` without a bump fails the publish on `master`. See [`DEVELOPMENT.md`](DEVELOPMENT.md) for the release checklist, versioning practice, and which checks actually cover this directory (the repo-root pre-commit hook does not).
 
 ## Configuration Files
 
@@ -292,6 +292,7 @@ Releases are **not** automatic: the version in `pyproject.toml` is bumped by han
 
 ## Important Notes
 
+- `skills/owid-catalog/SKILL.md` documents the `search()` / `fetch()` / `ResponseSet` API for AI agents doing analysis with the library, so update it in the same PR when that API changes
 - Python 3.11+ required — see `requires-python` in `pyproject.toml` for the supported range
 - This library is experimental - APIs may change
 - Extends ruff configuration from parent `../../pyproject.toml`

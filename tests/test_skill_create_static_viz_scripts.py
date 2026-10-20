@@ -100,6 +100,127 @@ def test_scaffold_is_ruff_clean(sketch):
         assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_scaffold_names_every_mark(sketch):
+    # A promoted sketch is a new step, and the skill asks new steps to pass the strict naming check.
+    verify = run(VERIFY, sketch, "--template", "horizontal", "--require-named-marks")
+    assert verify.returncode == 0, verify.stdout + verify.stderr
+
+
+# --- verify_static_viz.py: named marks --------------------------------------------------------------
+
+SVG_HEAD = (
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="850" height="638">'
+)
+
+
+def write_frame(tmp_path: Path, body: str) -> Path:
+    """A horizontal-template SVG and its sibling PNG, holding a named title and whatever `body` adds."""
+    from PIL import Image
+
+    stem = tmp_path / "frame"
+    title = '<g id="title"><text style="fill: #2d2e2d">Title</text></g>'
+    stem.with_suffix(".svg").write_text(f"{SVG_HEAD}{title}{body}</svg>")
+    Image.new("RGB", (850, 638), "white").save(stem.with_suffix(".png"))
+    return stem
+
+
+def test_unnamed_furniture_fails_only_when_required(tmp_path):
+    body = (
+        '<g id="row__bar"><path d="M0 0h10v10z" style="fill: #00295b"/></g>'
+        '<g id="line2d_1"><path d="M0 50h400" style="fill: none; stroke: #dddddd"/></g>'
+    )
+    stem = write_frame(tmp_path, body)
+    lenient = run(VERIFY, stem, "--template", "horizontal")
+    assert lenient.returncode == 0 and "1 unnamed marks" in lenient.stdout, lenient.stdout
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 1, strict.stdout
+    assert "1 painted mark(s)" in strict.stdout and "line2d_1 <path>" in strict.stdout
+
+
+def test_named_marks_ignore_what_paints_nothing_and_defs(tmp_path):
+    body = (
+        '<defs><path id="m0123456789" d="M0 0v4" style="stroke: #000000"/></defs>'
+        '<g id="patch_1"><path d="M0 0h850v638z" style="fill: none"/></g>'
+        '<g id="axis__x-ticks"><use xlink:href="#m0123456789" style="stroke: #000000"/></g>'
+        '<g id="line2d_2"><path d="M0 0h10" style="fill: none; stroke: #000000; stroke-opacity: 0"/></g>'
+    )
+    stem = write_frame(tmp_path, body)
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 0, strict.stdout
+
+
+def test_an_unnamed_raster_image_counts_as_a_mark(tmp_path):
+    # imshow / figimage emit <image>, which a designer styles like any other layer.
+    body = '<g id="image1"><image width="10" height="10" xlink:href="data:image/png;base64,AA=="/></g>'
+    stem = write_frame(tmp_path, body)
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 1 and "image1 <image>" in strict.stdout, strict.stdout
+
+
+def test_a_shared_gid_fails_only_when_required(tmp_path):
+    body = (
+        '<g id="series__same"><path d="M0 0h10" style="fill: none; stroke: #00295b"/></g>'
+        '<g id="series__same"><path d="M0 5h10" style="fill: none; stroke: #b13507"/></g>'
+    )
+    stem = write_frame(tmp_path, body)
+    assert run(VERIFY, stem, "--template", "horizontal").returncode == 0
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 1 and "series__same" in strict.stdout, strict.stdout
+
+
+# --- verify_static_viz.py: declared frame size -------------------------------------------------------
+
+
+def write_sized_frame(tmp_path: Path, width: int, height: int, unit: str = "") -> Path:
+    """A named SVG and its sibling PNG at a given frame size, in `unit` on the SVG root."""
+    from PIL import Image
+
+    stem = tmp_path / "frame"
+    w, h = (round(width * 0.72, 2), round(height * 0.72, 2)) if unit == "pt" else (width, height)
+    head = f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}{unit}" height="{h}{unit}">'
+    stem.with_suffix(".svg").write_text(f'{head}<g id="title"><text>Title</text></g></svg>')
+    Image.new("RGB", (width * 3, height * 3), "white").save(stem.with_suffix(".png"))
+    return stem
+
+
+def test_a_declared_size_replaces_the_template_ratio(tmp_path):
+    # A layout trimmed off its template on purpose fails the template check, and passes once declared.
+    stem = write_sized_frame(tmp_path, 850, 615)
+    template_only = run(VERIFY, stem, "--template", "horizontal")
+    assert template_only.returncode == 1 and "--size" in template_only.stdout, template_only.stdout
+    declared = run(VERIFY, stem, "--template", "horizontal", "--size", "frame=850x615")
+    assert declared.returncode == 0 and "frame matches declared 850x615" in declared.stdout, declared.stdout
+
+
+def test_a_declared_size_still_catches_a_crop(tmp_path):
+    stem = write_sized_frame(tmp_path, 850, 600)
+    result = run(VERIFY, stem, "--size", "frame=850x615")
+    assert result.returncode == 1 and "declared size is 850x615" in result.stdout, result.stdout
+
+
+def test_a_canvas_at_the_right_ratio_but_twice_the_scale_fails(tmp_path):
+    # matplotlib writes points, so an 850px frame is 612pt; at 1224pt every font would halve in Figma.
+    assert run(VERIFY, write_sized_frame(tmp_path, 850, 615, "pt"), "--size", "frame=850x615").returncode == 0
+    doubled = write_sized_frame(tmp_path, 1700, 1230, "pt")
+    for args in (["--size", "frame=850x615"], ["--template", "horizontal", "--size", "frame=850x615"]):
+        result = run(VERIFY, doubled, *args)
+        assert result.returncode == 1 and "the scale is 2x" in result.stdout, result.stdout
+
+
+@pytest.mark.parametrize("size", ["frame=850", "frame=850x0", "850x615", "frame=wxh"])
+def test_a_malformed_size_is_refused(tmp_path, size):
+    stem = write_sized_frame(tmp_path, 850, 615)
+    assert run(VERIFY, stem, "--size", size).returncode == 2
+
+
+def test_a_size_for_a_missing_output_is_refused(tmp_path):
+    # A typo in the stem would otherwise fall back to the template check without a word.
+    stem = write_sized_frame(tmp_path, 850, 615)
+    result = run(VERIFY, tmp_path, "--size", "fram=850x615")
+    assert result.returncode == 2 and "fram" in result.stderr, result.stderr
+    assert stem.with_suffix(".svg").exists()
+
+
 def test_scaffold_carries_the_promotion_markers(sketch):
     source = (sketch / "sketch.py").read_text()
     assert source.count("paths = SketchPaths(__file__)") == 1

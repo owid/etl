@@ -134,6 +134,16 @@ steps:
   viz://chart/energy/latest/fossil_fuels:
     - data://grapher/energy/2026-06-30/fossil_fuels
   #
+  # Energy - OWID Energy dataset (the wide file published on the catalog, combining the three datasets above).
+  #
+  data://garden/energy/2026-09-10/owid_energy:
+    - data://garden/energy/2026-06-30/energy_mix
+    - data://garden/energy/2026-06-30/electricity_mix
+    - data://garden/energy/2026-06-30/fossil_fuels
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+  #
   # IRENA - Renewable energy statistics.
   #
   data://garden/irena/2026-07-28/renewable_energy_statistics:
@@ -275,6 +285,11 @@ steps:
     - data://garden/energy/2026-06-30/electricity_mix
   viz://chart/energy/latest/electricity_mix:
     - data://grapher/energy/2026-06-30/electricity_mix
+  #
+  # Access to electricity MDim from WDI (share and number of people with and without access).
+  #
+  viz://chart/worldbank_wdi/latest/access_to_electricity:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
   #
   # Energy: global historical electricity scaling.
   #
