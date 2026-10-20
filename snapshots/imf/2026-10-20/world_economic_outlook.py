@@ -13,6 +13,8 @@ then the October 2026 one), so the version wildcard "+" (latest) is safe here. C
 output to confirm which release was fetched.
 """
 
+import csv
+import io
 import tempfile
 import time
 from pathlib import Path
@@ -72,18 +74,21 @@ def fetch_data() -> bytes:
                 raise
             time.sleep(30 * attempt)
 
-    # Sanity checks: the response is an SDMX-CSV file with observations for every indicator.
-    lines = response.content.decode().splitlines()
-    header = lines[0].split(",")
-    assert {"COUNTRY", "INDICATOR", "TIME_PERIOD", "OBS_VALUE", "LATEST_ACTUAL_ANNUAL_DATA"} <= set(header), (
+    # Sanity checks: the response is an SDMX-CSV file with observations for every indicator, all from one release.
+    # Parse it as CSV, since some fields (like SERIES_NAME) contain quoted commas.
+    reader = csv.DictReader(io.StringIO(response.content.decode()))
+    header = set(reader.fieldnames or [])
+    assert {"COUNTRY", "INDICATOR", "TIME_PERIOD", "OBS_VALUE", "LATEST_ACTUAL_ANNUAL_DATA"} <= header, (
         f"Unexpected header: {header}"
     )
-    assert len(lines) > 10_000, "Suspiciously few rows."
-    for indicator in INDICATORS:
-        assert any(f",{indicator},A," in line for line in lines[1:]), f"No data for {indicator}."
+    rows = list(reader)
+    assert len(rows) > 10_000, "Suspiciously few rows."
+    assert {row["INDICATOR"] for row in rows} == set(INDICATORS), "Unexpected or missing indicators."
+    releases = {(row["STRUCTURE_ID"], row["PUBLICATION_DATE"]) for row in rows}
+    assert len(releases) == 1, f"Data from more than one release: {releases}"
 
     # Log the dataflow version and publication date, to confirm which WEO release was fetched.
-    first_row = dict(zip(header, lines[1].split(",")))
-    log.info("weo.fetched", structure=first_row.get("STRUCTURE_ID"), publication_date=first_row.get("PUBLICATION_DATE"))
+    structure, publication_date = releases.pop()
+    log.info("weo.fetched", structure=structure, publication_date=publication_date)
 
     return response.content
