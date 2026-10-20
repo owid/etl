@@ -1,6 +1,6 @@
 """Load the WHO Mortality Database meadow dataset and create the garden dataset.
 
-Six tables come out:
+Seven tables come out:
 
 - `mortality_database`: deaths, death rates, age-standardized death rates and shares of total deaths,
   by country, year, sex and age group, for All Causes and the 23 cause groups that tile it.
@@ -13,6 +13,9 @@ Six tables come out:
   and for Malignant neoplasms itself (in `mortality_database`), which the childhood-cancer charts plot together.
 - `most_common_cancer`: the cancer type with the highest age-standardized death rate, per country, year
   and sex.
+- `broad_cause_groups`: the share of deaths from twelve broader groups that the 23 groups are merged into, plus
+  the deaths in groups WHO did not report, for both sexes and all ages (formerly the
+  deaths_from_cardiovascular_diseases_vs_other dataset), for a stacked chart that 23 series would crowd.
 - `causes`: one row per cause group, with its depth in WHO's cause tree (`cause_level`), its parent
   group, the ICD-10 codes that define it and the table it is published in. The codes are a property of
   the cause, not a dimension of the data, so they live here rather than in the fact tables' key.
@@ -132,6 +135,39 @@ DERIVED_AGE_GROUPS: list[tuple[list[str], dict[str, list[str]]]] = [
         },
     ),
 ]
+
+# The broader group each of the 23 partition groups is merged into, for broad_cause_groups.
+BROAD_CAUSE_GROUPS = {
+    "Congenital anomalies": "Congenital and maternal conditions",
+    "Maternal conditions": "Congenital and maternal conditions",
+    "Perinatal conditions": "Congenital and maternal conditions",
+    "Sudden infant death syndrome": "Congenital and maternal conditions",
+    "Diabetes mellitus, blood and endocrine disorders": "Endocrine and nutritional disorders",
+    "Nutritional deficiencies": "Endocrine and nutritional disorders",
+    "Digestive diseases": "Digestive and oral health",
+    "Oral conditions": "Digestive and oral health",
+    "Ill-defined diseases": "Ill-defined causes and injuries",
+    "Ill-defined injuries": "Ill-defined causes and injuries",
+    "Intentional injuries": "Ill-defined causes and injuries",
+    "Unintentional injuries": "Ill-defined causes and injuries",
+    "Infectious and parasitic diseases": "Infectious diseases",
+    "Respiratory infections": "Infectious diseases",
+    "Malignant neoplasms": "Cancer and neoplasms",
+    "Other neoplasms": "Cancer and neoplasms",
+    "Sense organ diseases": "Other diseases and conditions",
+    "Musculoskeletal diseases": "Other diseases and conditions",
+    "Skin diseases": "Other diseases and conditions",
+    "Neuropsychiatric conditions": "Neurological and mental health",
+    "Respiratory diseases": "Respiratory diseases",
+    "Cardiovascular diseases": "Cardiovascular diseases",
+    "Genitourinary diseases": "Genitourinary diseases",
+}
+# The rest of 100%: the deaths in the groups WHO did not report for a country-year.
+UNIDENTIFIED_CAUSES = "Unidentified causes"
+# WHO's own residuals, which correct_unintentional_injuries leaves alone below MATERIAL_EXCESS_DEATHS, can push the
+# groups over 100% and that rest below zero, in percentage points: in a small country a few deaths are a large
+# share (Brunei 2023: 9 deaths, 0.45 points). It is then set to zero.
+MAX_NEGATIVE_UNIDENTIFIED = 0.5
 
 # Causes that occur in one sex only. Deaths recorded for the other sex are coding errors in the source;
 # they are tolerated up to this share of the cause's deaths and logged.
@@ -283,14 +319,15 @@ def run() -> None:
 
     # Step 6: One table per layer - the partition tier, then one table per group of drill-downs - so the catalog
     # path says where a cause sits. Plus the leading cancer type, whose cause is a value rather than a key, so it
-    # cannot be a row of the fact tables.
+    # cannot be a row of the fact tables, and the broader groups, which are ours rather than WHO's.
     tables = _split_by_table(tb, tb_causes)
     tb_most_common_cancer = build_most_common_cancer(tb, tb_causes)
+    tb_broad_cause_groups = build_broad_cause_groups(tb, tb_causes)
     tb_causes = tb_causes.format(["cause"], short_name="causes")
 
     # Step 7: Save.
     ds_garden = paths.create_dataset(
-        tables=[*tables, tb_most_common_cancer, tb_causes],
+        tables=[*tables, tb_most_common_cancer, tb_broad_cause_groups, tb_causes],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
@@ -420,6 +457,39 @@ def build_most_common_cancer(tb: Table, tb_causes: Table) -> Table:
     )
     tb_top["cause"].metadata.origins = origins
     return tb_top.format(keys, short_name="most_common_cancer")
+
+
+def build_broad_cause_groups(tb: Table, tb_causes: Table) -> Table:
+    """Share of deaths from each group in BROAD_CAUSE_GROUPS, and from the groups WHO did not report, per country and year.
+
+    For both sexes and all ages only. A broad group's share is the sum of its groups' shares; a group WHO does not
+    report for a country-year counts as zero, and its deaths end up in UNIDENTIFIED_CAUSES, 100% minus the rest.
+    """
+    # Every partition group must be mapped, or its deaths would silently count as unidentified.
+    partition, mapped = set(_partition_groups(tb_causes)), set(BROAD_CAUSE_GROUPS)
+    assert partition == mapped, (
+        f"Partition groups missing from BROAD_CAUSE_GROUPS: {sorted(partition - mapped)}; "
+        f"mapped but not partition groups: {sorted(mapped - partition)}"
+    )
+
+    keys = ["country", "year", "cause"]
+    origins = tb["share_of_deaths"].metadata.origins
+    tb_groups = tb[(tb["sex"] == "Both sexes") & (tb["age_group"] == "all ages") & tb["cause"].isin(mapped)]
+    tb_groups = tb_groups[keys + ["share_of_deaths"]].reset_index(drop=True)
+    tb_groups["cause"] = tb_groups["cause"].astype(str).map(BROAD_CAUSE_GROUPS)
+    tb_groups = tb_groups.groupby(keys, observed=True, as_index=False)["share_of_deaths"].sum()
+
+    tb_unidentified = tb_groups.groupby(["country", "year"], observed=True, as_index=False)["share_of_deaths"].sum()
+    tb_unidentified["share_of_deaths"] = 100 - tb_unidentified["share_of_deaths"]
+    assert (tb_unidentified["share_of_deaths"] >= -MAX_NEGATIVE_UNIDENTIFIED).all(), (
+        "Broad cause groups add up to more than 100% of deaths"
+    )
+    tb_unidentified["share_of_deaths"] = tb_unidentified["share_of_deaths"].clip(lower=0)
+    tb_unidentified["cause"] = UNIDENTIFIED_CAUSES
+
+    tb_groups = pr.concat([tb_groups, tb_unidentified], ignore_index=True)
+    tb_groups["share_of_deaths"].metadata.origins = origins
+    return tb_groups.format(keys, short_name="broad_cause_groups")
 
 
 def _rename_categories(tb: Table, column: str, renames: dict[str, str]) -> Table:
