@@ -73,3 +73,6 @@ steps:
     - data://grapher/unicef/2026-01-07/child_migration
     - data://grapher/un/2025-07-03/refugee_data
     - data://grapher/regions/2023-01-01/regions
+  # archived; last active in d7da32ccb268 on 2026-10-20
+  viz://explorer/migration/latest/migration_flows:
+    - data://grapher/un/2025-03-18/migration_stock_flows
