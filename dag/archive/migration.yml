@@ -76,3 +76,11 @@ steps:
   # archived; last active in d7da32ccb268 on 2026-10-20
   viz://explorer/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
+  # archived; last active in d7da32ccb268 on 2026-10-20
+  viz://explorer/migration/2026-01-27/migration:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/idmc/2026-01-19/internal_displacement
+    - data://grapher/unicef/2026-01-07/child_migration
+    - data://grapher/un/2025-03-12/migrant_stock
+    - data://grapher/un/2025-07-03/refugee_data
