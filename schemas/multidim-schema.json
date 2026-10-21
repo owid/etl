@@ -369,8 +369,11 @@
             "examples_bad": [
                 [
                     "foreign_aid_given_climate",
+                    "/grapher/foreign-aid-given-climate"
+                ],
+                [
                     "Academic-Performance",
-                    "/grapher/academic-performance"
+                    "academic performance"
                 ]
             ]
         },
