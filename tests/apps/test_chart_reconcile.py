@@ -237,11 +237,54 @@ def test_pin_to_an_older_version_of_a_yaml_indicator_is_stale(repo):
 
 
 def test_dimensions_on_an_older_dataset_version_are_stale(repo):
-    patch = {"dimensions": [{"property": "y", "variableId": 6}, {"property": "y", "variableId": 2}]}
-    config, result = _reconcile(_step(repo), patch)
+    # Same indicators, order and display as the YAML, only on an older version: nothing to write.
+    patch = {
+        "dimensions": [
+            {"property": "y", "variableId": 6, "display": {"name": "Non-climate-related"}},
+            {"property": "y", "variableId": 2, "display": {"name": "Climate as main objective"}},
+        ]
+    }
+    step = _step(repo)
+    before = step.config_path.read_text()
+    config, result = _reconcile(step, patch)
     assert result.stale_pins == ["dimensions"]
     assert result.pulled == [] and result.already_in_etl == []
-    assert len(config["views"][0]["indicators"]["y"]) == 2
+    assert dump_config(config) == before
+
+
+def test_stale_dimensions_with_other_admin_edits_keep_those_edits(repo):
+    # An old id plus a new display name and an added indicator: the edits are copied, and the
+    # pin is still reported because the admin layer keeps the old id until it is cleared.
+    patch = {
+        "dimensions": [
+            {"property": "y", "variableId": 6, "display": {"name": "Not for climate"}},
+            {"property": "y", "variableId": 2, "display": {"name": "Climate as main objective"}},
+            {"property": "y", "variableId": 3},
+        ]
+    }
+    config, result = _reconcile(_step(repo), patch)
+    y = config["views"][0]["indicators"]["y"]
+    assert [_entry_path(e) for e in y] == [
+        "climate_related_oda_by_donor#non_climate",
+        "climate_related_oda_by_donor#climate_principal_objective",
+        "climate_related_oda_by_donor#climate_significant_objective",
+    ]
+    assert y[0]["display"]["name"] == "Not for climate"
+    assert result.stale_pins == ["dimensions"]
+    assert result.pulled == ["dimensions"]
+    assert result.overrides_etl == ["dimensions"]
+
+
+def test_stale_dimensions_with_other_edits_are_leftovers_when_nobody_edited(repo):
+    patch = {"dimensions": [{"property": "y", "variableId": 6}, {"property": "y", "variableId": 2}]}
+    config, result = _reconcile(_step(repo), patch, edited_after_adoption=False)
+    assert result.stale_pins == ["dimensions"]
+    assert result.leftovers == ["dimensions"]
+    assert config["views"][0]["indicators"]["y"][0]["display"]["name"] == "Non-climate-related"
+
+
+def _entry_path(entry):
+    return entry if isinstance(entry, str) else entry["catalogPath"]
 
 
 def test_skipped_fields_are_left_out(repo):

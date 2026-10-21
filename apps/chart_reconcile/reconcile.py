@@ -237,13 +237,17 @@ def reconcile_fields(
             if problems:
                 result.needs_manual.extend(problems)
                 continue
-            if any(int(d["variableId"]) in resolver.stale_ids for d in value):
-                result.stale_pins.append(key)
-                continue
+            stale = any(int(d["variableId"]) in resolver.stale_ids for d in value)
             existing = _canonical_indicators(view.get("indicators"))
             if existing == _canonical_indicators(indicators):
-                result.already_in_etl.append(key)
-            elif existing and leftovers_possible:
+                # A pure stale pin writes nothing: the YAML already names the current versions.
+                (result.stale_pins if stale else result.already_in_etl).append(key)
+                continue
+            # Other admin edits (order, display, indicators) are handled as usual, but the admin layer
+            # keeps the old ids until it is cleared, so the pin is still reported.
+            if stale:
+                result.stale_pins.append(key)
+            if existing and leftovers_possible:
                 result.leftovers.append(key)
             else:
                 view["indicators"] = indicators
