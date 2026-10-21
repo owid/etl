@@ -14,7 +14,6 @@ the latest published chart version still ended at February 2026).
 
 import io
 
-import click
 import pandas as pd
 import requests
 
@@ -31,8 +30,6 @@ EXPECTED_COLUMNS = ["Use of AI", "Daily AI users", "Frequent AI users", "Total A
 TIMEOUT = 30
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool = True) -> None:
     snap = paths.init_snapshot()
 
@@ -55,7 +52,7 @@ def fetch_chart_data() -> pd.DataFrame:
 
 
 def sanity_check(df: pd.DataFrame) -> None:
-    assert len(df) >= 7, f"Expected at least the 7 survey waves published up to May 2026, got {len(df)} rows."
+    assert len(df) >= 8, f"Expected at least the 8 survey waves published up to August 2026, got {len(df)} rows."
     dates = pd.to_datetime(df["Use of AI"], format="%m/%d/%y")
     assert dates.is_monotonic_increasing and not dates.duplicated().any(), "Survey dates are not sorted and unique."
     shares = df[EXPECTED_COLUMNS[1:]]
