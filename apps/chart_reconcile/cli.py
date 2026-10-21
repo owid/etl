@@ -62,7 +62,7 @@ console = Console()
 
 @click.command(name="chart-reconcile", help=__doc__, cls=click.RichCommand)
 @click.argument("targets", nargs=-1)
-@click.option("--all", "select_all", is_flag=True, help="Every ETL-authored single chart in the repo.")
+@click.option("--all", "select_all", is_flag=True, help="Every ETL-authored single chart in the active DAG.")
 @click.option(
     "--dataset",
     default=None,
@@ -143,11 +143,13 @@ def _source_env(env_name: str | None) -> OWIDEnv:
 
 def _select(steps: list[ChartStep], select_all: bool, dataset: str | None, targets: tuple[str, ...]) -> list[ChartStep]:
     if select_all:
-        return list(steps)
+        # Only steps in the active DAG: a superseded config can still sit in the repo next to its
+        # replacement, sharing its `chart_config_id`. A config file named explicitly is still taken.
+        return [s for s in steps if s.dag_file is not None]
     selected = []
     if dataset:
         try:
-            selected += [s for s in steps if depends_on_dataset(s, dataset)]
+            selected += [s for s in steps if s.dag_file is not None and depends_on_dataset(s, dataset)]
         except ValueError as e:
             raise click.UsageError(str(e)) from None
     by_uri = {s.uri: s for s in steps}
@@ -165,12 +167,17 @@ def _select(steps: list[ChartStep], select_all: bool, dataset: str | None, targe
 def _select_by_chart_id(owid_env: OWIDEnv, steps: list[ChartStep], chart_ids: tuple[int, ...]) -> list[ChartStep]:
     query = text("SELECT id, configId FROM charts WHERE id IN :ids").bindparams(bindparam("ids", expanding=True))
     rows = _query(owid_env, query, {"ids": list(chart_ids)})
-    by_config_id = {s.chart_config_id: s for s in steps}
-    found = {row.id: by_config_id.get(str(row.configId).lower()) for row in rows}
+    found = {row.id: _step_for_config_id(steps, str(row.configId).lower()) for row in rows}
     unknown = [str(i) for i in chart_ids if found.get(i) is None]
     if unknown:
         raise click.UsageError(f"No ETL-authored chart config in the repo for chart id(s) {', '.join(unknown)}.")
     return [found[i] for i in chart_ids]  # ty: ignore[invalid-return-type]
+
+
+def _step_for_config_id(steps: list[ChartStep], chart_config_id: str) -> ChartStep | None:
+    """The step with this `chart_config_id`, preferring one in the active DAG over a superseded copy."""
+    matches = [s for s in steps if s.chart_config_id == chart_config_id]
+    return next((s for s in matches if s.dag_file is not None), matches[0] if matches else None)
 
 
 def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLayers]:
@@ -227,6 +234,8 @@ def _reconcile(
     pull_leftovers: bool,
 ) -> Result:
     result = Result(step=step)
+    if step.dag_file is None:
+        result.warnings.append(f"{step.uri} isn't in the active DAG; reconcile it only if you are adopting it.")
     if layers is None:
         result.missing = True
         return result

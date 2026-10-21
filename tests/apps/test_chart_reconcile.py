@@ -5,10 +5,13 @@ decides what to write: which charts are selected, how admin overrides land in th
 and how a step is renamed for slug drift.
 """
 
+from types import SimpleNamespace
+
 import pytest
 from click.testing import CliRunner
 
-from apps.chart_reconcile.cli import cli
+from apps.chart_reconcile.cli import _reconcile as _reconcile_step
+from apps.chart_reconcile.cli import _select, _step_for_config_id, cli
 from apps.chart_reconcile.reconcile import (
     ChartLayers,
     Result,
@@ -416,6 +419,39 @@ def test_adopting_an_admin_only_chart_fills_an_empty_view(repo):
     assert result.pulled == ["title", "dimensions"]
     # Nothing was set in the YAML, so nothing ETL-authored is being replaced.
     assert result.overrides_etl == []
+
+
+def _repo_with_superseded_copy(repo):
+    """Add an older version of the chart's config, still on disk but no longer in the DAG."""
+    step_dir, dag_dir = repo
+    old_dir = step_dir / "viz" / "chart" / "oecd" / "2025-01-01"
+    old_dir.mkdir(parents=True)
+    (old_dir / "share_of_foreign_aid_given_that_is_climate_related.config.yml").write_text(CONFIG_YAML)
+    return find_chart_steps(step_dir, dag_dir)
+
+
+def test_all_and_dataset_select_only_steps_in_the_active_dag(repo):
+    steps = _repo_with_superseded_copy(repo)
+    assert len(steps) == 2
+    active = "viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related"
+    assert [s.uri for s in _select(steps, True, None, ())] == [active]
+    assert [s.uri for s in _select(steps, False, "oecd/climate_related_official_development_assistance", ())] == [
+        active
+    ]
+    # Looking a chart up by its id lands on the active step, not the superseded copy.
+    found = _step_for_config_id(steps, UUID)
+    assert found is not None and found.uri == active
+
+
+def test_explicit_target_outside_the_dag_is_reconciled_with_a_warning(repo):
+    steps = _repo_with_superseded_copy(repo)
+    old_uri = "viz://chart/oecd/2025-01-01/share_of_foreign_aid_given_that_is_climate_related"
+    (step,) = _select(steps, False, None, (old_uri,))
+    assert step.dag_file is None
+    layers = ChartLayers(chart_id=9287, patch={"slug": step.slug}, slug=step.slug)
+    env = SimpleNamespace(admin_site="http://localhost/admin")
+    result = _reconcile_step(step, layers, env, False, True, (), False)
+    assert any("isn't in the active DAG" in w for w in result.warnings)
 
 
 def test_cli_requires_a_selection():
