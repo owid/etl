@@ -388,6 +388,24 @@ def test_expect_rejects_unknown_operator():
         )
 
 
+def test_schema_locators():
+    # The schema accepts entity + years, match, or both; and rejects what _validate_correction rejects.
+    jsonschema = pytest.importorskip("jsonschema")
+    validator = jsonschema.Draft7Validator(json.loads((BASE_DIR / "schemas" / "corrections-schema.json").read_text()))
+    base = {"indicator": "v", "action": "drop", "reason": "r", "producer": "p", "status": "open"}
+
+    def valid(**locator):
+        return validator.is_valid([{**base, **locator}])
+
+    assert valid(entity="Malta", years=[1981])
+    assert valid(match={"age_group": "over 85"})
+    assert valid(entity="Malta", years=[1981], match={"age_group": "over 85"})
+    assert not valid()
+    assert not valid(years=[1981], match={"age_group": "over 85"})
+    assert not valid(entity="Malta", years=[1981], match={"year": 1981})
+    assert not valid(entity="Malta", years=[1981], match={"country": "Malta"})
+
+
 def test_all_repo_corrections_match_schema():
     """Every `.corrections.yml` in the repo must validate against schemas/corrections-schema.json
     (the same schema VSCode uses), so the editor lint and CI agree."""
