@@ -313,6 +313,9 @@ def run() -> None:
     _validate_cause_partition(
         tb, tb_causes, min_share_consistent=PARTITION_MIN_SHARE_AFTER_CORRECTION, stage="after correction"
     )
+    # Rates WHO computed on a broken population (see the .corrections.yml). Before the derived age bands, which
+    # recover their population from the same rates.
+    tb = paths.apply_corrections(tb)
 
     # Step 5: Age bands WHO does not publish, for the tables whose charts use them, on WHO's own population.
     tb = add_derived_age_groups(tb, tb_causes)

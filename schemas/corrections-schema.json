@@ -66,7 +66,7 @@
         "type": "object",
         "minProperties": 1,
         "additionalProperties": { "$ref": "#/definitions/matchValue" },
-        "description": "Locate rows by their current value(s), e.g. {value: 4.5}, or by comparison to another column of the same row, e.g. {value: {column: free_range}}. Mutually exclusive with entity/years."
+        "description": "Locate rows by their current value(s), e.g. {value: 4.5}, or by comparison to another column of the same row, e.g. {value: {column: free_range}}. Can be combined with entity + years to narrow the table's other columns (e.g. {age_group: over 85 years}); it then must not repeat the entity or year."
       },
       "action": {
         "enum": ["drop", "override", "scale", "flag"],
@@ -113,17 +113,20 @@
         "description": "Date we reported the error to the producer (optional)."
       }
     },
-    "oneOf": [
-      {
-        "required": ["entity", "years"],
-        "not": { "required": ["match"] }
-      },
-      {
-        "required": ["match"],
-        "not": { "anyOf": [{ "required": ["entity"] }, { "required": ["years"] }] }
-      }
-    ],
+    "dependencies": {
+      "entity": ["years"],
+      "years": ["entity"]
+    },
+    "anyOf": [{ "required": ["entity", "years"] }, { "required": ["match"] }],
     "allOf": [
+      {
+        "if": { "required": ["entity", "match"] },
+        "then": {
+          "properties": {
+            "match": { "not": { "anyOf": [{ "required": ["country"] }, { "required": ["year"] }] } }
+          }
+        }
+      },
       {
         "if": { "properties": { "action": { "const": "override" } }, "required": ["action"] },
         "then": { "required": ["value"] }
