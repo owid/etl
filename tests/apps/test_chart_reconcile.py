@@ -1,0 +1,276 @@
+"""Tests for `etl chart-reconcile` (apps.chart_reconcile).
+
+The database reads aren't covered here (they need a grapher DB). What's tested is the part that
+decides what to write: which charts are selected, how admin overrides land in the config YAML,
+and how a step is renamed for slug drift.
+"""
+
+import pytest
+from click.testing import CliRunner
+
+from apps.chart_reconcile.cli import cli
+from apps.chart_reconcile.reconcile import (
+    ChartLayers,
+    Result,
+    depends_on_dataset,
+    dump_config,
+    field_overrides,
+    find_chart_steps,
+    load_config,
+    reconcile_fields,
+    rename_step,
+    slug_target,
+    variable_ids_in_patch,
+)
+
+UUID = "01a139ce-1a6c-7753-99e9-6e82d73686c0"
+DATASET = "data://grapher/oecd/2026-10-07/climate_related_official_development_assistance"
+VAR_PREFIX = "grapher/oecd/2026-10-07/climate_related_official_development_assistance/"
+
+CONFIG_YAML = f"""\
+chart_config_id: {UUID}
+grapher_schema: "011"
+dimensions: []
+views:
+  - dimensions: {{}}
+    indicators:
+      y:
+        # The comment above the first indicator must survive.
+        - catalogPath: "climate_related_oda_by_donor#non_climate"
+          display:
+            name: "Non-climate-related"
+        - catalogPath: "climate_related_oda_by_donor#climate_principal_objective"
+          display:
+            name: "Climate as main objective"
+    config:
+      title: "Foreign aid given for climate"
+      note: "Old note."
+      map:
+        colorScale:
+          baseColorScheme: "YlGn"
+"""
+
+DAG_YAML = f"""\
+steps:
+  # Climate-related ODA charts — authored in ETL.
+  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+    - {DATASET}
+"""
+
+VARIABLE_PATHS = {
+    1: VAR_PREFIX + "climate_related_oda_by_donor#non_climate",
+    2: VAR_PREFIX + "climate_related_oda_by_donor#climate_principal_objective",
+    3: VAR_PREFIX + "climate_related_oda_by_donor#climate_significant_objective",
+    4: "grapher/other/2024-01-01/other_dataset/some_table#some_column",
+}
+
+
+@pytest.fixture
+def repo(tmp_path):
+    """A minimal repo with one ETL-authored chart and its DAG entry."""
+    step_dir = tmp_path / "steps"
+    chart_dir = step_dir / "viz" / "chart" / "oecd" / "latest"
+    chart_dir.mkdir(parents=True)
+    (chart_dir / "share_of_foreign_aid_given_that_is_climate_related.config.yml").write_text(CONFIG_YAML)
+    # An mdim without chart_config_id must not be picked up.
+    (chart_dir / "some_mdim.config.yml").write_text("dimensions: []\nviews: []\n")
+    dag_dir = tmp_path / "dag"
+    dag_dir.mkdir()
+    (dag_dir / "main.yml").write_text(DAG_YAML)
+    return step_dir, dag_dir
+
+
+def _step(repo):
+    step_dir, dag_dir = repo
+    (step,) = find_chart_steps(step_dir, dag_dir)
+    return step
+
+
+def _reconcile(step, patch, skip_fields=()):
+    config = load_config(step.config_path)
+    layers = ChartLayers(chart_id=9287, patch=patch, slug=patch.get("slug"))
+    layers.variable_paths = {i: VARIABLE_PATHS.get(i) for i in variable_ids_in_patch(patch)}
+    result = Result(step=step)
+    reconcile_fields(step, config, layers, result, skip_fields)
+    return config, result
+
+
+def test_finds_single_charts_with_their_dag_entry(repo):
+    step = _step(repo)
+    assert step.uri == "viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related"
+    assert step.chart_config_id == UUID
+    assert step.dependencies == {DATASET}
+    assert step.dag_file is not None and step.dag_file.name == "main.yml"
+
+
+@pytest.mark.parametrize(
+    "dataset, expected",
+    [
+        ("oecd/2026-10-07/climate_related_official_development_assistance", True),
+        ("oecd/climate_related_official_development_assistance", True),
+        (DATASET, True),
+        ("oecd/2025-01-01/climate_related_official_development_assistance", False),
+        ("oecd/official_development_assistance", False),
+    ],
+)
+def test_selects_charts_by_dataset(repo, dataset, expected):
+    assert depends_on_dataset(_step(repo), dataset) is expected
+
+
+def test_identity_keys_are_not_drift():
+    patch = {"$schema": "x", "id": 1, "slug": "s", "version": 3, "isPublished": True, "title": "T"}
+    assert field_overrides(patch) == {"title": "T"}
+
+
+def test_pulls_scalars_and_merges_objects(repo):
+    patch = {
+        "slug": "share-of-foreign-aid-given-that-is-climate-related",
+        "note": "New note.",
+        "hideTimeline": True,
+        "map": {"colorScale": {"binningStrategy": "manual"}},
+    }
+    config, result = _reconcile(_step(repo), patch)
+    view_config = config["views"][0]["config"]
+    assert view_config["note"] == "New note."
+    assert view_config["hideTimeline"] is True
+    # Nested objects merge: the YAML's colorScale keeps its own keys.
+    assert dict(view_config["map"]["colorScale"]) == {"baseColorScheme": "YlGn", "binningStrategy": "manual"}
+    assert result.pulled == ["note", "hideTimeline", "map"]
+    # Only `note` replaced a value the YAML set; the other two only added keys.
+    assert result.overrides_etl == ["note"]
+
+
+def test_dimensions_replace_indicators_in_admin_order(repo):
+    patch = {
+        "dimensions": [
+            {"property": "y", "variableId": 2, "display": {"name": "Main objective"}},
+            {"property": "y", "variableId": 3},
+            {"property": "y", "variableId": 1, "display": {"name": "Non-climate-related"}},
+        ]
+    }
+    config, result = _reconcile(_step(repo), patch)
+    y = config["views"][0]["indicators"]["y"]
+    assert [e if isinstance(e, str) else e["catalogPath"] for e in y] == [
+        "climate_related_oda_by_donor#climate_principal_objective",
+        # Not in the YAML yet: named relative to the step's only grapher dependency.
+        "climate_related_oda_by_donor#climate_significant_objective",
+        "climate_related_oda_by_donor#non_climate",
+    ]
+    assert y[0]["display"] == {"name": "Main objective"}
+    assert result.pulled == ["dimensions"]
+    assert result.overrides_etl == ["dimensions"]
+
+
+def test_column_slugs_are_mapped_back_to_paths(repo):
+    patch = {"sortColumnSlug": "2", "map": {"columnSlug": "1"}}
+    config, result = _reconcile(_step(repo), patch)
+    view_config = config["views"][0]["config"]
+    assert view_config["sortColumnSlug"] == "climate_related_oda_by_donor#climate_principal_objective"
+    assert view_config["map"]["columnSlug"] == "climate_related_oda_by_donor#non_climate"
+    assert not result.needs_manual
+
+
+def test_values_already_in_the_yaml_are_reported_not_rewritten(repo):
+    # E.g. after a version bump: the patch names old variable ids, the YAML the same short paths.
+    patch = {
+        "title": "Foreign aid given for climate",
+        "dimensions": [
+            {"property": "y", "variableId": 1, "display": {"name": "Non-climate-related"}},
+            {"property": "y", "variableId": 2, "display": {"name": "Climate as main objective"}},
+        ],
+    }
+    step = _step(repo)
+    before = step.config_path.read_text()
+    config, result = _reconcile(step, patch)
+    assert result.pulled == []
+    assert result.already_in_etl == ["title", "dimensions"]
+    assert dump_config(config) == before
+
+
+def test_indicator_from_an_unrelated_dataset_needs_manual_fix(repo):
+    patch = {"dimensions": [{"property": "y", "variableId": 4}], "title": "New title"}
+    config, result = _reconcile(_step(repo), patch)
+    assert result.pulled == ["title"]
+    assert len(result.needs_manual) == 1 and "doesn't depend on" in result.needs_manual[0]
+    # The indicators were left alone.
+    assert len(config["views"][0]["indicators"]["y"]) == 2
+
+
+def test_skipped_fields_are_left_out(repo):
+    config, result = _reconcile(
+        _step(repo), {"title": "Stale admin title", "note": "New note."}, skip_fields=("title",)
+    )
+    assert config["views"][0]["config"]["title"] == "Foreign aid given for climate"
+    assert result.pulled == ["note"]
+    assert result.skipped == ["title"]
+
+
+def test_comments_and_key_order_survive(repo):
+    config, _ = _reconcile(_step(repo), {"note": "New note."})
+    text = dump_config(config)
+    assert "# The comment above the first indicator must survive." in text
+    assert text.splitlines()[0] == f"chart_config_id: {UUID}"
+    assert 'note: "New note."' in text
+
+
+def test_slug_drift_maps_admin_slug_to_short_name(repo):
+    step = _step(repo)
+    layers = ChartLayers(chart_id=9287, patch={"slug": "foreign-aid-given-climate"}, slug="foreign-aid-given-climate")
+    assert slug_target(step, layers) == ("foreign_aid_given_climate", None)
+    in_sync = ChartLayers(chart_id=9287, patch={"slug": step.slug}, slug=step.slug)
+    assert slug_target(step, in_sync) == (None, None)
+
+
+def test_rename_step_moves_files_and_dag_entry(repo):
+    step_dir, dag_dir = repo
+    step = _step(repo)
+    step.config_path.with_name(f"{step.short_name}.py").write_text("# code\n")
+
+    rename_step(step, "foreign_aid_given_climate", dag_dir)
+
+    folder = step.config_path.parent
+    assert (folder / "foreign_aid_given_climate.config.yml").read_text() == CONFIG_YAML
+    assert (folder / "foreign_aid_given_climate.py").exists()
+    assert not step.config_path.exists()
+    dag_text = (dag_dir / "main.yml").read_text()
+    assert "viz://chart/oecd/latest/foreign_aid_given_climate:" in dag_text
+    assert "share_of_foreign_aid_given_that_is_climate_related" not in dag_text
+    assert "# Climate-related ODA charts — authored in ETL." in dag_text
+    # The renamed step is still found, with the same identity.
+    (renamed,) = find_chart_steps(step_dir, dag_dir)
+    assert renamed.short_name == "foreign_aid_given_climate" and renamed.chart_config_id == UUID
+
+
+def test_rename_step_refuses_to_clobber(repo):
+    _, dag_dir = repo
+    step = _step(repo)
+    taken = step.config_path.with_name("foreign_aid_given_climate.config.yml")
+    taken.write_text("chart_config_id: other\n")
+    with pytest.raises(FileExistsError, match="already taken"):
+        rename_step(step, "foreign_aid_given_climate", dag_dir)
+    # Nothing moved.
+    assert step.config_path.exists()
+    assert "share_of_foreign_aid_given_that_is_climate_related" in (dag_dir / "main.yml").read_text()
+
+
+def test_adopting_an_admin_only_chart_fills_an_empty_view(repo):
+    step = _step(repo)
+    step.config_path.write_text(f"chart_config_id: {UUID}\ndimensions: []\nviews:\n  - dimensions: {{}}\n")
+    patch = {"title": "From the admin", "dimensions": [{"property": "y", "variableId": 1}]}
+    config, result = _reconcile(step, patch)
+    view = config["views"][0]
+    assert view["indicators"]["y"] == ["climate_related_oda_by_donor#non_climate"]
+    assert view["config"]["title"] == "From the admin"
+    assert result.pulled == ["title", "dimensions"]
+    # Nothing was set in the YAML, so nothing ETL-authored is being replaced.
+    assert result.overrides_etl == []
+
+
+def test_cli_requires_a_selection():
+    result = CliRunner().invoke(cli, [])
+    assert result.exit_code != 0
+    assert "Name the charts" in result.output
+
+
+def test_patch_without_indicator_references_needs_no_lookup():
+    assert variable_ids_in_patch({"title": "T", "map": {"colorScale": {}}}) == set()

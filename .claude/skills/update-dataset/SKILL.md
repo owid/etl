@@ -57,6 +57,7 @@ Assumptions:
 - [ ] Run the adversarial review (`/fact-check-dataset`) as a background agent once the garden step is built, with effort scaled to the update (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
+- [ ] Reconcile the dataset's ETL-authored single charts with the admin (`/reconcile-chart`) before pushing their `viz://chart` steps: pull admin drift into the YAML, list it in the PR description, and confirm `in sync` on staging afterwards (see step 7)
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Run `check-hardcoded-years` after all remaps — numeric time pins below the new data's latest time hide the update; propose `"latest"` fixes with user sign-off (see step 7)
 - [ ] Run the empty-entity audit (`check-empty-entities`) as a background agent after the indicator upgrade: full automated pass, scaled follow-up; regressions vs production = fix, pre-existing = document (see step 7)
@@ -672,6 +673,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
      If the count is 0, the upgrade did not run — re-run it.
+   - **Reconcile ETL-authored single charts with the admin first (mandatory when the dataset has any).** A single chart in `etl/steps/viz/chart/` (one with `chart_config_id`) can carry edits made in the admin, and those win over ETL. A `dimensions` override is the dangerous one: it keeps the chart on the **old** variable ids after its step is repointed, because the admin copy of the array wins whole. Before pushing the chart steps below, run the **`reconcile-chart` skill**:
+     ```bash
+     .venv/bin/etl chart-reconcile --dataset <namespace>/<short_name> --apply   # reads staging-site-master (mirrors production)
+     ```
+     Fold whatever it pulls (fields, and steps renamed for slug drift, with their `etl archive-dag` follow-up) into this PR, and list it per chart in the PR description. Judge every field it reports as replacing an ETL value, as the skill describes. After the chart steps are pushed to staging, re-run it with `--env <branch>` (no `--apply`): every chart must report `in sync`. `already in ETL` on `dimensions` means the admin patch still names old ids: run the indicator upgrade and push the step again.
    - **The auto-upgrader only remaps grapher charts — NOT ETL-defined explorers or MDims.** Explorers (`viz://explorer/...`) and multidims (`viz://chart/...`) reference indicators by catalog path and are rebuilt by running their **viz steps**, which the indicator-upgrader never touches. If the dataset has any (check the DAG: `rg "viz://(explorer|chart)/.*/<short_name>" dag/ -g "*.yml"`), they'll still point at the **old** variables on staging until you re-run them:
      ```bash
      STAGING=<branch> .venv/bin/etlr viz://explorer/<ns>/latest/<short> viz://chart/<ns>/latest/<short> ... --grapher

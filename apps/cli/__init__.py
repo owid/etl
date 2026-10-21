@@ -169,6 +169,7 @@ GROUPS = (
             "commands": {
                 "chart-config-id": "apps.chart_config_id.cli.cli",
                 "chart-critic": "apps.chart_critic.cli.cli",
+                "chart-reconcile": "apps.chart_reconcile.cli.cli",
                 "chart-sync": "apps.chart_sync.cli.cli",
                 "approve": "apps.chart_approval.cli.cli",
                 "related-charts": "apps.related_charts.cli.cli",

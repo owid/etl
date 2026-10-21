@@ -1,0 +1,449 @@
+"""Pure logic behind `etl chart-reconcile`: fold a chart's admin overrides into its ETL config.
+
+An ETL-authored single chart renders as merge(indicator config, ETL layer, admin layer). Admin edits
+land in the admin layer (`charts.patchConfigId`) and win over ETL, which the admin flags as drift.
+Two kinds of drift exist, matching the admin's ETL badge:
+
+- Field drift: any top-level key in the admin patch besides the identity keys every patch carries
+  (`KEYS_EXCLUDED_FROM_INHERITANCE`). Fixed by writing those values into the chart's `.config.yml`.
+  Grapher re-diffs the admin patch against the new ETL layer on every push, so once a value is in
+  the YAML, it drops out of the admin layer by itself.
+- Slug drift: the admin slug differs from the slug ETL derives from the step's short name. Grapher
+  never lets an ETL layer change an existing chart's slug, so until chart configs carry a `slug`
+  field, the only fix is renaming the step (config files and DAG entry) to match the admin slug.
+
+Nothing here touches a database; the CLI fetches the layers and passes them in.
+"""
+
+import copy
+import json
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, cast
+
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from ruamel.yaml.scalarstring import DoubleQuotedScalarString
+
+from etl.dag_helpers import load_single_dag_file
+from etl.files import ruamel_dump, ruamel_load
+
+# Keys every admin patch carries regardless of drift (grapherConfigInheritance.ts in owid-grapher).
+KEYS_EXCLUDED_FROM_INHERITANCE = ("$schema", "id", "slug", "version", "isPublished")
+# Grapher config `dimensions` properties, in the order ETL emits them (etl/viz/chart/upsert.py).
+AXES = ("y", "x", "size", "color")
+# Same text scan as tests/test_chart_config_ids.py: config files may carry Jinja.
+CHART_CONFIG_ID_RE = re.compile(r"^\s*chart_config_id:\s*[\"']?([0-9a-fA-F-]{36})", re.MULTILINE)
+SHORT_NAME_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
+CONFIG_SUFFIX = ".config.yml"
+
+
+@dataclass
+class ChartStep:
+    """An ETL-authored single chart: its config file and DAG entry."""
+
+    config_path: Path
+    chart_config_id: str
+    namespace: str
+    version: str
+    short_name: str
+    dag_file: Path | None = None
+    dependencies: set[str] = field(default_factory=set)
+
+    @property
+    def uri(self) -> str:
+        return f"viz://chart/{self.namespace}/{self.version}/{self.short_name}"
+
+    @property
+    def slug(self) -> str:
+        """Slug ETL derives from the short name (etl/viz/chart/upsert.py)."""
+        return self.short_name.replace("_", "-")
+
+    @property
+    def has_code(self) -> bool:
+        return self.config_path.with_name(f"{self.short_name}.py").exists()
+
+
+@dataclass
+class ChartLayers:
+    """What the source environment holds for one chart."""
+
+    chart_id: int
+    patch: dict[str, Any]
+    slug: str | None
+    # variableId -> catalogPath, for every variable id the patch references.
+    variable_paths: dict[int, str | None] = field(default_factory=dict)
+
+
+@dataclass
+class Result:
+    """Outcome of reconciling one chart."""
+
+    step: ChartStep
+    chart_id: int | None = None
+    admin_url: str | None = None
+    pulled: list[str] = field(default_factory=list)
+    # Pulled fields that replace a value the YAML already set, rather than adding one.
+    overrides_etl: list[str] = field(default_factory=list)
+    skipped: list[str] = field(default_factory=list)
+    already_in_etl: list[str] = field(default_factory=list)
+    needs_manual: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    admin_slug: str | None = None
+    new_short_name: str | None = None
+    slug_fixed: bool = False
+    missing: bool = False
+
+    @property
+    def status(self) -> str:
+        if self.missing:
+            return "not found"
+        labels = []
+        if self.pulled:
+            labels.append("fields pulled")
+        if self.new_short_name:
+            labels.append("slug fixed" if self.slug_fixed else "slug drift")
+        if self.skipped:
+            labels.append("fields skipped")
+        if self.already_in_etl:
+            labels.append("already in ETL")
+        if self.needs_manual:
+            labels.append("needs manual")
+        return ", ".join(labels) or "in sync"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "chart_id": self.chart_id,
+            "admin_url": self.admin_url,
+            "step": self.step.uri,
+            "config_path": str(self.step.config_path),
+            "status": self.status,
+            "fields_pulled": self.pulled,
+            "fields_overriding_etl": self.overrides_etl,
+            "fields_skipped": self.skipped,
+            "fields_already_in_etl": self.already_in_etl,
+            "needs_manual": self.needs_manual,
+            "warnings": self.warnings,
+            "admin_slug": self.admin_slug,
+            "etl_slug": self.step.slug,
+            "new_short_name": self.new_short_name,
+            "slug_fixed": self.slug_fixed,
+        }
+
+
+def find_chart_steps(step_dir: Path, dag_dir: Path) -> list[ChartStep]:
+    """Every ETL-authored single chart in the repo, with its DAG file and dependencies."""
+    dag_entries: dict[str, tuple[Path, set[str]]] = {}
+    for dag_file in sorted(dag_dir.glob("*.yml")):
+        for step, deps in load_single_dag_file(dag_file).items():
+            if step.startswith("viz://chart/"):
+                dag_entries[step] = (dag_file, set(deps))
+
+    steps = []
+    for path in sorted((step_dir / "viz" / "chart").glob(f"*/*/*{CONFIG_SUFFIX}")):
+        match = CHART_CONFIG_ID_RE.search(path.read_text())
+        if not match:
+            continue
+        step = ChartStep(
+            config_path=path,
+            chart_config_id=match.group(1).lower(),
+            namespace=path.parent.parent.name,
+            version=path.parent.name,
+            short_name=path.name.removesuffix(CONFIG_SUFFIX),
+        )
+        if step.uri in dag_entries:
+            step.dag_file, step.dependencies = dag_entries[step.uri]
+        steps.append(step)
+    return steps
+
+
+def depends_on_dataset(step: ChartStep, dataset: str) -> bool:
+    """Whether the chart's step depends on a grapher dataset.
+
+    `dataset` is `ns/version/short`, `ns/short` (any version), or a full `data://grapher/...` URI.
+    """
+    dataset = re.sub(r"^(data|data-private)://grapher/", "", dataset)
+    parts = dataset.split("/")
+    if len(parts) == 3:
+        pattern = re.escape(dataset)
+    elif len(parts) == 2:
+        pattern = rf"{re.escape(parts[0])}/[^/]+/{re.escape(parts[1])}"
+    else:
+        raise ValueError(f"Dataset must look like `namespace/version/short_name` or `namespace/short_name`: {dataset}")
+    regex = re.compile(rf"^(data|data-private)://grapher/{pattern}$")
+    return any(regex.match(dep) for dep in step.dependencies)
+
+
+def field_overrides(patch: dict[str, Any]) -> dict[str, Any]:
+    """The admin patch minus the identity keys: what the admin's ETL badge counts as drift."""
+    return {k: v for k, v in patch.items() if k not in KEYS_EXCLUDED_FROM_INHERITANCE}
+
+
+def variable_ids_in_patch(patch: dict[str, Any]) -> set[int]:
+    """Variable ids the patch references, which the CLI resolves to catalog paths."""
+    ids = {int(d["variableId"]) for d in patch.get("dimensions", []) if "variableId" in d}
+    for value in (patch.get("sortColumnSlug"), (patch.get("map") or {}).get("columnSlug")):
+        if isinstance(value, str) and value.isdigit():
+            ids.add(int(value))
+    return ids
+
+
+def reconcile_fields(
+    step: ChartStep, config: CommentedMap, layers: ChartLayers, result: Result, skip_fields: tuple[str, ...] = ()
+) -> None:
+    """Fold the admin patch's field overrides into the config's single view, in place.
+
+    Pulling never changes what readers see, since the admin value is what renders today. A pulled
+    field that replaces a value the YAML already set is also listed in `result.overrides_etl`: there,
+    the admin value may be a stale leftover that masks a newer ETL edit, which a human has to judge.
+    """
+    view = config["views"][0]
+    overrides = field_overrides(layers.patch)
+    resolver = _PathResolver(view, layers.variable_paths, step.dependencies)
+
+    for key, value in overrides.items():
+        if key in skip_fields:
+            result.skipped.append(key)
+            continue
+        if key == "dimensions":
+            indicators, problems = _indicators_from_dimensions(value, resolver)
+            if problems:
+                result.needs_manual.extend(problems)
+                continue
+            existing = _canonical_indicators(view.get("indicators"))
+            if existing == _canonical_indicators(indicators):
+                result.already_in_etl.append(key)
+            else:
+                view["indicators"] = indicators
+                result.pulled.append(key)
+                if existing:
+                    result.overrides_etl.append(key)
+            continue
+
+        # Indicator references in the patch are variable ids; the YAML names indicators by path.
+        value = copy.deepcopy(value)
+        problems = []
+        if key == "sortColumnSlug":
+            value, problems = _resolve_column_slug(value, resolver, key)
+        elif key == "map" and isinstance(value, dict) and "columnSlug" in value:
+            value["columnSlug"], problems = _resolve_column_slug(value["columnSlug"], resolver, "map.columnSlug")
+        if problems:
+            result.needs_manual.extend(problems)
+            continue
+
+        if view.get("config") is None:
+            view["config"] = CommentedMap()
+        before = _plain(view["config"].get(key))
+        _merge_into(view["config"], key, value)
+        if _plain(view["config"].get(key)) == before:
+            result.already_in_etl.append(key)
+        else:
+            result.pulled.append(key)
+            if _replaces_existing(before, _plain(value)):
+                result.overrides_etl.append(key)
+
+    if step.has_code and result.pulled:
+        result.warnings.append(
+            f"{step.short_name}.py may recompute some of the pulled fields from the data: check them before committing."
+        )
+    patch_schema = _schema_number(layers.patch.get("$schema"))
+    yaml_schema = _schema_number(config.get("grapher_schema"))
+    if patch_schema and yaml_schema and patch_schema > yaml_schema:
+        result.warnings.append(
+            f"The admin patch uses grapher schema {patch_schema}, newer than the config's `grapher_schema: {yaml_schema}`."
+        )
+
+
+def slug_target(step: ChartStep, layers: ChartLayers) -> tuple[str | None, str | None]:
+    """The short name the step should have for its derived slug to match the admin slug.
+
+    Returns (new_short_name, problem). Both are None when the slugs already agree.
+    """
+    admin_slug = layers.patch.get("slug") or layers.slug
+    if not admin_slug or admin_slug == step.slug:
+        return None, None
+    new_short_name = admin_slug.replace("-", "_")
+    if not SHORT_NAME_RE.match(new_short_name):
+        return new_short_name, f"admin slug `{admin_slug}` doesn't map to a valid step short name; rename by hand"
+    return new_short_name, None
+
+
+def rename_step(step: ChartStep, new_short_name: str, dag_dir: Path) -> list[Path]:
+    """Rename a chart step: its `<short>.*` files and every mention of its URI in the DAG files.
+
+    Returns the new file paths. Refuses before changing anything if a target already exists.
+    """
+    folder = step.config_path.parent
+    sources = sorted(p for p in folder.glob(f"{step.short_name}.*") if p.is_file())
+    targets = [folder / (new_short_name + p.name[len(step.short_name) :]) for p in sources]
+    clashes = [str(t) for t in targets if t.exists()]
+    new_uri = f"viz://chart/{step.namespace}/{step.version}/{new_short_name}"
+    dag_files = sorted(dag_dir.glob("*.yml"))
+    uri_re = re.compile(rf"(?<![\w/]){re.escape(step.uri)}(?![\w])")
+    new_uri_re = re.compile(rf"(?<![\w/]){re.escape(new_uri)}(?![\w])")
+    clashes += [f"{new_uri} in {f}" for f in dag_files if new_uri_re.search(f.read_text())]
+    if clashes:
+        raise FileExistsError(f"Cannot rename {step.uri} to {new_short_name}: already taken by {', '.join(clashes)}")
+
+    for source, target in zip(sources, targets):
+        source.rename(target)
+    for dag_file in dag_files:
+        text = dag_file.read_text()
+        new_text = uri_re.sub(new_uri, text)
+        if new_text != text:
+            dag_file.write_text(new_text)
+    return targets
+
+
+def load_config(path: Path) -> CommentedMap:
+    """Load a chart config in round-trip mode (comments and key order survive)."""
+    return cast(CommentedMap, ruamel_load(path))  # ty: ignore[invalid-argument-type]
+
+
+def dump_config(config: CommentedMap) -> str:
+    return ruamel_dump(config)
+
+
+class _PathResolver:
+    """Map a grapher variable id back to the catalog path the chart's YAML uses for it."""
+
+    def __init__(self, view: CommentedMap, variable_paths: dict[int, str | None], dependencies: set[str]):
+        self.variable_paths = variable_paths
+        self.dependencies = dependencies
+        self.yaml_paths = _yaml_paths(view)
+
+    def resolve(self, variable_id: int) -> tuple[str | None, str | None]:
+        """Return (path, problem)."""
+        catalog_path = self.variable_paths.get(variable_id)
+        if not catalog_path:
+            return None, f"variable {variable_id} has no catalog path in grapher"
+        # Prefer the path already written in the YAML, in whatever short form it uses. A suffix match
+        # also covers a step repointed to a new dataset version, where the patch still holds old ids.
+        for path in self.yaml_paths:
+            if catalog_path == path or catalog_path.endswith("/" + path):
+                return path, None
+        # Otherwise name it relative to the step's grapher dependencies.
+        dataset_uri, _, column_part = catalog_path.rpartition("/")
+        grapher_deps = [d for d in self.dependencies if re.match(r"^(data|data-private)://grapher/", d)]
+        if any(d.split("://", 1)[1] == dataset_uri for d in grapher_deps):
+            if len(grapher_deps) == 1:
+                return column_part, None
+            return f"{dataset_uri.rpartition('/')[2]}/{column_part}", None
+        return None, (
+            f"variable {variable_id} ({catalog_path}) comes from a dataset the step doesn't depend on; "
+            "add the dependency and the indicator by hand"
+        )
+
+
+def _yaml_paths(view: CommentedMap) -> list[str]:
+    paths = []
+    indicators = view.get("indicators") or {}
+    for axis in AXES:
+        entries = indicators.get(axis)
+        if entries is None:
+            continue
+        for entry in entries if isinstance(entries, list) else [entries]:
+            paths.append(entry if isinstance(entry, str) else entry["catalogPath"])
+    config = view.get("config") or {}
+    for value in (config.get("sortColumnSlug"), (config.get("map") or {}).get("columnSlug")):
+        if isinstance(value, str) and "#" in value:
+            paths.append(value)
+    return paths
+
+
+def _indicators_from_dimensions(dimensions: list[dict[str, Any]], resolver: _PathResolver):
+    """Rebuild `indicators` from grapher `dimensions`, keeping their order and display."""
+    by_axis: dict[str, list[Any]] = {}
+    problems = []
+    for dim in dimensions:
+        extra = set(dim) - {"property", "variableId", "display"}
+        if extra:
+            problems.append(
+                f"dimension of variable {dim.get('variableId')} sets {sorted(extra)}, which ETL can't express"
+            )
+            continue
+        path, problem = resolver.resolve(int(dim["variableId"]))
+        if problem:
+            problems.append(f"dimensions: {problem}")
+            continue
+        entry: Any = DoubleQuotedScalarString(path)
+        if dim.get("display"):
+            entry = CommentedMap([("catalogPath", entry), ("display", _yaml_value(dim["display"]))])
+        by_axis.setdefault(dim["property"], []).append(entry)
+
+    unknown = set(by_axis) - set(AXES)
+    if unknown:
+        problems.append(f"dimensions use properties {sorted(unknown)}, which ETL can't express")
+    for axis in AXES[1:]:
+        if len(by_axis.get(axis, [])) > 1:
+            problems.append(f"dimensions have {len(by_axis[axis])} `{axis}` indicators; ETL allows one")
+
+    indicators = CommentedMap()
+    for axis in AXES:
+        if axis in by_axis:
+            indicators[axis] = CommentedSeq(by_axis[axis]) if axis == "y" else by_axis[axis][0]
+    return indicators, problems
+
+
+def _canonical_indicators(indicators: Any) -> dict[str, list[dict[str, Any]]]:
+    """Indicators in one shape, so `"t#c"` and `{catalogPath: "t#c"}` compare equal."""
+    canonical = {}
+    for axis in AXES:
+        entries = (indicators or {}).get(axis)
+        if entries is None:
+            continue
+        canonical[axis] = [
+            {"catalogPath": e, "display": None}
+            if isinstance(e, str)
+            else {"catalogPath": e["catalogPath"], "display": _plain(e.get("display")) or None}
+            for e in (entries if isinstance(entries, list) else [entries])
+        ]
+    return canonical
+
+
+def _resolve_column_slug(value: Any, resolver: _PathResolver, label: str) -> tuple[Any, list[str]]:
+    if isinstance(value, str) and value.isdigit():
+        path, problem = resolver.resolve(int(value))
+        if problem:
+            return value, [f"{label}: {problem}"]
+        return path, []
+    return value, []
+
+
+def _merge_into(target: CommentedMap, key: str, value: Any) -> None:
+    """Grapher's merge for one key: objects merge recursively, arrays and scalars replace."""
+    if isinstance(value, dict) and isinstance(target.get(key), dict):
+        for sub_key, sub_value in value.items():
+            _merge_into(target[key], sub_key, sub_value)
+    else:
+        target[key] = _yaml_value(value)
+
+
+def _replaces_existing(before: Any, value: Any) -> bool:
+    """Whether merging `value` changes a leaf the YAML already set (rather than only adding keys)."""
+    if before is None:
+        return False
+    if isinstance(before, dict) and isinstance(value, dict):
+        return any(_replaces_existing(before.get(k), v) for k, v in value.items())
+    return before != value
+
+
+def _yaml_value(value: Any) -> Any:
+    """Turn a JSON value into YAML nodes styled like the configs (double-quoted strings)."""
+    if isinstance(value, dict):
+        return CommentedMap((k, _yaml_value(v)) for k, v in value.items())
+    if isinstance(value, list):
+        return CommentedSeq(_yaml_value(v) for v in value)
+    if isinstance(value, str):
+        return DoubleQuotedScalarString(value)
+    return value
+
+
+def _plain(value: Any) -> Any:
+    """Comparable plain-JSON form of a YAML node."""
+    return json.loads(json.dumps(value, default=str))
+
+
+def _schema_number(value: Any) -> int | None:
+    match = re.search(r"(\d{3})", str(value or ""))
+    return int(match.group(1)) if match else None

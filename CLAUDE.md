@@ -32,6 +32,7 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
 | Build a chart from ETL (a single chart or a multidim), or an explorer | `/create-chart`, `/create-explorer` |
+| Bring admin edits of an ETL-authored chart back into ETL (the admin's "ETL" badge shows it drifted) | `/reconcile-chart` — wraps `etl chart-reconcile` |
 | Review a dataset-update PR | `/review-data-pr` |
 | Announce a finished update, internally | `/draft-data-update-slack-post` — the #data-updates-comms Slack form |
 | Announce a finished update, to readers | `/owid-staff:draft-data-update-post` — the "Data update" post on ourworldindata.org/latest; from the `owid-staff` plugin (owid/skills-private), auto-installed here |
