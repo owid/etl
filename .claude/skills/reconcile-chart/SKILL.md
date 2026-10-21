@@ -61,7 +61,7 @@ Statuses in the report:
 | `fields pulled` | Admin fields copied into the YAML | Review the diff (below) |
 | `slug drift` / `slug fixed` | Step needs renaming / was renamed | Archive the old name (below) |
 | `already in ETL` | The YAML already holds the admin value; the admin layer clears on the next push | Push |
-| `stale variable pins` | The admin pins `dimensions`, `sortColumnSlug` or `map.columnSlug` to an older version of an indicator the YAML names (an update that didn't remap the admin layer). The chart shows that old data, and no push clears the pin | Clear it in the admin (below). Copying it would change nothing, since the YAML already points at the current version |
+| `stale variable pins` | The admin pins `dimensions`, `sortColumnSlug` or `map.columnSlug` to an older version of an indicator the YAML names (an update that didn't remap the admin layer). No push clears the pin. On `dimensions` the chart plots the old variables. A `map.columnSlug` or `sortColumnSlug` that names a variable outside the chart's dimensions is often just a grapher artifact, since grapher falls back to the chart's own indicator (e.g. on a single-indicator map). It still counts as drift | Clear it in the admin (below). Copying it would change nothing, since the YAML already points at the current version |
 | `needs manual` | An indicator from a dataset the step doesn't depend on, a dimension field ETL can't express, or an invalid slug | Fix by hand, then re-run |
 | `fields skipped` | Left out with `--skip-field`; still set in the admin | Clear it in the admin (below) |
 | `admin leftovers` | Set in the admin before the move to ETL, masking a different ETL value; left out | Clear it in the admin (below) |
