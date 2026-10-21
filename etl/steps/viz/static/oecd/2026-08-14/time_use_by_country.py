@@ -214,7 +214,7 @@ The template text slots are not touched by it, so a copy change still means edit
 A render that CHANGES a colour cannot inherit: the old chart never bound the new hex, and the script
 refuses. Run it with `inheritStyles: false` and `families: []` instead (country labels and lists go to
 the body style through `bodyTextParent`), then bind each palette hex to its `Default Palette/*` style,
-moving the SVG's paint opacity onto the node first, and the in-band Note to `Text/Gray 70`.
+moving the SVG's paint opacity onto the node first, and the Note to `Text/Gray 70`.
 
 **Then rebuild the key as auto-layout containers**, which an SVG cannot carry, with
 `/owid-staff:create-figma-chart`'s `scripts/group_text_blocks.js`, run after the restyle and again after
@@ -236,9 +236,11 @@ legend names take `Data Insights/Annotations`, the chips their category's `Defau
 
 **On mobile, the Note then moves out of `chart` into the footer**, as the footer's first child: one Lato
 12 text joined from the `chart__note*` runs, `Note:` set bold, `Text/Gray 70`, width FILL and line height
-auto. Crop `chart` to what is left in it and re-pin the footer to the 16px bottom margin. Left in the
-chart, the imported runs keep this step's ink-tight boxes, and the gap to `Data source:` no longer
-matches the gap between the footer's own rows.
+auto. Crop `chart` to its children's boxes (the legend container's box sits above the ink the restyle
+crops to) and re-pin the footer to the 16px bottom margin. Left in the chart, the imported runs keep this
+step's ink-tight boxes, and the gap to `Data source:` no longer matches the gap between the footer's own
+rows. A re-import whose Note text is unchanged deletes the `chart__note*` runs from the copy to be styled
+before the restyle, since the footer already holds the Note.
 
 **The mobile frame's own slots carry the design team's sizes**, which the template's styles do not: the
 header at y=12 with a 4px gap, the title at 24px and the subtitle at 15px (line height auto), its box
@@ -685,10 +687,6 @@ LEGEND_BAR_GAP = 16
 # from the bars, and this far from the name.
 YEAR_COLUMN_GAP = 4
 
-# Air between the last bar and a Note drawn inside the band, which is where a frame with no Note
-# slot of its own has to put it.
-NOTE_BAND_GAP = 10
-
 # The Note's lead-in, set BOLD — the same shape the templates give their own footer: the placeholder's
 # `Data source: ` is Lato Bold and the producer name Regular. It is named here because three places
 # need to agree about it: the text `build_note` composes, the width its wrap has to leave for a bold
@@ -704,7 +702,7 @@ NOTE_LEAD = "Note:"
 #
 # The mobile frame differs in more than size, and both differences are in `template_text`: its
 # footer is two rows (`Data source:` and the license, no Note and no tagline), and its content is
-# 508px against the desktop's 818. The first is why the Note is drawn inside the band there; the
+# 508px against the desktop's 818. The first is why the step draws the Note as that footer's first row; the
 # second is why the key becomes a row of chips and names above the plot instead of names over the
 # segments.
 #
@@ -824,16 +822,14 @@ LAYOUTS = {
             "subtitle_line_px": 18,
             # This frame's footer is `Data source:` and the license, both full width — at 12px on 14px
             # lines with a 4px gap, the design team's sizes — and nothing else: no Note slot and no
-            # tagline. So `footer_top_px` is where the band stops, `note_in_band` moves the Note into the
-            # band's foot, and the absence of `tagline_y` tells `draw_footer` the license has a row of
-            # its own.
-            "footer_top_px": 836,
+            # tagline. So `note_in_band` has the step draw the Note as the footer's first row, and the
+            # absence of `tagline_y` tells `draw_footer` the license has a row of its own.
             "source_y": 836,
             "source_px": 12,
             "license_y": 854,
             "license_px": 12,
-            # Drawn inside the band, so a line costs a line of chart rather than the frame's bottom
-            # margin — which is why the cap is four here and two on the desktop frame. At 12px the Note
+            # Drawn above the footer's rows, so a line costs a line of chart rather than the frame's
+            # bottom margin — which is why the cap is four here and two on the desktop frame. At 12px the Note
             # takes four lines of 508px; it is the same text either way, and the caveats it carries are
             # the ones that can move a bar the reader is looking at.
             "note_px": 12,
@@ -1078,20 +1074,11 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     label_mode = layout["group_labels"]
     assert label_mode in {"aligned", "inline"}, f"Unknown group_labels {label_mode!r}."
     band_top = subtitle_y + lines_in(subtitle) * template["subtitle_line_px"]
-    band_bottom = (
-        template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
-        if band_note is None
-        else template["footer_top_px"]
-    )
-    # The band's foot is BAND_INSET of air — unless a Note is drawn there, in which case the Note IS the
-    # foot: it sits the footer's own row gap above the "Data source:" row, so the three read as three
-    # evenly spaced footer rows, with NOTE_BAND_GAP of air above it holding it off the last bar.
-    if band_note is None:
-        note_top_px = None
-        foot_px = BAND_INSET
-    else:
-        note_top_px = template["note_bottom_px"] - lines_in(band_note) * template["note_line_px"]
-        foot_px = band_bottom - note_top_px + NOTE_BAND_GAP
+    # The band stops at the Note, whether the template's slot holds it or the step draws it as the
+    # footer's first row. Under an inline legend the foot repeats the legend's top air, so the chart
+    # sits evenly in the band.
+    band_bottom = template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
+    foot_px = LEGEND_TOP_GAP if label_mode == "inline" else BAND_INSET
     # Where the last bar's INK has to stop. A bar fills `bar_fraction` of its row, centred, so it stops
     # half an inter-bar gap short of the axes' own bottom edge, and starts the same share below its top.
     ink_bottom_px = band_bottom - foot_px
@@ -1156,13 +1143,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         draw_key(fig, key, plot_left_px, chart_top_px + bar_head_rows * row_pitch_px, layout, palette, fx, fy)
 
     if band_note is not None:
-        assert note_top_px is not None
         # `chart__note`, not `note`: the Figma pass drops the step's copies of the template's own text
         # slots BY PREFIX, and `note` is one of them. On this frame the Note is not a duplicate of a
         # template slot — the frame has no Note slot, which is why it is drawn here — so a name that
         # collides with that list would have it deleted on import, silently and only on mobile. And
         # `<subject>__<role>`, so the re-import can join it to its library style by name.
-        draw_note(fig, margin_px, note_top_px, band_note, template, "chart__note", fx, fy)
+        draw_note(fig, margin_px, band_bottom, band_note, template, "chart__note", fx, fy)
 
     # Clipping is swept in `export_frame`, on the way out, which is what lets the labels drawn
     # outside the axes box survive into the SVG whole.
@@ -2173,8 +2159,8 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     wrapped = wrap_to_slot(text, slot_px, template["note_px"])
     # Two lines on the desktop frame, whose footer grows DOWNWARD from a fixed top (see
     # `note_bottom_px`), so a third eats the template's bottom margin rather than the chart's band.
-    # The mobile frame has no Note slot at all and draws this inside the band, where a line costs a
-    # line of chart and nothing else — which is why its cap is its own number.
+    # The mobile frame has no Note slot at all and draws this above its footer rows, where a line costs
+    # a line of chart and nothing else — which is why its cap is its own number.
     cap = template.get("note_max_lines", 2)
     assert lines_in(wrapped) <= cap, (
         f"The Note wraps to {lines_in(wrapped)} lines and this frame holds {cap} — shorten it, or "
