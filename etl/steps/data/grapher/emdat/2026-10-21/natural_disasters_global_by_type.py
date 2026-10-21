@@ -9,7 +9,7 @@ def run() -> None:
     #
     # Load garden dataset and read table on yearly data.
     ds_garden = paths.load_dataset("natural_disasters")
-    tb = ds_garden["natural_disasters_yearly"].reset_index()
+    tb = ds_garden.read("natural_disasters_yearly")
 
     #
     # Process data.
