@@ -68,5 +68,3 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
-
-# Test PR for the ops staging manifest; do not merge.
