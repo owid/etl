@@ -7,7 +7,7 @@ written to `chart_configs.etlConfig`. The only external dependency is
 stay pure.
 """
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -15,7 +15,7 @@ from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.viz.chart.model.core import Chart, Definitions
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.view import View, ViewIndicators
-from etl.viz.chart.upsert import _build_chart_config, _validate_chart_config
+from etl.viz.chart.upsert import _build_chart_config, _validate_chart_config, upsert_single_chart
 
 # Catalog-path -> variable-id map used to stub the DB lookup.
 _PATH_TO_ID = {
@@ -273,3 +273,69 @@ def test_declared_single_chart_routes_to_chart_upsert():
     with patch("etl.viz.chart.upsert.upsert_single_chart") as mock_upsert:
         chart.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
     mock_upsert.assert_called_once()
+
+
+def _admin_api_mock(**returns) -> MagicMock:
+    admin_api = MagicMock()
+    for method, value in returns.items():
+        getattr(admin_api, method).return_value = value
+    return admin_api
+
+
+def _upsert_single_chart(chart: Chart, admin_api: MagicMock) -> None:
+    with (
+        patch("etl.viz.chart.upsert.AdminAPI", return_value=admin_api),
+        patch("etl.viz.chart.upsert.map_indicator_path_to_id", side_effect=lambda path: _PATH_TO_ID[path]),
+    ):
+        upsert_single_chart(chart, owid_env=MagicMock())
+
+
+def test_single_chart_slug_defaults_to_short_name():
+    chart = _single_chart("0191b6c7-5595-70b2-8d30-fa03fccd7add")
+    chart.grapher_schema = "011"
+    admin_api = _admin_api_mock(upsert_chart_etl_config={"chartId": 1, "created": True})
+    _upsert_single_chart(chart, admin_api)
+    assert admin_api.upsert_chart_etl_config.call_args.kwargs["grapher_config"]["slug"] == "my-chart"
+
+
+def test_single_chart_slug_from_config_overrides_short_name():
+    chart = _single_chart("0191b6c7-5595-70b2-8d30-fa03fccd7add")
+    chart.grapher_schema = "011"
+    chart.slug = "short-slug"
+    admin_api = _admin_api_mock(upsert_chart_etl_config={"chartId": 1, "created": True})
+    _upsert_single_chart(chart, admin_api)
+    assert admin_api.upsert_chart_etl_config.call_args.kwargs["grapher_config"]["slug"] == "short-slug"
+
+
+def _mdim_with_slug(slug: str | None) -> Chart:
+    chart = _single_choice_mdim()
+    chart.grapher_schema = "011"
+    chart.slug = slug
+    return chart
+
+
+def _upsert_mdim(chart: Chart, admin_api: MagicMock) -> None:
+    with patch("etl.viz.chart.model.core.AdminAPI", return_value=admin_api):
+        chart.upsert_to_db(owid_env=MagicMock())
+
+
+def test_mdim_slug_is_set_when_missing():
+    admin_api = _admin_api_mock(put_mdim_config={"success": True, "id": 7}, get_mdim={"slug": None})
+    _upsert_mdim(_mdim_with_slug("my-mdim"), admin_api)
+    admin_api.set_mdim_slug.assert_called_once_with(7, "my-mdim")
+    # The slug lives on the mdim row, not in its config.
+    assert "slug" not in admin_api.put_mdim_config.call_args.args[1]
+
+
+def test_mdim_slug_is_never_changed_from_etl(capsys):
+    admin_api = _admin_api_mock(put_mdim_config={"success": True, "id": 7}, get_mdim={"slug": "renamed-in-admin"})
+    _upsert_mdim(_mdim_with_slug("my-mdim"), admin_api)
+    admin_api.set_mdim_slug.assert_not_called()
+    assert "chart.mdim.slug_not_applied" in capsys.readouterr().out
+
+
+def test_mdim_without_slug_leaves_grapher_slug_alone():
+    admin_api = _admin_api_mock(put_mdim_config={"success": True, "id": 7})
+    _upsert_mdim(_mdim_with_slug(None), admin_api)
+    admin_api.get_mdim.assert_not_called()
+    admin_api.set_mdim_slug.assert_not_called()

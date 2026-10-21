@@ -345,6 +345,35 @@
                 ]
             ]
         },
+        "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "The chart's public URL slug, as in `ourworldindata.org/grapher/<slug>`.",
+            "requirement_level": "optional",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "guidelines": [
+                [
+                    "Set it when the URL should differ from the step's short name; single charts default to the short name with dashes, and mdims get no slug without it."
+                ],
+                [
+                    "Applied only when grapher creates the chart, or when the mdim has no slug yet. An existing slug is never changed from ETL: rename it in the admin, which also creates the redirect."
+                ],
+                [
+                    "Lowercase words separated by dashes."
+                ]
+            ],
+            "examples": [
+                "foreign-aid-given-climate",
+                "academic-performance"
+            ],
+            "examples_bad": [
+                [
+                    "foreign_aid_given_climate",
+                    "Academic-Performance",
+                    "/grapher/academic-performance"
+                ]
+            ]
+        },
         "topic_tags": {
             "type": "array",
             "title": "Topic tags",

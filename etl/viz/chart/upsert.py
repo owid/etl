@@ -52,7 +52,7 @@ def upsert_single_chart(chart: "Chart", owid_env: OWIDEnv) -> int:
 
     view = chart.views[0]
     # Grapher slugs are dash-separated; mdim short_names are snake_case.
-    slug = chart.short_name.replace("_", "-")
+    slug = chart.slug or chart.short_name.replace("_", "-")
     chart_config = _build_chart_config(view, slug, resolve_grapher_schema(chart.grapher_schema))
     _validate_chart_config(chart_config, slug)
 
@@ -105,9 +105,9 @@ def upsert_single_chart(chart: "Chart", owid_env: OWIDEnv) -> int:
                 reason="tags are admin-managed once a chart exists; ETL only sets them at creation",
             )
 
-    # The slug is derived from the file's short name, but grapher excludes `slug` from what an
-    # ETL layer may contribute, so an existing chart keeps the slug it already had. Renaming the
-    # config file therefore looks like it renames the chart and doesn't.
+    # The slug comes from the config's `slug` (or the file's short name), but grapher excludes
+    # `slug` from what an ETL layer may contribute, so an existing chart keeps the slug it already
+    # had. Changing either therefore looks like it renames the chart and doesn't.
     if not is_new:
         slug_in_grapher = admin_api.get_chart_config(chart_id).get("slug")
         if slug_in_grapher and slug_in_grapher != slug:
@@ -115,7 +115,7 @@ def upsert_single_chart(chart: "Chart", owid_env: OWIDEnv) -> int:
                 "chart.chart.slug_not_applied",
                 chart_id=chart_id,
                 slug_in_grapher=slug_in_grapher,
-                slug_from_file_name=slug,
+                slug_in_etl=slug,
                 reason="an existing chart's slug cannot be changed from ETL; rename it in the admin instead",
             )
 

@@ -95,8 +95,11 @@ Create the directory if it doesn't exist:
 mkdir -p etl/steps/viz/chart/{namespace}/latest
 ```
 
-The chart's public slug is derived from the short name with underscores replaced by dashes
-(`banning_of_chick_culling` → `banning-of-chick-culling`).
+A single chart's public slug is derived from the short name with underscores replaced by dashes
+(`banning_of_chick_culling` → `banning-of-chick-culling`). When the URL should be shorter than the
+short name, set a top-level `slug:` instead; a multidim gets a slug only from `slug:`. Ask the user for
+the slug before merging: ETL applies it only when it creates the chart (or the multidim has no slug
+yet) and never renames one afterwards, so a later rename in the admin shows as drift.
 
 ### Python file: only when it does real work
 
