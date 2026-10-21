@@ -8,22 +8,22 @@ views:
   - dimensions: {}
     indicators:
       y:
-        - catalogPath: "climate_related_oda_by_donor#non_climate"
-          display:
-            name: "Non-climate-related"
-            color: "#C8A47E"
-        - catalogPath: "climate_related_oda_by_donor#climate_significant_objective"
-          display:
-            name: "Climate as secondary objective"
-            color: "#7389B3"
         - catalogPath: "climate_related_oda_by_donor#climate_principal_objective"
           display:
             name: "Climate as main objective"
             color: "#1F3F70"
+        - catalogPath: "climate_related_oda_by_donor#climate_significant_objective"
+          display:
+            name: "Climate as secondary objective"
+            color: "#7389B3"
+        - catalogPath: "climate_related_oda_by_donor#non_climate"
+          display:
+            name: "Non-climate-related"
+            color: "#C8A47E"
     config:
       title: "Foreign aid given for climate as a main or secondary objective"
       subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) covered by the OECD's climate tracking, by whether climate change mitigation or adaptation is the main objective of the project, a secondary objective, or not an objective. This data is expressed in US dollars and adjusted for inflation."
-      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
+      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
       originUrl: "/foreign-aid"
       tab: "chart"
       hasMapTab: false
@@ -32,6 +32,8 @@ views:
         - "StackedBar"
       stackMode: "absolute"
       hideRelativeToggle: false
+      hideAnnotationFieldsInTitle:
+        time: true
       selectedEntityNames:
         - "DAC members"
       addCountryMode: "change-country"
