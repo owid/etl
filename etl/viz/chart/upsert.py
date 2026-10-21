@@ -160,6 +160,10 @@ def _build_chart_config(view: "View", slug: str, grapher_schema: str) -> dict[st
         config["sortColumnSlug"] = str(map_indicator_path_to_id(config["sortColumnSlug"]))
     if isinstance(config.get("map"), dict) and "columnSlug" in config["map"]:
         config["map"]["columnSlug"] = str(map_indicator_path_to_id(config["map"]["columnSlug"]))
+    # `*VariableId` fields take an int in grapher (same as `replace_catalog_paths_with_ids` for mdims).
+    for key in ("colorVariableId", "xVariableId", "sizeVariableId"):
+        if key in config:
+            config[key] = int(map_indicator_path_to_id(config[key]))
 
     return config
 

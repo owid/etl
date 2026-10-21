@@ -107,6 +107,13 @@ def test_map_column_slug_rewritten_to_id_string():
     assert config["map"]["columnSlug"] == "222"
 
 
+def test_variable_id_fields_rewritten_to_int_ids():
+    view = _make_view({"y": "table#ind1"}, config={"colorVariableId": "table#color", "xVariableId": "table#x"})
+    config = _build(view)
+    assert config["colorVariableId"] == 555
+    assert config["xVariableId"] == 333
+
+
 def test_existing_schema_is_preserved():
     custom_schema = "https://files.ourworldindata.org/schemas/grapher-schema.001.json"
     view = _make_view({"y": "table#ind1"}, config={"$schema": custom_schema})
