@@ -16,8 +16,8 @@ etl chart-critic --top 50 --output /tmp/critic.html
 etl chart-critic --sample 100 --no-image --dry-run
 ```
 
-Roughly $0.04 per chart with the render attached on the default model at the default three passes,
-with prompt caching across the passes, so a pass over every published chart is under two hundred
+Roughly $0.08 per chart with the render attached on the default model at the default three passes,
+with prompt caching across the passes, so a pass over every published chart is under four hundred
 dollars. The binding constraint is not the bill — it is how many
 findings a human will read, which is why an empty result is a first-class outcome here.
 """

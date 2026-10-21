@@ -51,7 +51,11 @@ from apps.chart_critic.bundle import Bundle
 # raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
 # $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
 # render, so the small Claude tier is not a cheap substitute.
-DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
+#
+# Opus 5.5 replaced Sonnet 5.5 as the default. A side-by-side showed little difference, but at
+# twice Sonnet's price it is still only about $0.08 a chart, the daily run costs a few dollars a
+# month, and the team relies on the findings.
+DEFAULT_MODEL = "anthropic:claude-opus-5-5"
 
 # Settings for Claude models, which get none of them by default:
 # - Thinking is switched on explicitly: answering without it took about 40 output tokens a pass and
