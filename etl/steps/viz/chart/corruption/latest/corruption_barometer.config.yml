@@ -2,7 +2,7 @@ grapher_schema: "011"
 
 title:
   title: Perception of corruption
-  title_variant: by institution (staging test 5)
+  title_variant: by institution (staging test 6)
 default_selection:
   - World
 dimensions:
