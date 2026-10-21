@@ -324,8 +324,17 @@ def calculate_start_and_end_dates(tb: Table) -> Table:
     tb["start_date"] = pd.to_datetime(tb["start_date"])
     tb["end_date"] = pd.to_datetime(tb["end_date"])
 
-    error = "Events can't have an end_date prior to start_date."
-    assert tb[(tb["end_date"] < tb["start_date"])].empty, error
+    # An event ending in a year prior to its start year would break how impacts are distributed among years.
+    error = "Events can't have an end year prior to their start year."
+    assert tb[(tb["end_date"].dt.year < tb["start_date"].dt.year)].empty, error
+
+    # An end date prior to the start date within the same year does not change any yearly impact, so only warn.
+    inverted = tb[(tb["end_date"] < tb["start_date"])]
+    if not inverted.empty:
+        paths.log.warning(
+            "Events with an end date prior to their start date (in the same year): "
+            f"{inverted[['country', 'type', 'start_date', 'end_date']].astype(str).to_dict('records')}"
+        )
 
     return tb
 
