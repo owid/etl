@@ -353,16 +353,16 @@
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
             "guidelines": [
                 [
-                    "Naming the step after the slug (with underscores instead of dashes) is not required, but strongly recommended, so the file and the URL match."
-                ],
-                [
-                    "A multidim without it gets its slug in the admin."
+                    "Lowercase words separated by dashes."
                 ],
                 [
                     "Applied only when grapher creates the chart, or when the mdim has no slug yet. An existing slug is never changed from ETL: rename it in the admin, which also creates the redirect."
                 ],
                 [
-                    "Lowercase words separated by dashes."
+                    "A multidim without it gets its slug in the admin."
+                ],
+                [
+                    "The step's short name (its file name, e.g. `foreign_aid_given_climate`) should match the slug, with underscores instead of dashes. This is not required, but strongly recommended, so the file and the URL match."
                 ]
             ],
             "examples": [
