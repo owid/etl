@@ -261,6 +261,22 @@ def test_admin_values_from_before_the_move_to_etl_are_left_out(repo):
     assert "admin leftovers" in result.status
 
 
+def test_leftover_inside_an_object_keeps_its_admin_only_keys(repo):
+    # `map.colorScale.baseColorScheme` replaces the YAML's value; the other map keys are admin-only.
+    patch = {
+        "map": {"colorScale": {"baseColorScheme": "Reds", "binningStrategy": "manual"}, "columnSlug": "1", "time": 2020}
+    }
+    config, result = _reconcile(_step(repo), patch, edited_after_adoption=False)
+    map_config = config["views"][0]["config"]["map"]
+    assert map_config["colorScale"]["baseColorScheme"] == "YlGn"
+    assert map_config["colorScale"]["binningStrategy"] == "manual"
+    assert map_config["columnSlug"] == "climate_related_oda_by_donor#non_climate"
+    assert map_config["time"] == 2020
+    assert result.leftovers == ["map.colorScale.baseColorScheme"]
+    assert result.pulled == ["map"]
+    assert result.overrides_etl == []
+
+
 def test_admin_values_edited_after_the_move_are_pulled(repo):
     config, result = _reconcile(_step(repo), LEFTOVER_PATCH, edited_after_adoption=True)
     assert config["views"][0]["config"]["title"] == "Old admin title"

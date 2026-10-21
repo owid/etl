@@ -260,8 +260,11 @@ def reconcile_fields(
             view["config"] = CommentedMap()
         before = _plain(view["config"].get(key))
         if leftovers_possible and _replaces_existing(before, _plain(value)):
-            result.leftovers.append(key)
-            continue
+            # Only the leaves that replace an ETL value are leftovers; keys ETL doesn't set are still copied.
+            value, leftover_paths = _split_leftovers(before, _plain(value), key)
+            result.leftovers.extend(leftover_paths)
+            if value is None:
+                continue
         _merge_into(view["config"], key, value)
         if _plain(view["config"].get(key)) == before:
             result.already_in_etl.append(key)
@@ -492,6 +495,25 @@ def _replaces_existing(before: Any, value: Any) -> bool:
     if isinstance(before, dict) and isinstance(value, dict):
         return any(_replaces_existing(before.get(k), v) for k, v in value.items())
     return before != value
+
+
+def _split_leftovers(before: Any, value: Any, path: str) -> tuple[Any, list[str]]:
+    """Split an override into what replaces nothing in the YAML and the dotted paths of the leaves it replaces.
+
+    Returns (value to merge or None, leftover paths), e.g. `map.colorScale` when `map.columnSlug` is admin-only.
+    """
+    if not (isinstance(before, dict) and isinstance(value, dict)):
+        return None, [path]
+    kept, leftovers = {}, []
+    for key, sub_value in value.items():
+        if _replaces_existing(before.get(key), sub_value):
+            sub_kept, sub_leftovers = _split_leftovers(before.get(key), sub_value, f"{path}.{key}")
+            leftovers += sub_leftovers
+            if sub_kept is not None:
+                kept[key] = sub_kept
+        else:
+            kept[key] = sub_value
+    return (kept or None), leftovers
 
 
 def _yaml_value(value: Any) -> Any:
