@@ -5,6 +5,8 @@ Each column of the source grapher tables is tagged with dimension metadata
 indicator for each combination of choices.
 """
 
+# Rebuild with the shared chart-combining fix that preserves missing choice descriptions and groups.
+
 from shared import (
     ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE,
     ALL_DISASTERS_SUBTITLE,
