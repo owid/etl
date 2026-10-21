@@ -3,9 +3,9 @@ name: reconcile-chart
 description: >-
   Bring admin edits of ETL-authored single charts (viz://chart steps with chart_config_id) back
   into their ETL config, so the chart is defined in ETL again and the admin's ETL badge stops
-  showing it as drifted. Wraps the deterministic `etl chart-reconcile` command: copies every field
-  set in the admin into the chart's .config.yml, and fixes a slug changed in the admin by renaming
-  the step. Works on all ETL-authored charts, on the charts of one dataset, or on chosen charts.
+  showing it as drifted. Wraps the deterministic `etl chart-reconcile` command, which copies every
+  field set in the admin into the chart's .config.yml. Works on all ETL-authored charts, on the
+  charts of one dataset, or on chosen charts.
   Use when the user says a chart "drifted", "is out of sync with ETL", "has admin edits", asks to
   "copy the admin config to ETL", "reconcile", "undrift", or pastes an admin link of an
   ETL-authored chart; /update-dataset runs it on every update. Not for multidims or explorers.
@@ -22,9 +22,7 @@ An ETL-authored single chart renders as merge(indicator config, ETL layer, admin
 
 ## What counts as drift
 
-These are the same two checks the admin badge makes:
-
-- **Field drift.** Any top-level key in the admin patch besides the identity keys every patch carries (`$schema`, `id`, `slug`, `version`, `isPublished`). The command copies each one into the chart's `.config.yml`:
+- **Field drift.** The admin badge's main check: any top-level key in the admin patch besides the identity keys every patch carries (`$schema`, `id`, `slug`, `version`, `isPublished`). The command copies each one into the chart's `.config.yml`:
   - `dimensions` replace `views[0].indicators`, in the admin's order and with its `display`.
   - Variable ids (`dimensions`, `sortColumnSlug`, `map.columnSlug`) are written back as the catalog paths the YAML already uses.
   - Everything else is merged into `views[0].config`: nested objects merge, arrays and scalars replace.
@@ -32,13 +30,12 @@ These are the same two checks the admin badge makes:
 
   On the next push, grapher re-diffs the admin patch against the new ETL layer and drops every field ETL now holds.
 - **Admin leftovers.** When an existing chart moves into ETL, its whole old admin config stays in the admin layer, and a push only drops the values that equal ETL's. Every value ETL changed during the move stays masked, so the new ETL text never reaches readers. The command treats an override as a leftover when nobody has saved the chart in the admin since its ETL layer was created (no `chart_revisions` row by a user other than ETL), and when the override would replace a value the YAML already sets. It leaves those out (`--pull-leftovers` copies them anyway). Clear them in the admin so the ETL values show. Overrides on fields the YAML doesn't set are still copied, since they mask nothing. Inside an object, only the leaves that replace a YAML value are leftovers, reported by dotted path (e.g. `map.colorScale.baseColorScheme`); the object's other keys are copied, so unset exactly those paths.
-- **Slug drift.** The admin slug differs from the one ETL derives from the step's short name (underscores to dashes). Grapher never lets ETL change an existing chart's slug, so the command renames the step: `<short>.config.yml`, `<short>.py` and any other `<short>.*` file, plus every mention of the step URI in `dag/*.yml`. `chart_config_id` stays, so pushes keep landing on the same chart. This is interim: once chart configs carry a `slug` field, slug drift will be fixed by writing that field instead.
 
-Out of scope: multidims and explorers (no `chart_config_id`), and charts that exist only in the admin (adopt them first with `/create-chart`).
+Out of scope: slugs (a config's `slug:` only applies when ETL creates a chart, so a chart renamed in the admin keeps its new slug; set `slug:` by hand if you want the config to match), multidims and explorers (no `chart_config_id`), and charts that exist only in the admin (adopt them first with `/create-chart`).
 
 ## Run it
 
-The admin layers are read from `staging-site-master`, whose database mirrors production's, so no production credentials are needed. When `ENV_FILE_PROD` is set, production is read directly. To read a different server, pass `--env <staging-branch | env file>`.
+Read production. With no `--env`, the command reads production when `ENV_FILE_PROD` is set, and otherwise `staging-site-master`: a copy of production that can lag it by hours, so recent admin edits are missed (the command prints how old the copy is). To reconcile edits made today, pass a production env file, e.g. `--env /Users/<you>/etl/.env.live` (worktrees don't get a copy of it).
 
 ```bash
 # 1. Dry run: prints a YAML diff per chart and a status table.
@@ -47,7 +44,7 @@ The admin layers are read from `staging-site-master`, whose database mirrors pro
 .venv/bin/etl chart-reconcile --dataset <namespace>/<version>/<short_name>
 .venv/bin/etl chart-reconcile <config.yml | viz://chart/...> --chart-id <id>
 
-# 2. Write it (fields and slug renames). Add --json <file> for a machine-readable report.
+# 2. Write it. Add --json <file> for a machine-readable report.
 .venv/bin/etl chart-reconcile <same selection> --apply
 ```
 
@@ -57,12 +54,11 @@ Statuses in the report:
 
 | Status | Meaning | What to do |
 |---|---|---|
-| `in sync` | No admin override, slug matches | Nothing |
+| `in sync` | No admin override | Nothing |
 | `fields pulled` | Admin fields copied into the YAML | Review the diff (below) |
-| `slug drift` / `slug fixed` | Step needs renaming / was renamed | Archive the old name (below) |
 | `already in ETL` | The YAML already holds the admin value; the admin layer clears on the next push | Push |
 | `stale variable pins` | The admin pins `dimensions`, `sortColumnSlug` or `map.columnSlug` to an older version of an indicator the YAML names (an update that didn't remap the admin layer). No push clears the pin. On `dimensions` the chart plots the old variables. A `map.columnSlug` or `sortColumnSlug` that names a variable outside the chart's dimensions is often just a grapher artifact, since grapher falls back to the chart's own indicator (e.g. on a single-indicator map). It still counts as drift | Clear it in the admin (below). Copying it would change nothing, since the YAML already points at the current version. When stale `dimensions` also carry other admin edits (order, display, indicators), the command copies those edits as usual (`pulled` or `admin leftovers`) and still lists the pin: commit the copied edits first, then clear the pin |
-| `needs manual` | An indicator from a dataset the step doesn't depend on, a dimension field ETL can't express, or an invalid slug | Fix by hand, then re-run |
+| `needs manual` | An indicator from a dataset the step doesn't depend on, or a field ETL can't express | Fix by hand, then re-run |
 | `fields skipped` | Left out with `--skip-field`; still set in the admin | Clear it in the admin (below) |
 | `admin leftovers` | Set in the admin before the move to ETL, masking a different ETL value; left out | Clear it in the admin (below) |
 
@@ -84,9 +80,8 @@ Also check:
 ## Ship it
 
 1. Work in a worktree and open the PR with the usual flow. If nothing but reconciled charts changes, it's a small standalone PR.
-2. If steps were renamed: commit, run `.venv/bin/etl archive-dag`, check that it only archived the old step names (`git checkout` anything else it swept in), and commit `dag/archive/*.yml`.
-3. PR description: for each chart, its admin link, the fields pulled, the skipped fields and leftovers with both values, and any rename (old step → new step = live slug). Say that nothing reader-visible changes, except fields cleared in the admin.
-4. **Clear leftovers, stale variable pins and agreed skipped fields on the branch's staging server**, never on production. Use dotted paths for nested ones (`--unset map.columnSlug`). Run a dry run first and show the user the diff:
+2. PR description: for each chart, its admin link, the fields pulled, and the skipped fields and leftovers with both values. Say that nothing reader-visible changes, except fields cleared in the admin.
+3. **Clear leftovers, stale variable pins and agreed skipped fields on the branch's staging server**, never on production. Use dotted paths for nested ones (`--unset map.columnSlug`). Run a dry run first and show the user the diff:
 
    ```bash
    .venv/bin/python .claude/skills/edit-faust-metadata/scripts/update_chart_config.py \
@@ -94,14 +89,14 @@ Also check:
    ```
 
    Then run it again without `--dry-run`. The chart then renders the ETL values on staging and shows up in chart-diff. Once a reviewer approves it there, chart-sync carries the cleared admin layer to production after merge.
-5. **Verify on staging** once the branch's staging server has rebuilt (or push the steps with `STAGING=<branch> .venv/bin/etlr viz://chart/... --grapher`):
+4. **Verify on staging** once the branch's staging server has rebuilt (or push the steps with `STAGING=<branch> .venv/bin/etlr viz://chart/... --grapher`):
 
    ```bash
    .venv/bin/etl chart-reconcile <same selection> --env <branch>
    ```
 
    Every chart should report `in sync`. Chart-diff lists only the charts whose admin fields were cleared, because pulled fields don't change how a chart renders. Report the reconcile result too.
-6. After merge, the production run pushes the steps. Re-run the dry run without `--env` to confirm the badge is cleared. `staging-site-master` picks up production's changes shortly after.
+5. After merge, the production run pushes the steps. Re-run the dry run against production to confirm the badge is cleared.
 
 ## Close with what's still open
 

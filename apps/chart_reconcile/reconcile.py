@@ -1,16 +1,11 @@
 """Pure logic behind `etl chart-reconcile`: fold a chart's admin overrides into its ETL config.
 
 An ETL-authored single chart renders as merge(indicator config, ETL layer, admin layer). Admin edits
-land in the admin layer (`charts.patchConfigId`) and win over ETL, which the admin flags as drift.
-Two kinds of drift exist, matching the admin's ETL badge:
-
-- Field drift: any top-level key in the admin patch besides the identity keys every patch carries
-  (`KEYS_EXCLUDED_FROM_INHERITANCE`). Fixed by writing those values into the chart's `.config.yml`.
-  Grapher re-diffs the admin patch against the new ETL layer on every push, so once a value is in
-  the YAML, it drops out of the admin layer by itself.
-- Slug drift: the admin slug differs from the slug ETL derives from the step's short name. Grapher
-  never lets an ETL layer change an existing chart's slug, so until chart configs carry a `slug`
-  field, the only fix is renaming the step (config files and DAG entry) to match the admin slug.
+land in the admin layer (`charts.patchConfigId`) and win over ETL, which the admin flags as drift:
+any top-level key in the admin patch besides the identity keys every patch carries
+(`KEYS_EXCLUDED_FROM_INHERITANCE`). The fix is writing those values into the chart's `.config.yml`.
+Grapher re-diffs the admin patch against the new ETL layer on every push, so once a value is in the
+YAML, it drops out of the admin layer by itself.
 
 Nothing here touches a database; the CLI fetches the layers and passes them in.
 """
@@ -37,7 +32,6 @@ CHART_CONFIG_ID_RE = re.compile(r"^\s*chart_config_id:\s*[\"']?([0-9a-fA-F-]{36}
 # Variable-id fields of explorer and multidim views. Grapher chart configs don't define them (the
 # schema has `additionalProperties: false`), so a single chart's YAML can't carry them.
 VARIABLE_ID_FIELDS = ("colorVariableId", "xVariableId", "sizeVariableId")
-SHORT_NAME_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
 CONFIG_SUFFIX = ".config.yml"
 
 
@@ -58,11 +52,6 @@ class ChartStep:
         return f"viz://chart/{self.namespace}/{self.version}/{self.short_name}"
 
     @property
-    def slug(self) -> str:
-        """Slug ETL derives from the short name (etl/viz/chart/upsert.py)."""
-        return self.short_name.replace("_", "-")
-
-    @property
     def has_code(self) -> bool:
         return self.config_path.with_name(f"{self.short_name}.py").exists()
 
@@ -73,7 +62,6 @@ class ChartLayers:
 
     chart_id: int
     patch: dict[str, Any]
-    slug: str | None
     # variableId -> catalogPath, for every variable id the patch references.
     variable_paths: dict[int, str | None] = field(default_factory=dict)
     # Whether a person (not ETL) saved the chart in the admin after its ETL layer was created.
@@ -99,9 +87,6 @@ class Result:
     already_in_etl: list[str] = field(default_factory=list)
     needs_manual: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
-    admin_slug: str | None = None
-    new_short_name: str | None = None
-    slug_fixed: bool = False
     missing: bool = False
 
     @property
@@ -111,8 +96,6 @@ class Result:
         labels = []
         if self.pulled:
             labels.append("fields pulled")
-        if self.new_short_name:
-            labels.append("slug fixed" if self.slug_fixed else "slug drift")
         if self.skipped:
             labels.append("fields skipped")
         if self.leftovers:
@@ -140,10 +123,6 @@ class Result:
             "fields_already_in_etl": self.already_in_etl,
             "needs_manual": self.needs_manual,
             "warnings": self.warnings,
-            "admin_slug": self.admin_slug,
-            "etl_slug": self.step.slug,
-            "new_short_name": self.new_short_name,
-            "slug_fixed": self.slug_fixed,
         }
 
 
@@ -309,48 +288,6 @@ def reconcile_fields(
         result.warnings.append(
             f"The admin patch uses grapher schema {patch_schema}, newer than the config's `grapher_schema: {yaml_schema}`."
         )
-
-
-def slug_target(step: ChartStep, layers: ChartLayers) -> tuple[str | None, str | None]:
-    """The short name the step should have for its derived slug to match the admin slug.
-
-    Returns (new_short_name, problem). Both are None when the slugs already agree.
-    """
-    admin_slug = layers.patch.get("slug") or layers.slug
-    if not admin_slug or admin_slug == step.slug:
-        return None, None
-    new_short_name = admin_slug.replace("-", "_")
-    # The new short name must derive back to the admin slug (an underscore in the slug would not).
-    if not SHORT_NAME_RE.match(new_short_name) or new_short_name.replace("_", "-") != admin_slug:
-        return new_short_name, f"admin slug `{admin_slug}` isn't the slug of any valid step short name; rename by hand"
-    return new_short_name, None
-
-
-def rename_step(step: ChartStep, new_short_name: str, dag_dir: Path) -> list[Path]:
-    """Rename a chart step: its `<short>.*` files and every mention of its URI in the DAG files.
-
-    Returns the new file paths. Refuses before changing anything if a target already exists.
-    """
-    folder = step.config_path.parent
-    sources = sorted(p for p in folder.glob(f"{step.short_name}.*") if p.is_file())
-    targets = [folder / (new_short_name + p.name[len(step.short_name) :]) for p in sources]
-    clashes = [str(t) for t in targets if t.exists()]
-    new_uri = f"viz://chart/{step.namespace}/{step.version}/{new_short_name}"
-    dag_files = sorted(dag_dir.glob("*.yml"))
-    uri_re = re.compile(rf"(?<![\w/]){re.escape(step.uri)}(?![\w])")
-    new_uri_re = re.compile(rf"(?<![\w/]){re.escape(new_uri)}(?![\w])")
-    clashes += [f"{new_uri} in {f}" for f in dag_files if new_uri_re.search(f.read_text())]
-    if clashes:
-        raise FileExistsError(f"Cannot rename {step.uri} to {new_short_name}: already taken by {', '.join(clashes)}")
-
-    for source, target in zip(sources, targets):
-        source.rename(target)
-    for dag_file in dag_files:
-        text = dag_file.read_text()
-        new_text = uri_re.sub(new_uri, text)
-        if new_text != text:
-            dag_file.write_text(new_text)
-    return targets
 
 
 def load_config(path: Path) -> CommentedMap:

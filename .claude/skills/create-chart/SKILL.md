@@ -508,10 +508,10 @@ way, copying admin edits into the YAML so the chart is defined in ETL again, use
 
 ### Adopting a chart that exists only in the admin
 
-Write a minimal `.config.yml` (single-chart shape, one empty view) and its DAG entry with the grapher
+Write a minimal `.config.yml` (single-chart shape with the chart's current `slug`, one empty view) and its DAG entry with the grapher
 dataset as dependency, then point it at the existing chart with
 `etl chart-config-id lookup <config.yml> --chart-id <id>` (see Step 4). Then run
-`etl chart-reconcile <config.yml> --apply`, which copies the rest of the live config
+`etl chart-reconcile <config.yml> --env <production env file> --apply`, which copies the rest of the live config
 (indicators, FAUST, settings) into the YAML. Edit here from then on.
 
 ## Troubleshooting

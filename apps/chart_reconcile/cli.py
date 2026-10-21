@@ -11,9 +11,6 @@ flags the chart as drifted. This command reads the admin layer and writes it bac
   keeps masking any ETL value that differs. If no person has saved the chart since it moved to ETL,
   such values are leftovers: they are left out (`--pull-leftovers` copies them anyway), and should
   be cleared in the admin so the ETL values show. `--skip-field` leaves out any other field.
-- Slug drift: an admin slug that differs from the one ETL derives from the step name. Until chart
-  configs carry a `slug` field, the fix is renaming the step (its files and DAG entry) to match.
-  Commit the rename, then run `etl archive-dag` and commit the archived old name.
 
     # Report drift for every ETL-authored chart (dry run).
     etl chart-reconcile --all
@@ -24,10 +21,11 @@ flags the chart as drifted. This command reads the admin layer and writes it bac
     # After pushing the changes to a branch's staging server: every chart should be in sync.
     etl chart-reconcile --dataset oecd/climate_related_official_development_assistance --env <branch>
 
-The admin layers are read from staging-site-master, whose database mirrors production's (or from
-production itself when ENV_FILE_PROD is set), so no production credentials are needed. `--env`
-reads another staging server or env file instead. Multi-dimensional charts and explorers are out
-of scope.
+The admin layers are read from production when credentials are configured (ENV_FILE_PROD, or
+`--env <production env file>`). Otherwise they are read from staging-site-master, a copy of
+production that can lag it by hours, so recent admin edits may be missed; the command then says
+how old that copy is. `--env <staging-branch>` reads a branch's staging server, e.g. to confirm a
+push left its charts in sync. Multi-dimensional charts and explorers are out of scope.
 """
 
 import difflib
@@ -49,12 +47,10 @@ from apps.chart_reconcile.reconcile import (
     dump_config,
     find_chart_steps,
     reconcile_fields,
-    rename_step,
-    slug_target,
     variable_ids_in_patch,
 )
+from etl import config
 from etl.config import ETL_GRAPHER_USER_ID, OWIDEnv
-from etl.db import production_or_master_env
 from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
 
 console = Console()
@@ -70,7 +66,6 @@ console = Console()
 )
 @click.option("--chart-id", "chart_ids", type=int, multiple=True, help="Numeric chart id (`charts.id`). Repeatable.")
 @click.option("--apply", is_flag=True, help="Write the changes. Without it, only report them.")
-@click.option("--keep-slug", is_flag=True, help="With --apply: pull fields but don't rename steps for slug drift.")
 @click.option(
     "--skip-field",
     "skip_fields",
@@ -86,7 +81,7 @@ console = Console()
     "--env",
     "env_name",
     default=None,
-    help="Staging server name or env file to read from. Defaults to staging-site-master (a mirror of production).",
+    help="Staging server name or env file to read from. Defaults to production if configured, else staging-site-master.",
 )
 @click.option(
     "--json",
@@ -101,7 +96,6 @@ def cli(
     dataset: str | None,
     chart_ids: tuple[int, ...],
     apply: bool,
-    keep_slug: bool,
     skip_fields: tuple[str, ...],
     pull_leftovers: bool,
     env_name: str | None,
@@ -110,8 +104,10 @@ def cli(
     if not (select_all or dataset or chart_ids or targets):
         raise click.UsageError("Name the charts: --all, --dataset, --chart-id, or config files / step URIs.")
 
-    owid_env = _source_env(env_name)
+    owid_env, is_master_copy = _source_env(env_name)
     console.print(f"Reading admin layers from [bold]{owid_env.conf.DB_NAME}[/bold] on {owid_env.conf.DB_HOST}")
+    if is_master_copy:
+        _warn_master_copy_age(owid_env)
 
     steps = find_chart_steps(Path(STEP_DIR), Path(DAG_DIR))
     selected = _select(steps, select_all, dataset, targets)
@@ -123,7 +119,7 @@ def cli(
 
     layers = _fetch_layers(owid_env, [s.chart_config_id for s in selected])
     results = [
-        _reconcile(step, layers.get(step.chart_config_id), owid_env, apply, keep_slug, skip_fields, pull_leftovers)
+        _reconcile(step, layers.get(step.chart_config_id), owid_env, apply, skip_fields, pull_leftovers)
         for step in selected
     ]
 
@@ -133,12 +129,25 @@ def cli(
         console.print(f"Report written to {json_path}")
 
 
-def _source_env(env_name: str | None) -> OWIDEnv:
+def _source_env(env_name: str | None) -> tuple[OWIDEnv, bool]:
+    """The environment to read admin layers from, and whether it's the staging-site-master copy."""
     if env_name:
-        return OWIDEnv.from_staging_or_env_file(env_name)
-    # Production when credentials are configured, otherwise staging-site-master, whose database
-    # mirrors production's. Either way no production credentials are needed.
-    return production_or_master_env()
+        return OWIDEnv.from_staging_or_env_file(env_name), False
+    if config.OWID_ENV.env_remote == "production":
+        return config.OWID_ENV, False
+    if config.ENV_FILE_PROD:
+        return OWIDEnv.from_env_file(str(config.ENV_FILE_PROD)), False
+    return OWIDEnv.from_staging("master"), True
+
+
+def _warn_master_copy_age(owid_env: OWIDEnv) -> None:
+    """staging-site-master's database is a periodic copy of production: say how old it is."""
+    latest = _query(owid_env, text("SELECT MAX(updatedAt) AS latest FROM chart_configs"), {})[0].latest
+    console.print(
+        f"[yellow]staging-site-master is a copy of production whose newest chart edit is from {latest} (UTC). "
+        "Admin edits made since are missed: pass `--env <production env file>` or set ENV_FILE_PROD to read "
+        "production.[/yellow]"
+    )
 
 
 def _select(steps: list[ChartStep], select_all: bool, dataset: str | None, targets: tuple[str, ...]) -> list[ChartStep]:
@@ -181,11 +190,11 @@ def _step_for_config_id(steps: list[ChartStep], chart_config_id: str) -> ChartSt
 
 
 def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLayers]:
-    """Admin patch and rendered slug for each chart, plus the catalog paths of the variables it names."""
+    """Admin patch for each chart, plus the catalog paths of the variables it names."""
     # A plain SELECT, not the ORM `Chart`, as in `etl chart-config-id lookup`.
     # `last_human_edit` is the latest admin save by a person; ETL pushes are saved as the ETL user.
     query = text(
-        "SELECT c.id, c.configId, cc.slug, pa.config AS patch, pe.createdAt AS etl_created, "
+        "SELECT c.id, c.configId, pa.config AS patch, pe.createdAt AS etl_created, "
         "(SELECT MAX(r.createdAt) FROM chart_revisions r WHERE r.chartId = c.id AND r.userId <> :etl_user) "
         "AS last_human_edit "
         "FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
@@ -200,7 +209,7 @@ def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLa
         if row.etl_created is not None:
             edited_after_adoption = row.last_human_edit is not None and row.last_human_edit > row.etl_created
         layers[str(row.configId).lower()] = ChartLayers(
-            chart_id=row.id, patch=patch, slug=row.slug, edited_after_adoption=edited_after_adoption
+            chart_id=row.id, patch=patch, edited_after_adoption=edited_after_adoption
         )
 
     variable_ids = sorted(set().union(*(variable_ids_in_patch(layer.patch) for layer in layers.values())))
@@ -229,7 +238,6 @@ def _reconcile(
     layers: ChartLayers | None,
     owid_env: OWIDEnv,
     apply: bool,
-    keep_slug: bool,
     skip_fields: tuple[str, ...],
     pull_leftovers: bool,
 ) -> Result:
@@ -241,31 +249,16 @@ def _reconcile(
         return result
     result.chart_id = layers.chart_id
     result.admin_url = f"{owid_env.admin_site}/charts/{layers.chart_id}/edit"
-    result.admin_slug = layers.patch.get("slug") or layers.slug
 
     original = step.config_path.read_text()
     config_yaml = load_single_chart_config(step.config_path)
     reconcile_fields(step, config_yaml, layers, result, skip_fields, pull_leftovers)
     new_text = dump_config(config_yaml) if result.pulled else original
-
-    new_short_name, problem = slug_target(step, layers)
-    if problem:
-        result.needs_manual.append(problem)
-    elif new_short_name:
-        result.new_short_name = new_short_name
-
     if new_text != original:
         if apply:
             step.config_path.write_text(new_text)
         else:
             _print_diff(step.config_path, original, new_text)
-    if apply and result.new_short_name and not keep_slug:
-        try:
-            rename_step(step, result.new_short_name, Path(DAG_DIR))
-            result.slug_fixed = True
-        except FileExistsError as e:
-            result.needs_manual.append(str(e))
-            result.new_short_name = None
     return result
 
 
@@ -300,9 +293,6 @@ def _print_report(results: list[Result], apply: bool) -> None:
             )
         if r.already_in_etl:
             details.append(f"already in ETL, clears on next push: {', '.join(r.already_in_etl)}")
-        if r.new_short_name:
-            verb = "renamed to" if r.slug_fixed else "rename to"
-            details.append(f"admin slug `{r.admin_slug}`: {verb} {r.new_short_name}")
         details += [f"manual: {m}" for m in r.needs_manual]
         details += [f"warning: {w}" for w in r.warnings]
         if r.missing:
@@ -310,10 +300,5 @@ def _print_report(results: list[Result], apply: bool) -> None:
         table.add_row(str(r.chart_id or "-"), r.step.uri, r.status, "\n".join(details))
     console.print(table)
 
-    if not apply and any(r.pulled or r.new_short_name for r in results):
+    if not apply and any(r.pulled for r in results):
         console.print("Dry run: re-run with --apply to write these changes.")
-    if any(r.slug_fixed for r in results):
-        console.print(
-            "Steps were renamed. Commit, then run `etl archive-dag` so the old step names are archived, and commit "
-            "the regenerated `dag/archive/*.yml`."
-        )

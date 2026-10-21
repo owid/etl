@@ -1,8 +1,7 @@
 """Tests for `etl chart-reconcile` (apps.chart_reconcile).
 
 The database reads aren't covered here (they need a grapher DB). What's tested is the part that
-decides what to write: which charts are selected, how admin overrides land in the config YAML,
-and how a step is renamed for slug drift.
+decides what to write: which charts are selected and how admin overrides land in the config YAML.
 """
 
 from types import SimpleNamespace
@@ -21,8 +20,6 @@ from apps.chart_reconcile.reconcile import (
     find_chart_steps,
     load_config,
     reconcile_fields,
-    rename_step,
-    slug_target,
     variable_ids_in_patch,
 )
 
@@ -95,9 +92,7 @@ def _step(repo):
 
 def _reconcile(step, patch, skip_fields=(), edited_after_adoption=None, pull_leftovers=False):
     config = load_config(step.config_path)
-    layers = ChartLayers(
-        chart_id=9287, patch=patch, slug=patch.get("slug"), edited_after_adoption=edited_after_adoption
-    )
+    layers = ChartLayers(chart_id=9287, patch=patch, edited_after_adoption=edited_after_adoption)
     layers.variable_paths = {i: VARIABLE_PATHS.get(i) for i in variable_ids_in_patch(patch)}
     result = Result(step=step)
     reconcile_fields(step, config, layers, result, skip_fields, pull_leftovers)
@@ -361,53 +356,6 @@ def test_comments_and_key_order_survive(repo):
     assert 'note: "New note."' in text
 
 
-def test_slug_drift_maps_admin_slug_to_short_name(repo):
-    step = _step(repo)
-    layers = ChartLayers(chart_id=9287, patch={"slug": "foreign-aid-given-climate"}, slug="foreign-aid-given-climate")
-    assert slug_target(step, layers) == ("foreign_aid_given_climate", None)
-    in_sync = ChartLayers(chart_id=9287, patch={"slug": step.slug}, slug=step.slug)
-    assert slug_target(step, in_sync) == (None, None)
-
-
-def test_admin_slug_that_cannot_round_trip_needs_manual_rename(repo):
-    step = _step(repo)
-    layers = ChartLayers(chart_id=9287, patch={"slug": "foreign_aid"}, slug="foreign_aid")
-    new_short_name, problem = slug_target(step, layers)
-    assert problem is not None and "rename by hand" in problem
-
-
-def test_rename_step_moves_files_and_dag_entry(repo):
-    step_dir, dag_dir = repo
-    step = _step(repo)
-    step.config_path.with_name(f"{step.short_name}.py").write_text("# code\n")
-
-    rename_step(step, "foreign_aid_given_climate", dag_dir)
-
-    folder = step.config_path.parent
-    assert (folder / "foreign_aid_given_climate.config.yml").read_text() == CONFIG_YAML
-    assert (folder / "foreign_aid_given_climate.py").exists()
-    assert not step.config_path.exists()
-    dag_text = (dag_dir / "main.yml").read_text()
-    assert "viz://chart/oecd/latest/foreign_aid_given_climate:" in dag_text
-    assert "share_of_foreign_aid_given_that_is_climate_related" not in dag_text
-    assert "# Climate-related ODA charts — authored in ETL." in dag_text
-    # The renamed step is still found, with the same identity.
-    (renamed,) = find_chart_steps(step_dir, dag_dir)
-    assert renamed.short_name == "foreign_aid_given_climate" and renamed.chart_config_id == UUID
-
-
-def test_rename_step_refuses_to_clobber(repo):
-    _, dag_dir = repo
-    step = _step(repo)
-    taken = step.config_path.with_name("foreign_aid_given_climate.config.yml")
-    taken.write_text("chart_config_id: other\n")
-    with pytest.raises(FileExistsError, match="already taken"):
-        rename_step(step, "foreign_aid_given_climate", dag_dir)
-    # Nothing moved.
-    assert step.config_path.exists()
-    assert "share_of_foreign_aid_given_that_is_climate_related" in (dag_dir / "main.yml").read_text()
-
-
 def test_adopting_an_admin_only_chart_fills_an_empty_view(repo):
     step = _step(repo)
     step.config_path.write_text(f"chart_config_id: {UUID}\ndimensions: []\nviews:\n  - dimensions: {{}}\n")
@@ -448,9 +396,9 @@ def test_explicit_target_outside_the_dag_is_reconciled_with_a_warning(repo):
     old_uri = "viz://chart/oecd/2025-01-01/share_of_foreign_aid_given_that_is_climate_related"
     (step,) = _select(steps, False, None, (old_uri,))
     assert step.dag_file is None
-    layers = ChartLayers(chart_id=9287, patch={"slug": step.slug}, slug=step.slug)
+    layers = ChartLayers(chart_id=9287, patch={})
     env = SimpleNamespace(admin_site="http://localhost/admin")
-    result = _reconcile_step(step, layers, env, False, True, (), False)
+    result = _reconcile_step(step, layers, env, False, (), False)
     assert any("isn't in the active DAG" in w for w in result.warnings)
 
 
