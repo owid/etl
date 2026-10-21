@@ -176,21 +176,18 @@ def test_column_slugs_are_mapped_back_to_paths(repo):
     assert not result.needs_manual
 
 
-def test_variable_id_fields_are_mapped_back_to_paths(repo):
-    patch = {"colorVariableId": 3, "xVariableId": "2", "sizeVariableId": 4}
-    assert variable_ids_in_patch(patch) == {2, 3, 4}
+def test_explorer_variable_id_fields_need_manual_fix(repo):
+    # Not grapher chart config fields: writing them would fail the schema check on push.
+    patch = {"colorVariableId": 3, "xVariableId": "2", "title": "New title"}
     config, result = _reconcile(_step(repo), patch)
     view_config = config["views"][0]["config"]
-    assert view_config["colorVariableId"] == "climate_related_oda_by_donor#climate_significant_objective"
-    assert view_config["xVariableId"] == "climate_related_oda_by_donor#climate_principal_objective"
-    # An id from a dataset the step doesn't depend on is never written as a raw id.
-    assert "sizeVariableId" not in view_config
-    assert result.pulled == ["colorVariableId", "xVariableId"]
-    assert len(result.needs_manual) == 1 and result.needs_manual[0].startswith("sizeVariableId:")
+    assert "colorVariableId" not in view_config and "xVariableId" not in view_config
+    assert result.pulled == ["title"]
+    assert [m.split(":")[0] for m in result.needs_manual] == ["colorVariableId", "xVariableId"]
 
 
 def test_values_already_in_the_yaml_are_reported_not_rewritten(repo):
-    # E.g. after a version bump: the patch names old variable ids, the YAML the same short paths.
+    # E.g. right after the YAML adopted these values, before the next push re-diffs the admin layer.
     patch = {
         "title": "Foreign aid given for climate",
         "dimensions": [
@@ -223,11 +220,28 @@ def test_same_column_in_an_unrelated_dataset_needs_manual_fix(repo):
     assert "sortColumnSlug" not in config["views"][0]["config"]
 
 
-def test_older_version_of_a_yaml_indicator_maps_to_its_path(repo):
-    patch = {"sortColumnSlug": "6"}
+def test_pin_to_an_older_version_of_a_yaml_indicator_is_stale(repo):
+    # The admin still points at the old variable; the YAML's path resolves to the current one,
+    # so copying would change nothing and the pin would never clear.
+    patch = {"sortColumnSlug": "6", "map": {"columnSlug": "6", "colorScale": {"binningStrategy": "manual"}}}
     config, result = _reconcile(_step(repo), patch)
-    assert config["views"][0]["config"]["sortColumnSlug"] == "climate_related_oda_by_donor#non_climate"
+    view_config = config["views"][0]["config"]
+    assert "sortColumnSlug" not in view_config
+    assert "columnSlug" not in view_config["map"]
+    # The rest of the object is still copied.
+    assert view_config["map"]["colorScale"]["binningStrategy"] == "manual"
+    assert result.stale_pins == ["sortColumnSlug", "map.columnSlug"]
+    assert result.pulled == ["map"]
+    assert "stale variable pins" in result.status
     assert not result.needs_manual
+
+
+def test_dimensions_on_an_older_dataset_version_are_stale(repo):
+    patch = {"dimensions": [{"property": "y", "variableId": 6}, {"property": "y", "variableId": 2}]}
+    config, result = _reconcile(_step(repo), patch)
+    assert result.stale_pins == ["dimensions"]
+    assert result.pulled == [] and result.already_in_etl == []
+    assert len(config["views"][0]["indicators"]["y"]) == 2
 
 
 def test_skipped_fields_are_left_out(repo):

@@ -34,7 +34,8 @@ KEYS_EXCLUDED_FROM_INHERITANCE = ("$schema", "id", "slug", "version", "isPublish
 AXES = ("y", "x", "size", "color")
 # Same text scan as tests/test_chart_config_ids.py: config files may carry Jinja.
 CHART_CONFIG_ID_RE = re.compile(r"^\s*chart_config_id:\s*[\"']?([0-9a-fA-F-]{36})", re.MULTILINE)
-# Config fields holding a variable id in grapher, and a catalog path in ETL (etl/viz/chart/model/core.py).
+# Variable-id fields of explorer and multidim views. Grapher chart configs don't define them (the
+# schema has `additionalProperties: false`), so a single chart's YAML can't carry them.
 VARIABLE_ID_FIELDS = ("colorVariableId", "xVariableId", "sizeVariableId")
 SHORT_NAME_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
 CONFIG_SUFFIX = ".config.yml"
@@ -93,6 +94,8 @@ class Result:
     skipped: list[str] = field(default_factory=list)
     # Admin values set before the chart moved to ETL that would replace a newer ETL value: left out.
     leftovers: list[str] = field(default_factory=list)
+    # Admin pins to an older version of an indicator the YAML already names: no push clears them.
+    stale_pins: list[str] = field(default_factory=list)
     already_in_etl: list[str] = field(default_factory=list)
     needs_manual: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
@@ -114,6 +117,8 @@ class Result:
             labels.append("fields skipped")
         if self.leftovers:
             labels.append("admin leftovers")
+        if self.stale_pins:
+            labels.append("stale variable pins")
         if self.already_in_etl:
             labels.append("already in ETL")
         if self.needs_manual:
@@ -131,6 +136,7 @@ class Result:
             "fields_overriding_etl": self.overrides_etl,
             "fields_skipped": self.skipped,
             "fields_admin_leftovers": self.leftovers,
+            "fields_stale_variable_pins": self.stale_pins,
             "fields_already_in_etl": self.already_in_etl,
             "needs_manual": self.needs_manual,
             "warnings": self.warnings,
@@ -192,9 +198,7 @@ def field_overrides(patch: dict[str, Any]) -> dict[str, Any]:
 def variable_ids_in_patch(patch: dict[str, Any]) -> set[int]:
     """Variable ids the patch references, which the CLI resolves to catalog paths."""
     ids = {int(d["variableId"]) for d in patch.get("dimensions", []) if "variableId" in d}
-    values = [patch.get("sortColumnSlug"), (patch.get("map") or {}).get("columnSlug")]
-    values += [patch.get(key) for key in VARIABLE_ID_FIELDS]
-    for value in values:
+    for value in (patch.get("sortColumnSlug"), (patch.get("map") or {}).get("columnSlug")):
         variable_id = _as_variable_id(value)
         if variable_id is not None:
             ids.add(variable_id)
@@ -233,6 +237,9 @@ def reconcile_fields(
             if problems:
                 result.needs_manual.extend(problems)
                 continue
+            if any(int(d["variableId"]) in resolver.stale_ids for d in value):
+                result.stale_pins.append(key)
+                continue
             existing = _canonical_indicators(view.get("indicators"))
             if existing == _canonical_indicators(indicators):
                 result.already_in_etl.append(key)
@@ -245,16 +252,31 @@ def reconcile_fields(
                     result.overrides_etl.append(key)
             continue
 
+        if key in VARIABLE_ID_FIELDS:
+            result.needs_manual.append(
+                f"{key}: not a grapher chart config field, so the chart's YAML can't carry it; remove it in the admin"
+            )
+            continue
+
         # Indicator references in the patch are variable ids; the YAML names indicators by path.
         value = copy.deepcopy(value)
         problems = []
-        if key == "sortColumnSlug" or key in VARIABLE_ID_FIELDS:
+        if key == "sortColumnSlug":
             value, problems = _resolve_column_slug(value, resolver, key)
         elif key == "map" and isinstance(value, dict) and "columnSlug" in value:
             value["columnSlug"], problems = _resolve_column_slug(value["columnSlug"], resolver, "map.columnSlug")
         if problems:
             result.needs_manual.extend(problems)
             continue
+        # A pin to an older version of an indicator the YAML already names: nothing to copy.
+        if key == "sortColumnSlug" and _pins_stale_id(layers.patch.get(key), resolver):
+            result.stale_pins.append(key)
+            continue
+        if key == "map" and _pins_stale_id(layers.patch["map"].get("columnSlug"), resolver):
+            result.stale_pins.append("map.columnSlug")
+            del value["columnSlug"]
+            if not _plain(value):
+                continue
 
         if view.get("config") is None:
             view["config"] = CommentedMap()
@@ -343,6 +365,9 @@ class _PathResolver:
         self.variable_paths = variable_paths
         self.dependencies = dependencies
         self.yaml_paths = _yaml_paths(view)
+        # Ids that match a YAML indicator only in another version of its dataset than the step
+        # builds from: the admin still pins the old variable, which no ETL push can clear.
+        self.stale_ids: set[int] = set()
 
     def resolve(self, variable_id: int) -> tuple[str | None, str | None]:
         """Return (path, problem)."""
@@ -356,11 +381,13 @@ class _PathResolver:
         grapher_deps = [
             d.split("://", 1)[1] for d in self.dependencies if re.match(r"^(data|data-private)://grapher/", d)
         ]
+        dataset_uri, _, column_part = catalog_path.rpartition("/")
         for path in self.yaml_paths:
             if catalog_path == path or target in _unversioned_candidates(path, grapher_deps):
+                if dataset_uri not in grapher_deps and catalog_path != path:
+                    self.stale_ids.add(variable_id)
                 return path, None
         # Otherwise name it relative to the step's grapher dependencies.
-        dataset_uri, _, column_part = catalog_path.rpartition("/")
         if dataset_uri in grapher_deps:
             if len(grapher_deps) == 1:
                 return column_part, None
@@ -381,12 +408,14 @@ def _yaml_paths(view: CommentedMap) -> list[str]:
         for entry in entries if isinstance(entries, list) else [entries]:
             paths.append(entry if isinstance(entry, str) else entry["catalogPath"])
     config = view.get("config") or {}
-    values = [config.get("sortColumnSlug"), (config.get("map") or {}).get("columnSlug")]
-    values += [config.get(key) for key in VARIABLE_ID_FIELDS]
-    for value in values:
+    for value in (config.get("sortColumnSlug"), (config.get("map") or {}).get("columnSlug")):
         if isinstance(value, str) and "#" in value:
             paths.append(value)
     return paths
+
+
+def _pins_stale_id(value: Any, resolver: _PathResolver) -> bool:
+    return isinstance(value, str) and value.isdigit() and int(value) in resolver.stale_ids
 
 
 def _unversioned(path: str) -> str:

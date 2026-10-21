@@ -26,7 +26,7 @@ These are the same two checks the admin badge makes:
 
 - **Field drift.** Any top-level key in the admin patch besides the identity keys every patch carries (`$schema`, `id`, `slug`, `version`, `isPublished`). The command copies each one into the chart's `.config.yml`:
   - `dimensions` replace `views[0].indicators`, in the admin's order and with its `display`.
-  - Variable ids (`dimensions`, `sortColumnSlug`, `map.columnSlug`, `colorVariableId`, `xVariableId`, `sizeVariableId`) are written back as the catalog paths the YAML already uses.
+  - Variable ids (`dimensions`, `sortColumnSlug`, `map.columnSlug`) are written back as the catalog paths the YAML already uses.
   - Everything else is merged into `views[0].config`: nested objects merge, arrays and scalars replace.
   - Values always go to the chart YAML, never to the garden `.meta.yml`, so no other chart or data page changes.
 
@@ -60,7 +60,8 @@ Statuses in the report:
 | `in sync` | No admin override, slug matches | Nothing |
 | `fields pulled` | Admin fields copied into the YAML | Review the diff (below) |
 | `slug drift` / `slug fixed` | Step needs renaming / was renamed | Archive the old name (below) |
-| `already in ETL` | The YAML already holds the admin value; the admin layer clears on the next push | Push. On `dimensions` right after a version bump, the patch still names the old variable ids: run the indicator upgrade, then push the step again |
+| `already in ETL` | The YAML already holds the admin value; the admin layer clears on the next push | Push |
+| `stale variable pins` | The admin pins `dimensions`, `sortColumnSlug` or `map.columnSlug` to an older version of an indicator the YAML names (an update that didn't remap the admin layer). The chart shows that old data, and no push clears the pin | Clear it in the admin (below). Copying it would change nothing, since the YAML already points at the current version |
 | `needs manual` | An indicator from a dataset the step doesn't depend on, a dimension field ETL can't express, or an invalid slug | Fix by hand, then re-run |
 | `fields skipped` | Left out with `--skip-field`; still set in the admin | Clear it in the admin (below) |
 | `admin leftovers` | Set in the admin before the move to ETL, masking a different ETL value; left out | Clear it in the admin (below) |
@@ -85,7 +86,7 @@ Also check:
 1. Work in a worktree and open the PR with the usual flow. If nothing but reconciled charts changes, it's a small standalone PR.
 2. If steps were renamed: commit, run `.venv/bin/etl archive-dag`, check that it only archived the old step names (`git checkout` anything else it swept in), and commit `dag/archive/*.yml`.
 3. PR description: for each chart, its admin link, the fields pulled, the skipped fields and leftovers with both values, and any rename (old step → new step = live slug). Say that nothing reader-visible changes, except fields cleared in the admin.
-4. **Clear leftovers and agreed skipped fields on the branch's staging server**, never on production. Run a dry run first and show the user the diff:
+4. **Clear leftovers, stale variable pins and agreed skipped fields on the branch's staging server**, never on production. Use dotted paths for nested ones (`--unset map.columnSlug`). Run a dry run first and show the user the diff:
 
    ```bash
    .venv/bin/python .claude/skills/edit-faust-metadata/scripts/update_chart_config.py \
@@ -106,6 +107,6 @@ Also check:
 
 Follow `.claude/docs/open-items.md`. Typical items:
 
-- leftovers and skipped fields cleared on staging, waiting for chart-diff approval;
+- leftovers, stale variable pins and skipped fields cleared on staging, waiting for chart-diff approval;
 - `needs manual` findings;
 - the post-merge production check.

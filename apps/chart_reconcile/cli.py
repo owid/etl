@@ -284,6 +284,11 @@ def _print_report(results: list[Result], apply: bool) -> None:
                 f"left out, set in the admin before the move to ETL and masking ETL's value; "
                 f"clear in the admin: {', '.join(r.leftovers)}"
             )
+        if r.stale_pins:
+            details.append(
+                f"admin pins an older version of an indicator ETL already plots, which no push clears; "
+                f"clear in the admin: {', '.join(r.stale_pins)}"
+            )
         if r.already_in_etl:
             details.append(f"already in ETL, clears on next push: {', '.join(r.already_in_etl)}")
         if r.new_short_name:
