@@ -12,12 +12,11 @@ for the current decade do include the partial year.
 """
 
 import datetime
-from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, Variable, utils
+from owid.catalog import Table, utils
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
@@ -141,48 +140,13 @@ REGIONS = {
 # Overlaps found between historical regions and successor countries, that we accept in the data.
 # We accept them either because they happened close to the transition, or to avoid needing to introduce new
 # countries for which we do not have data (like the Russian Empire).
-ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}]
-
-# List issues found in the data:
-# Each element is a tuple with a dictionary that fully identifies the wrong row,
-# and another dictionary that specifies the changes.
-# Note: Countries here should appear as in the raw data (i.e. not harmonized).
-DATA_CORRECTIONS = []
-
-
-def correct_data_points(tb: Table, corrections: list[tuple[dict[Any, Any], dict[Any, Any]]]) -> Table:
-    """Make individual corrections to data points in a table.
-
-    Parameters
-    ----------
-    tb : Table
-        Data to be corrected.
-    corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
-        Corrections.
-
-    Returns
-    -------
-    tb_corrected : Table
-        Corrected data.
-
-    """
-    tb_corrected = tb.copy()
-
-    for correction in corrections:
-        wrong_row, corrected_row = correction
-
-        # Select the row in the table where the wrong data point is.
-        # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
-        selection = tb_corrected.loc[(tb_corrected[list(wrong_row)] == Variable(wrong_row)).fillna(False).all(axis=1)]
-        # Sanity check.
-        error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
-        assert len(selection) == 1, error
-
-        # Replace wrong fields by the corrected ones.
-        # Note: Changes to categorical fields will not work.
-        tb_corrected.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
-
-    return tb_corrected
+# NOTE: The 1995 overlap is Hurricane Luis, which EM-DAT records both for the Netherlands Antilles and for Sint Maarten
+# (Dutch part). It may count part of the same impacts twice. Check whether EM-DAT still has both records.
+ACCEPTED_OVERLAPS = [
+    {1911: {"USSR", "Kazakhstan"}},
+    {1991: {"Georgia", "USSR"}},
+    {1995: {"Sint Maarten (Dutch part)", "Netherlands Antilles"}},
+]
 
 
 def get_last_day_of_month(year: int, month: int):
@@ -216,11 +180,12 @@ def prepare_input_data(tb_meadow: Table) -> Table:
     # Select and rename columns.
     tb_meadow = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
+    # Correct known errors in the source data (see natural_disasters.corrections.yml).
+    # This is done before creating the year column, since some corrections affect the start year.
+    tb_meadow = paths.apply_corrections(tb_meadow, year_col="start_year")
+
     # Add a year column (assume the start of the event).
     tb_meadow["year"] = tb_meadow["start_year"].copy()
-
-    # Correct wrong data points (defined above in DATA_CORRECTIONS).
-    tb_meadow = correct_data_points(tb=tb_meadow, corrections=DATA_CORRECTIONS)
 
     # Remove spurious spaces in entities.
     tb_meadow["type"] = tb_meadow["type"].str.strip()

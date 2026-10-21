@@ -19,7 +19,11 @@ meta:
     url_main: https://emdat.be/
     date_accessed: '2026-10-21'
     # The date_published can be found in the excel file, sheet "EM-DAT Info", "Version".
-    date_published: '2026-04-28'
+    date_published: '2026-10-12'
     license:
       name: UCLouvain 2026
       url: https://doc.emdat.be/docs/legal/terms-of-use/
+outs:
+  - md5: 9021396f20cffc86afd6958653fb3b2f
+    size: 6532399
+    path: natural_disasters.xlsx

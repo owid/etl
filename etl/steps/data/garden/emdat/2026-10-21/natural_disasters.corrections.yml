@@ -1,0 +1,59 @@
+# Known upstream data errors in EM-DAT, corrected locally until fixed at the source.
+# Rows are located before harmonization, so country and type use EM-DAT's own names.
+# Each event's EM-DAT identifier (DisNo.) starts with the year of the event.
+# See etl/data_corrections.py for the format.
+- indicator: end_year
+  match: {country: Honduras, type: Storm, start_year: 2000, start_month: 9, start_day: 29, value: 2026}
+  action: override
+  value: 2000
+  reason: Hurricane Keith (DisNo. 2000-0643-HND) ends on 3 October 2026 in the source, but it lasted from
+    28 September to 6 October 2000 (https://www.nhc.noaa.gov/data/tcr/AL152000_Keith.pdf).
+  producer: EM-DAT
+  status: open
+
+- indicator: end_year
+  match: {country: Japan, type: Storm, start_year: 2002, start_month: 10, start_day: 2, value: 2026}
+  action: override
+  value: 2002
+  reason: Typhoon Higos (DisNo. 2002-0635-JPN) ends on 4 October 2026 in the source, but it hit Japan on
+    1 October 2002 and dissipated on 4 October 2002 (https://en.wikipedia.org/wiki/Typhoon_Higos_(2002)).
+  producer: EM-DAT
+  status: open
+
+- indicator: start_year
+  match: {country: Venezuela (Bolivarian Republic of), type: Storm, end_year: 1988, start_month: 9, start_day: 11, value: 2026}
+  action: override
+  value: 1988
+  reason: Hurricane Gilbert (DisNo. 1988-0424-VEN) starts on 11 September 2026 and ends on 11 September 1988 in the
+    source. Gilbert crossed the Caribbean in September 1988 (https://en.wikipedia.org/wiki/Hurricane_Gilbert).
+  producer: EM-DAT
+  status: open
+
+- indicator: start_year
+  match: {country: Nepal, type: Storm, end_year: 1995, start_month: 11, start_day: 10, value: 2026}
+  action: override
+  value: 1995
+  reason: A storm in Nepal (DisNo. 1995-0275-NPL) starts on 10 November 2026 and ends on 11 November 1995 in the
+    source; its identifier dates it to 1995.
+  producer: EM-DAT
+  status: open
+
+- indicator: end_month
+  match: {country: United States of America, type: Storm, start_year: 1995, start_month: 9, start_day: 10, value: 8}
+  action: override
+  value: 9
+  reason: Hurricane Luis (DisNo. 1995-0192-USA) starts on 10 September 1995 and ends on 10 August 1995 in the source.
+    Luis formed on 27 August and dissipated on 12 September 1995 (https://en.wikipedia.org/wiki/Hurricane_Luis), so the
+    end month can only be September.
+  producer: EM-DAT
+  status: open
+
+- indicator: end_month
+  match: {country: Indonesia, type: Earthquake, start_year: 2026, start_month: 4, start_day: 2, value: 3}
+  action: override
+  value: 4
+  reason: An earthquake in Indonesia (DisNo. 2026-0221-IDN) starts on 2 April 2026 and ends on 2 March 2026 in the
+    source. EM-DAT recorded it on 2 April 2026, and several earthquakes hit Indonesia that day
+    (https://www.earthquaketracker.org/earthquakes/today/2026-04-02).
+  producer: EM-DAT
+  status: open
