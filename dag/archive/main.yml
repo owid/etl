@@ -1375,6 +1375,18 @@ steps:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm:
       - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
       - data://garden/homicide/2025-08-06/who_mort_db
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/share_of_foreign_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_mitigation_and_adaptation:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
