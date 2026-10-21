@@ -32,3 +32,4 @@ views:
             "Not banned": "#ae2e3f"
             "Partially banned": "#a46f49"
             "Banned but not yet in effect": "#058580"
+        columnSlug: "chick_culling_laws#status"
