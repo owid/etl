@@ -515,19 +515,19 @@ steps:
   #
   # Climate-related ODA charts — authored in ETL.
   #
-  viz://chart/oecd/latest/foreign_aid_given_for_climate_mitigation_and_adaptation:
+  viz://chart/oecd/latest/aid_climate_mitigation_adaptation:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
-  viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
+  viz://chart/oecd/latest/foreign_aid_climate_main_secondary:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
   viz://chart/oecd/latest/climate_related_foreign_aid_given_by_sector:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
-  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+  viz://chart/oecd/latest/foreign_aid_given_climate:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
   viz://chart/oecd/latest/climate_related_foreign_aid_received:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
   viz://chart/oecd/latest/climate_related_foreign_aid_received_per_capita:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
-  viz://chart/oecd/latest/share_of_foreign_aid_received_that_is_climate_related:
+  viz://chart/oecd/latest/share_foreign_aid_received_climate:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
 
   #

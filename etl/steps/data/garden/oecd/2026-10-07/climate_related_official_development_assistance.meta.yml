@@ -24,7 +24,7 @@ definitions:
     G7 countries: Canada, France, Germany, Italy, Japan, UK and US
 
   # Short descriptions, following those of our main ODA dataset.
-  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
+  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
   short_commitments: Monetary aid is estimated as commitments.
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
@@ -35,7 +35,7 @@ definitions:
   key_bilateral_allocable: |-
     This data covers bilateral allocable ODA from [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html), the major donor countries in the OECD and EU institutions. This is the bilateral aid that the Rio markers apply to. It excludes general budget support, debt relief (other than debt swaps), administrative costs, development awareness, and the costs of hosting refugees and students from developing countries in donor countries. It also excludes core contributions to multilateral organizations, such as the World Bank, and aid from donors outside the DAC.
   key_bilateral_total: |-
-    Total bilateral ODA adds to bilateral allocable ODA the aid that the Rio markers don't apply to, such as general budget support, debt relief and the costs of hosting refugees in donor countries. It excludes core contributions to multilateral organizations and aid from donors outside the DAC.
+    Total bilateral ODA adds to bilateral allocable ODA the aid that the Rio markers don't apply to, such as general budget support, debt relief, and the costs of hosting refugees in donor countries. It excludes core contributions to multilateral organizations and aid from donors outside the DAC.
   key_bilateral_total_denominator: |-
     This share divides climate-related aid by total bilateral ODA, which also includes the aid that the Rio markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries.
   key_outside_negative: |-
@@ -345,7 +345,7 @@ tables:
           grapher_config:
             title: "Share of foreign aid given that is climate-related"
             subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA covered by the OECD's climate tracking."
-            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
+            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
             tab: "chart"
             hasMapTab: true
             chartTypes:
@@ -508,8 +508,8 @@ tables:
           grapher_config:
             title: "Share of foreign aid received that is climate-related"
             subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA received that is covered by the OECD's climate tracking."
-            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
-            tab: "map"
+            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
+            tab: "chart"
             hasMapTab: true
             chartTypes:
               - "LineChart"
@@ -520,12 +520,18 @@ tables:
                 baseColorScheme: "YlGn"
                 binningStrategy: "manual"
                 customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+            hideFacetControl: false
+            selectedFacetStrategy: "entity"
             selectedEntityNames:
               - "India"
               - "Philippines"
               - "Bangladesh"
               - "Indonesia"
               - "Kenya"
+              - "Brazil"
+              - "Senegal"
+              - "Sierra Leone"
+              - "Cote d'Ivoire"
         display:
           name: "Climate-related ODA by recipient (% of bilateral allocable ODA)"
           numDecimalPlaces: 1
