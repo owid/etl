@@ -40,11 +40,13 @@ Each block is aligned with the values under it — left at its segment's start, 
 bar's end — and its line breaks are the design team's (`key_lines`, `label_lines`). A block that clears
 the subtitle sideways may rise beside it, which is what lets the four-line lists sit right of a
 subtitle balanced over two shorter lines (`key_header_px`); `key_blocks_collide` asserts that no block
-reaches into its neighbour's. The mobile frame is too narrow for that and keeps a row legend instead.
+reaches into its neighbour's. The mobile frame is too narrow for that and takes one row of chips and
+names instead, with no member lists (`draw_inline_legend`).
 
-This layout is the design team's rework of the frame, replicated here: their palette, the key's order
+This layout is the design team's rework of both frames, replicated here: their palette, the key's order
 and alignment, the two-line country labels, the segment gaps, the wider bar spacing and the taller
-desktop frame.
+desktop frame; and on mobile, the one-row legend, the column of years against the bars, the subtitle
+broken after its first sentence, and their sizes for the header and footer slots.
 
 Two frames are emitted: 850x1162 desktop, from the vertical static-chart template run 67px taller, and
 a mobile frame from the mobile template, also run taller, so the wider bar spacing does not thin the
@@ -221,20 +223,32 @@ every re-import (it replaces `chart`, and the containers with it). Desktop, one 
     {"name": "key__<slug>", "direction": "VERTICAL", "itemSpacing": 3, "align": "MIN", "anchorY": "bottom",
      "children": [{"merge": "key__<slug>-members", "lineHeight": 16}, {"merge": "category__<slug>", "lineHeight": null}]}
 
-with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile, one `legend` block stacking a
-row per category at the import's own pitch:
+with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile, one `legend` row of items,
+then move it onto the 16px content edge and set its names to Lato Medium (the restyle maps a weight-500
+run to Regular):
 
-    {"name": "legend", "direction": "VERTICAL", "itemSpacing": "keep", "align": "MIN", "anchorY": "top",
+    {"name": "legend", "direction": "HORIZONTAL", "itemSpacing": 16, "align": "CENTER", "anchorY": "top",
      "children": [{"block": {"name": "legend__<column>", "direction": "HORIZONTAL", "itemSpacing": 5, "align": "CENTER",
-       "children": [{"node": "legend__<column>-chip"}, {"block": {"name": "legend__<column>-labels",
-         "direction": "HORIZONTAL", "itemSpacing": 8, "align": "CENTER",
-         "children": [{"merge": "legend__<column>", "lineHeight": null}, {"merge": "legend__<column>-members", "lineHeight": null}]}}]}}]}
+       "children": [{"node": "legend__<column>-chip"}, {"merge": "legend__<column>", "lineHeight": null}]}}]}
 
-The nested row also fixes the name-to-list gap, which the import lays out in this step's wider font.
+The containers also fix the gaps between runs, which the import lays out in this step's wider font. The
+legend names take `Data Insights/Annotations`, the chips their category's `Default Palette/*` style.
+
+**On mobile, the Note then moves out of `chart` into the footer**, as the footer's first child: one Lato
+12 text joined from the `chart__note*` runs, `Note:` set bold, `Text/Gray 70`, width FILL and line height
+auto. Crop `chart` to what is left in it and re-pin the footer to the 16px bottom margin. Left in the
+chart, the imported runs keep this step's ink-tight boxes, and the gap to `Data source:` no longer
+matches the gap between the footer's own rows.
+
+**The mobile frame's own slots carry the design team's sizes**, which the template's styles do not: the
+header at y=12 with a 4px gap, the title at 24px and the subtitle at 15px (line height auto), its box
+cropped to 420 with the step's explicit line breaks; the footer's two rows at 12px with a 4px gap, ending
+on the 16px bottom margin. A rebuild clones the frame, which keeps them, and needs only the chart
+re-imported.
 
 **The gate's standing findings**, each accepted rather than open: the template's own 11px tagline and
 licence rows (`text-floor`, desktop); the desktop key rising beside the subtitle's shorter lines (`gap`
-top ~3.5px, the design team's layout); the mobile Note drawn in the band (`gap` bottom ~4.4px); the
+top ~3.5px, the design team's layout); the
 two-author licence run (`diff_against_template`, mobile). `color_audit.py --separated` on the four
 composited fills fails under red-green colour-blindness (closest: Paid work against Unpaid work, dE 8.2
 for protanopia). Every segment sits in a fixed position under its own key block, so position rather than
@@ -242,6 +256,7 @@ hue carries the category; the palette is the design team's call.
 """
 
 import logging
+import re
 from pathlib import Path
 
 import matplotlib
@@ -656,13 +671,19 @@ HEADER_MIN_GAP = 8
 KEY_NAME_GAP = 3
 KEY_BAR_GAP = 10
 
-# The row legend, which is what a frame too narrow to name its own segments gets instead: the
-# colour chip, the gap after it, the gap between a category's name and its member list, and the air
-# between the block and the first bar. In template pixels.
-LEGEND_CHIP_PX = 9
+# The mobile legend, one row of chip-and-name items above the plot, in the design team's geometry and in
+# template pixels: the chip, the gap after it, the gap between items, the air between the header and the
+# row's box, the row's own line, and the air between the row and the first bar's ink.
+LEGEND_CHIP_PX = 12
 LEGEND_CHIP_GAP = 5
-LEGEND_NAME_GAP = 8
-LEGEND_BLOCK_GAP = 8
+LEGEND_ITEM_GAP = 16
+LEGEND_TOP_GAP = 12
+LEGEND_LINE_PX = 16
+LEGEND_BAR_GAP = 16
+
+# A mobile country label: the name in bold, right-aligned against a column of years, which sits this far
+# from the bars, and this far from the name.
+YEAR_COLUMN_GAP = 4
 
 # Air between the last bar and a Note drawn inside the band, which is where a frame with no Note
 # slot of its own has to put it.
@@ -674,10 +695,6 @@ NOTE_BAND_GAP = 10
 # run, and the run `draw_note` draws.
 NOTE_LEAD = "Note:"
 
-# Bars fill this share of a row's pitch: the design team's spacing, 25px bars on a 35px pitch on desktop
-# where it was 25 on 31.5. The frames are run taller to make room (`height_px`), so the bars keep their
-# thickness and only the air between them grows.
-BAR_FRACTION = 0.716
 
 # The two frames this step draws, cloned from "Static Chart Template_Vertical" (850x1095, node
 # `5332:93`) and "Static Chart Template_Mobile (example 2)" (540x824, node `24590:32`) and measured
@@ -688,11 +705,12 @@ BAR_FRACTION = 0.716
 # The mobile frame differs in more than size, and both differences are in `template_text`: its
 # footer is two rows (`Data source:` and the license, no Note and no tagline), and its content is
 # 508px against the desktop's 818. The first is why the Note is drawn inside the band there; the
-# second is why the key becomes a block of rows above the plot instead of names over the segments.
+# second is why the key becomes a row of chips and names above the plot instead of names over the
+# segments.
 #
 # Both frames run taller than their templates, by `*_EXTRA_PX`: the desktop by the 67px the design
-# team's rework added, the mobile frame by enough to keep its bars at the thickness they had before the
-# wider spacing. The footers are bottom-anchored, so every footer row moves down by that much.
+# team's rework added, the mobile frame by 60px. The desktop's footer is bottom-anchored, so its rows move
+# down by that much; the mobile frame's footer rows are the design team's own positions.
 DESKTOP_EXTRA_PX = 67
 MOBILE_EXTRA_PX = 60
 LAYOUTS = {
@@ -768,7 +786,10 @@ LAYOUTS = {
         "key_name_font_px": 14,
         "key_name_line_px": 17,
         # The country's name and its survey year on a line each.
-        "country_two_lines": True,
+        "country_label": "two_lines",
+        # Bars fill this share of a row's pitch: the design team's 25px bars on a 35px pitch, where it was
+        # 25 on 31.5. The frame runs taller to make room, so the bars keep their thickness.
+        "bar_fraction": 0.716,
         # Whether a value reads "4h 29m" rather than "4 hours 29 mins" when the long form does not fit.
         "with_mins_suffix": True,
         "groups": MAIN_CATEGORY_GROUPS,
@@ -787,28 +808,30 @@ LAYOUTS = {
         "size": (TEMPLATES["mobile"].width_px, TEMPLATES["mobile"].height_px + MOBILE_EXTRA_PX),
         "margin": 16,
         "template_text": {
-            # The 540-wide set's title node is 428 wide against a 508 content box, which is the orphan
-            # guard the design team builds in — so the title is measured against 428, not against the
-            # content. It fits on one line there, which puts the subtitle at 51 rather than the
-            # placeholder's 80, beside the logo — so the subtitle's box is cropped to clear it.
-            "origin_y": 16,
+            # The design team's mobile sizes, set on the frame's own slots (see the Figma recipe): the
+            # header at y=12 with a 4px gap, the title at 24px and the subtitle at 15px on an 18px line.
+            # The title node is 428 wide against a 508 content box, the orphan guard the templates
+            # build in, so the title is measured against 428. It fits on one line, which puts the
+            # subtitle beside the logo — so the subtitle's box is cropped to clear it.
+            "origin_y": 12,
             "logo_px": 0,
             "logo_x": 460,
             "title_slot_px": 428,
-            "title_px": 25,
-            "header_gap_px": 6,
+            "title_px": 24,
+            "header_gap_px": 4,
             "subtitle_slot_px": 508,
-            "subtitle_px": 16,
-            "subtitle_line_px": 19,
-            # This frame's footer is `Data source:` and the license, both full width at 14px, and
-            # nothing else — no Note slot and no tagline. So `footer_top_px` is where the band stops,
-            # `note_in_band` moves the Note into the band's foot, and the absence of `tagline_y` is
-            # what tells `draw_footer` the license has a row to itself.
-            "footer_top_px": 770 + MOBILE_EXTRA_PX,
-            "source_y": 770 + MOBILE_EXTRA_PX,
-            "source_px": 14,
-            "license_y": 791 + MOBILE_EXTRA_PX,
-            "license_px": 14,
+            "subtitle_px": 15,
+            "subtitle_line_px": 18,
+            # This frame's footer is `Data source:` and the license, both full width — at 12px on 14px
+            # lines with a 4px gap, the design team's sizes — and nothing else: no Note slot and no
+            # tagline. So `footer_top_px` is where the band stops, `note_in_band` moves the Note into the
+            # band's foot, and the absence of `tagline_y` tells `draw_footer` the license has a row of
+            # its own.
+            "footer_top_px": 836,
+            "source_y": 836,
+            "source_px": 12,
+            "license_y": 854,
+            "license_px": 12,
             # Drawn inside the band, so a line costs a line of chart rather than the frame's bottom
             # margin — which is why the cap is four here and two on the desktop frame. At 12px the Note
             # takes four lines of 508px; it is the same text either way, and the caveats it carries are
@@ -817,20 +840,10 @@ LAYOUTS = {
             "note_line_px": 14,
             "note_slot_px": 508,
             "note_max_lines": 4,
-            # Where the Note's own box ends, so it reads as a third footer row evenly spaced with the
-            # other two — the same field the desktop frame uses, and measured the same way: on the
-            # rendered frame, not derived. It has to be, because the two kinds of row do not agree
-            # about their boxes. The template stacks 17px line boxes around 14px text with a 4px
-            # `itemSpacing`, which renders as 8px of air between the source and licence rows; a Note
-            # imported from this step arrives as ink-tight boxes whose last line's ink stops 8px short
-            # of the box it is laid out in. So equal BOX gaps would render as 14px against 8px, and
-            # this number is the one that puts the same 8px above the source row. To re-derive it after
-            # a type-size change: measure the ink bands at the foot of the frame and shift by the
-            # difference (`measure_footer_ink.py` in the session notes did exactly that). It moved
-            # once already, by 2px, when the lead-in went bold: the Note is drawn as a one-line object
-            # plus a block of the rest, and those two do not compose their vertical metrics the way a
-            # single four-line block did.
-            "note_bottom_px": 770 + MOBILE_EXTRA_PX,
+            # Where the Note's box ends: the footer's 4px row gap above the source row, so the Note is
+            # the footer's first row on the same rhythm as the other two (source box 836..850, licence
+            # from 854). In Figma it moves into the footer's auto-layout, which then holds that gap.
+            "note_bottom_px": 832,
         },
         # The same point sizes as the desktop frame, deliberately: on a frame 0.64x as wide they read
         # half again as large, which is the direction the template itself goes (its own source and
@@ -841,18 +854,24 @@ LAYOUTS = {
         # The desktop's 8px scaled to this frame's width, which keeps the values on the two narrowest
         # segments that the full inset would push out.
         "value_inset_px": 5,
+        # The legend's names, in the body gray at Lato Medium — the design team's choice: on a frame this
+        # narrow the member lists crowd the plot, and the chips carry the link to the bars.
         "legend_font_px": 13,
         "with_mins_suffix": True,
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
-        # A block of rows above the plot, not names attached to the segments. The desktop reading is
-        # better and is why that frame keeps it, but it needs each segment to be wide enough to hold
-        # its own name: here the narrowest category spans 56px against a 105px name, so all four would
-        # overhang the bars they name by more than they cover. `draw_row_legend` says the rest.
-        "group_labels": "rows",
+        # One row of chip-and-name items above the plot, not names attached to the segments: the
+        # narrowest category spans 56px against a 105px name, so names over the segments would overhang
+        # the bars they name by more than they cover.
+        "group_labels": "inline",
+        # Name and year on one line, the years in a column of their own against the bars.
+        "country_label": "year_column",
+        # The design team's spacing here: 17px bars on a 26px pitch.
+        "bar_fraction": 0.652,
         "note_in_band": True,
-        # The same sentence as the desktop frame.
+        # The same sentence as the desktop frame, broken after its first sentence (`wrap_sentences`).
         "subtitle": SUBTITLE,
+        "subtitle_sentence_breaks": True,
     },
 }
 
@@ -1009,8 +1028,11 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     # Step 1: Header — the template's title row, then its subtitle.
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], PLAYFAIR_SLOT_SLACK)
     subtitle_text = layout["subtitle"].format(first=tb["year"].min(), last=tb["year"].max())
-    subtitle = wrap_balanced(
-        subtitle_text, subtitle_box_px(template, margin_px, lines_in(title)), template["subtitle_px"]
+    subtitle_box = subtitle_box_px(template, margin_px, lines_in(title))
+    subtitle = (
+        wrap_sentences(subtitle_text, subtitle_box, template["subtitle_px"])
+        if layout.get("subtitle_sentence_breaks")
+        else wrap_balanced(subtitle_text, subtitle_box, template["subtitle_px"])
     )
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
@@ -1039,25 +1061,22 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     countries = [str(SHORT_COUNTRY_NAMES.get(country, country)) for country in tb["country"].tolist()]
     years = [str(year) for year in tb["year"].tolist()]
     country_font = font_pt(layout, "country_font_px")
-    if layout.get("country_two_lines"):
-        # The ADVANCE, not the ink: a text node's box spans its side bearings too, so a column sized to
-        # the ink leaves the widest right-aligned label's box sticking past the frame margin.
-        label_px = max(
-            max(text_advance_px(name, country_font, bold=True), text_advance_px(year, country_font))
-            for name, year in zip(countries, years)
-        )
+    label_mode_country = layout["country_label"]
+    assert label_mode_country in {"two_lines", "year_column"}, f"Unknown country_label {label_mode_country!r}."
+    # The ADVANCE, not the ink: a text node's box spans its side bearings too, so a column sized to the ink
+    # leaves the widest right-aligned label's box sticking past the frame margin.
+    name_px = max(text_advance_px(name, country_font, bold=True) for name in countries)
+    year_px = max(text_advance_px(year, country_font) for year in years)
+    if label_mode_country == "two_lines":
+        plot_left_px = margin_px + max(name_px, year_px) + COUNTRY_LABEL_PAD
     else:
-        label_px = max(
-            run_row_width([(f"{name} ", True), (year, False)], layout["country_font_px"])
-            for name, year in zip(countries, years)
-        )
-    plot_left_px = margin_px + label_px + COUNTRY_LABEL_PAD
+        plot_left_px = margin_px + name_px + YEAR_COLUMN_GAP + year_px + YEAR_COLUMN_GAP
     plot_width_px = (width_px - margin_px) - plot_left_px
     px_per_min = plot_width_px / MINUTES_PER_DAY
 
     # Step 4: The band between the subtitle's ink and the footer's, and the key's room in it.
     label_mode = layout["group_labels"]
-    assert label_mode in {"aligned", "rows"}, f"Unknown group_labels {label_mode!r}."
+    assert label_mode in {"aligned", "inline"}, f"Unknown group_labels {label_mode!r}."
     band_top = subtitle_y + lines_in(subtitle) * template["subtitle_line_px"]
     band_bottom = (
         template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
@@ -1073,10 +1092,11 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     else:
         note_top_px = template["note_bottom_px"] - lines_in(band_note) * template["note_line_px"]
         foot_px = band_bottom - note_top_px + NOTE_BAND_GAP
-    # Where the last bar's INK has to stop. A bar fills BAR_FRACTION of its row, centred, so it stops half
-    # an inter-bar gap short of the axes' own bottom edge, and starts the same share below its top.
+    # Where the last bar's INK has to stop. A bar fills `bar_fraction` of its row, centred, so it stops
+    # half an inter-bar gap short of the axes' own bottom edge, and starts the same share below its top.
     ink_bottom_px = band_bottom - foot_px
-    bar_head_rows = (1 - BAR_FRACTION) / 2
+    bar_fraction = layout["bar_fraction"]
+    bar_head_rows = (1 - bar_fraction) / 2
     n_rows = len(tb)
 
     key = []
@@ -1090,15 +1110,15 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
             text_width_px(line, template["subtitle_px"] * POINTS_PER_PIXEL) for line in subtitle.split("\n")
         )
         bars_top_px = key_header_px(key, plot_left_px, band_top, subtitle_right_px)
-        share = bar_head_rows / (n_rows - bar_head_rows)
-        chart_top_px = (bars_top_px - share * ink_bottom_px) / (1 - share)
     else:
-        # The key is its own block above the plot, so the room it needs is the block plus the air under it.
-        chart_top_px = band_top + BAND_INSET + legend_block_px(layout) + LEGEND_BLOCK_GAP
+        # The legend is one row above the plot, so the first bar starts under it and the air around it.
+        bars_top_px = band_top + LEGEND_TOP_GAP + LEGEND_LINE_PX + LEGEND_BAR_GAP
+    share = bar_head_rows / (n_rows - bar_head_rows)
+    chart_top_px = (bars_top_px - share * ink_bottom_px) / (1 - share)
     row_pitch_px = (ink_bottom_px - chart_top_px) / (n_rows - bar_head_rows)
     chart_bottom_px = chart_top_px + n_rows * row_pitch_px
     paths.log.info(
-        f"{layout['template']}: bars {BAR_FRACTION * row_pitch_px:.2f}px on a {row_pitch_px:.2f}px pitch, "
+        f"{layout['template']}: bars {bar_fraction * row_pitch_px:.2f}px on a {row_pitch_px:.2f}px pitch, "
         f"first bar at {chart_top_px + bar_head_rows * row_pitch_px:.1f}px."
     )
 
@@ -1130,8 +1150,8 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     )
 
     # Step 6: The key.
-    if label_mode == "rows":
-        draw_row_legend(fig, layout, palette, band_top + BAND_INSET, fx, fy)
+    if label_mode == "inline":
+        draw_inline_legend(fig, layout, palette, band_top + LEGEND_TOP_GAP, fx, fy)
     else:
         draw_key(fig, key, plot_left_px, chart_top_px + bar_head_rows * row_pitch_px, layout, palette, fx, fy)
 
@@ -1177,6 +1197,19 @@ def wrap_balanced(text: str, slot_px: float, size_px: float) -> str:
         else:
             low = mid
     return wrap_to_slot(text, high, size_px)
+
+
+def wrap_sentences(text: str, slot_px: float, size_px: float) -> str:
+    """Wrap each sentence on lines of its own, unless that costs a line over the plain wrap.
+
+    A sentence boundary outranks balance: a second sentence that starts mid-line reads as a run-on, so it
+    starts a line of its own wherever that adds no line. Otherwise this falls back to `wrap_balanced`.
+    """
+    sentences = re.split(r"(?<=\.)\s+", text.strip())
+    by_sentence = "\n".join(wrap_to_slot(sentence, slot_px, size_px) for sentence in sentences)
+    if lines_in(by_sentence) <= lines_in(wrap_to_slot(text, slot_px, size_px)):
+        return by_sentence
+    return wrap_balanced(text, slot_px, size_px)
 
 
 def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str, int]:
@@ -1243,16 +1276,17 @@ def draw_bars(
 
     country_font = font_pt(layout, "country_font_px")
     label_x = -COUNTRY_LABEL_PAD / px_per_min
+    year_px = max(text_advance_px(year, country_font) for year in years)
     inset = layout["value_inset_px"]
     last_column = layout["groups"][-1]["column"]
     for row in range(len(tb)):
         country_row = tb.iloc[row]
         slug = slugify(str(country_row["country"]))
 
-        # The country's name in bold and its survey year in regular: a line each on desktop, centred on
-        # the bar, or one right-aligned line where the rows are too tight for two. No brackets on that line:
-        # the weight separates the two, and right-aligned, the years already form a column.
-        if layout.get("country_two_lines"):
+        # The country's name in bold and its survey year in regular: a line each on desktop, centred on the
+        # bar, or on mobile one line, the years in their own right-aligned column against the bars and each
+        # name right-aligned against that column. No brackets: the weight and the column separate them.
+        if layout["country_label"] == "two_lines":
             for text, offset, bold, gid in (
                 (countries[row], -COUNTRY_LINE_PX / 2, True, f"{slug}__label"),
                 (years[row], COUNTRY_LINE_PX / 2, False, f"{slug}__label-year"),
@@ -1269,21 +1303,15 @@ def draw_bars(
                     gid=gid,
                 )
         else:
-            name_run, year_run = f"{countries[row]} ", years[row]
-            name, name_ink, name_step = place_run(name_run, country_font, bold=True)
-            year, year_ink, _ = place_run(year_run, country_font)
-            # Laid out left to right from where the row has to start, each run anchored on its ink
-            # centre — the anchor that survives Figma's narrower face (see `draw_run_row`).
-            start_px = -COUNTRY_LABEL_PAD - (name_step + year_ink)
-            for text, centre_px, bold, gid in (
-                (name, start_px + name_ink / 2, True, f"{slug}__label"),
-                (year, start_px + name_step + year_ink / 2, False, f"{slug}__label-year"),
+            for text, right_px, bold, gid in (
+                (countries[row], -(YEAR_COLUMN_GAP + year_px + YEAR_COLUMN_GAP), True, f"{slug}__label"),
+                (years[row], -YEAR_COLUMN_GAP, False, f"{slug}__label-year"),
             ):
                 ax.text(
-                    centre_px / px_per_min,
+                    right_px / px_per_min,
                     row + baseline(country_font),
                     text,
-                    ha="center",
+                    ha="right",
                     va="baseline",
                     fontsize=country_font,
                     fontweight="bold" if bold else "normal",
@@ -1302,7 +1330,7 @@ def draw_bars(
                 row + 0.5,
                 minutes if last else segment_px(minutes, px_per_min) / px_per_min,
                 left=left,
-                height=BAR_FRACTION,
+                height=layout["bar_fraction"],
                 color=color,
                 alpha=SEGMENT_ALPHA,
                 linewidth=0,
@@ -1448,35 +1476,6 @@ def check_key_lines() -> None:
         )
 
 
-def layout_row_legend(layout: dict) -> list[dict]:
-    """Measure each legend row: the chip, the bold category name, then the members it holds.
-
-    Asserted to fit the content width rather than wrapped. A key row that wraps stops reading as a
-    row — the second line hangs under the members with nothing to tie it to its chip — so the fix is
-    the wording, and a member name is the thing to shorten.
-    """
-    fontsize = font_pt(layout, "legend_font_px")
-    content_px = layout["size"][0] - 2 * layout["margin"]
-    rows = []
-    for group in layout["groups"]:
-        members = run_in_list(group["members"])
-        width_px = (
-            LEGEND_CHIP_PX
-            + LEGEND_CHIP_GAP
-            + text_advance_px(group["label"], fontsize, bold=True)
-            + LEGEND_NAME_GAP
-            + text_advance_px(members, fontsize)
-        )
-        # Against the regular-weight slack, though the name is bold: bold Lato is the *narrower* of the
-        # two against this step's Arial, so the regular figure is the conservative one.
-        assert fits_slot(width_px, content_px), (
-            f"The {group['label']!r} key row needs {width_px:.0f}px of the frame's {content_px:.0f}px. "
-            f"Shorten a member name."
-        )
-        rows.append({"group": group, "members": members})
-    return rows
-
-
 def run_in_list(members: list[str]) -> str:
     """The members as one comma-separated phrase, in sentence case: "Paid work, commuting, homework".
 
@@ -1491,78 +1490,51 @@ def run_in_list(members: list[str]) -> str:
     return ", ".join([members[0], *(lowered(name) for name in members[1:])])
 
 
-def legend_block_px(layout: dict) -> float:
-    """How tall the row legend is, from its first row's INK: one line per category, less the top inset.
+def draw_inline_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
+    """The mobile key: one row of items, each a colour chip and the category's name, from the margin.
 
-    Measured from the ink for the same reason the desktop header is: the band is inset by BAND_INSET
-    from the subtitle, and reserving the first row's whole line box put the chip and text 3.5px further
-    down, 17.5px of air where every other frame holds 14.
-    """
-    return len(layout["groups"]) * line_px(font_pt(layout, "legend_font_px")) - legend_ink_inset_px(layout)
-
-
-def legend_ink_inset_px(layout: dict) -> float:
-    """How far below the top of a key row's line box its ink starts: the taller of chip and cap height."""
-    fontsize = font_pt(layout, "legend_font_px")
-    return line_px(fontsize) / 2 - max(LEGEND_CHIP_PX, cap_height_px(fontsize)) / 2
-
-
-def draw_row_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
-    """The key as a block of rows above the plot: a colour chip, the category's name, what it holds.
-
-    The desktop frame hangs each name over the run of bars it belongs to, which is the better reading
-    and is why that frame keeps it — the key is where the eye already is. It needs the segment to be
-    wide enough to hold the words, though, and this frame's 508px of content does not give it: the
-    narrowest category spans 56px against a 105px name, so all four names would overhang the bars they
-    name by more than they cover, and a name that overhangs points at its neighbour too. The chip
-    carries the link to the bar instead, at the bar's own fill and opacity.
-
-    Drawn in figure coordinates rather than on the axes, because unlike the desktop key it is
-    positioned by the frame's margin rather than by any segment.
+    The names are the only text: the member lists crowd a frame this narrow, and the chip, at the bar's
+    own fill and opacity, carries the link to the segment. Asserted to fit the content width.
     """
     fontsize = font_pt(layout, "legend_font_px")
     width_px, height_px = layout["size"]
-    line = line_px(fontsize)
-    for index, row in enumerate(layout_row_legend(layout)):
-        group = row["group"]
-        # The block starts at its ink (see `legend_block_px`), so the rows start an inset higher.
-        centre_px = top_px - legend_ink_inset_px(layout) + index * line + line / 2
-        # Ink centred on the row, the way `draw_bars` centres a value on its bar: `va="center"` centres
-        # the whole line box instead, which reserves room for descenders the chip does not have and
-        # leaves the two a descender out of line.
-        baseline_px = centre_px + cap_height_px(fontsize) / 2
+    centre_px = top_px + LEGEND_LINE_PX / 2
+    baseline_px = centre_px + cap_height_px(fontsize) / 2
+    cursor = layout["margin"]
+    for group in layout["groups"]:
+        column = slugify(group["column"])
         fig.add_artist(
             Rectangle(
-                (fx(layout["margin"]), fy(centre_px + LEGEND_CHIP_PX / 2)),
+                (fx(cursor), fy(centre_px + LEGEND_CHIP_PX / 2)),
                 LEGEND_CHIP_PX / width_px,
                 LEGEND_CHIP_PX / height_px,
                 transform=fig.transFigure,
                 facecolor=resolve_color(group["color"], palette),
                 alpha=SEGMENT_ALPHA,
                 linewidth=0,
-                gid=f"legend__{slugify(group['column'])}-chip",
+                gid=f"legend__{column}-chip",
             )
         )
-        cursor = layout["margin"] + LEGEND_CHIP_PX + LEGEND_CHIP_GAP
-        color = header_text_color(group["color"], palette)
-        # Name and members at one size, separated by weight and colour: the name in its category's
-        # colour, the list in the body gray, as on the desktop frame. There the name is also larger,
-        # because it is a heading on a line of its own above its list; inline, immediately before the
-        # list, weight and colour are enough.
-        for text, bold, gid in ((group["label"], True, ""), (row["members"], False, "-members")):
-            drawn, ink_px, step_px = place_run(text, fontsize, bold)
-            fig.text(
-                fx(cursor + ink_px / 2),
-                fy(baseline_px),
-                drawn,
-                ha="center",
-                va="baseline",
-                fontsize=fontsize,
-                fontweight="bold" if bold else "normal",
-                color=color if bold else MEMBER_TEXT_COLOR,
-                gid=f"legend__{slugify(group['column'])}{gid}",
-            )
-            cursor += step_px + (LEGEND_NAME_GAP if bold else 0.0)
+        cursor += LEGEND_CHIP_PX + LEGEND_CHIP_GAP
+        drawn, ink_px, step_px = place_run(group["label"], fontsize)
+        # Ink-centred, the anchor that survives Figma's narrower face (see `draw_run_row`).
+        fig.text(
+            fx(cursor + ink_px / 2),
+            fy(baseline_px),
+            drawn,
+            ha="center",
+            va="baseline",
+            fontsize=fontsize,
+            fontweight="medium",
+            color=MEMBER_TEXT_COLOR,
+            gid=f"legend__{column}",
+        )
+        cursor += step_px + LEGEND_ITEM_GAP
+    content_end = width_px - layout["margin"]
+    assert fits_slot(cursor - LEGEND_ITEM_GAP - layout["margin"], content_end - layout["margin"]), (
+        f"The legend row needs {cursor - LEGEND_ITEM_GAP - layout['margin']:.0f}px of the frame's "
+        f"{content_end - layout['margin']:.0f}px."
+    )
 
 
 def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, fy) -> None:
@@ -1927,10 +1899,11 @@ def cap_height_px(fontsize: float) -> float:
 def draw_note(fig, x_px: float, y_px: float, text: str, template: dict, gid: str, fx, fy) -> None:
     """Draw a Note with its lead-in bold: `Note:` in bold, then the sentence in regular.
 
-    matplotlib has no rich text, so the first line is two objects and the rest are one block. The
-    lead-in is anchored on its own ink centre and the remainder on its LEFT edge, which is what
-    survives Figma: a centred run re-rendered in the template's narrower Lato shrinks away from its
-    centre, and doing that to the remainder would open a gap after the lead-in.
+    matplotlib has no rich text, so the first line is two objects, and every later line is one object of
+    its own at `note_line_px` pitch: a multi-line block sets its own line height, which renders a pitch
+    that disagrees with the first line's. The lead-in is anchored on its own ink centre and the remainder
+    on its LEFT edge, which is what survives Figma: a centred run re-rendered in the template's narrower
+    Lato shrinks away from its centre, and doing that to the remainder would open a gap after the lead-in.
     """
     size_px = template["note_px"]
     line_height_px = template["note_line_px"]
@@ -1960,15 +1933,15 @@ def draw_note(fig, x_px: float, y_px: float, text: str, template: dict, gid: str
         color=FOOTER_COLOR,
         gid=f"{gid}--rest",
     )
-    if len(lines) > 1:
+    for index, line in enumerate(lines[1:], start=1):
         draw_slot(
             fig,
             fx(x_px),
-            fy(y_px + line_height_px),
-            "\n".join(lines[1:]),
+            fy(y_px + index * line_height_px),
+            line,
             size_px,
-            line_height_px,
-            f"{gid}--tail",
+            None,
+            f"{gid}--line-{index + 1}",
             FOOTER_COLOR,
         )
 
