@@ -47,6 +47,9 @@ def run() -> None:
     # Step 3: Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
+    # Step 4: Apply (or log) known source errors.
+    tb = paths.apply_corrections(tb)
+
     # Check the output is plausible.
     sanity_check_outputs(tb)
 
