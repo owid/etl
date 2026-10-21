@@ -388,6 +388,9 @@ def _indicators_from_dimensions(dimensions: list[dict[str, Any]], resolver: _Pat
     """Rebuild `indicators` from grapher `dimensions`, keeping their order and display."""
     by_axis: dict[str, list[Any]] = {}
     problems = []
+    # A single chart needs at least one indicator, or its next push fails.
+    if not dimensions:
+        problems.append("dimensions: the admin sets no indicators, and a single chart needs at least one")
     for dim in dimensions:
         extra = set(dim) - {"property", "variableId", "display"}
         if extra:

@@ -251,6 +251,13 @@ def test_stale_pin_leaves_a_column_the_yaml_already_sets(repo):
     assert result.pulled == ["map"]
 
 
+def test_empty_dimensions_need_manual_fix(repo):
+    config, result = _reconcile(_step(repo), {"dimensions": []})
+    assert result.pulled == []
+    assert len(result.needs_manual) == 1 and "at least one" in result.needs_manual[0]
+    assert len(config["views"][0]["indicators"]["y"]) == 2
+
+
 def test_dimensions_on_an_older_dataset_version_are_stale(repo):
     # Same indicators, order and display as the YAML, only on an older version: nothing to write.
     patch = {
