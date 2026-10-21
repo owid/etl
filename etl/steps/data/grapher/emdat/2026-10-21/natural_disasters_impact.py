@@ -33,8 +33,8 @@ def run() -> None:
     #
     # Load garden tables and remove unnecessary columns.
     ds_garden = paths.load_dataset("natural_disasters")
-    tb_yearly = ds_garden["natural_disasters_yearly_impact"]
-    tb_decadal = ds_garden["natural_disasters_decadal_impact"]
+    tb_yearly = ds_garden.read("natural_disasters_yearly_impact", reset_index=False)
+    tb_decadal = ds_garden.read("natural_disasters_decadal_impact", reset_index=False)
 
     #
     # Process data.
