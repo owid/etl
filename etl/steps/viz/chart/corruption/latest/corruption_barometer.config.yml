@@ -2,7 +2,7 @@ grapher_schema: "011"
 
 title:
   title: Perception of corruption
-  title_variant: by institution (new PR test)
+  title_variant: by institution (lane test)
 default_selection:
   - World
 dimensions:
