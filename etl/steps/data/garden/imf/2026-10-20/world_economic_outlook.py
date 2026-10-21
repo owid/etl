@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -11,6 +12,14 @@ RELEASE_YEAR = int(paths.version.split("-")[0])
 
 # Indicators, each split into observations and forecasts.
 INDICATORS = ["gross_domestic_product__gdp__constant_prices__percent_change", "unemployment_rate"]
+
+# Fiscal years the IMF reports, and whether each one is shown in the year it starts (True) or ends (False).
+FISCAL_YEAR_STARTS_IN_FIRST_YEAR = {
+    "April/March": True,
+    "July/June": False,
+    "August/July": False,
+    "October/September": False,
+}
 
 # Minimum number of countries and country groups expected (207 in the April and October 2026 releases).
 MIN_ENTITIES = 200
@@ -29,7 +38,13 @@ def run() -> None:
     #
     # Process data.
     #
-    # Harmonize country names.
+    # Step 1: Convert the IMF's latest year of actual data to a calendar year.
+    tb = add_latest_actual_year(tb)
+
+    # Step 2: Split each indicator into observations and forecasts, and reshape to wide format.
+    tb = split_observations_and_forecasts(tb)
+
+    # Step 3: Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Check the output is plausible.
@@ -45,6 +60,77 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_latest_actual_year(tb: Table) -> Table:
+    """
+    Converts the IMF's latest year of actual data (a year, or a fiscal-year label like FY2025/26) to an integer year.
+    """
+    tb["country"] = tb["country"].astype(str)
+
+    # The fiscal-year months are only reported on the GDP series, so take them per country.
+    fiscal_year_months = (
+        tb.dropna(subset=["start_end_months_of_reporting_year"])
+        .drop_duplicates(subset=["country"])
+        .set_index("country")["start_end_months_of_reporting_year"]
+        .to_dict()
+    )
+
+    tb["latest_actual_annual_data"] = [
+        convert_to_year(label, fiscal_year_months.get(country))
+        for label, country in zip(tb["latest_actual_annual_data"], tb["country"])
+    ]
+
+    # The IMF reports no latest year of actual data for most of its country groups. In its own tables, the current
+    # year and later years are projections, so the previous year is the last one of actual data.
+    tb["latest_actual_annual_data"] = tb["latest_actual_annual_data"].fillna(RELEASE_YEAR - 1).astype("Int64")
+
+    # Data for the release year itself is never complete, so it should be a projection (except for fiscal years that
+    # ended earlier in the release year, like Bangladesh's FY2025/26 from July to June, shown as 2026).
+    calendar_year = tb["country"].map(fiscal_year_months).fillna("January/December") == "January/December"
+    assert (tb.loc[calendar_year, "latest_actual_annual_data"] < RELEASE_YEAR).all(), (
+        "Some calendar-year series have actual data for the release year."
+    )
+    assert (tb["latest_actual_annual_data"] <= RELEASE_YEAR).all(), (
+        "Some series have actual data after the release year."
+    )
+
+    return tb.drop(columns="start_end_months_of_reporting_year")
+
+
+def convert_to_year(label, fiscal_year_months):
+    """
+    Converts the IMF's latest year of actual data to the year column the IMF shows that data in.
+
+    A fiscal year goes in the calendar year that holds most of its months, and in the year it ends when the split is
+    even: FY2025/26 from April to March is shown as 2025 (as the IMF does for India), and FY2024/25 from July to June
+    as 2025 (as for Egypt).
+    """
+    if pd.isna(label):
+        return pd.NA
+    if isinstance(label, str) and label.startswith("FY"):
+        start_year = int(label[2:6])
+        assert fiscal_year_months in FISCAL_YEAR_STARTS_IN_FIRST_YEAR, (
+            f"Unexpected fiscal year months for {label}: {fiscal_year_months}."
+        )
+        if FISCAL_YEAR_STARTS_IN_FIRST_YEAR[fiscal_year_months]:
+            return start_year
+        return start_year + 1
+    return int(label)
+
+
+def split_observations_and_forecasts(tb: Table) -> Table:
+    """
+    Splits each indicator into observations (up to the latest year of actual data) and forecasts, in wide format.
+    """
+    tb["indicator"] = tb["indicator"].astype(str)
+    tb.loc[tb["year"] > tb["latest_actual_annual_data"], "indicator"] += "_forecast"
+    tb.loc[tb["year"] <= tb["latest_actual_annual_data"], "indicator"] += "_observation"
+
+    tb = tb.dropna(subset=["value"]).drop(columns="latest_actual_annual_data")
+    tb = tb.pivot(index=["country", "year"], columns="indicator", values="value", join_column_levels_with="_")
+
+    return tb.underscore()
 
 
 def sanity_check_outputs(tb: Table) -> None:
