@@ -1,0 +1,99 @@
+# WHO's population for Malta aged 85+ is far too small in 1973-1981: 500-800 people, against 1,500 in 1972 and
+# 2,900 in 1982 (recovered as All Causes deaths / death rate). Every rate WHO divides by it is inflated: the
+# age-standardized rates of every cause (cardiovascular diseases peak at 945 per 100,000 in 1981, then 481 in
+# 1982), and the 85+ death rates (All Causes 1981: 438 deaths in 500 people, 87,600 per 100,000). Death counts,
+# shares of deaths and the death rates of the other age bands are unaffected and kept.
+
+# Guard: fails once WHO fixes its population, so this file is then revisited rather than silently re-applied.
+- indicator: death_rate
+  match: {country: Malta, year: 1981, sex: Both sexes, age_group: over 85 years, cause: All Causes}
+  action: override
+  value: null
+  expect: {gt: 50000}
+  reason: &reason >-
+    WHO's population aged 85+ for Malta in 1973-1981 (500-800 people, against 1,500 in 1972 and 2,900 in 1982)
+    is impossibly small, which inflates the age-standardized rates and the 85+ death rates of every cause.
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate_age_standardized
+  entity: Malta
+  years: {from: 1973, to: 1981}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+# One entry per year: `match` takes single values, and the entity + years form cannot select the age band.
+- indicator: death_rate
+  match: {country: Malta, year: 1973, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1974, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1975, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1976, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1977, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1978, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1979, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1980, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  match: {country: Malta, year: 1981, age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
