@@ -290,15 +290,18 @@ def _upsert_single_chart(chart: Chart, admin_api: MagicMock) -> None:
         upsert_single_chart(chart, owid_env=MagicMock())
 
 
-def test_single_chart_slug_defaults_to_short_name():
+def test_single_chart_requires_slug():
     chart = _single_chart("0191b6c7-5595-70b2-8d30-fa03fccd7add")
-    chart.grapher_schema = "011"
-    admin_api = _admin_api_mock(upsert_chart_etl_config={"chartId": 1, "created": True})
-    _upsert_single_chart(chart, admin_api)
-    assert admin_api.upsert_chart_etl_config.call_args.kwargs["grapher_config"]["slug"] == "my-chart"
+    with pytest.raises(ValueError, match="missing a top-level `slug`"):
+        chart.validate_slug()
 
 
-def test_single_chart_slug_from_config_overrides_short_name():
+def test_mdim_does_not_require_slug():
+    # Should not raise.
+    _single_choice_mdim().validate_slug()
+
+
+def test_single_chart_sends_config_slug():
     chart = _single_chart("0191b6c7-5595-70b2-8d30-fa03fccd7add")
     chart.grapher_schema = "011"
     chart.slug = "short-slug"

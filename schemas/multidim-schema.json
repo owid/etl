@@ -349,11 +349,14 @@
             "type": "string",
             "title": "Slug",
             "description": "The chart's public URL slug, as in `ourworldindata.org/grapher/<slug>`.",
-            "requirement_level": "optional",
+            "requirement_level": "required for single charts (`dimensions: []`), optional for multidims",
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
             "guidelines": [
                 [
-                    "Set it when the URL should differ from the step's short name; single charts default to the short name with dashes, and mdims get no slug without it."
+                    "Naming the step after the slug (with underscores instead of dashes) is not required, but strongly recommended, so the file and the URL match."
+                ],
+                [
+                    "A multidim without it gets its slug in the admin."
                 ],
                 [
                     "Applied only when grapher creates the chart, or when the mdim has no slug yet. An existing slug is never changed from ETL: rename it in the admin, which also creates the redirect."

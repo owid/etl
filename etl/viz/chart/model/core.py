@@ -135,8 +135,8 @@ class Chart(MDIMBase):
     # their catalog path instead. See `validate_chart_config_id()`.
     chart_config_id: str | None = None
 
-    # Public URL slug, applied only when grapher creates the chart or the mdim has no slug yet;
-    # an existing slug is never changed from ETL. Single charts fall back to the short name.
+    # Public URL slug. Required for single charts; optional for mdims. Applied only when grapher
+    # creates the chart or the mdim has no slug yet; an existing slug is never changed from ETL.
     slug: str | None = None
 
     dependencies: set[str] = field(default_factory=set)
@@ -324,6 +324,9 @@ class Chart(MDIMBase):
 
         # Single charts must declare their grapher identity (`chart_config_id`); mdims must not.
         self.validate_chart_config_id()
+
+        # Single charts must declare their slug.
+        self.validate_slug()
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
@@ -884,6 +887,17 @@ class Chart(MDIMBase):
                     "`chart_config_id` is not a UUIDv7. Grapher generates v7 UUIDs for chart "
                     "configs — double-check this is the intended chart's `charts.configId`."
                 ),
+            )
+
+    def validate_slug(self):
+        """`slug` is required for single charts, since grapher cannot create a chart without one."""
+        if self._chart_type != "multidim" or self.dimensions:
+            return
+        if not self.slug:
+            raise ValueError(
+                f"Chart '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing a "
+                "top-level `slug`, the chart's public URL. For a chart that already exists, use its "
+                "current slug; for a new one, preferably the step's short name with dashes."
             )
 
     def validate_default_selection(self):
