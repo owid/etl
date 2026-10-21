@@ -251,15 +251,20 @@ def reconcile_fields(
         if problems:
             result.needs_manual.extend(problems)
             continue
-        # A pin to an older version of an indicator the YAML already names: nothing to copy.
+        # A pin to an older version of an indicator the YAML names. The admin keeps the old id until it
+        # is cleared, so it is reported either way; the current path is copied when the YAML doesn't
+        # set this field yet, so that clearing the pin keeps the chart's sort or map column.
+        yaml_config = view.get("config") or {}
         if key == "sortColumnSlug" and _pins_stale_id(layers.patch.get(key), resolver):
             result.stale_pins.append(key)
-            continue
+            if yaml_config.get(key) is not None:
+                continue
         if key == "map" and _pins_stale_id(layers.patch["map"].get("columnSlug"), resolver):
             result.stale_pins.append("map.columnSlug")
-            del value["columnSlug"]
-            if not _plain(value):
-                continue
+            if (yaml_config.get("map") or {}).get("columnSlug") is not None:
+                del value["columnSlug"]
+                if not _plain(value):
+                    continue
 
         if view.get("config") is None:
             view["config"] = CommentedMap()

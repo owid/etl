@@ -219,19 +219,36 @@ def test_same_column_in_an_unrelated_dataset_needs_manual_fix(repo):
 
 
 def test_pin_to_an_older_version_of_a_yaml_indicator_is_stale(repo):
-    # The admin still points at the old variable; the YAML's path resolves to the current one,
-    # so copying would change nothing and the pin would never clear.
+    # The admin still points at the old variable, which no push clears. The YAML doesn't set these
+    # fields yet, so the current path is copied: clearing the pin then keeps the sort and map column.
     patch = {"sortColumnSlug": "6", "map": {"columnSlug": "6", "colorScale": {"binningStrategy": "manual"}}}
     config, result = _reconcile(_step(repo), patch)
     view_config = config["views"][0]["config"]
-    assert "sortColumnSlug" not in view_config
-    assert "columnSlug" not in view_config["map"]
+    assert view_config["sortColumnSlug"] == "climate_related_oda_by_donor#non_climate"
+    assert view_config["map"]["columnSlug"] == "climate_related_oda_by_donor#non_climate"
+    assert view_config["map"]["colorScale"]["binningStrategy"] == "manual"
+    assert result.stale_pins == ["sortColumnSlug", "map.columnSlug"]
+    assert result.pulled == ["sortColumnSlug", "map"]
+    assert "stale variable pins" in result.status
+    assert not result.needs_manual
+
+
+def test_stale_pin_leaves_a_column_the_yaml_already_sets(repo):
+    step = _step(repo)
+    config = load_config(step.config_path)
+    view_config = config["views"][0]["config"]
+    view_config["sortColumnSlug"] = "climate_related_oda_by_donor#climate_principal_objective"
+    view_config["map"]["columnSlug"] = "climate_related_oda_by_donor#climate_principal_objective"
+    step.config_path.write_text(dump_config(config))
+    patch = {"sortColumnSlug": "6", "map": {"columnSlug": "6", "colorScale": {"binningStrategy": "manual"}}}
+    config, result = _reconcile(step, patch)
+    view_config = config["views"][0]["config"]
+    assert view_config["sortColumnSlug"] == "climate_related_oda_by_donor#climate_principal_objective"
+    assert view_config["map"]["columnSlug"] == "climate_related_oda_by_donor#climate_principal_objective"
     # The rest of the object is still copied.
     assert view_config["map"]["colorScale"]["binningStrategy"] == "manual"
     assert result.stale_pins == ["sortColumnSlug", "map.columnSlug"]
     assert result.pulled == ["map"]
-    assert "stale variable pins" in result.status
-    assert not result.needs_manual
 
 
 def test_dimensions_on_an_older_dataset_version_are_stale(repo):
