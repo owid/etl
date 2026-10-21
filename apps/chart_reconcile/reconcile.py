@@ -34,6 +34,8 @@ KEYS_EXCLUDED_FROM_INHERITANCE = ("$schema", "id", "slug", "version", "isPublish
 AXES = ("y", "x", "size", "color")
 # Same text scan as tests/test_chart_config_ids.py: config files may carry Jinja.
 CHART_CONFIG_ID_RE = re.compile(r"^\s*chart_config_id:\s*[\"']?([0-9a-fA-F-]{36})", re.MULTILINE)
+# Config fields holding a variable id in grapher, and a catalog path in ETL (etl/viz/chart/model/core.py).
+VARIABLE_ID_FIELDS = ("colorVariableId", "xVariableId", "sizeVariableId")
 SHORT_NAME_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
 CONFIG_SUFFIX = ".config.yml"
 
@@ -182,9 +184,12 @@ def field_overrides(patch: dict[str, Any]) -> dict[str, Any]:
 def variable_ids_in_patch(patch: dict[str, Any]) -> set[int]:
     """Variable ids the patch references, which the CLI resolves to catalog paths."""
     ids = {int(d["variableId"]) for d in patch.get("dimensions", []) if "variableId" in d}
-    for value in (patch.get("sortColumnSlug"), (patch.get("map") or {}).get("columnSlug")):
-        if isinstance(value, str) and value.isdigit():
-            ids.add(int(value))
+    values = [patch.get("sortColumnSlug"), (patch.get("map") or {}).get("columnSlug")]
+    values += [patch.get(key) for key in VARIABLE_ID_FIELDS]
+    for value in values:
+        variable_id = _as_variable_id(value)
+        if variable_id is not None:
+            ids.add(variable_id)
     return ids
 
 
@@ -223,7 +228,7 @@ def reconcile_fields(
         # Indicator references in the patch are variable ids; the YAML names indicators by path.
         value = copy.deepcopy(value)
         problems = []
-        if key == "sortColumnSlug":
+        if key == "sortColumnSlug" or key in VARIABLE_ID_FIELDS:
             value, problems = _resolve_column_slug(value, resolver, key)
         elif key == "map" and isinstance(value, dict) and "columnSlug" in value:
             value["columnSlug"], problems = _resolve_column_slug(value["columnSlug"], resolver, "map.columnSlug")
@@ -350,7 +355,9 @@ def _yaml_paths(view: CommentedMap) -> list[str]:
         for entry in entries if isinstance(entries, list) else [entries]:
             paths.append(entry if isinstance(entry, str) else entry["catalogPath"])
     config = view.get("config") or {}
-    for value in (config.get("sortColumnSlug"), (config.get("map") or {}).get("columnSlug")):
+    values = [config.get("sortColumnSlug"), (config.get("map") or {}).get("columnSlug")]
+    values += [config.get(key) for key in VARIABLE_ID_FIELDS]
+    for value in values:
         if isinstance(value, str) and "#" in value:
             paths.append(value)
     return paths
@@ -426,9 +433,20 @@ def _canonical_indicators(indicators: Any) -> dict[str, list[dict[str, Any]]]:
     return canonical
 
 
-def _resolve_column_slug(value: Any, resolver: _PathResolver, label: str) -> tuple[Any, list[str]]:
+def _as_variable_id(value: Any) -> int | None:
+    """A variable id written as an int or a digit string, else None."""
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
     if isinstance(value, str) and value.isdigit():
-        path, problem = resolver.resolve(int(value))
+        return int(value)
+    return None
+
+
+def _resolve_column_slug(value: Any, resolver: _PathResolver, label: str) -> tuple[Any, list[str]]:
+    """Swap a variable id (column slug or `*VariableId` field) for the catalog path the YAML uses."""
+    variable_id = _as_variable_id(value)
+    if variable_id is not None:
+        path, problem = resolver.resolve(variable_id)
         if problem:
             return value, [f"{label}: {problem}"]
         return path, []

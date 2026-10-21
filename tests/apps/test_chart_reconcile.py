@@ -174,6 +174,19 @@ def test_column_slugs_are_mapped_back_to_paths(repo):
     assert not result.needs_manual
 
 
+def test_variable_id_fields_are_mapped_back_to_paths(repo):
+    patch = {"colorVariableId": 3, "xVariableId": "2", "sizeVariableId": 4}
+    assert variable_ids_in_patch(patch) == {2, 3, 4}
+    config, result = _reconcile(_step(repo), patch)
+    view_config = config["views"][0]["config"]
+    assert view_config["colorVariableId"] == "climate_related_oda_by_donor#climate_significant_objective"
+    assert view_config["xVariableId"] == "climate_related_oda_by_donor#climate_principal_objective"
+    # An id from a dataset the step doesn't depend on is never written as a raw id.
+    assert "sizeVariableId" not in view_config
+    assert result.pulled == ["colorVariableId", "xVariableId"]
+    assert len(result.needs_manual) == 1 and result.needs_manual[0].startswith("sizeVariableId:")
+
+
 def test_values_already_in_the_yaml_are_reported_not_rewritten(repo):
     # E.g. after a version bump: the patch names old variable ids, the YAML the same short paths.
     patch = {

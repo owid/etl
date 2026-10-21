@@ -26,7 +26,7 @@ These are the same two checks the admin badge makes:
 
 - **Field drift.** Any top-level key in the admin patch besides the identity keys every patch carries (`$schema`, `id`, `slug`, `version`, `isPublished`). The command copies each one into the chart's `.config.yml`:
   - `dimensions` replace `views[0].indicators`, in the admin's order and with its `display`.
-  - Variable ids (`dimensions`, `sortColumnSlug`, `map.columnSlug`) are written back as the catalog paths the YAML already uses.
+  - Variable ids (`dimensions`, `sortColumnSlug`, `map.columnSlug`, `colorVariableId`, `xVariableId`, `sizeVariableId`) are written back as the catalog paths the YAML already uses.
   - Everything else is merged into `views[0].config`: nested objects merge, arrays and scalars replace.
   - Values always go to the chart YAML, never to the garden `.meta.yml`, so no other chart or data page changes.
 
