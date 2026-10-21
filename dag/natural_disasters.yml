@@ -51,6 +51,32 @@ steps:
   viz://chart/natural_disasters/latest/deaths:
     - data://grapher/emdat/2026-10-21/natural_disasters
   #
+  # EM-DAT Natural disasters.
+  #
+  # Single charts on natural disasters.
+  viz://chart/natural_disasters/latest/number_of_natural_disaster_events:
+    - data://grapher/emdat/2026-10-21/natural_disasters_global_by_type
+  viz://chart/natural_disasters/latest/natural_disasters_by_type:
+    - data://grapher/emdat/2026-10-21/natural_disasters_global_by_type
+  viz://chart/natural_disasters/latest/economic_damage_from_natural_disasters:
+    - data://grapher/emdat/2026-10-21/natural_disasters_global_by_type
+  viz://chart/natural_disasters/latest/damage_costs_from_natural_disasters:
+    - data://grapher/emdat/2026-10-21/natural_disasters_global_by_type
+  viz://chart/natural_disasters/latest/natural_disasters_by_yearly_impact:
+    - data://grapher/emdat/2026-10-21/natural_disasters_impact
+  viz://chart/natural_disasters/latest/natural_disasters_by_decadal_size:
+    - data://grapher/emdat/2026-10-21/natural_disasters_impact
+  viz://chart/natural_disasters/latest/natural_disasters_reported_by_deaths:
+    - data://grapher/emdat/2026-10-21/natural_disasters_global_by_deaths
+  viz://chart/natural_disasters/latest/death_rates_disaster_gdp:
+    - data://grapher/emdat/2026-10-21/natural_disasters
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/natural_disasters/latest/affected_by_disasters_vs_gdp:
+    - data://grapher/emdat/2026-10-21/natural_disasters
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+    - data://grapher/regions/2023-01-01/regions
+  #
   # NOAA/NCEI Natural Hazards Data
   #
   data://grapher/noaa_ncei/2025-10-30/natural_hazards:

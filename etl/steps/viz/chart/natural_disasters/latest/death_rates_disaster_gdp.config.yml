@@ -1,0 +1,32 @@
+chart_config_id: 0191b6c7-5953-724d-a471-74e22c8ff6d5
+grapher_schema: "011"
+slug: death-rates-disaster-gdp
+topic_tags:
+  - "Natural Disasters"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "natural_disasters_yearly#total_dead_per_100k_people_all_disasters_excluding_extreme_temperature_yearly"
+          display:
+            name: "Deaths per 100,000"
+            tolerance: 5
+      x: "wdi#ny_gdp_pcap_pp_kd"
+      color: "regions#owid_region"
+    # timelineMaxTime is set in the .py step, from LAST_FULLY_REPORTED_YEAR in shared.py.
+    config:
+      title: "Deaths rates from disasters vs. GDP per capita"
+      subtitle: "Death rates are measured per 100,000 people. Disasters include all geophysical, meteorological and climate events including earthquakes, volcanic activity, landslides, drought, wildfires, storms, and flooding. GDP per capita is adjusted for inflation and differences in living costs between countries."
+      note: "Deaths from extreme temperatures are not included since very few countries provide these figures; heatwave deaths are predominantly estimated for Europe, with poor coverage of Africa, Asia or South America."
+      originUrl: "/natural-disasters"
+      chartTypes:
+        - "ScatterPlot"
+      minTime: "latest"
+      xAxis:
+        scaleType: "log"
+        canChangeScaleType: true
+      yAxis:
+        min: 0
+        scaleType: "log"
+        canChangeScaleType: true
