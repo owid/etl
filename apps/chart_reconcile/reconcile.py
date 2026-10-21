@@ -263,8 +263,9 @@ def slug_target(step: ChartStep, layers: ChartLayers) -> tuple[str | None, str |
     if not admin_slug or admin_slug == step.slug:
         return None, None
     new_short_name = admin_slug.replace("-", "_")
-    if not SHORT_NAME_RE.match(new_short_name):
-        return new_short_name, f"admin slug `{admin_slug}` doesn't map to a valid step short name; rename by hand"
+    # The new short name must derive back to the admin slug (an underscore in the slug would not).
+    if not SHORT_NAME_RE.match(new_short_name) or new_short_name.replace("_", "-") != admin_slug:
+        return new_short_name, f"admin slug `{admin_slug}` isn't the slug of any valid step short name; rename by hand"
     return new_short_name, None
 
 
@@ -317,15 +318,19 @@ class _PathResolver:
         catalog_path = self.variable_paths.get(variable_id)
         if not catalog_path:
             return None, f"variable {variable_id} has no catalog path in grapher"
-        # Prefer the path already written in the YAML, in whatever short form it uses. A suffix match
-        # also covers a step repointed to a new dataset version, where the patch still holds old ids.
+        # Prefer the path already written in the YAML, in whatever short form it uses. Paths are compared
+        # ignoring the dataset version, which covers a step repointed to a new dataset version, where
+        # the patch still holds old ids, but not a same-named table#column in an unrelated dataset.
+        target = _unversioned(catalog_path)
+        grapher_deps = [
+            d.split("://", 1)[1] for d in self.dependencies if re.match(r"^(data|data-private)://grapher/", d)
+        ]
         for path in self.yaml_paths:
-            if catalog_path == path or catalog_path.endswith("/" + path):
+            if catalog_path == path or target in _unversioned_candidates(path, grapher_deps):
                 return path, None
         # Otherwise name it relative to the step's grapher dependencies.
         dataset_uri, _, column_part = catalog_path.rpartition("/")
-        grapher_deps = [d for d in self.dependencies if re.match(r"^(data|data-private)://grapher/", d)]
-        if any(d.split("://", 1)[1] == dataset_uri for d in grapher_deps):
+        if dataset_uri in grapher_deps:
             if len(grapher_deps) == 1:
                 return column_part, None
             return f"{dataset_uri.rpartition('/')[2]}/{column_part}", None
@@ -349,6 +354,26 @@ def _yaml_paths(view: CommentedMap) -> list[str]:
         if isinstance(value, str) and "#" in value:
             paths.append(value)
     return paths
+
+
+def _unversioned(path: str) -> str:
+    """Drop the version from a full catalog path: `grapher/ns/version/dataset/table#column` -> `grapher/ns/dataset/table#column`."""
+    parts = path.split("/", 4)
+    if len(parts) == 5:
+        del parts[2]
+    return "/".join(parts)
+
+
+def _unversioned_candidates(yaml_path: str, dataset_uris: list[str]) -> set[str]:
+    """Full catalog paths (without version) that a YAML indicator path can stand for, given the step's grapher deps."""
+    if yaml_path.count("/") >= 4:
+        return {_unversioned(yaml_path)}
+    if "/" in yaml_path:
+        dataset_name, _, column_part = yaml_path.partition("/")
+        uris = [uri for uri in dataset_uris if uri.rpartition("/")[2] == dataset_name]
+    else:
+        column_part, uris = yaml_path, dataset_uris
+    return {_unversioned(f"{uri}/{column_part}") for uri in uris}
 
 
 def _indicators_from_dimensions(dimensions: list[dict[str, Any]], resolver: _PathResolver):

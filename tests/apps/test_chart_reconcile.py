@@ -62,6 +62,10 @@ VARIABLE_PATHS = {
     2: VAR_PREFIX + "climate_related_oda_by_donor#climate_principal_objective",
     3: VAR_PREFIX + "climate_related_oda_by_donor#climate_significant_objective",
     4: "grapher/other/2024-01-01/other_dataset/some_table#some_column",
+    # Same table#column as an indicator in the YAML, but in an unrelated dataset.
+    5: "grapher/other/2024-01-01/other_dataset/climate_related_oda_by_donor#non_climate",
+    # The YAML's indicator in an older version of the step's dataset.
+    6: "grapher/oecd/2025-01-01/climate_related_official_development_assistance/climate_related_oda_by_donor#non_climate",
 }
 
 
@@ -196,6 +200,21 @@ def test_indicator_from_an_unrelated_dataset_needs_manual_fix(repo):
     assert len(config["views"][0]["indicators"]["y"]) == 2
 
 
+def test_same_column_in_an_unrelated_dataset_needs_manual_fix(repo):
+    patch = {"sortColumnSlug": "5"}
+    config, result = _reconcile(_step(repo), patch)
+    assert result.pulled == [] and result.already_in_etl == []
+    assert len(result.needs_manual) == 1 and "doesn't depend on" in result.needs_manual[0]
+    assert "sortColumnSlug" not in config["views"][0]["config"]
+
+
+def test_older_version_of_a_yaml_indicator_maps_to_its_path(repo):
+    patch = {"sortColumnSlug": "6"}
+    config, result = _reconcile(_step(repo), patch)
+    assert config["views"][0]["config"]["sortColumnSlug"] == "climate_related_oda_by_donor#non_climate"
+    assert not result.needs_manual
+
+
 def test_skipped_fields_are_left_out(repo):
     config, result = _reconcile(
         _step(repo), {"title": "Stale admin title", "note": "New note."}, skip_fields=("title",)
@@ -219,6 +238,13 @@ def test_slug_drift_maps_admin_slug_to_short_name(repo):
     assert slug_target(step, layers) == ("foreign_aid_given_climate", None)
     in_sync = ChartLayers(chart_id=9287, patch={"slug": step.slug}, slug=step.slug)
     assert slug_target(step, in_sync) == (None, None)
+
+
+def test_admin_slug_that_cannot_round_trip_needs_manual_rename(repo):
+    step = _step(repo)
+    layers = ChartLayers(chart_id=9287, patch={"slug": "foreign_aid"}, slug="foreign_aid")
+    new_short_name, problem = slug_target(step, layers)
+    assert problem is not None and "rename by hand" in problem
 
 
 def test_rename_step_moves_files_and_dag_entry(repo):
