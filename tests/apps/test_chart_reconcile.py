@@ -90,12 +90,14 @@ def _step(repo):
     return step
 
 
-def _reconcile(step, patch, skip_fields=()):
+def _reconcile(step, patch, skip_fields=(), edited_after_adoption=None, pull_leftovers=False):
     config = load_config(step.config_path)
-    layers = ChartLayers(chart_id=9287, patch=patch, slug=patch.get("slug"))
+    layers = ChartLayers(
+        chart_id=9287, patch=patch, slug=patch.get("slug"), edited_after_adoption=edited_after_adoption
+    )
     layers.variable_paths = {i: VARIABLE_PATHS.get(i) for i in variable_ids_in_patch(patch)}
     result = Result(step=step)
-    reconcile_fields(step, config, layers, result, skip_fields)
+    reconcile_fields(step, config, layers, result, skip_fields, pull_leftovers)
     return config, result
 
 
@@ -235,6 +237,44 @@ def test_skipped_fields_are_left_out(repo):
     assert config["views"][0]["config"]["title"] == "Foreign aid given for climate"
     assert result.pulled == ["note"]
     assert result.skipped == ["title"]
+
+
+LEFTOVER_PATCH = {
+    "title": "Old admin title",
+    "hideTimeline": True,
+    "dimensions": [
+        {"property": "y", "variableId": 1, "display": {"name": "Old name"}},
+        {"property": "y", "variableId": 2},
+    ],
+}
+
+
+def test_admin_values_from_before_the_move_to_etl_are_left_out(repo):
+    # Nobody saved the chart since it moved to ETL: values that differ from the YAML are leftovers.
+    config, result = _reconcile(_step(repo), LEFTOVER_PATCH, edited_after_adoption=False)
+    view = config["views"][0]
+    assert view["config"]["title"] == "Foreign aid given for climate"
+    assert view["indicators"]["y"][0]["display"]["name"] == "Non-climate-related"
+    assert result.leftovers == ["title", "dimensions"]
+    # A value the YAML didn't set masks nothing, so it is still copied.
+    assert result.pulled == ["hideTimeline"]
+    assert "admin leftovers" in result.status
+
+
+def test_admin_values_edited_after_the_move_are_pulled(repo):
+    config, result = _reconcile(_step(repo), LEFTOVER_PATCH, edited_after_adoption=True)
+    assert config["views"][0]["config"]["title"] == "Old admin title"
+    assert result.leftovers == []
+    assert result.pulled == ["title", "hideTimeline", "dimensions"]
+
+
+@pytest.mark.parametrize("edited_after_adoption, pull_leftovers", [(None, False), (False, True)])
+def test_leftovers_are_pulled_when_unknown_or_asked_for(repo, edited_after_adoption, pull_leftovers):
+    _, result = _reconcile(
+        _step(repo), LEFTOVER_PATCH, edited_after_adoption=edited_after_adoption, pull_leftovers=pull_leftovers
+    )
+    assert result.leftovers == []
+    assert result.overrides_etl == ["title", "dimensions"]
 
 
 def test_comments_and_key_order_survive(repo):

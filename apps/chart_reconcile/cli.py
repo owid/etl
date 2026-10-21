@@ -6,8 +6,11 @@ flags the chart as drifted. This command reads the admin layer and writes it bac
 
 - Field drift: every field set in the admin is copied into the chart's `.config.yml`. After the
   next push, grapher drops those fields from the admin layer, since ETL now holds them. This never
-  changes what readers see. Where the admin value replaces one the YAML set, the report says so:
-  if that admin value is a stale leftover, leave it out with `--skip-field` and clear it in the admin.
+  changes what readers see. Where the admin value replaces one the YAML set, the report says so.
+- Admin leftovers: when a chart moves into ETL, its old admin config stays in the admin layer and
+  keeps masking any ETL value that differs. If no person has saved the chart since it moved to ETL,
+  such values are leftovers: they are left out (`--pull-leftovers` copies them anyway), and should
+  be cleared in the admin so the ETL values show. `--skip-field` leaves out any other field.
 - Slug drift: an admin slug that differs from the one ETL derives from the step name. Until chart
   configs carry a `slug` field, the fix is renaming the step (its files and DAG entry) to match.
   Commit the rename, then run `etl archive-dag` and commit the archived old name.
@@ -50,7 +53,7 @@ from apps.chart_reconcile.reconcile import (
     slug_target,
     variable_ids_in_patch,
 )
-from etl.config import OWIDEnv
+from etl.config import ETL_GRAPHER_USER_ID, OWIDEnv
 from etl.db import production_or_master_env
 from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
 
@@ -75,6 +78,11 @@ console = Console()
     help="Top-level field to leave out, e.g. when the admin value is a stale leftover and ETL's should win. Repeatable.",
 )
 @click.option(
+    "--pull-leftovers",
+    is_flag=True,
+    help="Also copy admin values set before the chart moved to ETL that would replace a newer ETL value.",
+)
+@click.option(
     "--env",
     "env_name",
     default=None,
@@ -95,6 +103,7 @@ def cli(
     apply: bool,
     keep_slug: bool,
     skip_fields: tuple[str, ...],
+    pull_leftovers: bool,
     env_name: str | None,
     json_path: Path | None,
 ) -> None:
@@ -114,7 +123,8 @@ def cli(
 
     layers = _fetch_layers(owid_env, [s.chart_config_id for s in selected])
     results = [
-        _reconcile(step, layers.get(step.chart_config_id), owid_env, apply, keep_slug, skip_fields) for step in selected
+        _reconcile(step, layers.get(step.chart_config_id), owid_env, apply, keep_slug, skip_fields, pull_leftovers)
+        for step in selected
     ]
 
     _print_report(results, apply)
@@ -166,16 +176,25 @@ def _select_by_chart_id(owid_env: OWIDEnv, steps: list[ChartStep], chart_ids: tu
 def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLayers]:
     """Admin patch and rendered slug for each chart, plus the catalog paths of the variables it names."""
     # A plain SELECT, not the ORM `Chart`, as in `etl chart-config-id lookup`.
+    # `last_human_edit` is the latest admin save by a person; ETL pushes are saved as the ETL user.
     query = text(
-        "SELECT c.id, c.configId, cc.slug, pa.config AS patch "
+        "SELECT c.id, c.configId, cc.slug, pa.config AS patch, pe.createdAt AS etl_created, "
+        "(SELECT MAX(r.createdAt) FROM chart_revisions r WHERE r.chartId = c.id AND r.userId <> :etl_user) "
+        "AS last_human_edit "
         "FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
         "LEFT JOIN chart_configs pa ON pa.id = c.patchConfigId "
+        "LEFT JOIN chart_configs pe ON pe.id = c.patchConfigIdETL "
         "WHERE c.configId IN :ids"
     ).bindparams(bindparam("ids", expanding=True))
     layers = {}
-    for row in _query(owid_env, query, {"ids": config_ids}):
+    for row in _query(owid_env, query, {"ids": config_ids, "etl_user": ETL_GRAPHER_USER_ID}):
         patch = row.patch if isinstance(row.patch, dict) else json.loads(row.patch or "{}")
-        layers[str(row.configId).lower()] = ChartLayers(chart_id=row.id, patch=patch, slug=row.slug)
+        edited_after_adoption = None
+        if row.etl_created is not None:
+            edited_after_adoption = row.last_human_edit is not None and row.last_human_edit > row.etl_created
+        layers[str(row.configId).lower()] = ChartLayers(
+            chart_id=row.id, patch=patch, slug=row.slug, edited_after_adoption=edited_after_adoption
+        )
 
     variable_ids = sorted(set().union(*(variable_ids_in_patch(layer.patch) for layer in layers.values())))
     if variable_ids:
@@ -205,6 +224,7 @@ def _reconcile(
     apply: bool,
     keep_slug: bool,
     skip_fields: tuple[str, ...],
+    pull_leftovers: bool,
 ) -> Result:
     result = Result(step=step)
     if layers is None:
@@ -216,7 +236,7 @@ def _reconcile(
 
     original = step.config_path.read_text()
     config_yaml = load_single_chart_config(step.config_path)
-    reconcile_fields(step, config_yaml, layers, result, skip_fields)
+    reconcile_fields(step, config_yaml, layers, result, skip_fields, pull_leftovers)
     new_text = dump_config(config_yaml) if result.pulled else original
 
     new_short_name, problem = slug_target(step, layers)
@@ -259,6 +279,11 @@ def _print_report(results: list[Result], apply: bool) -> None:
             details.append(f"admin value replaces an ETL value (check it isn't stale): {', '.join(r.overrides_etl)}")
         if r.skipped:
             details.append(f"skipped, still set in the admin: {', '.join(r.skipped)}")
+        if r.leftovers:
+            details.append(
+                f"left out, set in the admin before the move to ETL and masking ETL's value; "
+                f"clear in the admin: {', '.join(r.leftovers)}"
+            )
         if r.already_in_etl:
             details.append(f"already in ETL, clears on next push: {', '.join(r.already_in_etl)}")
         if r.new_short_name:

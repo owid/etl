@@ -75,6 +75,9 @@ class ChartLayers:
     slug: str | None
     # variableId -> catalogPath, for every variable id the patch references.
     variable_paths: dict[int, str | None] = field(default_factory=dict)
+    # Whether a person (not ETL) saved the chart in the admin after its ETL layer was created.
+    # False means every admin override predates the move to ETL; None means unknown.
+    edited_after_adoption: bool | None = None
 
 
 @dataclass
@@ -88,6 +91,8 @@ class Result:
     # Pulled fields that replace a value the YAML already set, rather than adding one.
     overrides_etl: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
+    # Admin values set before the chart moved to ETL that would replace a newer ETL value: left out.
+    leftovers: list[str] = field(default_factory=list)
     already_in_etl: list[str] = field(default_factory=list)
     needs_manual: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
@@ -107,6 +112,8 @@ class Result:
             labels.append("slug fixed" if self.slug_fixed else "slug drift")
         if self.skipped:
             labels.append("fields skipped")
+        if self.leftovers:
+            labels.append("admin leftovers")
         if self.already_in_etl:
             labels.append("already in ETL")
         if self.needs_manual:
@@ -123,6 +130,7 @@ class Result:
             "fields_pulled": self.pulled,
             "fields_overriding_etl": self.overrides_etl,
             "fields_skipped": self.skipped,
+            "fields_admin_leftovers": self.leftovers,
             "fields_already_in_etl": self.already_in_etl,
             "needs_manual": self.needs_manual,
             "warnings": self.warnings,
@@ -194,17 +202,27 @@ def variable_ids_in_patch(patch: dict[str, Any]) -> set[int]:
 
 
 def reconcile_fields(
-    step: ChartStep, config: CommentedMap, layers: ChartLayers, result: Result, skip_fields: tuple[str, ...] = ()
+    step: ChartStep,
+    config: CommentedMap,
+    layers: ChartLayers,
+    result: Result,
+    skip_fields: tuple[str, ...] = (),
+    pull_leftovers: bool = False,
 ) -> None:
     """Fold the admin patch's field overrides into the config's single view, in place.
 
     Pulling never changes what readers see, since the admin value is what renders today. A pulled
-    field that replaces a value the YAML already set is also listed in `result.overrides_etl`: there,
-    the admin value may be a stale leftover that masks a newer ETL edit, which a human has to judge.
+    field that replaces a value the YAML already set is also listed in `result.overrides_etl`.
+
+    When moving a chart into ETL, its whole admin config stays in the admin layer, and only values
+    equal to ETL's drop out on push. So if no person has saved the chart since its ETL layer was
+    created, an admin value that differs from the YAML's is a leftover from before the move, masking
+    the newer ETL value. Those are left out (`result.leftovers`) unless `pull_leftovers` is set.
     """
     view = config["views"][0]
     overrides = field_overrides(layers.patch)
     resolver = _PathResolver(view, layers.variable_paths, step.dependencies)
+    leftovers_possible = layers.edited_after_adoption is False and not pull_leftovers
 
     for key, value in overrides.items():
         if key in skip_fields:
@@ -218,6 +236,8 @@ def reconcile_fields(
             existing = _canonical_indicators(view.get("indicators"))
             if existing == _canonical_indicators(indicators):
                 result.already_in_etl.append(key)
+            elif existing and leftovers_possible:
+                result.leftovers.append(key)
             else:
                 view["indicators"] = indicators
                 result.pulled.append(key)
@@ -239,6 +259,9 @@ def reconcile_fields(
         if view.get("config") is None:
             view["config"] = CommentedMap()
         before = _plain(view["config"].get(key))
+        if leftovers_possible and _replaces_existing(before, _plain(value)):
+            result.leftovers.append(key)
+            continue
         _merge_into(view["config"], key, value)
         if _plain(view["config"].get(key)) == before:
             result.already_in_etl.append(key)

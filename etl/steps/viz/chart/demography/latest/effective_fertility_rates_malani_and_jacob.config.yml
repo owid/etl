@@ -11,27 +11,26 @@ views:
       y:
         - catalogPath: "distribution#efr__birth_year_1925"
           display:
-            name: "1925"
+            name: "Born in 1925"
             color: "#d4d4d4"
         - catalogPath: "distribution#efr__birth_year_1950"
           display:
-            name: "1950"
-            unit: "children per women"
+            name: "Born in 1950"
             color: "#cebcb4"
         - catalogPath: "distribution#efr__birth_year_1975"
           display:
-            name: "1975"
+            name: "Born in 1975"
             color: "#caaea4"
         - catalogPath: "distribution#efr__birth_year_2000"
           display:
-            name: "2000"
+            name: "Born in 2000"
             color: "#be826d"
         - catalogPath: "distribution#efr__birth_year_2023"
           display:
-            name: "2023"
+            name: "Born in 2023"
             color: "#b13507"
     config:
-      title: "Effective Fertility Rates, by age"
+      title: "Effective fertility rate by age of the children"
       subtitle: "Average number of children per woman who survive to each age, by the year the children were born. For example, a value of 2.7 at age 20 on the 1975 line means that, at the fertility rate of 1975, women would have 2.7 children each who live to age 20."
       note: "Before 1950, data is only available for a few countries. Survival after 2023 is based on UN projections."
       originUrl: "/fertility-rate"
