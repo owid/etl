@@ -1,4 +1,3 @@
-# Test PR for the ops staging manifest; do not merge.
 steps:
         #
         # Livestock counts - HYDE (historical) spliced with FAOSTAT (1961 onwards).
