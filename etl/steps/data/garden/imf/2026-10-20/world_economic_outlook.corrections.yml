@@ -1,7 +1,8 @@
 # NOTE: At every WEO update, check whether the IMF has fixed the break in Laos's GDP series (2019–2023 are IMF staff
 # estimates, 2024 onward the authorities' figures). If the published 2024 growth is no longer around 13.5%, the
 # `expect` guard below fails the build: compare the new 2024 value with the World Bank's and the authorities' figures,
-# and remove this entry if it now looks right. Also check that 2023 and 2025 didn't move to absorb the break.
+# and remove this entry if it now looks right, together with `description_processing_laos_break` in the garden
+# `.meta.yml`. Also check that 2023 and 2025 didn't move to absorb the break.
 - indicator: gross_domestic_product__gdp__constant_prices__percent_change_observation
   entity: Laos
   years: [2024]
