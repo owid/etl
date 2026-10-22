@@ -54,6 +54,7 @@ from etl.db import read_sql
 console = Console()
 
 SEVERITY_COLOR = {"high": "red", "medium": "yellow", "low": "cyan"}
+SEVERITY_RANK = {"high": 0, "medium": 1, "low": 2}
 
 # Slack's documented chat.postMessage limit is one message per second per channel.
 POST_INTERVAL_SECONDS = 1.0
@@ -179,7 +180,8 @@ def _readership(slugs: list[str]) -> dict[str, str]:
     and "no recorded views" would then be a false statement about every hand-picked chart. Fails
     soft to no line at all: readership informs the severity call, it is not needed to make one.
     """
-    if not slugs:
+    unique = set(slugs)
+    if not unique:
         return {}
     try:
         views = _pageviews(0)
@@ -190,7 +192,7 @@ def _readership(slugs: list[str]) -> dict[str, str]:
             JOIN charts c ON c.configId = cc.id
             WHERE cc.slug IN %(slugs)s
             """,
-            params={"slugs": tuple(set(slugs))},
+            params={"slugs": tuple(unique)},
         )
     except Exception as e:  # noqa: BLE001 — context for the model, not correctness
         console.print(f"[yellow]readership unavailable, reviewing without it: {str(e)[:90]}[/yellow]")
@@ -198,7 +200,7 @@ def _readership(slugs: list[str]) -> dict[str, str]:
     by_views = dict(zip(views.slug, views.views_365d))
     published = published.dropna(subset=["publishedAt"])
     by_date = dict(zip(published.slug, published.publishedAt))
-    return {s: readership_line(by_views.get(s), by_date.get(s)) for s in set(slugs)}
+    return {s: readership_line(by_views.get(s), by_date.get(s)) for s in unique}
 
 
 def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
@@ -262,11 +264,15 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
     "under 20 years" are one finding — so matching on a prefix counts them separately.
+
+    The merged finding keeps the highest severity any pass gave it. Severity decides whether the
+    digest posts it, and keeping the first pass's instead made that depend on pass order.
     """
     tokens = claim_tokens(new["claim"])
     for existing in issues:
         if existing["kind"] == new["kind"] and same_claim(tokens, claim_tokens(existing["claim"])):
             existing["passes"] += 1
+            existing["severity"] = min(existing["severity"], new["severity"], key=lambda s: SEVERITY_RANK[s])
             return
     issues.append(new | {"passes": 1})
 
@@ -658,7 +664,7 @@ def cli(
         else:
             already = sum(len(r["issues"]) for r in results)
             console.print(
-                f"\n[dim]nothing new to post — {already} finding(s), all low severity or already posted[/dim]"
+                f"\n[dim]nothing new to post — {already} finding(s), all low severity, already posted or in cooldown[/dim]"
                 if already
                 else "\n[dim]nothing new to post — no findings[/dim]"
             )

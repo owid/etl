@@ -96,7 +96,10 @@ class Issue(BaseModel):
             "chart that has been published for a while and is rarely read. Those are usually "
             "'low' — but a serious error, such as a wrong unit or an impossible headline value, "
             "matters however few people have read the chart so far, and a recently published "
-            "chart has simply not had time to collect readers."
+            "chart has simply not had time to collect readers. A discontinuity that looks like "
+            "an artefact of how the producer measured the data is worth knowing about even in a "
+            "small country, since the same break sits in every chart and download of that "
+            "series: rate it by how much it misleads, not by who looks at that country."
         )
     )
     kind: Literal["data", "chart"] = Field(
@@ -263,7 +266,7 @@ def readership_line(views_365d: int | float | None, published: dt.datetime | dt.
         read = f"about {per_day:g} view{'' if per_day == 1 else 's'} a day"
     else:
         read = "no recorded views"
-    since = f", first published {day.isoformat()}" if day else ""
+    since = f", published {day.isoformat()}" if day else ""
     return f"Readership: {read}{since}."
 
 
