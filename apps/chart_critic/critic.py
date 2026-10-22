@@ -88,7 +88,11 @@ class Issue(BaseModel):
             "'low': technically true but nobody acts on it — a typo that misleads no one, a "
             "naming inconsistency, or a defect confined to a micro-territory or a range that "
             "ends decades ago. Judge the reader's loss, not how odd the defect looks: a "
-            "correct observation about Tuvalu in 1965 is 'low', not 'high'."
+            "correct observation about Tuvalu in 1965 is 'low', not 'high'. "
+            "Most readers see the chart as it opens and look for large countries, so a defect "
+            "confined to a small country, or to a country the chart does not show by default "
+            "(on a line or bar chart, one outside its default entities), reaches few of them: "
+            "it is 'low' unless it stands out in the chart's default view."
         )
     )
     kind: Literal["data", "chart"] = Field(

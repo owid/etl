@@ -384,7 +384,7 @@ def _review_one(
     type=int,
     default=DEFAULT_MIN_VIEWS,
     show_default=True,
-    help="Ignore charts below this many annual pageviews.",
+    help="Ignore charts below this many annual pageviews, with --sample, --top and --changed-since.",
 )
 @click.option("--seed", type=int, default=0, show_default=True, help="Sampling seed, so a run is reproducible.")
 @click.option("--model", type=str, default=DEFAULT_MODEL, show_default=True, help="Model to review with.")
@@ -528,6 +528,15 @@ def cli(
         by_views = dict(zip(ranked.slug, ranked.views_365d))
         changed.sort(key=lambda s: -by_views.get(s, 0))
         console.print(f"[bold]{len(changed)} published charts changed in the last {changed_since} day(s)[/bold]")
+        # The same floor as --sample and --top: a correct finding on a chart a few people a day
+        # open is rarely worth someone's morning, and the editors' daily batch is full of them.
+        read = [s for s in changed if by_views.get(s, 0) >= min_views]
+        if len(read) < len(changed):
+            skipped = len(changed) - len(read)
+            console.print(f"[dim]skipping {skipped} of them below {min_views:,} views a year (--min-views)[/dim]")
+        changed = read
+        if not changed:
+            return
         targets = [(s, int(by_views.get(s, 0)), params) for s in changed[: top or len(changed)]]
     else:
         targets = _expand_mdims(_select(slugs, sample, top, min_views, seed, params), mdim_views, seed)
@@ -625,7 +634,7 @@ def cli(
         else:
             already = sum(len(r["issues"]) for r in results)
             console.print(
-                f"\n[dim]nothing new to post — {already} finding(s), all previously reported[/dim]"
+                f"\n[dim]nothing new to post — {already} finding(s), all low severity or already posted[/dim]"
                 if already
                 else "\n[dim]nothing new to post — no findings[/dim]"
             )

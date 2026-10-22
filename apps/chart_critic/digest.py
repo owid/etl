@@ -400,15 +400,19 @@ def new_findings(
     (highest severity, then most read) is the one that goes. A second, different problem on the
     same chart waits for the cooldown to pass — a smaller cost than what this replaced, where the
     same problem reworded came back the morning after it was ticked.
+
+    A 'low' finding is never posted: the model's rubric for it is "technically true but nobody
+    acts on it", and a post nobody acts on teaches the channel to skip the digest. It stays in
+    the report.
     """
     day = today or _today()
     cutoff = (day - timedelta(days=COOLDOWN_DAYS)).isoformat()
     posted = {key: when for key, when in state.items() if when >= cutoff}
     out: list[tuple[dict[str, Any], dict[str, Any]]] = []
-    order = {"high": 0, "medium": 1, "low": 2}
+    order = {"high": 0, "medium": 1}
     ranked = sorted(
-        ((r, i) for r in results for i in r["issues"]),
-        key=lambda ri: (order.get(ri[1].get("severity", "low"), 3), -ri[0].get("views", 0)),
+        ((r, i) for r in results for i in r["issues"] if i.get("severity") in order),
+        key=lambda ri: (order[ri[1]["severity"]], -ri[0].get("views", 0)),
     )
     for result, issue in ranked:
         keys = _dedup_keys(result["slug"], issue, facts)
