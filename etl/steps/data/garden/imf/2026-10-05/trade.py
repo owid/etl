@@ -31,7 +31,7 @@ EXPORT_COL = "Exports of goods, Free on board (FOB), US dollar"
 IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
 
 # Categories of the importer ranking of China and the United States.
-IMPORT_RANK_CATEGORIES = {"1st - Top source", "2nd", "3rd", "4th", "5th", "Not in top 5", "China", "United States"}
+IMPORT_RANK_CATEGORIES = {"1st - Top source", "2nd", "3rd", "4th", "5th", "Not in top 5"}
 
 # Map colors of the top-partner categories, from grapher's OWID categorical map palette (OwidMapColors). The same
 # partner gets the same color on the import and export maps. China is the only strong, warm color, so keep warm hues
@@ -392,35 +392,15 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
     china_gdp = china_gdp[["country", "year", "china_imports_share_of_gdp"]].copy()
     china_gdp["counterpart_country"] = "World"
 
-    # First merge the regular china_imports_share_of_gdp data
+    # China's imports from itself (re-imports) are not applicable here; maps mark China as such.
+    china_gdp = china_gdp[china_gdp["country"] != "China"]
+
     tb = pr.merge(
         tb,
         china_gdp,
         on=["country", "year", "counterpart_country"],
         how="left",
     )
-    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype("string")
-
-    # Create China rows for each year with china_imports_share_of_gdp = -1
-    china_years = tb[tb["counterpart_country"] == "World"]["year"].unique()
-    for year in china_years:
-        china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World") & (tb["year"] == year)
-        if china_mask.any():
-            # Update existing rows
-            tb.loc[china_mask, "china_imports_share_of_gdp"] = "China"
-        else:
-            # Add new row if it doesn't exist
-            new_row = Table(
-                pd.DataFrame(
-                    {
-                        "country": ["China"],
-                        "year": [year],
-                        "counterpart_country": ["World"],
-                        "china_imports_share_of_gdp": ["China"],
-                    }
-                )
-            ).copy_metadata(tb)
-            tb = pr.concat([tb, new_row], ignore_index=True)
 
     return tb
 
@@ -537,41 +517,15 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
         import_data.groupby(["country", "year"])["value"].rank(method="min", ascending=False).astype(int)
     )
 
-    # Filter for target country only
-    out = import_data[import_data["counterpart_country"] == target_country][["country", "year", "import_rank"]].copy()
-
-    out["import_rank"] = out["import_rank"].astype(str)
-
-    # Add self-referential rows (e.g., China importing from China) with rank=-1
-    # This row likely doesn't exist in the data but is needed for visualization
-    target_country_years = import_data["year"].unique()
-
-    target_country_template = Table(
-        pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": target_country})
-    )
-
-    # Combine: remove any existing self-referential rows and add our template
-    mask = out["country"] != target_country
-    out = pr.concat([out.loc[mask], target_country_template], ignore_index=True)
+    # Keep the target country's rank among each other country's partners. Its rank among its own partners (e.g.
+    # China's re-imports from China) is not applicable; maps mark the target country as such.
+    out = import_data[
+        (import_data["counterpart_country"] == target_country) & (import_data["country"] != target_country)
+    ][["country", "year", "import_rank"]].copy()
 
     # Add color category based on ranking
-    def categorize_rank(rank):
-        if rank == target_country:
-            return target_country
-        elif rank == "1":
-            return "1st - Top source"
-        elif rank == "2":
-            return "2nd"
-        elif rank == "3":
-            return "3rd"
-        elif rank == "4":
-            return "4th"
-        elif rank == "5":
-            return "5th"
-        else:
-            return "Not in top 5"
-
-    out["import_rank_category"] = out["import_rank"].apply(categorize_rank)
+    rank_categories = {1: "1st - Top source", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th"}
+    out["import_rank_category"] = out["import_rank"].map(lambda rank: rank_categories.get(rank, "Not in top 5"))
 
     out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country

@@ -55,6 +55,9 @@ tables:
             <% elif counterpart_country != 'Intraregional' %>
             Imports of goods from << counterpart_country >>
             <%- endif -%>
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         description_processing: *description_processing_aggregates
         display:
           name: << counterpart_country >>
@@ -88,6 +91,9 @@ tables:
             <% elif counterpart_country != 'Intraregional' %>
             Exports of goods to << counterpart_country >>
             <%- endif -%>
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         description_processing: *description_processing_aggregates
         display:
           name: << counterpart_country >>
@@ -125,6 +131,9 @@ tables:
             <% elif counterpart_country != 'Intraregional' %>
             Exports to << counterpart_country >> as a share of total exports
             <%- endif -%>
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         display:
           name: << counterpart_country >>
           numDecimalPlaces: 1
@@ -161,6 +170,9 @@ tables:
             <% elif counterpart_country != 'Intraregional' %>
             Imports from << counterpart_country >> as a share of total imports
             <%- endif -%>
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         display:
           name: << counterpart_country >>
           numDecimalPlaces: 1
@@ -193,6 +205,9 @@ tables:
             <% elif counterpart_country != 'Intraregional' %>
             Trade with << counterpart_country >> as a share of total trade
             <%- endif -%>
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         description_processing: |-
           We calculated this share by dividing the value of trade in goods (exports plus imports) with << counterpart_country >> by the country's total trade in goods (exports plus imports) with the World, then multiplying by 100.
 
@@ -216,6 +231,9 @@ tables:
         description_processing: We calculated the share of imports from China by dividing the value of CIF imports by GDP and multiplying by 100. Import data came from official trade statistics and were valued in current US dollars. GDP was taken from World Bank data, both in current US dollars.
         presentation:
           title_public: Imports from China as a share of GDP
+          grapher_config:
+            inapplicableEntityNames:
+              - China
         display:
           name: Imports from China
           numDecimalPlaces: 1
@@ -251,6 +269,9 @@ tables:
         description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> in this ranking was then recorded: 1 if it was the top supplier, 2 if the second largest, and so on. Rankings were produced separately for each year."
         presentation:
           title_public: Rank of << counterpart_country >> among import partners
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         display:
           name: Rank of << counterpart_country >>
           numDecimalPlaces: 0
@@ -263,10 +284,13 @@ tables:
         description_key:
           - This indicator categorizes the rank of << counterpart_country >> among a country's import partners into distinct groups.
           - *cif_basis
-          - Categories include "1st - Top source" (largest supplier), "2nd", "3rd", "4th", "5th", and "Not in top 5" for all other partners. << counterpart_country >> itself is shown as its own category.
-        description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> was then categorized: '1st - Top source' if it was the top supplier, '2nd' if the second largest, continuing through '5th', and 'Not in top 5' for all partners ranked lower than 5th. << counterpart_country >> itself is assigned its own category."
+          - Categories include "1st - Top source" (largest supplier), "2nd", "3rd", "4th", "5th", and "Not in top 5" for all other partners. For << counterpart_country >> itself, this ranking is not applicable.
+        description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> was then categorized: '1st - Top source' if it was the top supplier, '2nd' if the second largest, continuing through '5th', and 'Not in top 5' for all partners ranked lower than 5th. For << counterpart_country >> itself, the ranking is not applicable."
         presentation:
           title_public: Rank category of << counterpart_country >> among import partners
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         display:
           name: Rank of << counterpart_country >>
           numDecimalPlaces: 0
@@ -343,6 +367,9 @@ tables:
             <% elif counterpart_country != 'Intraregional' %>
             Total trade volume with << counterpart_country >>
             <%- endif -%>
+          grapher_config:
+            inapplicableEntityNames:
+              - << counterpart_country >>
         description_processing: |-
           <% if counterpart_country == 'Intraregional' %>
           We calculated the trade volume by adding the value of exports of goods to and imports of goods from other countries in the same region.
