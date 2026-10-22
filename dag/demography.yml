@@ -241,11 +241,6 @@ steps:
         - data://garden/un/2024-07-12/un_wpp
 
   # Human Fertility Database
-  data://garden/hmd/2025-10-22/hfd:
-    - data://meadow/hmd/2025-10-22/hfd:
-        - snapshot://hmd/2025-10-22/hfd.zip
-  data://grapher/hmd/2025-10-22/hfd:
-    - data://garden/hmd/2025-10-22/hfd
   data://grapher/hmd/2026-10-22/hfd:
     - data://garden/hmd/2026-10-22/hfd:
         - data://meadow/hmd/2026-10-22/hfd:
@@ -258,9 +253,9 @@ steps:
             - snapshot://demography/2024-11-26/multiple_births.7z
 
   # OMM: Fertility Rate -- HFD + UN WPP
-  data://grapher/demography/2025-10-22/fertility_rate:
-    - data://garden/demography/2025-10-22/fertility_rate:
-        - data://garden/hmd/2025-10-22/hfd
+  data://grapher/demography/2026-10-22/fertility_rate:
+    - data://garden/demography/2026-10-22/fertility_rate:
+        - data://garden/hmd/2026-10-22/hfd
         - data://garden/un/2024-07-12/un_wpp
 
   # OMM: Birth rate -- HMD + UN WPP
@@ -297,10 +292,10 @@ steps:
     - data://grapher/demography/2025-10-22/efr_malani_jacob
 
   # Mean Age at childbirth (HFD + UN WPP)
-  data://grapher/demography/2025-10-22/mean_age_childbearing:
-    - data://garden/demography/2025-10-22/mean_age_childbearing:
+  data://grapher/demography/2026-10-22/mean_age_childbearing:
+    - data://garden/demography/2026-10-22/mean_age_childbearing:
         - data://garden/un/2024-07-12/un_wpp
-        - data://garden/hmd/2025-10-22/hfd
+        - data://garden/hmd/2026-10-22/hfd
 
   ########################################################################
   # Mortality                                                            #
