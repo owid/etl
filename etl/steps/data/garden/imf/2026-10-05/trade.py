@@ -187,7 +187,8 @@ def run() -> None:
         else:
             tb[column].metadata.origins = tb_long["value"].metadata.origins
 
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    # Keep float64 values, as in meadow (repacking would round totals in the trillions to float32).
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata, repack=False)
     ds_garden.save()
 
 

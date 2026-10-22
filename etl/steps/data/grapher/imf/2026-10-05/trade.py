@@ -22,7 +22,8 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    # Keep float64 values, as in garden (repacking would round totals in the trillions to float32).
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata, repack=False)
 
     # Save grapher dataset.
     ds_grapher.save()

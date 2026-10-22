@@ -51,9 +51,10 @@ def run() -> None:
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
     tb["indicator"] = tb["indicator"].map(INDICATOR_NAMES)
 
-    # Use categoricals to reduce memory and file size.
+    # Use compact types: categoricals for labels, a small integer for years.
     for column in ["country", "indicator", "counterpart_country"]:
         tb[column] = tb[column].astype("category")
+    tb["year"] = tb["year"].astype("uint16")
 
     tables = [tb.format(["country", "year", "indicator", "counterpart_country"])]
 
@@ -61,7 +62,9 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata)
+    # Keep values in float64: repacking would store them as float32, which rounds the largest totals (trillions of
+    # US dollars) by up to about a million dollars. Types are already compact above.
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata, repack=False)
 
     # Save meadow dataset.
     ds_meadow.save()
