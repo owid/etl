@@ -27,7 +27,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: https://www.mortality.org/Data/UserAgreement
+      url: https://www.humanfertility.org/Data/UserAgreement
 outs:
   - md5: 350bd8bce3b9927fb20dfbc7cc5f85f5
     size: 39122975

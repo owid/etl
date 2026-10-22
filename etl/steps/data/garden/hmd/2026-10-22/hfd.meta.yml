@@ -40,7 +40,11 @@ definitions:
       <%- else %>
       << title >> - Mother age: << age_str >> - Birth order: << birth_order >>
       <%- endif %>
+    france_note: |-
+      HFD's data for France covers metropolitan France only. It doesn't include the overseas departments.
   common:
+    description_processing: |-
+      {definitions.others.france_note}
     presentation:
       attribution_short: HFD
       topic_tags:
@@ -78,7 +82,7 @@ tables:
           <% set title = "Period total fertility rate by age 40" %>
           {definitions.others.title}
         description_short: |-
-          Average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
+          Average number of{definitions.others.bo_1} children a woman would have before age 40 if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
           - Useful for understanding early and mid-reproductive age fertility patterns.
@@ -95,7 +99,7 @@ tables:
           <%- endif %>
         unit: "births per woman"
         description_key:
-          - The total fertility rate (TFR) has been adjusted using a method proposed by [Bongaarts-Feeney](https://en.wikipedia.org/wiki/Sub-replacement_fertility). It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
+          - The total fertility rate (TFR) has been adjusted using a method proposed by [Bongaarts and Feeney](https://doi.org/10.2307/2807974). It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
           - The tempo-adjusted TFR adjusts for timing shifts in childbearing, such as postponement of births.
           - The tempo-adjusted TFR helps to distinguish between changes in the number of children women have and changes in the timing of when they have them.
           - The tempo-adjusted TFR often displays large year-to-year fluctuations ([Sobotka 2003](https://www.demographic-research.org/articles/volume/8/6)), which can make its use for specific years problematic. Therefore, three- or five-year moving averages are often used to smooth out fluctuations.
@@ -463,3 +467,5 @@ tables:
           share of women with N births = ppr(1) * ppr(2) * ··· * ppr(N) * [1 - ppr(N+1)]
 
           Note that we need the [1 - ppr(N+1)] term to not count women that had more than N births.
+
+          {definitions.others.france_note}
