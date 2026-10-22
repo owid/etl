@@ -370,13 +370,35 @@ C 4A: code, year, cohort, ardy [COHORT]
 import re
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
+# Sanity checks: plausible value ranges per indicator (well outside the observed ranges, to catch unit slips or parsing errors).
+VALUE_BOUNDS = {
+    "period": {
+        **{col: (0, 10) for col in ["tfr", "tfr40", "adjtfr", "patfr"]},
+        **{col: (12, 55) for col in ["mab", "mab40", "tmab"]},
+        **{col: (0, 15) for col in ["sdmab", "sdmab40"]},
+        "cbr": (0, 80),
+    },
+    "cohort": {
+        **{col: (0, 10) for col in ["ccf", "ccf40", "ccf_plus15y", "ccf_plus30y"]},
+        **{col: (12, 55) for col in ["cmab", "cmab40"]},
+        **{col: (0, 15) for col in ["sdcmab", "sdcmab40"]},
+        "ppr": (0, 1),
+    },
+    "period_ages": {"asfr_period": (0, 1)},
+    "cohort_ages": {"asfr_cohort": (0, 1), "ccfr_cohort": (0, 10)},
+    "period_ages_years": {"asfr_period": (0, 1)},
+    "cohort_ages_years": {"asfr_cohort": (0, 1), "ccfr_cohort": (0, 10)},
+}
+# NOTE: Number of countries in the 2026 release. A drop usually means a parsing or mapping regression; check before lowering.
+MIN_COUNTRIES = 39
 
 # CONFIG
 COLUMN_RAW = "column_raw"
@@ -533,6 +555,9 @@ def run() -> None:
     )
 
     # Special table: Distribution of period metrics
+    # NOTE: In the 2026 update, only Denmark had data for 2025, so `asfr_period__year_as_dimension_2025` wasn't added
+    # to chart 8398 (period-age-specific-fertility-rate). On the next update, add the 2025 series to that chart once
+    # more countries have 2025 data.
     ## Keep only birth_order = total
     tb_period_years = tb_period_ages.loc[(tb_period_ages["birth_order"] == "total")].drop(columns=["birth_order"])
     ## Keep only cohorts that are multiples of 5 (from year_min to year_max)
@@ -566,9 +591,12 @@ def run() -> None:
         col_bo=col_bo,
         regex_bo=REGEX_COHORT_AGE_BO,
         check_integration=False,
+        # NOTE: Exact number of (country, cohort, age) rows where the main and birth-order tables disagree beyond
+        # TOLERANCE. Mostly POL and DEUTE. The 2026 release added 3 for ccfr (POL, young cohorts, third-decimal
+        # rounding of small values). On update, check that new mismatches are rounding-level before bumping.
         check_integration_limit={
             "asfr": 143,
-            "ccfr": 101,
+            "ccfr": 104,
         },
     )
     ## Consolidate
@@ -621,6 +649,7 @@ def run() -> None:
         tb_cohort_years,
         tb_share_women,
     ]
+    sanity_check_outputs(tables)
 
     #
     # Save outputs.
@@ -634,6 +663,42 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_outputs(tables) -> None:
+    """Check value ranges, internal consistency, and coverage of the output tables."""
+    tbs = {tb.m.short_name: tb.reset_index() for tb in tables}
+
+    # Values within plausible bounds.
+    for tname, bounds in VALUE_BOUNDS.items():
+        tb = tbs[tname]
+        for col, (lo, hi) in bounds.items():
+            values = tb[col].astype(float)
+            bad = tb.loc[(values < lo) | (values > hi), ["country", col]]
+            assert bad.empty, f"{tname}.{col} outside [{lo}, {hi}]:\n{bad.head(10)}"
+
+    # Shares of women by number of births add up to 100% for each (country, cohort).
+    totals = tbs["cohort_share_women"].groupby(["country", "cohort"])["share_women"].sum()
+    bad = totals[(totals - 100).abs() > 0.01]
+    assert bad.empty, f"Shares of women by number of births don't add up to 100%:\n{bad.head(10)}"
+
+    # Period TFR equals the sum of its birth-order components, where all of them are available.
+    tb = tbs["period"]
+    tfr_total = tb[tb["birth_order"] == "total"].set_index(["country", "year"])["tfr"].astype(float)
+    tfr_sum = (
+        tb[tb["birth_order"].isin(["1", "2", "3", "4", "5p"])]
+        .groupby(["country", "year"])["tfr"]
+        .sum(min_count=5)
+        .astype(float)
+    )
+    diff = (tfr_total - tfr_sum).dropna().abs()
+    assert (diff < 0.01).all(), f"Period TFR doesn't match the sum of its birth orders:\n{diff[diff >= 0.01].head(10)}"
+
+    # Coverage didn't shrink.
+    num_countries = tbs["period"]["country"].nunique()
+    assert num_countries >= MIN_COUNTRIES, (
+        f"Only {num_countries} countries in the period table (expected {MIN_COUNTRIES}+)."
+    )
 
 
 def make_table_list(
@@ -716,9 +781,8 @@ def read_table(ds_meadow, tname, tname_base=None):
         tb = tb.rename(columns=COLUMNS_RENAME[tname_base])
 
     # Harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
+    tb = paths.regions.harmonize_names(
+        tb,
         country_col="code",
         warn_on_unused_countries=False,
     )
@@ -825,7 +889,7 @@ def make_table_with_birth_order(tb, cols_index, core_indicators, col_bo="birth_o
     return tb
 
 
-def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None, formatting=True) -> geo.Table:
+def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None, formatting=True) -> Table:
     ## Sanity check: no column is named the same
     _sanity_check_colnames(tbs, cols_index_out)
 

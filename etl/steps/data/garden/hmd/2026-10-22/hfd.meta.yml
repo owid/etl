@@ -12,7 +12,7 @@ definitions:
        fourth
       <%- elif birth_order == '5p' %>
        fifth (or greater)
-      <% endif %>
+      <%- endif %>
     bo_1_m1: |-
       <% if birth_order == '2' %>
        second
@@ -22,7 +22,7 @@ definitions:
        fourth
       <%- elif birth_order == '5p' %>
        fifth (or greater)
-      <% endif %>
+      <%- endif %>
     title: |-
       <% if birth_order == 'total' %>
       << title >> - Total
@@ -40,7 +40,12 @@ definitions:
       <%- else %>
       << title >> - Mother age: << age_str >> - Birth order: << birth_order >>
       <%- endif %>
+    france_note: |-
+      HFD's data for France covers metropolitan France only. It doesn't include the overseas departments.
   common:
+    processing_level: minor
+    description_processing: |-
+      {definitions.others.france_note}
     presentation:
       attribution_short: HFD
       topic_tags:
@@ -67,7 +72,7 @@ tables:
           Average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
-          - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
+          - Assumes current age-specific fertility rates remain constant throughout a woman’s lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
         presentation:
           title_public: "Fertility rate: births per woman"
@@ -78,7 +83,7 @@ tables:
           <% set title = "Period total fertility rate by age 40" %>
           {definitions.others.title}
         description_short: |-
-          Average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
+          Average number of{definitions.others.bo_1} children a woman would have before age 40 if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
           - Useful for understanding early and mid-reproductive age fertility patterns.
@@ -95,7 +100,7 @@ tables:
           <%- endif %>
         unit: "births per woman"
         description_key:
-          - The TFR has been adjusted using a method proposed by [Bongaarts-Feeney](https://en.wikipedia.org/wiki/Sub-replacement_fertility). It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
+          - The total fertility rate (TFR) has been adjusted using a method proposed by [Bongaarts and Feeney](https://doi.org/10.2307/2807974). It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
           - The tempo-adjusted TFR adjusts for timing shifts in childbearing, such as postponement of births.
           - The tempo-adjusted TFR helps to distinguish between changes in the number of children women have and changes in the timing of when they have them.
           - The tempo-adjusted TFR often displays large year-to-year fluctuations ([Sobotka 2003](https://www.demographic-research.org/articles/volume/8/6)), which can make its use for specific years problematic. Therefore, three- or five-year moving averages are often used to smooth out fluctuations.
@@ -109,11 +114,11 @@ tables:
           <% if birth_order == 'total' %>
           Total fertility rate adjusted for both the age of the mother and the number of children she already has.
           <%- else %>
-          Total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
+          Total fertility rate for{definitions.others.bo_1} births, adjusted for both the age of the mother and the number of children she already has.
           <%- endif %>
         unit: "births per woman"
         description_key:
-          - The Parity- and age-adjusted TFR accounts for both the age structure and parity distribution of the female population.
+          - The parity- and age-adjusted total fertility rate (PATFR) accounts for both the age structure and parity distribution of the female population.
 
       # Mean ages at birth, and at 40
       mab:
@@ -234,7 +239,7 @@ tables:
         description_key: &ccf_description_key
           - Shows the total number of children that women born in the same year have by the end of their childbearing years.
           - Helps compare how many children different generations of women have on average.
-          - Calculated using the actual number of births recorded at different ages throughout a woman's childbearing years.
+          - Calculated using the actual number of births recorded at different ages throughout a woman’s childbearing years.
 
       ccf_plus15y:
         title: |-
@@ -248,6 +253,11 @@ tables:
           <%- endif %>
         unit: "births per woman"
         description_key: *ccf_description_key
+        processing_level: major
+        description_processing: |-
+          We shift the completed cohort fertility rate forward by 15 years: the value shown for year X is the completed cohort fertility rate of women born in year X − 15. This makes it easier to compare with the period total fertility rate in the years when these women were having children.
+
+          {definitions.others.france_note}
       ccf_plus30y:
         title: |-
           <% set title = "Completed cohort fertility rate (adjusted +30 years)" %>
@@ -260,6 +270,11 @@ tables:
           <%- endif %>
         unit: "births per woman"
         description_key: *ccf_description_key
+        processing_level: major
+        description_processing: |-
+          We shift the completed cohort fertility rate forward by 30 years: the value shown for year X is the completed cohort fertility rate of women born in year X − 30. This makes it easier to compare with the period total fertility rate in the years when these women were having children.
+
+          {definitions.others.france_note}
 
       ccf40:
         title: |-
@@ -393,9 +408,8 @@ tables:
           It measures the average number of children born to a specific group of women (a cohort) by the age << age >>. It reflects the realized fertility of a generation, providing insights into long-term fertility trends and societal changes over time.
         unit: "births per woman"
         description_key:
-          - Shows fertility rates for each age group in a specific year.
+          - Shows the average number of children that women born in the same year have had by each age.
           - Useful for detailed analysis of fertility patterns by both age and year.
-          # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
   period_ages_years:
     variables:
@@ -433,24 +447,30 @@ tables:
   cohort_share_women:
     variables:
       share_women:
+        # NOTE: `num_births` is an integer dimension, so compare with `|int` (comparing to '0' never matches).
         title: |-
-          <% if num_births == '0' %>
+          <% if num_births|int == 0 %>
           Share of women without births
-          <%- elif num_births == '4' %>
+          <%- elif num_births|int == 1 %>
+          Share of women with 1 birth
+          <%- elif num_births|int == 4 %>
           Share of women with 4 or more births
           <%- else %>
           Share of women with << num_births >> births
-          <% endif %>
+          <%- endif %>
         description_short: |-
-          <% if num_births == '0' %>
-          Share of women born in a given year that did not give birth.
-          <%- elif num_births == '4' %>
-          Share of women born in a given year that had 4 or more births.
+          <% if num_births|int == 0 %>
+          Share of women born in a given year who did not give birth.
+          <%- elif num_births|int == 1 %>
+          Share of women born in a given year who had exactly 1 birth.
+          <%- elif num_births|int == 4 %>
+          Share of women born in a given year who had 4 or more births.
           <%- else %>
-          Share of women born in a given year that had << num_births >> or more births.
-          <% endif %>
+          Share of women born in a given year who had exactly << num_births >> births.
+          <%- endif %>
         unit: "%"
         short_unit: "%"
+        processing_level: major
         description_processing: |-
           We have estimated the share of women with N births using the estimates on the cohort parity progression ratio (ppr). ppr(N) is an estimate on the probability of giving birth to an Nth child, conditioned on having had N-1 children before.
 
@@ -459,3 +479,5 @@ tables:
           share of women with N births = ppr(1) * ppr(2) * ··· * ppr(N) * [1 - ppr(N+1)]
 
           Note that we need the [1 - ppr(N+1)] term to not count women that had more than N births.
+
+          {definitions.others.france_note}
