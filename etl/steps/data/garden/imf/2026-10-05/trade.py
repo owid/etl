@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Table, VariablePresentationMeta
 
 from etl.helpers import PathFinder
 
@@ -32,6 +32,27 @@ IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
 
 # Categories of the importer ranking of China and the United States.
 IMPORT_RANK_CATEGORIES = {"1st - Top source", "2nd", "3rd", "4th", "5th", "Not in top 5", "China", "United States"}
+
+# Map colors of the top-partner categories, from grapher's OWID categorical map palette (OwidMapColors). The same
+# partner gets the same color on the import and export maps. China is the only strong, warm color, so keep warm hues
+# (oranges, sands, cherries) away from partners whose countries can border China's.
+# NOTE: The top ten partners are recomputed on every update. If a new one enters, the build fails until it gets a
+# color here; pick an unused, cool one from OwidMapColors (owid-grapher, color/CustomSchemes.ts).
+TOP_PARTNER_COLORS = {
+    "China": "#D94C3F",  # Tomato
+    "United States": "#526F9B",  # Muted denim
+    "Germany": "#238A84",  # Muted teal
+    "India": "#77538F",  # Soft purple
+    "Italy": "#A07AB8",  # Light purple
+    "France": "#5B6D35",  # Olive
+    "United Kingdom": "#6FA54F",  # Leaf green
+    "Russia": "#5FB8C8",  # Sky turquoise
+    "Japan": "#8E97C7",  # Lavender
+    "Saudi Arabia": "#D9BC54",  # Mustard
+    "Netherlands": "#92D3DE",  # Light denim
+    "Switzerland": "#9DCA7B",  # Light green
+    "Other": "#B9B2A6",  # Taupe
+}
 
 # Historical region dissolution dates
 HISTORICAL_DISSOLUTIONS = {
@@ -186,10 +207,24 @@ def run() -> None:
         else:
             tb[column].metadata.origins = tb_long["value"].metadata.origins
 
-    # Order the top-partner categories for chart legends: most common in the latest year first, "Other" last.
+    # Order and color the top-partner categories for maps: most common in the latest year first, "Other" last.
     for column in ["top_partner_category", "top_export_partner_category"]:
+        order = _top_partner_order(tb, column)
+        missing = set(order) - set(TOP_PARTNER_COLORS)
+        assert not missing, f"Add a map color to TOP_PARTNER_COLORS for the new top partner(s): {sorted(missing)}"
         tb[column].metadata.type = "ordinal"
-        tb[column].metadata.sort = _top_partner_order(tb, column)
+        tb[column].metadata.sort = order
+        if tb[column].metadata.presentation is None:
+            tb[column].metadata.presentation = VariablePresentationMeta()
+        tb[column].metadata.presentation.grapher_config = {
+            **(tb[column].metadata.presentation.grapher_config or {}),
+            "map": {
+                "colorScale": {
+                    "baseColorScheme": "OwidCategoricalMap",
+                    "customCategoryColors": {category: TOP_PARTNER_COLORS[category] for category in order},
+                }
+            },
+        }
 
     # Keep float64 values, as in meadow (repacking would round totals in the trillions to float32).
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata, repack=False)
