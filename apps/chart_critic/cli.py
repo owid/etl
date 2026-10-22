@@ -200,7 +200,8 @@ def _readership(slugs: list[str]) -> dict[str, str]:
     by_views = dict(zip(views.slug, views.views_365d))
     published = published.dropna(subset=["publishedAt"])
     by_date = dict(zip(published.slug, published.publishedAt))
-    return {s: readership_line(by_views.get(s), by_date.get(s)) for s in unique}
+    typical = views.views_365d.median() if len(views) else None
+    return {s: readership_line(by_views.get(s), by_date.get(s), typical) for s in unique}
 
 
 def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
@@ -355,7 +356,7 @@ def _review_one(
             pass
 
     agent = build_agent(model)
-    parts = prompt_parts(bundle, extra_views, readership)
+    parts = prompt_parts(bundle, extra_views, readership, params)
     found: list[dict[str, Any]] = []
     in_tokens = out_tokens = cache_read = cache_write = 0
 

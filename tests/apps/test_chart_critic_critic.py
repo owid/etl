@@ -23,3 +23,8 @@ def test_a_chart_nobody_has_opened_yet_says_so():
 
 def test_readership_without_a_publish_date():
     assert readership_line(36500, None) == "Readership: about 100 views a day."
+
+
+def test_readership_carries_the_typical_chart_as_a_reference_point():
+    line = readership_line(400, dt.date(2024, 5, 8), typical_views_365d=800)
+    assert line == "Readership: about 1 view a day, published 2024-05-08 (a typical chart gets about 2 a day)."
