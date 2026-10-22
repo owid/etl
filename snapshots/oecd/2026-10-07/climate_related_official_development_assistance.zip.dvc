@@ -21,13 +21,13 @@ meta:
     # Files
     url_main: https://data-explorer.oecd.org/vis?lc=en&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_RIOMRKR%40DF_RIOMARKERS&df[ag]=OECD.DCD.FSD
     # NOTE: There is no single download file; the snapshot script queries the OECD SDMX API.
-    date_accessed: 2026-10-08
+    date_accessed: 2026-10-22
 
     # License
     license:
       name: "OECD Terms & conditions"
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: f03615dd2174ea426ea040ce80f50b0f
-    size: 40165755
+  - md5: 515b9afdcb1c94d0bbff592798ce3a46
+    size: 43142124
     path: climate_related_official_development_assistance.zip
