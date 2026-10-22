@@ -89,10 +89,14 @@ class Issue(BaseModel):
             "naming inconsistency, or a defect confined to a micro-territory or a range that "
             "ends decades ago. Judge the reader's loss, not how odd the defect looks: a "
             "correct observation about Tuvalu in 1965 is 'low', not 'high'. "
-            "Most readers see the chart as it opens and look for large countries, so a defect "
-            "confined to a small country, or to a country the chart does not show by default "
-            "(on a line or bar chart, one outside its default entities), reaches few of them: "
-            "it is 'low' unless it stands out in the chart's default view."
+            "Weigh how many readers the defect reaches as well as how wrong it is. Most readers "
+            "see the chart as it opens and look for large countries, so a defect confined to a "
+            "small country, or to a country the chart does not show by default (on a line or bar "
+            "chart, one outside its default entities), reaches few of them. So does one on a "
+            "chart that has been published for a while and is rarely read. Those are usually "
+            "'low' — but a serious error, such as a wrong unit or an impossible headline value, "
+            "matters however few people have read the chart so far, and a recently published "
+            "chart has simply not had time to collect readers."
         )
     )
     kind: Literal["data", "chart"] = Field(
@@ -243,6 +247,26 @@ def format_views(views_365d: int | float | None) -> str:
     return f"{per_day:,.0f} views/day" if per_day >= 10 else f"{per_day:,.1f} views/day"
 
 
+def readership_line(views_365d: int | float | None, published: dt.datetime | dt.date | None) -> str:
+    """How much the chart is read, for the model to weigh in its severity call.
+
+    Per day over the days the chart has been live, not over a flat year: a chart published last
+    week has a few hundred views in its annual total and would otherwise read as one nobody opens.
+    Rounded to one significant figure, so the daily drift in pageviews does not change what the
+    model is shown and throw away its cached reviews.
+    """
+    today = dt.date.today()
+    day = published.date() if isinstance(published, dt.datetime) else published
+    live_days = min(max((today - day).days, 1), 365) if day else 365
+    if views_365d:
+        per_day = float(f"{views_365d / live_days:.1g}")
+        read = f"about {per_day:g} view{'' if per_day == 1 else 's'} a day"
+    else:
+        read = "no recorded views"
+    since = f", first published {day.isoformat()}" if day else ""
+    return f"Readership: {read}{since}."
+
+
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """An agent with no system instructions — see :func:`prompt_parts` for why.
 
@@ -266,8 +290,10 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     return Agent[None, Review](model=claude, output_type=Review, retries=2, model_settings=ANTHROPIC_SETTINGS)  # ty: ignore[invalid-argument-type]
 
 
-def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:
-    """The user turn: the render, then the metadata and numbers, then the instruction.
+def prompt_parts(
+    bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None, readership: str = ""
+) -> list[str | BinaryContent]:
+    """The user turn: the render, then the metadata, numbers and readership, then the instruction.
 
     The instruction goes **here rather than in the agent's system instructions**, and the
     difference is large. Measured over three passes each on two charts with known findings and
@@ -293,5 +319,7 @@ def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = N
         parts.append(f"Image {i} — {label}:")
         parts.append(BinaryContent(data=png, media_type="image/png"))
     parts.append(bundle.summary)
+    if readership:
+        parts.append(readership)
     parts.append(INSTRUCTIONS.format(today=dt.date.today().isoformat()))
     return parts

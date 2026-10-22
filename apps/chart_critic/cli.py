@@ -45,6 +45,7 @@ from apps.chart_critic.critic import (
     format_views,
     issue_params,
     prompt_parts,
+    readership_line,
     same_claim,
 )
 from apps.utils.llms.costs import estimate_llm_cost
@@ -171,6 +172,35 @@ def _select(
     return [(r.slug, int(r.views), r.params) for r in picked.itertuples()]
 
 
+def _readership(slugs: list[str]) -> dict[str, str]:
+    """``{slug: line}`` telling the model how much each chart is read and since when.
+
+    Looked up here rather than taken from the targets because ``--slugs`` carries no pageviews,
+    and "no recorded views" would then be a false statement about every hand-picked chart. Fails
+    soft to no line at all: readership informs the severity call, it is not needed to make one.
+    """
+    if not slugs:
+        return {}
+    try:
+        views = _pageviews(0)
+        published = read_sql(
+            """
+            SELECT cc.slug, c.publishedAt
+            FROM chart_configs cc
+            JOIN charts c ON c.configId = cc.id
+            WHERE cc.slug IN %(slugs)s
+            """,
+            params={"slugs": tuple(set(slugs))},
+        )
+    except Exception as e:  # noqa: BLE001 — context for the model, not correctness
+        console.print(f"[yellow]readership unavailable, reviewing without it: {str(e)[:90]}[/yellow]")
+        return {}
+    by_views = dict(zip(views.slug, views.views_365d))
+    published = published.dropna(subset=["publishedAt"])
+    by_date = dict(zip(published.slug, published.publishedAt))
+    return {s: readership_line(by_views.get(s), by_date.get(s)) for s in set(slugs)}
+
+
 def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
     """Price a call; a model genai-prices does not know counts as $0, with a warning, so the review is kept.
 
@@ -271,6 +301,7 @@ def _review_one(
     ttl_hours: float = cache.DEFAULT_TTL_HOURS,
     views: int = 1,
     params: str = "",
+    readership: str = "",
 ) -> dict[str, Any]:
     result: dict[str, Any] = {
         "slug": slug,
@@ -318,7 +349,7 @@ def _review_one(
             pass
 
     agent = build_agent(model)
-    parts = prompt_parts(bundle, extra_views)
+    parts = prompt_parts(bundle, extra_views, readership)
     found: list[dict[str, Any]] = []
     in_tokens = out_tokens = cache_read = cache_write = 0
 
@@ -326,7 +357,7 @@ def _review_one(
     # genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
-    bundle_hash = cache.content_hash(bundle.summary, bundle.png, *(png for _, png in extra_views))
+    bundle_hash = cache.content_hash(f"{bundle.summary}\n{readership}", bundle.png, *(png for _, png in extra_views))
 
     # Take every pass already cached for this bundle, not the first --repeat of them. Passes
     # disagree, so replaying a fixed slot that happened to miss froze a chart as "clean" forever;
@@ -384,7 +415,7 @@ def _review_one(
     type=int,
     default=DEFAULT_MIN_VIEWS,
     show_default=True,
-    help="Ignore charts below this many annual pageviews, with --sample, --top and --changed-since.",
+    help="Ignore charts below this many annual pageviews.",
 )
 @click.option("--seed", type=int, default=0, show_default=True, help="Sampling seed, so a run is reproducible.")
 @click.option("--model", type=str, default=DEFAULT_MODEL, show_default=True, help="Model to review with.")
@@ -528,15 +559,6 @@ def cli(
         by_views = dict(zip(ranked.slug, ranked.views_365d))
         changed.sort(key=lambda s: -by_views.get(s, 0))
         console.print(f"[bold]{len(changed)} published charts changed in the last {changed_since} day(s)[/bold]")
-        # The same floor as --sample and --top: a correct finding on a chart a few people a day
-        # open is rarely worth someone's morning, and the editors' daily batch is full of them.
-        read = [s for s in changed if by_views.get(s, 0) >= min_views]
-        if len(read) < len(changed):
-            skipped = len(changed) - len(read)
-            console.print(f"[dim]skipping {skipped} of them below {min_views:,} views a year (--min-views)[/dim]")
-        changed = read
-        if not changed:
-            return
         targets = [(s, int(by_views.get(s, 0)), params) for s in changed[: top or len(changed)]]
     else:
         targets = _expand_mdims(_select(slugs, sample, top, min_views, seed, params), mdim_views, seed)
@@ -552,6 +574,7 @@ def cli(
             f"(algorithm {cache.algo_fingerprint()})[/dim]"
         )
 
+    readership = _readership([slug for slug, _, _ in targets])
     results: list[dict[str, Any]] = []
     with cf.ThreadPoolExecutor(workers) as ex:
         futures = [
@@ -567,6 +590,7 @@ def cli(
                 ttl_hours=cache_ttl,
                 views=views,
                 params=target_params,
+                readership=readership.get(slug, ""),
             )
             for slug, chart_pageviews, target_params in targets
         ]
