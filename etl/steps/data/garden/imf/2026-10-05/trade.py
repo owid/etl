@@ -609,6 +609,12 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
 
 
 def calculate_trade_relationship_shares(tb: Table) -> Table:
+    # NOTE: Every country pair with data in any year counts in every year from 1948, including years before one of
+    # the countries existed (e.g. South Sudan before 2011). Those pairs count as non-trading, which inflates the
+    # non-trading share before 2000 (by about 33 points in 1950, 12-15 points in 1960-1991, none from 2015 on). The
+    # chart using these shares (share-of-bilateral-trade-partnerships) is unpublished. Before publishing it, count each
+    # pair only from the year both countries exist (first year in the IMF data, or independence dates) and describe
+    # the choice in the metadata.
     THRESHOLD = 10_000  # USD
 
     df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)

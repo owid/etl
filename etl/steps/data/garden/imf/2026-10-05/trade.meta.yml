@@ -13,6 +13,9 @@ definitions:
   fob_basis: &fob_basis In this data, exports are valued "free on board" (FOB). That is the value of the goods up to the exporter's border, without the cost of shipping and insuring them abroad.
   cif_basis: &cif_basis In this data, imports are valued at "cost, insurance, and freight" (CIF). That is the value of the goods plus the cost of shipping and insuring them to the importing country's border. Not every country records its imports this way; for some of those that don't, the IMF adds an estimate of these costs.
 
+  # NOTE: These shares count every country pair in every year from 1948, including years before one of the countries
+  # existed, which inflates the non-trading share before 2000. The chart is unpublished; before publishing it, fix that in
+  # calculate_trade_relationship_shares (see the NOTE there) and say how pairs are counted in this text.
   description_processing_partnerships: &description_processing_partnerships We calculated the share of bilateral, unilateral, and non-trading partnerships by examining all possible country pairs for each year. For each pair, we checked whether both countries reported trade in goods (exports or imports) worth more than $10,000 with each other (bilateral), only one of the two countries did (unilateral), or neither did (non-trading). We then counted the total number of partnerships in each category and calculated their shares as a percentage of all partnerships.
   description_processing_aggregates: &description_processing_aggregates Trade with continents, with Asia (excluding China), and with the World is the sum of trade with the individual countries in them, calculated by Our World in Data. It therefore leaves out trade the IMF cannot attribute to a specific partner country. Values for continents and for Asia (excluding China) as reporters are, likewise, the sum of the values of their member countries.
 
