@@ -37,12 +37,6 @@ steps:
   #
   # EM-DAT Natural disasters.
   #
-  # Natural disasters explorer.
-  data://explorers/emdat/latest/natural_disasters:
-    - data://garden/emdat/2026-10-21/natural_disasters
-  #
-  # EM-DAT Natural disasters.
-  #
   # Multi-dim charts on the human and economic impact of natural disasters.
   viz://chart/natural_disasters/latest/affected:
     - data://grapher/emdat/2026-10-21/natural_disasters
