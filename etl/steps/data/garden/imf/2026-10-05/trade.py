@@ -33,9 +33,6 @@ IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
 # Categories of the importer ranking of China and the United States.
 IMPORT_RANK_CATEGORIES = {"1st - Top source", "2nd", "3rd", "4th", "5th", "Not in top 5"}
 
-# Prefix of the top-partner categories outside the top ten, e.g. "Other (South Korea)".
-OTHER_PREFIX = "Other ("
-
 # Map colors of the top-partner categories, from grapher's OWID categorical map palette (OwidMapColors). The same
 # partner gets the same color on the import and export maps. China is the only strong, warm color, so keep warm hues
 # (oranges, sands, cherries) away from partners whose countries can border China's.
@@ -213,31 +210,18 @@ def run() -> None:
     # Order and color the top-partner categories for maps: most common in the latest year first, "Other" last.
     for column in ["top_partner_category", "top_export_partner_category"]:
         order = _top_partner_order(tb, column)
-        named = [category for category in order if not category.startswith(OTHER_PREFIX)]
-        others = [category for category in order if category.startswith(OTHER_PREFIX)]
-        missing = set(named) - set(TOP_PARTNER_COLORS)
+        missing = set(order) - set(TOP_PARTNER_COLORS)
         assert not missing, f"Add a map color to TOP_PARTNER_COLORS for the new top partner(s): {sorted(missing)}"
         tb[column].metadata.type = "ordinal"
         tb[column].metadata.sort = order
         if tb[column].metadata.presentation is None:
             tb[column].metadata.presentation = VariablePresentationMeta()
-        # All "Other (<partner>)" categories share the "Other" color and are labeled "Other". The map tooltip shows the
-        # raw value, so it names the partner, as long as the chart's "Show custom label in the tooltip" option
-        # (map.tooltipUseCustomLabels) stays off. The legend keeps a single "Other" entry by hiding all but the first.
-        # NOTE: This relies on grapher coloring countries in hidden legend categories (customHiddenCategories). On
-        # every update, check that each map legend shows one "Other" entry and that hovering an "Other" country shows
-        # its partner's name.
         tb[column].metadata.presentation.grapher_config = {
             **(tb[column].metadata.presentation.grapher_config or {}),
             "map": {
                 "colorScale": {
                     "baseColorScheme": "OwidCategoricalMap",
-                    "customCategoryColors": {
-                        **{category: TOP_PARTNER_COLORS[category] for category in named},
-                        **{category: TOP_PARTNER_COLORS["Other"] for category in others},
-                    },
-                    "customCategoryLabels": {category: "Other" for category in others},
-                    "customHiddenCategories": {category: True for category in others[1:]},
+                    "customCategoryColors": {category: TOP_PARTNER_COLORS[category] for category in order},
                 }
             },
         }
@@ -288,9 +272,7 @@ def sanity_check_outputs(tb: Table) -> None:
         f"Unexpected import rank categories: {categories - IMPORT_RANK_CATEGORIES}"
     )
     for column in ["top_partner_category", "top_export_partner_category"]:
-        categories = set(tb[column].dropna())
-        named = {category for category in categories if not category.startswith(OTHER_PREFIX)}
-        assert len(named) <= 10, f"{column} should name at most 10 partners, the rest as 'Other (<partner>)'."
+        assert tb[column].dropna().nunique() <= 11, f"{column} should have the top 10 partners plus 'Other'."
 
     # Every partner of interest is present.
     missing = set(REGIONS_OF_INTEREST + ["World"]) - set(tb["counterpart_country"].dropna())
@@ -442,7 +424,7 @@ def get_top_partner(tb: Table) -> Table:
     This function:
     1. Finds the largest import partner for each country-year
     2. Counts how frequently each partner appears as #1 globally
-    3. Keeps the top 10 most frequent partners, groups others as 'Other (<partner>)'
+    3. Keeps the top 10 most frequent partners, groups others as 'Other'
     4. Returns with counterpart_country='World' for easy merging
 
     Args:
@@ -458,7 +440,7 @@ def get_top_partner(tb: Table) -> Table:
     partner_counts = top_df.groupby("counterpart_country")["country"].nunique().sort_values(ascending=False)
     top_10 = set(partner_counts.head(10).index.tolist())
 
-    top_df["top_partner_category"] = top_df["counterpart_country"].apply(lambda x: x if x in top_10 else f"Other ({x})")
+    top_df["top_partner_category"] = top_df["counterpart_country"].apply(lambda x: x if x in top_10 else "Other")
     out = Table(top_df[["country", "year", "top_partner_category"]]).copy_metadata(tb)
     out = out.drop_duplicates(subset=["country", "year"])  # safety
 
@@ -468,8 +450,10 @@ def get_top_partner(tb: Table) -> Table:
 
 def _top_partner_order(tb: Table, column: str) -> list[str]:
     """Categories ordered by how many countries have them as top partner in the latest year (ties broken by the count
-    over all years, as in the top-10 selection): the named partners first, then the "Other (<partner>)" ones."""
+    over all years, as in the top-10 selection), with "Other" last."""
     categories = tb.reset_index()[["country", "year", column]].dropna()
+    assert "Other" in set(categories[column]), f"Expected an 'Other' category in {column}."
+    categories = categories[categories[column] != "Other"]
     counts = pd.DataFrame(
         {
             "latest": categories[categories["year"] == categories["year"].max()].groupby(column)["country"].nunique(),
@@ -477,10 +461,7 @@ def _top_partner_order(tb: Table, column: str) -> list[str]:
         }
     ).fillna(0)
     order = counts.sort_values(["latest", "all_years"], ascending=False).index.tolist()
-    named = [category for category in order if not category.startswith(OTHER_PREFIX)]
-    others = [category for category in order if category.startswith(OTHER_PREFIX)]
-    assert others, f"Expected 'Other (<partner>)' categories in {column}."
-    return named + others
+    return order + ["Other"]
 
 
 def get_top_export_partner(tb: Table) -> Table:
@@ -490,7 +471,7 @@ def get_top_export_partner(tb: Table) -> Table:
     This function:
     1. Finds the largest export destination for each country-year
     2. Counts how frequently each destination appears as #1 globally
-    3. Keeps the top 10 most frequent destinations, groups others as 'Other (<partner>)'
+    3. Keeps the top 10 most frequent destinations, groups others as 'Other'
     4. Returns with counterpart_country='World' for easy merging
 
     Args:
@@ -506,9 +487,7 @@ def get_top_export_partner(tb: Table) -> Table:
     partner_counts = top_df.groupby("counterpart_country")["country"].nunique().sort_values(ascending=False)
     top_10 = set(partner_counts.head(10).index.tolist())
 
-    top_df["top_export_partner_category"] = top_df["counterpart_country"].apply(
-        lambda x: x if x in top_10 else f"Other ({x})"
-    )
+    top_df["top_export_partner_category"] = top_df["counterpart_country"].apply(lambda x: x if x in top_10 else "Other")
     out = Table(top_df[["country", "year", "top_export_partner_category"]]).copy_metadata(tb)
     out = out.drop_duplicates(subset=["country", "year"])  # safety
 
