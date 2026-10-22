@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -579,16 +578,12 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
 
     df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
 
-    #    This uses vectorized minimum/maximum on object‑dtypes:
-    c1 = df[["country", "counterpart_country"]]
-    df["pair"] = pd.Series(
-        np.where(
-            c1.country.values < c1.counterpart_country.values,
-            c1.country.values + "--" + c1.counterpart_country.values,
-            c1.counterpart_country.values + "--" + c1.country.values,
-        ),
-        index=df.index,
-    )
+    # Label each pair of countries the same way in both directions (names in alphabetical order).
+    country = df["country"].astype(str)
+    counterpart = df["counterpart_country"].astype(str)
+    df["pair"] = counterpart + "--" + country
+    country_first = country < counterpart
+    df.loc[country_first, "pair"] = country[country_first] + "--" + counterpart[country_first]
 
     active = df[df.has_trade]
     dir_counts = (
