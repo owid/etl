@@ -5194,6 +5194,16 @@ def test_a_rewritten_passage_reads_as_before_and_after_not_as_fragments():
     assert "(not there before)" in before_after_html("- a", "- a\n- b")
     assert "(removed)" in before_after_html("- a\n- b", "- a")
 
+    # Past the visible few, the rest fold into an expander instead of being dropped: the verdict covers them.
+    many_old = "\n".join(f"- Passage {i} reads one way." for i in range(6))
+    many_new = "\n".join(f"- Passage {i} reads another way." for i in range(6))
+    folded = before_after_html(many_old, many_new, max_passages=4)
+    assert folded.count(">Before<") == 6
+    visible, hidden = folded.split("<details", 1)
+    assert visible.count(">Before<") == 4 and hidden.count(">Before<") == 2
+    assert "2 more changed passages</summary>" in hidden and "Passage 5" in hidden
+    assert "<details" not in before_after_html(old, new)
+
 
 def test_the_dimension_tree_draws_the_charts_when_no_mdim_is_reached(monkeypatch):
     """A branch that reaches only charts still gets the tree, with the charts branch on it — not a caption

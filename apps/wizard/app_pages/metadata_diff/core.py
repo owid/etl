@@ -982,22 +982,28 @@ def before_after_html(old: Any, new: Any, max_passages: int = 4) -> str:
     The readable form of a scattered edit: the reader sees the old sentence with what was cut struck
     through, and under it the new sentence with what was written highlighted — two texts they can read,
     instead of one where deletions and insertions alternate word by word.
+
+    Past `max_passages` the rest fold into an expander rather than being dropped: the card's verdict covers
+    the whole edit, so every passage it covers has to be one click away.
     """
-    pairs = changed_passages(old, new)
-    rows = []
-    for old_text, new_text in pairs[:max_passages]:
+
+    def row(old_text: str, new_text: str) -> str:
         before = inline_diff_html(old_text, new_text, side="old") if old_text else "<em>(not there before)</em>"
         after = inline_diff_html(old_text, new_text, side="new") if new_text else "<em>(removed)</em>"
-        rows.append(
+        return (
             '<div class="mdd-ba">'
             f'<div class="mdd-ba-row"><span class="mdd-ba-label">Before</span><span>{before}</span></div>'
             f'<div class="mdd-ba-row"><span class="mdd-ba-label">After</span><span>{after}</span></div>'
             "</div>"
         )
-    hidden = len(pairs) - max_passages
-    if hidden > 0:
-        rows.append(f'<p class="mdd-note">… and {hidden} more changed passage{"s" if hidden != 1 else ""}.</p>')
-    return "".join(rows)
+
+    pairs = changed_passages(old, new)
+    shown = "".join(row(o, n) for o, n in pairs[:max_passages])
+    rest = pairs[max_passages:]
+    if rest:
+        label = f"… and {len(rest)} more changed passage{'s' if len(rest) != 1 else ''}"
+        shown += f'<details class="mdd-note"><summary>{label}</summary>{"".join(row(o, n) for o, n in rest)}</details>'
+    return shown
 
 
 def diff_window_html(old: Any, new: Any, max_chars: int = 240, lead: int = 70) -> str:
