@@ -18,6 +18,10 @@ def run(upload: bool = True, path_to_file: str | None = None) -> None:
         upload: Whether to upload the snapshot to S3.
         path_to_file: Path to local data file.
     """
+    # The download URL needs an authenticated HFD session, so a local file is mandatory.
+    if path_to_file is None:
+        raise ValueError("HFD requires login: download HFD.zip manually and pass it with `--path-to-file`.")
+
     # Init Snapshot object
     snap = paths.init_snapshot()
 
