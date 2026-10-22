@@ -20,7 +20,7 @@ tables:
         title: Trade volume index
         unit: index 1800=1
         short_unit: ""
-        description_short: World trade index, based on the average of exports and imports values, adjusted for inflation (1800 = 1).
+        description_short: World trade index, based on the volume of goods traded between countries, adjusted for price changes (1800 = 1).
         description_key:
           - One of the defining developments of the past two centuries has been the increasing integration of national economies into a single global system. This indicator illustrates the expansion of trade and the growing interconnectedness of the world economy since 1800.
           - It shows the volume of world trade, measuring the goods exchanged across national borders at constant prices, so that changes in prices don't distort comparisons over time. The series is expressed as an index relative to a baseline year (here, 1800 = 1).
