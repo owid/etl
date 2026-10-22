@@ -11,6 +11,10 @@ definitions:
       <% if (variant is defined) and (variant != 'estimates') -%>
       Future projections are based on the [UN's << variant | replace('constant_fertility', 'constant-fertility') | replace('zero_migration', 'zero-migration') >> scenario](#dod:un-projection-scenarios).<% if variant == 'zero_migration' %> In this scenario, net migration is set to zero from 2024 onwards.<% endif %>
       <%- endif -%>
+    # Variant name for indicator titles (e.g. "Zero migration"). Titles with Jinja skip the automatic
+    # dimension suffix, so `title_dimensions` rebuilds it with readable variant names.
+    variant_title: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
+    title_dimensions: "- Sex: << sex >> - Age: << age >> - Variant: {definitions.global.variant_title}"
     # Noun for population/deaths titles, based on sex × age.
     # Outputs e.g. "infants", "girls", "adolescent boys", "adult women", "people".
     # Use with {definitions.global.pop_noun} — produces extra whitespace that
@@ -90,7 +94,7 @@ tables:
   population:
     variables:
       population:
-        title: Population
+        title: Population {definitions.global.title_dimensions}
         unit: people
         description_short: |-
           Total population, measured on 1 July of the year shown. {definitions.global.dimensions.description_short}
@@ -121,7 +125,7 @@ tables:
               <%- endif %> {definitions.global.projections}
 
       population_change:
-        title: Population change
+        title: Population change {definitions.global.title_dimensions}
         unit: people
         description_short: |-
           Annual change in population, calculated as the difference between population on 1 July of consecutive years. {definitions.global.dimensions.description_short}
@@ -155,7 +159,7 @@ tables:
               <%- endif %> {definitions.global.projections}
 
       population_density:
-        title: Population density
+        title: Population density {definitions.global.title_dimensions}
         unit: people per square kilometer
         short_unit: people/km²
         description_short: |-
@@ -227,7 +231,7 @@ tables:
   growth_rate:
     variables:
       growth_rate:
-        title: Population growth rate
+        title: Population growth rate {definitions.global.title_dimensions}
         short_unit: "%"
         unit: "%"
         description_short: |-
@@ -248,7 +252,7 @@ tables:
   natural_change_rate:
     variables:
       natural_change_rate:
-        title: Natural population growth rate
+        title: Natural population growth rate {definitions.global.title_dimensions}
         short_unit: "%"
         unit: "%"
         description_short: |-
@@ -271,7 +275,7 @@ tables:
   fertility_rate:
     variables:
       fertility_rate:
-        title: Fertility rate
+        title: Fertility rate {definitions.global.title_dimensions}
         unit: |-
           <% if age == 'all' %>
           live births per woman
@@ -340,7 +344,7 @@ tables:
   migration:
     variables:
       net_migration:
-        title: Net migration
+        title: Net migration {definitions.global.title_dimensions}
         unit: migrants
         description_short: |-
           Number of immigrants minus the number of emigrants. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
@@ -364,7 +368,7 @@ tables:
               Total number of immigrants minus the number of emigrants. Positive values mean more people moved in than out. {definitions.global.projections}
 
       net_migration_rate:
-        title: Annual net migration rate
+        title: Annual net migration rate {definitions.global.title_dimensions}
         unit: migrants per 1,000 people
         description_short: |-
           Number of immigrants minus the number of emigrants, per 1,000 people in the population. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
@@ -387,7 +391,7 @@ tables:
   deaths:
     variables:
       deaths:
-        title: Deaths
+        title: Deaths {definitions.global.title_dimensions}
         unit: deaths
         description_short: |-
           Number of deaths in a calendar year. {definitions.global.dimensions.description_short}
@@ -413,7 +417,7 @@ tables:
             note: *crvs_note
 
       death_rate:
-        title: Death rate
+        title: Death rate {definitions.global.title_dimensions}
         unit: deaths per 1,000 people
         description_short: |-
           Number of deaths in a year per 1,000 people in the population. {definitions.global.dimensions.description_short}
@@ -433,7 +437,7 @@ tables:
   births:
     variables:
       births:
-        title: Births
+        title: Births {definitions.global.title_dimensions}
         unit: births
         description_short: |-
           Number of live births in a calendar year. {definitions.global.dimensions.description_short_births}
@@ -455,7 +459,7 @@ tables:
             <%- endif %>
 
       birth_rate:
-        title: Birth rate
+        title: Birth rate {definitions.global.title_dimensions}
         unit: births per 1,000 people
         description_short: |-
           Number of live births in a year per 1,000 people in the population. {definitions.global.dimensions.description_short}
@@ -476,7 +480,7 @@ tables:
   median_age:
     variables:
       median_age:
-        title: Median age
+        title: Median age {definitions.global.title_dimensions}
         unit: years
         description_short: |-
           Age that divides the population into two halves of equal size — half are younger and half are older. {definitions.global.dimensions.description_short}
@@ -496,7 +500,7 @@ tables:
   mean_age_childbearing:
     variables:
       mean_age_childbearing:
-        title: Mean age at childbearing
+        title: Mean age at childbearing {definitions.global.title_dimensions}
         unit: years
         description_short: |-
           Average age at which women give birth, calculated from a single year's age-specific fertility rates. {definitions.global.dimensions.description_short}
@@ -516,7 +520,7 @@ tables:
   life_expectancy:
     variables:
       life_expectancy:
-        title: Life expectancy
+        title: Life expectancy {definitions.global.title_dimensions}
         unit: years
         short_unit: years
         description_short: |-
@@ -572,7 +576,7 @@ tables:
   sex_ratio:
     variables:
       sex_ratio:
-        title: Sex ratio
+        title: Sex ratio {definitions.global.title_dimensions}
         unit: "males per 100 females"
         description_short: |-
           <% if age == '0' %>
@@ -641,11 +645,11 @@ tables:
       dependency_ratio:
         title: |-
           <% if age == "total" %>
-          Total dependency ratio - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
+          Total dependency ratio - Sex: << sex >> - Variant: {definitions.global.variant_title}
           <%- elif age == "youth" %>
-          Child dependency ratio - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
+          Child dependency ratio - Sex: << sex >> - Variant: {definitions.global.variant_title}
           <%- else %>
-          Old-age dependency ratio - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
+          Old-age dependency ratio - Sex: << sex >> - Variant: {definitions.global.variant_title}
           <%- endif %>
         unit: "%"
         description_short: |-
@@ -704,9 +708,9 @@ tables:
       mortality_rate:
         title: |-
           <% if age == '0' %>
-          Infant mortality rate - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
+          Infant mortality rate - Sex: << sex >> - Variant: {definitions.global.variant_title}
           <%- else %>
-          Child mortality rate - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
+          Child mortality rate - Sex: << sex >> - Variant: {definitions.global.variant_title}
           <%- endif %>
         unit: |-
           <% if age == '0' %>
