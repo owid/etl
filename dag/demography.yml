@@ -301,6 +301,23 @@ steps:
     - data://garden/demography/2025-10-22/fertility_rate:
         - data://garden/hmd/2026-10-22/hfd
         - data://garden/un/2024-07-12/un_wpp
+  #
+  # Fertility rate (OMM) charts — authored in ETL.
+  #
+  viz://chart/demography/latest/age_of_mothers_at_childbirth_by_year:
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/children_born_per_woman:
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/comparison_of_fertility_rates:
+    - data://grapher/demography/2025-10-22/efr_malani_jacob
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/fertility_rate_complete_gapminder:
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/fertility_rate_vs_mean_years_of_schooling:
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/demography/2025-10-22/fertility_rate
+    - data://grapher/education/2023-07-17/education_barro_lee_projections
+    - data://grapher/regions/2023-01-01/regions
 
   # OMM: Birth rate -- HMD + UN WPP
   data://grapher/demography/2025-10-22/birth_rate:
@@ -340,6 +357,11 @@ steps:
     - data://garden/demography/2025-10-22/mean_age_childbearing:
         - data://garden/un/2024-07-12/un_wpp
         - data://garden/hmd/2026-10-22/hfd
+  #
+  # Mean age at childbearing (OMM) charts — authored in ETL.
+  #
+  viz://chart/demography/latest/period_average_age_of_mothers:
+    - data://grapher/demography/2025-10-22/mean_age_childbearing
 
   ########################################################################
   # Mortality                                                            #
