@@ -36,6 +36,17 @@ EXPECTED_FIXED_VALUES_CRS = {
     "MODALITY": "_T",  # All types of aid
 }
 
+# The same, for the totals of ODA from the DAC1 table (DAC countries and EU institutions).
+EXPECTED_FIXED_VALUES_DAC1 = {
+    "SECTOR": "_Z",  # Not applicable
+    "TYING_STATUS": "_Z",  # Not applicable
+    "FLOW_TYPE": 1150,  # Commitments, total
+    "PRICE_BASE": "Q",  # Constant prices
+    "UNIT_MEASURE": "USD",  # US dollars
+    "BASE_PER": CONSTANT_PRICE_BASE_YEAR,  # Base year of constant prices
+    "UNIT_MULT": 6,  # Unit multiplier: values are in millions (10^6)
+}
+
 # Columns to keep from the data files, and their new names.
 COLUMNS_TOTALS = {
     "DONOR": "donor_code",
@@ -94,12 +105,14 @@ def run() -> None:
     # Retrieve snapshots: RioMarkers (totals, project-level rows, names of codes) and CRS (total bilateral ODA).
     snap = paths.load_snapshot("climate_related_official_development_assistance.zip")
     snap_crs = paths.load_snapshot("bilateral_official_development_assistance_commitments.csv")
+    snap_dac1 = paths.load_snapshot("total_official_development_assistance_commitments.csv")
 
     # Load data from snapshots.
     tables_totals = [snap.read_in_archive(file_name, low_memory=False) for file_name in FILES_TOTALS]
     tb_activities = snap.read_in_archive("activities.csv", low_memory=False)
     tb_eu = snap.read_in_archive("eu_institutions_activities.csv", low_memory=False)
     tb_bilateral = snap_crs.read(low_memory=False)
+    tb_dac1 = snap_dac1.read()
     # Names of codes and groups are in SDMX XML files.
     with zipfile.ZipFile(snap.path) as zf:
         structure = ET.fromstring(zf.read("structure.xml"))
@@ -116,6 +129,7 @@ def run() -> None:
         tb=tb_eu, name="EU institutions", expected={**EXPECTED_FIXED_VALUES, "DONOR": "4EU001", "MARKER": 20}
     )
     sanity_check_fixed_dimensions(tb=tb_bilateral, name="CRS totals", expected=EXPECTED_FIXED_VALUES_CRS)
+    sanity_check_fixed_dimensions(tb=tb_dac1, name="DAC1 totals", expected=EXPECTED_FIXED_VALUES_DAC1)
 
     # Step 2: Total bilateral ODA (CRS). Its two queries share one series (all DAC members to all developing countries),
     # which is kept once.
@@ -126,6 +140,12 @@ def run() -> None:
     tb_bilateral = tb_bilateral.drop_duplicates()
     assert not tb_bilateral.duplicated(subset=["donor_code", "recipient_code", "year"]).any(), (
         "CRS queries disagree on overlapping values."
+    )
+
+    # Total ODA (DAC1): total, bilateral, and contributions to EU institutions, of DAC countries and EU institutions.
+    tb_dac1 = tb_dac1[["DONOR", "MEASURE", "TIME_PERIOD", "OBS_VALUE"]].rename(
+        columns={"DONOR": "donor_code", "MEASURE": "measure", "TIME_PERIOD": "year", "OBS_VALUE": "value"},
+        errors="raise",
     )
 
     # Step 3: RioMarkers totals, by marker and score. The three files share some series, which are kept once.
@@ -169,6 +189,7 @@ def run() -> None:
         tb_codes.format(["codelist", "code"], short_name="codes"),
         tb_groups.format(["hierarchy", "parent_code", "child_code"], short_name="groups"),
         tb_bilateral.format(["donor_code", "recipient_code", "year"], short_name="bilateral_totals"),
+        tb_dac1.format(["donor_code", "measure", "year"], short_name="total_oda"),
     ]
 
     #

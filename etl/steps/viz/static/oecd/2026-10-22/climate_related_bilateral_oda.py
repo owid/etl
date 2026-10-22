@@ -57,7 +57,7 @@ To update it:
    - The three climate segment labels mix a bold colored name with a regular value: edit the value with
      `deleteCharacters`/`insertCharacters` so both runs keep their styles, and center each on its segment
      (y = segment middle - 8).
-   - Subtitle (in "Frame 36"): SUBTITLE_LINES joined with "\\n". Note: edit only the year, with
+   - Subtitle (in "Frame 36"): SUBTITLE_LINES joined with "\\n", with the share the step logs. Note: edit only the year, with
      `insertCharacters`, to keep "Note:" bold. The title and the "Data source" row do not change.
 5. Check the frame against this step's PNG: the subtitle must stay at 3 lines (57 px tall), and the Note at one.
 
@@ -168,14 +168,15 @@ TITLE_LINES = [
     [("How much bilateral development aid", TITLE_COLOR)],
     [("is spent on ", TITLE_COLOR), ("climate-related projects", TITLE_HIGHLIGHT), ("?", TITLE_COLOR)],
 ]
-# NOTE: "Almost 90%" is DAC members' bilateral ODA commitments (CRS, $210 billion in 2024) as a share of all their ODA
-# commitments, counting EU institutions as a donor and leaving out the DAC countries' contributions to them, so the
-# same money is not counted twice (DAC1, $238 billion in 2024: DAC countries' total, minus their contributions to EU
-# institutions, plus EU institutions' total, minus the EIB). It comes from another dataset, so check it at each update.
-# Broken by hand, as in the frame: the second sentence starts its own line (Lato widths 473, 491 and 323 of 508 px).
+# The subtitle's share of development aid that is bilateral is computed from table `total_oda` of the same dataset
+# (DAC members' bilateral ODA over all their ODA, both commitments, counting EU institutions as a donor without
+# counting the DAC countries' contributions to them twice). It is written as a round number ("almost 90%", for 88.4% in
+# 2024). Counting only DAC countries, with EU institutions as multilateral (the OECD's usual presentation), it would
+# instead be about three-quarters.
+# Lines broken by hand, as in the frame: the second sentence starts its own line (Lato widths 473, 491, 323 of 508 px).
 SUBTITLE_LINES = [
     "Bilateral aid is given from one country (or EU institution) to another.",
-    "It makes up almost 90% of development aid; the rest is multilateral aid",
+    "It makes up {bilateral_share} of development aid; the rest is multilateral aid",
     "(money pooled by international organizations).",
 ]
 SOURCE = "Based on OECD RioMarkers and Creditor Reporting System."
@@ -188,7 +189,9 @@ def run() -> None:
     #
     # Load inputs.
     #
-    tb = paths.load_dataset("climate_related_official_development_assistance").read("climate_related_oda_by_donor")
+    ds = paths.load_dataset("climate_related_official_development_assistance")
+    tb = ds.read("climate_related_oda_by_donor")
+    tb_total_oda = ds.read("total_oda")
 
     #
     # Process data.
@@ -204,12 +207,20 @@ def run() -> None:
     values["non_allocable"] = values["oda_bilateral_total"] - values["oda_bilateral_allocable"]
     sanity_check_inputs(values)
     sanity_check_source(tb)
-    paths.log.info(f"{ENTITY} in {year}: " + ", ".join(f"{k} {v:.2f}bn" for k, v in values.items()))
+    # Share of all development aid that is bilateral, for the subtitle.
+    total_oda = tb_total_oda[(tb_total_oda["country"] == ENTITY) & (tb_total_oda["year"] == year)]
+    assert len(total_oda) == 1, f"No total ODA of {ENTITY} in {year}."
+    bilateral_share = float(total_oda["oda_bilateral_share_of_total"].iloc[0])
+    paths.log.info(
+        f"{ENTITY} in {year}: "
+        + ", ".join(f"{k} {v:.2f}bn" for k, v in values.items())
+        + f"; bilateral share of all ODA {bilateral_share:.1f}%"
+    )
 
     #
     # Save outputs.
     #
-    fig = create_visualization(values, year)
+    fig = create_visualization(values, year, bilateral_share)
     export_frame(paths, fig, paths.short_name, template="mobile-square")
     plt.close(fig)
 
@@ -246,11 +257,11 @@ def sanity_check_source(tb) -> None:
 # ---------------------------------------------------------------------------
 
 
-def create_visualization(values: dict[str, float], year: int):
+def create_visualization(values: dict[str, float], year: int, bilateral_share: float):
     fig = plt.figure(figsize=(FRAME_W / PX_PER_INCH, FRAME_H / PX_PER_INCH))
     fig.patch.set_facecolor("white")  # the PNG stays legible; the SVG is saved transparent
 
-    draw_header(fig)
+    draw_header(fig, round_share(bilateral_share))
 
     # Scale: the left bar spans the same height every year.
     scale = (BARS_BOTTOM - BARS_TOP) / values["oda_bilateral_total"]
@@ -390,7 +401,7 @@ def create_visualization(values: dict[str, float], year: int):
     return fig
 
 
-def draw_header(fig) -> None:
+def draw_header(fig, bilateral_share: str) -> None:
     """Title (two lines, with a highlighted run) and subtitle (three lines)."""
     for i, line in enumerate(TITLE_LINES):
         runs(
@@ -402,11 +413,12 @@ def draw_header(fig) -> None:
             f"header__title-{i}",
             line_px=TITLE_LINE_PX,
         )
-    assert len(SUBTITLE_LINES) <= SUBTITLE_MAX_LINES, "The subtitle has too many lines; shorten it."
-    for line in SUBTITLE_LINES:
+    lines = [line.format(bilateral_share=bilateral_share) for line in SUBTITLE_LINES]
+    assert len(lines) <= SUBTITLE_MAX_LINES, "The subtitle has too many lines; shorten it."
+    for line in lines:
         width = text_width(line, SUBTITLE_SIZE) * LATO_WIDTH_RATIO
         assert width <= CONTENT_W, f"Subtitle line wraps in the frame ({width:.0f} px): {line!r}"
-    multiline(fig, MARGIN, SUBTITLE_Y, SUBTITLE_SIZE, SUBTITLE_LINES, TEXT_COLOR, "header__subtitle")
+    multiline(fig, MARGIN, SUBTITLE_Y, SUBTITLE_SIZE, lines, TEXT_COLOR, "header__subtitle")
 
 
 def draw_footer(fig, year: int) -> None:
@@ -452,6 +464,14 @@ def draw_footer(fig, year: int) -> None:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def round_share(share: float) -> str:
+    """A share as a round number for prose: the nearest multiple of 5, as "almost", "about" or "over" it."""
+    nearest = 5 * round(share / 5)
+    if abs(share - nearest) < 0.5:
+        return f"about {nearest}%"
+    return f"{'almost' if share < nearest else 'over'} {nearest}%"
 
 
 def billions(value: float) -> str:

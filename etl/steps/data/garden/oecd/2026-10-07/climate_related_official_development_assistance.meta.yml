@@ -898,3 +898,27 @@ tables:
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+
+  # Not published in grapher: used by the static chart of climate-related bilateral aid.
+  total_oda:
+    variables:
+      oda_total:
+        title: "Total ODA given by DAC members"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "All [ODA](#dod:oda) from members of the OECD Development Assistance Committee (DAC), bilateral and multilateral. {definitions.short_commitments} {definitions.short_constant_usd}"
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator from the OECD DAC1 table as the total ODA of DAC countries, minus their contributions to EU institutions, plus the total ODA of EU institutions. EU institutions count as a donor here, as in the rest of this data, so we subtract the DAC countries' contributions to them, which would otherwise be counted twice.
+
+          {definitions.processing_european_investment_bank}
+      oda_bilateral_share_of_total:
+        title: "Bilateral ODA as a share of total ODA given by DAC members"
+        unit: "%"
+        short_unit: "%"
+        description_short: "Bilateral [ODA](#dod:oda) as a share of all ODA from members of the OECD Development Assistance Committee (DAC). {definitions.short_commitments}"
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator by dividing total bilateral ODA, from the OECD Creditor Reporting System, by total ODA, from the OECD DAC1 table, expressed as a percentage. Total ODA counts EU institutions as a donor and leaves out the DAC countries' contributions to them, which would otherwise be counted twice.
+
+          {definitions.processing_european_investment_bank}

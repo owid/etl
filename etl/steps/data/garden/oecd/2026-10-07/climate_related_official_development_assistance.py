@@ -39,6 +39,13 @@ CODE_ALL_SECTORS = "1000"
 CODE_EU_INSTITUTIONS = "4EU001"
 AGENCY_EXCLUDED = "European Investment Bank"
 
+# Codes of the DAC1 table: DAC countries (as a group), and measures of total ODA, bilateral ODA and contributions to EU
+# institutions (EU institutions use the same code as in the RioMarkers data).
+DAC1_DAC_COUNTRIES = "DAC"
+DAC1_TOTAL_ODA = 1010
+DAC1_BILATERAL_ODA = 1015
+DAC1_CONTRIBUTIONS_TO_EU = 2102
+
 # Groups of donors, defined in the OECD hierarchy of donors.
 DONOR_GROUPS = [
     "DAC_EC",  # DAC members: DAC countries and EU institutions
@@ -154,6 +161,7 @@ def run() -> None:
     tb_codes = ds_meadow.read("codes")
     tb_groups = ds_meadow.read("groups")
     tb_bilateral = ds_meadow.read("bilateral_totals", safe_types=False)
+    tb_dac1 = ds_meadow.read("total_oda")
 
     #
     # Process data.
@@ -278,7 +286,12 @@ def run() -> None:
         tb=tb_bilateral_received, tb_excluded=sum_over_scores(tb_excluded_received), keys=["entity_code", "year"]
     )
 
-    # Step 5: Climate-related ODA by donor and recipient, combined with the totals of steps 3 and 4 (for shares).
+    # Step 5: All ODA of DAC members (DAC1), to show which share of it is bilateral.
+    tb_total_oda = create_total_oda_table(
+        tb_dac1=tb_dac1, tb_bilateral_given=tb_bilateral_given, tb_excluded=sum_over_scores(tb_excluded_given)
+    )
+
+    # Step 6: Climate-related ODA by donor and recipient, combined with the totals of steps 3 and 4 (for shares).
     tb_given = create_climate_related_table(
         tb_climate=aggregate_by_members(
             tb=tb_climate, code_column="donor_code", members=members_donors, keys=["year"], columns=CLIMATE_COLUMNS
@@ -298,7 +311,7 @@ def run() -> None:
         tb_bilateral=tb_bilateral_received,
     )
 
-    # Step 6: Climate-related ODA given by donor and sector, combined with bilateral allocable ODA in each sector.
+    # Step 7: Climate-related ODA given by donor and sector, combined with bilateral allocable ODA in each sector.
     tb_sectors = create_sectors_table(
         tb_climate=tb_climate,
         tb_totals=tb_totals,
@@ -308,13 +321,14 @@ def run() -> None:
         donors=donors,
     )
 
-    # Step 7: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
+    # Step 8: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
     names = tb_codes[tb_codes["codelist"] == "area"].set_index("code")["name"].to_dict()
     names.update(NAMES_BY_CODE)
     tables = {
         "climate_related_oda_by_donor": (tb_given, []),
         "climate_related_oda_by_recipient": (tb_received, []),
         "climate_related_oda_by_donor_and_sector": (tb_sectors, ["sector"]),
+        "total_oda": (tb_total_oda, []),
     }
     for short_name, (tb, dimensions) in tables.items():
         tb["country"] = tb["entity_code"].map(names)
@@ -485,6 +499,66 @@ def add_total_bilateral_oda(tb: Table, tb_bilateral: Table) -> Table:
 
     tb["climate_related_share_of_bilateral_total"] = share(tb["climate_related"], tb["oda_bilateral_total"])
     return tb
+
+
+def create_total_oda_table(tb_dac1: Table, tb_bilateral_given: Table, tb_excluded: Table) -> Table:
+    """All ODA commitments of DAC members (DAC countries and EU institutions), and the share of it that is bilateral.
+
+    EU institutions count as a donor here, as in the rest of the dataset. DAC countries' contributions to EU institutions
+    are part of the DAC countries' (multilateral) ODA, and EU institutions then commit them as their own ODA, so they are
+    subtracted once to avoid counting them twice. The excluded agency (the EIB) is subtracted, as everywhere else.
+    """
+
+    def series(donor: str, measure: int) -> Table:
+        tb = tb_dac1[(tb_dac1["donor_code"] == donor) & (tb_dac1["measure"] == measure)][["year", "value"]]
+        return tb.rename(columns={"value": f"{donor}_{measure}"}, errors="raise")
+
+    tb = series(DAC1_DAC_COUNTRIES, DAC1_TOTAL_ODA)
+    for donor, measure in [
+        (DAC1_DAC_COUNTRIES, DAC1_CONTRIBUTIONS_TO_EU),
+        (DAC1_DAC_COUNTRIES, DAC1_BILATERAL_ODA),
+        (CODE_EU_INSTITUTIONS, DAC1_TOTAL_ODA),
+        (CODE_EU_INSTITUTIONS, DAC1_BILATERAL_ODA),
+    ]:
+        tb = pr.merge(tb, series(donor, measure), on="year", how="inner")
+
+    # Bilateral ODA of all DAC members, from the CRS, after leaving out the excluded agency.
+    tb_bilateral = tb_bilateral_given[tb_bilateral_given["entity_code"] == CODE_ALL_DONORS][["year", "value"]]
+    tb = pr.merge(tb, tb_bilateral.rename(columns={"value": "bilateral"}), on="year", how="inner")
+    tb = pr.merge(
+        tb,
+        tb_excluded[tb_excluded["entity_code"] == CODE_ALL_DONORS][["year", "value"]].rename(
+            columns={"value": "excluded"}
+        ),
+        on="year",
+        how="left",
+    )
+    tb["excluded"] = tb["excluded"].fillna(0)
+    tb = tb[tb["year"] >= START_YEAR_ADAPTATION_MARKER].reset_index(drop=True)
+
+    # Bilateral ODA in DAC1 must match the CRS (before leaving out the excluded agency), so the share compares like
+    # with like.
+    dac1_bilateral = (
+        tb[f"{DAC1_DAC_COUNTRIES}_{DAC1_BILATERAL_ODA}"] + tb[f"{CODE_EU_INSTITUTIONS}_{DAC1_BILATERAL_ODA}"]
+    )
+    difference = (tb["bilateral"] + tb["excluded"]) / dac1_bilateral - 1
+    assert (difference.abs() < 0.01).all(), (
+        f"Bilateral ODA in DAC1 and the CRS differ by up to {difference.abs().max():.1%}."
+    )
+
+    tb["oda_total"] = (
+        tb[f"{DAC1_DAC_COUNTRIES}_{DAC1_TOTAL_ODA}"]
+        - tb[f"{DAC1_DAC_COUNTRIES}_{DAC1_CONTRIBUTIONS_TO_EU}"]
+        + tb[f"{CODE_EU_INSTITUTIONS}_{DAC1_TOTAL_ODA}"]
+        - tb["excluded"]
+    )
+    tb["oda_bilateral_share_of_total"] = share(tb["bilateral"], tb["oda_total"])
+    assert tb["oda_bilateral_share_of_total"].between(75, 95).all(), "Unexpected bilateral share of all ODA."
+    # Express amounts in US dollars (the source is in millions).
+    tb["oda_total"] *= 1e6
+    tb["entity_code"] = CODE_ALL_DONORS
+
+    return tb[["entity_code", "year", "oda_total", "oda_bilateral_share_of_total"]]
 
 
 def create_sectors_table(
