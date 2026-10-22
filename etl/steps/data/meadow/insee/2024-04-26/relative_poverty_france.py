@@ -69,7 +69,7 @@ def reformat_table(tb: Table) -> Table:
     # Reset index and rename first column to "year"
     tb_transposed = tb_transposed.reset_index()
     tb_transposed = tb_transposed.rename(columns={"index": "year"})
-    tb_transposed["year"] = tb_transposed["year"].astype("string")
+    tb_transposed["year"] = tb_transposed["year"].astype("str")
 
     # Add country
     tb_transposed["country"] = "France"

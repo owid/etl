@@ -116,8 +116,6 @@ steps:
     - snapshot://fasttrack/latest/cumulative_lives_saved_vaccination_shattock.csv
   data://grapher/fasttrack/latest/heat_deaths_climate_historical:
     - snapshot://fasttrack/latest/heat_deaths_climate_historical.csv
-  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp: !!set
-    ? snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
   data://grapher/fasttrack/latest/air_conditioning_rate_iea:
     - snapshot://fasttrack/latest/air_conditioning_rate_iea.csv
   data://grapher/fasttrack/latest/projections_air_conditioners_iea:

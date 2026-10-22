@@ -57,6 +57,8 @@ def run() -> None:
     df_long = (
         df.set_index(["country_name", "indicator_code"])[years]
         .stack()
+        # pandas 3 stack() keeps missing values; drop them, as pandas 2 did.
+        .dropna()
         .sort_index()
         .reset_index()
         .rename(columns={"country_name": "country", "level_2": "year", 0: "value"})

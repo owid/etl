@@ -39,7 +39,6 @@ from etl import config
 from etl.viz.chart.download_package_format import (
     IndicatorColumn,
     format_attributions,
-    get_attribution,
     normalize_description_key,
 )
 
@@ -142,9 +141,9 @@ def sync_feed(step_path: str, local_dir: Path, max_workers: int = 20) -> FeedLoc
 # `BespokeMetadata` (`packages/@ourworldindata/types/src/domainTypes/BespokeMetadata.ts` in
 # owid-grapher). It goes into the top level of the manifest the bundle already fetches
 # (`<slug>.metadata.json`, the registry's `metadataFilename`), which is also the file grapher
-# reads for the methods-and-sources box -- so one file serves both. The source line is grapher's
-# own formatting, via the port in `download_package_format.py`, so it reads like the source line
-# under a chart.
+# reads for the methods-and-sources box -- so one file serves both. Grapher builds the viz's source
+# line from `origins`, as it does under a chart; `attribution` carries a custom line only, in the
+# role `presentation.attribution` has for a chart's indicator.
 #
 
 # Fields only a single-column feed gets: a feed combining several columns has no one
@@ -193,10 +192,17 @@ def build_feed_metadata(
             if origin not in origins:
                 origins.append(origin)
 
+    # A custom source line set on a column (`presentation.attribution`). Without one, `attribution` is left out and
+    # grapher builds the line from `origins`, shortening it beyond three sources as under a chart. With one, the line
+    # combines it with the other columns' sources, each listed once, as grapher would for a chart on these columns.
+    has_custom_line = any((api.get("presentation") or {}).get("attribution") for api in apis)
     metadata = {
         "title": title,
-        # The "Source: ..." line, as grapher composes it for a chart built on these columns.
-        "attribution": format_attributions(_uniq([get_attribution(IndicatorColumn(api)) for api in apis])),
+        "attribution": format_attributions(
+            _uniq([fragment for api in apis for fragment in IndicatorColumn(api).attribution_fragments])
+        )
+        if has_custom_line
+        else None,
         "origins": origins,
         "updatePeriodDays": update_period_days,
         # The feed is as processed as its most processed column.

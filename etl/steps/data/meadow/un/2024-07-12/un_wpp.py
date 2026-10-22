@@ -367,7 +367,7 @@ def make_tb_mortality(tb_main: Table) -> Table:
     # Combine tables
     tb = pr.concat([tb_child_mort, tb_infant_mort])
     # Reduce size
-    tb = tb.astype({"age": "string"})
+    tb = tb.astype({"age": "str"})
     # Format
     tb = tb.format(COLUMNS_INDEX_FORMAT, short_name="mortality_rate")
 
@@ -695,7 +695,7 @@ def _categorize_index(tb: Table) -> Table:
     """Convert string index levels to categoricals to reduce feather file size and read time."""
     _CATEGORICAL_COLS = {"country", "variant", "sex", "age", "month"}
     idx_names = list(tb.index.names)
-    cols_to_convert = {n: "string" for n in idx_names if n in _CATEGORICAL_COLS}
+    cols_to_convert = {n: "str" for n in idx_names if n in _CATEGORICAL_COLS}
     if not cols_to_convert:
         return tb
     tb = tb.reset_index()

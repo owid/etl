@@ -223,7 +223,7 @@ def make_table_with_dummies(
 
     # Convert to string
     indicator_names = [indicator["name"] for indicator in indicators]
-    tb_[indicator_names] = tb_[indicator_names].astype("string")
+    tb_[indicator_names] = tb_[indicator_names].astype("str")
 
     # Sanity check that the categories for each indicator are as expected
     for indicator in indicators:
@@ -391,7 +391,7 @@ def add_age_groups(
         tb[column],
         bins=age_bins,
         labels=labels,
-    ).astype("string")
+    ).astype("str")
 
     # Add additional categories
     for regime_id, regime_name in category_names.items():

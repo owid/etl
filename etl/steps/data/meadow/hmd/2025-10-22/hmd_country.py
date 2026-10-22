@@ -52,8 +52,8 @@ def run() -> None:
     tb = tb.groupby(["country", "Year", "Month"], as_index=False)["Births"].mean()
     tb = tb.astype(
         {
-            "country": "string",
-            "Month": "string",
+            "country": "str",
+            "Month": "str",
         }
     )
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.

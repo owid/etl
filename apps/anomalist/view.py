@@ -2,7 +2,7 @@
 
 `etl anomalist` detects anomalies and stores them in the grapher `anomalies` table: one row per
 dataset and anomaly type, with the per-entity scores as a feather blob. The Wizard page renders
-those for a human to click through, and its "AI Summary" button sends them to GPT.
+those for a human to click through, and its "AI Summary" button sends them to an LLM.
 
 This command prints the same rows as plain text instead, so that whoever reads it — an agent, or
 anyone on a terminal — does the summarizing. It deliberately calls no model itself.

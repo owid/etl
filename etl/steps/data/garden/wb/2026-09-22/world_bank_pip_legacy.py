@@ -917,13 +917,13 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         last_welfare_type = list(tb_country[tb_country["year"] == max_year]["welfare_type"].unique())
         last_welfare_type.sort()
 
-        # Count how many times welfare_type switches from income to consumption and vice versa
+        # Count the welfare series: the first row starts one, and each switch between income and consumption another
         number_of_welfare_series = (
-            (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).astype(float).cumsum().max()
+            (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1).fillna("")).astype(int).cumsum().max()
         )
 
         # If there are only two welfare series, use one for these countries
-        if number_of_welfare_series == 1:
+        if number_of_welfare_series == 2:
             # assert if last_welfare type values are expected
             if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
                 welfare_expected = ["consumption"]

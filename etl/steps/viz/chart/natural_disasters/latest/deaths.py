@@ -1,5 +1,7 @@
 """Multi-dim chart on deaths from natural disasters."""
 
+# Rebuild with the shared chart-combining fix that preserves missing choice descriptions and groups.
+
 from shared import (
     ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE,
     ALL_DISASTERS_SUBTITLE,

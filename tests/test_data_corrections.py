@@ -266,12 +266,64 @@ def test_validate_rejects_empty_match():
         _validate_correction(_correction(action="drop", match={}), "<test>")
 
 
-def test_validate_rejects_match_combined_with_years():
-    # `match` + `years` (without entity) passes the XOR check but `years` would be silently ignored.
+def test_validate_rejects_years_without_entity():
+    # `years` (or `entity`) on its own would be silently ignored, with or without a `match`.
     from etl.data_corrections import _validate_correction
 
-    with pytest.raises(AssertionError, match="do not combine 'match'"):
+    with pytest.raises(AssertionError, match="must be given together"):
         _validate_correction(_correction(action="drop", match={"value": 10.0}, years=[2006]), "<test>")
+    with pytest.raises(AssertionError, match="must be given together"):
+        _validate_correction(_correction(action="drop", entity="Panama"), "<test>")
+
+
+def _make_table_with_age() -> Table:
+    return Table(
+        {
+            "country": ["Malta"] * 4 + ["France"] * 2,
+            "year": [1980, 1980, 1981, 1982, 1980, 1981],
+            "age_group": ["over 85", "all ages", "over 85", "over 85", "over 85", "over 85"],
+            "value": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        }
+    )
+
+
+def test_entity_years_combined_with_match_selects_both():
+    # entity + years locate the country-years; match narrows the other dimensions.
+    tb = _make_table_with_age()
+    out = apply_corrections(
+        tb,
+        [
+            _correction(
+                action="override",
+                value=None,
+                entity="Malta",
+                years={"from": 1980, "to": 1981},
+                match={"age_group": "over 85"},
+            )
+        ],
+    )
+    # Only Malta's 1980 and 1981 over-85 rows are blanked: not its all-ages row, not 1982, not France.
+    assert out["value"].isna().tolist() == [True, False, True, False, False, False]
+
+
+def test_validate_rejects_entity_or_year_repeated_in_match():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="given both in 'match' and as entity"):
+        _validate_correction(_correction(entity="Malta", years=[1981], match={"year": 1981}), "<test>")
+    with pytest.raises(AssertionError, match="given both in 'match' and as entity"):
+        _validate_correction(_correction(entity="Malta", years=[1981], match={"country": "Malta"}), "<test>")
+
+
+def test_apply_rejects_custom_year_column_repeated_in_match():
+    # With a custom year column, the repetition is only visible when the correction is applied.
+    tb = _make_table_with_age().rename(columns={"year": "start_year"})
+    with pytest.raises(AssertionError, match="given both in 'match' and as entity"):
+        apply_corrections(
+            tb,
+            [_correction(entity="Malta", years=[1981], match={"start_year": 1981})],
+            year_col="start_year",
+        )
 
 
 def test_scale_multiplies_matched_values():
@@ -334,6 +386,24 @@ def test_expect_rejects_unknown_operator():
         _validate_correction(
             _correction(action="scale", factor=0.5, entity="France", years="all", expect={"approx": 10}), "<test>"
         )
+
+
+def test_schema_locators():
+    # The schema accepts entity + years, match, or both; and rejects what _validate_correction rejects.
+    jsonschema = pytest.importorskip("jsonschema")
+    validator = jsonschema.Draft7Validator(json.loads((BASE_DIR / "schemas" / "corrections-schema.json").read_text()))
+    base = {"indicator": "v", "action": "drop", "reason": "r", "producer": "p", "status": "open"}
+
+    def valid(**locator):
+        return validator.is_valid([{**base, **locator}])
+
+    assert valid(entity="Malta", years=[1981])
+    assert valid(match={"age_group": "over 85"})
+    assert valid(entity="Malta", years=[1981], match={"age_group": "over 85"})
+    assert not valid()
+    assert not valid(years=[1981], match={"age_group": "over 85"})
+    assert not valid(entity="Malta", years=[1981], match={"year": 1981})
+    assert not valid(entity="Malta", years=[1981], match={"country": "Malta"})
 
 
 def test_all_repo_corrections_match_schema():
@@ -407,7 +477,7 @@ def test_audit_path_is_under_data_tree():
     assert "corrections_audit" in out.parts and "garden" in out.parts
 
 
-def test_load_corrections_rejects_both_entity_and_match(tmp_path):
+def test_load_corrections_accepts_entity_years_and_match(tmp_path):
     p = tmp_path / "x.corrections.yml"
     p.write_text(
         "- indicator: value\n"
@@ -419,5 +489,44 @@ def test_load_corrections_rejects_both_entity_and_match(tmp_path):
         "  producer: p\n"
         "  status: open\n"
     )
-    with pytest.raises(AssertionError, match="exactly one of"):
+    [correction] = load_corrections(p)
+    assert correction["entity"] == "Panama" and correction["match"] == {"value": 4.5}
+
+
+def test_load_corrections_rejects_neither_entity_nor_match(tmp_path):
+    p = tmp_path / "x.corrections.yml"
+    p.write_text("- indicator: value\n  action: drop\n  reason: r\n  producer: p\n  status: open\n")
+    with pytest.raises(AssertionError, match="specify"):
         load_corrections(p)
+
+
+def test_load_corrections_expands_indicator_list(tmp_path):
+    p = tmp_path / "x.corrections.yml"
+    p.write_text(
+        "- indicator: [a, b]\n"
+        "  entity: Panama\n"
+        "  years: all\n"
+        "  action: override\n"
+        "  value: null\n"
+        "  expect: {gt: 0}\n"
+        "  reason: r\n"
+        "  producer: p\n"
+        "  status: open\n"
+    )
+    corrections = load_corrections(p)
+    # One entry per column, each keeping every other field (including its own `expect` guard).
+    assert [c["indicator"] for c in corrections] == ["a", "b"]
+    assert all(c["expect"] == {"gt": 0} and c["entity"] == "Panama" for c in corrections)
+
+    tb = Table({"country": ["Panama", "France"], "year": [2020, 2020], "a": [1.0, 2.0], "b": [3.0, 4.0]})
+    out = apply_corrections(tb, corrections)
+    assert out["a"].isna().tolist() == [True, False]
+    assert out["b"].isna().tolist() == [True, False]
+
+
+@pytest.mark.parametrize("indicator", [[], ["a", ""], ["a", "a"], [1]])
+def test_validate_rejects_malformed_indicator_list(indicator):
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="'indicator'"):
+        _validate_correction(_correction(indicator=indicator, entity="Panama", years="all"), "x.yml")

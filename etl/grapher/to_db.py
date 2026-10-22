@@ -205,7 +205,7 @@ def upsert_table(
     # NOTE: we could make the code more efficient if we didn't convert `value` to string
     # TODO: can we avoid setting & resetting index back and forth?
     df = table.reset_index().rename(columns={column_name: "value"})
-    df["value"] = df["value"].astype("string")
+    df["value"] = df["value"].astype("str")
 
     checksum_data = calculate_checksum_data(df)
     checksum_metadata = calculate_checksum_metadata(variable_meta, df, dataset_upsert_result.metadata_fields)

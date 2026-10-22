@@ -60,6 +60,12 @@ class Explorer(Chart):
                 "Grapher has no way to apply it to explorer view configs."
             )
 
+        # An explorer's URL is its short name.
+        if self.slug is not None:
+            raise ValueError(
+                "`slug` is only supported for multidim charts, not explorers: their URL is the short name."
+            )
+
     @property
     def local_config_path(self) -> Path:
         # who/latest/influenza#influenza -> viz/explorer/who/latest/influenza/influenza.config.json

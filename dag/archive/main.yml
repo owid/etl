@@ -1350,12 +1350,43 @@ steps:
   # archived; last active in 1561731bf7ef on 2026-10-02
   data://garden/bls/2026-08-18/us_ppi_construction:
     - snapshot://bls/2026-08-18/us_ppi_construction.csv
-  # archived; last active in ef8804d984ca on 2026-10-05
-  data://grapher/trade/2025-09-22/wto_trade_growth:
-    - data://garden/trade/2025-09-22/wto_trade_growth:
-      - data://meadow/trade/2025-09-22/wto_trade_growth:
-        - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
-      - data://garden/trade/2025-09-22/historic_trade
+  # archived; last active in 9abb8154211e on 2026-10-12
+  data://grapher/missing_data/2024-03-26/who_md_suicides:
+    - data://garden/missing_data/2024-03-26/who_md_suicides:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/who/2024-03-24/self_inflicted_injuries
+      - data://garden/demography/2023-03-31/population
+  # archived; last active in c13b29b8ad4a on 2026-10-14
+  data://grapher/missing_data/2026-10-02/who_md_suicides:
+    - data://garden/missing_data/2026-10-02/who_md_suicides:
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/who/2025-08-06/self_inflicted_injuries
+      - data://garden/demography/2023-03-31/population
+  # archived; last active in b5045f314ce8 on 2026-10-15
+  data://grapher/homicide/2025-08-06/who_mort_db:
+    - data://garden/homicide/2025-08-06/who_mort_db:
+      - data://meadow/homicide/2025-08-06/who_mort_db:
+        - snapshot://homicide/2025-08-06/who_mort_db.csv
+      - data://garden/un/2024-07-12/un_wpp
+  # archived; last active in b5045f314ce8 on 2026-10-15
+  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
+    - data://garden/homicide/2024-07-30/homicide_long_run_omm:
+      - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+      - data://garden/homicide/2025-08-06/who_mort_db
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/share_of_foreign_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_mitigation_and_adaptation:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

@@ -10,7 +10,7 @@ metadata:
 
 Practical guidelines for writing high-quality metadata in `*.meta.yml` files.
 
-**Core principle:** Metadata is for the public. Every field should help someone understand the data. Write in plain language -- if a layperson can't understand it, rewrite it.
+**Core principle:** Metadata is for the public. Every field should help someone understand the data. Write it plainly, following `.claude/rules/plain-writing.md`.
 
 ## When to Use
 
@@ -98,20 +98,19 @@ title: Number of neutron star mergers (NASA, 2023)
 | Field | Format | Examples |
 |-------|--------|----------|
 | `unit` | Lowercase, plural, "per" not "/" | `tonnes per hectare`, `%`, `""` |
-| `short_unit` | SI abbreviation | `t/ha`, `%`, `""` |
+| `short_unit` | SI abbreviation (`g` not `grams`, `%` not `pct`) | `t/ha`, `%`, `""` |
 
 - Always set `unit` explicitly, even to `""` for dimensionless indicators (scores, indexes)
 - `short_unit` is only needed when there's an actual unit to abbreviate. Omit it for dimensionless indicators -- it defaults to `None` and grapher won't show a unit label.
 - Use "person" not "capita" (`kilowatts per person`)
 - Choose human-friendly scales -- if most values are below 1 tonne per person, use "kilograms per person" instead
-- `short_unit` should use SI abbreviations (`g` not `grams`, `%` not `pct`)
 
 **Decimal precision:** 0 for counts, 1 for percentages, 2 for economic/per-capita values. Be consistent across related variables. Always set `numDecimalPlaces` explicitly -- it's a frequent source of review feedback.
 
 ### Descriptions
 
 **`description_short`** -- 1-2 sentences, ~200 characters ideally. Answers "What does this number measure?" Longer explanations belong in `description_key`.
-- Use `|-` block scalar for multi-line; inline strings are fine for single sentences
+- Use `|-` block scalar for multi-line; inline strings are fine for single sentences. This applies to every field: write several paragraphs (e.g. a `description_processing` that joins several `{definitions.…}` references) as a `|-` block with a blank line between them, never as a quoted string with `\n\n` escapes
 - Don't mention units, sources, or processing (redundant or belongs elsewhere)
 - Don't just repeat the title -- if it adds nothing beyond the title, omit it entirely
 - Remove filler phrases like "Emissions are..." at the start
@@ -129,10 +128,11 @@ description_short: |-
   The number of people living in extreme poverty, based on data and estimates from different sources.
 ```
 
-**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is still accepted and renders as a markdown list, but prefer prose — see grapher's descriptionKey-to-string migration.)
-- Plain language, no jargon (e.g. "livestock digestive processes" not "enteric fermentation"). Expand acronyms on first use.
+**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is also accepted and renders as a markdown list, but prefer prose.)
+- Plain language (see `.claude/rules/plain-writing.md`). Expand acronyms on first use.
 - **Add concrete examples** for abstract scope descriptions (what countries are included, what events qualify)
-- **Order**: data-specific points first, methodology second, caveats last
+- **Order and flow**: read each variable's rendered list top to bottom as one text. Most important first (what the indicator measures and covers), then methodology, then caveats; notes that only matter for some entities (regional or "unspecified" entities, gaps for specific countries) go near the end. Define every term in the bullet where it first appears or in an earlier one, never after a bullet already uses it, and check this per variable: each variable assembles its own list from shared definitions, so a bullet one list relies on can be missing or later in another.
+- **Right length**: give each bullet the words its point needs and no more. A shared definition shows up in every variable that references it, so a few extra sentences add up across a whole list; cut asides a reader doesn't need to understand the data.
 - Only describe data that actually exists in the indicator. State implications of limitations explicitly.
 - Separate distinct facts with blank lines (paragraphs), so line breaks render meaningfully.
 - **No redundancy.** The bullets are read as a set, directly under `description_short` and the chart's title/subtitle, so a sentence that repeats another at the same level of detail costs the reader attention and makes the panel look padded. Before adding one, read the whole *rendered* list and ask what it adds that isn't already there; if the answer is "it says an existing bullet more fully", edit that bullet rather than adding a second. **Expanding `description_short` is not redundancy** — the short line is a one-sentence summary, and unpacking it in the first bullet (the full definition, how it's measured, what's included) is exactly what the panel is for. What to avoid is a bullet that restates it and stops there. Two shapes to watch: a source or caveat sentence duplicating a caveat already made in different words, and a Jinja variant bullet restating the shared bullet for some dimension values only.
@@ -181,13 +181,13 @@ Set in `definitions.common`, override per-variable as needed.
   - `selectedEntityColors`: Map entity names to hex colors (e.g. `{"Africa": "#A2559C", "Asia": "#00847E"}`)
   - `map`: Map tab settings — `colorScale` with `baseColorScheme` (e.g. `"YlOrRd"`), `binningStrategy` (`"manual"`), and `customNumericValues` for bin thresholds
   - Set at variable level, or in `definitions.common.presentation` when all variables share the same chart defaults
-- `display.numDecimalPlaces`: Set explicitly. Use `metadata-export --decimals auto` to auto-detect.
+- `display.numDecimalPlaces`: see "Decimal precision" under Units. Use `metadata-export --decimals auto` to auto-detect.
 - `display.tolerance`: Number of years to allow gap-bridging on line charts (default 0). Set higher (e.g. 5-10) for sparse historical data where connecting distant points is acceptable.
 - `display.roundingMode`: Use `"significantFigures"` with `numSignificantFigures` instead of `numDecimalPlaces` when values span many orders of magnitude.
 
 ## YAML Efficiency Patterns
 
-**Use `definitions.common`** when 3+ variables share the same field values. Remember: `common` does NOT merge -- it completely overrides. Use `<<: *anchor` for partial overrides.
+**Use `definitions.common`** when 3+ variables share the same field values. Remember: `common` does NOT merge -- it completely overrides.
 
 **Use anchors/aliases** for identical blocks shared by 2+ variables. Define in `definitions:` at the top. **Name anchors to indicate their target field** (e.g. `description_producer_refugee` not `description_refugee`) so reviewers can tell which metadata field the text will end up in.
 
@@ -247,7 +247,7 @@ Name the conditional definition after what it chooses between (`…_total_or_by_
 
 The exception is a fragment inside a sentence or a title, such as `title: GNI per capita<% if sex != "total" %> (<<sex>>)<% endif %>`. Splitting that one leaves a line break or stray indentation in the rendered text, so keep it inline. Short fragments like this can still live in a definition (`among_sex: <% if sex == "males" %> among men<% elif … %><% endif %>`) when several fields reuse them. When you restructure an existing conditional, render every dimension value before and after to confirm nothing changed (the text-neutrality recipe in `.claude/skills/edit-faust-metadata/SKILL.md`).
 
-**A sentence written with one breakdown in mind renders on all the others**, where the view's own filtering can make it false. Sweep every dimension value before shipping — check 6 of the quality suite below.
+**A sentence written with one breakdown in mind renders on all the others**, where the view's own filtering can make it false. Sweep every dimension value before shipping — check 5 of the quality suite below.
 
 **Use `{definitions.xxx}` string interpolation** for reusing text fragments inline (e.g. `'{definitions.methodology}'` in a `description_key` bullet). Unlike YAML anchors which substitute entire nodes, this inserts text within strings. Use anchors for whole fields/blocks, interpolation for composing text.
 
@@ -266,7 +266,7 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 
 1. **Generate skeleton**: `.venv/bin/etl metadata-export data/garden/<ns>/<ver>/<ds> --output /tmp/<ds>.meta.yml` (never run without `--show` or `--output` to avoid overwriting)
 2. **Inspect the data**: Load dataset, check columns, value ranges, existing origin metadata
-3. **Research sources**: Read snapshot `.dvc` for origin URLs, visit source docs for methodology and definitions
+3. **Research sources**: Starting from the snapshot `.dvc` origin URLs, find the producer's latest documentation (dataset page, methodology, codebook, main report, what's new) per `.claude/rules/producer-documentation.md`. Use it to fill the fields and to contrast any text already written, and ask the user when it is missing, insufficient or inaccessible
 4. **Write top-down**: Start with `definitions:` and `common:` to identify shared patterns before individual variables
 5. **Fill systematically**: For each variable: title -> units -> description_short -> description_key -> processing_level -> display
 6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr data://grapher/<ns>/<ver>/<ds> --grapher --only`
@@ -285,11 +285,11 @@ Run all of these after the metadata is written and the steps are built, so every
    - Sentences that only make sense if you already know the data source
    - Quantitative claims with no unit context surfacing anywhere in the user-facing text
    - Inconsistent terminology between indicators in the same dataset
-   - Domain phrases with a plain-English equivalent ("anthropogenic emissions" → "human-caused emissions")
+   - Wording that fails the talk test in `.claude/rules/plain-writing.md` (e.g. "anthropogenic emissions" → "human-caused emissions")
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that; agencies revise methodology
    - Scope qualifiers present in the origin title but absent from user-facing text (private-only, adults-only, market-exchange-rate-only)
-   - Text that adds nothing to what the reader has already read — a bullet repeating another bullet, `description_short`, or the title at the same level of detail. Expanding the short line is fine and expected; restating it is padding. See the `description_key` guidance above.
-4. **Link verification** — every URL and `[term](#dod:term)` in the text: URLs must resolve (curl as the batch primary; on a 4xx from an OWID link, double-check with WebFetch + Wayback before acting); dod slugs checked against the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`); a missing dod → keep the link and list it as a "create in admin" follow-up in the PR body.
+   - Text that adds nothing to what the reader has already read — a bullet repeating another bullet, `description_short`, or the title at the same level of detail (see the `description_key` guidance above).
+4. **Link verification** — every URL and `[term](#dod:term)` in the text: URLs must resolve (curl as the batch primary; on a 4xx from an OWID link, double-check with WebFetch + Wayback before acting, and offer to open a page that blocks both in the user's Chrome through the Claude in Chrome extension); dod slugs checked against the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`); a missing dod → keep the link and list it as a "create in admin" follow-up in the PR body.
 5. **Dimension sweep** — for dimensional indicators (Jinja over a dimension, or a `definitions:` key several variants reference), every sentence must hold at *every* value it renders on, not just the one it was written for. Render the text per dimension value and read each output as a reader of that chart, asking what the view already restricts: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X; a scope word like "all employees" overclaims on a variant filtered to a subgroup; a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Prefer qualifying the wording so it holds everywhere (often one word, nothing extra to maintain) over adding a Jinja branch or a view-level override. Automated reviewers catch this class reliably, so sweeping first saves a review round.
 6. **Adversarial claims verification** — `/fact-check-dataset` scoped to the newly written or edited metadata text only: treat each added/changed sentence as a claim and verify it against the producer's documentation (read what's behind the links — check 4 only proves they resolve). Catches text that is well-formed but factually wrong: stale methodology attributions, scope overclaims, misread units in prose. Scope by context: **mandatory in `/edit-faust-metadata`** (claims-only, no data cross-checks — cheap); the full-dataset review including data-value cross-checks stays the opt-in step described in `/update-dataset` §6c-bis (token-heavy).
 
@@ -303,7 +303,7 @@ The checks above read the text **as authored**. The **Metadata Diff** Wizard pag
 http://staging-site-<container_branch>/etl/wizard/metadata-diff
 ```
 
-It is not an eighth check: it needs a staging server and a human's judgment, and it runs *after* the checks, once the text is settled. What it shows that nothing above does is **reach** — reword one shared `description_key` and dozens of charts change while every chart-config diff stays empty, because that text is inherited, not configured. (Chart Diff compares configs; this compares rendered texts. It is also not Chart Diff's own per-chart "Metadata differences" modal.)
+It is not one more check: it needs a staging server and a human's judgment, and it runs *after* the checks, once the text is settled. What it shows that nothing above does is **reach** — reword one shared `description_key` and dozens of charts change while every chart-config diff stays empty, because that text is inherited, not configured. (Chart Diff compares configs; this compares rendered texts. It is also not Chart Diff's own per-chart "Metadata differences" modal.)
 
 Two preconditions, both silent when unmet:
 
