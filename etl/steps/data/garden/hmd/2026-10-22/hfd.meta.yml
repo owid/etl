@@ -132,6 +132,8 @@ tables:
           Average age of mothers when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
 
       mab40:
         title: |-
@@ -144,6 +146,8 @@ tables:
           Average age of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Focuses on childbearing occurring before age 40, providing insights into early fertility patterns.
 
@@ -158,6 +162,8 @@ tables:
           Variation in the ages of mothers when they have their{definitions.others.bo_1} child in a specific year.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Measures the spread of ages at which women give birth.
           - A low standard deviation indicates that most births occur around the same age, while a high standard deviation suggests a wider range of ages.
@@ -174,6 +180,8 @@ tables:
           Variation in the ages of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Reflects variability in the timing of births up to age 40.
           - Helps to understand how concentrated or spread out early childbearing is within the population.
@@ -189,6 +197,8 @@ tables:
           Average age of mothers at the birth of their{definitions.others.bo_1} child.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Derived from fertility tables that account for both age and parity.
           - Provides a more detailed understanding of the timing of births across different birth orders.
@@ -201,6 +211,8 @@ tables:
         description_short: |-
           Number of{definitions.others.bo_1} live births per 1,000 people in a given year. It is not standardized for the age structure of the population.
         unit: "births per 1,000 people"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - The rate is calculated by dividing the total number of{definitions.others.bo_1} live births occurring in a given year by person-years lived by all population in that year.
           - Simple measure of birth intensity, not adjusted for age or parity.
@@ -303,6 +315,8 @@ tables:
           Average age at which women in a specific birth cohort have their{definitions.others.bo_1} child. It is standardized for the age structure of the female population of reproductive age.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Shows the average age when women in a specific group have their children.
           - Highlights how the timing of childbirth differs from one generation to the next.
@@ -319,6 +333,8 @@ tables:
           Average age at which women under 40 in a specific cohort have their{definitions.others.bo_1} child.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Focuses on births occurring before age 40, providing insights into early fertility patterns for the cohort.
           - Useful for comparing early reproductive behavior across different cohorts.
@@ -334,6 +350,8 @@ tables:
           Variation in the ages at which women in a specific cohort have their{definitions.others.bo_1} child.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Measures the spread of ages at which women in a cohort give birth.
           - A lower value indicates concentrated timing, while a higher value suggests more variation in childbearing ages.
@@ -350,6 +368,8 @@ tables:
           How much variation there is in the ages at which women in a specific cohort have their{definitions.others.bo_1} child, calculated only up to age 40.
           <%- endif %>
         unit: "years"
+        display:
+          numDecimalPlaces: 1
         description_key:
           - Reflects variability in the timing of births up to age 40 within a cohort.
           - Helps to understand how concentrated or spread out early childbearing is within the cohort.
@@ -469,6 +489,8 @@ tables:
           Share of women born in a given year who had exactly << num_births >> births.
           <%- endif %>
         unit: "%"
+        display:
+          numDecimalPlaces: 1
         short_unit: "%"
         processing_level: major
         description_processing: |-

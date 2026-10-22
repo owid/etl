@@ -9,8 +9,6 @@ views:
     indicators:
       y:
         - catalogPath: mean_age_childbearing#mean_age_childbearing_hist
-          display:
-            numDecimalPlaces: 1
     config:
       title: Average age of mothers at childbirth
       subtitle: Estimated average age of women who have given birth in each year. This includes all births that year, not just women's first childbirth.

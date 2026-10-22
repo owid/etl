@@ -12,7 +12,6 @@ views:
         - catalogPath: cohort_share_women#share_women__num_births_0
           display:
             name: No births
-            numDecimalPlaces: 1
     config:
       title: Share of women who have had no births by the end of their childbearing years
       subtitle: ''

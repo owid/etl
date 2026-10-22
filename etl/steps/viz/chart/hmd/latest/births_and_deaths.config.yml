@@ -18,7 +18,6 @@ views:
           display:
             name: Birth rate
             color: '#4c6a9c'
-            numDecimalPlaces: 1
     config:
       title: Birth rate and death rate
       subtitle: Estimated number of annual births and deaths per 1,000 people.

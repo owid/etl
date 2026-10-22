@@ -12,7 +12,6 @@ views:
           display:
             name: 1st birth
             color: '#002147'
-            numDecimalPlaces: 1
         - catalogPath: period#mab__birth_order_2
           display:
             name: 2nd birth
