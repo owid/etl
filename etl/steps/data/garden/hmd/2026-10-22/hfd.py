@@ -533,6 +533,9 @@ def run() -> None:
     )
 
     # Special table: Distribution of period metrics
+    # NOTE: In the 2026 update, only Denmark had data for 2025, so `asfr_period__year_as_dimension_2025` wasn't added
+    # to chart 8398 (period-age-specific-fertility-rate). On the next update, add the 2025 series to that chart once
+    # more countries have 2025 data.
     ## Keep only birth_order = total
     tb_period_years = tb_period_ages.loc[(tb_period_ages["birth_order"] == "total")].drop(columns=["birth_order"])
     ## Keep only cohorts that are multiples of 5 (from year_min to year_max)
