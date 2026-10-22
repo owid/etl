@@ -279,6 +279,8 @@ steps:
     - data://grapher/hmd/2026-10-22/hfd
   viz://chart/hmd/latest/standard_deviation_in_age_of_mothers_at_birth:
     - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/tempo_adjusted_total_fertility_rate_by_birth_order:
+    - data://grapher/hmd/2026-10-22/hfd
   viz://chart/hmd/latest/total_fertility_rate_vs_cohort_fertility_rate_vs_tempo_adjusted_tfr:
     - data://grapher/hmd/2026-10-22/hfd
   viz://chart/hmd/latest/total_live_births_hfd:
