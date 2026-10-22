@@ -187,7 +187,7 @@ def run() -> None:
         else:
             tb[column].metadata.origins = tb_long["value"].metadata.origins
 
-    # Order the top-partner categories for chart legends: most frequent first, "Other" last.
+    # Order the top-partner categories for chart legends: most common in the latest year first, "Other" last.
     for column in ["top_partner_category", "top_export_partner_category"]:
         tb[column].metadata.type = "ordinal"
         tb[column].metadata.sort = _top_partner_order(tb, column)
@@ -435,11 +435,18 @@ def get_top_partner(tb: Table) -> Table:
 
 
 def _top_partner_order(tb: Table, column: str) -> list[str]:
-    """Categories ordered by how many countries have them as top partner (as in the top-10 selection), "Other" last."""
-    categories = tb.reset_index()[["country", column]].dropna()
-    counts = categories[categories[column] != "Other"].groupby(column)["country"].nunique()
-    order = counts.sort_values(ascending=False, kind="stable").index.tolist()
+    """Categories ordered by how many countries have them as top partner in the latest year (ties broken by the count
+    over all years, as in the top-10 selection), with "Other" last."""
+    categories = tb.reset_index()[["country", "year", column]].dropna()
     assert "Other" in set(categories[column]), f"Expected an 'Other' category in {column}."
+    categories = categories[categories[column] != "Other"]
+    counts = pd.DataFrame(
+        {
+            "latest": categories[categories["year"] == categories["year"].max()].groupby(column)["country"].nunique(),
+            "all_years": categories.groupby(column)["country"].nunique(),
+        }
+    ).fillna(0)
+    order = counts.sort_values(["latest", "all_years"], ascending=False).index.tolist()
     return order + ["Other"]
 
 
