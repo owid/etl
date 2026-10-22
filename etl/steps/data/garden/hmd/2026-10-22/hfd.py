@@ -566,9 +566,12 @@ def run() -> None:
         col_bo=col_bo,
         regex_bo=REGEX_COHORT_AGE_BO,
         check_integration=False,
+        # NOTE: Exact number of (country, cohort, age) rows where the main and birth-order tables disagree beyond
+        # TOLERANCE. Mostly POL and DEUTE. The 2026 release added 3 for ccfr (POL, young cohorts, third-decimal
+        # rounding of small values). On update, check that new mismatches are rounding-level before bumping.
         check_integration_limit={
             "asfr": 143,
-            "ccfr": 101,
+            "ccfr": 104,
         },
     )
     ## Consolidate
