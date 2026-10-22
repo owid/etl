@@ -1,0 +1,48 @@
+grapher_schema: "011"
+chart_config_id: 01935484-6d80-7c89-b1b4-bc8b851e52cd
+slug: period-average-age-of-mothers-birth-order
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#mab__birth_order_1
+          display:
+            name: 1st birth
+            color: '#002147'
+            numDecimalPlaces: 1
+        - catalogPath: period#mab__birth_order_2
+          display:
+            name: 2nd birth
+            color: '#294668'
+        - catalogPath: period#mab__birth_order_3
+          display:
+            name: 3rd birth
+            color: '#526c89'
+        - catalogPath: period#mab__birth_order_4
+          display:
+            name: 4th birth
+            color: '#7b91a9'
+        - catalogPath: period#mab__birth_order_5p
+          display:
+            name: 5th birth or higher
+            color: '#a4b6ca'
+        - catalogPath: period#mab__birth_order_total
+          display:
+            name: All
+            color: '#be5915'
+    config:
+      title: Average age of mothers at childbirth by birth order
+      subtitle: Each line shows the average age of women who had their first child, second child, third child, or higher in a given year.
+      note: ''
+      variantName: ''
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - United States
+      yAxis:
+        min: 15
