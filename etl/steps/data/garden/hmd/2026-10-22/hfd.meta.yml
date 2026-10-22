@@ -118,7 +118,7 @@ tables:
           <%- endif %>
         unit: "births per woman"
         description_key:
-          - The parity- and age-adjusted total fertility rate (TFR) accounts for both the age structure and parity distribution of the female population.
+          - The parity- and age-adjusted total fertility rate (PATFR) accounts for both the age structure and parity distribution of the female population.
 
       # Mean ages at birth, and at 40
       mab:
@@ -409,7 +409,7 @@ tables:
         unit: "births per woman"
         description_key:
           - Shows the average number of children that women born in the same year have had by each age.
-          - Useful for comparing how quickly different generations of women have children.
+          - Useful for detailed analysis of fertility patterns by both age and year.
 
   period_ages_years:
     variables:
