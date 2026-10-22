@@ -184,6 +184,13 @@ NOTE = (
 )
 
 
+def get_note(view) -> str:
+    """Footnote of a view. Annual views also flag that the latest year shown may still be incomplete."""
+    if view.dimensions["timespan"] == "annual":
+        return f"{NOTE} The latest year may be incomplete due to reporting delays."
+    return NOTE
+
+
 def get_date_published(tb: Table) -> dt.date:
     """Publication date of the EM-DAT release behind the table, from its EM-DAT origins."""
     dates = {

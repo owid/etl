@@ -9,12 +9,12 @@ from shared import (
     DISASTER_PHRASES,
     DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
     INDIVIDUAL_DISASTER_TYPES,
-    NOTE,
     add_total_indicator_for_map,
     apply_decadal_time_range,
     apply_disaster_colors,
     get_common_view_config,
     get_last_fully_reported_year,
+    get_note,
     get_stacked_view_config,
     prepare_table,
 )
@@ -114,7 +114,7 @@ def run() -> None:
         {
             "title": _title,
             "subtitle": _subtitle,
-            "note": NOTE,
+            "note": get_note,
         }
     )
 

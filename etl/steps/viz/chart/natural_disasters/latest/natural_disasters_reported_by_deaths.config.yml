@@ -16,7 +16,7 @@ views:
     config:
       title: "Global number of reported natural disasters by the number of deaths"
       subtitle: "The number of disaster events reported in the EM-DAT disaster database, broken down by the size of the event, in terms of deaths. There has been an increase in the number of the smallest events – with over 200 deaths – at least partly due to improvements in recording over time."
-      note: "Data includes disasters reported up to {{date_published}}."
+      note: "Data includes disasters reported up to {{date_published}}. The latest year may be incomplete due to reporting delays."
       originUrl: "/natural-disasters"
       selectedFacetStrategy: "entity"
       yAxis:

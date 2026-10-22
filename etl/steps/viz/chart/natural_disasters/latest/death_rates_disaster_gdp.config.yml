@@ -18,7 +18,7 @@ views:
     config:
       title: "Deaths rates from disasters vs. GDP per capita"
       subtitle: "Death rates are measured per 100,000 people. Disasters include all geophysical, meteorological and climate events including earthquakes, volcanic activity, landslides, drought, wildfires, storms, and flooding. GDP per capita is adjusted for inflation and differences in living costs between countries."
-      note: "Deaths from extreme temperatures are not included since very few countries provide these figures; heatwave deaths are predominantly estimated for Europe, with poor coverage of Africa, Asia or South America."
+      note: "Extreme temperatures are not included because their geographical and time coverage is poor. The latest year may be incomplete due to reporting delays."
       originUrl: "/natural-disasters"
       chartTypes:
         - "ScatterPlot"
