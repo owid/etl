@@ -9,7 +9,7 @@ definitions:
   global:
     projections: |-
       <% if (variant is defined) and (variant != 'estimates') -%>
-      Future projections are based on the [UN's << variant >> scenario](#dod:un-projection-scenarios).
+      Future projections are based on the [UN's << variant | replace('constant_fertility', 'constant-fertility') | replace('zero_migration', 'zero-migration') >> scenario](#dod:un-projection-scenarios).<% if variant == 'zero_migration' %> In this scenario, net migration is set to zero from 2024 onwards.<% endif %>
       <%- endif -%>
     # Noun for population/deaths titles, based on sex × age.
     # Outputs e.g. "infants", "girls", "adolescent boys", "adult women", "people".
@@ -38,7 +38,7 @@ definitions:
         age << age >><%- if variant != 'estimates' %>, <%endif %>
         <%- endif %>
         <%- if variant != 'estimates' %>
-        << variant >> projection
+        << variant | replace('constant_fertility', 'constant-fertility') | replace('zero_migration', 'zero-migration') >> projection
         <%- endif %>
         <%- endif %>
       description_short: |-
@@ -70,7 +70,7 @@ definitions:
       # "Indicator (UN WPP, medium scenario)".
       title_variant: |-
         <% if (variant is defined) and (variant != 'estimates') -%>
-        with << variant >> scenario projections
+        with << variant | replace('constant_fertility', 'constant-fertility') | replace('zero_migration', 'zero-migration') >> scenario projections
         <%- endif -%>
       grapher_config:
         subtitle: "{definitions.global.projections}"
@@ -641,11 +641,11 @@ tables:
       dependency_ratio:
         title: |-
           <% if age == "total" %>
-          Total dependency ratio - Sex: << sex >> - Variant: << variant >>
+          Total dependency ratio - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
           <%- elif age == "youth" %>
-          Child dependency ratio - Sex: << sex >> - Variant: << variant >>
+          Child dependency ratio - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
           <%- else %>
-          Old-age dependency ratio - Sex: << sex >> - Variant: << variant >>
+          Old-age dependency ratio - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
           <%- endif %>
         unit: "%"
         description_short: |-
@@ -704,9 +704,9 @@ tables:
       mortality_rate:
         title: |-
           <% if age == '0' %>
-          Infant mortality rate - Sex: << sex >> - Variant: << variant >>
+          Infant mortality rate - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
           <%- else %>
-          Child mortality rate - Sex: << sex >> - Variant: << variant >>
+          Child mortality rate - Sex: << sex >> - Variant: << variant | replace('constant_fertility', 'Constant fertility') | replace('zero_migration', 'Zero migration') >>
           <%- endif %>
         unit: |-
           <% if age == '0' %>
