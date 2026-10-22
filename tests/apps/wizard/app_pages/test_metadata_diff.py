@@ -5140,3 +5140,89 @@ def test_a_chart_text_master_already_says_is_not_this_branchs(monkeypatch):
     # reports as UNKNOWN — a conservative list beats a silently short one.
     unchecked = discovery.changed_chart_texts("src", "tgt", scope, built)  # type: ignore[arg-type]
     assert sorted(unchecked.diffs) == ["masters", "mixed", "ours"]
+
+
+def test_a_rewritten_passage_reads_as_before_and_after_not_as_fragments():
+    """A rewrite spread over a paragraph summarizes to "borders. … To … compare … trade …", which no one
+    can read. Such an edit is shown as its changed passages, old then new, each side marking only its own
+    words; a one-word edit keeps the compact `old → new` line.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import (
+        before_after_html,
+        changed_passages,
+        edit_fingerprint,
+        is_scattered_edit,
+    )
+
+    old = (
+        "- Trade has grown since 1800.\n"
+        "- It shows the volume of world trade, measuring the goods exchanged across national borders. To compare "
+        "trade over time, researchers construct an index that averages exports and imports.\n"
+        "- From 1950 onwards, we extend the series using WTO data."
+    )
+    new = (
+        "- Trade has grown since 1800.\n"
+        "- It shows the volume of world trade, measuring the goods exchanged across national borders at constant "
+        "prices. The series is expressed as an index relative to a baseline year.\n"
+        "- From 1951 onwards, we extend the series using WTO data on merchandise trade."
+    )
+    inserted, deleted = edit_fingerprint(old, new)
+    assert is_scattered_edit(inserted, deleted)
+    assert not is_scattered_edit(*edit_fingerprint("World trade index.", "Global trade index."))
+
+    # Only the bullets that changed, each paired with its own rewrite; the untouched first bullet is left out.
+    pairs = changed_passages(old, new)
+    assert len(pairs) == 2
+    assert pairs[0][0].startswith("It shows") and pairs[0][1].startswith("It shows")
+    assert pairs[1] == (
+        "From 1950 onwards, we extend the series using WTO data.",
+        "From 1951 onwards, we extend the series using WTO data on merchandise trade.",
+    )
+
+    rendered = before_after_html(old, new)
+    assert rendered.count(">Before<") == 2 and rendered.count(">After<") == 2
+    assert "Trade has grown since 1800" not in rendered
+    # Each side highlights only its own words: deletions on the Before row, insertions on the After row.
+    rows = rendered.split('<div class="mdd-ba-row">')[1:]
+    befores = [r for r in rows if ">Before<" in r]
+    afters = [r for r in rows if ">After<" in r]
+    assert all('<ins class="mdd-ins">' not in r for r in befores)
+    assert all('<del class="mdd-del">' not in r for r in afters)
+    assert any('<del class="mdd-del">' in r for r in befores) and any('<ins class="mdd-ins">' in r for r in afters)
+
+    # An added or removed passage says so rather than leaving one side blank.
+    assert "(not there before)" in before_after_html("- a", "- a\n- b")
+    assert "(removed)" in before_after_html("- a\n- b", "- a")
+
+
+def test_the_dimension_tree_draws_the_charts_when_no_mdim_is_reached(monkeypatch):
+    """A branch that reaches only charts still gets the tree, with the charts branch on it — not a caption
+    saying there is no MDim grid, followed by a plain list.
+    """
+    from apps.wizard.app_pages.metadata_diff import blast_section
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    reach = [
+        ChangeReach(
+            field="descriptionShort",
+            old="World trade index, based on the average of exports and imports.",
+            new="World trade index, based on the volume of goods traded.",
+            charts=[{"chartId": 327, "slug": "growth-of-global-trade", "title": "Growth of global trade"}],
+        )
+    ]
+    captions, drawn, listed = [], [], []
+    source = SimpleNamespace(**vars(_stub_source()), wizard_url="http://wizard")
+    monkeypatch.setattr(blast_section, "SOURCE", source)
+    monkeypatch.setattr(blast_section, "_st_surface_filter", lambda reach: "all")
+    monkeypatch.setattr(blast_section, "_explorer_hierarchy", lambda *a, **k: None)
+    monkeypatch.setattr(blast_section.cached, "chart_views", lambda ids: {327: 8008})
+    monkeypatch.setattr(blast_section.cached, "mdim_redirected_charts", lambda engine: {})
+    monkeypatch.setattr(blast_section.st, "caption", lambda text, *a, **k: captions.append(text))
+    monkeypatch.setattr(blast_section.components, "html", lambda body, **k: drawn.append(body))
+    monkeypatch.setattr(blast_section, "_chart_reach", lambda *a, **k: listed.append(a))
+
+    blast_section._dimension_tree(None, None, reach)  # type: ignore[arg-type]
+
+    assert not any("No MDim" in c for c in captions), captions
+    assert listed == [], "the charts belong on the tree, not in the fallback list"
+    assert len(drawn) == 1 and "Growth of global trade" in drawn[0]
