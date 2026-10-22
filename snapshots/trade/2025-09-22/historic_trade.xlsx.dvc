@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Federico-Tena World Trade Historical Database
     description: |-
-      The Federico-Tena World Trade Historical Database reports series of imports and exports at current and constant prices, and at current and constant (1913) borders, for almost all polities from 1800 to 1938. Federico and Tena-Junguito (2019) describe the database and its estimation methodology, and build from it an index of world trade volume by summing exports at constant prices.
+      The Federico-Tena World Trade Historical Database reports the imports and exports of almost every country and colony from 1800 to 1938, at current and constant prices, and within both their borders at the time and their 1913 borders. Its world trade index measures the volume of world trade as the sum of all countries’ exports at constant prices.
     # NOTE: The file was received by email and is a later revision of the database's public release (October
     # 2017, https://doi.org/10.21950/JKZFDP): the world trade index matches it exactly up to 1884 and within 1.2%
     # for 1885–1938. Its 1950 value links the series to United Nations trade statistics; there is no 1939–1949.
