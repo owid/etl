@@ -114,7 +114,7 @@ tables:
           <% if birth_order == 'total' %>
           Total fertility rate adjusted for both the age of the mother and the number of children she already has.
           <%- else %>
-          Total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
+          Total fertility rate for{definitions.others.bo_1} births, adjusted for both the age of the mother and the number of children she already has.
           <%- endif %>
         unit: "births per woman"
         description_key:
