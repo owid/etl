@@ -112,3 +112,6 @@ steps:
   # archived; last active in 330554d87429 on 2026-10-21
   data://grapher/emdat/2026-04-30/natural_disasters_global_by_type:
     - data://garden/emdat/2026-04-30/natural_disasters
+  # archived; last active in 15d945074424 on 2026-10-22
+  data://explorers/emdat/latest/natural_disasters:
+    - data://garden/emdat/2026-10-21/natural_disasters
