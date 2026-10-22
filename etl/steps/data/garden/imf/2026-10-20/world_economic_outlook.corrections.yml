@@ -1,10 +1,15 @@
 - indicator: gross_domestic_product__gdp__constant_prices__percent_change_observation
   entity: Laos
   years: [2024]
-  action: flag
+  action: override
+  value: null
+  expect: {gt: 10}
   reason: >-
-    Real GDP growth of 13.5% in 2024 (4.3% in the April 2026 WEO). The World Bank (4.1%), the Asian Development Bank
-    (4.0%) and the IMF's own February 2026 Article IV report (4.3%) all put it at about 4%, and the implied GDP deflator
-    rises only 2% in a year of 23% consumer price inflation. Kept as published for now; to raise with the IMF.
+    Real GDP growth of 13.5% in 2024 comes from a break in the IMF's source data, not from real growth. The IMF
+    confirmed in October 2026 that its Laos team used its own GDP estimates for 2019–2023 and the authorities' reported
+    GDP from 2024, so 2024 growth compares two different sources. The World Bank (4.1%), the Asian Development Bank
+    (4.0%) and the authorities (4.6%) all put 2024 growth at about 4%. The IMF's Laos team is reviewing how to address
+    the break; remove this entry once the published value no longer shows it.
   producer: International Monetary Fund
-  status: open
+  reported: 2026-10-21
+  status: acknowledged
