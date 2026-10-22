@@ -293,9 +293,9 @@ tables:
         description_key:
           - |-
             <% if age == 'all' -%>
-            The UN's projections come in three scenarios: medium, high, and low. The medium scenario is the central estimate; the high and low scenarios are designed to fully reach 0.5 births per woman above and below the medium from the mid-2030s onward (e.g. medium 2.1 → high 2.6, low 1.6). In the first decade of the projection the gap is narrower (about ±0.25 in 2024–2028, ±0.4 in 2029–2033).
+            The UN's projections come in several scenarios. The medium scenario is the central estimate; the high and low scenarios are designed to fully reach 0.5 births per woman above and below the medium from the mid-2030s onward (e.g. medium 2.1 → high 2.6, low 1.6). In the first decade of the projection the gap is narrower (about ±0.25 in 2024–2028, ±0.4 in 2029–2033). The constant-fertility scenario keeps fertility at its current level, and the zero-migration scenario uses the same fertility as the medium scenario.
             <%- else -%>
-            The UN's high and low scenarios for age-specific fertility are derived from the corresponding total-fertility scenario, which runs roughly 0.5 births per woman above or below the medium in the long run.
+            The UN's high and low scenarios for age-specific fertility are derived from the corresponding total-fertility scenario, which runs roughly 0.5 births per woman above or below the medium in the long run. The zero-migration scenario uses the same fertility as the medium scenario.
             <%- endif -%>
         description_processing: |-
           <% if age == 'all' -%>
