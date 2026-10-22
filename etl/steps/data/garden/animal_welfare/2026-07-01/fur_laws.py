@@ -122,7 +122,7 @@ def run() -> None:
 
     # Prepare fur trading ban statuses.
     tb["fur_trading_status"] = map_series(
-        tb["fur_trading_status"].astype("string").fillna(""),
+        tb["fur_trading_status"].astype("str").fillna(""),
         mapping=FUR_TRADING_BAN_STATUS,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
@@ -131,7 +131,7 @@ def run() -> None:
 
     # Prepare fur farming activity statuses.
     tb["fur_farms_active"] = map_series(
-        tb["fur_farms_active"].astype("string").fillna(""),
+        tb["fur_farms_active"].astype("str").fillna(""),
         mapping=FUR_FARMING_ACTIVE,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
@@ -158,7 +158,7 @@ def run() -> None:
 def prepare_fur_farming_ban_status(tb: Table) -> Table:
     tb = tb.copy()
     # Fill missing values with "".
-    tb["fur_farming_status"] = tb["fur_farming_status"].astype("string").fillna("")
+    tb["fur_farming_status"] = tb["fur_farming_status"].astype("str").fillna("")
 
     # There is a column for the status of the ban, and another for those cases where there is no ban, but fur farming
     # has been phased out due to stricter regulations.

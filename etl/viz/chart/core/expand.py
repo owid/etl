@@ -405,8 +405,9 @@ class ChartConfigExpander:
         cols_dims = [col for col in df_dims.columns if col not in [self.indicators_slug, "short_name"]]
         df_dims = df_dims[[self.indicators_slug] + sorted(cols_dims) + ["short_name"]]
 
-        # Set df_dims as string!
-        df_dims = df_dims.astype(str)
+        # Set df_dims as string! Indicators lacking a dimension get the choice "nan", as astype(str) produced
+        # before the pandas str dtype (which keeps missing values as NaN).
+        df_dims = df_dims.astype(str).fillna("nan")
 
         return df_dims
 

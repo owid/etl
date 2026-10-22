@@ -1100,6 +1100,8 @@ def list_members_of_region(
         # Create a dataframe of countries in each income group.
         tb_countries_in_income_group = (
             tb_income.rename(columns={"classification": "region", "country": "members"})  # ty: ignore
+            # pandas 3 fails to aggregate a categorical column into lists.
+            .astype({"members": object})
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
@@ -1538,7 +1540,7 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
     # Create date column
     population["date"] = pd.to_datetime(
-        population["year"].astype("string") + "-07-01"  # ty: ignore[unsupported-operator]
+        population["year"].astype("str") + "-07-01"  # ty: ignore[unsupported-operator]
     )
     # Keep relevant columns
     population = population.loc[:, ["date", "country", "population"]]

@@ -1322,6 +1322,73 @@
                               "description": "Variable ID to show. TODO: remove this and use dimensions instead",
                               "maximum": 2147483647,
                               "minimum": 0
+                            },
+                            "region": {
+                              "type": "string",
+                              "description": "Which region to focus on",
+                              "enum": [
+                                "World",
+                                "Europe",
+                                "Africa",
+                                "Asia",
+                                "NorthAmerica",
+                                "SouthAmerica",
+                                "Oceania"
+                              ],
+                              "default": "World"
+                            },
+                            "startTime": {
+                              "description": "Select a specific start time to be displayed. If given, two maps are shown next to each other.",
+                              "oneOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "latest",
+                                    "earliest"
+                                  ]
+                                }
+                              ]
+                            },
+                            "columnSlug": {
+                              "description": "Column to show in the map tab. Can be a column slug (e.g. in explorers) or a variable ID (as string).\nIf not provided, the first y dimension is used.\n",
+                              "type": "string"
+                            },
+                            "selectedEntityNames": {
+                              "type": "array",
+                              "description": "The initial selection of entities to show on the map",
+                              "default": [],
+                              "items": {
+                                "type": [
+                                  "string"
+                                ]
+                              }
+                            },
+                            "globe": {
+                              "type": "object",
+                              "description": "Configuration of the globe",
+                              "properties": {
+                                "isActive": {
+                                  "type": "boolean",
+                                  "description": "Whether the globe is initially shown"
+                                },
+                                "rotation": {
+                                  "type": "array",
+                                  "description": "Latitude and Longitude of the globe rotation",
+                                  "items": {
+                                    "type": [
+                                      "number"
+                                    ]
+                                  }
+                                },
+                                "zoom": {
+                                  "type": "number",
+                                  "description": "Zoom level of the globe"
+                                }
+                              },
+                              "additionalProperties": false
                             }
                           },
                           "additionalProperties": false
@@ -1603,14 +1670,32 @@
                           "description": "List of dimensions and their mapping to variables",
                           "items": {
                             "type": "object",
+                            "description": "One slot of the chart bound to one column of data.",
                             "required": [
-                              "property",
-                              "variableId"
+                              "property"
                             ],
+                            "oneOf": [
+                              {
+                                "required": [
+                                  "variableId"
+                                ]
+                              },
+                              {
+                                "required": [
+                                  "slug"
+                                ]
+                              }
+                            ],
+                            "not": {
+                              "required": [
+                                "slug",
+                                "targetYear"
+                              ]
+                            },
                             "properties": {
                               "targetYear": {
                                 "type": "integer",
-                                "description": "Charts that can display more than one primary dimensions (i.e. scatter and marimekko)\nsometimes need to \"hardcode\" one dimension to a specific year. This happens e.g. when\nmixing a daily X variable in a scatter plot with a yearly one, e.g. population.\n"
+                                "description": "Charts that can display more than one primary dimensions (i.e. scatter and marimekko)\nsometimes need to \"hardcode\" one dimension to a specific year. This happens e.g. when\nmixing a daily X variable in a scatter plot with a yearly one, e.g. population.\nOnly supported on dimensions with a variableId.\n"
                               },
                               "property": {
                                 "type": "string",
@@ -1630,6 +1715,10 @@
                                 "type": "integer",
                                 "description": "The variable id to get the values for this time series",
                                 "minimum": 0
+                              },
+                              "slug": {
+                                "type": "string",
+                                "description": "The slug of a column in the supplied table, as an alternative to variableId"
                               }
                             },
                             "additionalProperties": false
@@ -1949,48 +2038,6 @@
                             "hide",
                             "show"
                           ]
-                        },
-                        "dumbbell": {
-                          "type": "object",
-                          "description": "Configuration of the dumbbell chart",
-                          "properties": {
-                            "connectorStyle": {
-                              "type": "string",
-                              "default": "arrow",
-                              "description": "How the connector between dumbbell heads is drawn.\n- arrow: draw an arrow pointing from start to end\n- line: draw a simple line (only respected when two indicators are plotted)\n",
-                              "enum": [
-                                "arrow",
-                                "line"
-                              ]
-                            },
-                            "valueLabelMode": {
-                              "type": "string",
-                              "default": "absolute",
-                              "description": "What to display as value labels next to each dumbbell.\n- absolute: show the raw values at the start and end\n- change: show the absolute change (e.g. +50)\n- percentChange: show the percentage change (e.g. +33%)\n- none: hide value labels\n",
-                              "enum": [
-                                "absolute",
-                                "change",
-                                "percentChange",
-                                "none"
-                              ]
-                            },
-                            "trendColorMap": {
-                              "type": "object",
-                              "description": "Custom colors for the time-range encoding",
-                              "properties": {
-                                "increase": {
-                                  "type": "string",
-                                  "description": "Color for dumbbells whose value increased over time"
-                                },
-                                "decrease": {
-                                  "type": "string",
-                                  "description": "Color for dumbbells whose value decreased over time"
-                                }
-                              },
-                              "additionalProperties": false
-                            }
-                          },
-                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false

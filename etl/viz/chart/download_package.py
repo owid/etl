@@ -592,7 +592,7 @@ def _resolve_entity_codes(names: list[str]) -> dict[str, str]:
 
 
 def resolve_page_slug(chart: Chart) -> str | None:
-    """The MDIM's public page slug (e.g. "years-of-schooling"), or None if it has none.
+    """The MDIM's public page slug (e.g. "years-of-schooling"), or None if it is not published.
 
     Not derivable from the catalog path -- grapher owns the mapping, and the
     slug is hyphenated where the catalog short name is underscored. Requires
@@ -600,10 +600,9 @@ def resolve_page_slug(chart: Chart) -> str | None:
     It matters here for more than the R2 filename: the readme and
     metadata.json both link to the real page URL.
 
-    None means the chart has no data page. `put_mdim_config` sends only the
-    config, never a slug -- that is assigned when someone publishes the MDIM in the
-    admin -- so an MDIM whose export step runs but which was never published has a
-    row and no slug. On a staging server that is the normal state of 13 of the 59
+    None means the chart has no public data page. An MDIM whose export step runs but
+    which was never published in the admin has a row, and a slug only if its config
+    declares one. On a staging server that is the normal state of 13 of the 59
     multidim steps. Such a chart has nothing to attach a package to, which is
     why callers treat it as "nothing to publish" rather than an error.
     """
@@ -614,7 +613,7 @@ def resolve_page_slug(chart: Chart) -> str | None:
 
     with Session(OWID_ENV.engine) as session:
         mdim = MultiDimDataPage.load_mdim(session, catalogPath=chart.catalog_path)
-    if mdim is None or not mdim.slug:
+    if mdim is None or not mdim.slug or not mdim.published:
         return None
     return mdim.slug
 
@@ -1025,8 +1024,8 @@ def build_download_package_for_chart(
     if page_slug is None:
         raise ValueError(
             f"No published MDIM found for {chart.catalog_path!r} -- call chart.save() "
-            "before building the download package, and check the MDIM has been published (it needs "
-            "a slug). `Chart.save()` skips unpublished charts rather than calling this."
+            "before building the download package, and check the MDIM has been published. "
+            "`Chart.save()` skips unpublished charts rather than calling this."
         )
     page_url = f"https://ourworldindata.org/grapher/{page_slug}"
 

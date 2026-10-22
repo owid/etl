@@ -297,8 +297,8 @@ def test_to_safe_types():
     # Check that the dtypes have been converted appropriately
     assert df_safe.index.dtype == "Int64"
     assert df_safe["float_col"].dtype == "Float64"
-    assert df_safe["cat_col"].dtype == "string[pyarrow]"
-    assert df_safe["object_col"].dtype == "string[pyarrow]"
+    assert df_safe["cat_col"].dtype == "str"
+    assert df_safe["object_col"].dtype == "str"
 
 
 def test_to_safe_types_multiindex():
@@ -317,7 +317,7 @@ def test_to_safe_types_multiindex():
 
     # Check index levels
     assert df_safe.index.levels[0].dtype == "Int64"  # ty: ignore
-    assert df_safe.index.levels[1].dtype == "string[pyarrow]"  # ty: ignore
+    assert df_safe.index.levels[1].dtype == "str"  # ty: ignore
     # Check column dtype
     assert df_safe["float_col"].dtype == "Float64"
 
@@ -346,8 +346,21 @@ def test_to_safe_types_with_nan():
     # since we store everything as nullable types)
     assert df_safe["int_with_nan"].dtype == "Float64"
     assert df_safe["nullable_int_with_nan"].dtype == "Int64"
-    assert df_safe["cat_col"].dtype == "string[pyarrow]"
+    assert df_safe["cat_col"].dtype == "str"
 
-    # Ensure that the NA value in 'cat_col' remains pd.NA and not the string "NA"
+    # Missing strings are NaN, as in pandas' default str dtype, and not the string "nan"
     assert pd.isna(df_safe["cat_col"].iloc[1])
-    assert df_safe["cat_col"].iloc[1] is pd.NA
+    assert df_safe["cat_col"].iloc[1] is not pd.NA
+
+
+def test_to_safe_types_string_dtypes():
+    # Every string-like dtype ends up as pandas' default str dtype, including the pd.NA-based "string"
+    df = pd.DataFrame(
+        {
+            "string_col": pd.Series(["a", None], dtype="string"),
+            "str_col": pd.Series(["a", None], dtype="str"),
+        }
+    )
+    df_safe = repack.to_safe_types(df)
+    assert (df_safe.dtypes == "str").all()
+    assert df_safe["string_col"].dtype == df_safe["str_col"].dtype

@@ -123,7 +123,7 @@ def run(dest_dir: str) -> None:
     tb = add_regions(tb, ds_regions)
 
     # Correct former country names
-    tb.country = tb.country.astype("string")
+    tb.country = tb.country.astype("str")
 
     paths.log.info("finish handling former countries West Germany and Sudan (former)")
     tb.loc[(tb["country"] == "Germany") & (tb["year"] <= YEAR_GERMANY), "country"] = "West Germany"

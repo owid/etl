@@ -19,11 +19,11 @@ import numpy as np
 import owid.catalog.core.processing as pr
 import pandas as pd
 import structlog
-from detected_anomalies import handle_anomalies
 from owid import repack  # ty: ignore
 from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
 from owid.catalog.core import utils, warnings
 from owid.datautils import dataframes
+from shared_detected_anomalies import handle_anomalies
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
@@ -543,6 +543,8 @@ def harmonize_elements(
                 tb[element_col] = tb[element_col].cat.add_categories(amendment["new_fao_element"])
             if unit_col is not None and amendment["new_fao_unit"] not in tb[unit_col].cat.categories:
                 tb[unit_col] = tb[unit_col].cat.add_categories(amendment["new_fao_unit"])
+            # Without a copy, pandas 3 fails to write into the categoricals ("assignment destination is read-only").
+            tb = tb.copy()
 
             if unit_col is not None:
                 # Update element code, element name, and unit name.
@@ -1951,7 +1953,8 @@ def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) ->
         assert all(pivot.map(len) == 1)
         return pivot.map(lambda x: list(x)[0]).to_dict()  # ty: ignore
     else:
-        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # ty: ignore
+        # Sorted, since set order changes between runs.
+        return pivot.map(lambda x: "".join(sorted(x))).to_dict()  # ty: ignore
 
 
 def parse_amendments_table(amendments: Table, dataset_short_name: str):

@@ -224,7 +224,7 @@ def run(dest_dir: str) -> None:
 
         # drop empty columns
         tb_from_excel = tb_from_excel.drop(
-            columns=["Unnamed: 3", "Unnamed: 6", "Unnamed: 9", "Unnamed: 12"], axis=1, errors="raise"
+            columns=["Unnamed: 3", "Unnamed: 6", "Unnamed: 9", "Unnamed: 12"], errors="raise"
         )
 
         # change header and remove sub-header columns

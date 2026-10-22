@@ -30,7 +30,7 @@ def run() -> None:
         },
         "ged": {
             "index": ["id"],
-            "dtype": {"gwnoa": "string"},
+            "dtype": {"gwnoa": "str"},
         },
         "prio_armed_conflict": {
             "index": ["conflict_id", "year"],

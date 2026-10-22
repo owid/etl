@@ -1,0 +1,39 @@
+# WHO's population for Malta aged 85+ is far too small in 1973-1981: 500-800 people, against 1,500 in 1972 and
+# 2,900 in 1982 (recovered as All Causes deaths / death rate). Every rate WHO divides by it is inflated: the
+# age-standardized rates of every cause (cardiovascular diseases peak at 945 per 100,000 in 1981, then 481 in
+# 1982), and the 85+ death rates (All Causes 1981: 438 deaths in 500 people, 87,600 per 100,000). Death counts,
+# shares of deaths and the death rates of the other age bands are unaffected and kept.
+
+# Guard: fails once WHO fixes its population (the rate would fall to about 580), so this file is then revisited
+# rather than silently re-applied. Keep it first: the next entry blanks this cell, and `expect` would then fail.
+- indicator: death_rate_age_standardized
+  entity: Malta
+  years: [1981]
+  match: {sex: Both sexes, age_group: all ages, cause: Cardiovascular diseases}
+  action: override
+  value: null
+  expect: {gt: 800}
+  reason: &reason >-
+    WHO's population aged 85+ for Malta in 1973-1981 (500-800 people, against 1,500 in 1972 and 2,900 in 1982)
+    is impossibly small, which inflates the age-standardized rates and the 85+ death rates of every cause.
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate_age_standardized
+  entity: Malta
+  years: {from: 1973, to: 1981}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: death_rate
+  entity: Malta
+  years: {from: 1973, to: 1981}
+  match: {age_group: over 85 years}
+  action: override
+  value: null
+  reason: *reason
+  producer: WHO Mortality Database
+  status: open
