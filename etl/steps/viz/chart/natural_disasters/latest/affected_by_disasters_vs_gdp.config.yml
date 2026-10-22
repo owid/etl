@@ -11,7 +11,6 @@ views:
         - catalogPath: "natural_disasters_yearly#total_affected_per_100k_people_all_disasters_excluding_extreme_temperature_yearly"
           display:
             name: "People affected by disasters"
-            tolerance: 5
       x: "wdi#ny_gdp_pcap_pp_kd"
       color: "regions#owid_region"
     # timelineMaxTime is set in the .py step, from the EM-DAT release date.
