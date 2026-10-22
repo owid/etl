@@ -1,6 +1,6 @@
 """Chart of death rates from disasters vs. GDP per capita."""
 
-from shared import LAST_FULLY_REPORTED_YEAR
+from shared import get_last_fully_reported_year
 
 from etl.helpers import PathFinder
 
@@ -12,12 +12,14 @@ def run() -> None:
     # Load inputs.
     #
     config = paths.load_config()
+    tb = paths.load_dataset("natural_disasters").read("natural_disasters_yearly", load_data=False)
 
     #
     # Process data.
     #
+    view_config = config["views"][0]["config"]
     # End the timeline at the last fully reported year, like the natural disasters multidims.
-    config["views"][0]["config"]["timelineMaxTime"] = LAST_FULLY_REPORTED_YEAR
+    view_config["timelineMaxTime"] = get_last_fully_reported_year(tb)
 
     #
     # Save outputs.

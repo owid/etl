@@ -24,11 +24,11 @@ views:
           display:
             color: "#6d6d6d"
             numDecimalPlaces: 0
-    # timelineMaxTime is set in the .py step, from LAST_FULLY_REPORTED_YEAR in shared.py.
+    # timelineMaxTime is set in the .py step, and {{date_published}} in the note is filled in there, both from the EM-DAT release date.
     config:
       title: "Global number of reported disasters by size"
       subtitle: "‘Small’ events have 5 or fewer deaths, less than 1,500 people affected, or reported economic damages below US$13 million. ‘Large’ events have at least 50 deaths, more than 150,000 people affected, or reported economic damages of at least US$320 million. At least part of the increase in small and medium reported events is due to improved reporting over time."
-      note: "Data includes disasters reported up to April 2026."
+      note: "Data includes disasters reported up to {{date_published}}."
       originUrl: "/natural-disasters"
       hideRelativeToggle: false
       selectedFacetStrategy: "metric"

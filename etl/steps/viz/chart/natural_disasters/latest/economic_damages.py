@@ -5,16 +5,17 @@
 from shared import (
     ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE,
     ALL_DISASTERS_SUBTITLE,
-    COMMON_VIEW_CONFIG,
     DISASTER_DESCRIPTIONS,
     DISASTER_PHRASES,
     DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
     INDIVIDUAL_DISASTER_TYPES,
     NOTE,
-    STACKED_VIEW_CONFIG,
     add_total_indicator_for_map,
     apply_decadal_time_range,
     apply_disaster_colors,
+    get_common_view_config,
+    get_last_fully_reported_year,
+    get_stacked_view_config,
     prepare_table,
 )
 
@@ -80,6 +81,8 @@ def run() -> None:
     #
     # Process data.
     #
+    # End the timeline and pin the map at the last fully reported year, from the EM-DAT release date.
+    last_fully_reported_year = get_last_fully_reported_year(tb_yearly)
     # Sample the all-disasters aggregate description_key for grouped views (must
     # run before prepare_table drops the column). In the grapher channel this is a
     # markdown string — never wrap it in list(), which splits it into one bullet per character.
@@ -92,7 +95,7 @@ def run() -> None:
         config=config,
         tb=[tb_yearly, tb_decadal],
         indicator_names="value",
-        common_view_config=COMMON_VIEW_CONFIG,
+        common_view_config=get_common_view_config(last_fully_reported_year),
     )
     grouped_view_metadata = {
         "presentation": {"title_public": _title},
@@ -106,14 +109,14 @@ def run() -> None:
                 "dimension": "type",
                 "choice_new_slug": "all_stacked",
                 "choices": INDIVIDUAL_DISASTER_TYPES,
-                "view_config": STACKED_VIEW_CONFIG,
+                "view_config": get_stacked_view_config(last_fully_reported_year),
                 "view_metadata": grouped_view_metadata,
             },
             {
                 "dimension": "type",
                 "choice_new_slug": "all_disasters_excluding_extreme_temperature",
                 "choices": DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
-                "view_config": STACKED_VIEW_CONFIG,
+                "view_config": get_stacked_view_config(last_fully_reported_year),
                 "view_metadata": grouped_view_metadata,
             },
         ],

@@ -9,11 +9,11 @@ views:
     indicators:
       y:
         - "natural_disasters_global_by_type#total_damages"
-    # timelineMaxTime is set in the .py step, from LAST_FULLY_REPORTED_YEAR in shared.py.
+    # timelineMaxTime is set in the .py step, and {{date_published}} in the note is filled in there, both from the EM-DAT release date.
     config:
       title: "Global damage costs from natural disasters"
       subtitle: "Total economic cost of damages as a result of global natural disasters in any given year, measured in current US$. Includes those from drought, floods, extreme weather, extreme temperature, landslides, dry mass movements, wildfires, volcanic activity and earthquakes."
-      note: "Data includes disasters reported up to April 2026. The latest year may be incomplete due to reporting delays."
+      note: "Data includes disasters reported up to {{date_published}}. The latest year may be incomplete due to reporting delays."
       originUrl: "/natural-disasters"
       chartTypes:
         - "StackedBar"

@@ -14,7 +14,7 @@ views:
             tolerance: 5
       x: "wdi#ny_gdp_pcap_pp_kd"
       color: "regions#owid_region"
-    # timelineMaxTime is set in the .py step, from LAST_FULLY_REPORTED_YEAR in shared.py.
+    # timelineMaxTime is set in the .py step, from the EM-DAT release date.
     config:
       title: "Deaths rates from disasters vs. GDP per capita"
       subtitle: "Death rates are measured per 100,000 people. Disasters include all geophysical, meteorological and climate events including earthquakes, volcanic activity, landslides, drought, wildfires, storms, and flooding. GDP per capita is adjusted for inflation and differences in living costs between countries."

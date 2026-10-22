@@ -11,11 +11,11 @@ views:
         - catalogPath: "natural_disasters_global_by_type#total_damages"
           display:
             tolerance: 5
-    # timelineMaxTime is set in the .py step, from LAST_FULLY_REPORTED_YEAR in shared.py.
+    # timelineMaxTime is set in the .py step, and {{date_published}} in the note is filled in there, both from the EM-DAT release date.
     config:
       title: "Economic damage by natural disaster type"
       subtitle: "Global economic damage from natural disasters, differentiated by disaster category and measured in US$ per year. It is not adjusted for inflation."
-      note: "Data includes disasters reported up to April 2026. The latest year may be incomplete due to reporting delays."
+      note: "Data includes disasters reported up to {{date_published}}. The latest year may be incomplete due to reporting delays."
       originUrl: "/natural-disasters"
       chartTypes:
         - "StackedBar"
