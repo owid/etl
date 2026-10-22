@@ -378,6 +378,28 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+# Sanity checks: plausible value ranges per indicator (well outside the observed ranges, to catch unit slips or parsing errors).
+VALUE_BOUNDS = {
+    "period": {
+        **{col: (0, 10) for col in ["tfr", "tfr40", "adjtfr", "patfr"]},
+        **{col: (12, 55) for col in ["mab", "mab40", "tmab"]},
+        **{col: (0, 15) for col in ["sdmab", "sdmab40"]},
+        "cbr": (0, 80),
+    },
+    "cohort": {
+        **{col: (0, 10) for col in ["ccf", "ccf40", "ccf_plus15y", "ccf_plus30y"]},
+        **{col: (12, 55) for col in ["cmab", "cmab40"]},
+        **{col: (0, 15) for col in ["sdcmab", "sdcmab40"]},
+        "ppr": (0, 1),
+    },
+    "period_ages": {"asfr_period": (0, 1)},
+    "cohort_ages": {"asfr_cohort": (0, 1), "ccfr_cohort": (0, 10)},
+    "period_ages_years": {"asfr_period": (0, 1)},
+    "cohort_ages_years": {"asfr_cohort": (0, 1), "ccfr_cohort": (0, 10)},
+}
+# NOTE: Number of countries in the 2026 release. A drop usually means a parsing or mapping regression; check before lowering.
+MIN_COUNTRIES = 39
+
 # CONFIG
 COLUMN_RAW = "column_raw"
 COLUMN_IND = "indicator_name"
@@ -627,6 +649,7 @@ def run() -> None:
         tb_cohort_years,
         tb_share_women,
     ]
+    sanity_check_outputs(tables)
 
     #
     # Save outputs.
@@ -640,6 +663,42 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_outputs(tables) -> None:
+    """Check value ranges, internal consistency, and coverage of the output tables."""
+    tbs = {tb.m.short_name: tb.reset_index() for tb in tables}
+
+    # Values within plausible bounds.
+    for tname, bounds in VALUE_BOUNDS.items():
+        tb = tbs[tname]
+        for col, (lo, hi) in bounds.items():
+            values = tb[col].astype(float)
+            bad = tb.loc[(values < lo) | (values > hi), ["country", col]]
+            assert bad.empty, f"{tname}.{col} outside [{lo}, {hi}]:\n{bad.head(10)}"
+
+    # Shares of women by number of births add up to 100% for each (country, cohort).
+    totals = tbs["cohort_share_women"].groupby(["country", "cohort"])["share_women"].sum()
+    bad = totals[(totals - 100).abs() > 0.01]
+    assert bad.empty, f"Shares of women by number of births don't add up to 100%:\n{bad.head(10)}"
+
+    # Period TFR equals the sum of its birth-order components, where all of them are available.
+    tb = tbs["period"]
+    tfr_total = tb[tb["birth_order"] == "total"].set_index(["country", "year"])["tfr"].astype(float)
+    tfr_sum = (
+        tb[tb["birth_order"].isin(["1", "2", "3", "4", "5p"])]
+        .groupby(["country", "year"])["tfr"]
+        .sum(min_count=5)
+        .astype(float)
+    )
+    diff = (tfr_total - tfr_sum).dropna().abs()
+    assert (diff < 0.01).all(), f"Period TFR doesn't match the sum of its birth orders:\n{diff[diff >= 0.01].head(10)}"
+
+    # Coverage didn't shrink.
+    num_countries = tbs["period"]["country"].nunique()
+    assert num_countries >= MIN_COUNTRIES, (
+        f"Only {num_countries} countries in the period table (expected {MIN_COUNTRIES}+)."
+    )
 
 
 def make_table_list(
