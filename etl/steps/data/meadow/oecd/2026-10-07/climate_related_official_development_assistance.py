@@ -48,6 +48,7 @@ COLUMNS_TOTALS = {
 }
 COLUMNS_ACTIVITIES = {
     "MD_ID": "activity_id",
+    "DONOR_AGENCY": "donor_agency",
     "DONOR": "donor_code",
     "RECIPIENT": "recipient_code",
     "SECTOR": "sector_code",
@@ -55,6 +56,19 @@ COLUMNS_ACTIVITIES = {
     "SCORE": "score",
     "CLIMATE_MITIGATION": "climate_mitigation_score",
     "CLIMATE_ADAPTATION": "climate_adaptation_score",
+    "TIME_PERIOD": "year",
+    "OBS_VALUE": "value",
+}
+
+# Columns to keep from the project-level rows of EU institutions (at all scores of the mitigation marker), and their
+# new names. The agency identifies the projects of the European Investment Bank.
+COLUMNS_EU_INSTITUTIONS = {
+    "MD_ID": "activity_id",
+    "DONOR_AGENCY": "donor_agency",
+    "DONOR": "donor_code",
+    "RECIPIENT": "recipient_code",
+    "SECTOR": "sector_code",
+    "SCORE": "score",
     "TIME_PERIOD": "year",
     "OBS_VALUE": "value",
 }
@@ -84,6 +98,7 @@ def run() -> None:
     # Load data from snapshots.
     tables_totals = [snap.read_in_archive(file_name, low_memory=False) for file_name in FILES_TOTALS]
     tb_activities = snap.read_in_archive("activities.csv", low_memory=False)
+    tb_eu = snap.read_in_archive("eu_institutions_activities.csv", low_memory=False)
     tb_bilateral = snap_crs.read(low_memory=False)
     # Names of codes and groups are in SDMX XML files.
     with zipfile.ZipFile(snap.path) as zf:
@@ -97,6 +112,9 @@ def run() -> None:
     for file_name, tb in zip(FILES_TOTALS, tables_totals):
         sanity_check_fixed_dimensions(tb=tb, name=file_name, expected=EXPECTED_FIXED_VALUES)
     sanity_check_fixed_dimensions(tb=tb_activities, name="activities.csv", expected=EXPECTED_FIXED_VALUES)
+    sanity_check_fixed_dimensions(
+        tb=tb_eu, name="EU institutions", expected={**EXPECTED_FIXED_VALUES, "DONOR": "4EU001", "MARKER": 20}
+    )
     sanity_check_fixed_dimensions(tb=tb_bilateral, name="CRS totals", expected=EXPECTED_FIXED_VALUES_CRS)
 
     # Step 2: Total bilateral ODA (CRS). Its two queries share one series (all DAC members to all developing countries),
@@ -125,12 +143,17 @@ def run() -> None:
     tb_activities = tb_activities[list(COLUMNS_ACTIVITIES)].rename(columns=COLUMNS_ACTIVITIES, errors="raise")
     tb_activities = tb_activities.astype({"sector_code": "str"})
 
+    # Step 5: Project-level rows of EU institutions, at all scores of the mitigation marker.
+    tb_eu = tb_eu[list(COLUMNS_EU_INSTITUTIONS)].rename(columns=COLUMNS_EU_INSTITUTIONS, errors="raise")
+    tb_eu = tb_eu.astype({"sector_code": "str"})
+
     # Store codes as categoricals, to keep the large tables small.
     for tb in [tb_totals, tb_activities]:
-        for column in ["donor_code", "recipient_code", "sector_code"]:
-            tb[column] = tb[column].astype("category")
+        for column in ["donor_code", "recipient_code", "sector_code", "donor_agency"]:
+            if column in tb.columns:
+                tb[column] = tb[column].astype("category")
 
-    # Step 5: Names of donors, recipients and sectors (with the hierarchy of sectors).
+    # Step 6: Names of donors, recipients and sectors (with the hierarchy of sectors).
     tb_codes = snap.read_from_records(extract_codelists(structure=structure))
     assert set(tb_codes["codelist"]) == set(CODELISTS.values()), "Missing codelists in the structure."
     # Hierarchy of groups of recipients and donors: each group with its direct members.
@@ -142,6 +165,7 @@ def run() -> None:
     tables = [
         tb_totals.format(keys, short_name="totals"),
         tb_activities.format(["activity_id"], short_name="activities"),
+        tb_eu.format(["activity_id"], short_name="eu_institutions_activities"),
         tb_codes.format(["codelist", "code"], short_name="codes"),
         tb_groups.format(["hierarchy", "parent_code", "child_code"], short_name="groups"),
         tb_bilateral.format(["donor_code", "recipient_code", "year"], short_name="bilateral_totals"),
