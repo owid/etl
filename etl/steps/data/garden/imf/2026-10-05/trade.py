@@ -187,6 +187,11 @@ def run() -> None:
         else:
             tb[column].metadata.origins = tb_long["value"].metadata.origins
 
+    # Order the top-partner categories for chart legends: most frequent first, "Other" last.
+    for column in ["top_partner_category", "top_export_partner_category"]:
+        tb[column].metadata.type = "ordinal"
+        tb[column].metadata.sort = _top_partner_order(tb, column)
+
     # Keep float64 values, as in meadow (repacking would round totals in the trillions to float32).
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata, repack=False)
     ds_garden.save()
@@ -427,6 +432,15 @@ def get_top_partner(tb: Table) -> Table:
 
     out["counterpart_country"] = "World"
     return out
+
+
+def _top_partner_order(tb: Table, column: str) -> list[str]:
+    """Categories ordered by how many countries have them as top partner (as in the top-10 selection), "Other" last."""
+    categories = tb.reset_index()[["country", column]].dropna()
+    counts = categories[categories[column] != "Other"].groupby(column)["country"].nunique()
+    order = counts.sort_values(ascending=False, kind="stable").index.tolist()
+    assert "Other" in set(categories[column]), f"Expected an 'Other' category in {column}."
+    return order + ["Other"]
 
 
 def get_top_export_partner(tb: Table) -> Table:
