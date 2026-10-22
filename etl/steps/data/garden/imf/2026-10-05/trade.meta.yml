@@ -307,12 +307,12 @@ tables:
           - This indicator shows which country was the largest source of imports for each country–year, based on import values in current US dollars.
           - *cif_basis
           - *goods_only
-          - The ten partners that are the largest source of imports for the most countries are shown by name. All other partners are grouped as "Other".
+          - The ten partners that are the largest source of imports for the most countries are shown by name. All other partners are grouped as "Other", and hovering over a country shows which partner it is.
         presentation:
           title_public: Top import partner category
           grapher_config:
-            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "Other".
-        description_processing: For each country and year, we identified the partner country with the largest value of imports of goods. We then counted for how many countries each partner was ever the largest source of imports. The ten partners with the highest counts are shown individually, and all others are grouped as "Other".
+            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "Other" (hover over a country to see which partner it is).
+        description_processing: For each country and year, we identified the partner country with the largest value of imports of goods. We then counted for how many countries each partner was ever the largest source of imports. The ten partners with the highest counts are shown individually, and all others are grouped as "Other", with the partner's name in brackets.
         display:
           name: Top import partner
           numDecimalPlaces: 0
@@ -329,12 +329,12 @@ tables:
           - This indicator shows which country was the largest destination for exports from each country–year, based on export values in current US dollars.
           - *fob_basis
           - *goods_only
-          - The ten partners that are the largest export destination for the most countries are shown by name. All other partners are grouped as "Other".
+          - The ten partners that are the largest export destination for the most countries are shown by name. All other partners are grouped as "Other", and hovering over a country shows which partner it is.
         presentation:
           title_public: Top export partner category
           grapher_config:
-            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "Other".
-        description_processing: For each country and year, we identified the partner country with the largest value of exports of goods. We then counted for how many countries each partner was ever the largest export destination. The ten partners with the highest counts are shown individually, and all others are grouped as "Other".
+            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "Other" (hover over a country to see which partner it is).
+        description_processing: For each country and year, we identified the partner country with the largest value of exports of goods. We then counted for how many countries each partner was ever the largest export destination. The ten partners with the highest counts are shown individually, and all others are grouped as "Other", with the partner's name in brackets.
         display:
           name: Top export partner
           numDecimalPlaces: 0
