@@ -275,7 +275,7 @@ def complete_series_years(tb: Table) -> Table:
     the empty years too. This reproduces the panel of the IMF's wide download, used in previous versions.
     """
     series = tb[["country", "indicator", "counterpart_country"]].drop_duplicates()
-    years = Table(pd.DataFrame({"year": range(tb["year"].min(), tb["year"].max() + 1)}))
+    years = pr.read_from_records([(year,) for year in range(tb["year"].min(), tb["year"].max() + 1)], columns=["year"])
     grid = pr.merge(series, years, how="cross")
     tb = pr.merge(grid, tb, on=["country", "indicator", "counterpart_country", "year"], how="left")
 
