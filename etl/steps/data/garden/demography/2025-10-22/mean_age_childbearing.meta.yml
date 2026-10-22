@@ -2,6 +2,8 @@
 definitions:
   common:
     processing_level: major
+    display:
+      numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Fertility Rate

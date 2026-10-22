@@ -1,0 +1,36 @@
+grapher_schema: "011"
+chart_config_id: 01935484-72ba-798c-ba48-6d0bb68da290
+slug: standard-deviation-in-age-of-mothers-at-birth
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#sdmab__birth_order_total
+          display:
+            name: All
+        - catalogPath: period#sdmab__birth_order_1
+          display:
+            name: First birth
+        - catalogPath: period#sdmab__birth_order_2
+          display:
+            name: Second birth
+        - catalogPath: period#sdmab__birth_order_3
+          display:
+            name: Third birth
+        - catalogPath: period#sdmab__birth_order_4
+          display:
+            name: Fourth birth
+        - catalogPath: period#sdmab__birth_order_5p
+          display:
+            name: Fifth birth or more
+    config:
+      title: Standard deviation in age of mothers at birth
+      hasMapTab: true
+      selectedEntityNames:
+        - United States
+      selectedFacetStrategy: metric
+      yAxis:
+        min: 0

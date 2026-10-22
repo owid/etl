@@ -246,6 +246,50 @@ steps:
     - data://garden/hmd/2026-10-22/hfd:
         - data://meadow/hmd/2026-10-22/hfd:
             - snapshot://hmd/2026-10-22/hfd.zip
+  #
+  # Human Fertility Database charts — authored in ETL.
+  #
+  viz://chart/hmd/latest/age_adjusted_total_fertility_rate_after_a_given_number_of_births:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/average_age_of_mothers_birth_cohort:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/births_and_deaths:
+    - data://grapher/hmd/2026-10-22/hfd
+    - data://grapher/hmd/2025-10-22/hmd
+  viz://chart/hmd/latest/cohort_fertility_rate:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/cohort_fertility_rate_by_age:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/cohort_fertility_rate_completed_and_by_age_40:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/crude_birth_rate_hfd:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/cumulative_cohort_fertility_rate_by_age:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/period_age_specific_fertility_rate:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/period_average_age_of_mothers_birth_order:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/period_total_fertility_rate:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/period_versus_tempo_adjusted_total_fertility_rate:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/share_of_women_having_births:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/share_of_women_who_have_had_no_births_across_their_childbearing_years:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/standard_deviation_in_age_of_mothers_at_birth:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/tempo_adjusted_total_fertility_rate_by_birth_order:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/total_fertility_rate_vs_cohort_fertility_rate_vs_tempo_adjusted_tfr:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/total_live_births_hfd:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/total_number_of_births_by_birth_order:
+    - data://grapher/hmd/2026-10-22/hfd
+  viz://chart/hmd/latest/women_who_have_next_birth_parity_progression_ratio:
+    - data://grapher/hmd/2026-10-22/hfd
 
   # Multiple births
   data://grapher/demography/2024-11-26/multiple_births:
@@ -258,6 +302,23 @@ steps:
     - data://garden/demography/2025-10-22/fertility_rate:
         - data://garden/hmd/2026-10-22/hfd
         - data://garden/un/2024-07-12/un_wpp
+  #
+  # Fertility rate (OMM) charts — authored in ETL.
+  #
+  viz://chart/demography/latest/age_of_mothers_at_childbirth_by_year:
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/children_born_per_woman:
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/comparison_of_fertility_rates:
+    - data://grapher/demography/2025-10-22/efr_malani_jacob
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/fertility_rate_complete_gapminder:
+    - data://grapher/demography/2025-10-22/fertility_rate
+  viz://chart/demography/latest/fertility_rate_vs_mean_years_of_schooling:
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/demography/2025-10-22/fertility_rate
+    - data://grapher/education/2023-07-17/education_barro_lee_projections
+    - data://grapher/regions/2023-01-01/regions
 
   # OMM: Birth rate -- HMD + UN WPP
   data://grapher/demography/2025-10-22/birth_rate:
@@ -297,6 +358,11 @@ steps:
     - data://garden/demography/2025-10-22/mean_age_childbearing:
         - data://garden/un/2024-07-12/un_wpp
         - data://garden/hmd/2026-10-22/hfd
+  #
+  # Mean age at childbearing (OMM) charts — authored in ETL.
+  #
+  viz://chart/demography/latest/period_average_age_of_mothers:
+    - data://grapher/demography/2025-10-22/mean_age_childbearing
 
   ########################################################################
   # Mortality                                                            #
