@@ -362,3 +362,26 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/pew/latest/religious_composition:
     - data://grapher/pew/2025-10-31/religious_composition
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://meadow/hmd/2025-10-22/hfd:
+    - snapshot://hmd/2025-10-22/hfd.zip
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://grapher/demography/2025-10-22/mean_age_childbearing:
+    - data://garden/demography/2025-10-22/mean_age_childbearing
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://garden/demography/2025-10-22/fertility_rate:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2025-10-22/hfd
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://garden/hmd/2025-10-22/hfd:
+    - data://meadow/hmd/2025-10-22/hfd
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://grapher/hmd/2025-10-22/hfd:
+    - data://garden/hmd/2025-10-22/hfd
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://grapher/demography/2025-10-22/fertility_rate:
+    - data://garden/demography/2025-10-22/fertility_rate
+  # archived; last active in c1c01bba8497 on 2026-10-22
+  data://garden/demography/2025-10-22/mean_age_childbearing:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2025-10-22/hfd
