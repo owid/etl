@@ -2,6 +2,7 @@ grapher_schema: "011"
 # Identity of the chart in grapher (`charts.configId`) — this is the chart that
 # already existed at /grapher/effective-fertility-rates-malani-and-jacob before it moved to ETL.
 chart_config_id: "0193e5ba-72b1-7c3a-a9fe-fca50873aff5"
+slug: effective-fertility-rates-malani-and-jacob
 topic_tags:
   - "Fertility Rate"
 dimensions: []

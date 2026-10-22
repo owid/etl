@@ -90,3 +90,25 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/natural_disasters/latest/deaths:
     - data://grapher/emdat/2026-04-30/natural_disasters
+  # archived; last active in 330554d87429 on 2026-10-21
+  data://grapher/emdat/2026-04-30/natural_disasters_impact:
+    - data://garden/emdat/2026-04-30/natural_disasters
+  # archived; last active in 330554d87429 on 2026-10-21
+  data://garden/emdat/2026-04-30/natural_disasters:
+    - data://garden/worldbank_wdi/2026-07-27/wdi
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/emdat/2026-04-30/natural_disasters
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 330554d87429 on 2026-10-21
+  data://meadow/emdat/2026-04-30/natural_disasters:
+    - snapshot://emdat/2026-04-30/natural_disasters.xlsx
+  # archived; last active in 330554d87429 on 2026-10-21
+  data://grapher/emdat/2026-04-30/natural_disasters:
+    - data://garden/emdat/2026-04-30/natural_disasters
+  # archived; last active in 330554d87429 on 2026-10-21
+  data://grapher/emdat/2026-04-30/natural_disasters_global_by_deaths:
+    - data://garden/emdat/2026-04-30/natural_disasters
+  # archived; last active in 330554d87429 on 2026-10-21
+  data://grapher/emdat/2026-04-30/natural_disasters_global_by_type:
+    - data://garden/emdat/2026-04-30/natural_disasters

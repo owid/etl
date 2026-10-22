@@ -28,10 +28,10 @@ steps:
     - data://garden/ggdc/2025-10-09/penn_world_table
 
       # IMF World Economic Outlook
-  data://grapher/imf/2026-04-22/world_economic_outlook:
-    - data://garden/imf/2026-04-22/world_economic_outlook:
-      - data://meadow/imf/2026-04-22/world_economic_outlook:
-        - snapshot://imf/2026-04-22/world_economic_outlook.csv
+  data://grapher/imf/2026-10-20/world_economic_outlook:
+    - data://garden/imf/2026-10-20/world_economic_outlook:
+      - data://meadow/imf/2026-10-20/world_economic_outlook:
+        - snapshot://imf/2026-10-20/world_economic_outlook.csv
 
   #
   # Average working hours - Huberman and Minns (2007)
