@@ -6,11 +6,11 @@ definitions:
     processing_level: minor
     description_key:
       - In this data, pension entitlements are the pensions that people have already earned, valued today. They include the remaining pensions of people who are already retired and the pensions that today’s workers have earned through the contributions they have paid so far. Pension rights that people will earn in the future are not included.
-      - The data covers old-age pensions as well as survivor and disability pensions, in all social insurance schemes, which are financed by contributions. That includes state pensions run as social security, pension schemes for government employees, and private workplace and personal pension schemes. Pensions that count as social assistance, such as those paid out of general taxes to residents regardless of the contributions they paid, are not included. For example, Denmark’s state pension is left out, which is why Denmark’s total is low.
-      - Unfunded government schemes, which include social security and some pension schemes for government employees, pay pensions out of future contributions and taxes rather than from savings set aside. Private and funded schemes are mostly backed by assets, such as those held by pension funds.
-      - The values are estimates of what future pension payments are worth today. They depend on assumptions about future wages, life expectancy, and, above all, the discount rate used to convert future payments into today’s money. Eurostat uses a discount rate of 4% (2% after inflation) for most countries, but 4.5% for Poland and Romania and 5% for Hungary, which makes their values lower. According to Eurostat, moving from a 5% to a 4% discount rate raises entitlements by roughly 15% to 20%.
+      - The data covers old-age pensions as well as survivor and disability pensions, in all social insurance schemes, which are financed by contributions. That includes state pensions run as social security, pension schemes for government employees, and private schemes that people join through their work or that the government requires or encourages them to join. Retirement savings that people take out on their own count as life insurance and are not included. Neither are pensions that count as social assistance, such as those paid out of general taxes to residents regardless of the contributions they paid. Denmark, for example, leaves out its state pension, as well as the workplace pensions run by its life insurance companies, which is why Denmark’s total is low.
+      - Unfunded government schemes, which include social security and some pension schemes for government employees, mostly pay pensions out of future contributions and taxes rather than from savings set aside. Private and funded schemes are mostly backed by assets, such as those held by pension funds.
+      - The values are estimates of what future pension payments are worth today. They depend on assumptions about future wages, life expectancy, and, above all, the discount rate used to convert future payments into today’s money. For government schemes, countries use the rate Eurostat recommends, which is 2% after inflation from 2016 onward and 3% after inflation up to 2015. Private schemes use the rates of their own accounts. According to Eurostat, moving from a 5% to a 4% discount rate before inflation raises entitlements by roughly 15% to 20%.
       - These entitlements are not part of government debt, and they don’t measure whether public finances are sustainable, because they leave out the pension rights people will earn in the future.
-      - Countries report this data every three years, for 2015, 2018 and 2021 so far, and some report other years voluntarily. Eurostat notes that the assumptions behind the estimates change between rounds, so the values are hard to compare over time.
+      - Countries report this data every three years, for 2015, 2018, and 2021 so far, and some report other years voluntarily. Eurostat doesn’t recalculate earlier rounds when the assumptions change, and advises against reading the rounds as a time series. For example, much of the rise between 2015 and 2018 comes from the lower discount rate used from 2016 onward.
     presentation:
       topic_tags:
         - Government Spending
@@ -20,12 +20,14 @@ definitions:
       numDecimalPlaces: 0
       tolerance: 0
   description_processing_from_currency: |-
-    Eurostat publishes this type of scheme in national currency only. We express it as a share of GDP, using the GDP implied by Eurostat’s own figures for all schemes, in national currency and as a share of GDP. Because Eurostat rounds that share to whole percentages, the result can differ slightly from a calculation with official GDP figures.
+    Eurostat publishes this type of scheme in national currency only. We express it as a share of GDP, using the GDP implied by Eurostat’s own figures for all schemes, in national currency and as a share of GDP. That keeps the result consistent with Eurostat’s published shares, but it can differ from a calculation with the latest official GDP figures.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 1095
+  # NOTE: Countries report every three years, but the 2024 round is due in early 2027, so this is set to catch it.
+  # After that update, set it to 1095.
+  update_period_days: 180
   owners:
     - Bertha Rohenkohl
 
@@ -116,7 +118,7 @@ tables:
           tolerance: 0
       private_share_gdp:
         title: Pension entitlements in private schemes as a share of GDP
-        description_short: Value today of the pensions that people have already earned in private workplace and personal pension schemes, as a share of GDP.
+        description_short: Value today of the pensions that people have already earned in private pension schemes they join through their work or that the government requires or encourages them to join, as a share of GDP.
         processing_level: major
         description_processing: "{definitions.description_processing_from_currency}"
         presentation:

@@ -22,8 +22,8 @@ redraws them without hand edits:
 - the countries left out of the full frame because they publish their two parts but no total (Romania in
   2021), named in the Note;
 - the Note's flag sentences, from Eurostat's flags on the values shown ("p" provisional, "d" different
-  definition, "e" estimated, "b" break in series), and the discount-rate sentence for the countries shown
-  whose rate differs from the base case (`DISCOUNT_RATES`, from Eurostat's metadata).
+  definition, "e" estimated, "b" break in series), and the discount rate after inflation that Eurostat
+  recommends for government schemes in that year (`real_discount_rate`, from Eurostat's metadata).
 
 Render:  .venv/bin/etlr viz://static/eurostat/2026-10-23/pension_entitlements_by_country
 Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
@@ -121,11 +121,13 @@ SELECTION = [
 # NOTE: Countries report every three years (2015, 2018, 2021; 2024 is due in early 2027). Check that the
 # threshold still picks the latest full round.
 MIN_COUNTRIES_PER_YEAR = 25
-# Eurostat's base-case discount rate, and the countries that use a different one (Eurostat's metadata,
-# https://ec.europa.eu/eurostat/cache/metadata/en/nasa_10_pens_esms.htm). A higher rate lowers the values.
-# NOTE: Re-check both against the metadata at each update.
-BASE_DISCOUNT_RATE = 4
-DISCOUNT_RATES = {"Hungary": 5, "Poland": 4.5, "Romania": 4.5}
+# Discount rate after inflation that Eurostat recommends for government schemes: 3% up to 2015 and 2% afterward
+# (https://ec.europa.eu/eurostat/cache/metadata/en/nasa_10_pens_esms.htm). Countries' rates before inflation differ
+# only by their inflation targets (4% in most, 4.5% in Poland and Romania, 5% in Hungary), so the Note gives the
+# rate after inflation, which they share.
+# NOTE: Re-check both rates against the metadata at each update.
+REAL_DISCOUNT_RATE_UP_TO_2015 = 3
+REAL_DISCOUNT_RATE_AFTER_2015 = 2
 # How the Note says each Eurostat flag, for one value ("total") or several ("figures").
 FLAG_PHRASES = {
     "p": ("is provisional", "are provisional"),
@@ -281,7 +283,7 @@ def run() -> None:
     for name, layout in LAYOUTS.items():
         shown = select_countries(tb, layout["countries"])
         not_shown = without_total if layout["countries"] is None else []
-        note = build_note(shown, len(tb), not_shown, tb_flags)
+        note = build_note(shown, len(tb), not_shown, tb_flags, year)
         fig = build(shown, layout, source, note)
         export_frame(paths, fig, name, template=layout["template"])
         plt.close(fig)
@@ -296,8 +298,6 @@ def sanity_check_inputs(tb: Table) -> None:
     rows = tb[part_columns + [TOTAL_COLUMN]].dropna()
     gap = (rows[part_columns].sum(axis=1) - rows[TOTAL_COLUMN]).abs()
     assert (gap <= ROUNDING_TOLERANCE).all(), f"Parts do not add up in rows {rows.index[gap > ROUNDING_TOLERANCE].tolist()}."
-    unknown_rates = set(DISCOUNT_RATES) - set(tb["country"])
-    assert not unknown_rates, f"Discount rates set for countries not in the data: {unknown_rates}"
 
 
 def latest_reporting_year(tb: Table) -> int:
@@ -324,24 +324,23 @@ def select_countries(tb: Table, countries: list[str] | None) -> Table:
     return tb[tb["country"].isin(countries)].reset_index(drop=True)
 
 
-def build_note(shown: Table, n_with_total: int, not_shown: list[str], tb_flags: Table) -> str:
-    """The Note: what the frame leaves out, the discount rates that differ, and Eurostat's flags."""
+def real_discount_rate(year: int) -> float:
+    """The discount rate after inflation Eurostat recommends for government schemes in a given year."""
+    return REAL_DISCOUNT_RATE_UP_TO_2015 if year <= 2015 else REAL_DISCOUNT_RATE_AFTER_2015
+
+
+def build_note(shown: Table, n_with_total: int, not_shown: list[str], tb_flags: Table, year: int) -> str:
+    """The Note: what the frame leaves out, the discount rate behind the values, and Eurostat's flags."""
     countries = list(shown["country"])
     sentences = []
     # What the frame leaves out.
     if len(shown) < n_with_total:
         sentences.append(f"This chart shows {len(shown)} of the {n_with_total} countries with data")
-    # Discount rates other than the base case, highest first; a higher rate lowers the values.
-    rates = sorted(
-        ((rate, country) for country, rate in DISCOUNT_RATES.items() if country in countries),
-        key=lambda pair: (-pair[0], pair[1]),
+    # The discount rate behind the values of government schemes, which matters most to the estimates.
+    sentences.append(
+        f"Eurostat values future pensions in government schemes with a discount rate of {real_discount_rate(year):g}% "
+        "after inflation; a lower rate would give higher values"
     )
-    if rates:
-        exceptions = join_words([f"{rate:g}% for {country}" for rate, country in rates])
-        sentences.append(
-            f"Eurostat values future pensions with a {BASE_DISCOUNT_RATE:g}% discount rate, but {exceptions}, "
-            "which lowers their values"
-        )
     # Eurostat's flags on the values shown, in ranking order.
     flagged = []
     for country in countries:

@@ -487,10 +487,10 @@ z
    <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="737.6445" transform="rotate(-0 11.52 737.6445)">Note:</text>
   </g>
   <g id="note-rest">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="36.078188" y="737.6445" transform="rotate(-0 36.078188 737.6445)">Eurostat values future pensions with a 4% discount rate, but 5% for Hungary and 4.5% for Poland, which lowers their values.</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="36.078188" y="737.6445" transform="rotate(-0 36.078188 737.6445)">Eurostat values future pensions in government schemes with a discount rate of 2% after inflation; a lower rate would give higher</text>
   </g>
   <g id="note-line2">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="747.7245" transform="rotate(-0 11.52 747.7245)">Austria’s total uses a different definition, and Germany’s figures are provisional. Romania is not shown, as it reports no total.</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="747.7245" transform="rotate(-0 11.52 747.7245)">values. Austria’s total uses a different definition, and Germany’s figures are provisional. Romania is not shown, as it reports no total.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="760.6845" transform="rotate(-0 11.52 760.6845)">Data source: Eurostat (2026)</text>
