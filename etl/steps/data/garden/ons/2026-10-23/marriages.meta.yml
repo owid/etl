@@ -32,7 +32,7 @@ tables:
         description_key:
           - The data covers marriages registered in England and Wales. It doesn’t include marriages of residents that take place abroad, so the true share of people who have ever married could be higher.
           - From 2014, people who married a same-sex partner also count as ever married. The first same-sex weddings in England and Wales took place on March 29, 2014.
-          - Same-sex couples who converted their civil partnership into a marriage count as ever married. The ONS doesn’t know whether they had been married before their civil partnership, so it assumes they hadn’t.
+          - Same-sex couples who converted their civil partnership into a marriage count as ever married.
           - A new law raised the minimum age of marriage to 18 in February 2023. Before that, people aged 16 and 17 could marry with their parents’ consent, and those marriages are included in this data.
         description_from_producer: |-
           Marriage statistics are derived from information recorded when marriages are legally registered as part of civil registration.
@@ -41,7 +41,7 @@ tables:
 
           Ages are presented in 'exact years', so the figures should be interpreted as the proportion per 1,000 men or women that have married up to that actual birthday. So 'by age 30' represents marriages up to the last day a person is 29 (the day before their 30th birthday).
 
-          For tables 14a, 14b, 15a and 15b, from 2014 marriage statistics onwards, ever married will include people entering into a marriage with either an opposite sex or a same sex partner. Same-sex couples converting their civil partnership into a marriage will be included with ever married because previous marital status is unknown; therefore within this table we are assuming a previous marital status (before civil partnership) of never married or civil partnered.
+          From 2014 marriage statistics onwards, ever married will include people entering into a marriage with either an opposite sex or a same sex partner. Same-sex couples converting their civil partnership into a marriage will be included with ever married because previous marital status is unknown; therefore within this table we are assuming a previous marital status (before civil partnership) of never married or civil partnered.
         processing_level: minor
         presentation:
           title_public: Share of people born in << birth_cohort >> who had ever married, by age
