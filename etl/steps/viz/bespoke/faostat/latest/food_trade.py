@@ -101,6 +101,8 @@ def run() -> None:
         columns={"Bilateral trade flow": tb["value"]},
         update_period_days=ds.metadata.update_period_days,
     )
+    # Leave the origins out of the feed.
+    del feed_metadata["origins"]
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
