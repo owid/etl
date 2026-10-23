@@ -1061,13 +1061,18 @@ Workflow when the user agrees:
    ```
    Convert the relocated new entries to nested while reordering, so the active and archived blocks match. Verify it parses with `.venv/bin/python -c "from etl.dag_helpers import load_dag; load_dag()"` (a malformed nesting raises).
 
-   **When only some snapshots bumped, re-declare the unchanged inputs in the new block**, including another dataset's whole chain (meadow, garden and snapshot) that the old block declared inline. If they were declared only inside the old nested block, deleting it leaves them undeclared, and the parse check above doesn't notice. Check:
+   **When only some snapshots bumped, re-declare the unchanged inputs in the new block**, including another dataset's whole chain (meadow, garden and snapshot) that the old block declared inline. If they were declared only inside the old nested block, deleting it leaves them undeclared, and the parse check above doesn't notice. Check every step reachable from the new version, not only its direct dependencies, so a re-declared chain with a bare leaf (say, the other dataset's meadow) is caught too:
    ```bash
    .venv/bin/python -c "
    from etl.dag_helpers import load_dag
    dag = load_dag()
-   new = [s for s in dag if '/<namespace>/<new_version>/' in s]
-   print(sorted({d for s in new for d in dag[s] if d.startswith(('data://', 'data-private://')) and d not in dag}))  # must be []
+   todo, seen = [s for s in dag if '/<namespace>/<new_version>/' in s], set()
+   while todo:
+       s = todo.pop()
+       if s not in seen:
+           seen.add(s)
+           todo += dag.get(s, ())
+   print(sorted(s for s in seen if s.startswith(('data://', 'data-private://')) and s not in dag))  # must be []
    "
    ```
 5. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
