@@ -1,0 +1,30 @@
+grapher_schema: "011"
+chart_config_id: 01935484-6bd4-71ae-953e-7b3f225184ad
+slug: crude-birth-rate-hfd
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#cbr__birth_order_total
+          display:
+            tolerance: 5
+    config:
+      title: Birth rate
+      subtitle: The number of live births per 1,000 people in a given year.
+      note: The birth rate is not adjusted for the change in the population's age structure.
+      variantName: HFD
+      internalNotes: ''
+      originUrl: /fertility-rate
+      hasMapTab: true
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - United Kingdom
+        - France
+        - Spain
+        - Italy
+      yAxis:
+        min: 0

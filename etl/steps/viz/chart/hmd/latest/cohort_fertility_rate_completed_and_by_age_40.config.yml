@@ -1,0 +1,29 @@
+grapher_schema: "011"
+chart_config_id: 0193982c-ac17-74d2-b7b4-93113b126157
+slug: cohort-fertility-rate-completed-and-by-age-40
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort#ccf__birth_order_total
+          display:
+            name: Cohort fertility rate by age 55+
+        - catalogPath: cohort#ccf40__birth_order_total
+          display:
+            name: Cohort fertility rate by age 40
+    config:
+      title: 'Cohort fertility rate: completed and by age 40'
+      subtitle: The [cohort fertility rate](#dod:cohort-fertility-rate) is the total number of children born per woman born in a given year.
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - Sweden
+      xAxis:
+        label: Birth year
+      yAxis:
+        min: 0

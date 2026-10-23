@@ -241,6 +241,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
             "Low": "low",
             "High": "high",
             "Constant fertility": "constant_fertility",
+            "Zero migration": "zero_migration",
         },
     )
     tb_sex = harmonize_dimension(
@@ -251,6 +252,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
             "Low": "low",
             "High": "high",
             "Constant fertility": "constant_fertility",
+            "Zero migration": "zero_migration",
         },
     )
     tb = harmonize_dimension(
@@ -683,6 +685,7 @@ def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> T
             "Medium": "medium",
             "Low": "low",
             "High": "high",
+            "Zero migration": "zero_migration",
         },
         strict=False,
     )

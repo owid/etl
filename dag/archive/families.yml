@@ -61,3 +61,12 @@ steps:
   # archived; last active in f009f8544cf5 on 2026-10-15
   data://meadow/un/2025-01-14/married_women:
     - snapshot://un/2025-01-14/married_women.xlsx
+  # archived; last active in 5c8661eefe75 on 2026-10-22
+  data://garden/ons/2025-10-07/marriages:
+    - data://meadow/ons/2025-10-07/marriages
+  # archived; last active in 5c8661eefe75 on 2026-10-22
+  data://meadow/ons/2025-10-07/marriages:
+    - snapshot://ons/2025-10-07/marriages.xlsx
+  # archived; last active in 5c8661eefe75 on 2026-10-22
+  data://grapher/ons/2025-10-07/marriages:
+    - data://garden/ons/2025-10-07/marriages

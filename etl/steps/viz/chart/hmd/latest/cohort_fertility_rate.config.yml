@@ -1,0 +1,49 @@
+grapher_schema: "011"
+chart_config_id: 0193d053-133d-78c3-b131-d4cdb2d013b7
+slug: cohort-fertility-rate
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort#ccf__birth_order_total
+          display:
+            name: Completed cohort fertility rate
+            tolerance: 5
+    config:
+      title: 'Completed cohort fertility rate: births per woman'
+      subtitle: The average number of children born to a woman by the end of her childbearing years, given by her birth year.
+      note: ''
+      originUrl: /fertility-rate
+      hasMapTab: true
+      hideAnnotationFieldsInTitle:
+        time: true
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericColors:
+            - null
+          customNumericValues:
+            - 100
+            - 1.6
+            - 1.8
+            - 2
+            - 2.2
+            - 2.4
+            - 2.6
+            - 2.8
+            - 0
+      selectedEntityNames:
+        - United States
+        - England and Wales
+        - Russia
+        - Germany
+        - Japan
+        - Spain
+      xAxis:
+        label: Women's birth year
+      yAxis:
+        min: 0

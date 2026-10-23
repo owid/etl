@@ -1388,6 +1388,12 @@ steps:
   viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
   # archived; last active in 9aded105cbe0 on 2026-10-22
+  data://grapher/trade/2025-09-22/wto_trade_growth:
+    - data://garden/trade/2025-09-22/wto_trade_growth:
+      - data://garden/trade/2025-09-22/historic_trade
+      - data://meadow/trade/2025-09-22/wto_trade_growth:
+        - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+  # archived; last active in 9aded105cbe0 on 2026-10-22
   data://grapher/imf/2025-07-08/trade:
     - data://garden/imf/2025-07-08/trade:
       - data://garden/regions/2023-01-01/regions
