@@ -6,12 +6,14 @@
 # The final text belongs in the garden .meta.yml, and this file and its override in food_trade.py should not be merged.
 title: null
 description_short: null
+# Paragraphs are separated by backslash lines, not blank lines, so the box shows all of them before "More about
+# this data": it previews only the text before the first blank line.
 description_key: |-
-  This tool is built from country-to-country trade data (→ [www.fao.org](https://www.fao.org)) from the Food and Agriculture Organization of the United Nations.
-
-  We made a number of steps to make the data easier to digest and present. For example, we sum together some detailed categories reported by the FAO only separately (e.g. "milled rice" and "broken rice" are shown together as a total for traded rice).
-
-  Importantly, when digging into this data, we found that what exporting countries say they’ve exported to a given country doesn’t always match what the receiving country says they’ve imported. This is a common issue for all trade data, not just food. To keep things balanced, we prioritize data reported by the *importing* country, as this is generally considered to be more reliable.
-
+  This tool is built from country-to-country trade data (→ [www.fao.org](https://www.fao.org)) from the Food and Agriculture Organization of the United Nations.\
+  \
+  We made a number of steps to make the data easier to digest and present. For example, we sum together some detailed categories reported by the FAO only separately (e.g. "milled rice" and "broken rice" are shown together as a total for traded rice).\
+  \
+  Importantly, when digging into this data, we found that what exporting countries say they’ve exported to a given country doesn’t always match what the receiving country says they’ve imported. This is a common issue for all trade data, not just food. To keep things balanced, we prioritize data reported by the *importing* country, as this is generally considered to be more reliable.\
+  \
   Pablo Rosado, our data scientist behind this work, explains how we processed the original FAO data in more detail in our technical documentation (→ [docs.owid.io](https://docs.owid.io/projects/etl/analyses/food_trade/food_trade)).
 description_processing: null
