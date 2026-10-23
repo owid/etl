@@ -784,6 +784,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      yourself** — it is reader-facing copy owned by whoever wrote it. Record the outcome (fixed / deliberately
      left, with the reason) in the PR's open items, so the next updater doesn't re-flag it — and say whether the
      update was append-only or revised named periods, since that decides whether bounded claims were in scope.
+     The PR body alone doesn't tell the user: list each unsettled finding in your reply as waiting on their
+     decision, with the current and proposed text, and repeat it in every report until they settle it.
      **Link every finding, so content can act on it without searching.** For each claim give the live page,
      the Google Doc (`https://docs.google.com/document/d/<surface_id>/edit`), a scroll-to-text link that lands
      on the sentence itself (`<live url>#:~:text=<url-encoded claim>`), and the chart whose numbers it cites. A
