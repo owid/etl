@@ -665,7 +665,7 @@ def cli(
         else:
             already = sum(len(r["issues"]) for r in results)
             console.print(
-                f"\n[dim]nothing new to post — {already} finding(s), all low severity, seen by a minority of passes, already posted or in cooldown[/dim]"
+                f"\n[dim]nothing new to post — {already} finding(s), all low severity, already posted or in cooldown[/dim]"
                 if already
                 else "\n[dim]nothing new to post — no findings[/dim]"
             )
@@ -685,8 +685,8 @@ def _post_digest(messages: list[digest.DigestMessage]) -> None:
     so tomorrow re-posts the whole digest — the same trade the caller makes.
 
     Paced at Slack's documented ``chat.postMessage`` rate of one message per second per channel.
-    That costs a run a second per call, which is cheap next to the burst — and the partial post
-    a 429 mid-loop would leave behind — that it takes off the table.
+    A digest is at most seven calls, so this costs a run six seconds and takes the burst — and
+    the partial post a 429 mid-loop would leave behind — off the table.
 
     Deliberately not tolerant of a missing token: ``send_slack_message`` prints to stdout when
     ``SLACK_API_TOKEN`` is unset, which in a scheduled build is indistinguishable from a

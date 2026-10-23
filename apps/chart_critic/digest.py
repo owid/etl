@@ -62,6 +62,13 @@ ASK = "*Is this a real error, or is the chart fine?*"
 # How the channel closes a post, and why an unticked finding is not a lost one.
 TICK = ":white_check_mark:  Tick when it's been checked."
 
+# What a person reads over coffee, and now also what a low-traffic channel can absorb:
+# #chart-reviews carries two or three posts a day with one default reviewer. A finding held back
+# is not stamped, but the daily sweep only re-reviews charts edited since the last one, so in
+# practice it is dropped unless the chart is edited again. A bulk edit to one dataset's charts can
+# raise a dozen findings in a sweep, which is why the cap stays and the ranking has to be right.
+MAX_FINDINGS = 3
+
 # How long a chart or indicator stays out of the digest once a finding on it has been posted.
 # Long enough that a fix, a tick and the re-review the edit itself triggers all fall inside it;
 # short enough that a chart which goes wrong again a few weeks later is news again.
@@ -392,21 +399,18 @@ def new_findings(
 
     One finding per chart or indicator, in the run as well as across days: a chart that is
     already up for review does not need a second message saying so, and the best finding on it
-    (highest severity, then most read) is the one that goes. A second, different problem on the
+    is the one that goes.
+
+    Best means raised by the largest share of passes, then highest severity, then most read.
+    Agreement between passes is the one confidence signal that does not come from the model
+    grading itself: ranked on severity and readership alone, a nit seen on one pass of three went
+    out while a misstated subtitle seen on all three was held back. A second, different problem on the
     same chart waits for the cooldown to pass — a smaller cost than what this replaced, where the
     same problem reworded came back the morning after it was ticked.
 
     A 'low' finding is never posted: the model's rubric for it is "technically true but nobody
     acts on it", and a post nobody acts on teaches the channel to skip the digest. It stays in
     the report.
-
-    Nor is a finding raised by only a minority of the passes. Agreement between passes is the
-    one confidence signal that does not come from the model grading itself, and it replaces a
-    fixed cap of three a day: a sweep raises five to thirty findings, so the cap dropped most of
-    them on readership alone — a nit seen once went out while a misstated subtitle seen on every
-    pass did not, and a chart that is not edited again is never re-reviewed, so what the cap held
-    back never came back. The cost is recall: a genuine finding the model flickers on can miss
-    the majority. It stays in the report too.
     """
     day = today or _today()
     cutoff = (day - timedelta(days=COOLDOWN_DAYS)).isoformat()
@@ -414,14 +418,12 @@ def new_findings(
     out: list[tuple[dict[str, Any], dict[str, Any]]] = []
     order = {"high": 0, "medium": 1}
     ranked = sorted(
-        (
-            (r, i)
-            for r in results
-            for i in r["issues"]
-            # Missing counts mean a single pass, which is a majority of itself.
-            if i.get("severity") in order and 2 * i.get("passes", 1) > r.get("passes", 1)
+        ((r, i) for r in results for i in r["issues"] if i.get("severity") in order),
+        key=lambda ri: (
+            -ri[1].get("passes", 1) / max(ri[0].get("passes", 1), 1),
+            order[ri[1]["severity"]],
+            -ri[0].get("views", 0),
         ),
-        key=lambda ri: (order[ri[1]["severity"]], -ri[0].get("views", 0)),
     )
     for result, issue in ranked:
         keys = _dedup_keys(result["slug"], issue, facts)
@@ -568,6 +570,7 @@ def format_slack(
     if not findings:
         return []
 
+    shown = findings[:MAX_FINDINGS]
     # Say what was actually reviewed. A header claiming "changed since yesterday" on a run that
     # reviewed a hand-picked list is the kind of small inaccuracy that costs a digest its trust.
     if window_days == 1:
@@ -579,7 +582,8 @@ def format_slack(
     truncated = "" if reviewed >= candidates else f" of {candidates}"
     lead = [
         f"{scope} — reviewed {reviewed}{truncated}, {len(findings)} worth a look"
-        + (", each posted separately below." if len(findings) > 1 else ", posted below."),
+        + (f" (showing the top {len(shown)})" if len(findings) > len(shown) else "")
+        + (", each posted separately below." if len(shown) > 1 else ", posted below."),
         "",
     ]
     # What the run cost, in the footer. It is the sweep's actual model spend, so a day whose
@@ -591,9 +595,7 @@ def format_slack(
     if incomplete:
         lead.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
 
-    return [DigestMessage("\n".join(lead))] + [
-        _format_finding(result, issue, facts, model) for result, issue in findings
-    ]
+    return [DigestMessage("\n".join(lead))] + [_format_finding(result, issue, facts, model) for result, issue in shown]
 
 
 def stamp(
@@ -606,7 +608,7 @@ def stamp(
     a finding keyed per-chart here and looked up per-indicator tomorrow matches nothing, and the
     digest would re-post every finding every day."""
     day = (today or _today()).isoformat()
-    for result, issue in findings:
+    for result, issue in findings[:MAX_FINDINGS]:
         for key in _dedup_keys(result["slug"], issue, facts):
             state[key] = day
     return state
