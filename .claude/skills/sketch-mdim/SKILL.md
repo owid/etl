@@ -95,7 +95,7 @@ views:
 - **From chart links**: copy each chart's title, subtitle and note into its view, so the view starts out looking
   like the chart. Use the first chart's selected countries as `default_selection`.
 - **Web address**: ask for it before building the page, as in "Choosing the web address" below, and write it as
-  `slug:`. The page doesn't show it; it carries it through to the setup they copy back.
+  `slug:`. It pre-fills the page's "Web address" field, where they can still change it.
 
 ### Choosing the web address
 
@@ -160,8 +160,9 @@ mechanics, not for the conversation:
 
 - **Does the MDim replace existing charts?** If the draft came from chart links, name those charts. If yes, step
   5g handles them.
-- **Its web address,** if the setup has no `slug:` yet (an empty page, or a draft built without one). Ask as in
-  "Choosing the web address" (step 2). If it has one, check it's still free, and ask again only if it isn't.
+- **Its web address,** if the setup has no `slug:` (they left the page's field empty). Ask as in "Choosing the
+  web address" (step 2). If it has one, check it's free, since they may have changed it in the page, and ask
+  again only if it isn't.
 - **Anything the setup leaves open:** combinations with no indicator yet, and specific map bins if they asked
   for them (the page only offers automatic ones).
 

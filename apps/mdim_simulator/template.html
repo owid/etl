@@ -184,6 +184,13 @@ td.text-col { white-space: nowrap; }
 .tag-chip--main { font-weight: 700; }
 .panel select.tag-picker { width: 100%; padding: 7px 9px; border: 1px solid #c9c9c9; border-radius: 4px; background: #fff; color: var(--body); font-size: 14px; }
 .tags-section { margin-bottom: 24px; }
+.slug-row { display: flex; align-items: center; border: 1px solid #c9c9c9; border-radius: 4px; background: #fff; }
+.slug-row:focus-within { outline: 2px solid var(--link); outline-offset: -1px; border-color: transparent; }
+.slug-row__prefix { padding-left: 9px; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.panel .slug-row input[type="text"] { padding-left: 1px; border: none; outline: none; }
+.slug-row.invalid { border-color: #b13507; }
+.slug-note { margin-top: 4px; }
+.slug-note.invalid { color: #b13507; }
 #chart-settings { display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--body); }
 .settings-group { display: flex; flex-direction: column; gap: 6px; }
 .settings-group__title { font-size: 13px; font-weight: 700; color: var(--text); }
@@ -288,6 +295,10 @@ table.combos td.indicator { width: 42%; }
       <section>
         <h3>Title</h3>
         <div id="page-fields" class="page-fields"></div>
+        <div class="tags-section">
+          <h3>Web address</h3>
+          <div id="slug-field"></div>
+        </div>
         <div class="tags-section">
           <h3>Topic tags</h3>
           <div id="tags-editor"></div>

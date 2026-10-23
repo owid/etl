@@ -152,6 +152,11 @@ def main() -> None:
             "topic tags link to their topic pages",
             page.get_attribute("#topic-tags a >> nth=0", "href") == "https://ourworldindata.org/internet",
         )
+        slug_input = page.locator("#slug-field input")
+        check("the agreed web address is pre-filled", slug_input.input_value() == "internet-users-check")
+        slug_input.fill("Internet Users")
+        check("an invalid web address is flagged", "lowercase letters" in page.inner_text("#slug-field"))
+        slug_input.fill("internet-users-check")
         page.select_option("#tags-editor select", label="Loneliness & Social Connections")
         check("a topic tag can be added", "Loneliness & Social Connections" in page.inner_text("#topic-tags"))
 
@@ -465,7 +470,13 @@ def main() -> None:
         own = {
             "title": {"title": "Nitrogen"},
             "dimensions": [{"slug": "metric", "name": "Metric", "choices": [{"slug": "nue", "name": "Efficiency"}]}],
-            "views": [{"dimensions": {"metric": "nue"}, "indicators": {"y": [{"catalogPath": nitrogen_path}]}}],
+            "views": [
+                {
+                    "dimensions": {"metric": "nue"},
+                    "indicators": {"y": [{"catalogPath": nitrogen_path}]},
+                    "metadata": {"description_key": ["The only point, shown as a paragraph."]},
+                }
+            ],
         }
         own_path = OUT / "check_own_settings.yml"
         own_path.write_text(yaml.safe_dump(own, sort_keys=False))
@@ -477,6 +488,16 @@ def main() -> None:
             "an indicator's own subtitle shows in the preview",
             "is the ratio between nitrogen inputs and output" in page.inner_text("#chart"),
         )
+        # A one-item WYSK list shows as a paragraph, as in ETL; once a second point is added, both are bullets.
+        check("a one-item WYSK list shows as a paragraph", page.locator("#wysk-list li.wysk-prose").count() == 1)
+        page.click("#text-editor-toggle")
+        page.click(".add-bullet")
+        page.keyboard.press("Enter")
+        check(
+            "a second point turns the list into bullets",
+            page.locator("#wysk-list li").count() == 2 and page.locator("#wysk-list li.wysk-prose").count() == 0,
+        )
+        page.click("#text-editor-toggle")
         page.locator("#chart").get_by_text("Map", exact=True).first.click()
         page.click("#text-editor-toggle")
         page.wait_for_selector("#map-palette", timeout=10000)

@@ -236,7 +236,8 @@ function mdInline(text) {
 // original. List items become "- " blocks. descriptionKeyValue() turns blocks back into the original's form.
 function descriptionKeyBlocks(descriptionKey) {
   if (!descriptionKey) return [];
-  if (Array.isArray(descriptionKey)) return descriptionKey.map((item) => `- ${item}`);
+  // A one-item list is shown as a paragraph, as ETL and Grapher show it.
+  if (Array.isArray(descriptionKey)) return descriptionKey.length === 1 ? [String(descriptionKey[0])] : descriptionKey.map((item) => `- ${item}`);
   const blocks = [];
   for (const line of String(descriptionKey).split("\n")) {
     if (line.startsWith("- ") || !blocks.length) blocks.push(line);
@@ -251,6 +252,9 @@ function descriptionKeyValue(blocks, asList) {
 
 // A pre-filled view records whether its text came as a list; text edited in the page follows the indicator.
 const descriptionKeyAsList = (edits, meta) => edits?.descriptionKeyIsList ?? Array.isArray(meta.descriptionKey);
+
+// A list keeps the shape ETL gives it: one item is a paragraph, several are all bullets.
+const listShaped = (blocks) => (blocks.length === 1 ? [blockText(blocks[0])] : blocks.map((b) => (isBullet(b) ? b : `- ${b}`)));
 
 // A block's text without its bullet, as markdown: continuation lines join the paragraph, nested "- " lines
 // become a nested list.
@@ -517,6 +521,7 @@ function setText(field, value) {
 function setViewText(key, meta, field, value) {
   const views = state.textEdits.views;
   const own = (views[key] ||= {});
+  if (field === "descriptionKey" && descriptionKeyAsList(own, meta)) value = listShaped(value);
   if (same(value, originalTexts(meta)[field])) {
     delete own[field];
     dropSuggestion(key, field);
@@ -1303,6 +1308,42 @@ function renderPageFields() {
   box.append(titleInput, variantInput, addVariant);
 }
 
+// The MDim's web address, as ETL's schema allows it: lowercase words joined by hyphens.
+const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const validSlug = () => SLUG_PATTERN.test(state.slug || "");
+
+function renderSlugField() {
+  const box = document.getElementById("slug-field");
+  box.innerHTML = "";
+  const row = document.createElement("label");
+  row.className = "slug-row";
+  const prefix = document.createElement("span");
+  prefix.className = "slug-row__prefix";
+  prefix.textContent = "ourworldindata.org/grapher/";
+  const input = textInput(state.slug || "", "e.g. internet-users", () => {});
+  input.setAttribute("aria-label", "Web address");
+  input.spellcheck = false;
+  const note = document.createElement("p");
+  note.className = "settings-note slug-note";
+  const show = () => {
+    const bad = Boolean(state.slug) && !validSlug();
+    row.classList.toggle("invalid", bad);
+    note.classList.toggle("invalid", bad);
+    note.textContent = bad
+      ? "Use lowercase letters, numbers and hyphens only, e.g. internet-users."
+      : state.slug ? "Claude checks that it's free before building the MDim." : "Leave it empty and Claude will ask.";
+  };
+  input.addEventListener("input", () => {
+    state.slug = input.value.trim();
+    if (!state.slug) delete state.slug;
+    saveState();
+    show();
+  });
+  show();
+  row.append(prefix, input);
+  box.append(row, note);
+}
+
 function renderBar() {
   closeMenu();
   const bar = document.getElementById("mdim-bar");
@@ -1814,7 +1855,9 @@ async function setupYaml() {
     "# Claude: whoever made this may not work in the ETL. Do the technical work yourself, ask only plain-language",
     "# questions, and follow the hand-off in the /sketch-mdim skill (step 5).",
     `grapher_schema: ${JSON.stringify(GRAPHER_SCHEMA_VERSION)}`,
-    ...(state.slug ? [`slug: ${JSON.stringify(state.slug)}`] : []),
+    ...(state.slug
+      ? [validSlug() ? `slug: ${JSON.stringify(state.slug)}` : `# slug: ${JSON.stringify(state.slug)} isn't a valid web address (lowercase words joined by hyphens)`]
+      : []),
     "title:",
     `  title: ${JSON.stringify(state.title.trim())}`,
   ];
@@ -1982,6 +2025,7 @@ function refresh() {
 applyOpen();
 renderHeader();
 renderPageFields();
+renderSlugField();
 renderTopicTags();
 renderTagsEditor();
 normalizeDefaultTab();

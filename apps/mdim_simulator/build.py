@@ -147,7 +147,8 @@ def description_key_blocks(description_key: str | list) -> list[str]:
     if isinstance(description_key, list):
         # Nested lists flatten as ETL's chart model flattens them (_flatten_description_key).
         flat = [item for sub in description_key for item in ([sub] if isinstance(sub, str) else sub)]
-        return [f"- {item}" for item in flat]
+        # A one-item list is shown as a paragraph, as ETL and Grapher show it.
+        return flat if len(flat) == 1 else [f"- {item}" for item in flat]
     blocks: list[str] = []
     for line in str(description_key).split("\n"):
         if line.startswith("- ") or not blocks:
