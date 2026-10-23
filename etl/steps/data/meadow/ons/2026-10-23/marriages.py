@@ -36,7 +36,10 @@ def run() -> None:
         tb = tb.melt(id_vars=["Year of birth"], var_name="age", value_name="cumulative_percentage_per_1000")
 
         # Keep only numbers in the age column
-        tb["age"] = tb["age"].str.extract(r"(\d+)").astype(int)
+        # (.str accessors return a plain Series, so restore the column's metadata.)
+        age_metadata = tb["age"].metadata
+        tb["age"] = tb["age"].str.extract(r"(\d+)", expand=False).astype(int)
+        tb["age"].metadata = age_metadata
 
         # Treat whitespace-only cells as missing (the 2023 workbook has one stray " " in an empty cell of 14a).
         values = tb["cumulative_percentage_per_1000"]
