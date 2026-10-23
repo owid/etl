@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Marriages in England and Wales
     description: |-
-      Number of marriages that took place in England and Wales by age, sex, previous partnership status and civil or religious ceremony.
+      Number of marriages that took place in England and Wales by age, sex, previous partnership status, and civil or religious ceremony.
 
     date_published: '2025-11-18'
 

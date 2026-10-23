@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Marriages & Divorces
+      attribution_short: UK ONS
 
 
 # Learn more about the available fields:
@@ -25,9 +26,10 @@ tables:
         description_short: |-
           Percentage of men or women born in a specific year who have ever married by a certain age.
         description_key:
-          - Data covers marriages legally registered in England and Wales, including marriages of residents that take place outside England and Wales.
-          - Marriages between same-sex couples became legal on 29 March 2014, so the 2014 figures include only same-sex marriages that took place from that date onward.
-          - Civil partnerships converted into marriages are included, and are counted as marriages that previously had "never married or civil partnered" status when prior marital status is unknown.
+          - The data covers marriages registered in England and Wales. It doesn’t include marriages of residents that take place abroad, so the true share of people who have ever married could be higher.
+          - Marriages between same-sex couples became legal on March 29, 2014, so the 2014 figures include only same-sex marriages that took place from that date onward.
+          - Same-sex couples who converted their civil partnership into a marriage count as ever married. The ONS doesn’t know whether they had been married before their civil partnership, so it assumes they hadn’t.
+          - A new law raised the minimum age of marriage to 18 in February 2023. Before that, people aged 16 and 17 could marry with their parents’ consent, and those marriages are included in this data.
         description_from_producer: |-
           Marriage statistics are derived from information recorded when marriages are legally registered as part of civil registration.
 
@@ -35,11 +37,11 @@ tables:
 
           Marriages of same-sex couples first took place on 29 March 2014. Figures for 2014 represent a part-year only.
 
-          Same-sex couples in a civil partnership have been able to convert their existing civil partnership into a marriage since 10 December 2014. These conversions are included in the number of marriages taking place but are reported separately in Table 13.
+          Same-sex couples in a civil partnership have been able to convert their existing civil partnership into a marriage, if they so desired, from 10 December 2014; these are not included in the number of marriages taking place but are reported separately in Table 13.
         processing_level: minor
         presentation:
-          title_public: Share of men or women ever been married for << birth_cohort >> birth cohort by a certain age
+          title_public: Share of people born in << birth_cohort >> who had ever married, by age
         display:
-          numDecimalPlaces: 1
+          roundingMode: significantFigures
+          numSignificantFigures: 2
           name: << birth_cohort >>
-
