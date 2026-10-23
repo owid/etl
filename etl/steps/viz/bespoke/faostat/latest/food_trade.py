@@ -103,6 +103,8 @@ def run() -> None:
     )
     # Leave the origins out of the feed.
     del feed_metadata["origins"]
+    # Leave the processing description out of the feed.
+    del feed_metadata["descriptionProcessing"]
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
