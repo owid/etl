@@ -50,6 +50,7 @@ NUM_DECIMALS = 3
 # can be iterated on staging without re-running the garden step. Maps the file's keys to the feed's fields.
 DRAFT_ABOUT_FILE = Path(__file__).parent / "food_trade.about.yml"
 DRAFT_ABOUT_FIELDS = {
+    "title": "title",
     "description_short": "descriptionShort",
     "description_key": "descriptionKey",
     "description_processing": "descriptionProcessing",
@@ -118,6 +119,10 @@ def run() -> None:
     unknown = set(draft_about) - set(DRAFT_ABOUT_FIELDS)
     assert not unknown, f"Unknown fields in {DRAFT_ABOUT_FILE.name}: {sorted(unknown)}"
     for field, value in draft_about.items():
+        # A null field is left out of the feed, so grapher omits it (or, for the title, shows its fallback heading).
+        if value is None:
+            feed_metadata.pop(DRAFT_ABOUT_FIELDS[field], None)
+            continue
         if field == "description_key":
             value = normalize_description_key(value)
         feed_metadata[DRAFT_ABOUT_FIELDS[field]] = value
