@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 
 from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
-from etl.http import USER_AGENT
+from etl.http import USER_AGENT, reset_in_forked_children
 from etl.http import session as http_session
 
 log = structlog.get_logger()
@@ -540,7 +540,7 @@ def requests_with_retry() -> requests.Session:
     adapter = HTTPAdapter(max_retries=retries, pool_maxsize=20)
     s.mount("http://", adapter)
     s.mount("https://", adapter)
-    return s
+    return reset_in_forked_children(s)
 
 
 class AdminAPIError(Exception):

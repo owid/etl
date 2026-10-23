@@ -744,16 +744,9 @@ class DataStep(Step):
         if pid == 0:
             # ---------- child process ----------
             try:
-                # Close all inherited file descriptors except stdin/stdout/stderr.
-                # The forked child inherits FDs for the multiprocessing Manager
-                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
-                # os._exit() later closes them implicitly it can confuse the
-                # Manager server and cause the parent worker to hang.
-                import resource as _resource
-
-                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
-                os.closerange(3, _max_fd)
-
+                # Inherited descriptors stay open: closing them here wouldn't affect the parent's
+                # copies, and the objects still holding them would fail on their next use. Clients
+                # that pool connections reset themselves in the child instead (`etl.http`).
                 config.enable_structlog_filtering()
                 step_type, path = str(self).split("://", 1)
                 step_type = step_type.replace("-private", "")

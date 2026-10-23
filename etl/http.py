@@ -34,6 +34,7 @@ For ``httpx`` clients, pass :data:`HEADERS` as the ``headers=`` kwarg::
 
 from __future__ import annotations
 
+import os
 import platform
 
 import requests
@@ -51,10 +52,22 @@ HEADERS = {"User-Agent": USER_AGENT}
 STORAGE_OPTIONS = {"User-Agent": USER_AGENT}
 
 
+def reset_in_forked_children(s: requests.Session) -> requests.Session:
+    """Give a forked child an empty connection pool instead of the parent's open connections.
+
+    ETL runs each step in a forked child, which inherits a copy of every pooled socket. A
+    connection used from both processes breaks (TLS keeps its state in process memory), so the
+    child drops its copies right after the fork; the parent's connections stay open. Use this
+    on every long-lived session.
+    """
+    os.register_at_fork(after_in_child=s.close)
+    return s
+
+
 def _make_session() -> requests.Session:
     s = requests.Session()
     s.headers["User-Agent"] = USER_AGENT
-    return s
+    return reset_in_forked_children(s)
 
 
 #: Module-level session — reuse for connection pooling.
