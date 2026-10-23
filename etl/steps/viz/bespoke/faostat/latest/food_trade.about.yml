@@ -1,0 +1,15 @@
+# DRAFT, for iterating on the "About this data" box on this PR's staging server only.
+# Fields set here replace the ones derived from the garden metadata
+# (etl/steps/data/garden/faostat/2026-05-07/food_trade.meta.yml), and editing this file re-runs only the viz step,
+# not the garden step that loads the full trade matrix. Delete a field to fall back to the garden text.
+# The final text belongs in the garden .meta.yml, and this file and its override in food_trade.py should not be merged.
+description_short: |-
+  Quantity of the item flowing from the exporter to the importer in the export year.
+description_key:
+  - Trade is measured by weight, in tonnes, not by monetary value.
+  - Some items combine several of FAO's commodity codes. For example, beef includes both bone-in and boneless meat, and rice includes both milled and broken rice. Processed products such as flour, oil and juice are shown as separate items.
+  - Countries often report different quantities for the same trade flow. Where the exporting and importing countries disagree, we use the importing country's figure.
+description_processing: |-
+  - When only one country reports, we use that country's reported quantity.
+  - When both the exporter and the importer country report a value, we use the importer's quantity, because, according to FAOSTAT's [Food Balance Sheets and Supply Utilization Accounts Resource Handbook 2025](https://openknowledge.fao.org/items/30e641b1-6d57-4998-8e8a-395727aa4307), section 6.1, "imports are typically documented more thoroughly and verified more rigorously than exports". This claim cites the United Nations Statistics Division's [International Merchandise Trade Statistics](https://unstats.un.org/unsd/trade/EG-IMTS/IMTS2010-CM%20-%20white%20cover%20version.pdf).
+  - Rows where reporter country is identical to partner country are dropped.

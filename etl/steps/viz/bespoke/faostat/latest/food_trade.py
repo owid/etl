@@ -25,13 +25,16 @@ environment being built, so the feed is served at
 """
 
 import json
+from pathlib import Path
 
 import pandas as pd
+import yaml
 from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
 from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
+from etl.viz.chart.download_package_format import normalize_description_key
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -42,6 +45,15 @@ FILE_SLUG = "food-trade"
 # quantities are large, so 3 decimals is far below any meaningful precision
 # while keeping the files compact.
 NUM_DECIMALS = 3
+
+# DRAFT (not for merging): text for the "About this data" box that replaces the garden-derived fields, so the text
+# can be iterated on staging without re-running the garden step. Maps the file's keys to the feed's fields.
+DRAFT_ABOUT_FILE = Path(__file__).parent / "food_trade.about.yml"
+DRAFT_ABOUT_FIELDS = {
+    "description_short": "descriptionShort",
+    "description_key": "descriptionKey",
+    "description_processing": "descriptionProcessing",
+}
 
 
 def _build_product_data(df: pd.DataFrame, product: str, entity_to_id: dict) -> dict:
@@ -101,6 +113,14 @@ def run() -> None:
         columns={"Bilateral trade flow": tb["value"]},
         update_period_days=ds.metadata.update_period_days,
     )
+    # DRAFT: apply the text being iterated on in food_trade.about.yml.
+    draft_about = yaml.safe_load(DRAFT_ABOUT_FILE.read_text()) or {}
+    unknown = set(draft_about) - set(DRAFT_ABOUT_FIELDS)
+    assert not unknown, f"Unknown fields in {DRAFT_ABOUT_FILE.name}: {sorted(unknown)}"
+    for field, value in draft_about.items():
+        if field == "description_key":
+            value = normalize_description_key(value)
+        feed_metadata[DRAFT_ABOUT_FIELDS[field]] = value
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
