@@ -182,6 +182,21 @@ def test_one_finding_per_chart_within_a_run_and_the_best_one_goes():
     assert issue["claim"] == "High: the unit is wrong."
 
 
+def test_a_finding_most_passes_missed_is_not_posted():
+    seen_once, seen_twice = _result("a", "chart"), _result("b", "chart")
+    seen_once["passes"] = seen_twice["passes"] = 3
+    seen_once["issues"][0]["passes"] = 1
+    seen_twice["issues"][0]["passes"] = 2
+    assert [r["slug"] for r, _ in digest.new_findings([seen_once, seen_twice], {})] == ["b"]
+
+
+def test_every_new_finding_is_posted():
+    results = [_result(slug, "chart", f"Claim {slug}") for slug in "abcde"]
+    messages = _format(results, {})
+    assert len(messages) == 6
+    assert "reviewed 5, 5 worth a look, each posted separately below." in messages[0].text
+
+
 def test_a_low_severity_finding_is_never_posted():
     result = _result("a", "data", "Malta's 1981 value looks implausibly high.")
     result["issues"][0]["severity"] = "low"
