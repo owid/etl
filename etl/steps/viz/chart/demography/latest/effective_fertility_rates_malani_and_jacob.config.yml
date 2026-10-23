@@ -48,6 +48,3 @@ views:
         - "Spain"
       hideAnnotationFieldsInTitle:
         time: true
-      colorScale:
-        baseColorScheme: "Oranges"
-        customNumericColorsActive: true
