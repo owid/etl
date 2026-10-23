@@ -76,7 +76,7 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
 | [reference/SKETCHING.md](reference/SKETCHING.md) | Sketch mode, instead of Steps 1–4 | Data pull, scaffold, render, verify, the Figma sketch handoff, iterating, promotion to a step. |
 
-**Size budget, enforced by `--structure`: this spine under 34 KB, TEMPLATES.md under 25 KB.** Both are read on every
+**Size budget, enforced by `--structure`: this spine under 40 KB, TEMPLATES.md under 25 KB.** Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
 its step. After editing any doc in this skill:
 
@@ -371,6 +371,14 @@ Then, in this order:
 Show the render. When a design choice is genuinely open, **measure the options and offer the
 numbers**, not adjectives — see the [panel-aspect gotcha](reference/GOTCHAS.md) under Layout for why.
 
+**Feedback from anyone other than the user** — a Figma comment, a Slack thread, a PR review, a note
+the user relays — goes through the feedback ledger (`/owid-staff:create-figma-chart` →
+`reference/FEEDBACK.md`): first a table of their suggestions with your proposal for each, confirmed
+before you change anything; then the same table with ✅ done, ❌ not done and why, or ⏳ open, per
+row. An accepted change made in Figma is also ported into the step
+([WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) → *Porting a designer's rework*). The ticked
+table goes in the PR body without Slack links or who said what internally — this repo is public.
+
 ## Step 7 — Hand off to `/owid-staff:create-figma-chart`
 
 Give it the local SVG path. That skill's Step 1/3 cover the local-file route: there is nothing to
@@ -493,7 +501,7 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 4. Child issue opened (Bertha).
 5. **Pull the data, rebuild, import to Figma** — Steps 4–7 here.
 6. Review as needed (Bertha) → **design review with @mrwbkrm, mandatory** → final edits →
-   final review with @edomt.
+   final review with @edomt. Each round's feedback goes through the Step 6 ledger.
 7. **Upload the refreshed image under a new filename** and repoint the references. The API rejects
    a duplicate name, and the old file must stay reachable for anything still pointing at it.
 8. Accompanying text edited (Bertha and the author).
