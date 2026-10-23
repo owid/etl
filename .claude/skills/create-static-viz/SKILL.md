@@ -371,13 +371,15 @@ Then, in this order:
 Show the render. When a design choice is genuinely open, **measure the options and offer the
 numbers**, not adjectives — see the [panel-aspect gotcha](reference/GOTCHAS.md) under Layout for why.
 
-**Feedback from anyone other than the user** — a Figma comment, a Slack thread, a PR review, a note
-the user relays — goes through the feedback ledger (`/owid-staff:create-figma-chart` →
+**Feedback from anyone other than the user** — a Figma comment, a Slack thread, a colleague's PR
+review, a note the user relays — goes through the feedback ledger (`/owid-staff:create-figma-chart` →
 `reference/FEEDBACK.md`): first a table of their suggestions with your proposal for each, confirmed
 before you change anything; then the same table with ✅ done, ❌ not done and why, or ⏳ open, per
 row. An accepted change made in Figma is also ported into the step
 ([WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) → *Porting a designer's rework*). The ticked
 table goes in the PR body without Slack links or who said what internally — this repo is public.
+Codex and other bot reviews stay outside the ledger: the `/babysit-pr` round in Step 9 judges and
+fixes those without a confirmation step.
 
 ## Step 7 — Hand off to `/owid-staff:create-figma-chart`
 
