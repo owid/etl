@@ -1814,6 +1814,7 @@ async function setupYaml() {
     "# Claude: whoever made this may not work in the ETL. Do the technical work yourself, ask only plain-language",
     "# questions, and follow the hand-off in the /sketch-mdim skill (step 5).",
     `grapher_schema: ${JSON.stringify(GRAPHER_SCHEMA_VERSION)}`,
+    ...(state.slug ? [`slug: ${JSON.stringify(state.slug)}`] : []),
     "title:",
     `  title: ${JSON.stringify(state.title.trim())}`,
   ];

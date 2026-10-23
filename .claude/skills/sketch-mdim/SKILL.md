@@ -56,6 +56,7 @@ short kebab-case name for the MDim, such as `internet-users`. A typical draft ha
 per indicator:
 
 ```yaml
+slug: "internet-users"   # the web address, agreed with them before building the page
 title:
   title: "Internet users"
 topic_tags:
@@ -93,6 +94,22 @@ views:
 - **Topic tags**: from the indicators' `presentation.topicTagsLinks`.
 - **From chart links**: copy each chart's title, subtitle and note into its view, so the view starts out looking
   like the chart. Use the first chart's selected countries as `default_selection`.
+- **Web address**: ask for it before building the page, as in "Choosing the web address" below, and write it as
+  `slug:`. The page doesn't show it; it carries it through to the setup they copy back.
+
+### Choosing the web address
+
+Propose one from the title (`ourworldindata.org/grapher/<slug>`, lowercase words joined by hyphens), and offer
+one or two alternatives. Before proposing an address, check it's free. It must match none of these:
+
+- a chart (`chart_configs.slug`);
+- an old chart address (`chart_slug_redirects.slug`);
+- an MDim (`multi_dim_data_pages.slug`);
+- a site redirect (`redirects.source` = `/grapher/<slug>`).
+
+Check all four in the public Datasette. Then check that `https://ourworldindata.org/grapher/<slug>` returns 404:
+anything else means the address is in use, including redirects to other MDims (`multi_dim_redirects`), which the
+public Datasette doesn't list.
 
 ## 3. Build and open the page
 
@@ -143,17 +160,8 @@ mechanics, not for the conversation:
 
 - **Does the MDim replace existing charts?** If the draft came from chart links, name those charts. If yes, step
   5g handles them.
-- **Its web address.** Propose one from the title (`ourworldindata.org/grapher/<slug>`, lowercase words joined
-  by hyphens). Before proposing it, check it's free, because the admin refuses an address that's taken. It must
-  match none of these:
-  - a chart (`chart_configs.slug`);
-  - an old chart address (`chart_slug_redirects.slug`);
-  - an MDim (`multi_dim_data_pages.slug`);
-  - a site redirect (`redirects.source` = `/grapher/<slug>`).
-
-  Check all four in the public Datasette. Then check that `https://ourworldindata.org/grapher/<slug>` returns
-  404: anything else means the address is in use, including redirects to other MDims (`multi_dim_redirects`),
-  which the public Datasette doesn't list. If the admin still refuses the address later, propose another one.
+- **Its web address,** if the setup has no `slug:` yet (an empty page, or a draft built without one). Ask as in
+  "Choosing the web address" (step 2). If it has one, check it's still free, and ask again only if it isn't.
 - **Anything the setup leaves open:** combinations with no indicator yet, and specific map bins if they asked
   for them (the page only offers automatic ones).
 
@@ -167,7 +175,9 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
   Convert each one to the short `table#indicator` form, as every MDim does. The version then lives only in the
   step's DAG dependency, `data://grapher/<namespace>/<version>/<dataset>`, so a dataset update only has to change
   that line. Keep the full form only where two dependencies have a table of the same name.
-- **The web address isn't part of the step:** the config has no slug field. Keep it for step 5f.
+- **Keep `slug:` in the config.** ETL gives the MDim that address when it first writes it, as long as the MDim
+  has none yet. A taken address makes the step fail, so the staging build in step 5c catches it: if it does,
+  propose another address and push again.
 - **The comments at the end:** use the text changes against each indicator's original in the PR description.
   Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
   using that indicator first.
@@ -234,8 +244,11 @@ if it's this MDim, and tell them in plain words.
 
 Once the run has passed, send something like:
 
-> It's ready to go live. Open https://admin.owid.io/admin/multi-dims, find "<MDim title>", type `<slug>` in
-> its Slug field, and switch it to Published. It will then be at https://ourworldindata.org/grapher/<slug>.
+> It's ready to go live. Open https://admin.owid.io/admin/multi-dims, find "<MDim title>", and switch it to
+> Published. It will then be at https://ourworldindata.org/grapher/<slug>.
+
+If they say the Slug field is empty there, the production run didn't set it: have them type `<slug>` in it, and
+find out why from the run's log.
 
 ### 5g. Replace the old charts, if they said yes
 

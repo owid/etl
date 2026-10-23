@@ -40,7 +40,7 @@ Every view's y-axis starts at zero.
 
 ## What the copied setup contains
 
-The dropdowns, the views and their catalog paths, `default_dimensions`, `default_selection`, `topic_tags`, the shared settings under `definitions.common_views`, and each view's own text, rounding and map colours. Only what someone changed is exported. Comments at the end list combinations with no indicator yet, each text change against the indicator's original, and any changes suggested for the indicator itself, which Claude checks against other charts before making. Specific map bins and the MDim's web address are settled in that conversation too.
+The dropdowns, the views and their catalog paths, `default_dimensions`, `default_selection`, `topic_tags`, the shared settings under `definitions.common_views`, and each view's own text, rounding and map colours. Only what someone changed is exported. Comments at the end list combinations with no indicator yet, each text change against the indicator's original, and any changes suggested for the indicator itself, which Claude checks against other charts before making. Specific map bins are settled in that conversation too. The MDim's web address (`slug`) is agreed with Claude before the page is built: the page doesn't show it, but carries it from the setup it was built with into the one it copies out.
 
 ## How it works
 

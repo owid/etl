@@ -220,6 +220,8 @@ def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
         "title": (setup.get("title") or {}).get("title", ""),
         "titleVariant": (setup.get("title") or {}).get("title_variant", ""),
         "topicTags": list(setup.get("topic_tags") or []),
+        # The web address is agreed with Claude before the page is built; the page only carries it through.
+        **({"slug": setup["slug"]} if setup.get("slug") else {}),
         "dims": dims,
         "links": links,
         "selected": {f"d-{slug}": f"c-{slug}-{choice}" for slug, choice in default_dimensions.items()},

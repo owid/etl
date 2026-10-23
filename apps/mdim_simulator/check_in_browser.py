@@ -72,6 +72,7 @@ def build_pages() -> None:
     """A page pre-filled with the newest "Number of people using the Internet", and an empty one."""
     _, number_path = build.latest_indicator(*build.EXAMPLE_INDICATOR)
     setup = {
+        "slug": "internet-users-check",
         "title": {"title": "Internet users"},
         "topic_tags": ["Internet", "Technological Change"],
         "dimensions": [
@@ -575,6 +576,7 @@ def main() -> None:
     share = next(v for v in setup["views"] if v["dimensions"]["metric"] == "share_of_population")
     number = next(v for v in setup["views"] if v["dimensions"]["metric"] == "number_of_people")
     check("first view exported", setup["default_dimensions"]["metric"] == "share_of_population")
+    check("the web address agreed beforehand is exported", setup.get("slug") == "internet-users-check")
     check(
         "shared settings exported",
         shared["tab"] == "map" and "SlopeChart" in shared["chartTypes"] and shared["yAxis"] == {"min": 0},
