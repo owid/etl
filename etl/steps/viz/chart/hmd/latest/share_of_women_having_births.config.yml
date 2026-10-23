@@ -1,0 +1,45 @@
+grapher_schema: "011"
+chart_config_id: 019445c0-1bf6-73b9-8507-972e9c4d83e3
+slug: share-of-women-having-births
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort_share_women#share_women__num_births_0
+          display:
+            name: No births
+            color: '#edf8fb'
+        - catalogPath: cohort_share_women#share_women__num_births_1
+          display:
+            name: 1 birth
+            color: '#9ebcda'
+        - catalogPath: cohort_share_women#share_women__num_births_2
+          display:
+            name: 2 births
+            color: '#8c96c6'
+        - catalogPath: cohort_share_women#share_women__num_births_3
+          display:
+            name: 3 births
+            color: '#8856a7'
+        - catalogPath: cohort_share_women#share_women__num_births_4
+          display:
+            name: 4 births or more
+            color: '#810f7c'
+    config:
+      title: Share of women who have had a given number of births
+      subtitle: The share of women who have had a given number of births by the end of their childbearing years.
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      chartTypes:
+        - StackedArea
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - United States
+      xAxis:
+        label: Women's birth year
+      yAxis:
+        min: 0

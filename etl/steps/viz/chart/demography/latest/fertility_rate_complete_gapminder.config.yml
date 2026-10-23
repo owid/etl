@@ -1,0 +1,39 @@
+grapher_schema: "011"
+chart_config_id: 0191b6c7-444c-7165-a370-4238e93c7e2d
+slug: fertility-rate-complete-gapminder
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: fertility_rate#fertility_rate
+    config:
+      title: 'Fertility rate: children per woman over the long-term'
+      note: The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
+      internalNotes: This is the full Gapminder dataset that includes its guesstimate figures. This should only be linked to for people that want the full dataset – we have another which is more public which only includes estimates with credible sources.
+      originUrl: /fertility-rate
+      hasMapTab: true
+      map:
+        time: 2026
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 2
+            - 4
+            - 6
+            - 8
+            - 10
+        columnSlug: fertility_rate#fertility_rate
+      minTime: 1800
+      selectedEntityNames:
+        - Indonesia
+        - Moldova
+        - Fiji
+      tab: map
+      yAxis:
+        max: 0
+        min: 0

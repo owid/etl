@@ -176,11 +176,16 @@ def test_a_second_problem_on_a_posted_chart_waits_for_the_cooldown():
 
 
 def test_one_finding_per_chart_within_a_run_and_the_best_one_goes():
-    result = _result("a", "chart", "Low: a naming inconsistency.")
-    result["issues"][0]["severity"] = "low"
+    result = _result("a", "chart", "Medium: the note is out of date.")
     result["issues"].append(result["issues"][0] | {"severity": "high", "claim": "High: the unit is wrong."})
     ((_, issue),) = digest.new_findings([result], {})
     assert issue["claim"] == "High: the unit is wrong."
+
+
+def test_a_low_severity_finding_is_never_posted():
+    result = _result("a", "data", "Malta's 1981 value looks implausibly high.")
+    result["issues"][0]["severity"] = "low"
+    assert digest.new_findings([result], {}) == []
 
 
 def test_the_same_data_finding_on_a_chart_sharing_an_indicator_is_not_news():
