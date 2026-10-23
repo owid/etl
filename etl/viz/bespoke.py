@@ -160,11 +160,13 @@ SINGLE_COLUMN_FIELDS = (
 
 
 def build_feed_metadata(
-    title: str,
+    title: str | None,
     columns: dict[str, Variable],
     update_period_days: int | None = None,
 ) -> dict:
     """The feed's provenance as `BespokeMetadata` fields, derived from the columns it is built from.
+
+    `title` is optional in `BespokeMetadata`; pass None for a feed whose viz shows no title.
 
     `columns` maps the name a reader sees to the garden column carrying the metadata, e.g.
     `{"Deaths": tb["value"]}`. Most bespoke feeds are built from a single long table, so that is
