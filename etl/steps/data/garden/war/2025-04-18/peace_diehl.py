@@ -60,8 +60,8 @@ def run() -> None:
     # Set time fields as strings
     tb = tb.astype(
         {
-            "time_start": "string",
-            "time_end": "string",
+            "time_start": "str",
+            "time_end": "str",
         }
     )
 

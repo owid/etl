@@ -781,7 +781,7 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
 
 
 def harmonize_units(tb: Table) -> Table:
-    tb = tb.astype({"value": "Float64", "unit": "string"}).copy()
+    tb = tb.astype({"value": "Float64", "unit": "str"}).copy()
 
     # In some cases, units given in "tonnes *" can safely be converted to simply "tonnes".
     # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.

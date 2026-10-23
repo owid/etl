@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "DAC1: Flows by provider (ODA+OOF+Private)"
+    description: |-
+      This dataset provides main aggregates of DAC members' and other provider countries' official development assistance (ODA) flows and grant equivalents, as well as other resource flows to developing countries.
+    # NOTE: From the dataflow's "Actual" content constraint (validFrom, dataflow version 1.8), which matches the Data
+    # Explorer page's "Last updated" stamp.
+    date_published: "2026-10-08"
+
+    # Citation
+    producer: "OECD"
+    citation_full: |-
+      OECD (2026). DAC1: Flows by provider (ODA+OOF+Private). OECD Data Explorer.
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?lc=en&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC1%40DF_DAC1&df[ag]=OECD.DCD.FSD
+    # NOTE: There is no single download file; the snapshot script queries the OECD SDMX API.
+    date_accessed: 2026-10-22
+
+    # License
+    license:
+      name: "OECD Terms & conditions"
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 6536885904ec63460a8401bd852e2630
+    size: 25497
+    path: total_official_development_assistance_commitments.csv

@@ -69,7 +69,6 @@ def run() -> None:
     #
     manifest = {
         "years": years,
-        "source": metadata["attribution"],
         "dimensions": {
             "entities": [{"id": entity_id[c], "name": c} for c in countries],
             "commodityGroups": [{"id": group_id[g], "name": g} for g in groups],

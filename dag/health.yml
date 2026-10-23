@@ -11,9 +11,6 @@ steps:
             - snapshot://health/2025-04-18/deaths_karlinsky.csv
         - data://garden/demography/2024-07-15/population
 
-  # IHME GBD Leading cause of deaths - update
-  #data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
-  # - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
 
   data-private://grapher/ihme_gbd/2026-02-11/leading_causes_deaths:
     - data-private://garden/ihme_gbd/2026-02-11/leading_causes_deaths:
@@ -133,10 +130,6 @@ steps:
             - snapshot://oecd/2024-07-01/passenger_travel.csv
         - data://garden/demography/2023-03-31/population
 
-  # WHO Cardiovascular diseases deaths
-  data://grapher/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
-        - data://garden/who/2026-10-13/mortality_database
   # Global Mental Health Countdown
   data://grapher/health/2024-03-21/gmh_countdown:
     - data://garden/health/2024-03-21/gmh_countdown:
@@ -190,13 +183,6 @@ steps:
             - snapshot-private://ihme_gbd/2026-02-07/gbd_mental_health_burden.feather
         - data://garden/un/2024-07-12/un_wpp
 
-  # GBD 2021 - GBD Risk Factors
-  data-private://grapher/ihme_gbd/2024-05-20/gbd_risk:
-    - data-private://garden/ihme_gbd/2024-05-20/gbd_risk:
-        - data-private://meadow/ihme_gbd/2024-05-20/gbd_risk:
-            - snapshot-private://ihme_gbd/2024-05-20/gbd_risk.feather
-        - data://garden/regions/2023-01-01/regions
-        - data://garden/un/2024-07-12/un_wpp
 
   # GBD 2023 - GBD Child Mortality
   data-private://grapher/ihme_gbd/2026-02-07/gbd_child_mortality:
@@ -262,10 +248,6 @@ steps:
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
 
-  # Most common cancers
-  data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
-    - data://garden/who/2024-08-06/mortality_database_cancer_most_common:
-        - data://garden/who/2025-08-05/mortality_database_cancer
   # Mpox (Monkeypox) - WHO
   data://garden/who/latest/monkeypox:
     - data://meadow/who/latest/monkeypox:
@@ -287,13 +269,6 @@ steps:
     - data://garden/health/2026-09-02/eurostat_cancer:
         - data://meadow/health/2026-09-02/eurostat_cancer:
             - snapshot://health/2026-09-02/eurostat_cancer.csv
-
-  # NOTE: this was just a proof of concept for multi-dims, it'd have to be revisited.
-  #   We commented it because there were too many indicators and rendering thumbnail
-  #   was freezing Cloudflare Workers and crashing staging servers
-  # Multi-dim indicators
-  #  viz://chart/health/latest/causes_of_death:
-  #    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD data on share of deaths from total cancers
   data-private://grapher/ihme_gbd/2026-02-11/gbd_cancers_deaths:
@@ -512,9 +487,9 @@ steps:
             - snapshot://cancer/2026-09-02/gco_cancer_survival.csv
 
   # Measles deaths long run
-  data://grapher/health/2025-02-20/measles_deaths_long_run:
-    - data://garden/health/2025-02-20/measles_deaths_long_run:
-        - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+  data://grapher/health/2026-10-13/measles_deaths_long_run:
+    - data://garden/health/2026-10-13/measles_deaths_long_run:
+        - data://garden/who/2026-10-13/mortality_database
       # Measles deaths historical - US Census Bureau
         - data://garden/health/2025-02-20/measles_deaths_census_bureau:
             - data://meadow/health/2025-02-20/measles_deaths_census_bureau:
@@ -592,8 +567,8 @@ steps:
   #
   # US diphtheria deaths - long run combined sources
   #
-  data://grapher/health/2025-03-04/diphtheria_deaths:
-    - data://garden/health/2025-03-04/diphtheria_deaths:
+  data://grapher/health/2026-10-13/diphtheria_deaths:
+    - data://garden/health/2026-10-13/diphtheria_deaths:
       #
       # US Public Health Reports - Diphtheria deaths
       #
@@ -607,7 +582,7 @@ steps:
             - data://meadow/us_census_bureau/2025-03-04/diphtheria_deaths:
                 - snapshot://us_census_bureau/2025-02-26/diphtheria_deaths.csv
         - data://garden/demography/2024-07-15/population
-        - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+        - data://garden/who/2026-10-13/mortality_database
 
   # Multi-dim indicators - vaccination coverage
   viz://chart/health/latest/vaccination_coverage:
@@ -657,15 +632,15 @@ steps:
   #
   # Pertussis deaths - combined
   #
-  data://grapher/health/2025-03-06/pertussis_deaths:
-    - data://garden/health/2025-03-06/pertussis_deaths:
+  data://grapher/health/2026-10-13/pertussis_deaths:
+    - data://garden/health/2026-10-13/pertussis_deaths:
       #
       # Pertussis deaths - US Census Bureau
       #
         - data://garden/us_census_bureau/2025-03-06/pertussis_deaths:
             - data://meadow/us_census_bureau/2025-03-06/pertussis_deaths:
                 - snapshot://us_census_bureau/2025-03-06/pertussis_deaths.csv
-        - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+        - data://garden/who/2026-10-13/mortality_database
         - data://garden/demography/2024-07-15/population
 
   #
@@ -832,31 +807,15 @@ steps:
   data://grapher/who/2026-03-17/guinea_worm:
     - data://garden/who/2026-03-17/guinea_worm
 
-  # WHO Mortality Database - Cancer specific
-  data://garden/who/2025-08-05/mortality_database_cancer:
-    - data://meadow/who/2025-08-05/mortality_database_cancer:
-        - snapshot://who/2025-08-05/mortality_database_cancer.csv
-    - data://garden/who/2026-10-13/mortality_database
-  data://grapher/who/2025-08-05/mortality_database_cancer:
-    - data://garden/who/2025-08-05/mortality_database_cancer
   # WHO ICD codes
   data://grapher/who/2026-10-02/icd_codes:
     - data://garden/who/2026-10-02/icd_codes:
         - data://meadow/who/2026-10-02/icd_codes:
             - snapshot://who/2026-10-02/icd_codes.zip
   # Suicides based on WHO Mortality Database
-  data://grapher/who/2025-08-06/self_inflicted_injuries:
-    - data://garden/who/2025-08-06/self_inflicted_injuries:
-        - data://meadow/who/2025-08-06/self_inflicted_injuries:
-            - snapshot://who/2025-08-06/self_inflicted_injuries.csv
   #
   # WHO Mortality Database - Vaccine Preventable
   #
-  data://garden/who/2025-08-06/mortality_database_vaccine_preventable:
-    - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable:
-        - snapshot://who/2025-08-06/mortality_database_vaccine_preventable.csv
-  data://grapher/who/2025-08-06/mortality_database_vaccine_preventable:
-    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
 
   # GCO cancer over time (cervical)
   data://grapher/cancer/2025-08-08/gco_cancer_over_time_cervical:

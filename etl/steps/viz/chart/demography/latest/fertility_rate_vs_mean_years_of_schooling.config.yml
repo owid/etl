@@ -1,0 +1,33 @@
+grapher_schema: "011"
+chart_config_id: 0191b6c7-3b28-7d01-b0be-82641f4fb7fc
+slug: fertility-rate-vs-mean-years-of-schooling
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: fertility_rate#fertility_rate
+          display:
+            name: Total fertility rate
+      x:
+        catalogPath: education_barro_lee_projections#mf_youth_and_adults__15_64_years__average_years_of_education
+        display:
+          name: Average years of schooling in 15-64 year olds
+      size:
+        catalogPath: historical#population_historical
+      color:
+        catalogPath: regions#owid_region
+    config:
+      title: Fertility rate vs. average years of schooling
+      subtitle: The [total fertility rate](#dod:fertility-rate), in a given year. Before 2015, the share without education are based on estimates; from 2015 onwards, they are based on projections.
+      originUrl: /fertility-rate
+      chartTypes:
+        - ScatterPlot
+      hideRelativeToggle: false
+      matchingEntitiesOnly: true
+      minTime: latest
+      timelineMaxTime: 2024
+      yAxis:
+        min: 0

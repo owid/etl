@@ -215,6 +215,62 @@ def test_combine_charts_preserves_yaml_views():
     assert "lifecycle#stages" in catalog_paths, "YAML hand-listed view was not preserved"
 
 
+def test_combine_charts_preserves_optional_choice_metadata():
+    """Combining charts must not turn missing descriptions or groups into literal 'nan'."""
+    choices = [
+        {"slug": "total", "name": "Total"},
+        {"slug": "fossil", "name": "Fossil fuels", "description": "Coal, oil, and gas", "group": "Aggregates"},
+        {"slug": "blank", "name": "Blank", "description": "", "group": ""},
+        {"slug": "literal", "name": "Literal", "description": "nan", "group": "nan"},
+    ]
+    source = {"slug": "source", "name": "Source", "choices": choices}
+    charts = [
+        _make_sub_explorer(
+            frequency,
+            frequency,
+            extra_dimensions=[source],
+            extra_view_dimensions={"source": "total"},
+        )
+        for frequency in ["annual", "monthly"]
+    ]
+
+    with patch("etl.viz.chart.core.utils.process_views"):
+        combined = combine_charts(charts, catalog_path="combined#combined")
+
+    # Identical choices from both charts collapse, preserving text and intentional empty strings.
+    assert [choice.to_dict() for choice in combined.get_dimension("source").choices] == choices
+    # A dimension with no optional metadata must also stay clean when another dimension has it.
+    assert [choice.to_dict() for choice in combined.get_dimension("view_type").choices] == [
+        {"slug": "annual", "name": "annual"},
+        {"slug": "monthly", "name": "monthly"},
+    ]
+
+
+def test_combine_charts_preserves_missing_metadata_when_resolving_conflicts():
+    """A missing description and a populated one remain distinct choices with valid view references."""
+    choices = [
+        {"slug": "total", "name": "Total"},
+        {"slug": "total", "name": "Total", "description": "All sources", "group": "Aggregates"},
+    ]
+    charts = [
+        _make_sub_explorer(
+            frequency,
+            frequency,
+            extra_dimensions=[{"slug": "source", "name": "Source", "choices": [choice]}],
+            extra_view_dimensions={"source": "total"},
+        )
+        for frequency, choice in zip(["annual", "monthly"], choices)
+    ]
+
+    with patch("etl.viz.chart.core.utils.process_views"):
+        combined = combine_charts(charts, catalog_path="combined#combined")
+
+    assert [choice.to_dict() for choice in combined.get_dimension("source").choices] == [
+        {**choice, "slug": f"total__{i}"} for i, choice in enumerate(choices)
+    ]
+    assert [view.dimensions["source"] for view in combined.views] == ["total__0", "total__1"]
+
+
 def test_combine_charts_allows_identical_checkbox_dim():
     """When every sub-chart declares the same checkbox dimension (same slug, same
     choice slugs, same ``choice_slug_true``), the combine should succeed — the merge is

@@ -27,14 +27,14 @@ def run() -> None:
             # dyad_id, side_a_id, side_b_id are string ID columns that may contain
             # comma-separated lists (e.g. "411, 412"), so cast to string dtype explicitly
             # to avoid mixed-type object columns that break feather serialization.
-            "dtype": {"dyad_id": "string", "side_a_id": "string", "side_b_id": "string"},
+            "dtype": {"dyad_id": "str", "side_a_id": "str", "side_b_id": "str"},
         },
         "battle_related_dyadic": {
             "index": ["conflict_id", "dyad_id", "year"],
         },
         "ged": {
             "index": ["id"],
-            "dtype": {"gwnoa": "string"},
+            "dtype": {"gwnoa": "str"},
         },
         "prio_armed_conflict": {
             "index": ["conflict_id", "year"],

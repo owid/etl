@@ -165,35 +165,39 @@ def run() -> None:
 
     tb = tb.drop(columns=["population"])
 
+    # NOTE: Aggregating arrivals by region of origin (indicator `inbound_tourism_by_region`) is disabled.
+    # The sum is not stable over time, because many destinations stop reporting arrivals by region of origin in
+    # recent years (181 in 2019, 137 in 2022, 58 in 2024), and some report a broader measure than overnight tourists.
+    # Its only chart (international-tourist-arrivals-by-region-of-origin) was deleted and now redirects to
+    # international-tourist-trips. Revisit on the next update: re-enable only if coverage is comparable across years.
+    # # Calculate the inbound tourism by region
+    # #
+    # # Define region columns mapping
+    # region_columns_mapping = {
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total": "Africa (UNWTO)",
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total": "Americas (UNWTO)",
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total": "East Asia and the Pacific (UNWTO)",
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total": "Europe (UNWTO)",
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total": "Middle East (UNWTO)",
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_other_not_class_unwto_total": "Other (UNWTO)",
+    #     "in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total": "South Asia (UNWTO)",
+    # }
     #
-    # Calculate the inbound tourism by region
+    # # Filter to only existing columns
+    # existing_region_columns = [col for col in region_columns_mapping.keys() if col in tb.columns]
     #
-    # Define region columns mapping
-    region_columns_mapping = {
-        "in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total": "Africa (UNWTO)",
-        "in_tour_regions_trips_region_overnight_vis_tourists_americas_unwto_total": "Americas (UNWTO)",
-        "in_tour_regions_trips_region_overnight_vis_tourists_east_asia_and_the_pacific_unwto_total": "East Asia and the Pacific (UNWTO)",
-        "in_tour_regions_trips_region_overnight_vis_tourists_europe_unwto_total": "Europe (UNWTO)",
-        "in_tour_regions_trips_region_overnight_vis_tourists_middle_east_unwto_total": "Middle East (UNWTO)",
-        "in_tour_regions_trips_region_overnight_vis_tourists_other_not_class_unwto_total": "Other (UNWTO)",
-        "in_tour_regions_trips_region_overnight_vis_tourists_south_asia_unwto_total": "South Asia (UNWTO)",
-    }
-
-    # Filter to only existing columns
-    existing_region_columns = [col for col in region_columns_mapping.keys() if col in tb.columns]
-
-    if existing_region_columns:
-        tb_regions_sum = tb[existing_region_columns + ["year"]].groupby("year").sum().reset_index()
-
-        # Rename the columns
-        tb_regions_sum = tb_regions_sum.rename(columns=region_columns_mapping)
-
-        # Melt the Table so that each region is a row in a country column
-        tb_regions_sum = pr.melt(
-            tb_regions_sum, id_vars=["year"], var_name="country", value_name="inbound_tourism_by_region"
-        )
-
-        tb = pr.concat([tb, tb_regions_sum], axis=0)
+    # if existing_region_columns:
+    #     tb_regions_sum = tb[existing_region_columns + ["year"]].groupby("year").sum().reset_index()
+    #
+    #     # Rename the columns
+    #     tb_regions_sum = tb_regions_sum.rename(columns=region_columns_mapping)
+    #
+    #     # Melt the Table so that each region is a row in a country column
+    #     tb_regions_sum = pr.melt(
+    #         tb_regions_sum, id_vars=["year"], var_name="country", value_name="inbound_tourism_by_region"
+    #     )
+    #
+    #     tb = pr.concat([tb, tb_regions_sum], axis=0)
 
     #
     # Rename environment and GDP variables to shorter names

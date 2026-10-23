@@ -1341,3 +1341,13 @@ steps:
       - data://garden/bls/2026-08-18/us_ppi_construction
       - data://meadow/us_census_bureau/2026-08-18/datacenter_construction:
         - snapshot://us_census_bureau/2026-08-18/datacenter_construction.xlsx
+  # archived; last active in 0871d82c32e8 on 2026-10-19
+  data://grapher/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
+    - data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
+      - data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
+        - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://grapher/gallup/2026-07-15/ai_indicator:
+    - data://garden/gallup/2026-07-15/ai_indicator:
+      - data://meadow/gallup/2026-07-15/ai_indicator:
+        - snapshot://gallup/2026-07-15/ai_indicator.csv

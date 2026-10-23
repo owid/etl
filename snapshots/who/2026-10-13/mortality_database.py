@@ -7,15 +7,16 @@ version, because those two derived indicators only exist there.
 
 The platform's download button calls an export endpoint, one cause group per request. This
 script calls that endpoint for every cause group in CAUSES and stacks the results into one
-table. The 24 groups here are the tier of WHO's cause tree that partitions all registered
-deaths: 23 groups that tile "All Causes", plus All Causes itself.
+table. The first 24 groups in CAUSES are the tier of WHO's cause tree that partitions all registered
+deaths: 23 groups that tile "All Causes", plus All Causes itself. The rest are drill-downs inside one
+of those groups; the garden step's `causes` table records where each sits in the tree.
 
 Each export opens with five metadata lines and a blank line. The fifth line carries the ICD-10
 codes that define the cause group; we keep it as `icd10_codes`, so the definition travels with
 the data instead of being typed by hand.
 
 Raw exports are cached under CACHE_DIR, in a folder named after this snapshot's version, so re-running
-after a parsing fix does not re-download roughly 700 MB, and a later version never reuses an older
+after a parsing fix does not re-download roughly 1.5 GB, and a later version never reuses an older
 release's files. Delete the folder to force fresh downloads.
 """
 
@@ -73,6 +74,44 @@ CAUSES = {
     "Intentional injuries": "CG1560",
     "Ill-defined injuries/accidents": "CG1605",
     "Ill-defined diseases": "CG1610",
+    # Drill-downs inside "Infectious and parasitic diseases", formerly the mortality_database_vaccine_preventable
+    # dataset. The first five are the children of WHO's "Childhood-cluster diseases" (CG0110), which is not fetched.
+    "Pertussis": "CG0120",
+    "Poliomyelitis": "CG0130",
+    "Diphtheria": "CG0140",
+    "Measles": "CG0150",
+    "Tetanus": "CG0160",
+    "Hepatitis B": "CG0180",
+    "Japanese encephalitis": "CG0300",
+    # Drill-downs inside "Intentional injuries", formerly the self_inflicted_injuries and homicide/who_mort_db datasets.
+    "Self-inflicted injuries": "CG1570",
+    "Violence": "CG1580",
+    # Drill-downs inside "Malignant neoplasms", formerly the mortality_database_cancer dataset.
+    "Mouth and oropharynx cancers": "CG0610",
+    "Oesophagus cancer": "CG0620",
+    "Stomach cancer": "CG0630",
+    "Colon and rectum cancers": "CG0640",
+    "Liver cancer": "CG0650",
+    "Pancreas cancer": "CG0660",
+    "Trachea, bronchus, lung cancers": "CG0670",
+    "Melanoma and other skin cancers": "CG0680",
+    "Breast cancer": "CG0690",
+    "Cervix uteri cancer": "CG0700",
+    "Corpus uteri cancer": "CG0710",
+    "Ovary cancer": "CG0720",
+    "Prostate cancer": "CG0730",
+    "Testicular cancer": "CG0731",
+    "Kidney cancer": "CG0732",
+    "Bladder cancer": "CG0740",
+    "Brain and nervous system cancers": "CG0741",
+    "Gallbladder and biliary tract cancer": "CG0742",
+    "Larynx cancer": "CG0743",
+    "Thyroid cancer": "CG0744",
+    "Mesothelioma": "CG0745",
+    "Lymphomas, multiple myeloma": "CG0750",
+    "Leukaemia": "CG0760",
+    "Ill-defined malignant neoplasms": "CG0768",
+    "Other malignant neoplasms": "CG0769",
 }
 
 # Five metadata lines and a blank line precede the header row.

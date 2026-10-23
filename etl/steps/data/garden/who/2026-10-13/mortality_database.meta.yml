@@ -7,60 +7,38 @@ definitions:
       attribution_short: WHO
     processing_level: minor
 
-  # NOTE: The ICD-10 codes below must match the `causes` table this step builds from WHO's own export
-  # headers (`icd10_codes` column). They are repeated here because indicator text is rendered per
-  # cause and the codes are no longer a dimension of the data. When a cause group is added or WHO
-  # changes a definition, update both.
-  icd10_codes: |-
-    <% if cause == "All Causes" %>
-    A00-Y89
-    <%- elif cause == "Cardiovascular diseases" %>
-    I00-I99
-    <%- elif cause == "Congenital anomalies" %>
-    Q00-Q99
-    <%- elif cause == "Diabetes mellitus, blood and endocrine disorders" %>
-    E10-E14, D55-D64 (minus D64.9), D65-D89, E03-E07, E15-E16, E20-E34, E65-E88
-    <%- elif cause == "Digestive diseases" %>
-    K20-K92
-    <%- elif cause == "Genitourinary diseases" %>
-    N00-N64, N75-N98
-    <%- elif cause == "Ill-defined injuries" %>
-    Y10-Y34, Y872
-    <%- elif cause == "Infectious and parasitic diseases" %>
-    A00-B99, G00-G04, G14, N70-N73, P37.3, P37.4
-    <%- elif cause == "Intentional injuries" %>
-    X60-Y09, Y35-Y36, Y870, Y871
-    <%- elif cause == "Malignant neoplasms" %>
-    C00-C97
-    <%- elif cause == "Maternal conditions" %>
-    O00-O99
-    <%- elif cause == "Musculoskeletal diseases" %>
-    M00-M99
-    <%- elif cause == "Neuropsychiatric conditions" %>
-    F01-F99, G06-G98 (minus G14), U07.0, X41, X42, X44, X45
-    <%- elif cause == "Nutritional deficiencies" %>
-    E00-E02, E40-E46, E50, D50-D53, D64.9, E51-E64
-    <%- elif cause == "Oral conditions" %>
-    K00-K14
-    <%- elif cause == "Other neoplasms" %>
-    D00-D48
-    <%- elif cause == "Perinatal conditions" %>
-    P00-P96 (minus P23, P37.3, P37.4)
-    <%- elif cause == "Respiratory diseases" %>
-    J30-J98
-    <%- elif cause == "Respiratory infections" %>
-    H65-H66, J00-J22, P23, U04, U07.1, U07.2, U09.9, U10.9
-    <%- elif cause == "Sense organ diseases" %>
-    H00-H61, H68-H93
-    <%- elif cause == "Skin diseases" %>
-    L00-L98
-    <%- elif cause == "Sudden infant death syndrome" %>
-    R95
-    <%- elif cause == "Unintentional injuries" %>
-    V01-X59, Y40-Y86, Y88, Y89 (minus X41-X42, X44-X45), U12.9
-    <%- elif cause == "Ill-defined diseases" %>
-    R00-R94, R96-R99
-    <%- endif -%>
+  # The cause as it reads inside a sentence: lower case, except for names that keep their capitals. WHO's "Violence"
+  # (assault, X85-Y09) reads as homicide, the word the retired homicide dataset and its charts use.
+  cause_in_text: |-
+    <% if cause in ["Hepatitis B", "Japanese encephalitis"] %><< cause >><% elif cause == "Violence" %>homicide<% else %><< cause.lower() >><% endif %>
+
+  # Whose deaths a sentence is about: "people" for both sexes, else the sex, with unknown sex spelled out.
+  people: |-
+    <% if sex == "Both sexes" %>people<% elif sex == "Unknown sex" %>people of unknown sex<% else %><< sex.lower() >><% endif %>
+
+  # The age band as a qualifier after "people"/"females"/"males": empty for all ages, " aged 15-19 years", " aged under 10",
+  # " aged 85 and over", " of unknown age" (" and age" after "people of unknown sex").
+  aged: |-
+    <% if age_group == "all ages" %><% elif age_group == "Unknown age" %><% if sex == "Unknown sex" %> and age<% else %> of unknown age<% endif %><% elif age_group.startswith("<") %> aged under << age_group[1:].replace(" years", "") >><% elif age_group.startswith("over ") %> aged << age_group[5:].replace(" years", "") >> and over<% else %> aged << age_group >><% endif %>
+
+  # " among females aged 15-19 years"; nothing at all for both sexes, all ages, the headline slice.
+  among: |-
+    <% if sex == "Both sexes" and age_group == "all ages" %><% else %> among {definitions.people}{definitions.aged}<% endif %>
+
+  underlying_cause: based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates
+
+  # NOTE: Display names and short descriptions, per metric. The display name is the sentence readers see as the
+  # indicator's title (data page, the chart's "learn more" panel when the chart sets no label of its own, table
+  # headers); it goes in `display.name`, not `presentation.title_public`, because grapher lets a public title
+  # override the chart's own labels in that panel, while a display name yields to them.
+  display_name_deaths: "Deaths from {definitions.cause_in_text}{definitions.among}"
+  description_short_deaths: "Reported deaths from {definitions.cause_in_text}{definitions.among}, {definitions.underlying_cause}."
+  display_name_death_rate: "Deaths from {definitions.cause_in_text} per 100,000 {definitions.people}{definitions.aged}"
+  description_short_death_rate: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}{definitions.aged}, {definitions.underlying_cause}."
+  display_name_share: "Share of deaths{definitions.among} that are from {definitions.cause_in_text}"
+  description_short_share: "Share of all reported deaths{definitions.among} that are from {definitions.cause_in_text}, {definitions.underlying_cause}."
+  display_name_death_rate_age_standardized: "Age-standardized death rate from {definitions.cause_in_text} per 100,000 {definitions.people}"
+  description_short_death_rate_age_standardized: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}, {definitions.underlying_cause}. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
 
   description_disease_producer: |-
     <% if cause == "All Causes" %>
@@ -115,17 +93,77 @@ definitions:
   annotation: |-
     <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
 
+  # Rendered only for the age bands we derive; see add_derived_age_groups in the garden step. The death-rate text is
+  # the retired cancer dataset's, kept as it was; the count one is new (the count is derived too).
+  description_processing_derived_age_group_count: |-
+    <% if age_group in ["<5 years", "<10 years"] %>
+    WHO does not publish this combined age group. We add up the deaths it reports for each of the underlying age groups.
+    <%- endif -%>
+  description_processing_derived_age_group_rate: |-
+    <% if age_group in ["<5 years", "<10 years"] %>
+    WHO does not publish a death rate for this combined age group. We add up the deaths it reports for each of the underlying age groups, and divide by the population WHO itself used as the denominator, which we recover from its reported death counts and rates for all causes combined. Where that population cannot be recovered for every underlying age group, we leave the rate missing rather than reporting it as zero.
+    <%- endif -%>
+
   # Rendered only for Unintentional injuries; see correct_unintentional_injuries in the garden step.
   description_processing_unintentional_injuries: |-
     <% if cause == "Unintentional injuries" %>
     In WHO's February 2026 release, this group counts the accidental drug and alcohol poisonings (ICD-10 codes X41, X42, X44 and X45) that WHO's own definition excludes, and that WHO already counts under neuropsychiatric conditions. For the country-years where this makes the cause groups add up to more than all deaths, we set deaths from unintentional injuries to all-cause deaths minus the other cause groups, and recompute the share of deaths and the death rate from that. The age-standardized death rate is left missing for those country-years.
     <%- endif -%>
+  # Rendered for the rates the .corrections.yml removes for Malta 1973-1981 (all age-standardized rates, and the
+  # death rates of the age bands that include ages 85+). They can follow another note, whose `-%>` eats the whitespace
+  # after it, so the paragraph break sits inside the block: trim_blocks drops the first newline, the result is stripped.
+  description_processing_malta_age_standardized: |-
+    <% if age_group == "all ages" %>
+
+
+    WHO's population figures for Malta count far too few people aged 85 and older in 1973–1981: between 500 and 800, compared with 1,500 in 1972 and 2,900 in 1982. Age-standardized death rates depend on that number, so we removed Malta's age-standardized rates for those years.
+    <%- endif -%>
+  description_processing_malta_over_85: |-
+    <% if age_group in ["over 85 years", "over 70 years"] %>
+
+
+    WHO's population figures for Malta count far too few people aged 85 and older in 1973–1981: between 500 and 800, compared with 1,500 in 1972 and 2,900 in 1982. Death rates for this age group depend on that number, so we removed Malta's rates for those years.
+    <%- endif -%>
+  # Rendered for the broad_cause_groups table; see build_broad_cause_groups in the garden step. The text for the
+  # merged groups is the retired deaths_from_cardiovascular_diseases_vs_other dataset's, kept as it was.
+  description_processing_broad_cause_group: |-
+    <% if cause == "Cancer and neoplasms" %>
+    The "Cancer and Neoplasms" category aggregates the share of deaths attributed to both malignant neoplasms and other neoplasms.
+    <% elif cause == "Congenital and maternal conditions" %>
+    The 'Congenital & Maternal Conditions' category aggregates the share of deaths attributed to congenital anomalies, maternal conditions, perinatal conditions, and sudden infant death syndrome.
+    <% elif cause == "Digestive and oral health" %>
+    The 'Digestive & Oral Health' category encompasses the share of deaths due to digestive diseases and oral conditions.
+    <% elif cause == "Endocrine and nutritional disorders" %>
+    The 'Endocrine & Nutritional Disorders' category aggregates the share of deaths resulting from diabetes mellitus, blood and endocrine disorders, as well as nutritional deficiencies.
+    <% elif cause == "Ill-defined causes and injuries" %>
+    The 'Ill-defined Causes & Injuries' category sums up the share of deaths from ill-defined diseases, ill-defined injuries, intentional injuries, and unintentional injuries.
+    <% elif cause == "Infectious diseases" %>
+    The 'Infectious Diseases' category aggregates the share of deaths caused by infectious and parasitic diseases, alongside respiratory infections.
+    <% elif cause == "Neurological and mental health" %>
+    The 'Neurological & Mental Health' category represents the share of deaths due to neuropsychiatric conditions.
+    <% elif cause == "Other diseases and conditions" %>
+    The 'Other Diseases & Conditions' category represents the share of deaths due to musculoskeletal diseases, skin diseases or sense organ diseases.
+    <% elif cause == "Unidentified causes" %>
+    This category is the share of deaths left once all other categories are counted: the deaths in the cause groups that WHO did not report for that country and year.
+    <%- endif -%>
+
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   # WHO refreshes the database each February. The data page computes "next expected update" as this
   # step's version date plus this period, so 150 days from 2026-10-13 lands in March 2027.
   update_period_days: 150
   changelog:
+    - date: 2026-10-20
+      changes:
+        - Added the share of deaths from twelve broader cause groups, for both sexes and all ages, in the table `broad_cause_groups`; previously the separate "Mortality Database - Cardiovascular Diseases vs Other Causes" dataset. Genitourinary diseases are now their own group; that dataset counted them under "Unidentified causes".
+    - date: 2026-10-15
+      changes:
+        - Added violence (homicides) as a drill-down cause inside "Intentional injuries", in the table `intentional_injuries`, with the age bands the homicide charts use (<5, 5-14, 15-49, 50-69, over 70 and <20 years) derived on WHO's own population; previously the separate "WHO Mortality Database - Homicides" dataset, which derived them on UN population and dropped WHO's own age bands.
+    - date: 2026-10-14
+      changes:
+        - Added seven vaccine-preventable diseases (pertussis, poliomyelitis, diphtheria, measles, tetanus, hepatitis B and Japanese encephalitis) as drill-down causes inside "Infectious and parasitic diseases"; they were previously the separate "WHO Mortality Database – Vaccine Preventable" dataset.
+        - Added the 25 cancer types as drill-down causes inside "Malignant neoplasms", in the table `cancers`, with the under-5 and under-10 age bands we derive, and the leading cancer type per country, year and sex as the table `most_common_cancer`; previously the separate "WHO Mortality Database - Cancer Deaths" and "Leading cancer types causing death" datasets.
+        - Added self-inflicted injuries (suicides) as a drill-down cause inside "Intentional injuries", in the table `intentional_injuries`; previously the separate "WHO Mortality Database - Self-inflicted injuries" dataset.
     - date: 2026-10-13
       changes:
         - Data updated to WHO's February 2026 release; it now runs to 2024.
@@ -139,18 +177,17 @@ dataset:
     - Lucas Rodés-Guirao
 tables:
   mortality_database:
-    variables:
-      number:
-        title: Deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>
-        description_short: Reported total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are {definitions.icd10_codes}."
+    variables: &fact_variables
+      deaths:
+        title: "<< cause >> — Deaths — << sex >>, << age_group >>"
+        description_short: "{definitions.description_short_deaths}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_count}
         unit: deaths
         display:
+          name: "{definitions.display_name_deaths}"
           numDecimalPlaces: 0
           entityAnnotationsMap: |-
             {definitions.annotation}
@@ -158,11 +195,9 @@ tables:
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-      percentage_of_cause_specific_deaths_out_of_total_deaths:
-        title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
-        description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are {definitions.icd10_codes}."
+      share_of_deaths:
+        title: "<< cause >> — Share of total deaths — << sex >>, << age_group >>"
+        description_short: "{definitions.description_short_share}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -170,22 +205,22 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
+          name: "{definitions.display_name_share}"
           numDecimalPlaces: 1
         presentation:
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-      age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
-        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are {definitions.icd10_codes}."
+      death_rate_age_standardized:
+        title: "<< cause >> — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
+        description_short: "{definitions.description_short_death_rate_age_standardized}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_malta_age_standardized}
         unit: deaths per 100,000 people
         display:
+          name: "{definitions.display_name_death_rate_age_standardized}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
@@ -193,17 +228,16 @@ tables:
           grapher_config:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-      death_rate_per_100_000_population:
-        title: Deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>
-        description_short: Reported deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are {definitions.icd10_codes}."
+      death_rate:
+        title: "<< cause >> — Death rate per 100,000 people — << sex >>, << age_group >>"
+        description_short: "{definitions.description_short_death_rate}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_rate}{definitions.description_processing_malta_over_85}
         unit: deaths per 100,000 people
         display:
+          name: "{definitions.display_name_death_rate}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
@@ -214,11 +248,68 @@ tables:
 
   # A lookup table, kept in the catalog and not published to Grapher. It records where each cause group sits in
   # WHO's cause tree, so the groups that partition all deaths can be told apart from drill-downs inside them.
+  vaccine_preventable_diseases:
+    # The retired vaccine_preventable dataset was tagged Vaccination; its successors keep that tag next to the common one.
+    common:
+      presentation:
+        topic_tags:
+          - Causes of Death
+          - Vaccination
+    variables: *fact_variables
+  intentional_injuries:
+    # The retired self_inflicted_injuries dataset was tagged Mental Health only and the retired homicide dataset Global
+    # Health only; each cause keeps its own. The table carries the first; the grapher step sets Global Health on Violence
+    # (TOPIC_TAGS_BY_CAUSE), because a tag list cannot vary by dimension here and the schema allows no template in it.
+    common:
+      presentation:
+        topic_tags:
+          - Mental Health
+    variables: *fact_variables
+  cancers:
+    # The retired mortality_database_cancer dataset was tagged Causes of Death and Cancer; its successors keep both.
+    common:
+      presentation:
+        topic_tags:
+          - Causes of Death
+          - Cancer
+    variables: *fact_variables
+  most_common_cancer:
+    common:
+      presentation:
+        topic_tags:
+          - Causes of Death
+          - Cancer
+    variables:
+      cause:
+        title: Leading cancer types causing death in << sex.lower() >>
+        description_short: Most common cause of [cancer](#dod:cancer) deaths in << sex.lower() >>, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
+        description_processing: |-
+          The leading cancer type is the one with the highest age-standardized death rate among the 25 cancer types WHO publishes, for each country, year and sex.
+
+          Malta is missing in 1973–1981, because WHO's age-standardized rates for those years rely on a population figure for people aged 85 and older that is far too low.
+        unit: ""
+  broad_cause_groups:
+    # The retired deaths_from_cardiovascular_diseases_vs_other dataset was tagged Cardiovascular Diseases only.
+    common:
+      presentation:
+        topic_tags:
+          - Cardiovascular Diseases
+    variables:
+      share_of_deaths:
+        title: Share of deaths from << cause.lower() >>
+        unit: "%"
+        short_unit: "%"
+        description_short: Based on the underlying cause listed on death certificates.
+        description_processing: |-
+          {definitions.description_processing_broad_cause_group}
+        display:
+          name: << cause >>
+          numDecimalPlaces: 1
   causes:
     variables:
       cause_level:
         title: Depth of the cause group in WHO's cause tree
-        description_short: 0 is All Causes; 1 is one of WHO's four top-level groups; 2 is a group one level below them.
+        description_short: 0 is All Causes; 1 is one of WHO's four top-level groups; 2 is a group one level below them; 3 and 4 are drill-downs inside those.
         unit: ""
       parent_cause:
         title: Parent cause group in WHO's cause tree
@@ -227,4 +318,8 @@ tables:
       icd10_codes:
         title: ICD-10 codes that define the cause group
         description_short: The International Classification of Diseases (Version 10) codes WHO groups under this cause, as given in its export.
+        unit: ""
+      table:
+        title: Table of this dataset that carries the cause
+        description_short: mortality_database holds All Causes and the groups that tile it; drill-down causes sit in one table per group.
         unit: ""

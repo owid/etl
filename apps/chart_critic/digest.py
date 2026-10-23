@@ -62,11 +62,6 @@ ASK = "*Is this a real error, or is the chart fine?*"
 # How the channel closes a post, and why an unticked finding is not a lost one.
 TICK = ":white_check_mark:  Tick when it's been checked."
 
-# On every finding rather than once in the lead. The lead says what the sweep was; this says what
-# the claim is worth, and it is the finding that gets forwarded, quoted and replied to on its own.
-# Plain italics, no nested code span: Slack mrkdwn renders nested formatting unreliably.
-CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
-
 # What a person reads over coffee, and now also what a low-traffic channel can absorb:
 # #chart-reviews carries two or three posts a day with one default reviewer, and a finding held
 # back is not dropped — it is not stamped either, so it comes back tomorrow if it still stands.
@@ -86,10 +81,15 @@ THREAD_SEPARATOR = "\n\n----- in thread -----\n\n"
 
 @dataclass
 class DigestMessage:
-    """One Slack message, with whatever is posted underneath it in its own thread."""
+    """One Slack message, with whatever is posted underneath it in its own thread.
+
+    ``text`` is what the digest file records and what Slack shows in a notification; ``blocks``,
+    when set, is how the message is laid out in the channel.
+    """
 
     text: str
     thread: list[str] = field(default_factory=list)
+    blocks: list[dict[str, Any]] | None = None
 
 
 def render(messages: list[DigestMessage]) -> str:
@@ -400,15 +400,19 @@ def new_findings(
     (highest severity, then most read) is the one that goes. A second, different problem on the
     same chart waits for the cooldown to pass — a smaller cost than what this replaced, where the
     same problem reworded came back the morning after it was ticked.
+
+    A 'low' finding is never posted: the model's rubric for it is "technically true but nobody
+    acts on it", and a post nobody acts on teaches the channel to skip the digest. It stays in
+    the report.
     """
     day = today or _today()
     cutoff = (day - timedelta(days=COOLDOWN_DAYS)).isoformat()
     posted = {key: when for key, when in state.items() if when >= cutoff}
     out: list[tuple[dict[str, Any], dict[str, Any]]] = []
-    order = {"high": 0, "medium": 1, "low": 2}
+    order = {"high": 0, "medium": 1}
     ranked = sorted(
-        ((r, i) for r in results for i in r["issues"]),
-        key=lambda ri: (order.get(ri[1].get("severity", "low"), 3), -ri[0].get("views", 0)),
+        ((r, i) for r in results for i in r["issues"] if i.get("severity") in order),
+        key=lambda ri: (order[ri[1]["severity"]], -ri[0].get("views", 0)),
     )
     for result, issue in ranked:
         keys = _dedup_keys(result["slug"], issue, facts)
@@ -435,7 +439,7 @@ def _chart_title(result: dict[str, Any]) -> str:
 
 
 def _thumbnail(url: str) -> str:
-    """The chart's own render, as a bare URL for Slack to unfurl into the message.
+    """The chart's own render, as an image in the message.
 
     The one thing the digest lacked that every other #chart-reviews post has. A claim about a
     chart is adjudicated by looking at the chart, and a link alone makes everybody click.
@@ -483,9 +487,9 @@ def _format_finding(
     facts: dict[str, dict[str, Any]] | None = None,
     model: str = "",
 ) -> DigestMessage:
-    """One finding as its own message, in the shape the channel already uses: the chart's title,
-    the chart, a row of actions, the question being asked and who is being asked it, the claim,
-    the facts in a blockquote, and the tick that closes it — with the evidence in the thread.
+    """One finding as its own message, in the shape #analytics-bites uses: the chart's title as
+    its live link, the question and who is being asked it, the claim, the chart, and a muted
+    footer with the facts, the links and the tick — with the evidence in the thread.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
@@ -493,29 +497,38 @@ def _format_finding(
     """
     chart = (facts or {}).get(result["slug"]) or {}
     url = issue.get("url") or f"{GRAPHER_URL}/{result['slug']}"
-    lines = [_chart_title(result), _thumbnail(url)]
-
-    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to
-    # edit. The live link is always there, and is what the tick is taken against.
-    actions = [f":chart_with_upwards_trend:  <{url}|View live chart>"]
-    if chart_id := chart.get("chart_id"):
-        actions.append(f":pencil2:  <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
-    lines.append("      ".join(actions))
+    title = _chart_title(result)
 
     # The ask, and who is being asked. Near the top rather than in the footer: a finding whose
     # only mention sits at the end of a middot-separated footer does not read as addressed to
     # anyone, and a finding addressed to nobody gets read and forgotten.
     editor = chart.get("editor_mention")
-    lines.append(ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""))
-
-    lines.append(issue.get("claim", "").rstrip(".") + ".")
+    body = "\n".join(
+        [
+            f"*<{url}|{title}>*",
+            ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""),
+            issue.get("claim", "").rstrip(".") + ".",
+        ]
+    )
 
     dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
-    lines.append(f"> *Severity:*  {dot} {issue.get('severity', 'low')}  ·  {issue.get('kind', 'chart')}-level")
+    footer = [f"{dot} {issue.get('severity', 'low')}", f"{issue.get('kind', 'chart')}-level"]
     if views := format_views(result.get("views")):
-        lines.append(f"> *Readership:*  {views}")
-    lines.append(f"{TICK}   ·   {CAVEAT}")
-    return DigestMessage("\n".join(lines), [_evidence(issue, model)])
+        footer.append(views)
+    footer.append(f":chart_with_upwards_trend: <{url}|View live chart>")
+    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to edit.
+    if chart_id := chart.get("chart_id"):
+        footer.append(f":pencil2: <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
+    footer.append(TICK)
+    footer_text = "   ·   ".join(footer)
+
+    thumbnail = _thumbnail(url)
+    blocks = [
+        {"type": "section", "text": {"type": "mrkdwn", "text": body}},
+        {"type": "image", "image_url": thumbnail, "alt_text": title},
+        {"type": "context", "elements": [{"type": "mrkdwn", "text": footer_text}]},
+    ]
+    return DigestMessage("\n".join([body, thumbnail, footer_text]), [_evidence(issue, model)], blocks)
 
 
 def format_slack(

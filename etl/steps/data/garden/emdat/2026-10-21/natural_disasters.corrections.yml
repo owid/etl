@@ -1,0 +1,52 @@
+# Known errors in EM-DAT's data, amended here until EM-DAT fixes them.
+# Each entry amends one year that contradicts the rest of the same record: the year in the event's identifier (DisNo.)
+# and the event's other date.
+# Rows are located before harmonization, so country and type use EM-DAT's names.
+# See etl/data_corrections.py for the format.
+- indicator: end_year
+  match: {country: Honduras, type: Storm, start_year: 2000, start_month: 9, start_day: 29, value: 2026}
+  action: override
+  value: 2000
+  reason: >-
+    Hurricane Keith (DisNo. 2000-0643-HND).
+    Reason: a storm cannot last 26 years.
+    EM-DAT says: from 2000-09-29 to 2026-10-03.
+    Amended: from 2000-09-29 to 2000-10-03 (the identifier and the start date are both in 2000).
+  producer: EM-DAT
+  status: open
+
+- indicator: end_year
+  match: {country: Japan, type: Storm, start_year: 2002, start_month: 10, start_day: 2, value: 2026}
+  action: override
+  value: 2002
+  reason: >-
+    Typhoon Higos (DisNo. 2002-0635-JPN).
+    Reason: a storm cannot last 24 years.
+    EM-DAT says: from 2002-10-02 to 2026-10-04.
+    Amended: from 2002-10-02 to 2002-10-04 (the identifier and the start date are both in 2002).
+  producer: EM-DAT
+  status: open
+
+- indicator: start_year
+  match: {country: Venezuela (Bolivarian Republic of), type: Storm, end_year: 1988, start_month: 9, start_day: 11, value: 2026}
+  action: override
+  value: 1988
+  reason: >-
+    Hurricane Gilbert (DisNo. 1988-0424-VEN).
+    Reason: an event cannot start after it ends.
+    EM-DAT says: from 2026-09-11 to 1988-09-11.
+    Amended: from 1988-09-11 to 1988-09-11 (the identifier and the end date are both in 1988).
+  producer: EM-DAT
+  status: open
+
+- indicator: start_year
+  match: {country: Nepal, type: Storm, end_year: 1995, start_month: 11, start_day: 10, value: 2026}
+  action: override
+  value: 1995
+  reason: >-
+    Storm in Nepal (DisNo. 1995-0275-NPL).
+    Reason: an event cannot start after it ends.
+    EM-DAT says: from 2026-11-10 to 1995-11-11.
+    Amended: from 1995-11-10 to 1995-11-11 (the identifier and the end date are both in 1995).
+  producer: EM-DAT
+  status: open

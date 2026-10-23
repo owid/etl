@@ -20,6 +20,8 @@ Silent data corruption is one of the easier bugs to miss. A step can run cleanly
 
 Use plain `assert` with a clear error message. Hard-fail is the default — let the step crash loudly. Save `log.warning(...)` for checks that flag suspicious patterns the maintainer should *review* but that aren't always wrong (e.g., a country dropping to zero in the latest year — could be a real signal, could be incomplete reporting).
 
+Compare floats with a relative tolerance of about 1e-6, not 1e-9. Saved tables are repacked to float32 (about 7 significant digits), so a check that passes on the float64 values inside the step fails when you re-run it against the built dataset, which is how you negative-test it.
+
 ```python
 def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
     assert set(tb_economy["jurisdiction"]) == set(tb_coverage["jurisdiction"]), "Jurisdictions don't match between the two input tables."

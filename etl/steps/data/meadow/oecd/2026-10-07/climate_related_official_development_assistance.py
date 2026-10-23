@@ -36,6 +36,17 @@ EXPECTED_FIXED_VALUES_CRS = {
     "MODALITY": "_T",  # All types of aid
 }
 
+# The same, for the totals of ODA from the DAC1 table (DAC countries and EU institutions).
+EXPECTED_FIXED_VALUES_DAC1 = {
+    "SECTOR": "_Z",  # Not applicable
+    "TYING_STATUS": "_Z",  # Not applicable
+    "FLOW_TYPE": 1150,  # Commitments, total
+    "PRICE_BASE": "Q",  # Constant prices
+    "UNIT_MEASURE": "USD",  # US dollars
+    "BASE_PER": CONSTANT_PRICE_BASE_YEAR,  # Base year of constant prices
+    "UNIT_MULT": 6,  # Unit multiplier: values are in millions (10^6)
+}
+
 # Columns to keep from the data files, and their new names.
 COLUMNS_TOTALS = {
     "DONOR": "donor_code",
@@ -48,6 +59,7 @@ COLUMNS_TOTALS = {
 }
 COLUMNS_ACTIVITIES = {
     "MD_ID": "activity_id",
+    "DONOR_AGENCY": "donor_agency",
     "DONOR": "donor_code",
     "RECIPIENT": "recipient_code",
     "SECTOR": "sector_code",
@@ -55,6 +67,19 @@ COLUMNS_ACTIVITIES = {
     "SCORE": "score",
     "CLIMATE_MITIGATION": "climate_mitigation_score",
     "CLIMATE_ADAPTATION": "climate_adaptation_score",
+    "TIME_PERIOD": "year",
+    "OBS_VALUE": "value",
+}
+
+# Columns to keep from the project-level rows of EU institutions (at all scores of the mitigation marker), and their
+# new names. The agency identifies the projects of the European Investment Bank.
+COLUMNS_EU_INSTITUTIONS = {
+    "MD_ID": "activity_id",
+    "DONOR_AGENCY": "donor_agency",
+    "DONOR": "donor_code",
+    "RECIPIENT": "recipient_code",
+    "SECTOR": "sector_code",
+    "SCORE": "score",
     "TIME_PERIOD": "year",
     "OBS_VALUE": "value",
 }
@@ -80,11 +105,14 @@ def run() -> None:
     # Retrieve snapshots: RioMarkers (totals, project-level rows, names of codes) and CRS (total bilateral ODA).
     snap = paths.load_snapshot("climate_related_official_development_assistance.zip")
     snap_crs = paths.load_snapshot("bilateral_official_development_assistance_commitments.csv")
+    snap_dac1 = paths.load_snapshot("total_official_development_assistance_commitments.csv")
 
     # Load data from snapshots.
     tables_totals = [snap.read_in_archive(file_name, low_memory=False) for file_name in FILES_TOTALS]
     tb_activities = snap.read_in_archive("activities.csv", low_memory=False)
+    tb_eu = snap.read_in_archive("eu_institutions_activities.csv", low_memory=False)
     tb_bilateral = snap_crs.read(low_memory=False)
+    tb_dac1 = snap_dac1.read()
     # Names of codes and groups are in SDMX XML files.
     with zipfile.ZipFile(snap.path) as zf:
         structure = ET.fromstring(zf.read("structure.xml"))
@@ -97,7 +125,11 @@ def run() -> None:
     for file_name, tb in zip(FILES_TOTALS, tables_totals):
         sanity_check_fixed_dimensions(tb=tb, name=file_name, expected=EXPECTED_FIXED_VALUES)
     sanity_check_fixed_dimensions(tb=tb_activities, name="activities.csv", expected=EXPECTED_FIXED_VALUES)
+    sanity_check_fixed_dimensions(
+        tb=tb_eu, name="EU institutions", expected={**EXPECTED_FIXED_VALUES, "DONOR": "4EU001", "MARKER": 20}
+    )
     sanity_check_fixed_dimensions(tb=tb_bilateral, name="CRS totals", expected=EXPECTED_FIXED_VALUES_CRS)
+    sanity_check_fixed_dimensions(tb=tb_dac1, name="DAC1 totals", expected=EXPECTED_FIXED_VALUES_DAC1)
 
     # Step 2: Total bilateral ODA (CRS). Its two queries share one series (all DAC members to all developing countries),
     # which is kept once.
@@ -110,6 +142,12 @@ def run() -> None:
         "CRS queries disagree on overlapping values."
     )
 
+    # Total ODA (DAC1): total, bilateral, and contributions to EU institutions, of DAC countries and EU institutions.
+    tb_dac1 = tb_dac1[["DONOR", "MEASURE", "TIME_PERIOD", "OBS_VALUE"]].rename(
+        columns={"DONOR": "donor_code", "MEASURE": "measure", "TIME_PERIOD": "year", "OBS_VALUE": "value"},
+        errors="raise",
+    )
+
     # Step 3: RioMarkers totals, by marker and score. The three files share some series, which are kept once.
     tb_totals = pr.concat(
         [tb[list(COLUMNS_TOTALS)].rename(columns=COLUMNS_TOTALS, errors="raise") for tb in tables_totals],
@@ -119,18 +157,23 @@ def run() -> None:
     tb_totals = tb_totals.drop_duplicates()
     assert not tb_totals.duplicated(subset=keys).any(), "Files with totals disagree on overlapping values."
     # Store sector codes as text, like the other codes.
-    tb_totals = tb_totals.astype({"sector_code": "string"})
+    tb_totals = tb_totals.astype({"sector_code": "str"})
 
     # Step 4: Project-level rows (activities): one per project and marker, with both climate scores.
     tb_activities = tb_activities[list(COLUMNS_ACTIVITIES)].rename(columns=COLUMNS_ACTIVITIES, errors="raise")
-    tb_activities = tb_activities.astype({"sector_code": "string"})
+    tb_activities = tb_activities.astype({"sector_code": "str"})
+
+    # Step 5: Project-level rows of EU institutions, at all scores of the mitigation marker.
+    tb_eu = tb_eu[list(COLUMNS_EU_INSTITUTIONS)].rename(columns=COLUMNS_EU_INSTITUTIONS, errors="raise")
+    tb_eu = tb_eu.astype({"sector_code": "str"})
 
     # Store codes as categoricals, to keep the large tables small.
     for tb in [tb_totals, tb_activities]:
-        for column in ["donor_code", "recipient_code", "sector_code"]:
-            tb[column] = tb[column].astype("category")
+        for column in ["donor_code", "recipient_code", "sector_code", "donor_agency"]:
+            if column in tb.columns:
+                tb[column] = tb[column].astype("category")
 
-    # Step 5: Names of donors, recipients and sectors (with the hierarchy of sectors).
+    # Step 6: Names of donors, recipients and sectors (with the hierarchy of sectors).
     tb_codes = snap.read_from_records(extract_codelists(structure=structure))
     assert set(tb_codes["codelist"]) == set(CODELISTS.values()), "Missing codelists in the structure."
     # Hierarchy of groups of recipients and donors: each group with its direct members.
@@ -142,9 +185,11 @@ def run() -> None:
     tables = [
         tb_totals.format(keys, short_name="totals"),
         tb_activities.format(["activity_id"], short_name="activities"),
+        tb_eu.format(["activity_id"], short_name="eu_institutions_activities"),
         tb_codes.format(["codelist", "code"], short_name="codes"),
         tb_groups.format(["hierarchy", "parent_code", "child_code"], short_name="groups"),
         tb_bilateral.format(["donor_code", "recipient_code", "year"], short_name="bilateral_totals"),
+        tb_dac1.format(["donor_code", "measure", "year"], short_name="total_oda"),
     ]
 
     #

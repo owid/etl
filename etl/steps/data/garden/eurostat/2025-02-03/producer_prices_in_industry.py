@@ -81,7 +81,7 @@ def run() -> None:
     )
 
     # Separate flags from values.
-    tb["flag"] = tb["ppi"].astype("string").str.extract(r"([a-z]+)", expand=False)
+    tb["flag"] = tb["ppi"].astype("str").str.extract(r"([a-z]+)", expand=False)
     tb["flag"] = tb["flag"].map(FLAGS).fillna("")
     tb["ppi"] = tb["ppi"].str.replace(r"[a-z]", "", regex=True).str.strip().astype("Float64")
 
