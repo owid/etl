@@ -1105,7 +1105,7 @@ This is the **last step** of the pre-review work, and it comes **before the anno
   ```
   http://staging-site-<container_branch>/etl/wizard/chart-diff
   ```
-  An approval covers the charts as they were when approved: any later upload of the dataset to staging, a metadata-only one included, flags them again and owidbot's `chart-diff` check fails. Batch edits before asking for approval, and after a later upload tell the user Chart Diff needs approving again.
+  An approval is tied to the chart's `updatedAt`. A later upload to staging of an indicator that carries a `presentation.grapher_config`, a metadata-only one included, re-renders every chart inheriting from it through the admin API, which bumps that timestamp: those charts drop back to pending and owidbot's `chart-diff` check fails. Batch such edits before asking for approval, and after one tell the user Chart Diff needs approving again. Uploads that don't touch an indicator `grapher_config` keep the approvals; review their text changes in Metadata Diff.
 - **Metadata Diff** — the text counterpart to Chart Diff. Compares the *rendered* reader-facing texts (chart title/subtitle/footnote, `description_short`, WYSK/`description_key`) against the same baseline, across charts, MDim views and explorer views. Catches what a config diff structurally cannot: text the chart **inherits**, so a reworded `description_key` in a garden step changes dozens of charts while Chart Diff shows nothing.
   ```
   http://staging-site-<container_branch>/etl/wizard/metadata-diff
