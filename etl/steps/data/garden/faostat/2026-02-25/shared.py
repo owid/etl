@@ -19,11 +19,11 @@ import numpy as np
 import owid.catalog.core.processing as pr
 import pandas as pd
 import structlog
-from detected_anomalies import handle_anomalies
 from owid import repack  # ty: ignore
 from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
 from owid.catalog.core import utils, warnings
 from owid.datautils import dataframes
+from shared_detected_anomalies import handle_anomalies
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo

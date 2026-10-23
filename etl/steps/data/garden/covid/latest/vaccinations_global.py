@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     # Dtypes
     tb = tb.astype(
         {
-            "country": "string",
+            "country": "str",
             "total_vaccinations": float,
             "people_vaccinated": float,
             "people_fully_vaccinated": float,

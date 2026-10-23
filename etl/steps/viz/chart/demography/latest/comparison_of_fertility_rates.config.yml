@@ -1,0 +1,36 @@
+grapher_schema: "011"
+chart_config_id: 0193e5ba-6ff7-7661-9b72-9ad0a8340d0c
+slug: comparison-of-fertility-rates
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: fertility_rate#fertility_rate_hist
+          display:
+            name: Total fertility rate (births per woman)
+            color: '#008291'
+        - catalogPath: aggregated#efr_repr
+          display:
+            name: Effective fertility rate (children surviving until childbearing age)
+            color: '#996d39'
+        - catalogPath: aggregated#efr_labor
+          display:
+            name: Effective fertility rate (children surviving until working age)
+            color: '#6d3e91'
+    config:
+      title: Comparison of fertility rates that account for survival of children
+      subtitle: The [total fertility rate](#dod:fertility-rate) considers all births per woman. In contrast, the effective reproductive fertility rate considers only those expected to survive to their own childbearing years, and the effective labor fertility rate considers only those expected to survive to working age.
+      note: Childbearing years is defined by the authors as the average of 15–49 years, while working age is defined as the average of 15–65 years old.
+      variantName: Comparison
+      sourceDesc: Malani and Jacob (2024); UN WPP (2024); HFD (2025)
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - India
+      yAxis:
+        min: 0

@@ -95,8 +95,12 @@ Create the directory if it doesn't exist:
 mkdir -p etl/steps/viz/chart/{namespace}/latest
 ```
 
-The chart's public slug is derived from the short name with underscores replaced by dashes
-(`banning_of_chick_culling` → `banning-of-chick-culling`).
+The top-level `slug:` is the chart's public URL (`ourworldindata.org/grapher/<slug>`). Single charts must
+set it; a multidim without it gets its slug in the admin. Naming the step after the slug is not required,
+but strongly recommended, so the file and the URL match (`banning_of_chick_culling.config.yml` →
+`slug: banning-of-chick-culling`). Ask the user for the slug before merging: ETL applies it only when it
+creates the chart (or the multidim has no slug yet) and never renames one afterwards, so a later rename in
+the admin shows as drift.
 
 ### Python file: only when it does real work
 
@@ -214,6 +218,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ```yaml
 grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
+slug: banning-of-chick-culling
 topic_tags:
   - "Animal Welfare"
 dimensions: []
@@ -222,6 +227,7 @@ views:
     indicators:
       y:
         - catalogPath: "<dataset_short_name>#<indicator_short_name>"
+    # Single-indicator chart: leave `config` out and set these in garden (see below).
     config:
       title: "Your chart title"
       subtitle: "One-line context for the chart."
@@ -244,6 +250,8 @@ Key fields:
   authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required** for single charts, the chart's identity in grapher (`charts.configId`).
   See Step 4.
+- `slug` — **required** for single charts, optional for multidims: the chart's public URL. See "Directory
+  structure".
 - `topic_tags` — **required**, see "Topic tags".
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not a multidim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
@@ -252,6 +260,26 @@ Key fields:
   while being far less visible (ETL warns when it does).
 - No top-level `title:`, `default_selection:` or `default_dimensions:` block — those exist only for multidim
   pages and are ignored for single charts.
+- **Single-indicator chart: configure it in garden, not here.** A chart that shows one indicator inherits
+  every field of that indicator's `presentation.grapher_config`, except `$schema`, `id`, `slug`, `version` and
+  `isPublished`. So put its FAUST (`title`, `subtitle`, `note`) and its settings (`originUrl`, `hasMapTab`,
+  `tab`, `chartTypes`, `map` with its `colorScale`, `yAxis`, `selectedEntityNames`, `selectedFacetStrategy`,
+  `addCountryMode`…) there, and leave `views[0].config` empty. These become the indicator's defaults, so any
+  other chart, multidim or explorer on it gets them too: if the indicator is already shown elsewhere and a
+  setting is only for this chart, keep that setting in `views[0].config`. Later edits to an existing chart go
+  through `edit-faust-metadata`, which reports the other surfaces first.
+  - Put settings shared by all indicators, such as `originUrl`, once in
+    `definitions.common.presentation.grapher_config`: it merges into each indicator's own `grapher_config`.
+    But a variable's `map` block replaces the common one instead of merging into it.
+  - A field set in the chart config overrides the inherited one, so keep only what is specific to this chart.
+  - When `title_public` isn't set, `grapher_config.title` also becomes the indicator's data page title.
+  - Grapher only inherits from a chart's single y-indicator (`getParentVariableIdFromChartConfig`): a chart
+    with several y-indicators, or a scatter plot, has nothing to inherit from, whatever its
+    `charts.isInheritanceEnabled` says. So does any chart whose `isInheritanceEnabled` is 0, such as some
+    charts adopted from the admin. Their FAUST and settings stay in the chart config.
+  - To check, read `charts.isInheritanceEnabled` and the chart's own layers on staging (the `chart_configs`
+    rows named by `charts.patchConfigIdETL` and `charts.patchConfigId`), not the rendered config, where an
+    override looks the same as an inherited value.
 
 ## Config YAML: multidim
 

@@ -287,6 +287,7 @@ def test_select_dirty_steps():
     assert all([s.is_dirty() for s in select_dirty_steps(steps, 10)])
 
 
+@pytest.mark.integration
 def test_get_etag():
     try:
         etag = get_etag("https://raw.githubusercontent.com/owid/owid-grapher/master/README.md")

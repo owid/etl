@@ -1210,3 +1210,73 @@ steps:
     - data://garden/who/2024-03-24/self_inflicted_injuries:
       - data://meadow/who/2024-03-24/self_inflicted_injuries:
         - snapshot://who/2024-03-24/self_inflicted_injuries.csv
+  # archived; last active in 713c5842dbb3 on 2026-10-13
+  data://grapher/who/2025-04-17/mortality_database:
+    - data://garden/who/2025-04-17/mortality_database:
+      - data://meadow/who/2025-04-17/mortality_database:
+        - snapshot://who/2025-04-17/mortality_database.feather
+  # archived; last active in 713c5842dbb3 on 2026-10-13
+  data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
+    - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
+      - data://garden/who/2025-04-17/mortality_database
+  # archived; last active in 713c5842dbb3 on 2026-10-13
+  data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/maternal_mortality/2024-07-08/maternal_mortality:
+      - data://garden/demography/2024-07-15/population
+      - data://garden/who/2025-04-17/mortality_database
+      - data://garden/gapminder/2024-07-08/maternal_mortality
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/un/2024-07-08/maternal_mortality
+  # archived; last active in 5730de9231a1 on 2026-10-13
+  data://grapher/health/2025-02-20/measles_deaths_long_run:
+    - data://garden/health/2025-02-20/measles_deaths_long_run:
+      - data://garden/who/2025-08-06/mortality_database_vaccine_preventable:
+        - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable:
+          - snapshot://who/2025-08-06/mortality_database_vaccine_preventable.csv
+      - data://garden/health/2025-02-20/measles_deaths_census_bureau
+      - data://garden/health/2025-02-20/measles_deaths_public_health_reports
+      - data://garden/demography/2024-07-15/population
+  # archived; last active in 5730de9231a1 on 2026-10-13
+  data://grapher/health/2025-03-04/diphtheria_deaths:
+    - data://garden/health/2025-03-04/diphtheria_deaths:
+      - data://garden/demography/2024-07-15/population
+      - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+      - data://garden/public_health_reports/2025-03-04/diphtheria_deaths
+      - data://garden/us_census_bureau/2025-03-04/diphtheria_deaths
+  # archived; last active in 5730de9231a1 on 2026-10-13
+  data://grapher/who/2025-08-06/mortality_database_vaccine_preventable:
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+  # archived; last active in 5730de9231a1 on 2026-10-13
+  data://grapher/health/2025-03-06/pertussis_deaths:
+    - data://garden/health/2025-03-06/pertussis_deaths:
+      - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+      - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
+      - data://garden/demography/2024-07-15/population
+  # archived; last active in c13b29b8ad4a on 2026-10-14
+  data://grapher/who/2025-08-06/self_inflicted_injuries:
+    - data://garden/who/2025-08-06/self_inflicted_injuries:
+      - data://meadow/who/2025-08-06/self_inflicted_injuries:
+        - snapshot://who/2025-08-06/self_inflicted_injuries.csv
+  # archived; last active in 486bb60a45ec on 2026-10-14
+  data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
+    - data://garden/who/2024-08-06/mortality_database_cancer_most_common:
+      - data://garden/who/2025-08-05/mortality_database_cancer:
+        - data://garden/who/2026-10-13/mortality_database
+        - data://meadow/who/2025-08-05/mortality_database_cancer:
+          - snapshot://who/2025-08-05/mortality_database_cancer.csv
+  # archived; last active in 486bb60a45ec on 2026-10-14
+  data://grapher/who/2025-08-05/mortality_database_cancer:
+    - data://garden/who/2025-08-05/mortality_database_cancer
+  # archived; last active in 48d739268955 on 2026-10-19
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_risk:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_risk:
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - data-private://meadow/ihme_gbd/2024-05-20/gbd_risk:
+        - snapshot-private://ihme_gbd/2024-05-20/gbd_risk.feather
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://grapher/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
+    - data://garden/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
+      - data://garden/who/2026-10-13/mortality_database

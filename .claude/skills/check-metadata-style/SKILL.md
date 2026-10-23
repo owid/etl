@@ -127,13 +127,15 @@ for table_name in ds.table_names:
         for i, o in enumerate(getattr(m, 'origins', None) or []):
             put(f'origins[{i}].attribution', getattr(o, 'attribution', None))
             put(f'origins[{i}].producer', getattr(o, 'producer', None))
+            put(f'origins[{i}].description', getattr(o, 'description', None))
 
         if entry['fields']:
             rows.append(entry)
 
 # Step 4: whitespace artifacts in the rendered strings
+# A source description is multi-paragraph by design, so newlines don't count as artifacts there.
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
-      if isinstance(v, str) and ('  ' in v or v != v.strip() or '\n' in v)]
+      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not k.endswith('.description')))]
 print(f'WHITESPACE ISSUES: {len(ws)}')
 for t, var, k, v in ws:
     print(f'  {t}.{var}.{k}: {v[:150]!r}')
@@ -158,6 +160,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | `presentation.attribution` | Full source credit under the chart (`producer – data product (year)`) |
 | `origins[i].attribution` | Where that credit usually comes from — the footer falls back to it when `presentation.attribution` is unset |
 | `origins[i].producer` | The last fallback: with no attribution set, the footer renders `producer (year)` |
+| `origins[i].description` | Source description in the Sources tab. `etl update` copies it from the previous version unchanged, so nothing else rereads it. Audit it once per origin, not once per variable |
 | `presentation.attribution_short` | Short source credit under the chart |
 | `presentation.grapher_config.title` | Overrides chart title when set |
 | `presentation.grapher_config.subtitle` | Chart subtitle |
@@ -174,7 +177,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 
 If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree.
 
-Origin fields (`origins[i].attribution`, `origins[i].producer`) live in the snapshot `.dvc`, not the `.meta.yml`, so this fallback does not cover them — say so in the report.
+Origin fields (`origins[i].attribution`, `origins[i].producer`, `origins[i].description`) live in the snapshot `.dvc`, not the `.meta.yml`, so this fallback does not cover them — say so in the report.
 
 **Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
 
@@ -233,6 +236,8 @@ Match the pattern in [check-metadata-typos](../check-metadata-typos/SKILL.md) §
 - **Fix all** — apply every suggested rewrite.
 - **Review each** — step through one at a time, user confirms/rejects/edits each.
 - **Cancel** — exit without changes.
+
+A fix that changes what the text claims, not just how it is worded, has to rest on the producer's documentation (`.claude/rules/producer-documentation.md`). Check it there before applying it, and ask the user when the documentation is missing or inaccessible.
 
 Apply fixes to the `.meta.yml` file with `ruamel_load` / `ruamel_dump` so comments and key ordering are preserved (see `CLAUDE.md` → *YAML Editing*):
 

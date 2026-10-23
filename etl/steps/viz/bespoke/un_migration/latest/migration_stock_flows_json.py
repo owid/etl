@@ -89,7 +89,7 @@ GENDER_MAP = {
 POPULATION_YEARS = [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]
 
 
-def create_metadata_json(tb: Table, tb_pop: Table, source: str) -> tuple[dict, dict]:
+def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
     """Build the metadata JSON and return it alongside lookup dicts."""
     # All entities = union of destinations and origins
     all_entities = sorted(set(tb["country_destination"].unique()) | set(tb["country_origin"].unique()))
@@ -131,7 +131,6 @@ def create_metadata_json(tb: Table, tb_pop: Table, source: str) -> tuple[dict, d
     metadata = {
         "timeRange": {"start": int(tb["year"].min()), "end": int(tb["year"].max())},
         "years": sorted(tb["year"].unique().tolist()),
-        "source": source,
         "dimensions": {
             "entities": entities,
             "genders": genders,
@@ -210,7 +209,7 @@ def run() -> None:
         update_period_days=ds_garden.metadata.update_period_days,
     )
 
-    metadata, mappings = create_metadata_json(tb, tb_pop, source=feed_metadata["attribution"])
+    metadata, mappings = create_metadata_json(tb, tb_pop)
 
     total_files = len(mappings["entities"]) + 1
     log.info(f"Creating {total_files} JSON files.")

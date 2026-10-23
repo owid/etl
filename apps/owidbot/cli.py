@@ -1,6 +1,7 @@
 import datetime as dt
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Literal, get_args
 
 import click
@@ -83,38 +84,45 @@ def cli(
         log.warning(f"No open PR found for branch {branch}")
         return
 
-    # recalculate services
-    services_body = {}
-    for service in services:
+    # Recalculate services in parallel: they are independent and spend their time waiting on
+    # databases, the catalog and GitHub, so the run takes as long as the slowest one.
+    def run_service(service: str) -> str | None:
         if service == "data-diff":
-            services_body["data-diff"] = data_diff.run(include, branch=branch)
+            return data_diff.run(include, branch=branch)
 
         elif service == "chart-diff":
             charts_df = chart_diff.call_chart_diff(branch)
-            services_body["chart-diff"] = chart_diff.run(branch, charts_df)
-
             # update github check run
             chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
+            return chart_diff.run(branch, charts_df)
 
         elif service == "metadata-diff":
-            metadata_summary = metadata_diff.call_metadata_diff(branch)
-            services_body["metadata-diff"] = metadata_diff.run(branch, metadata_summary)
-
             # No check run on purpose: metadata ships through ETL on merge and gates nothing, so a
             # red check here would be noise rather than a signal.
+            return metadata_diff.run(branch, metadata_diff.call_metadata_diff(branch))
 
         elif service == "grapher":
-            services_body["grapher"] = grapher.run(branch, head_sha=pr.head.sha)
+            return grapher.run(branch, head_sha=pr.head.sha)
 
         elif service == "anomalist":
             # TODO: anomalist could post a summary of anomalies to the PR
             anomalist.run(branch)
+            return None
 
         else:
             # We raise a warning instead of an error to make it backward compatible on old
             # staging servers when adding a new service.
             log.warning("Invalid service", service=service)
-            continue
+            return None
+
+    services_body = {}
+    if services:
+        with ThreadPoolExecutor(max_workers=len(services)) as executor:
+            futures = {service: executor.submit(run_service, service) for service in services}
+        for service, future in futures.items():
+            body = future.result()
+            if body is not None:
+                services_body[service] = body
 
     # get existing status comments (do this as late as possible to avoid race conditions)
     comments = [c for c in repo.get_comments_from_pr(pr) if STATUS_COMMENT_MARKER in c.body]

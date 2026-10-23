@@ -1,0 +1,46 @@
+grapher_schema: "011"
+chart_config_id: 019485f9-d8fb-712b-bfdb-63f0f09d8be6
+slug: births-and-deaths
+topic_tags:
+  - Population Growth
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: deaths_agg#death_rate__sex_total
+          display:
+            name: Death rate
+            color: '#b13507'
+            tolerance: 5
+            numDecimalPlaces: 1
+        - catalogPath: period#cbr__birth_order_total
+          display:
+            name: Birth rate
+            color: '#4c6a9c'
+    config:
+      title: Birth rate and death rate
+      subtitle: Estimated number of annual births and deaths per 1,000 people.
+      originUrl: /population-growth
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericColors:
+            - null
+          customNumericValues:
+            - 0
+            - 2
+            - 5
+            - 10
+            - 20
+            - 50
+            - 1
+      missingDataStrategy: hide
+      selectedEntityNames:
+        - United States
+      yAxis:
+        min: 0

@@ -1,0 +1,50 @@
+grapher_schema: "011"
+chart_config_id: 01935484-7110-76ef-b4ba-4de2bb00af62
+slug: period-total-fertility-rate
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#tfr__birth_order_total
+          display:
+            name: Period fertility rate
+            tolerance: 5
+    config:
+      title: 'Total fertility rate: births per woman'
+      subtitle: The [total fertility rate](#dod:fertility-rate) summarizes the total number of births a woman would have, if she experienced the birth rates seen in women of each age group in one particular year across her childbearing years.
+      variantName: HFD
+      internalNotes: ''
+      originUrl: /fertility-rate
+      hasMapTab: true
+      hideAnnotationFieldsInTitle:
+        time: true
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues:
+            - 100
+            - 1.4
+            - 1.6
+            - 1.8
+            - 2
+            - 2.2
+            - 2.4
+            - 2.6
+            - 2.8
+            - 1
+        columnSlug: period#tfr__birth_order_total
+      selectedEntityNames:
+        - Germany
+        - Spain
+        - United States
+        - Japan
+        - England and Wales
+        - Chile
+        - South Korea
+        - Russia
+      yAxis:
+        min: 0

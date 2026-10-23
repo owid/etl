@@ -2,8 +2,8 @@
 
 Loads the `food_trade` garden table and writes two kinds of files:
 
-  * one metadata JSON at `food-trade.metadata.json` listing the year, source,
-    the entity/product id-to-name mappings, and a `productsByEntity` map
+  * one metadata JSON at `food-trade.metadata.json` listing the year, the
+    entity/product id-to-name mappings, and a `productsByEntity` map
     that tells the viz which (entity, product) combinations have any data;
   * one per-product JSON at `food-trade.<product_id>.json` carrying that
     product's `flows` (every (exporter, importer, value) triple in the data
@@ -135,7 +135,6 @@ def run() -> None:
     #
     metadata = {
         "year": year,
-        "source": feed_metadata["attribution"],
         "dimensions": {
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
             "products": [{"id": product_to_id[p], "name": p} for p in products],

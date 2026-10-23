@@ -51,7 +51,6 @@ dependencies = [
     "pytz>=2024.1",
     "sqlalchemy>=2.0.30",
     "pymysql>=1.1.1",
-    "tiktoken>=0.7.0",
     "earthengine-api>=0.1.411",
     "python-docx>=1.1.2",
     "h5netcdf>=1.3.0",
@@ -70,16 +69,16 @@ dependencies = [
     # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
     "fastmcp>=3.2.0",
     "pyproj>=3.7.2",
-    "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.99.0",
+    "pydantic-ai-slim[anthropic,google,mcp,openai]>=2.55.0,<3",
+    "anthropic>=1.13.0",
     "codespell>=2.4.1",
     "zensical>=0.0.15",
     "pandas-gbq>=0.29.2",
     "tomli>=2.2.1",
-    "genai-prices>=0.0.50",
+    "genai-prices",
     "marshmallow>=3.26.2",
     "brotli>=1.2.0",
     "pyopenssl>=26.0.0",
-    "google-genai>=1.59.0",
     "h5py>=3.15.1",
     "html5lib>=1.1",
     "requests>=2.32.5",
@@ -88,6 +87,11 @@ dependencies = [
 
 [tool.uv]
 exclude-newer = "3 days"
+# genai-prices is the LLM price table, re-released whenever a provider changes prices;
+# a cooldown would only make the cost estimates lag behind them.
+# certifi is the CA trust store; its releases distrust compromised CAs, so a cooldown would
+# only keep forged certificates trusted for longer.
+exclude-newer-package = { genai-prices = false, certifi = false }
 link-mode = "hardlink"
 
 # PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*
