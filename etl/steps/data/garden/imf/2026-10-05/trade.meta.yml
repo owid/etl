@@ -363,7 +363,7 @@ tables:
           Combined value of a country’s goods exports to and imports from << counterpart_country >>, measured in current US dollars.
           <%- endif -%>
         description_key:
-          - This indicator shows the total value of a country’s trade in goods with a partner, combining both exports and imports.
+          - This indicator shows how much a country trades with a particular partner or region, combining both exports and imports.
           - *fob_basis
           - *cif_basis
           - *goods_only
