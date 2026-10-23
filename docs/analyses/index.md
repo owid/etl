@@ -66,3 +66,13 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
+
+!!! note ""
+
+    ## [Food balances in calories and protein, from crops to food](food_supply_chain/food_supply_chain.html)
+    Technical companion to our chart that follows each country's food from the crops it grows to the food available to eat.
+    It explains how we convert FAOSTAT's food balances from tonnes into calories and protein, using two FAOSTAT datasets: the *Supply Utilization Accounts* (from 2010) and the *Food Balance Sheets* (from 1961).
+
+    [:material-notebook: View notebook](food_supply_chain/food_supply_chain.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_supply_chain/food_supply_chain.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_supply_chain/food_supply_chain.ipynb){ .md-button }

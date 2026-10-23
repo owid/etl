@@ -16,7 +16,7 @@ definitions:
       - The SCL dataset doesn't include fish and seafood, so we take that data from FAOSTAT's Food Balance Sheets.
       - "Data adjustments" collect the differences needed to make the chain add up to the food available. These include FAOSTAT's residuals and rounding errors, and numerical discrepancies caused during the conversion of tonnes into calories and protein.
       - We divide all values by population and by 365 days. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources). Regions are the sum of their countries.
-      - We describe the method in full in [this technical publication](***).
+      - We describe the method in full in [this technical publication](https://docs.owid.io/projects/etl/analyses/food_supply_chain/food_supply_chain.html).
 
 dataset:
   update_period_days: 365

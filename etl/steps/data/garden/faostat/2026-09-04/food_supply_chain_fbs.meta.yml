@@ -16,7 +16,7 @@ definitions:
       - This dataset has two known limitations, which the Supply Utilization Accounts method (from 2010) avoids. Crops that are mostly processed, such as sugar cane, are valued only by the part people eat, so processing can appear to create calories. And oilseed cake is not recorded, so it appears as lost in processing instead of as animal feed.
       - "Data adjustments" collect the differences needed to make the chain add up to the food available. These include FAOSTAT's residuals and rounding errors, and numerical discrepancies caused during the conversion of tonnes into calories and protein.
       - We divide all values by population and by 365 days. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources). Regions are the sum of their countries.
-      - We describe the method in full in [this technical publication](***).
+      - We describe the method in full in [this technical publication](https://docs.owid.io/projects/etl/analyses/food_supply_chain/food_supply_chain.html).
 
 dataset:
   update_period_days: 365
