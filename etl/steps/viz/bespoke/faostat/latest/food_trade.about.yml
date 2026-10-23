@@ -5,8 +5,7 @@
 # to leave it out of the box altogether (a null title makes grapher show its fallback heading, "About this data").
 # The final text belongs in the garden .meta.yml, and this file and its override in food_trade.py should not be merged.
 title: null
-description_short: |-
-  Quantity of the item flowing from the exporter to the importer in the export year.
+description_short: null
 description_key: |-
   This tool is built from country-to-country trade data (→ [www.fao.org](https://www.fao.org)) from the Food and Agriculture Organization of the United Nations.
 
