@@ -33,6 +33,7 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
 | Build a chart from ETL (a single chart or a multidim), or an explorer | `/create-chart`, `/create-explorer` |
 | Sketch a small MDim visually, with the real Grapher, and take it to a live MDim (for non-ETL users) | `/sketch-mdim` — uses `/create-chart` for the step itself |
+| Bring admin edits of an ETL-authored chart back into ETL (the admin's "ETL" badge shows it drifted) | `/pull-chart` — wraps `etl chart-pull` |
 | Review a dataset-update PR | `/review-data-pr` |
 | Announce a finished update, internally | `/draft-data-update-slack-post` — the #data-updates-comms Slack form |
 | Announce a finished update, to readers | `/owid-staff:draft-data-update-post` — the "Data update" post on ourworldindata.org/latest; from the `owid-staff` plugin (owid/skills-private), auto-installed here |
