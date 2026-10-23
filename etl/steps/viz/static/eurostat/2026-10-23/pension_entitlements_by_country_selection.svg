@@ -95,61 +95,61 @@ L 71.706291 172.526715
 z
 " style="fill: #4c6a9c"/>
   </g>
-  <g id="switzerland__unfunded">
+  <g id="portugal__unfunded">
    <path d="M 71.706291 207.459854 
-L 285.409994 207.459854 
-L 285.409994 193.07562 
+L 415.727848 207.459854 
+L 415.727848 193.07562 
 L 71.706291 193.07562 
 z
 " style="fill: #4c6a9c"/>
   </g>
-  <g id="switzerland__funded">
-   <path d="M 286.129994 207.459854 
-L 420.144809 207.459854 
-L 420.144809 193.07562 
-L 286.129994 193.07562 
+  <g id="portugal__funded">
+   <path d="M 416.447848 207.459854 
+L 426.614489 207.459854 
+L 426.614489 193.07562 
+L 416.447848 193.07562 
 z
 " style="fill: #b13507"/>
   </g>
-  <g id="germany__unfunded">
+  <g id="switzerland__unfunded">
    <path d="M 71.706291 228.008759 
-L 366.743123 228.008759 
-L 366.743123 213.624526 
+L 285.409994 228.008759 
+L 285.409994 213.624526 
 L 71.706291 213.624526 
 z
 " style="fill: #4c6a9c"/>
   </g>
-  <g id="germany__funded">
-   <path d="M 367.463123 228.008759 
-L 392.417606 228.008759 
-L 392.417606 213.624526 
-L 367.463123 213.624526 
+  <g id="switzerland__funded">
+   <path d="M 286.129994 228.008759 
+L 420.144809 228.008759 
+L 420.144809 213.624526 
+L 286.129994 213.624526 
 z
 " style="fill: #b13507"/>
   </g>
-  <g id="hungary__unfunded">
+  <g id="germany__unfunded">
    <path d="M 71.706291 248.557664 
-L 377.834004 248.557664 
-L 377.834004 234.173431 
+L 366.743123 248.557664 
+L 366.743123 234.173431 
 L 71.706291 234.173431 
 z
 " style="fill: #4c6a9c"/>
   </g>
-  <g id="norway__unfunded">
+  <g id="germany__funded">
+   <path d="M 367.463123 248.557664 
+L 392.417606 248.557664 
+L 392.417606 234.173431 
+L 367.463123 234.173431 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="hungary__unfunded">
    <path d="M 71.706291 269.106569 
-L 314.985677 269.106569 
-L 314.985677 254.722336 
+L 377.834004 269.106569 
+L 377.834004 254.722336 
 L 71.706291 254.722336 
 z
 " style="fill: #4c6a9c"/>
-  </g>
-  <g id="norway__funded">
-   <path d="M 315.705677 269.106569 
-L 353.599521 269.106569 
-L 353.599521 254.722336 
-L 315.705677 254.722336 
-z
-" style="fill: #b13507"/>
   </g>
   <g id="sweden__unfunded">
    <path d="M 71.706291 289.655474 
@@ -215,35 +215,35 @@ L 305.539036 336.917956
 z
 " style="fill: #b13507"/>
   </g>
-  <g id="bulgaria__unfunded">
+  <g id="slovakia__unfunded">
    <path d="M 71.706291 371.851095 
-L 252.13735 371.851095 
-L 252.13735 357.466861 
+L 281.713034 371.851095 
+L 281.713034 357.466861 
 L 71.706291 357.466861 
 z
 " style="fill: #4c6a9c"/>
   </g>
-  <g id="bulgaria__funded">
-   <path d="M 252.85735 371.851095 
-L 265.796712 371.851095 
-L 265.796712 357.466861 
-L 252.85735 357.466861 
+  <g id="slovakia__funded">
+   <path d="M 282.433034 371.851095 
+L 292.599675 371.851095 
+L 292.599675 357.466861 
+L 282.433034 357.466861 
 z
 " style="fill: #b13507"/>
   </g>
-  <g id="ireland__unfunded">
+  <g id="bulgaria__unfunded">
    <path d="M 71.706291 392.4 
-L 204.076865 392.4 
-L 204.076865 378.015766 
+L 252.13735 392.4 
+L 252.13735 378.015766 
 L 71.706291 378.015766 
 z
 " style="fill: #4c6a9c"/>
   </g>
-  <g id="ireland__funded">
-   <path d="M 204.796865 392.4 
-L 229.751348 392.4 
-L 229.751348 378.015766 
-L 204.796865 378.015766 
+  <g id="bulgaria__funded">
+   <path d="M 252.85735 392.4 
+L 265.796712 392.4 
+L 265.796712 378.015766 
+L 252.85735 378.015766 
 z
 " style="fill: #b13507"/>
   </g>
@@ -307,29 +307,29 @@ z
   <g id="france__total">
    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="442.229611" y="183.23817" transform="rotate(-0 442.229611 183.23817)">397%</text>
   </g>
+  <g id="portugal__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="203.787075" transform="rotate(-0 65.946291 203.787075)">Portugal</text>
+  </g>
+  <g id="portugal__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="430.214489" y="203.787075" transform="rotate(-0 430.214489 203.787075)">384%</text>
+  </g>
   <g id="switzerland__label">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="203.787075" transform="rotate(-0 65.946291 203.787075)">Switzerland</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="224.33598" transform="rotate(-0 65.946291 224.33598)">Switzerland</text>
   </g>
   <g id="switzerland__total">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="423.744809" y="203.787075" transform="rotate(-0 423.744809 203.787075)">378%</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="423.744809" y="224.33598" transform="rotate(-0 423.744809 224.33598)">378%</text>
   </g>
   <g id="germany__label">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="224.33598" transform="rotate(-0 65.946291 224.33598)">Germany</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="244.884885" transform="rotate(-0 65.946291 244.884885)">Germany</text>
   </g>
   <g id="germany__total">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="396.017606" y="224.33598" transform="rotate(-0 396.017606 224.33598)">347%</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="396.017606" y="244.884885" transform="rotate(-0 396.017606 244.884885)">347%</text>
   </g>
   <g id="hungary__label">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="244.884885" transform="rotate(-0 65.946291 244.884885)">Hungary</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="265.43379" transform="rotate(-0 65.946291 265.43379)">Hungary</text>
   </g>
   <g id="hungary__total">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="382.154004" y="244.884885" transform="rotate(-0 382.154004 244.884885)">332%</text>
-  </g>
-  <g id="norway__label">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="265.43379" transform="rotate(-0 65.946291 265.43379)">Norway</text>
-  </g>
-  <g id="norway__total">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="357.199521" y="265.43379" transform="rotate(-0 357.199521 265.43379)">305%</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="382.154004" y="265.43379" transform="rotate(-0 382.154004 265.43379)">332%</text>
   </g>
   <g id="sweden__label">
    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="285.982695" transform="rotate(-0 65.946291 285.982695)">Sweden</text>
@@ -355,17 +355,17 @@ z
   <g id="czechia__total">
    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="317.457197" y="347.62941" transform="rotate(-0 317.457197 347.62941)">262%</text>
   </g>
+  <g id="slovakia__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="368.178316" transform="rotate(-0 65.946291 368.178316)">Slovakia</text>
+  </g>
+  <g id="slovakia__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="296.199675" y="368.178316" transform="rotate(-0 296.199675 368.178316)">239%</text>
+  </g>
   <g id="bulgaria__label">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="368.178316" transform="rotate(-0 65.946291 368.178316)">Bulgaria</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="388.727221" transform="rotate(-0 65.946291 388.727221)">Bulgaria</text>
   </g>
   <g id="bulgaria__total">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="269.396712" y="368.178316" transform="rotate(-0 269.396712 368.178316)">210%</text>
-  </g>
-  <g id="ireland__label">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="388.727221" transform="rotate(-0 65.946291 388.727221)">Ireland</text>
-  </g>
-  <g id="ireland__total">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="233.351348" y="388.727221" transform="rotate(-0 233.351348 388.727221)">171%</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="269.396712" y="388.727221" transform="rotate(-0 269.396712 388.727221)">210%</text>
   </g>
  </g>
 </svg>

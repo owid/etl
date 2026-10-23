@@ -35,21 +35,21 @@ Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static
              --template vertical --require-named-marks --expect-gid spain__unfunded --expect-gid spain__funded
          .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
              etl/steps/viz/static/eurostat/2026-10-23/pension_entitlements_by_country_selection \
-             --template horizontal --require-named-marks --expect-gid spain__unfunded --expect-gid norway__funded
+             --template horizontal --require-named-marks --expect-gid spain__unfunded --expect-gid slovakia__funded
          .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
              etl/steps/viz/static/eurostat/2026-10-23/pension_entitlements_by_country_scheme_type \
              --template horizontal --require-named-marks --expect-gid spain__state --expect-gid spain__employer \
-             --expect-gid norway__pots
+             --expect-gid slovakia__pots
 Then read the three PNGs.
 
 Figma handoff
 -------------
-All three frames show this step's current render. Record names, not just ids: the frame NAME is the durable
-join; ids are a convenience.
+Record names, not just ids: the frame NAME is the durable join; ids are a convenience.
 - File: Charts (2026), key `s6Sv60bakebRRW2TxsMQbF`
 - Page: "20260824 Wealth charts (Bertha)" (`26458:5`), an existing page shared with other wealth charts,
   so it carries no ` [sketch]` marker; the frames do.
-- Frames, variants of one desktop format (the person picks at finalize). None has a PNG reference copy:
+- Frames, variants of one desktop format (the person picks at finalize). None has a PNG reference copy.
+  Frames a and b show this step's current render:
   - `pension-entitlements-by-country--sketch-a` -> `29779:23` (850 x 1095), every country, from frame
     stem `pension_entitlements_by_country`, cloned from `Static Chart Template_Vertical` `5332:93`, at
     x=8430, y=0. Chart cropped to 16..832.71 x 124..1001.81; footer re-pinned to its 1078.81 bottom.
@@ -57,10 +57,11 @@ join; ids are a convenience.
     from frame stem `pension_entitlements_by_country_selection`, cloned from
     `Static Chart Template_Horizontal` `5332:75`, at x=8430, y=1195. Chart cropped to 16..832.71 x 124..545;
     footer re-pinned to its 622 bottom.
-  - `pension-entitlements-by-country--sketch-c` -> `29793:1132` (850 x 638), the `SELECTION` countries by
-    scheme type, from frame stem `pension_entitlements_by_country_scheme_type`, cloned from frame b, at
-    x=8430, y=1933. Chart cropped to 16..832.71 x 105..559 under its two-line subtitle; footer re-pinned to its
-    622 bottom.
+  - `pension-entitlements-by-country--sketch-c` (was `29793:1132`), the `SELECTION` countries by scheme
+    type, from frame stem `pension_entitlements_by_country_scheme_type`, cloned from frame b, at x=8430, y=1933.
+    It is no longer on the page, so its render here is newer than any Figma copy. To bring it back, clone frame b
+    and import this stem with `inheritStyles: false` and the `families` below. Chart cropped to 16..832.71 x
+    105..559 under its two-line subtitle; footer re-pinned to its 622 bottom.
 - Deep links: https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29779-23 (a),
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29782-26 (b),
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29793-1132 (c)
@@ -122,14 +123,16 @@ SUBTITLE_BY_SCHEME_TYPE = (
     "Data for {year}, for selected countries."
 )
 # The shorter frames' countries: the top and the bottom of the ranking, the largest economies, the
-# countries that rely most on funded schemes and the ones that rely on none. Denmark is left out because its
-# figures leave out its state pension, which Eurostat counts as social assistance; Norway, whose schemes are all
-# reported and unflagged, takes its place.
+# countries that rely most on funded schemes and the ones that rely on none. Left out: Denmark, whose figures
+# leave out its state pension (Eurostat counts it as social assistance), and Ireland and Norway, whose GDP is a
+# poor measure of their economies (inflated by multinationals' profits in Ireland and by oil and gas in Norway), so
+# a share of it understates their pensions. Portugal and Slovakia, with every published value unflagged, fill in.
 SELECTION = [
     "Spain",
     "Italy",
     "Netherlands",
     "France",
+    "Portugal",
     "Switzerland",
     "Germany",
     "Hungary",
@@ -137,9 +140,8 @@ SELECTION = [
     "Poland",
     "Iceland",
     "Czechia",
+    "Slovakia",
     "Bulgaria",
-    "Ireland",
-    "Norway",
 ]
 # The year shown is the latest one in which at least this many countries report a total.
 # NOTE: Countries report every three years (2015, 2018, 2021; 2024 is due in early 2027). Check that the
