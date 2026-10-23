@@ -13,10 +13,10 @@ steps:
   #
   # ONS Marriages in England and Wales
   #
-  data://grapher/ons/2025-10-07/marriages:
-    - data://garden/ons/2025-10-07/marriages:
-      - data://meadow/ons/2025-10-07/marriages:
-        - snapshot://ons/2025-10-07/marriages.xlsx
+  data://grapher/ons/2026-10-23/marriages:
+    - data://garden/ons/2026-10-23/marriages:
+      - data://meadow/ons/2026-10-23/marriages:
+        - snapshot://ons/2026-10-23/marriages.xlsx
 
   #
   # UN Women of reproductive age who are married or in a union

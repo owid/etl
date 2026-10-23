@@ -1,6 +1,7 @@
+from pathlib import Path
 from unittest.mock import patch
 
-from etl.io import get_all_changed_catalog_paths
+from etl.io import data_step_catalog_path, get_all_changed_catalog_paths
 
 
 @patch("etl.io.load_dag")
@@ -258,3 +259,44 @@ def test_get_all_changed_catalog_paths_skips_deleted_files(mock_load_dag):
         "etl/steps/viz/explorer/who/latest/influenza.py": {"status": "A", "diff": ""},
     }
     assert get_all_changed_catalog_paths(files_changed, include_export=True) == ["viz://explorer/who/latest/influenza"]
+
+
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_folder_step(mock_load_dag):
+    """A step written as a folder of modules resolves to the step, not to one path per module.
+
+    Such a step (V-Dem's garden step, for one) is `<short>/__init__.py` plus `<short>/<module>.py`,
+    `<short>/<short>.meta.yml`, etc. Suffix-stripping turned those into `garden/.../<short>/<module>`,
+    which matches no step, so `--modified` (the staging build), chart-diff and datadiff all silently
+    skipped the branch. Step names are made up and the DAG is mocked, so the test doesn't depend on
+    any real dataset or version.
+    """
+    mock_load_dag.return_value = {
+        "data://garden/test_namespace/2020-01-01/folder_step": set(),
+        "data://grapher/test_namespace/2020-01-01/folder_step": {"data://garden/test_namespace/2020-01-01/folder_step"},
+    }
+    files_changed = {
+        "etl/steps/data/garden/test_namespace/2020-01-01/folder_step/__init__.py": "M",
+        "etl/steps/data/garden/test_namespace/2020-01-01/folder_step/folder_step_clean.py": "M",
+        "etl/steps/data/garden/test_namespace/2020-01-01/folder_step/folder_step.meta.yml": "M",
+    }
+
+    result = get_all_changed_catalog_paths(files_changed)
+
+    assert sorted(result) == [
+        "garden/test_namespace/2020-01-01/folder_step",
+        "grapher/test_namespace/2020-01-01/folder_step",
+    ]
+
+
+def test_data_step_catalog_path():
+    """Companion files of a flat step, and files inside a folder step, all map to the step itself."""
+    for rel in [
+        "garden/test_namespace/2020-01-01/test_step.py",
+        "garden/test_namespace/2020-01-01/test_step.meta.yml",
+        "garden/test_namespace/2020-01-01/test_step.countries.json",
+        "grapher/test_namespace/2020-01-01/test_step.meta.override.yml",
+        "garden/test_namespace/2020-01-01/test_step/__init__.py",
+        "garden/test_namespace/2020-01-01/test_step/test_step_clean.py",
+    ]:
+        assert data_step_catalog_path(Path(rel)).split("/", 1)[1] == "test_namespace/2020-01-01/test_step", rel

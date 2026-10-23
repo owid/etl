@@ -10,3 +10,5 @@ views:
     indicators:
       y:
         - catalogPath: "climate_related_oda_by_donor#climate_related_share"
+    config:
+      note: "In some years, some donors did not screen all of their aid for climate objectives, so their shares may be underestimated. The OECD's climate tracking excludes general budget support, debt relief, and costs in donor countries, such as hosting refugees."

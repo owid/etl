@@ -1,0 +1,36 @@
+chart_config_id: 0191b6c7-3bad-799b-b5db-4d33837c2753
+grapher_schema: "011"
+slug: economic-damage-from-natural-disasters
+topic_tags:
+  - "Natural Disasters"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "natural_disasters_global_by_type#total_damages"
+          display:
+            tolerance: 5
+    # timelineMaxTime is set in the .py step, and {{date_published}} in the note is filled in there, both from the EM-DAT release date.
+    config:
+      title: "Economic damage by natural disaster type"
+      subtitle: "Global economic damage from natural disasters, differentiated by disaster category and measured in US$ per year. It is not adjusted for inflation."
+      note: "Data includes disasters reported up to {{date_published}}. The latest year may be incomplete due to reporting delays."
+      originUrl: "/natural-disasters"
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "OwidCategoricalA"
+      minTime: 2000
+      yAxis:
+        min: 0
+      entityType: "disaster category"
+      entityTypePlural: "disaster categories"
+      selectedEntityNames:
+        - "Drought"
+        - "Flood"
+        - "Earthquake"
+        - "Extreme weather"
+        - "Extreme temperature"
+        - "Volcanic activity"
+        - "Landslide"
+        - "Wildfire"
