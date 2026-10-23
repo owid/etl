@@ -13,13 +13,13 @@ flags the chart as drifted. This command reads the admin layer and writes it bac
   be cleared in the admin so the ETL values show. `--skip-field` leaves out any other field.
 
     # Report drift for every ETL-authored chart (dry run).
-    etl chart-reconcile --all
+    etl chart-pull --all
     # Only the charts built from one dataset; any version with `namespace/short_name`.
-    etl chart-reconcile --dataset oecd/2026-10-07/climate_related_official_development_assistance
+    etl chart-pull --dataset oecd/2026-10-07/climate_related_official_development_assistance
     # Specific charts, by config file, step URI or chart id; --apply writes the changes.
-    etl chart-reconcile viz://chart/oecd/latest/foreign_aid_given_climate --chart-id 8406 --apply
+    etl chart-pull viz://chart/oecd/latest/foreign_aid_given_climate --chart-id 8406 --apply
     # After pushing the changes to a branch's staging server: every chart should be in sync.
-    etl chart-reconcile --dataset oecd/climate_related_official_development_assistance --env <branch>
+    etl chart-pull --dataset oecd/climate_related_official_development_assistance --env <branch>
 
 The admin layers are read from production when credentials are configured (ENV_FILE_PROD, or
 `--env <production env file>`). Otherwise they are read from staging-site-master, a copy of
@@ -39,14 +39,14 @@ from sqlalchemy import bindparam, text
 from sqlalchemy.exc import OperationalError
 
 from apps.chart_config_id.cli import _load_config as load_single_chart_config
-from apps.chart_reconcile.reconcile import (
+from apps.chart_pull.pull import (
     ChartLayers,
     ChartStep,
     Result,
     depends_on_dataset,
     dump_config,
     find_chart_steps,
-    reconcile_fields,
+    pull_fields,
     variable_ids_in_patch,
 )
 from etl import config
@@ -56,7 +56,7 @@ from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
 console = Console()
 
 
-@click.command(name="chart-reconcile", help=__doc__, cls=click.RichCommand)
+@click.command(name="chart-pull", help=__doc__, cls=click.RichCommand)
 @click.argument("targets", nargs=-1)
 @click.option("--all", "select_all", is_flag=True, help="Every ETL-authored single chart in the active DAG.")
 @click.option(
@@ -119,8 +119,7 @@ def cli(
 
     layers = _fetch_layers(owid_env, [s.chart_config_id for s in selected])
     results = [
-        _reconcile(step, layers.get(step.chart_config_id), owid_env, apply, skip_fields, pull_leftovers)
-        for step in selected
+        _pull(step, layers.get(step.chart_config_id), owid_env, apply, skip_fields, pull_leftovers) for step in selected
     ]
 
     _print_report(results, apply)
@@ -233,7 +232,7 @@ def _query(owid_env: OWIDEnv, query, params: dict):
         ) from None
 
 
-def _reconcile(
+def _pull(
     step: ChartStep,
     layers: ChartLayers | None,
     owid_env: OWIDEnv,
@@ -243,7 +242,7 @@ def _reconcile(
 ) -> Result:
     result = Result(step=step)
     if step.dag_file is None:
-        result.warnings.append(f"{step.uri} isn't in the active DAG; reconcile it only if you are adopting it.")
+        result.warnings.append(f"{step.uri} isn't in the active DAG; pull it only if you are adopting it.")
     if layers is None:
         result.missing = True
         return result
@@ -252,7 +251,7 @@ def _reconcile(
 
     original = step.config_path.read_text()
     config_yaml = load_single_chart_config(step.config_path)
-    reconcile_fields(step, config_yaml, layers, result, skip_fields, pull_leftovers)
+    pull_fields(step, config_yaml, layers, result, skip_fields, pull_leftovers)
     new_text = dump_config(config_yaml) if result.pulled else original
     if new_text != original:
         if apply:

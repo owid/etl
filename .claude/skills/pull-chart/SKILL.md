@@ -1,9 +1,9 @@
 ---
-name: reconcile-chart
+name: pull-chart
 description: >-
   Bring admin edits of ETL-authored single charts (viz://chart steps with chart_config_id) back
   into their ETL config, so the chart is defined in ETL again and the admin's ETL badge stops
-  showing it as drifted. Wraps the deterministic `etl chart-reconcile` command, which copies every
+  showing it as drifted. Wraps the deterministic `etl chart-pull` command, which copies every
   field set in the admin into the chart's .config.yml. Works on all ETL-authored charts, on the
   charts of one dataset, or on chosen charts.
   Use when the user says a chart "drifted", "is out of sync with ETL", "has admin edits", asks to
@@ -14,9 +14,9 @@ metadata:
   owner: paarriagadap
 ---
 
-# Reconcile ETL-authored charts with the admin
+# Pull admin edits of ETL-authored charts into ETL
 
-An ETL-authored single chart renders as merge(indicator config, ETL layer, admin layer), and the admin layer wins. An edit in the chart editor therefore overrides ETL quietly, and the admin flags the chart with a drifted "ETL" badge. `etl chart-reconcile` reads the admin layer and writes it back into the step, the same way every time. This skill runs it, judges what it can't, and ships the result.
+An ETL-authored single chart renders as merge(indicator config, ETL layer, admin layer), and the admin layer wins. An edit in the chart editor therefore overrides ETL quietly, and the admin flags the chart with a drifted "ETL" badge. `etl chart-pull` reads the admin layer and writes it back into the step, the same way every time. This skill runs it, judges what it can't, and ships the result.
 
 > **Called from:** `/update-dataset` step 7, before the dataset's `viz://chart` steps are pushed. Keep that pointer in sync with this file.
 
@@ -39,13 +39,13 @@ Read production. With no `--env`, the command reads production when `ENV_FILE_PR
 
 ```bash
 # 1. Dry run: prints a YAML diff per chart and a status table.
-.venv/bin/etl chart-reconcile --all
-.venv/bin/etl chart-reconcile --dataset <namespace>/<short_name>          # any version
-.venv/bin/etl chart-reconcile --dataset <namespace>/<version>/<short_name>
-.venv/bin/etl chart-reconcile <config.yml | viz://chart/...> --chart-id <id>
+.venv/bin/etl chart-pull --all
+.venv/bin/etl chart-pull --dataset <namespace>/<short_name>          # any version
+.venv/bin/etl chart-pull --dataset <namespace>/<version>/<short_name>
+.venv/bin/etl chart-pull <config.yml | viz://chart/...> --chart-id <id>
 
 # 2. Write it. Add --json <file> for a machine-readable report.
-.venv/bin/etl chart-reconcile <same selection> --apply
+.venv/bin/etl chart-pull <same selection> --apply
 ```
 
 Don't run step 1 against the branch's own staging server. That server's database was copied when the branch was created and has since received the branch's own pushes, so it misses admin edits made later on production. Use `--env <branch>` only to verify the branch's changes (see "Ship it").
@@ -79,7 +79,7 @@ Also check:
 
 ## Ship it
 
-1. Work in a worktree and open the PR with the usual flow. If nothing but reconciled charts changes, it's a small standalone PR.
+1. Work in a worktree and open the PR with the usual flow. If nothing but pulled charts changes, it's a small standalone PR.
 2. PR description: for each chart, its admin link, the fields pulled, and the skipped fields and leftovers with both values. Say that nothing reader-visible changes, except fields cleared in the admin.
 3. **Clear leftovers, stale variable pins and agreed skipped fields on the branch's staging server**, never on production. Use dotted paths for nested ones (`--unset map.columnSlug`). Run a dry run first and show the user the diff:
 
@@ -92,7 +92,7 @@ Also check:
 4. **Verify on staging** once the branch's staging server has rebuilt (or push the steps with `STAGING=<branch> .venv/bin/etlr viz://chart/... --grapher`):
 
    ```bash
-   .venv/bin/etl chart-reconcile <same selection> --env <branch>
+   .venv/bin/etl chart-pull <same selection> --env <branch>
    ```
 
    Every chart should report `in sync`. Chart-diff lists only the charts whose admin fields were cleared, because pulled fields don't change how a chart renders. Report the reconcile result too.

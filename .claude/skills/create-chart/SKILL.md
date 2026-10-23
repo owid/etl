@@ -503,15 +503,15 @@ the rendered config (charts.configId) = merge(indicator config, ETL layer, admin
 
 Admin overrides always win on a per-field basis. To "unlink" a field back to the ETL-authored value, click
 the chip next to the field in the admin editor — it clears that field from the admin layer. To go the other
-way, copying admin edits into the YAML so the chart is defined in ETL again, use the `reconcile-chart` skill
-(`etl chart-reconcile`).
+way, copying admin edits into the YAML so the chart is defined in ETL again, use the `pull-chart` skill
+(`etl chart-pull`).
 
 ### Adopting a chart that exists only in the admin
 
 Write a minimal `.config.yml` (single-chart shape with the chart's current `slug`, one empty view) and its DAG entry with the grapher
 dataset as dependency, then point it at the existing chart with
 `etl chart-config-id lookup <config.yml> --chart-id <id>` (see Step 4). Then run
-`etl chart-reconcile <config.yml> --env <production env file> --apply`, which copies the rest of the live config
+`etl chart-pull <config.yml> --env <production env file> --apply`, which copies the rest of the live config
 (indicators, FAUST, settings) into the YAML. Edit here from then on.
 
 ## Troubleshooting

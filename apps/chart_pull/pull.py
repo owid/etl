@@ -1,4 +1,4 @@
-"""Pure logic behind `etl chart-reconcile`: fold a chart's admin overrides into its ETL config.
+"""Pure logic behind `etl chart-pull`: fold a chart's admin overrides into its ETL config.
 
 An ETL-authored single chart renders as merge(indicator config, ETL layer, admin layer). Admin edits
 land in the admin layer (`charts.patchConfigId`) and win over ETL, which the admin flags as drift:
@@ -71,7 +71,7 @@ class ChartLayers:
 
 @dataclass
 class Result:
-    """Outcome of reconciling one chart."""
+    """Outcome of pulling one chart."""
 
     step: ChartStep
     chart_id: int | None = None
@@ -184,7 +184,7 @@ def variable_ids_in_patch(patch: dict[str, Any]) -> set[int]:
     return ids
 
 
-def reconcile_fields(
+def pull_fields(
     step: ChartStep,
     config: CommentedMap,
     layers: ChartLayers,
