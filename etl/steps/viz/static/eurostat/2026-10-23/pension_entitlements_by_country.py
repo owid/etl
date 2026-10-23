@@ -3,15 +3,18 @@
 A static chart of the pensions people have already earned (accrued-to-date pension entitlements in social
 insurance), valued today and measured as a share of GDP, for the European countries Eurostat reports.
 
-One stacked horizontal bar per country, ranked by its total, split into the two parts Eurostat publishes:
-unfunded government schemes (social security and some schemes for government employees, paid from future
-contributions and taxes) and private and funded schemes. The total sits at the end of each bar, with the unit
-spelled out on the longest one only. A one-row legend with square chips names the two parts; their names take
-their part's color.
-
-Two frames: every country on the tall template (`pension_entitlements_by_country`), and the 14 `SELECTION`
-countries on the landscape template (`pension_entitlements_by_country_selection`). Both use the same bar
-pitch, so the bars keep their thickness.
+One stacked horizontal bar per country, ranked by its total. The total sits at the end of each bar, with the unit
+spelled out on the longest one only. A one-row legend with square chips names the parts; their names take their
+part's color. Three frames, each a `LAYOUTS` entry:
+- `pension_entitlements_by_country`: every country on the tall template, split into the two parts Eurostat
+  publishes (`PARTS_BY_FUNDING`): unfunded government schemes (social security and some schemes for government
+  employees, paid from future contributions and taxes) and private and funded schemes;
+- `pension_entitlements_by_country_selection`: the 14 `SELECTION` countries on the landscape template, split the
+  same way;
+- `pension_entitlements_by_country_scheme_type`: the same 14 countries split by scheme type
+  (`PARTS_BY_SCHEME_TYPE`): state pensions (social security), employer promises (defined benefit schemes, of
+  private employers and for government employees) and pension pots (defined contribution schemes).
+All three use the same bar pitch, so the bars keep their thickness.
 
 Data: table `pension_entitlements` of `garden/eurostat/2026-10-23/pension_entitlements` (Eurostat,
 `nasa_10_pens1`), and its flags table `pension_entitlements_flags`. Derived from the data, so a new release
@@ -21,9 +24,10 @@ redraws them without hand edits:
   in this release);
 - the countries left out of the full frame because they publish their two parts but no total (Romania in
   2021), named in the Note;
-- the Note's flag sentences, from Eurostat's flags on the values shown ("p" provisional, "d" different
-  definition, "e" estimated, "b" break in series), and the discount rate after inflation that Eurostat
-  recommends for government schemes in that year (`real_discount_rate`, from Eurostat's metadata).
+- the Note's flag sentences, from Eurostat's flags on the published shares of the countries shown ("p"
+  provisional, "d" different definition, "e" estimated, "b" break in series), and the discount rate after
+  inflation that Eurostat recommends for government schemes in that year (`real_discount_rate`, from Eurostat's
+  metadata).
 
 Render:  .venv/bin/etlr viz://static/eurostat/2026-10-23/pension_entitlements_by_country
 Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
@@ -32,45 +36,52 @@ Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static
          .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
              etl/steps/viz/static/eurostat/2026-10-23/pension_entitlements_by_country_selection \
              --template horizontal --require-named-marks --expect-gid spain__unfunded --expect-gid denmark__funded
-Then read both PNGs.
+         .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
+             etl/steps/viz/static/eurostat/2026-10-23/pension_entitlements_by_country_scheme_type \
+             --template horizontal --require-named-marks --expect-gid spain__state --expect-gid spain__employer \
+             --expect-gid denmark__pots
+Then read the three PNGs.
 
 Figma handoff
 -------------
-Both frames were built from the sketch this step was promoted from, so they show its render: the Note there
-has no discount-rate sentence and the bars sit a line lower than this step draws them. Re-import both frames
-(the import steps below, with `inheritStyles: true`) at finalize. Record names, not just ids: the frame NAME is
-the durable join; ids are a convenience.
+All three frames show this step's current render. Record names, not just ids: the frame NAME is the durable
+join; ids are a convenience.
 - File: Charts (2026), key `s6Sv60bakebRRW2TxsMQbF`
 - Page: "20260824 Wealth charts (Bertha)" (`26458:5`), an existing page shared with other wealth charts,
   so it carries no ` [sketch]` marker; the frames do.
-- Frames, two variants of one desktop format (the person picks one at finalize):
+- Frames, variants of one desktop format (the person picks at finalize). None has a PNG reference copy:
   - `pension-entitlements-by-country--sketch-a` -> `29779:23` (850 x 1095), every country, from frame
     stem `pension_entitlements_by_country`, cloned from `Static Chart Template_Vertical` `5332:93`, at
-    x=8430, y=0; chart group `29778:23`. Its PNG reference copy (`29778:824`, x=7480) is no longer on the
-    page.
+    x=8430, y=0. Chart cropped to 16..832.71 x 124..1001.81; footer re-pinned to its 1078.81 bottom.
   - `pension-entitlements-by-country--sketch-b` -> `29782:26` (850 x 638), the `SELECTION` countries,
     from frame stem `pension_entitlements_by_country_selection`, cloned from
-    `Static Chart Template_Horizontal` `5332:75`, at x=8430, y=1195; chart group `29781:26`. Its PNG
-    reference copy `29781:711` sits to the left at x=7480, y=1195. Chart cropped to 16..832.71 x
-    124..559; footer re-pinned to its 622 bottom (y 573).
+    `Static Chart Template_Horizontal` `5332:75`, at x=8430, y=1195. Chart cropped to 16..832.71 x 124..545;
+    footer re-pinned to its 622 bottom.
+  - `pension-entitlements-by-country--sketch-c` -> `29793:1132` (850 x 638), the `SELECTION` countries by
+    scheme type, from frame stem `pension_entitlements_by_country_scheme_type`, cloned from frame b, at
+    x=8430, y=1933. Same crop and footer as frame b.
 - Deep links: https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29779-23 (a),
-  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29782-26 (b)
-- Import: `upload_assets` of the SVG, then `restyle_static_import.js` with one job (`canvasWidth` 816,
-  `frameWidth` 850, no `reference`, `reflowLegend` false, `inheritStyles` false), `families` Denim
-  (`#4c6a9c`, key `e1538d9330d7b22168f0c19fa562897aa8975f90`) for `unfunded` and Rusty Orange (`#b13507`,
-  key `65bab597d085689b1ea82a69f4d785cb9212c234`) for `funded`, and `bodyTextParent: /__(label|total)$/`
-  so row labels and totals take the body text style. It arrived in Lato (no face change, 0 labels
-  recentred) and cropped to 16..832.71 x 124..1015.81 (frame a).
-- Text slots: title and subtitle set as one string each (subtitle with this file's line breaks) and
-  re-bound to their template styles; the subtitle box cropped to 731 beside the logo (one-line title).
-  The Note and Data source rows keep the template's runs (`Note:` Bold, space Medium, rest Regular;
-  `Data source:` Bold, rest Regular). Tagline and licence untouched (`[Name of author]` still a
-  placeholder). After writing the Note, re-pin the footer to its bottom (1078.81 on frame a, 622 on b).
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29782-26 (b),
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29793-1132 (c)
+- Import: `upload_assets` of the SVG, then `restyle_static_import.js` with one job per frame (`canvasWidth`
+  816, `frameWidth` 850, no `reference`, `reflowLegend` false). Frames a and b re-import with
+  `inheritStyles: true`. Frame c is styled from scratch (`inheritStyles: false`) with `families` Default
+  Palette/Denim (`#4c6a9c`, key `e1538d9330d7b22168f0c19fa562897aa8975f90`) for `state` and `unfunded`,
+  Default Palette/Light Teal (`#58ac8c`, key `9a2854bc767115e1ddc8c7d8fcd47b88b51b16f7`) for `employer`, and
+  Default Palette/Rusty Orange (`#b13507`, key `65bab597d085689b1ea82a69f4d785cb9212c234`) for `pots` and
+  `funded`, and `bodyTextParent: /__(label|total)$/` so row labels and totals take Text/Gray 80. The restyle
+  paints legend names in their family's base, so after it rebind `category__employer` to Line and Slope
+  Charts/Light Teal (`#2c8465`, key `a07c13547f40f65980745f6ad8b96e0f7b440f5c`), the darker variant for text.
+- Text slots: title and subtitle set as one string each, with this file's line breaks, and kept on their
+  template styles; the subtitle box is 731 wide beside the logo (one-line title). The Note keeps the template's
+  runs (`Note:` Bold, space Medium, rest Regular) and this file's line break; the licence row its runs
+  (Medium, `CC-BY` Bold, Medium, author Bold). After writing the Note, re-pin the footer to its bottom (1078.81
+  on frame a, 622 on b and c).
 
-Node names (`gid`s) this step emits, for the restyle pass: `<country>__unfunded` and `<country>__funded` for
-the bar segments, `<country>__label` for the row labels, `<country>__total` for the totals,
-`legend-chip__unfunded` / `legend-chip__funded` for the chips and `category__unfunded` / `category__funded`
-for the legend names.
+Node names (`gid`s) this step emits, for the restyle pass: `<country>__<part>` for the bar segments
+(`unfunded` / `funded` on frames a and b, `state` / `employer` / `pots` on frame c), `<country>__label` for the
+row labels, `<country>__total` for the totals, `legend-chip__<part>` for the chips and `category__<part>` for
+the legend names.
 """
 
 import logging
@@ -94,10 +105,15 @@ apply_svg_rcparams()
 paths = PathFinder(__file__)
 
 TITLE = "Pension entitlements as a share of GDP"
-SUBTITLE = (
+SUBTITLE_BY_FUNDING = (
     "The value today of the pensions people have already earned in state, workplace, and private schemes, "
     "as a share of GDP. Unfunded government schemes will pay them from future contributions and taxes; "
     "private and funded schemes mostly from savings set aside. Data for {year}."
+)
+SUBTITLE_BY_SCHEME_TYPE = (
+    "The value today of the pensions people have already earned, as a share of GDP. State pensions are run as "
+    "social security; employer promises are workplace pensions set by a formula, usually based on salary; pension "
+    "pots depend on what was paid in and the returns on it. Data for {year}."
 )
 # The shorter frame's countries: the top and the bottom of the ranking, the largest economies, the
 # countries that rely most on funded schemes and the ones that rely on none.
@@ -135,19 +151,46 @@ FLAG_PHRASES = {
     "d": ("uses a different definition", "use a different definition"),
     "b": ("follows a break in the series", "follow a break in the series"),
 }
-AUTHOR = "[Name of author]"
+AUTHOR = "Bertha Rohenkohl"
 
 # Exact template strings (TEMPLATES.md -> Exact strings the templates use).
 TAGLINE = "OurWorldinData.org — Research and data to make progress against the world’s largest problems."
 LICENSE = f"Licensed under CC-BY by the author {AUTHOR}"
 
-# The two parts of each bar, in stack order, with their legend names. The Figma pass binds each to a
-# library style by these keys (`<country>__<key>`), so the hexes here only make the PNG a preview:
-# Default Palette/Denim on the larger part (the quieter colour on the bigger area), Rusty Orange on
-# the other.
-PARTS = [
-    {"key": "unfunded", "column": "unfunded_share_gdp", "name": "Unfunded government schemes", "color": "#4c6a9c"},
-    {"key": "funded", "column": "private_and_funded_share_gdp", "name": "Private and funded schemes", "color": "#b13507"},
+# The parts of each bar, in stack order, with their legend names and the garden columns each one adds up. The
+# Figma pass binds each to a library style by these keys (`<country>__<key>`), so the hexes here only make the PNG
+# a preview: Default Palette/Denim on the largest part (the quieter colour on the bigger area).
+# By funding: the two parts Eurostat publishes as a share of GDP.
+PARTS_BY_FUNDING = [
+    {"key": "unfunded", "columns": ["unfunded_share_gdp"], "name": "Unfunded government schemes", "color": "#4c6a9c"},
+    {"key": "funded", "columns": ["private_and_funded_share_gdp"], "name": "Private and funded schemes", "color": "#b13507"},
+]
+# By scheme type: social security; defined benefit schemes, of private employers and for government employees;
+# and defined contribution schemes, private and government-run. Together they are all of Eurostat's schemes
+# (columns A, B and D to H of its table 29), so they add up to its total. Light Teal goes between Denim and Rusty
+# Orange: of the palette's third colors it keeps the most contrast across both seams (create-figma-chart's
+# color_audit.py).
+PARTS_BY_SCHEME_TYPE = [
+    {"key": "state", "columns": ["social_security_share_gdp"], "name": "State pensions", "color": "#4c6a9c"},
+    {
+        "key": "employer",
+        "columns": [
+            "private_defined_benefit_share_gdp",
+            "government_employee_defined_benefit_financial_corporations_share_gdp",
+            "government_employee_defined_benefit_in_core_share_gdp",
+            "government_employee_defined_benefit_outside_core_share_gdp",
+        ],
+        "name": "Employer promises",
+        "color": "#58ac8c",
+        # Light Teal is too pale for text on white, so its name takes the library's darker variant for text.
+        "text_color": "#2c8465",
+    },
+    {
+        "key": "pots",
+        "columns": ["private_defined_contribution_share_gdp", "government_defined_contribution_share_gdp"],
+        "name": "Pension pots",
+        "color": "#b13507",
+    },
 ]
 TOTAL_COLUMN = "total_share_gdp"
 # Eurostat rounds each value to a whole percent, so the parts can miss the published total by one.
@@ -224,11 +267,14 @@ SEGMENT_GAP_PX = 1
 # edge (TEMPLATES.md -> Vertical and Horizontal): the header grows down from `origin_y`, and the footer's rows
 # keep their y while the Note grows up from its ink bottom. The first frame shows every country on the tall
 # template; the second the `SELECTION` on the landscape one, where 14 rows land on the same bar pitch as the
-# tall frame's 29. The verifier needs `--template horizontal` for the second stem.
+# tall frame's 29; the third the same countries split by scheme type. The verifier needs `--template horizontal`
+# for the second and third stems.
 LAYOUTS = {
     "pension_entitlements_by_country": {
         "template": "vertical",
         "countries": None,
+        "parts": PARTS_BY_FUNDING,
+        "subtitle": SUBTITLE_BY_FUNDING,
         "margin": 16,
         "origin_y": 16,
         "title_slot_px": 737.84,
@@ -240,6 +286,21 @@ LAYOUTS = {
     "pension_entitlements_by_country_selection": {
         "template": "horizontal",
         "countries": SELECTION,
+        "parts": PARTS_BY_FUNDING,
+        "subtitle": SUBTITLE_BY_FUNDING,
+        "margin": 16,
+        "origin_y": 16,
+        "title_slot_px": 737.84,
+        "logo_x": 771,
+        "note_ink_bottom": 587,
+        "source_y": 590.62,
+        "footer_y": 608.62,
+    },
+    "pension_entitlements_by_country_scheme_type": {
+        "template": "horizontal",
+        "countries": SELECTION,
+        "parts": PARTS_BY_SCHEME_TYPE,
+        "subtitle": SUBTITLE_BY_SCHEME_TYPE,
         "margin": 16,
         "origin_y": 16,
         "title_slot_px": 737.84,
@@ -281,7 +342,8 @@ def run() -> None:
     #
     # Step 3: Draw one frame per layout.
     for name, layout in LAYOUTS.items():
-        shown = select_countries(tb, layout["countries"])
+        shown = add_parts(select_countries(tb, layout["countries"]), layout["parts"])
+        sanity_check_parts(shown, layout["parts"])
         not_shown = without_total if layout["countries"] is None else []
         note = build_note(shown, len(tb), not_shown, tb_flags, year)
         fig = build(shown, layout, source, note)
@@ -291,7 +353,7 @@ def run() -> None:
 
 def sanity_check_inputs(tb: Table) -> None:
     """Assert what the chart assumes about the garden table."""
-    part_columns = [part["column"] for part in PARTS]
+    part_columns = [column for part in PARTS_BY_FUNDING for column in part["columns"]]
     assert not tb.duplicated(subset=["country", "year"]).any(), "A country-year appears twice."
     assert (tb[part_columns + [TOTAL_COLUMN]].min() >= 0).all(), "A negative share of GDP."
     # The parts must add up to Eurostat's own total wherever all three are published.
@@ -310,7 +372,7 @@ def latest_reporting_year(tb: Table) -> int:
 
 def sanity_check_year(tb: Table) -> None:
     """Assert what the chart assumes about the year it shows."""
-    part_columns = [part["column"] for part in PARTS]
+    part_columns = [column for part in PARTS_BY_FUNDING for column in part["columns"]]
     assert tb[part_columns].notna().all().all(), "A country with a total is missing one of its two parts."
     assert len(tb) >= MIN_COUNTRIES_PER_YEAR, f"Only {len(tb)} countries to show."
 
@@ -322,6 +384,26 @@ def select_countries(tb: Table, countries: list[str] | None) -> Table:
     missing = set(countries) - set(tb["country"])
     assert not missing, f"Selected countries not in the data: {sorted(missing)}"
     return tb[tb["country"].isin(countries)].reset_index(drop=True)
+
+
+def add_parts(tb: Table, parts: list[dict]) -> Table:
+    """One column per part of the bar, named by its key: the sum of the part's schemes.
+
+    Eurostat leaves out (flag "m") the schemes a country doesn't have or doesn't report, so a scheme with no value
+    counts as zero. `sanity_check_parts` then asserts that the parts still add up to Eurostat's total.
+    """
+    tb = tb.copy()
+    for part in parts:
+        tb[part["key"]] = tb[part["columns"]].sum(axis=1)
+    return tb
+
+
+def sanity_check_parts(tb: Table, parts: list[dict]) -> None:
+    """Assert that each country's parts add up to its total, so no scheme is missing from its bar."""
+    keys = [part["key"] for part in parts]
+    gap = (tb[keys].sum(axis=1) - tb[TOTAL_COLUMN]).abs()
+    off = tb.loc[gap > ROUNDING_TOLERANCE, "country"].tolist()
+    assert not off, f"Parts {keys} do not add up to the total for {off}."
 
 
 def real_discount_rate(year: int) -> float:
@@ -394,7 +476,9 @@ def build(tb: Table, layout: dict, source: str, note_text: str) -> plt.Figure:
     title = wrap_to_width(TITLE, layout["title_slot_px"] * PLAYFAIR_SLOT_SLACK, px_to_pt(SLOT_PX["title"]))
     title_lines = lines_in(title)
     subtitle_slot = layout["logo_x"] - 24 - margin if title_lines == 1 else content_w
-    subtitle = wrap_balanced(SUBTITLE.format(year=year), subtitle_slot * LATO_SLOT_SLACK, px_to_pt(SLOT_PX["subtitle"]))
+    subtitle = wrap_balanced(
+        layout["subtitle"].format(year=year), subtitle_slot * LATO_SLOT_SLACK, px_to_pt(SLOT_PX["subtitle"])
+    )
     subtitle_y = layout["origin_y"] + title_lines * TITLE_LINE_PX + HEADER_GAP_PX
     draw_lines(fig, fx, fy, margin, layout["origin_y"], title, SLOT_PX["title"], TITLE_LINE_PX, TITLE_COLOR, "title")
     draw_lines(fig, fx, fy, margin, subtitle_y, subtitle, SLOT_PX["subtitle"], SUBTITLE_LINE_PX, TEXT_COLOR, "subtitle")
@@ -412,7 +496,7 @@ def build(tb: Table, layout: dict, source: str, note_text: str) -> plt.Figure:
 
     # Step 3: The legend, one row under the subtitle.
     legend_top = band_top + BAND_INSET
-    draw_legend(fig, fx, fy, margin, legend_top)
+    draw_legend(fig, fx, fy, margin, legend_top, layout["parts"])
 
     # Step 4: The plot's extent. The label column is as wide as the widest name, and the longest bar's
     # total, unit included, ends on the content edge.
@@ -454,10 +538,11 @@ def build(tb: Table, layout: dict, source: str, note_text: str) -> plt.Figure:
             color=TEXT_COLOR,
             gid=f"{slug}__label",
         )
+        parts = layout["parts"]
         left = plot_left
-        for position, part in enumerate(PARTS):
-            width = row[part["column"]] * px_per_point
-            last = position == len(PARTS) - 1
+        for position, part in enumerate(parts):
+            width = row[part["key"]] * px_per_point
+            last = position == len(parts) - 1
             # Every segment but the last stops short by the gap, so each still starts at its value. A
             # segment too narrow to survive the gap is skipped rather than drawn backwards.
             drawn = width if last else width - SEGMENT_GAP_PX
@@ -488,12 +573,12 @@ def build(tb: Table, layout: dict, source: str, note_text: str) -> plt.Figure:
     return fig
 
 
-def draw_legend(fig, fx, fy, margin: float, top: float) -> None:
+def draw_legend(fig, fx, fy, margin: float, top: float, parts: list[dict]) -> None:
     """One row of square chips, each followed by its part's name in the part's own colour."""
     body_pt = px_to_pt(SLOT_PX["body"])
     centre = top + LEGEND_LINE_PX / 2
     x = margin
-    for part in PARTS:
+    for part in parts:
         fig.add_artist(
             Rectangle(
                 (fx(x), fy(centre + LEGEND_CHIP_PX / 2)),
@@ -513,7 +598,7 @@ def draw_legend(fig, fx, fy, margin: float, top: float) -> None:
             ha="left",
             va="baseline",
             fontsize=body_pt,
-            color=part["color"],
+            color=part.get("text_color", part["color"]),
             gid=f"category__{part['key']}",
         )
         x += text_advance_px(part["name"], body_pt) + LEGEND_ITEM_GAP
