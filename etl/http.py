@@ -52,23 +52,21 @@ HEADERS = {"User-Agent": USER_AGENT}
 STORAGE_OPTIONS = {"User-Agent": USER_AGENT}
 
 
-def reset_in_forked_children(s: requests.Session) -> requests.Session:
-    """Give a forked child an empty connection pool instead of the parent's open connections.
+def make_session() -> requests.Session:
+    """Create a long-lived session that a forked child doesn't share with its parent.
 
     ETL runs each step in a forked child, which inherits a copy of every pooled socket. A
     connection used from both processes breaks (TLS keeps its state in process memory), so the
-    child drops its copies right after the fork; the parent's connections stay open. Use this
-    on every long-lived session.
+    child empties its pool right after the fork; the parent's connections stay open. DB engines
+    solve the same problem by caching per pid (`etl.db.get_engine`).
+
+    The fork hook keeps the session alive for good, so create one per process, not per call.
     """
+    s = requests.Session()
+    s.headers["User-Agent"] = USER_AGENT
     os.register_at_fork(after_in_child=s.close)
     return s
 
 
-def _make_session() -> requests.Session:
-    s = requests.Session()
-    s.headers["User-Agent"] = USER_AGENT
-    return reset_in_forked_children(s)
-
-
 #: Module-level session — reuse for connection pooling.
-session = _make_session()
+session = make_session()

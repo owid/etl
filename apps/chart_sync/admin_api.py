@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 
 from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
-from etl.http import USER_AGENT, reset_in_forked_children
+from etl.http import make_session
 from etl.http import session as http_session
 
 log = structlog.get_logger()
@@ -520,8 +520,7 @@ def requests_with_retry() -> requests.Session:
     fresh connection for every request, which on a dataset like world_bank_pip means tens
     of thousands of them in a single step.
     """
-    s = requests.Session()
-    s.headers["User-Agent"] = USER_AGENT
+    s = make_session()
     # 401 is included because staging's admin API can transiently reject a valid key while
     # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
     # `read=1` keeps a hung server from multiplying TIMEOUT by the full retry budget; the
@@ -540,7 +539,7 @@ def requests_with_retry() -> requests.Session:
     adapter = HTTPAdapter(max_retries=retries, pool_maxsize=20)
     s.mount("http://", adapter)
     s.mount("https://", adapter)
-    return reset_in_forked_children(s)
+    return s
 
 
 class AdminAPIError(Exception):
