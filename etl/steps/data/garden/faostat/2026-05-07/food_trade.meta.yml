@@ -7,6 +7,11 @@ tables:
         short_unit: t
         description_short: |-
           Quantity of the item flowing from the exporter to the importer in the export year.
+        # DRAFT: text for the "About this data" box under the food trade viz, to iterate on in this PR's staging server.
+        description_key:
+          - Trade is measured by weight, in tonnes, not by monetary value.
+          - Some items combine several of FAO's commodity codes. For example, beef includes both bone-in and boneless meat, and rice includes both milled and broken rice. Processed products such as flour, oil and juice are shown as separate items.
+          - Countries often report different quantities for the same trade flow. Where the exporting and importing countries disagree, we use the importing country's figure.
         description_processing: |-
           - When only one country reports, we use that country's reported quantity.
           - When both the exporter and the importer country report a value, we use the importer's quantity, because, according to FAOSTAT's [Food Balance Sheets and Supply Utilization Accounts Resource Handbook 2025](https://openknowledge.fao.org/items/30e641b1-6d57-4998-8e8a-395727aa4307), section 6.1, "imports are typically documented more thoroughly and verified more rigorously than exports". This claim cites the United Nations Statistics Division's [International Merchandise Trade Statistics](https://unstats.un.org/unsd/trade/EG-IMTS/IMTS2010-CM%20-%20white%20cover%20version.pdf).
