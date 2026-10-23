@@ -510,7 +510,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 6c) Indicator metadata coverage, dataset block, and link verification
    The other quality checks catch *content* issues; this step catches *missing fields* and *broken URLs* before they reach review.
 
-   **Snapshot DVC freshness.** `etl update` clones the previous snapshot's `.dvc` content verbatim except for `date_accessed`. Always re-check `date_published` and the year in `citation_full` / `attribution` under `snapshots/<ns>/<new_version>/*.dvc` — they will otherwise silently ship the old version's values. Set `date_published` to the producer's real release date when discoverable; otherwise copy `date_accessed`. Bump the year in `citation_full` and `attribution` to match.
+   **Snapshot DVC freshness.** `etl update` clones the previous snapshot's `.dvc` content verbatim except for `date_accessed`. Always re-check `date_published` and the year in `citation_full` / `attribution` under `snapshots/<ns>/<new_version>/*.dvc` — they will otherwise silently ship the old version's values. Set `date_published` to the producer's real release date when discoverable; otherwise copy `date_accessed`. Bump the year in `citation_full` and `attribution` to match. The license is cloned too: open the producer's terms page and confirm `license.name` and `license.url` still match it, since a label carried over from an earlier version can name terms the producer never granted. A license-only edit doesn't reach a grapher DB that already holds the origin (`Origin._upsert_select` in `etl/grapher/model.py` matches every field except `license`), so staging keeps the old license until another origin field changes.
 
    - **Citation year vs `date_published` year.** After setting both, check whether the year inside `citation_full` / `attribution` matches `date_published`'s year. If they differ, confirm it's intentional before shipping: it's legitimate when the producer labels the release by *edition* rather than publish date (e.g. UN IGME's "2025 report" published `2026-03-17` → `citation_full` `(2025)`, `date_published` `2026`), but otherwise it's a stale citation. When the gap is deliberate, leave a one-line note for the reviewer so they don't re-flag it.
 
@@ -786,6 +786,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      yourself** — it is reader-facing copy owned by whoever wrote it. Record the outcome (fixed / deliberately
      left, with the reason) in the PR's open items, so the next updater doesn't re-flag it — and say whether the
      update was append-only or revised named periods, since that decides whether bounded claims were in scope.
+     The PR body alone doesn't tell the user: list each unsettled finding in your reply as waiting on their
+     decision, with the current and proposed text, and repeat it in every report until they settle it.
      **Link every finding, so content can act on it without searching.** For each claim give the live page,
      the Google Doc (`https://docs.google.com/document/d/<surface_id>/edit`), a scroll-to-text link that lands
      on the sentence itself (`<live url>#:~:text=<url-encoded claim>`), and the chart whose numbers it cites. A
@@ -1063,13 +1065,18 @@ Workflow when the user agrees:
    ```
    Convert the relocated new entries to nested while reordering, so the active and archived blocks match. Verify it parses with `.venv/bin/python -c "from etl.dag_helpers import load_dag; load_dag()"` (a malformed nesting raises).
 
-   **When only some snapshots bumped, re-declare the unchanged inputs in the new block.** If they were declared only inside the old nested block, deleting it leaves them undeclared, and the parse check above doesn't notice. Check:
+   **When only some snapshots bumped, re-declare the unchanged inputs in the new block**, including another dataset's whole chain (meadow, garden and snapshot) that the old block declared inline. If they were declared only inside the old nested block, deleting it leaves them undeclared, and the parse check above doesn't notice. Check every step reachable from the new version, not only its direct dependencies, so a re-declared chain with a bare leaf (say, the other dataset's meadow) is caught too:
    ```bash
    .venv/bin/python -c "
    from etl.dag_helpers import load_dag
    dag = load_dag()
-   new = [s for s in dag if '/<namespace>/<new_version>/' in s]
-   print(sorted({d for s in new for d in dag[s] if d.startswith(('data://', 'data-private://')) and d not in dag}))  # must be []
+   todo, seen = [s for s in dag if '/<namespace>/<new_version>/' in s], set()
+   while todo:
+       s = todo.pop()
+       if s not in seen:
+           seen.add(s)
+           todo += dag.get(s, ())
+   print(sorted(s for s in seen if s.startswith(('data://', 'data-private://')) and s not in dag))  # must be []
    "
    ```
 5. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
@@ -1223,7 +1230,7 @@ In the same message, remind the user that when the dataset is important and the 
 - **`paths.regions` auto-resolves DAG dependencies**: `paths.regions.add_population(tb)` and `paths.regions.add_aggregates(tb, regions=[...])` pick up the `population` and `income_groups` datasets directly from the DAG. Don't `paths.load_dataset("population")` and pass it through unless the helper specifically asks for the dataset — the parameter is unused.
 - **WB income-group aggregates**: add the four classification names (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) to your `REGIONS` list and add `data://garden/wb/<latest>/income_groups` to the DAG. `paths.regions.add_aggregates(...)` auto-resolves the classification.
 - **Detect structural placeholders dynamically**: when a source ships "balanced panel" rows that are zero everywhere by design (status combos that exist only for completeness), detect them at runtime (`groupby(...).max() == 0`) and assert the count matches the codebook. A coding change in the source then surfaces as a test failure instead of silently shipping noise.
-- **In-place source revisions: compare file dates/hashes, not version labels.** Some producers replace the published file (and codebook) without bumping their stated version and without a changelog. When checking whether a source has a new release, look at the hosting platform's file-modification dates or hashes (e.g. the OSF API's `date_modified` per file) against the previous snapshot's `date_accessed`/md5 — an unchanged version label proves nothing. If you ingest such a revision, set `date_published` to the replacement date and leave a `.dvc` NOTE naming the behavior so the next updater re-checks.
+- **In-place source revisions: compare file dates/hashes, not version labels.** Some producers replace the published file (and codebook) without bumping their stated version and without a changelog. When checking whether a source has a new release, look at the hosting platform's file-modification dates or hashes (e.g. the OSF API's `date_modified` per file) against the previous snapshot's `date_accessed`/md5 — an unchanged version label proves nothing. If you ingest such a revision, set `date_published` to the replacement date and leave a `.dvc` NOTE naming the behavior so the next updater re-checks. If the replacement appeared after `etl update` created the new version, move the steps to a version dated on or after the new `date_published`, so the folder isn't dated before its data.
 - **Category-state churn in combined categorical indicators.** A source revision can add or remove the *states* a categorical indicator takes (a recode wave eliminating an enforcement state, a new cross-combination appearing). The net that catches it is metadata validation failing with "extra variables in YAML file / in table" on per-category regional variables. Fix all four surfaces together — the category map in step code, the `sort:` lists, the coding-description sentences, and the per-category regional `_count`/`_pop` YAML blocks — then re-run the phantom-category audit. Never keep a label the new data cannot produce.
 - **Guard silent catch-all buckets with an assert.** A lookup that routes labeled source values into an *existing* fallback category ("requirement unknown", "other") degrades silently when the source adds a new label — the row lands in the fallback and nothing fires (unlike unmapped values that leak as *new* categories, which metadata validation catches). Assert `observed labels ⊆ map keys`, letting only genuinely-blank values reach the fallback.
 - **Grep metadata prose for numbers carried from the old release.** Validated fields are covered by checks; *prose* numbers in `description_key`/descriptions (country counts, category counts, year ranges) are not. After a revision that changes panel composition, `rg` the new `.meta.yml` for the previous release's counts. The mirror of this check for *published content* that cites the dataset is the referencing-prose audit in step 7.
