@@ -67,10 +67,10 @@ Assumptions:
 - [ ] Ask the user whether to remove the old version; if yes, remove+archive its DAG entries now and relocate the new entries into the old slot, but KEEP the old step files until review sign-off — the consecutive-version review diffs them from disk; deleting the files is the final commit before merge (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff + Metadata Diff on the staging branch, plus the data-diff report) together with the staging links to the 5 most-viewed data pages, and **wait for the user's sign-off** — they read those pages themselves, and the announcements below wait for it (see "Final QA hand-off")
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
-- [ ] Right before merging, check the producer hasn't published a newer release since the snapshot (see "Final QA hand-off")
-- [ ] After the merge, show both announcements again in the session: the Slack text in full and the /latest Doc link, with any number the merged data changed updated (see step 8)
 - [ ] Render Slack announcement via `draft-data-update-slack-post` (only after the QA sign-off), save to workbench, and notify user to post it to #data-updates-comms
 - [ ] Draft the public-facing "Data update" post for OWID /latest via `/owid-staff:draft-data-update-post` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
+- [ ] Right before merging, check the producer hasn't published a newer release since the snapshot (see "Final QA hand-off")
+- [ ] After the merge, show both announcements again in the session: the Slack text in full, and the /latest Doc link (or, when the post was declined, its eligible date), with any number the merged data changed corrected (see step 8)
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -797,7 +797,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
 8) Update context for public announcement
    - **Steps 8, 9 and 9b run only after the user has signed off the final QA hand-off.** An announcement describes the data, and the review can still change it.
-   - **After the merge, show both announcements again in the session**, since the drafts were handed over many turns earlier: the Slack text in full in the reply (not only the file link), and the /latest Doc link with its open steps. First recheck their numbers against the merged data, because changes after the drafts (review fixes, a decision on suspect source values, a late metadata edit) can move them; update the saved draft where they moved.
+   - **After the merge, show both announcements again in the session**, since the drafts were handed over many turns earlier: the Slack text in full in the reply (not only the file link), and the /latest Doc link with its open steps, or, when 9b declined the post, its eligible date instead. First recheck their numbers against the merged data, because changes after the drafts (review fixes, a decision on suspect source values, a late metadata edit) can move them; update the saved drafts (`slack-announcement.md`, `data-update.md`) where they moved. The Doc can't be edited from here (see 9b), so next to its link list each number the user must correct in it by hand, old and new.
    - In `workbench/<short_name>/update-context.yml` (kept up to date as facts are discovered, see Assumptions), record at minimum:
      ```yaml
      dataset:
