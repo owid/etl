@@ -21,33 +21,20 @@ import json
 import re
 import unicodedata
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
-import yaml
 from owid.catalog import Dataset, Table, Variable
 from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
 from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
-from etl.viz.chart.download_package_format import normalize_description_key
 
 log = get_logger()
 paths = PathFinder(__file__)
 
 # The file that indexes the rest of the feed.
 INDEX_FILENAME = "demography.metadata.json"
-
-# DRAFT (not for merging): text for the "About this data" box that replaces the derived fields, so the text can be
-# iterated on staging. Maps the file's keys to the feed's fields.
-DRAFT_ABOUT_FILE = Path(__file__).parent / "demography.about.yml"
-DRAFT_ABOUT_FIELDS = {
-    "title": "title",
-    "description_short": "descriptionShort",
-    "description_key": "descriptionKey",
-    "description_processing": "descriptionProcessing",
-}
 
 # The five-year bands the visualization draws its population pyramid from. `un_wpp` also carries
 # single years of age and wider bands over the same people (`0-14`, `15-64`), which would double
@@ -281,18 +268,6 @@ def run() -> None:
         },
         update_period_days=ds_garden.metadata.update_period_days,
     )
-    # DRAFT: apply the text being iterated on in demography.about.yml.
-    draft_about = yaml.safe_load(DRAFT_ABOUT_FILE.read_text()) or {}
-    unknown = set(draft_about) - set(DRAFT_ABOUT_FIELDS)
-    assert not unknown, f"Unknown fields in {DRAFT_ABOUT_FILE.name}: {sorted(unknown)}"
-    for field, value in draft_about.items():
-        # A null field is left out of the feed, so grapher omits it (or, for the title, shows its fallback heading).
-        if value is None:
-            feed_metadata.pop(DRAFT_ABOUT_FIELDS[field], None)
-            continue
-        if field == "description_key":
-            value = normalize_description_key(value)
-        feed_metadata[DRAFT_ABOUT_FIELDS[field]] = value
 
     manifest = {"countries": entities, "slugs": {entity: slugify(entity) for entity in entities}}
     save_json(add_feed_metadata(manifest, feed_metadata), INDEX_FILENAME)
