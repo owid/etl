@@ -13,8 +13,8 @@ part's color. Three frames, each a `LAYOUTS` entry:
   same way;
 - `pension_entitlements_by_country_scheme_type`: the same 14 countries split by scheme type
   (`PARTS_BY_SCHEME_TYPE`): state pensions (social security), employer promises (defined benefit schemes, of
-  private employers and for government employees) and pension pots (defined contribution schemes).
-All three use the same bar pitch, so the bars keep their thickness.
+  private employers and for government employees) and pension pots (defined contribution schemes). It has its own
+  title and subtitle, and a shorter Note.
 
 Data: table `pension_entitlements` of `garden/eurostat/2026-10-23/pension_entitlements` (Eurostat,
 `nasa_10_pens1`), and its flags table `pension_entitlements_flags`. Derived from the data, so a new release
@@ -35,11 +35,11 @@ Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static
              --template vertical --require-named-marks --expect-gid spain__unfunded --expect-gid spain__funded
          .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
              etl/steps/viz/static/eurostat/2026-10-23/pension_entitlements_by_country_selection \
-             --template horizontal --require-named-marks --expect-gid spain__unfunded --expect-gid denmark__funded
+             --template horizontal --require-named-marks --expect-gid spain__unfunded --expect-gid norway__funded
          .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py \
              etl/steps/viz/static/eurostat/2026-10-23/pension_entitlements_by_country_scheme_type \
              --template horizontal --require-named-marks --expect-gid spain__state --expect-gid spain__employer \
-             --expect-gid denmark__pots
+             --expect-gid norway__pots
 Then read the three PNGs.
 
 Figma handoff
@@ -59,7 +59,8 @@ join; ids are a convenience.
     footer re-pinned to its 622 bottom.
   - `pension-entitlements-by-country--sketch-c` -> `29793:1132` (850 x 638), the `SELECTION` countries by
     scheme type, from frame stem `pension_entitlements_by_country_scheme_type`, cloned from frame b, at
-    x=8430, y=1933. Same crop and footer as frame b.
+    x=8430, y=1933. Chart cropped to 16..832.71 x 105..559 under its two-line subtitle; footer re-pinned to its
+    622 bottom.
 - Deep links: https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29779-23 (a),
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29782-26 (b),
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29793-1132 (c)
@@ -67,16 +68,16 @@ join; ids are a convenience.
   816, `frameWidth` 850, no `reference`, `reflowLegend` false). Frames a and b re-import with
   `inheritStyles: true`. Frame c is styled from scratch (`inheritStyles: false`) with `families` Default
   Palette/Denim (`#4c6a9c`, key `e1538d9330d7b22168f0c19fa562897aa8975f90`) for `state` and `unfunded`,
-  Default Palette/Light Teal (`#58ac8c`, key `9a2854bc767115e1ddc8c7d8fcd47b88b51b16f7`) for `employer`, and
+  Default Palette/Camel (`#bc8e5a`, key `45161823f7f1a90184f8efaeaa46bea6a5b71061`) for `employer`, and
   Default Palette/Rusty Orange (`#b13507`, key `65bab597d085689b1ea82a69f4d785cb9212c234`) for `pots` and
   `funded`, and `bodyTextParent: /__(label|total)$/` so row labels and totals take Text/Gray 80. The restyle
   paints legend names in their family's base, so after it rebind `category__employer` to Line and Slope
-  Charts/Light Teal (`#2c8465`, key `a07c13547f40f65980745f6ad8b96e0f7b440f5c`), the darker variant for text.
+  Charts/Camel (`#996d39`, key `c17ca762a19289d7f2ec4fd00ba83a053f4d39f9`), the darker variant for text.
 - Text slots: title and subtitle set as one string each, with this file's line breaks, and kept on their
   template styles; the subtitle box is 731 wide beside the logo (one-line title). The Note keeps the template's
   runs (`Note:` Bold, space Medium, rest Regular) and this file's line break; the licence row its runs
   (Medium, `CC-BY` Bold, Medium, author Bold). After writing the Note, re-pin the footer to its bottom (1078.81
-  on frame a, 622 on b and c).
+  on frame a, 622 on b and c). Frame c's subtitle is two lines, broken where `SUBTITLE_BY_SCHEME_TYPE` breaks.
 
 Node names (`gid`s) this step emits, for the restyle pass: `<country>__<part>` for the bar segments
 (`unfunded` / `funded` on frames a and b, `state` / `employer` / `pots` on frame c), `<country>__label` for the
@@ -104,19 +105,26 @@ apply_svg_rcparams()
 
 paths = PathFinder(__file__)
 
-TITLE = "Pension entitlements as a share of GDP"
+TITLE_BY_FUNDING = "Pension entitlements as a share of GDP"
+TITLE_BY_SCHEME_TYPE = "Pension wealth as a share of GDP"
 SUBTITLE_BY_FUNDING = (
     "The value today of the pensions people have already earned in state, workplace, and private schemes, "
     "as a share of GDP. Unfunded government schemes will pay them from future contributions and taxes; "
     "private and funded schemes mostly from savings set aside. Data for {year}."
 )
+# A subtitle with line breaks keeps them, and its lines are drawn as given rather than wrapped: they were fitted
+# to the template's subtitle box in its own face, Lato, which this step can't measure (it sets this first line
+# 2.4% wider than Lato does: 743px against 725px in Figma, in a 731px box).
+# NOTE: After editing this subtitle, re-measure each line in Figma (TEMPLATES.md -> Predicting the template's line
+# breaks); a line wider than the box wraps there.
 SUBTITLE_BY_SCHEME_TYPE = (
-    "The value today of the pensions people have already earned, as a share of GDP. State pensions are run as "
-    "social security; employer promises are workplace pensions set by a formula, usually based on salary; pension "
-    "pots depend on what was paid in and the returns on it. Data for {year}."
+    "The present value today of pension entitlements, expressed as a share of gross domestic product (GDP).\n"
+    "Data for {year}, for selected countries."
 )
-# The shorter frame's countries: the top and the bottom of the ranking, the largest economies, the
-# countries that rely most on funded schemes and the ones that rely on none.
+# The shorter frames' countries: the top and the bottom of the ranking, the largest economies, the
+# countries that rely most on funded schemes and the ones that rely on none. Denmark is left out because its
+# figures leave out its state pension, which Eurostat counts as social assistance; Norway, whose schemes are all
+# reported and unflagged, takes its place.
 SELECTION = [
     "Spain",
     "Italy",
@@ -131,7 +139,7 @@ SELECTION = [
     "Czechia",
     "Bulgaria",
     "Ireland",
-    "Denmark",
+    "Norway",
 ]
 # The year shown is the latest one in which at least this many countries report a total.
 # NOTE: Countries report every three years (2015, 2018, 2021; 2024 is due in early 2027). Check that the
@@ -167,9 +175,7 @@ PARTS_BY_FUNDING = [
 ]
 # By scheme type: social security; defined benefit schemes, of private employers and for government employees;
 # and defined contribution schemes, private and government-run. Together they are all of Eurostat's schemes
-# (columns A, B and D to H of its table 29), so they add up to its total. Light Teal goes between Denim and Rusty
-# Orange: of the palette's third colors it keeps the most contrast across both seams (create-figma-chart's
-# color_audit.py).
+# (columns A, B and D to H of its table 29), so they add up to its total. Camel goes between Denim and Rusty Orange.
 PARTS_BY_SCHEME_TYPE = [
     {"key": "state", "columns": ["social_security_share_gdp"], "name": "State pensions", "color": "#4c6a9c"},
     {
@@ -181,9 +187,9 @@ PARTS_BY_SCHEME_TYPE = [
             "government_employee_defined_benefit_outside_core_share_gdp",
         ],
         "name": "Employer promises",
-        "color": "#58ac8c",
-        # Light Teal is too pale for text on white, so its name takes the library's darker variant for text.
-        "text_color": "#2c8465",
+        "color": "#bc8e5a",
+        # Camel is too pale for text on the canvas, so its name takes the library's darker variant for text.
+        "text_color": "#996d39",
     },
     {
         "key": "pots",
@@ -267,14 +273,18 @@ SEGMENT_GAP_PX = 1
 # edge (TEMPLATES.md -> Vertical and Horizontal): the header grows down from `origin_y`, and the footer's rows
 # keep their y while the Note grows up from its ink bottom. The first frame shows every country on the tall
 # template; the second the `SELECTION` on the landscape one, where 14 rows land on the same bar pitch as the
-# tall frame's 29; the third the same countries split by scheme type. The verifier needs `--template horizontal`
-# for the second and third stems.
+# tall frame's 29; the third the same countries split by scheme type. Each layout sets its own title and subtitle,
+# and whether its Note counts the countries shown and says what a lower discount rate would do. The verifier needs
+# `--template horizontal` for the second and third stems.
 LAYOUTS = {
     "pension_entitlements_by_country": {
         "template": "vertical",
         "countries": None,
         "parts": PARTS_BY_FUNDING,
+        "title": TITLE_BY_FUNDING,
         "subtitle": SUBTITLE_BY_FUNDING,
+        "note_counts_countries": True,
+        "note_explains_rate": True,
         "margin": 16,
         "origin_y": 16,
         "title_slot_px": 737.84,
@@ -287,7 +297,10 @@ LAYOUTS = {
         "template": "horizontal",
         "countries": SELECTION,
         "parts": PARTS_BY_FUNDING,
+        "title": TITLE_BY_FUNDING,
         "subtitle": SUBTITLE_BY_FUNDING,
+        "note_counts_countries": True,
+        "note_explains_rate": True,
         "margin": 16,
         "origin_y": 16,
         "title_slot_px": 737.84,
@@ -300,7 +313,11 @@ LAYOUTS = {
         "template": "horizontal",
         "countries": SELECTION,
         "parts": PARTS_BY_SCHEME_TYPE,
+        "title": TITLE_BY_SCHEME_TYPE,
         "subtitle": SUBTITLE_BY_SCHEME_TYPE,
+        # The subtitle already says the countries are a selection.
+        "note_counts_countries": False,
+        "note_explains_rate": False,
         "margin": 16,
         "origin_y": 16,
         "title_slot_px": 737.84,
@@ -345,7 +362,14 @@ def run() -> None:
         shown = add_parts(select_countries(tb, layout["countries"]), layout["parts"])
         sanity_check_parts(shown, layout["parts"])
         not_shown = without_total if layout["countries"] is None else []
-        note = build_note(shown, len(tb), not_shown, tb_flags, year)
+        note = build_note(
+            shown,
+            len(tb) if layout["note_counts_countries"] else len(shown),
+            not_shown,
+            tb_flags,
+            year,
+            explain_rate=layout["note_explains_rate"],
+        )
         fig = build(shown, layout, source, note)
         export_frame(paths, fig, name, template=layout["template"])
         plt.close(fig)
@@ -411,7 +435,9 @@ def real_discount_rate(year: int) -> float:
     return REAL_DISCOUNT_RATE_UP_TO_2015 if year <= 2015 else REAL_DISCOUNT_RATE_AFTER_2015
 
 
-def build_note(shown: Table, n_with_total: int, not_shown: list[str], tb_flags: Table, year: int) -> str:
+def build_note(
+    shown: Table, n_with_total: int, not_shown: list[str], tb_flags: Table, year: int, explain_rate: bool = True
+) -> str:
     """The Note: what the frame leaves out, the discount rate behind the values, and Eurostat's flags."""
     countries = list(shown["country"])
     sentences = []
@@ -419,10 +445,8 @@ def build_note(shown: Table, n_with_total: int, not_shown: list[str], tb_flags: 
     if len(shown) < n_with_total:
         sentences.append(f"This chart shows {len(shown)} of the {n_with_total} countries with data")
     # The discount rate behind the values of government schemes, which matters most to the estimates.
-    sentences.append(
-        f"Eurostat values future pensions in government schemes with a discount rate of {real_discount_rate(year):g}% "
-        "after inflation; a lower rate would give higher values"
-    )
+    rate = f"Eurostat values future pensions in government schemes with a discount rate of {real_discount_rate(year):g}% after inflation"
+    sentences.append(f"{rate}; a lower rate would give higher values" if explain_rate else rate)
     # Eurostat's flags on the values shown, in ranking order.
     flagged = []
     for country in countries:
@@ -473,12 +497,16 @@ def build(tb: Table, layout: dict, source: str, note_text: str) -> plt.Figure:
 
     # Step 1: Header. Under a one-line title the subtitle starts beside the logo, so its box ends 24px
     # short of it (TEMPLATES.md); wrap there, into lines of about equal length.
-    title = wrap_to_width(TITLE, layout["title_slot_px"] * PLAYFAIR_SLOT_SLACK, px_to_pt(SLOT_PX["title"]))
+    title = wrap_to_width(layout["title"], layout["title_slot_px"] * PLAYFAIR_SLOT_SLACK, px_to_pt(SLOT_PX["title"]))
     title_lines = lines_in(title)
     subtitle_slot = layout["logo_x"] - 24 - margin if title_lines == 1 else content_w
-    subtitle = wrap_balanced(
-        layout["subtitle"].format(year=year), subtitle_slot * LATO_SLOT_SLACK, px_to_pt(SLOT_PX["subtitle"])
-    )
+    subtitle = layout["subtitle"].format(year=year)
+    if "\n" in subtitle:
+        for line in subtitle.split("\n"):
+            width = text_width_px(line, px_to_pt(SLOT_PX["subtitle"]))
+            assert width <= content_w, f"Subtitle line {line!r} is wider than the content ({width:.0f}px)."
+    else:
+        subtitle = wrap_balanced(subtitle, subtitle_slot * LATO_SLOT_SLACK, px_to_pt(SLOT_PX["subtitle"]))
     subtitle_y = layout["origin_y"] + title_lines * TITLE_LINE_PX + HEADER_GAP_PX
     draw_lines(fig, fx, fy, margin, layout["origin_y"], title, SLOT_PX["title"], TITLE_LINE_PX, TITLE_COLOR, "title")
     draw_lines(fig, fx, fy, margin, subtitle_y, subtitle, SLOT_PX["subtitle"], SUBTITLE_LINE_PX, TEXT_COLOR, "subtitle")
