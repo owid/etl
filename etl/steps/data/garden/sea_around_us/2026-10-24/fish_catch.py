@@ -47,13 +47,16 @@ BREAKDOWNS_OF_TOTAL_CATCH = {
 }
 END_USES = ["direct_human_consumption", "fishmeal_and_fish_oil", "other_uses"]
 
-# Last year with a usable breakdown by end use and by gear.
-# NOTE: In the 2019 data, the end use and gear of several large fishing countries are left unallocated: Peru's
-# anchoveta catch (mostly turned into fishmeal, and caught with purse seines) gets almost no fishmeal and goes to
-# "unknown gear", and Indonesia and India also jump into "unknown gear". So we drop the end-use and gear breakdowns
-# for that year. On the next update, check whether the latest year has the same problem (sanity_check_outputs
-# catches it), and move this year forward.
-LAST_YEAR_END_USE_AND_GEAR = 2018
+# Last year of data that we show.
+# NOTE: The 2019 data looks unfinished for several large fishing countries: it counts almost all of Peru's anchoveta
+# catch (mostly turned into fishmeal, and caught with purse seines) as eaten by people and as "unknown gear";
+# Indonesia and India also jump into "unknown gear"; and Japan's catch is ~20% above FAO's and Japan's own figures
+# (its sardine catch doubles). So we drop 2019. On the next update, check whether the latest year has the same
+# problems (sanity_check_outputs catches the gear and Peru ones), and move this year forward.
+# NOTE: In 2017 and 2018, Sea Around Us counts most of the US Gulf menhaden catch (almost all turned into fishmeal)
+# as eaten by people, so US fishmeal falls from ~730 kt in 2016 to ~110 kt. We keep it as published; check whether
+# the next release fixes it.
+LAST_YEAR = 2018
 
 # Tolerance (relative) when checking that the categories of different breakdowns add up to the same total.
 # NOTE: The breakdowns of a few small fishing countries, in a few years, differ by up to ~1%.
@@ -85,8 +88,8 @@ def run() -> None:
     # Step 5: Add the total catch (landings plus discards).
     tb["total_catch"] = tb[BREAKDOWNS_OF_TOTAL_CATCH["catchtype"]].sum(axis=1, min_count=1)
 
-    # Step 6: Drop the end-use and gear breakdowns of the latest year, which are incomplete (see NOTE above).
-    tb.loc[tb["year"] > LAST_YEAR_END_USE_AND_GEAR, END_USES + BREAKDOWNS_OF_TOTAL_CATCH["gear"]] = None
+    # Step 6: Drop the latest year, which looks unfinished (see NOTE above).
+    tb = tb[tb["year"] <= LAST_YEAR].reset_index(drop=True)
 
     sanity_check_outputs(tb)
 
