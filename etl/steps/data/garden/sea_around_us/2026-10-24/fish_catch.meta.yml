@@ -1,0 +1,299 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: tonnes
+    short_unit: t
+    processing_level: minor
+    description_processing: "{definitions.description_processing_fishing_entities}"
+    description_key:
+      - "{definitions.description_key_reconstruction}"
+      - "{definitions.description_key_fishing_country}"
+      - "{definitions.description_key_scope}"
+    presentation:
+      attribution_short: Sea Around Us
+      topic_tags:
+        - Fish & Overfishing
+    display:
+      numDecimalPlaces: 0
+      tolerance: 0
+
+  # Shared description_key text.
+  description_key_reconstruction: |-
+    Sea Around Us "reconstructs" the full catch of each country. It starts from the official figures that countries report to the Food and Agriculture Organization of the United Nations (FAO), and adds estimates of the catch these figures leave out, such as much of the catch by small-scale, subsistence and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. These estimates draw on scientific studies, government reports, and local experts.
+  description_key_fishing_country: |-
+    The catch of each country is the catch of its own fishers and fleets, wherever they fish: in its own waters, in other countries' waters, or on the high seas. The world total also includes catch whose fishing country is unknown.
+  description_key_scope: |-
+    This data covers marine fish and invertebrates (such as shrimp, squid and crabs). It does not include marine mammals, reptiles, corals, sponges, seaweed, freshwater fishing, or fish farming (aquaculture).
+  description_key_end_use: |-
+    Sea Around Us splits the catch brought to land by what it is used for: eaten directly by people; turned into fishmeal and fish oil, mostly used as feed for farmed fish and livestock; or other uses, such as feeding animals directly, bait, fertilizer and industrial products. Fish thrown back into the sea are not included. Waste from processing fish for food, which can also be turned into fishmeal, is not counted either.
+  description_key_gear: |-
+    Sea Around Us assigns each part of the catch to the type of fishing gear used to catch it, based on the gears that industrial and small-scale fishers use in each country.
+  description_key_sector: |-
+    Sea Around Us splits the catch into four fishing sectors. Industrial fishing uses large, motorized vessels, and includes all trawlers, whatever their size. Artisanal fishing is small-scale fishing close to the coast whose catch is mostly sold. Subsistence fishing is small-scale fishing whose catch is mostly eaten by the fishers' families and communities. Recreational fishing is done mainly for pleasure.
+  description_key_catch_type: |-
+    Landings are the part of the catch that fishers keep and bring to land. Discards are the fish and other animals that are caught and then thrown back into the sea; Sea Around Us generally assumes that they die.
+  description_key_reporting_status: |-
+    Reported catch is the catch that appears in official statistics, which countries report to the Food and Agriculture Organization of the United Nations (FAO). Unreported catch is the part Sea Around Us estimates is missing from these statistics.
+
+  description_processing_latest_year_end_use: |-
+    Sea Around Us data goes up to 2019, but in 2019 it leaves the end use of several large fishing countries unallocated: for example, almost none of Peru's anchoveta catch, which is mostly turned into fishmeal and fish oil, counts as such. So we don't show the breakdown by end use for 2019; it ends in 2018.
+  description_processing_latest_year_gear: |-
+    Sea Around Us data goes up to 2019, but in 2019 it leaves the fishing gear of several large fishing countries (including Peru, Indonesia and India) unknown. So we don't show the breakdown by gear for 2019; it ends in 2018.
+  description_processing_fishing_entities: |-
+    Sea Around Us lists some overseas fleets separately from the country they belong to. We add them to that country: the Azores and Madeira to Portugal; Ascension and Tristan da Cunha to Saint Helena; and Bonaire, Saba and Sint Eustatius to Bonaire Sint Eustatius and Saba.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Hannah Ritchie  # backport
+    - Edouard Mathieu
+
+tables:
+  fish_catch:
+    variables:
+      total_catch:
+        title: Total wild fish catch
+        processing_level: major
+        presentation:
+          title_public: Total wild fish catch
+        description_short: Estimated catch of fish and other marine animals by fishers, including the fish thrown back into the sea.
+        description_processing: |-
+          We calculate the total catch as the sum of landings (the catch brought to land) and discards (the catch thrown back into the sea).
+
+          {definitions.description_processing_fishing_entities}
+        display:
+          name: Total catch
+
+      # End use.
+      direct_human_consumption:
+        description_processing: |-
+          {definitions.description_processing_latest_year_end_use}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch used for direct human consumption
+        presentation:
+          title_public: Wild fish catch used for direct human consumption
+        description_short: Estimated catch of fish and other marine animals that is brought to land and eaten directly by people.
+        description_key:
+          - "{definitions.description_key_end_use}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Direct human consumption
+      fishmeal_and_fish_oil:
+        description_processing: |-
+          {definitions.description_processing_latest_year_end_use}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch used for fishmeal and fish oil
+        presentation:
+          title_public: Wild fish catch used for fishmeal and fish oil
+        description_short: Estimated catch of fish and other marine animals that is brought to land and turned into fishmeal and fish oil, mostly used as feed for farmed fish and livestock.
+        description_key:
+          - "{definitions.description_key_end_use}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Fishmeal and fish oil
+      other_uses:
+        description_processing: |-
+          {definitions.description_processing_latest_year_end_use}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch used for other purposes
+        presentation:
+          title_public: Wild fish catch used for other purposes
+        description_short: Estimated catch of fish and other marine animals that is brought to land and used for purposes other than food or fishmeal, such as feeding animals directly, bait, fertilizer and industrial products.
+        description_key:
+          - "{definitions.description_key_end_use}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Other uses
+
+      # Fishing gear.
+      bottom_trawl:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from bottom trawling
+        presentation:
+          title_public: Wild fish catch from bottom trawling
+        description_short: Estimated catch of fish and other marine animals caught with bottom trawls, large nets dragged along the seafloor.
+        description_key: &description_key_gear
+          - "{definitions.description_key_gear}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Bottom trawl
+      pelagic_trawl:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from pelagic trawling
+        presentation:
+          title_public: Wild fish catch from pelagic trawling
+        description_short: Estimated catch of fish and other marine animals caught with pelagic trawls, large nets towed through open water, above the seafloor.
+        description_key: *description_key_gear
+        display:
+          name: Pelagic trawl
+      purse_seine:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from purse seines
+        presentation:
+          title_public: Wild fish catch from purse seines
+        description_short: Estimated catch of fish and other marine animals caught with purse seines, large nets that encircle a school of fish and are then closed at the bottom.
+        description_key: *description_key_gear
+        display:
+          name: Purse seine
+      longline:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from longlines
+        presentation:
+          title_public: Wild fish catch from longlines
+        description_short: Estimated catch of fish and other marine animals caught with longlines, long fishing lines carrying many baited hooks.
+        description_key: *description_key_gear
+        display:
+          name: Longline
+      gillnets:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from gillnets
+        presentation:
+          title_public: Wild fish catch from gillnets
+        description_short: Estimated catch of fish and other marine animals caught with gillnets, walls of netting in which fish get caught by their gills.
+        description_key: *description_key_gear
+        display:
+          name: Gillnets
+      small_scale_gear:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from small-scale fishing gear
+        presentation:
+          title_public: Wild fish catch from small-scale fishing gear
+        description_short: Estimated catch of fish and other marine animals caught with the many types of gear used in small-scale fishing, such as hand lines, traps and small nets.
+        description_key: *description_key_gear
+        display:
+          name: Small-scale gear
+      other_gear:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from other fishing gear
+        presentation:
+          title_public: Wild fish catch from other fishing gear
+        description_short: Estimated catch of fish and other marine animals caught with other types of fishing gear.
+        description_key: *description_key_gear
+        display:
+          name: Other gear
+      unknown_gear:
+        description_processing: |-
+          {definitions.description_processing_latest_year_gear}
+
+          {definitions.description_processing_fishing_entities}
+        title: Wild fish catch from unknown fishing gear
+        presentation:
+          title_public: Wild fish catch from unknown fishing gear
+        description_short: Estimated catch of fish and other marine animals for which the fishing gear is unknown.
+        description_key: *description_key_gear
+        display:
+          name: Unknown gear
+
+      # Fishing sector.
+      industrial:
+        title: Wild fish catch by industrial fishing
+        presentation:
+          title_public: Wild fish catch by industrial fishing
+        description_short: Estimated catch of fish and other marine animals by industrial fishing, which uses large, motorized vessels.
+        description_key: &description_key_sector
+          - "{definitions.description_key_sector}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Industrial
+      artisanal:
+        title: Wild fish catch by artisanal fishing
+        presentation:
+          title_public: Wild fish catch by artisanal fishing
+        description_short: Estimated catch of fish and other marine animals by artisanal fishing, which is small-scale fishing close to the coast whose catch is mostly sold.
+        description_key: *description_key_sector
+        display:
+          name: Artisanal
+      subsistence:
+        title: Wild fish catch by subsistence fishing
+        presentation:
+          title_public: Wild fish catch by subsistence fishing
+        description_short: Estimated catch of fish and other marine animals by subsistence fishing, which is small-scale fishing whose catch is mostly eaten by the fishers' families and communities.
+        description_key: *description_key_sector
+        display:
+          name: Subsistence
+      recreational:
+        title: Wild fish catch by recreational fishing
+        presentation:
+          title_public: Wild fish catch by recreational fishing
+        description_short: Estimated catch of fish and other marine animals by recreational fishing, which is done mainly for pleasure.
+        description_key: *description_key_sector
+        display:
+          name: Recreational
+
+      # Catch type.
+      landings:
+        title: Wild fish landings
+        presentation:
+          title_public: Wild fish landings
+        description_short: Estimated catch of fish and other marine animals that fishers keep and bring to land.
+        description_key: &description_key_catch_type
+          - "{definitions.description_key_catch_type}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Landings
+      discards:
+        title: Wild fish discards
+        presentation:
+          title_public: Wild fish discards
+        description_short: Estimated catch of fish and other marine animals that are caught and then thrown back into the sea.
+        description_key: *description_key_catch_type
+        display:
+          name: Discards
+
+      # Reporting status.
+      reported_catch:
+        title: Reported wild fish catch
+        presentation:
+          title_public: Reported wild fish catch
+        description_short: Catch of fish and other marine animals that appears in official statistics.
+        description_key: &description_key_reporting_status
+          - "{definitions.description_key_reporting_status}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
+        display:
+          name: Reported
+      unreported_catch:
+        title: Unreported wild fish catch
+        presentation:
+          title_public: Unreported wild fish catch
+        description_short: Estimated catch of fish and other marine animals that is missing from official statistics.
+        description_key: *description_key_reporting_status
+        display:
+          name: Unreported
