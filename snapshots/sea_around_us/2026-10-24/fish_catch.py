@@ -13,7 +13,7 @@ The rows are stored as the API returns them (one row per area, dimension, catego
 
 NOTE: The API answers 404 for fishing entities that have no catch of their own (e.g. "European Union", "Mariculture",
 or sub-national entities like "Alaska (USA)" whose catch sits under the parent country). Those are skipped, but the
-number of skipped entities is checked, so that a change in the API's coverage gets noticed.
+set of skipped entities is checked against a known list, so that a change in the API's coverage gets noticed.
 """
 
 from concurrent.futures import ThreadPoolExecutor
@@ -37,8 +37,30 @@ DIMENSIONS = ["enduse", "gear", "sector", "catchtype", "reporting-status"]
 # Region id of the whole world in the "global" endpoint.
 GLOBAL_REGION_ID = 1
 
-# Maximum number of fishing entities without data (19 at the time of writing).
-MAX_ENTITIES_WITHOUT_DATA = 25
+# Fishing entities for which the API has no data (it answers 404). Most have no catch of their own, or their catch
+# sits under another entity (e.g. "Alaska (USA)" under the United States).
+# NOTE: If an entity starts having data, remove it from this list; a new entity without data fails the check below.
+ENTITIES_WITHOUT_DATA = {
+    "Alaska (USA)",
+    "Crozet Island (France)",
+    "Cyprus Island",
+    "Ethiopia",
+    "European Union",
+    "Fishing Country Unknown",
+    "Gibraltar (GBR)",
+    "Isle of Man (GBR)",
+    "Johnston Island (USA)",
+    "Kerguelen Island (France)",
+    "Macau / Macao (China)",
+    "Mariculture",
+    "Monaco",
+    "Other countries",
+    "Russia (Kaliningrad)",
+    "Russia (St Petersburg)",
+    "Svalbard Island (Norway)",
+    "United States Minor Outlying Islands",
+    "Western Sahara (Morocco)",
+}
 
 # The API is slow (~5 s per request), so requests are run in parallel.
 MAX_WORKERS = 8
@@ -112,13 +134,18 @@ def sanity_check(df: pd.DataFrame, entities: list[dict]) -> None:
     dimensions_global = set(df[df["area_type"] == "global"]["dimension"])
     assert dimensions_global == set(DIMENSIONS), f"Missing global dimensions: {set(DIMENSIONS) - dimensions_global}"
 
-    # Only a handful of fishing entities should have no data.
+    # Fishing entities without data should be exactly the known ones.
     entities_with_data = set(df[df["area_type"] == "fishing-entity"]["area_id"])
-    entities_without_data = sorted(entity["title"] for entity in entities if entity["id"] not in entities_with_data)
-    log.info(f"Fishing entities without data: {entities_without_data}")
-    assert len(entities_without_data) <= MAX_ENTITIES_WITHOUT_DATA, (
-        f"{len(entities_without_data)} fishing entities have no data: {entities_without_data}"
+    entities_without_data = {entity["title"] for entity in entities if entity["id"] not in entities_with_data}
+    assert entities_without_data == ENTITIES_WITHOUT_DATA, (
+        f"Newly without data: {sorted(entities_without_data - ENTITIES_WITHOUT_DATA)}; "
+        f"now with data: {sorted(ENTITIES_WITHOUT_DATA - entities_without_data)}"
     )
+
+    # Every entity with data should have data for every dimension (the API can answer 404 for just one of them).
+    dimensions_per_entity = df.groupby(["area_type", "area_id"])["dimension"].nunique()
+    incomplete = dimensions_per_entity[dimensions_per_entity < len(DIMENSIONS)]
+    assert incomplete.empty, f"Entities missing some dimensions: {incomplete.index.tolist()}"
 
     # The data should start in 1950, and there should be no duplicates.
     assert df["year"].min() == 1950, f"Unexpected first year: {df['year'].min()}"

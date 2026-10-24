@@ -22,7 +22,7 @@ definitions:
 
   # Shared description_key text.
   description_key_reconstruction: |-
-    Sea Around Us “reconstructs” the full catch of each country. It starts from the official figures that countries report to the Food and Agriculture Organization of the United Nations (FAO), and adds estimates of the catch these figures leave out, such as much of the catch by small-scale, subsistence, and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. These estimates draw on scientific studies, government reports, and local experts.
+    Sea Around Us attempts to reconstruct the full catch of each country. It starts from the official figures that countries report to the Food and Agriculture Organization of the United Nations (FAO), and adds estimates of the catch these figures leave out, such as much of the catch by small-scale, subsistence, and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. These estimates draw on scientific studies, government reports, and local experts.
   description_key_fishing_country: |-
     The catch of each country is the catch of its own fishers and fleets, wherever they fish: in its own waters, in other countries’ waters, or on the high seas. The world total also includes catch whose fishing country is unknown.
   description_key_scope: |-
@@ -34,7 +34,7 @@ definitions:
   description_key_sector: |-
     Sea Around Us splits the catch into four fishing sectors. Industrial fishing uses large, motorized vessels, and includes all trawlers, whatever their size. Artisanal fishing is small-scale fishing close to the coast whose catch is mostly sold. Subsistence fishing is small-scale fishing whose catch is mostly eaten by the fishers’ families and communities. Recreational fishing is done mainly for pleasure.
   description_key_catch_type: |-
-    Landings are the part of the catch that fishers keep and bring to land. Discards are the fish and other animals that are caught and then thrown back into the sea; Sea Around Us generally assumes that they die.
+    Landings are the part of the catch that fishers keep and bring to land. Discards are the fish and other animals that are caught and then thrown back into the sea.
   description_key_reporting_status: |-
     Reported catch is the catch that appears in official statistics, which countries report to the Food and Agriculture Organization of the United Nations (FAO). Unreported catch is the part Sea Around Us estimates is missing from these statistics.
 
@@ -119,8 +119,7 @@ tables:
         presentation:
           title_public: Wild fish catch from bottom trawling
         description_short: Estimated catch of fish and other marine animals caught by industrial fishing with bottom trawls, large nets dragged along the seafloor.
-        description_key: &description_key_gear
-          - "{definitions.description_key_gear}"
+        description_key:
           - "{definitions.description_key_reconstruction}"
           - "{definitions.description_key_fishing_country}"
           - "{definitions.description_key_scope}"
@@ -133,7 +132,11 @@ tables:
         presentation:
           title_public: Wild fish catch from pelagic trawling
         description_short: Estimated catch of fish and other marine animals caught by industrial fishing with pelagic trawls, large nets towed through open water, above the seafloor.
-        description_key: *description_key_gear
+        description_key: &description_key_gear
+          - "{definitions.description_key_gear}"
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
         display:
           name: Pelagic trawl
           numDecimalPlaces: 0
@@ -265,7 +268,10 @@ tables:
         presentation:
           title_public: Wild fish discards
         description_short: Estimated catch of fish and other marine animals that are caught and then thrown back into the sea.
-        description_key: *description_key_catch_type
+        description_key:
+          - "{definitions.description_key_reconstruction}"
+          - "{definitions.description_key_fishing_country}"
+          - "{definitions.description_key_scope}"
         display:
           name: Discards
           numDecimalPlaces: 0
