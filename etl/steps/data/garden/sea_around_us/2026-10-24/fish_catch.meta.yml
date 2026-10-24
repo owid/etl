@@ -24,7 +24,7 @@ definitions:
   description_key_reconstruction: |-
     Sea Around Us attempts to reconstruct the full catch of each country. It starts from the official figures that countries report to the Food and Agriculture Organization of the United Nations (FAO), and adds estimates of the catch these figures leave out, such as much of the catch by small-scale, subsistence, and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. These estimates draw on scientific studies, government reports, and local experts.
   description_key_fishing_country: |-
-    The catch of each country is the catch of its own fishers and fleets, wherever they fish: in its own waters, in other countries’ waters, or on the high seas. The world total also includes catch whose fishing country is unknown.
+    The catch of each country is the catch of its own fishers and fleets, wherever they fish: in its own waters, in other countries’ waters, or on the high seas. Catch whose fishing country is unknown is shown as “Unknown fishing country”, and is part of the world total.
   description_key_scope: |-
     This data covers marine fish and invertebrates (such as shrimp, squid, and crabs). It does not include marine mammals, reptiles, corals, sponges, seaweed, freshwater fishing, or fish farming (aquaculture).
   description_key_end_use: |-

@@ -67,6 +67,7 @@
   "Georgia": "Georgia",
   "Germany": "Germany",
   "Ghana": "Ghana",
+  "Global": "World",
   "Greece": "Greece",
   "Greenland": "Greenland",
   "Grenada": "Grenada",
@@ -190,11 +191,11 @@
   "United Arab Emirates": "United Arab Emirates",
   "United Kingdom": "United Kingdom",
   "United States of America": "United States",
+  "Unknown Fishing Country": "Unknown fishing country",
   "Uruguay": "Uruguay",
   "Vanuatu": "Vanuatu",
   "Venezuela": "Venezuela",
   "Viet Nam": "Vietnam",
   "Wallis and Futuna (France)": "Wallis and Futuna",
-  "Yemen": "Yemen",
-  "Global": "World"
+  "Yemen": "Yemen"
 }

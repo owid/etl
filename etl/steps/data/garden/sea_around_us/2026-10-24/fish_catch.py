@@ -69,8 +69,7 @@ def run() -> None:
     tb = ds_meadow.read("fish_catch")
     sanity_check_inputs(tb)
 
-    # Step 2: Harmonize country names; "Global" becomes "World", and the catch of unknown fishing countries is
-    # dropped from the country-level data (it is still part of the world total).
+    # Step 2: Harmonize country names ("Global" becomes "World").
     tb = paths.regions.harmonize_names(tb)
 
     # Step 3: Add up fishing entities that belong to the same OWID country (e.g. Azores and Madeira are part of
@@ -109,12 +108,11 @@ def sanity_check_inputs(tb: Table) -> None:
 
 
 def sanity_check_outputs(tb: Table) -> None:
-    # The world total should be the sum of all fishing countries (including those that we don't show separately).
-    # So it should be larger than the sum of the countries we keep, but not by much.
+    # The world total should be the sum of all fishing countries (including "Unknown fishing country").
     tb_world = tb[tb["country"] == "World"].set_index("year")["total_catch"]
     tb_countries = tb[tb["country"] != "World"].groupby("year")["total_catch"].sum()
     ratio = tb_countries / tb_world
-    assert ((ratio > 0.95) & (ratio <= 1 + 1e-6)).all(), f"Countries don't add up to the world: {ratio.describe()}"
+    assert ((ratio > 1 - 1e-4) & (ratio < 1 + 1e-4)).all(), f"Countries don't add up to the world: {ratio.describe()}"
 
     # Each breakdown should add up to the same total catch; end uses should add up to landings.
     for breakdown, columns in BREAKDOWNS_OF_TOTAL_CATCH.items():
