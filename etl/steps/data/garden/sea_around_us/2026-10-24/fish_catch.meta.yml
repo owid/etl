@@ -19,28 +19,28 @@ definitions:
 
   # Shared description_key text.
   description_key_reconstruction: |-
-    Sea Around Us "reconstructs" the full catch of each country. It starts from the official figures that countries report to the Food and Agriculture Organization of the United Nations (FAO), and adds estimates of the catch these figures leave out, such as much of the catch by small-scale, subsistence and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. These estimates draw on scientific studies, government reports, and local experts.
+    Sea Around Us “reconstructs” the full catch of each country. It starts from the official figures that countries report to the Food and Agriculture Organization of the United Nations (FAO), and adds estimates of the catch these figures leave out, such as much of the catch by small-scale, subsistence, and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. These estimates draw on scientific studies, government reports, and local experts.
   description_key_fishing_country: |-
-    The catch of each country is the catch of its own fishers and fleets, wherever they fish: in its own waters, in other countries' waters, or on the high seas. The world total also includes catch whose fishing country is unknown.
+    The catch of each country is the catch of its own fishers and fleets, wherever they fish: in its own waters, in other countries’ waters, or on the high seas. The world total also includes catch whose fishing country is unknown.
   description_key_scope: |-
-    This data covers marine fish and invertebrates (such as shrimp, squid and crabs). It does not include marine mammals, reptiles, corals, sponges, seaweed, freshwater fishing, or fish farming (aquaculture).
+    This data covers marine fish and invertebrates (such as shrimp, squid, and crabs). It does not include marine mammals, reptiles, corals, sponges, seaweed, freshwater fishing, or fish farming (aquaculture).
   description_key_end_use: |-
-    Sea Around Us splits the catch brought to land by what it is used for: eaten directly by people; turned into fishmeal and fish oil, mostly used as feed for farmed fish and livestock; or other uses, such as feeding animals directly, bait, fertilizer and industrial products. Fish thrown back into the sea are not included. Waste from processing fish for food, which can also be turned into fishmeal, is not counted either.
+    Sea Around Us splits the catch brought to land by what it is used for: eaten directly by people; turned into fishmeal and fish oil, mostly used as feed for farmed fish and livestock; or other uses, such as feeding animals directly, bait, fertilizer, and industrial products. Fish thrown back into the sea are not included. Waste from processing fish for food, which can also be turned into fishmeal, is not counted either.
   description_key_gear: |-
     Sea Around Us assigns each part of the catch to the type of fishing gear used to catch it, based on the gears that industrial and small-scale fishers use in each country.
   description_key_sector: |-
-    Sea Around Us splits the catch into four fishing sectors. Industrial fishing uses large, motorized vessels, and includes all trawlers, whatever their size. Artisanal fishing is small-scale fishing close to the coast whose catch is mostly sold. Subsistence fishing is small-scale fishing whose catch is mostly eaten by the fishers' families and communities. Recreational fishing is done mainly for pleasure.
+    Sea Around Us splits the catch into four fishing sectors. Industrial fishing uses large, motorized vessels, and includes all trawlers, whatever their size. Artisanal fishing is small-scale fishing close to the coast whose catch is mostly sold. Subsistence fishing is small-scale fishing whose catch is mostly eaten by the fishers’ families and communities. Recreational fishing is done mainly for pleasure.
   description_key_catch_type: |-
     Landings are the part of the catch that fishers keep and bring to land. Discards are the fish and other animals that are caught and then thrown back into the sea; Sea Around Us generally assumes that they die.
   description_key_reporting_status: |-
     Reported catch is the catch that appears in official statistics, which countries report to the Food and Agriculture Organization of the United Nations (FAO). Unreported catch is the part Sea Around Us estimates is missing from these statistics.
 
   description_processing_latest_year_end_use: |-
-    Sea Around Us data goes up to 2019, but in 2019 it leaves the end use of several large fishing countries unallocated: for example, almost none of Peru's anchoveta catch, which is mostly turned into fishmeal and fish oil, counts as such. So we don't show the breakdown by end use for 2019; it ends in 2018.
+    Sea Around Us data goes up to 2019, but in 2019 it leaves the end use of several large fishing countries unallocated: for example, almost none of Peru’s anchoveta catch, which is mostly turned into fishmeal and fish oil, counts as such. So we don’t show the breakdown by end use for 2019; it ends in 2018.
   description_processing_latest_year_gear: |-
-    Sea Around Us data goes up to 2019, but in 2019 it leaves the fishing gear of several large fishing countries (including Peru, Indonesia and India) unknown. So we don't show the breakdown by gear for 2019; it ends in 2018.
+    Sea Around Us data goes up to 2019, but in 2019 it leaves the fishing gear of several large fishing countries (including Peru, Indonesia, and India) unknown. So we don’t show the breakdown by gear for 2019; it ends in 2018.
   description_processing_fishing_entities: |-
-    Sea Around Us lists some overseas fleets separately from the country they belong to. We add them to that country: the Azores and Madeira to Portugal; Ascension and Tristan da Cunha to Saint Helena; and Bonaire, Saba and Sint Eustatius to Bonaire Sint Eustatius and Saba.
+    Sea Around Us lists some overseas fleets separately from the country they belong to. We add them to that country: the Azores and Madeira to Portugal; Ascension and Tristan da Cunha to Saint Helena; and Bonaire, Saba, and Sint Eustatius to Bonaire Sint Eustatius and Saba.
 
 dataset:
   update_period_days: 365
@@ -105,7 +105,7 @@ tables:
         title: Wild fish catch used for other purposes
         presentation:
           title_public: Wild fish catch used for other purposes
-        description_short: Estimated catch of fish and other marine animals that is brought to land and used for purposes other than food or fishmeal, such as feeding animals directly, bait, fertilizer and industrial products.
+        description_short: Estimated catch of fish and other marine animals that is brought to land and used for purposes other than food or fishmeal, such as feeding animals directly, bait, fertilizer, and industrial products.
         description_key:
           - "{definitions.description_key_end_use}"
           - "{definitions.description_key_reconstruction}"
@@ -187,7 +187,7 @@ tables:
         title: Wild fish catch from small-scale fishing gear
         presentation:
           title_public: Wild fish catch from small-scale fishing gear
-        description_short: Estimated catch of fish and other marine animals caught with the many types of gear used in small-scale fishing, such as hand lines, traps and small nets.
+        description_short: Estimated catch of fish and other marine animals caught with the many types of gear used in small-scale fishing, such as hand lines, traps, and small nets.
         description_key: *description_key_gear
         display:
           name: Small-scale gear
@@ -241,7 +241,7 @@ tables:
         title: Wild fish catch by subsistence fishing
         presentation:
           title_public: Wild fish catch by subsistence fishing
-        description_short: Estimated catch of fish and other marine animals by subsistence fishing, which is small-scale fishing whose catch is mostly eaten by the fishers' families and communities.
+        description_short: Estimated catch of fish and other marine animals by subsistence fishing, which is small-scale fishing whose catch is mostly eaten by the fishers’ families and communities.
         description_key: *description_key_sector
         display:
           name: Subsistence
