@@ -30,3 +30,7 @@ steps:
   # How much bilateral development aid is spent on climate-related projects? (OECD RioMarkers and CRS)
   viz://static/oecd/2026-10-22/climate_related_bilateral_oda:
     - data://garden/oecd/2026-10-07/climate_related_official_development_assistance
+
+  # Pension entitlements as a share of GDP, by country (Eurostat)
+  viz://static/eurostat/2026-10-23/pension_entitlements_by_country:
+    - data://garden/eurostat/2026-10-23/pension_entitlements

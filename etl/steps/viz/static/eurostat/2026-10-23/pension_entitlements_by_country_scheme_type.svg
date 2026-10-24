@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="612pt" height="459.36pt" viewBox="0 0 612 459.36" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 459.36 
+L 612 459.36 
+L 612 0 
+L 0 0 
+L 0 459.36 
+z
+" style="fill: none"/>
+  </g>
+  <g id="legend-chip__state">
+   <path d="M 11.52 84.24 
+L 20.16 84.24 
+L 20.16 75.6 
+L 11.52 75.6 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="legend-chip__employer">
+   <path d="M 102.409059 84.24 
+L 111.049059 84.24 
+L 111.049059 75.6 
+L 102.409059 75.6 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="legend-chip__pots">
+   <path d="M 212.508787 84.24 
+L 221.148787 84.24 
+L 221.148787 75.6 
+L 212.508787 75.6 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="spain__state">
+   <path d="M 71.706291 112.798248 
+L 488.272094 112.798248 
+L 488.272094 97.2 
+L 71.706291 97.2 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="spain__employer">
+   <path d="M 488.992094 112.798248 
+L 531.187985 112.798248 
+L 531.187985 97.2 
+L 488.992094 97.2 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="spain__pots">
+   <path d="M 531.907985 112.798248 
+L 534.750569 112.798248 
+L 534.750569 97.2 
+L 531.907985 97.2 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="italy__state">
+   <path d="M 71.706291 135.08146 
+L 467.641778 135.08146 
+L 467.641778 119.483212 
+L 71.706291 119.483212 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="italy__pots">
+   <path d="M 468.632999 135.08146 
+L 476.523444 135.08146 
+L 476.523444 119.483212 
+L 468.632999 119.483212 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="netherlands__state">
+   <path d="M 71.706291 157.364672 
+L 264.244718 157.364672 
+L 264.244718 141.766423 
+L 71.706291 141.766423 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="netherlands__employer">
+   <path d="M 264.964718 157.364672 
+L 445.092816 157.364672 
+L 445.092816 141.766423 
+L 264.964718 141.766423 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="netherlands__pots">
+   <path d="M 445.812816 157.364672 
+L 453.417454 157.364672 
+L 453.417454 141.766423 
+L 445.812816 141.766423 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="france__state">
+   <path d="M 71.706291 179.647883 
+L 389.411206 179.647883 
+L 389.411206 164.049635 
+L 71.706291 164.049635 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="france__employer">
+   <path d="M 390.131206 179.647883 
+L 437.9096 179.647883 
+L 437.9096 164.049635 
+L 390.131206 164.049635 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="portugal__state">
+   <path d="M 71.706291 201.931095 
+L 327.894013 201.931095 
+L 327.894013 186.332847 
+L 71.706291 186.332847 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="portugal__employer">
+   <path d="M 328.614013 201.931095 
+L 425.069096 201.931095 
+L 425.069096 186.332847 
+L 328.614013 186.332847 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="portugal__pots">
+   <path d="M 425.789096 201.931095 
+L 426.614056 201.931095 
+L 426.614056 186.332847 
+L 425.789096 186.332847 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="switzerland__state">
+   <path d="M 71.706291 224.214307 
+L 285.875259 224.214307 
+L 285.875259 208.616058 
+L 71.706291 208.616058 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="switzerland__employer">
+   <path d="M 286.595259 224.214307 
+L 420.349056 224.214307 
+L 420.349056 208.616058 
+L 286.595259 208.616058 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="germany__state">
+   <path d="M 71.706291 246.497518 
+L 325.504014 246.497518 
+L 325.504014 230.89927 
+L 71.706291 230.89927 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="germany__employer">
+   <path d="M 326.224014 246.497518 
+L 391.697604 246.497518 
+L 391.697604 230.89927 
+L 326.224014 230.89927 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="hungary__state">
+   <path d="M 71.706291 268.78073 
+L 377.834004 268.78073 
+L 377.834004 253.182482 
+L 71.706291 253.182482 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="sweden__state">
+   <path d="M 71.706291 291.063942 
+L 244.310954 291.063942 
+L 244.310954 275.465693 
+L 71.706291 275.465693 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="sweden__employer">
+   <path d="M 245.030954 291.063942 
+L 272.79636 291.063942 
+L 272.79636 275.465693 
+L 245.030954 275.465693 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="sweden__pots">
+   <path d="M 273.51636 291.063942 
+L 350.826802 291.063942 
+L 350.826802 275.465693 
+L 273.51636 275.465693 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="poland__state">
+   <path d="M 71.706291 313.347153 
+L 320.045418 313.347153 
+L 320.045418 297.748905 
+L 71.706291 297.748905 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="poland__employer">
+   <path d="M 320.765418 313.347153 
+L 341.071665 313.347153 
+L 341.071665 297.748905 
+L 320.765418 297.748905 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="poland__pots">
+   <path d="M 341.791665 313.347153 
+L 348.978314 313.347153 
+L 348.978314 297.748905 
+L 341.791665 297.748905 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="iceland__state">
+   <path d="M 71.706291 335.630365 
+L 161.093834 335.630365 
+L 161.093834 320.032117 
+L 71.706291 320.032117 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="iceland__employer">
+   <path d="M 161.813834 335.630365 
+L 198.436365 335.630365 
+L 198.436365 320.032117 
+L 161.813834 320.032117 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="iceland__pots">
+   <path d="M 199.156365 335.630365 
+L 347.129848 335.630365 
+L 347.129848 320.032117 
+L 199.156365 320.032117 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="czechia__state">
+   <path d="M 71.706291 357.913577 
+L 304.858679 357.913577 
+L 304.858679 342.315328 
+L 71.706291 342.315328 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="czechia__pots">
+   <path d="M 305.578679 357.913577 
+L 313.857194 357.913577 
+L 313.857194 342.315328 
+L 305.578679 342.315328 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="slovakia__state">
+   <path d="M 71.706291 380.196788 
+L 249.978736 380.196788 
+L 249.978736 364.59854 
+L 71.706291 364.59854 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="slovakia__employer">
+   <path d="M 250.698736 380.196788 
+L 281.935657 380.196788 
+L 281.935657 364.59854 
+L 250.698736 364.59854 
+z
+" style="fill: #bc8e5a"/>
+  </g>
+  <g id="slovakia__pots">
+   <path d="M 282.655657 380.196788 
+L 292.599681 380.196788 
+L 292.599681 364.59854 
+L 282.655657 364.59854 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="bulgaria__state">
+   <path d="M 71.706291 402.48 
+L 252.133641 402.48 
+L 252.133641 386.881752 
+L 71.706291 386.881752 
+z
+" style="fill: #4c6a9c"/>
+  </g>
+  <g id="bulgaria__pots">
+   <path d="M 252.853641 402.48 
+L 265.796714 402.48 
+L 265.796714 386.881752 
+L 252.853641 386.881752 
+z
+" style="fill: #b13507"/>
+  </g>
+  <g id="title">
+   <text style="font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="24.564375" transform="rotate(-0 11.52 24.564375)">Pension wealth as a share of GDP</text>
+  </g>
+  <g id="subtitle">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="45.0684" transform="rotate(-0 11.52 45.0684)">The present value today of pension entitlements, expressed as a share of gross domestic product (GDP).</text>
+  </g>
+  <g id="subtitle-line2">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="58.7484" transform="rotate(-0 11.52 58.7484)">Data for 2021, for selected countries.</text>
+  </g>
+  <g id="note">
+   <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="418.8213" transform="rotate(-0 11.52 418.8213)">Note:</text>
+  </g>
+  <g id="note-rest">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="36.078188" y="418.8213" transform="rotate(-0 36.078188 418.8213)">Eurostat values future pensions in government schemes with a discount rate of 2% after inflation. Germany’s figures are provisional.</text>
+  </g>
+  <g id="data-source">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="431.5077" transform="rotate(-0 11.52 431.5077)">Data source: Eurostat (2026)</text>
+  </g>
+  <g id="tagline">
+   <text style="font-size: 7.92px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="443.945925" transform="rotate(-0 11.52 443.945925)">OurWorldinData.org — Research and data to make progress against the world’s largest problems.</text>
+  </g>
+  <g id="license">
+   <text style="font-size: 7.92px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #858585" x="600.48" y="443.945925" transform="rotate(-0 600.48 443.945925)">Licensed under CC-BY by the author Bertha Rohenkohl</text>
+  </g>
+  <g id="category__state">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #4c6a9c" x="23.76" y="83.439338" transform="rotate(-0 23.76 83.439338)">State pensions</text>
+  </g>
+  <g id="category__employer">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #996d39" x="114.649059" y="83.439338" transform="rotate(-0 114.649059 83.439338)">Employer promises</text>
+  </g>
+  <g id="category__pots">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #b13507" x="224.748787" y="83.439338" transform="rotate(-0 224.748787 83.439338)">Pension pots</text>
+  </g>
+  <g id="spain__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="108.518462" transform="rotate(-0 65.946291 108.518462)">Spain</text>
+  </g>
+  <g id="spain__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="538.350569" y="108.518462" transform="rotate(-0 538.350569 108.518462)">501% of GDP</text>
+  </g>
+  <g id="italy__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="130.801673" transform="rotate(-0 65.946291 130.801673)">Italy</text>
+  </g>
+  <g id="italy__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="480.123444" y="130.801673" transform="rotate(-0 480.123444 130.801673)">438%</text>
+  </g>
+  <g id="netherlands__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="153.084885" transform="rotate(-0 65.946291 153.084885)">Netherlands</text>
+  </g>
+  <g id="netherlands__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="457.017454" y="153.084885" transform="rotate(-0 457.017454 153.084885)">413%</text>
+  </g>
+  <g id="france__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="175.368097" transform="rotate(-0 65.946291 175.368097)">France</text>
+  </g>
+  <g id="france__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="442.2296" y="175.368097" transform="rotate(-0 442.2296 175.368097)">397%</text>
+  </g>
+  <g id="portugal__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="197.651308" transform="rotate(-0 65.946291 197.651308)">Portugal</text>
+  </g>
+  <g id="portugal__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="430.214056" y="197.651308" transform="rotate(-0 430.214056 197.651308)">384%</text>
+  </g>
+  <g id="switzerland__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="219.93452" transform="rotate(-0 65.946291 219.93452)">Switzerland</text>
+  </g>
+  <g id="switzerland__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="424.669056" y="219.93452" transform="rotate(-0 424.669056 219.93452)">378%</text>
+  </g>
+  <g id="germany__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="242.217732" transform="rotate(-0 65.946291 242.217732)">Germany</text>
+  </g>
+  <g id="germany__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="396.017604" y="242.217732" transform="rotate(-0 396.017604 242.217732)">347%</text>
+  </g>
+  <g id="hungary__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="264.500943" transform="rotate(-0 65.946291 264.500943)">Hungary</text>
+  </g>
+  <g id="hungary__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="382.154004" y="264.500943" transform="rotate(-0 382.154004 264.500943)">332%</text>
+  </g>
+  <g id="sweden__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="286.784155" transform="rotate(-0 65.946291 286.784155)">Sweden</text>
+  </g>
+  <g id="sweden__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="354.426802" y="286.784155" transform="rotate(-0 354.426802 286.784155)">302%</text>
+  </g>
+  <g id="poland__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="309.067367" transform="rotate(-0 65.946291 309.067367)">Poland</text>
+  </g>
+  <g id="poland__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="352.578314" y="309.067367" transform="rotate(-0 352.578314 309.067367)">300%</text>
+  </g>
+  <g id="iceland__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="331.350578" transform="rotate(-0 65.946291 331.350578)">Iceland</text>
+  </g>
+  <g id="iceland__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="350.729848" y="331.350578" transform="rotate(-0 350.729848 331.350578)">298%</text>
+  </g>
+  <g id="czechia__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="353.63379" transform="rotate(-0 65.946291 353.63379)">Czechia</text>
+  </g>
+  <g id="czechia__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="317.457194" y="353.63379" transform="rotate(-0 317.457194 353.63379)">262%</text>
+  </g>
+  <g id="slovakia__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="375.917002" transform="rotate(-0 65.946291 375.917002)">Slovakia</text>
+  </g>
+  <g id="slovakia__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="296.199681" y="375.917002" transform="rotate(-0 296.199681 375.917002)">239%</text>
+  </g>
+  <g id="bulgaria__label">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="65.946291" y="398.200213" transform="rotate(-0 65.946291 398.200213)">Bulgaria</text>
+  </g>
+  <g id="bulgaria__total">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="269.396714" y="398.200213" transform="rotate(-0 269.396714 398.200213)">210%</text>
+  </g>
+ </g>
+</svg>
