@@ -39,7 +39,7 @@ definitions:
     Reported catch is the catch that appears in official statistics, which countries report to the Food and Agriculture Organization of the United Nations (FAO). Unreported catch is the part Sea Around Us estimates is missing from these statistics.
 
   description_processing_latest_year: |-
-    Sea Around Us data goes up to 2019, but its 2019 figures look unfinished for several large fishing countries. For example, it counts almost all of Peru’s anchoveta catch, which is mostly turned into fishmeal and fish oil, as eaten directly by people; it doesn’t say which gear caught large parts of the catch of Peru, Indonesia, and India; and Japan’s catch is about 20% higher than Japan’s and FAO’s official figures. So our data ends in 2018.
+    Sea Around Us data goes up to 2019, but its 2019 figures look unfinished for several large fishing countries. For example, it counts almost all of Peru’s anchoveta catch, which is mostly turned into fishmeal and fish oil, as eaten directly by people; it doesn’t say which gear caught large parts of the catch of Peru, Indonesia, and India; and Japan’s catch is about 20% higher than Japan’s and FAO’s official figures. Because of this, we only show on our charts data up to 2018.
   description_processing_fishing_entities: |-
     Sea Around Us lists some overseas fleets separately from the country they belong to. We add them to that country: the Azores and Madeira to Portugal; Ascension and Tristan da Cunha to Saint Helena; and Bonaire, Saba, and Sint Eustatius to Bonaire Sint Eustatius and Saba.
 
