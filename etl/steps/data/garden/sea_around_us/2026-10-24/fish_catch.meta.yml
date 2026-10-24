@@ -15,7 +15,7 @@ definitions:
         - Fish & Overfishing
     display:
       numDecimalPlaces: 0
-      tolerance: 0
+      tolerance: 3
 
   # Shared description_key text.
   description_key_reconstruction: |-
@@ -43,7 +43,7 @@ definitions:
     Sea Around Us lists some overseas fleets separately from the country they belong to. We add them to that country: the Azores and Madeira to Portugal; Ascension and Tristan da Cunha to Saint Helena; and Bonaire, Saba, and Sint Eustatius to Bonaire Sint Eustatius and Saba.
 
 dataset:
-  update_period_days: 365
+  update_period_days: 1095
   owners:
     - Hannah Ritchie  # backport
     - Edouard Mathieu
@@ -63,6 +63,8 @@ tables:
           {definitions.description_processing_fishing_entities}
         display:
           name: Total catch
+          numDecimalPlaces: 0
+          tolerance: 3
 
       # End use.
       direct_human_consumption:
@@ -81,6 +83,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Direct human consumption
+          numDecimalPlaces: 0
+          tolerance: 3
       fishmeal_and_fish_oil:
         description_processing: |-
           {definitions.description_processing_latest_year_end_use}
@@ -97,6 +101,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Fishmeal and fish oil
+          numDecimalPlaces: 0
+          tolerance: 3
       other_uses:
         description_processing: |-
           {definitions.description_processing_latest_year_end_use}
@@ -113,6 +119,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Other uses
+          numDecimalPlaces: 0
+          tolerance: 3
 
       # Fishing gear.
       bottom_trawl:
@@ -131,6 +139,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Bottom trawl
+          numDecimalPlaces: 0
+          tolerance: 3
       pelagic_trawl:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -143,6 +153,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Pelagic trawl
+          numDecimalPlaces: 0
+          tolerance: 3
       purse_seine:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -155,6 +167,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Purse seine
+          numDecimalPlaces: 0
+          tolerance: 3
       longline:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -167,6 +181,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Longline
+          numDecimalPlaces: 0
+          tolerance: 3
       gillnets:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -179,6 +195,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Gillnets
+          numDecimalPlaces: 0
+          tolerance: 3
       small_scale_gear:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -191,6 +209,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Small-scale gear
+          numDecimalPlaces: 0
+          tolerance: 3
       other_gear:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -203,6 +223,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Other gear
+          numDecimalPlaces: 0
+          tolerance: 3
       unknown_gear:
         description_processing: |-
           {definitions.description_processing_latest_year_gear}
@@ -215,6 +237,8 @@ tables:
         description_key: *description_key_gear
         display:
           name: Unknown gear
+          numDecimalPlaces: 0
+          tolerance: 3
 
       # Fishing sector.
       industrial:
@@ -229,6 +253,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Industrial
+          numDecimalPlaces: 0
+          tolerance: 3
       artisanal:
         title: Wild fish catch by artisanal fishing
         presentation:
@@ -237,6 +263,8 @@ tables:
         description_key: *description_key_sector
         display:
           name: Artisanal
+          numDecimalPlaces: 0
+          tolerance: 3
       subsistence:
         title: Wild fish catch by subsistence fishing
         presentation:
@@ -245,6 +273,8 @@ tables:
         description_key: *description_key_sector
         display:
           name: Subsistence
+          numDecimalPlaces: 0
+          tolerance: 3
       recreational:
         title: Wild fish catch by recreational fishing
         presentation:
@@ -253,6 +283,8 @@ tables:
         description_key: *description_key_sector
         display:
           name: Recreational
+          numDecimalPlaces: 0
+          tolerance: 3
 
       # Catch type.
       landings:
@@ -267,6 +299,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Landings
+          numDecimalPlaces: 0
+          tolerance: 3
       discards:
         title: Wild fish discards
         presentation:
@@ -275,6 +309,8 @@ tables:
         description_key: *description_key_catch_type
         display:
           name: Discards
+          numDecimalPlaces: 0
+          tolerance: 3
 
       # Reporting status.
       reported_catch:
@@ -289,6 +325,8 @@ tables:
           - "{definitions.description_key_scope}"
         display:
           name: Reported
+          numDecimalPlaces: 0
+          tolerance: 3
       unreported_catch:
         title: Unreported wild fish catch
         presentation:
@@ -297,3 +335,5 @@ tables:
         description_key: *description_key_reporting_status
         display:
           name: Unreported
+          numDecimalPlaces: 0
+          tolerance: 3
