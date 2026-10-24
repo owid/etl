@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table, VariablePresentationMeta
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -31,6 +29,30 @@ REGIONS_OWID = ["North America", "South America", "Europe", "Africa", "Asia", "O
 # Column name constants for imports and exports
 EXPORT_COL = "Exports of goods, Free on board (FOB), US dollar"
 IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
+
+# Categories of the importer ranking of China and the United States.
+IMPORT_RANK_CATEGORIES = {"1st - Top source", "2nd", "3rd", "4th", "5th", "Not in top 5"}
+
+# Map colors of the top-partner categories, from grapher's OWID categorical map palette (OwidMapColors). The same
+# partner gets the same color on the import and export maps. China is the only strong, warm color, so keep warm hues
+# (oranges, sands, cherries) away from partners whose countries can border China's.
+# NOTE: The top ten partners are recomputed on every update. If a new one enters, the build fails until it gets a
+# color here; pick an unused, cool one from OwidMapColors (owid-grapher, color/CustomSchemes.ts).
+TOP_PARTNER_COLORS = {
+    "China": "#D94C3F",  # Tomato
+    "United States": "#526F9B",  # Muted denim
+    "Germany": "#238A84",  # Muted teal
+    "India": "#77538F",  # Soft purple
+    "Italy": "#A07AB8",  # Light purple
+    "France": "#5B6D35",  # Olive
+    "United Kingdom": "#6FA54F",  # Leaf green
+    "Russia": "#5FB8C8",  # Sky turquoise
+    "Japan": "#8E97C7",  # Lavender
+    "Saudi Arabia": "#D9BC54",  # Mustard
+    "Netherlands": "#92D3DE",  # Light denim
+    "Switzerland": "#9DCA7B",  # Light green
+    "Other": "#B9B2A6",  # Taupe
+}
 
 # Historical region dissolution dates
 HISTORICAL_DISSOLUTIONS = {
@@ -59,15 +81,28 @@ EXCLUDE_MEMBERS_OF_HISTORICAL_REGIONS = {
 def run() -> None:
     # Load inputs
     ds_meadow = paths.load_dataset("trade")
-    ds_regions = paths.load_dataset("regions")
     ds_wdi = paths.load_dataset("wdi")
 
-    # Read table from meadow dataset (LONG format with 'indicator' & 'value')
-    tb_long = ds_meadow.read("trade")
+    # Read table from meadow dataset (LONG format with 'indicator' & 'value'), keeping categoricals for the ~5M rows.
+    tb_long = ds_meadow.read("trade", safe_types=False)
+    sanity_check_inputs(tb_long)
 
-    # --- Harmonize & keep only the two indicators we actually use ----------------
+    # --- Keep only the two indicators we actually use, then harmonize ----------------
+    tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])]
+    # Downstream steps rely on string dtypes (pair labels, new region labels), so convert after filtering.
+    tb_long = tb_long.astype(
+        {
+            "country": "string[pyarrow]",
+            "indicator": "string[pyarrow]",
+            "counterpart_country": "string[pyarrow]",
+            "year": "Int64",
+            "value": "Float64",
+        }
+    )
     tb_long = _harmonize_countries(tb_long)
-    tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])].copy()
+
+    # --- Give every series a row for every year (empty where there is no observation) ---------------
+    tb_long = complete_series_years(tb_long)
 
     # --- Historical overlaps: remove both on exporter side and partner side -----
     tb_long = clean_historical_overlaps(tb_long, country_col="country")
@@ -76,7 +111,7 @@ def run() -> None:
     # --- Member countries (for “all-countries” analyses) which exclude regional aggregates ------------------------
     members: set[str] = set()
     for region in REGIONS_OWID:
-        members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
+        members.update(paths.regions.get_region(region)["members"])
 
     tb_all_countries = tb_long[
         (tb_long["country"].isin(members)) & (tb_long["counterpart_country"].isin(members))
@@ -90,7 +125,7 @@ def run() -> None:
     tb_all_countries = tb_all_countries.dropna(subset=["value"])
 
     # --- Add regional aggregates on both axes (plus Asia excl. China) -----------
-    tb_long = _add_regional_aggregates(tb_long, ds_regions)
+    tb_long = _add_regional_aggregates(tb_long)
 
     # Keep a focused slice: countries = members or the specific regions of interest;
     # counterpart = the regions of interest + World.
@@ -159,6 +194,8 @@ def run() -> None:
     )
 
     tb = pr.concat([tb, tb_partnerships], ignore_index=True)
+    sanity_check_outputs(tb)
+
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for column in tb.columns:
@@ -170,64 +207,118 @@ def run() -> None:
         else:
             tb[column].metadata.origins = tb_long["value"].metadata.origins
 
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    # Order and color the top-partner categories for maps: most common in the latest year first, "Other" last.
+    for column in ["top_partner_category", "top_export_partner_category"]:
+        order = _top_partner_order(tb, column)
+        missing = set(order) - set(TOP_PARTNER_COLORS)
+        assert not missing, f"Add a map color to TOP_PARTNER_COLORS for the new top partner(s): {sorted(missing)}"
+        tb[column].metadata.type = "ordinal"
+        tb[column].metadata.sort = order
+        if tb[column].metadata.presentation is None:
+            tb[column].metadata.presentation = VariablePresentationMeta()
+        tb[column].metadata.presentation.grapher_config = {
+            **(tb[column].metadata.presentation.grapher_config or {}),
+            "map": {
+                "colorScale": {
+                    "baseColorScheme": "OwidCategoricalMap",
+                    "customCategoryColors": {category: TOP_PARTNER_COLORS[category] for category in order},
+                }
+            },
+        }
+
+    # Keep float64 values, as in meadow (repacking would round totals in the trillions to float32).
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata, repack=False)
     ds_garden.save()
 
 
+def sanity_check_inputs(tb: Table) -> None:
+    expected_indicators = {
+        EXPORT_COL,
+        IMPORT_COL,
+        "Imports of goods, Free on board (FOB), US dollar",
+        "Trade balance goods, US dollar",
+    }
+    assert set(tb["indicator"]) == expected_indicators, f"Unexpected indicators: {set(tb['indicator'])}"
+
+    # Coverage: almost every reporter has total exports in the latest year (227 in the 2026-10-05 release).
+    latest = tb[
+        (tb["year"] == tb["year"].max()) & (tb["counterpart_country"] == "G001") & (tb["indicator"] == EXPORT_COL)
+    ]
+    assert latest["country"].nunique() >= 220, f"Only {latest['country'].nunique()} reporters in {tb['year'].max()}."
+
+    # Magnitude: values are in US dollars, not millions (US exports of goods are in the low trillions).
+    us_exports = latest.loc[latest["country"] == "USA", "value"]
+    assert len(us_exports) == 1 and 1e12 < us_exports.item() < 1e13, f"Unexpected US exports: {us_exports.tolist()}"
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    # Shares are non-negative. They can exceed 100% in some early years, where IMF partner estimates add up to more
+    # than the reported total (e.g. Austria's trade with the European Union in the 1960s).
+    for column in [
+        "exports_of_goods__free_on_board__fob__share",
+        "imports_of_goods__cost_insurance_freight__cif__share",
+        "share_of_total_trade",
+    ]:
+        assert (tb[column].dropna() >= 0).all(), f"Negative values in {column}."
+
+    # Trade-relationship shares add up to 100% each year.
+    tb_partnerships = tb[["share_bilateral", "share_unilateral", "share_non_trading"]].dropna()
+    assert not tb_partnerships.empty, "No trade-relationship shares."
+    assert ((tb_partnerships.sum(axis=1) - 100).abs() < 0.01).all(), "Trade-relationship shares don't add up to 100%."
+
+    # Categorical indicators take only the expected values.
+    categories = set(tb["import_rank_category"].dropna())
+    assert categories <= IMPORT_RANK_CATEGORIES, (
+        f"Unexpected import rank categories: {categories - IMPORT_RANK_CATEGORIES}"
+    )
+    for column in ["top_partner_category", "top_export_partner_category"]:
+        assert tb[column].dropna().nunique() <= 11, f"{column} should have the top 10 partners plus 'Other'."
+
+    # Every partner of interest is present.
+    missing = set(REGIONS_OF_INTEREST + ["World"]) - set(tb["counterpart_country"].dropna())
+    assert not missing, f"Missing partners: {missing}"
+
+    # Magnitude: US exports of goods to the world are in the low trillions of US dollars.
+    us_exports = tb.loc[
+        (tb["country"] == "United States") & (tb["counterpart_country"] == "World") & (tb["year"] == tb["year"].max()),
+        EXPORT_COL,
+    ]
+    assert len(us_exports) == 1 and 1e12 < us_exports.item() < 1e13, f"Unexpected US exports: {us_exports.tolist()}"
+
+
 def _harmonize_countries(tb: Table) -> Table:
-    """Harmonize country names for both country and counterpart_country columns."""
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        warn_on_unknown_excluded_countries=False,
-    )
-    tb = geo.harmonize_countries(
-        df=tb,
-        country_col="counterpart_country",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        warn_on_unknown_excluded_countries=False,
-    )
+    """Harmonize country codes for both country and counterpart_country columns."""
+    tb = paths.regions.harmonize_names(tb, warn_on_unknown_excluded_countries=False)
+    tb = paths.regions.harmonize_names(tb, country_col="counterpart_country", warn_on_unknown_excluded_countries=False)
     return tb
 
 
-def _add_regional_aggregates(tb: Table, ds_regions: Dataset) -> Table:
-    """Add regional aggregates for both country and counterpart_country columns."""
-    # Add standard OWID regions plus World
-    tb = geo.add_regions_to_table(
-        tb,
-        ds_regions,
-        index_columns=["country", "year", "indicator", "counterpart_country"],
-        country_col="counterpart_country",
-        regions=REGIONS_OWID + ["World"],
-    )
-    tb = geo.add_regions_to_table(
-        tb,
-        ds_regions,
-        index_columns=["country", "year", "indicator", "counterpart_country"],
-        country_col="country",
-        regions=REGIONS_OWID + ["World"],
-    )
+def _add_regional_aggregates(tb: Table) -> Table:
+    """Add regional aggregates (OWID continents, World, and Asia excluding China) on both trade axes."""
+    regions = {region: {} for region in REGIONS_OWID + ["World"]}
+    regions["Asia (excl. China)"] = {"additional_regions": ["Asia"], "excluded_members": ["China"]}
+    index_columns = ["country", "year", "indicator", "counterpart_country"]
 
-    # Create "Asia (excl. China)" region
-    asia_members = geo.list_members_of_region(region="Asia", ds_regions=ds_regions)
-    asia_minus_china_members = [c for c in asia_members if c != "China"]
+    # Aggregate partners first, so that aggregating reporters also yields region-to-region trade.
+    tb = paths.regions.add_aggregates(
+        tb, regions=regions, index_columns=index_columns, country_col="counterpart_country"
+    )
+    tb = paths.regions.add_aggregates(tb, regions=regions, index_columns=index_columns, country_col="country")
+    return tb
 
-    tb = geo.add_region_aggregates(
-        tb,
-        region="Asia (excl. China)",
-        countries_in_region=asia_minus_china_members,
-        index_columns=["country", "year", "indicator", "counterpart_country"],
-        country_col="counterpart_country",
-    )
-    tb = geo.add_region_aggregates(
-        tb,
-        region="Asia (excl. China)",
-        countries_in_region=asia_minus_china_members,
-        index_columns=["country", "year", "indicator", "counterpart_country"],
-        country_col="country",
-    )
+
+def complete_series_years(tb: Table) -> Table:
+    """Give every (country, indicator, counterpart_country) series a row for every year in the data.
+
+    The IMF API only returns observations that have a value. The trade-relationship shares count every pair of
+    countries with a series as a potential partnership in every year (non-trading when there is no trade), so they need
+    the empty years too. This reproduces the panel of the IMF's wide download, used in previous versions.
+    """
+    series = tb[["country", "indicator", "counterpart_country"]].drop_duplicates()
+    years = pr.read_from_records([(year,) for year in range(tb["year"].min(), tb["year"].max() + 1)], columns=["year"])
+    grid = pr.merge(series, years, how="cross")
+    tb = pr.merge(grid, tb, on=["country", "indicator", "counterpart_country", "year"], how="left")
+
     return tb
 
 
@@ -238,15 +329,14 @@ def calculate_trade_shares_as_share_world(tb_long: Table) -> Table:
 
     This function:
     1. Pivots long format data to wide format (exports/imports as columns)
-    2. Converts values from millions USD to USD
-    3. Calculates shares by dividing bilateral trade by total trade with World
-    4. Adds bilateral trade volume metrics
+    2. Calculates shares by dividing bilateral trade by total trade with World
+    3. Adds bilateral trade volume metrics
 
     Args:
         tb_long: Table in long format with 'indicator' and 'value' columns
 
     Returns:
-        Table with share columns added and absolute values in USD (not millions)
+        Table with share columns added and absolute values in USD
     """
     wide = (
         tb_long.pivot_table(
@@ -257,12 +347,6 @@ def calculate_trade_shares_as_share_world(tb_long: Table) -> Table:
         .reset_index()
         .rename_axis(None, axis=1)
     )
-
-    # Convert from millions of USD to USD
-    if EXPORT_COL in wide:
-        wide[EXPORT_COL] = wide[EXPORT_COL] * 1_000_000
-    if IMPORT_COL in wide:
-        wide[IMPORT_COL] = wide[IMPORT_COL] * 1_000_000
 
     # Totals by (country, year) from counterpart='World'
     world_totals = (
@@ -308,35 +392,15 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
     china_gdp = china_gdp[["country", "year", "china_imports_share_of_gdp"]].copy()
     china_gdp["counterpart_country"] = "World"
 
-    # First merge the regular china_imports_share_of_gdp data
+    # China's imports from itself (re-imports) are not applicable here; maps mark China as such.
+    china_gdp = china_gdp[china_gdp["country"] != "China"]
+
     tb = pr.merge(
         tb,
         china_gdp,
         on=["country", "year", "counterpart_country"],
         how="left",
     )
-    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype("str")
-
-    # Create China rows for each year with china_imports_share_of_gdp = -1
-    china_years = tb[tb["counterpart_country"] == "World"]["year"].unique()
-    for year in china_years:
-        china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World") & (tb["year"] == year)
-        if china_mask.any():
-            # Update existing rows
-            tb.loc[china_mask, "china_imports_share_of_gdp"] = "China"
-        else:
-            # Add new row if it doesn't exist
-            new_row = Table(
-                pd.DataFrame(
-                    {
-                        "country": ["China"],
-                        "year": [year],
-                        "counterpart_country": ["World"],
-                        "china_imports_share_of_gdp": ["China"],
-                    }
-                )
-            ).copy_metadata(tb)
-            tb = pr.concat([tb, new_row], ignore_index=True)
 
     return tb
 
@@ -382,6 +446,22 @@ def get_top_partner(tb: Table) -> Table:
 
     out["counterpart_country"] = "World"
     return out
+
+
+def _top_partner_order(tb: Table, column: str) -> list[str]:
+    """Categories ordered by how many countries have them as top partner in the latest year (ties broken by the count
+    over all years, as in the top-10 selection), with "Other" last."""
+    categories = tb.reset_index()[["country", "year", column]].dropna()
+    assert "Other" in set(categories[column]), f"Expected an 'Other' category in {column}."
+    categories = categories[categories[column] != "Other"]
+    counts = pd.DataFrame(
+        {
+            "latest": categories[categories["year"] == categories["year"].max()].groupby(column)["country"].nunique(),
+            "all_years": categories.groupby(column)["country"].nunique(),
+        }
+    ).fillna(0)
+    order = counts.sort_values(["latest", "all_years"], ascending=False).index.tolist()
+    return order + ["Other"]
 
 
 def get_top_export_partner(tb: Table) -> Table:
@@ -437,41 +517,15 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
         import_data.groupby(["country", "year"])["value"].rank(method="min", ascending=False).astype(int)
     )
 
-    # Filter for target country only
-    out = import_data[import_data["counterpart_country"] == target_country][["country", "year", "import_rank"]].copy()
-
-    out["import_rank"] = out["import_rank"].astype(str)
-
-    # Add self-referential rows (e.g., China importing from China) with rank=-1
-    # This row likely doesn't exist in the data but is needed for visualization
-    target_country_years = import_data["year"].unique()
-
-    target_country_template = Table(
-        pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": target_country})
-    )
-
-    # Combine: remove any existing self-referential rows and add our template
-    mask = out["country"] != target_country
-    out = pr.concat([out.loc[mask], target_country_template], ignore_index=True)
+    # Keep the target country's rank among each other country's partners. Its rank among its own partners (e.g.
+    # China's re-imports from China) is not applicable; maps mark the target country as such.
+    out = import_data[
+        (import_data["counterpart_country"] == target_country) & (import_data["country"] != target_country)
+    ][["country", "year", "import_rank"]].copy()
 
     # Add color category based on ranking
-    def categorize_rank(rank):
-        if rank == "China":
-            return target_country
-        elif rank == "1":
-            return "1st - Top source"
-        elif rank == "2":
-            return "2nd"
-        elif rank == "3":
-            return "3rd"
-        elif rank == "4":
-            return "4th"
-        elif rank == "5":
-            return "5th"
-        else:
-            return "Not in top 5"
-
-    out["import_rank_category"] = out["import_rank"].apply(categorize_rank)
+    rank_categories = {1: "1st - Top source", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th"}
+    out["import_rank_category"] = out["import_rank"].map(lambda rank: rank_categories.get(rank, "Not in top 5"))
 
     out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country
@@ -509,20 +563,22 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
 
 
 def calculate_trade_relationship_shares(tb: Table) -> Table:
-    THRESHOLD = 0.01  # million USD
+    # NOTE: Every country pair with data in any year counts in every year from 1948, including years before one of
+    # the countries existed (e.g. South Sudan before 2011). Those pairs count as non-trading, which inflates the
+    # non-trading share before 2000 (by about 33 points in 1950, 12-15 points in 1960-1991, none from 2015 on). The
+    # chart using these shares (share-of-bilateral-trade-partnerships) is unpublished. Before publishing it, count each
+    # pair only from the year both countries exist (first year in the IMF data, or independence dates) and describe
+    # the choice in the metadata.
+    THRESHOLD = 10_000  # USD
 
     df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
 
-    #    This uses vectorized minimum/maximum on object‑dtypes:
-    c1 = df[["country", "counterpart_country"]]
-    df["pair"] = pd.Series(
-        np.where(
-            c1.country.values < c1.counterpart_country.values,
-            c1.country.values + "--" + c1.counterpart_country.values,
-            c1.counterpart_country.values + "--" + c1.country.values,
-        ),
-        index=df.index,
-    )
+    # Label each pair of countries the same way in both directions (names in alphabetical order).
+    country = df["country"].astype(str)
+    counterpart = df["counterpart_country"].astype(str)
+    df["pair"] = counterpart + "--" + country
+    country_first = country < counterpart
+    df.loc[country_first, "pair"] = country[country_first] + "--" + counterpart[country_first]
 
     active = df[df.has_trade]
     dir_counts = (

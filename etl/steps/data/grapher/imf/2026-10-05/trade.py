@@ -15,14 +15,13 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("trade", reset_index=False)
-    tb["import_rank"] = tb["import_rank"].astype("str")
-    tb["china_imports_share_of_gdp"] = tb["china_imports_share_of_gdp"].astype("str")
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    # Keep float64 values, as in garden (repacking would round totals in the trillions to float32).
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata, repack=False)
 
     # Save grapher dataset.
     ds_grapher.save()
