@@ -62,6 +62,11 @@ ENTITIES_WITHOUT_DATA = {
     "Western Sahara (Morocco)",
 }
 
+# Years every area and dimension should cover.
+# NOTE: Move LAST_YEAR forward when Sea Around Us adds a year.
+FIRST_YEAR = 1950
+LAST_YEAR = 2019
+
 # The API is slow (~5 s per request), so requests are run in parallel.
 MAX_WORKERS = 8
 TIMEOUT = 180
@@ -147,6 +152,13 @@ def sanity_check(df: pd.DataFrame, entities: list[dict]) -> None:
     incomplete = dimensions_per_entity[dimensions_per_entity < len(DIMENSIONS)]
     assert incomplete.empty, f"Entities missing some dimensions: {incomplete.index.tolist()}"
 
-    # The data should start in 1950, and there should be no duplicates.
-    assert df["year"].min() == 1950, f"Unexpected first year: {df['year'].min()}"
+    # Every area and dimension should cover every year (an endpoint could return a truncated series).
+    expected_years = set(range(FIRST_YEAR, LAST_YEAR + 1))
+    years = df.groupby(["area_type", "area_id", "dimension"])["year"].agg(set)
+    truncated = years[years.apply(lambda y: y != expected_years)]
+    assert truncated.empty, (
+        f"Areas and dimensions not covering {FIRST_YEAR}-{LAST_YEAR}: {truncated.index.tolist()[:10]}"
+    )
+
+    # There should be no duplicates.
     assert not df.duplicated(subset=["area_type", "area_id", "dimension", "category", "year"]).any(), "Duplicates."
