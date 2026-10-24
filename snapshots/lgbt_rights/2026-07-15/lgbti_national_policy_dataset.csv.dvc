@@ -1,0 +1,30 @@
+meta:
+  origin:
+    producer: Velasco
+    title: LGBTI National Policy Dataset
+    description: |-
+      The LGBTI National Policy Dataset (Version 3.0) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 195 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination, with the share of the population covered, the adoption and implementation years, the policy's descriptors (penalty, fine, sexes covered, scope, enforcement), up to twelve source citations and a confidence rating. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
+
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 36 contain substantive data; the remaining 18 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
+    citation_full: |-
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 3.0." https://doi.org/10.17605/OSF.IO/WTA9P.
+    attribution_short: Velasco
+    version_producer: '3.0'
+    url_main: https://osf.io/wta9p/overview
+    # NOTE: Version 3.0 was ingested from the files the producer sent us directly
+    # (`etls lgbt_rights/2026-07-15/lgbti_national_policy_dataset --path-to-file LGBTI_Policy_Data_Long.csv`),
+    # before it was posted on OSF. Once it is on OSF, add url_download back, re-derived from the OSF API (the
+    # producer deletes and re-uploads this file on each revision, so its GUID changes every time):
+    #   curl -s "https://api.osf.io/v2/nodes/wta9p/files/osfstorage/?page%5Bsize%5D=50"
+    # and read `links.download` for LGBTI_Policy_Data_Long.csv. Re-run the snapshot from it and confirm the md5
+    # below is unchanged, i.e. that the public file is the one we ingested.
+    date_accessed: '2026-10-19'
+    # NOTE: Date of the files in the release the producer sent; its README dates Version 3.0 "October 2026".
+    date_published: '2026-10-16'
+    license:
+      name: CC BY 4.0
+      url: https://osf.io/wta9p/
+outs:
+  - md5: 58fa0b0b54a062521811b28db4e24b5e
+    size: 171324594
+    path: lgbti_national_policy_dataset.csv
