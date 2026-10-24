@@ -97,10 +97,12 @@ def run() -> None:
 
     # The feed's provenance, derived from the origins of the data it is built on.
     feed_metadata = build_feed_metadata(
-        title="Food trade",
+        title=None,
         columns={"Bilateral trade flow": tb["value"]},
         update_period_days=ds.metadata.update_period_days,
     )
+    # Leave the processing description out of the feed.
+    del feed_metadata["descriptionProcessing"]
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):

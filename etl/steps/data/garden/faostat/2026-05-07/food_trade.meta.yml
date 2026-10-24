@@ -3,10 +3,14 @@ tables:
     variables:
       value:
         title: Bilateral trade flow
-        unit: tonnes
-        short_unit: t
-        description_short: |-
-          Quantity of the item flowing from the exporter to the importer in the export year.
+        description_key: |-
+          This tool is built from country-to-country [trade data](https://www.fao.org/faostat/en/#data/TM) from the Food and Agriculture Organization of the United Nations.
+
+          We made a number of steps to make the data easier to digest and present. For example, we sum together some detailed categories reported by the FAO only separately (e.g. "milled rice" and "broken rice" are shown together as a total for traded rice).
+
+          Importantly, when digging into this data, we found that what exporting countries say they’ve exported to a given country doesn’t always match what the receiving country says they’ve imported. This is a common issue for all trade data, not just food. To keep things balanced, we prioritize data reported by the importing country, as this is generally considered to be more reliable.
+
+          Pablo Rosado, our data scientist behind this work, explains how we processed the original FAO data in more detail in our [technical documentation](https://docs.owid.io/projects/etl/analyses/food_trade/food_trade).
         description_processing: |-
           - When only one country reports, we use that country's reported quantity.
           - When both the exporter and the importer country report a value, we use the importer's quantity, because, according to FAOSTAT's [Food Balance Sheets and Supply Utilization Accounts Resource Handbook 2025](https://openknowledge.fao.org/items/30e641b1-6d57-4998-8e8a-395727aa4307), section 6.1, "imports are typically documented more thoroughly and verified more rigorously than exports". This claim cites the United Nations Statistics Division's [International Merchandise Trade Statistics](https://unstats.un.org/unsd/trade/EG-IMTS/IMTS2010-CM%20-%20white%20cover%20version.pdf).
