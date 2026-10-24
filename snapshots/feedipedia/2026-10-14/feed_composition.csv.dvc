@@ -1,0 +1,49 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Tables of composition and nutritive value of animal feeds"
+    description: |-
+      Main analysis tables (dry matter, protein, fat, fibre, ash and others) of a selection of Feedipedia feed composition pages.
+    # NOTE: date_published is the most recent "Last updated" date among the table pages (node 11682, 03/02/2020 in day/month/year).
+    # The datasheet citations carry their own years (2015 to 2024), since a datasheet text is revised separately from its tables.
+    date_published: "2020-02-03"
+
+    # Citation
+    producer: "Feedipedia"
+    # NOTE: Feedipedia gives no citation for the site as a whole, so citation_full opens with the phrase that ends each
+    # datasheet citation, then lists the citation of each datasheet that the tables used belong to.
+    citation_full: |-
+      Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO (2020).
+
+      Datasheets used:
+      - Heuzé V., Tran G., Kaushik S., 2020. Soybean meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/674
+      - Heuzé V., Tran G., Sauvant D., Lessire M., Lebas F., 2020. Rapeseed meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://feedipedia.org/node/52
+      - Heuzé V., Tran G., Hassoun P., Lessire M., Lebas F., 2019. Sunflower meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://feedipedia.org/node/732
+      - Heuzé V., Tran G., Hassoun P., Bastianelli D., Lebas F., 2019. Cottonseed meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/550
+      - Heuzé V., Tran G., Sauvant D., Noblet J., Renaudeau D., Bastianelli D., Lebas F., 2024. Palm kernel meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://feedipedia.org/node/43
+      - Heuzé V., Thiollet H., Tran G., Bastianelli D., Lebas F., 2018. Peanut meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/699
+      - Heuzé V., Tran G., 2015. Rice bran and other rice by-products. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/750
+      - Heuzé V., Tran G., Lebas F., 2015. Maize germ meal and maize germ. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/716
+      - Heuzé V., Tran G., Sauvant D., Bastianelli D., 2015. Copra meal and coconut by-products. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://feedipedia.org/node/46
+      - Heuzé V., Tran G., Bastianelli D., Lebas F., 2021. Sesame (Sesamum indicum) seeds and oil meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/26
+      - Heuzé V., Tran G., Nozière P., Lessire M., Lebas F., 2018. Linseed meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/735
+      - Heuzé V., Tran G., Chapoutot P., Renaudeau D., Bastianelli D., Lebas F., 2015. Safflower (Carthamus tinctorius) seeds and oil meal. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/49
+      - Tran G., 2019. Hemp (Cannabis sativa). Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/50
+      - Tran G., 2015. Poppy (Papaver somniferum). Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/29
+      - Heuzé V., Tran G., Sauvant D., Renaudeau D., Lessire M., Lebas F., 2015. Corn gluten feed. Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://feedipedia.org/node/714
+      - Heuzé V., Tran G., Sauvant D., Bastianelli D., Lebas F., 2021. Lentil (Lens culinaris). Feedipedia, a programme by INRAE, CIRAD, AFZ and FAO. https://www.feedipedia.org/node/284
+
+    # Files
+    url_main: https://www.feedipedia.org
+    date_accessed: 2026-10-14
+
+    # License
+    license:
+      name: "© INRAE, CIRAD, AFZ and FAO"
+      url: https://www.feedipedia.org/content/copyright
+outs:
+  - md5: 98f6c72b81c529f76c4dc34afd563bc6
+    size: 15741
+    path: feed_composition.csv
