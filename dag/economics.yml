@@ -17,6 +17,12 @@ steps:
       - data://meadow/economics/2026-07-28/wealth_france:
         - snapshot://economics/2026-07-28/wealth_france.xlsx
 
+  # Accrued-to-date pension entitlements in social insurance (Eurostat)
+  data://grapher/eurostat/2026-10-23/pension_entitlements:
+    - data://garden/eurostat/2026-10-23/pension_entitlements:
+      - data://meadow/eurostat/2026-10-23/pension_entitlements:
+        - snapshot://eurostat/2026-10-23/pension_entitlements.gz
+
   # OWID - OWID Deflator.
   # NOTE: The 2025-08-29 version is kept while Lazard's levelized cost of energy step depends on it.
   data://garden/economics/2025-08-29/owid_deflator:

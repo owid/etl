@@ -1,0 +1,160 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: "% of GDP"
+    short_unit: "%"
+    processing_level: minor
+    description_key:
+      - In this data, pension entitlements are the pensions that people have already earned, valued today. They include the remaining pensions of people who are already retired and the pensions that today’s workers have earned through the contributions they have paid so far. Pension rights that people will earn in the future are not included.
+      - The data covers old-age pensions as well as survivor and disability pensions, in all social insurance schemes, which are financed by contributions. That includes state pensions run as social security, pension schemes for government employees, and private schemes that people join through their work or that the government requires or encourages them to join. Retirement savings that people take out on their own count as life insurance and are not included. Neither are pensions that count as social assistance, such as those paid out of general taxes to residents regardless of the contributions they paid. Denmark, for example, leaves out its state pension, as well as the workplace pensions run by its life insurance companies, which is why Denmark’s total is low.
+      - Unfunded government schemes, which include social security and some pension schemes for government employees, mostly pay pensions out of future contributions and taxes rather than from savings set aside. Private and funded schemes are mostly backed by assets, such as those held by pension funds.
+      - The values are estimates of what future pension payments are worth today. They depend on assumptions about future wages, life expectancy, and, above all, the discount rate used to convert future payments into today’s money. For government schemes, countries use the rate Eurostat recommends, which is 2% after inflation from 2016 onward and 3% after inflation up to 2015. Private schemes use the rates of their own accounts. According to Eurostat, moving from a 5% to a 4% discount rate before inflation raises entitlements by roughly 15% to 20%.
+      - These entitlements are not part of government debt, and they don’t measure whether public finances are sustainable, because they leave out the pension rights people will earn in the future.
+      - Countries report this data every three years, for 2015, 2018, and 2021 so far, and some report other years voluntarily. Eurostat doesn’t recalculate earlier rounds when the assumptions change, and advises against reading the rounds as a time series. For example, much of the rise between 2015 and 2018 comes from the lower discount rate used from 2016 onward.
+    presentation:
+      topic_tags:
+        - Government Spending
+        - Economic Inequality
+      attribution_short: Eurostat
+    display:
+      numDecimalPlaces: 0
+      tolerance: 0
+  description_processing_from_currency: |-
+    Eurostat publishes this type of scheme in national currency only. We express it as a share of GDP, using the GDP implied by Eurostat’s own figures for all schemes, in national currency and as a share of GDP. That keeps the result consistent with Eurostat’s published shares, but it can differ from a calculation with the latest official GDP figures.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  # NOTE: Countries report every three years, but the 2024 round is due in early 2027, so this is set to catch it.
+  # After that update, set it to 1095.
+  update_period_days: 180
+  owners:
+    - Bertha Rohenkohl
+
+tables:
+  pension_entitlements:
+    variables:
+      total_share_gdp:
+        title: Pension entitlements as a share of GDP
+        description_short: Value today of the pensions that people have already earned in all social insurance pension schemes, as a share of GDP.
+        presentation:
+          title_public: Pension entitlements as a share of GDP
+        display:
+          name: All schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+      unfunded_share_gdp:
+        title: Pension entitlements in unfunded government schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in government schemes that pay pensions out of future contributions and taxes, such as social security, as a share of GDP.
+        presentation:
+          title_public: Pension entitlements in unfunded government schemes as a share of GDP
+        display:
+          name: Unfunded government schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+      private_and_funded_share_gdp:
+        title: Pension entitlements in private and funded schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in private schemes and in government schemes that are mostly backed by assets set aside, as a share of GDP.
+        presentation:
+          title_public: Pension entitlements in private and funded schemes as a share of GDP
+        display:
+          name: Private and funded schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+      social_security_share_gdp:
+        title: Pension entitlements in social security schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in social security pension schemes, which governments run for the wider population and mostly pay for out of future contributions, as a share of GDP.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in social security schemes as a share of GDP
+        display:
+          name: Social security
+          numDecimalPlaces: 0
+          tolerance: 0
+      government_employee_defined_benefit_outside_core_share_gdp:
+        title: Pension entitlements in unfunded schemes for government employees as a share of GDP
+        description_short: Value today of the pensions that government employees have already earned in unfunded defined benefit schemes run by the government, as a share of GDP. In a defined benefit scheme, the pension is set by a formula, usually based on salary and years of work.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in unfunded schemes for government employees as a share of GDP
+        display:
+          name: Unfunded schemes for government employees
+          numDecimalPlaces: 0
+          tolerance: 0
+      government_employee_defined_benefit_in_core_share_gdp:
+        title: Pension entitlements in funded government-run schemes for government employees as a share of GDP
+        description_short: Value today of the pensions that government employees have already earned in defined benefit schemes run by the government and recorded in the core national accounts, as a share of GDP. In a defined benefit scheme, the pension is set by a formula, usually based on salary and years of work.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in funded government-run schemes for government employees as a share of GDP
+        display:
+          name: Funded government-run schemes for government employees
+          numDecimalPlaces: 0
+          tolerance: 0
+      government_employee_defined_benefit_financial_corporations_share_gdp:
+        title: Pension entitlements in schemes for government employees run by pension funds or insurers as a share of GDP
+        description_short: Value today of the pensions that government employees have already earned in defined benefit schemes run by pension funds or insurance companies, as a share of GDP. In a defined benefit scheme, the pension is set by a formula, usually based on salary and years of work.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in schemes for government employees run by pension funds or insurers as a share of GDP
+        display:
+          name: Schemes for government employees run by pension funds or insurers
+          numDecimalPlaces: 0
+          tolerance: 0
+      government_defined_contribution_share_gdp:
+        title: Pension entitlements in government-run defined contribution schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in defined contribution schemes run by the government, as a share of GDP. In a defined contribution scheme, the pension depends on the contributions paid in and the returns earned on them.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in government-run defined contribution schemes as a share of GDP
+        display:
+          name: Government-run defined contribution schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+      private_share_gdp:
+        title: Pension entitlements in private schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in private pension schemes they join through their work or that the government requires or encourages them to join, as a share of GDP.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in private schemes as a share of GDP
+        display:
+          name: Private schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+      private_defined_benefit_share_gdp:
+        title: Pension entitlements in private defined benefit schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in private defined benefit schemes, as a share of GDP. In a defined benefit scheme, the pension is set by a formula, usually based on salary and years of work.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in private defined benefit schemes as a share of GDP
+        display:
+          name: Private defined benefit schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+      private_defined_contribution_share_gdp:
+        title: Pension entitlements in private defined contribution schemes as a share of GDP
+        description_short: Value today of the pensions that people have already earned in private defined contribution schemes, as a share of GDP. In a defined contribution scheme, the pension depends on the contributions paid in and the returns earned on them.
+        processing_level: major
+        description_processing: "{definitions.description_processing_from_currency}"
+        presentation:
+          title_public: Pension entitlements in private defined contribution schemes as a share of GDP
+        display:
+          name: Private defined contribution schemes
+          numDecimalPlaces: 0
+          tolerance: 0
+
+  pension_entitlements_flags:
+    title: Eurostat flags on pension entitlements
+    variables:
+      flag:
+        title: Eurostat flag on the value
+        unit: ""
+        description_short: Flag Eurostat attaches to a published value, for example “p” for provisional, “e” for estimated, “d” for a definition that differs from the standard, or “b” for a break in the series.
+        processing_level: minor
