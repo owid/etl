@@ -51,7 +51,7 @@ definitions:
         <%- if sex == 'all' %>
          people<%- elif sex == 'female' %> women<%- else %> men<%- endif %>
         <%- if age == '0' %> at birth<%- elif age != 'all' %> aged << age >><%- endif %>.
-        <%- endif %> {definitions.global.projections}
+        <%- endif %><% if not (sex == 'all' and age == 'all') %> <% endif %>{definitions.global.projections}
 
       description_short_births: |-
         <% if sex is defined %>
@@ -64,7 +64,7 @@ definitions:
          mothers aged << age >>
         <%- endif %>.
         <%- endif %>
-        <%- endif %> {definitions.global.projections}
+        <%- endif %><% if (sex is defined) and not (sex == 'all' and age == 'all') %> <% endif %>{definitions.global.projections}
 
   common:
     presentation:
