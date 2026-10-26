@@ -1,0 +1,41 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Pensions at a Glance"
+    description: |-
+      The OECD Pensions at a Glance database provides internationally comparable indicators on pension policies and their outcomes for OECD countries and, where possible, for other members of the G20 and the European Union. It accompanies the OECD report of the same name, published every two years, and this release matches the 2025 edition.
+
+      The indicators cover:
+
+      - The design of pension systems: the current and future normal retirement ages for a person who enters the labor market at age 22.
+      - Pension entitlements, modeled for a worker who enters the labor market at age 22 in 2024 and works a full career under the rules legislated in each country: gross and net replacement rates and gross and net pension wealth, for workers earning half, one and two times the average wage, and the average tax rates paid by workers and pensioners.
+      - The demographic and economic context: fertility rates, life expectancy, the old-age to working-age ratio, employment rates of older workers, average wages, the effective age of labor market exit and the expected number of years spent after it.
+      - The incomes and poverty of older people: their disposable income relative to the total population, their income poverty rate and the sources of their income.
+      - The finances of retirement-income systems: public spending on pensions and its projected path to 2060.
+    date_published: "2025-12-16"
+    version_producer: "2025"
+
+    # Citation
+    producer: "OECD"
+    citation_full: |-
+      OECD (2025), Pensions at a Glance 2025: OECD and G20 Indicators, OECD Publishing, Paris, https://doi.org/10.1787/e40274c1-en. Data from the OECD Data Explorer, Pensions at a glance (DSD_PAG@DF_PAG).
+    attribution_short: "OECD"
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_PAG%40DF_PAG&df[ag]=OECD.ELS.SPD&df[vs]=1.0
+    # NOTE: The 2025 report also ships each table and figure as a StatLink Excel file (e.g. Table 4.1: https://stat.link/oeavq4).
+    # Only Figure 4.3 is snapshotted (pensions_at_a_glance_tax_rates), because this dataflow lacks the workers' tax rate.
+    # The dataflow is only at version 1.0 (2026-10-26).
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ELS.SPD,DSD_PAG@DF_PAG,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2026-10-26
+
+    # License
+    license:
+      name: "OECD Terms and Conditions"
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: a80ae7fe17dc58f606bca2010b71cff2
+    size: 4550487
+    path: pensions_at_a_glance.csv

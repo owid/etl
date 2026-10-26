@@ -36,6 +36,15 @@ steps:
     - data://garden/oecd/2025-12-11/social_expenditure
 
   #
+  # OECD Pensions at a Glance
+  #
+  data://grapher/oecd/2026-10-26/pensions_at_a_glance:
+    - data://garden/oecd/2026-10-26/pensions_at_a_glance:
+      - data://meadow/oecd/2026-10-26/pensions_at_a_glance:
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance.csv
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance_tax_rates.xlsx
+
+  #
   # Social expenditure OMM
   #
   data://grapher/social_expenditure/2025-03-07/social_expenditure_omm:
