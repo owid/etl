@@ -51,7 +51,11 @@ from apps.chart_critic.bundle import Bundle
 # raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
 # $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
 # render, so the small Claude tier is not a cheap substitute.
-DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
+#
+# Opus 5.5 replaced Sonnet 5.5 as the default. A side-by-side showed little difference, but at
+# twice Sonnet's price it is still only about $0.08 a chart, the daily run costs a few dollars a
+# month, and the team relies on the findings.
+DEFAULT_MODEL = "anthropic:claude-opus-5-5"
 
 # Settings for Claude models, which get none of them by default:
 # - Thinking is switched on explicitly: answering without it took about 40 output tokens a pass and
@@ -75,7 +79,9 @@ class Issue(BaseModel):
 
     severity: Literal["high", "medium", "low"] = Field(
         description=(
-            "How much this misleads a reader who is actually looking at the chart. "
+            "Decides whether anyone sees the finding: 'medium' and 'high' are posted for OWID's data "
+            "team to check, 'low' only goes into a report. Rate the reader's loss — how wrong it is "
+            "and how many readers it reaches — not how odd the defect looks. "
             "'high': it changes what someone concludes about a country or region people care "
             "about, in a period people look at — a wrong unit, an impossible value, a series "
             "that contradicts the chart's own text. "
@@ -83,8 +89,16 @@ class Issue(BaseModel):
             "revisits, or text that disagrees with the data without changing the headline reading. "
             "'low': technically true but nobody acts on it — a typo that misleads no one, a "
             "naming inconsistency, or a defect confined to a micro-territory or a range that "
-            "ends decades ago. Judge the reader's loss, not how odd the defect looks: a "
-            "correct observation about Tuvalu in 1965 is 'low', not 'high'."
+            "ends decades ago; a correct observation about Tuvalu in 1965 is 'low', not 'high'. "
+            "Readers mostly see the chart as it opens and then look up large countries, so a "
+            "defect in a small country that the default view does not show reaches few of them, "
+            "and so does any defect on a chart that has been published for a while and is rarely "
+            "read. Those are usually 'low'. But a serious error, such as a wrong unit or an "
+            "impossible value, matters however few people have read the chart so far, and a "
+            "recently published chart has not yet had time to collect readers. A discontinuity "
+            "that looks like an artefact of how the producer measured the data sits in every chart "
+            "and download of that series, so rate it by how much it misleads, not by who looks at "
+            "that country."
         )
     )
     kind: Literal["data", "chart"] = Field(
@@ -102,7 +116,7 @@ class Issue(BaseModel):
             "How sure you are that this is actually wrong — a separate question from how much it "
             "matters. 'high' when what you were shown is enough to establish it, 'low' when it "
             "would need checking against the source or an expert. Say 'low' rather than dropping "
-            "a suspicion, and never inflate it to make a finding look stronger."
+            "a suspicion."
         )
     )
     found_in: Literal[
@@ -115,19 +129,18 @@ class Issue(BaseModel):
     ] = Field(
         default="data_summary",
         description=(
-            "Which part of what you were shown carried this finding. 'rendered_chart' for something "
-            "only the picture shows; 'chart_text' for the title, subtitle or note; "
-            "'indicator_metadata' for a unit, description or column name; 'data_summary' for the "
-            "numbers; 'chart_config' for the configuration; "
-            "'contradiction_between_fields' when two of them disagree with each other."
+            "Which part of what you were shown carried this finding; "
+            "'contradiction_between_fields' when two parts disagree with each other."
         ),
     )
     chart_params: str = Field(
         default="",
         description=(
-            "Grapher query parameters that make this problem visible, so a reviewer lands on it "
-            "instead of the default view. Use ISO3 codes joined with ~ for entities, e.g. "
-            "'country=~CAF&time=2000..latest' or 'country=~GBR&time=1945..1960&tab=line'. "
+            "Grapher query parameters that put this problem on screen — the entities and time range "
+            "it is about — so a reviewer lands on it instead of the default view. Entities are "
+            "joined with ~: countries by ISO3 code, anything else (World, a region, an income "
+            "group, a category) by its name as it appears in the data, with spaces as %20. E.g. "
+            "'country=~CAF&time=2000..latest' or 'country=~World~GBR&time=1945..1960&tab=line'. "
             "Leave empty if the default view already shows it."
         ),
     )
@@ -137,7 +150,8 @@ class Review(BaseModel):
     issues: list[Issue] = Field(default_factory=list)
 
 
-INSTRUCTIONS = """You are reviewing a published Our World in Data chart before readers see it.
+INSTRUCTIONS = """You are reviewing a published Our World in Data chart for anything that would
+mislead its readers.
 
 Today's date is {today}. Data up to this date is current, not future-dated.
 
@@ -154,7 +168,8 @@ change can move a series enormously and legitimately; say nothing about those.
 
 A change in how something was *measured* is different, and worth flagging: a survey redesign,
 a rebased index or a source switch produces a jump that a reader will read as a real-world
-trend. Say so when a discontinuity looks like an artefact of measurement rather than an event.
+trend. Say so when a discontinuity looks like an artefact of measurement rather than an event,
+unless the indicator's metadata explains it (see below).
 
 One discontinuity is the exception, because it is already known and nothing will be done about
 it: producers' world and regional aggregates exclude the Soviet Union before 1992 and count its
@@ -162,13 +177,9 @@ successor states from 1992 onwards, so a global or European series can step up a
 Say nothing about that step. This covers the post-Soviet coverage break and nothing else — any
 other change in which countries a series covers is still worth flagging.
 
-For each issue, set chart_params to the grapher query parameters that put the problem on
-screen — the entity and time range you are talking about — so a reviewer sees it immediately
-rather than the chart's default view.
-
 The indicator's key facts and processing notes are our own documentation of the data, written
 for readers. They are where a value that looks impossible is explained — a crisis adjustment
-added on top of a modelled series, a survey redesign, a deliberate aggregation. An extreme value
+added on top of a modelled series, a source switch, a deliberate aggregation. An extreme value
 or a discontinuity that the metadata accounts for is documented rather than wrong: say nothing
 about it. Judge it against what the metadata actually says, not against whether the number looks
 extreme — an explanation that does not cover the value you are looking at is not a licence to
@@ -235,6 +246,38 @@ def format_views(views_365d: int | float | None) -> str:
     return f"{per_day:,.0f} views/day" if per_day >= 10 else f"{per_day:,.1f} views/day"
 
 
+def readership_line(
+    views_365d: int | float | None,
+    published: dt.datetime | dt.date | None,
+    typical_views_365d: int | float | None = None,
+) -> str:
+    """How much the chart is read, for the model to weigh in its severity call.
+
+    Per day over the days the chart has been live, not over a flat year: a chart published last
+    week has a few hundred views in its annual total and would otherwise read as one nobody opens.
+    Rounded to one significant figure, so the daily drift in pageviews does not change what the
+    model is shown and throw away its cached reviews.
+
+    ``typical_views_365d`` is the median chart's, because "rarely read" needs a reference point:
+    most charts get a few views a day, which the model has no way to know.
+    """
+    today = dt.date.today()
+    day = published.date() if isinstance(published, dt.datetime) else published
+    live_days = min(max((today - day).days, 1), 365) if day else 365
+    if views_365d:
+        per_day = float(f"{views_365d / live_days:.1g}")
+        read = f"about {per_day:g} view{'' if per_day == 1 else 's'} a day"
+    else:
+        read = "no recorded views"
+    since = f", published {day.isoformat()}" if day else ""
+    typical = (
+        f" (a typical chart gets about {float(f'{typical_views_365d / 365:.1g}'):g} a day)"
+        if typical_views_365d
+        else ""
+    )
+    return f"Readership: {read}{since}{typical}."
+
+
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """An agent with no system instructions — see :func:`prompt_parts` for why.
 
@@ -258,8 +301,10 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     return Agent[None, Review](model=claude, output_type=Review, retries=2, model_settings=ANTHROPIC_SETTINGS)  # ty: ignore[invalid-argument-type]
 
 
-def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:
-    """The user turn: the render, then the metadata and numbers, then the instruction.
+def prompt_parts(
+    bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None, readership: str = "", params: str = ""
+) -> list[str | BinaryContent]:
+    """The user turn: the render, then the metadata, numbers and readership, then the instruction.
 
     The instruction goes **here rather than in the agent's system instructions**, and the
     difference is large. Measured over three passes each on two charts with known findings and
@@ -277,7 +322,11 @@ def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = N
     """
     parts: list[str | BinaryContent] = []
     if bundle.png:
-        parts.append("Image 1 — the chart's default view, as a reader first sees it:")
+        # A reviewed view (an mdim view, a --params run) is not what a reader first sees.
+        if params:
+            parts.append(f"Image 1 — the view under review, at ?{params}:")
+        else:
+            parts.append("Image 1 — the chart's default view, as a reader first sees it:")
         parts.append(BinaryContent(data=bundle.png, media_type="image/png"))
     # Extra views matter because the default view is usually not where a problem is visible.
     # In #we-need-to-correct-it almost every reported chart link carries query parameters.
@@ -285,5 +334,7 @@ def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = N
         parts.append(f"Image {i} — {label}:")
         parts.append(BinaryContent(data=png, media_type="image/png"))
     parts.append(bundle.summary)
+    if readership:
+        parts.append(readership)
     parts.append(INSTRUCTIONS.format(today=dt.date.today().isoformat()))
     return parts

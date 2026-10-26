@@ -1,0 +1,25 @@
+chart_config_id: 0191b6c7-3873-7ba2-ab39-3f713c5baabd
+grapher_schema: "011"
+slug: number-of-natural-disaster-events
+topic_tags:
+  - "Natural Disasters"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - "natural_disasters_global_by_type#n_events"
+    # timelineMaxTime is set in the .py step, and {{date_published}} in the note is filled in there, both from the EM-DAT release date.
+    config:
+      title: "Number of reported natural disaster events"
+      subtitle: "The number of global reported natural disaster events in any given year. Note that this largely reflects increases in data reporting, and should not be used to assess the total number of events."
+      note: "Data includes disasters reported up to {{date_published}}. The latest year may be incomplete due to reporting delays."
+      originUrl: "/natural-disasters"
+      minTime: 1900
+      yAxis:
+        max: 0
+        min: 0
+      entityType: "disaster category"
+      entityTypePlural: "disaster categories"
+      selectedEntityNames:
+        - "All disasters"

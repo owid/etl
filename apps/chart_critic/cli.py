@@ -16,8 +16,8 @@ etl chart-critic --top 50 --output /tmp/critic.html
 etl chart-critic --sample 100 --no-image --dry-run
 ```
 
-Roughly $0.04 per chart with the render attached on the default model at the default three passes,
-with prompt caching across the passes, so a pass over every published chart is under two hundred
+Roughly $0.08 per chart with the render attached on the default model at the default three passes,
+with prompt caching across the passes, so a pass over every published chart is under four hundred
 dollars. The binding constraint is not the bill — it is how many
 findings a human will read, which is why an empty result is a first-class outcome here.
 """
@@ -45,6 +45,7 @@ from apps.chart_critic.critic import (
     format_views,
     issue_params,
     prompt_parts,
+    readership_line,
     same_claim,
 )
 from apps.utils.llms.costs import estimate_llm_cost
@@ -53,6 +54,7 @@ from etl.db import read_sql
 console = Console()
 
 SEVERITY_COLOR = {"high": "red", "medium": "yellow", "low": "cyan"}
+SEVERITY_RANK = {"high": 0, "medium": 1, "low": 2}
 
 # Slack's documented chat.postMessage limit is one message per second per channel.
 POST_INTERVAL_SECONDS = 1.0
@@ -171,6 +173,37 @@ def _select(
     return [(r.slug, int(r.views), r.params) for r in picked.itertuples()]
 
 
+def _readership(slugs: list[str]) -> dict[str, str]:
+    """``{slug: line}`` telling the model how much each chart is read and since when.
+
+    Looked up here rather than taken from the targets because ``--slugs`` carries no pageviews,
+    and "no recorded views" would then be a false statement about every hand-picked chart. Fails
+    soft to no line at all: readership informs the severity call, it is not needed to make one.
+    """
+    unique = set(slugs)
+    if not unique:
+        return {}
+    try:
+        views = _pageviews(0)
+        published = read_sql(
+            """
+            SELECT cc.slug, c.publishedAt
+            FROM chart_configs cc
+            JOIN charts c ON c.configId = cc.id
+            WHERE cc.slug IN %(slugs)s
+            """,
+            params={"slugs": tuple(unique)},
+        )
+    except Exception as e:  # noqa: BLE001 — context for the model, not correctness
+        console.print(f"[yellow]readership unavailable, reviewing without it: {str(e)[:90]}[/yellow]")
+        return {}
+    by_views = dict(zip(views.slug, views.views_365d))
+    published = published.dropna(subset=["publishedAt"])
+    by_date = dict(zip(published.slug, published.publishedAt))
+    typical = views.views_365d.median() if len(views) else None
+    return {s: readership_line(by_views.get(s), by_date.get(s), typical) for s in unique}
+
+
 def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
     """Price a call; a model genai-prices does not know counts as $0, with a warning, so the review is kept.
 
@@ -232,11 +265,15 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
     "under 20 years" are one finding — so matching on a prefix counts them separately.
+
+    The merged finding keeps the highest severity any pass gave it. Severity decides whether the
+    digest posts it, and keeping the first pass's instead made that depend on pass order.
     """
     tokens = claim_tokens(new["claim"])
     for existing in issues:
         if existing["kind"] == new["kind"] and same_claim(tokens, claim_tokens(existing["claim"])):
             existing["passes"] += 1
+            existing["severity"] = min(existing["severity"], new["severity"], key=lambda s: SEVERITY_RANK[s])
             return
     issues.append(new | {"passes": 1})
 
@@ -271,6 +308,7 @@ def _review_one(
     ttl_hours: float = cache.DEFAULT_TTL_HOURS,
     views: int = 1,
     params: str = "",
+    readership: str = "",
 ) -> dict[str, Any]:
     result: dict[str, Any] = {
         "slug": slug,
@@ -318,7 +356,7 @@ def _review_one(
             pass
 
     agent = build_agent(model)
-    parts = prompt_parts(bundle, extra_views)
+    parts = prompt_parts(bundle, extra_views, readership, params)
     found: list[dict[str, Any]] = []
     in_tokens = out_tokens = cache_read = cache_write = 0
 
@@ -326,7 +364,7 @@ def _review_one(
     # genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
-    bundle_hash = cache.content_hash(bundle.summary, bundle.png, *(png for _, png in extra_views))
+    bundle_hash = cache.content_hash(f"{bundle.summary}\n{readership}", bundle.png, *(png for _, png in extra_views))
 
     # Take every pass already cached for this bundle, not the first --repeat of them. Passes
     # disagree, so replaying a fixed slot that happened to miss froze a chart as "clean" forever;
@@ -543,6 +581,7 @@ def cli(
             f"(algorithm {cache.algo_fingerprint()})[/dim]"
         )
 
+    readership = _readership([slug for slug, _, _ in targets])
     results: list[dict[str, Any]] = []
     with cf.ThreadPoolExecutor(workers) as ex:
         futures = [
@@ -558,6 +597,7 @@ def cli(
                 ttl_hours=cache_ttl,
                 views=views,
                 params=target_params,
+                readership=readership.get(slug, ""),
             )
             for slug, chart_pageviews, target_params in targets
         ]
@@ -625,7 +665,7 @@ def cli(
         else:
             already = sum(len(r["issues"]) for r in results)
             console.print(
-                f"\n[dim]nothing new to post — {already} finding(s), all previously reported[/dim]"
+                f"\n[dim]nothing new to post — {already} finding(s), all low severity, already posted or in cooldown[/dim]"
                 if already
                 else "\n[dim]nothing new to post — no findings[/dim]"
             )
