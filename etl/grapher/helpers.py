@@ -15,9 +15,8 @@ from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.db import get_engine, read_sql
-from etl.files import get_schema_from_url, yaml_dump
+from etl.files import yaml_dump
 from etl.grapher.io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
@@ -733,7 +732,6 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             assert tab[col].m.origins, f"Column `{col}` must have at least one origin"
 
             _validate_ordinal_variables(tab, col)
-            _validate_grapher_config(tab, col)
             _validate_time_interval(tab, col)
 
             # Data Page title uses the following fallback
@@ -795,29 +793,6 @@ def _validate_time_interval(tab: Table, col: str) -> None:
         assert time_interval in TIME_INTERVALS, (
             f"Column `{col}` has display.timeInterval='{time_interval}', which is not one of {sorted(TIME_INTERVALS)}."
         )
-
-
-def _validate_grapher_config(tab: Table, col: str) -> None:
-    """Validate grapher config against given schema or against the default schema."""
-    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
-    if grapher_config:
-        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
-
-        # Load schema and remove properties that are not relevant for the validation
-        schema = get_schema_from_url(grapher_config["$schema"])
-        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
-        schema["required"] = []
-
-        from jsonschema import ValidationError, validate
-
-        # Re-raise as ValueError because jsonschema.exceptions.ValidationError is not
-        # reliably picklable across multiprocessing workers (re-imported class identity
-        # mismatches break ForkingPickler), which crashes parallel `etl run` past
-        # --continue-on-failure.
-        try:
-            validate(grapher_config, schema)
-        except ValidationError as e:
-            raise ValueError(f"Invalid grapher_config for column `{col}`: {e}") from None
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:
