@@ -31,7 +31,7 @@ tables:
           name: <<revision>> projection
         presentation:
           title_public: Population, UN <<revision>> revision
-          attribution: UN, World Population Prospects (1968 - 2024)
+          attribution: UN, World Population Prospects (1968–2024)
           grapher_config:
             subtitle: ""
             note: ""
@@ -47,7 +47,7 @@ tables:
           name: <<revision>> estimates
         presentation:
           title_public: Population, UN <<revision>> revision
-          attribution: UN, World Population Prospects (1968 - 2024)
+          attribution: UN, World Population Prospects (1968–2024)
           grapher_config:
             subtitle: ""
             note: ""

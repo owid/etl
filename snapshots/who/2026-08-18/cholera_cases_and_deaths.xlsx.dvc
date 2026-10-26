@@ -11,7 +11,7 @@ meta:
     # Citation
     producer: "World Health Organization"
     citation_full: |-
-      Cholera dashboard - World Health Organization (WHO), Geneva, 2026. https://worldhealthorg.shinyapps.io/Cholera/
+      Cholera dashboard – World Health Organization (WHO), Geneva, 2026. https://worldhealthorg.shinyapps.io/Cholera/
     attribution_short: "WHO"
 
     # Files

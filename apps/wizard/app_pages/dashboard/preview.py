@@ -3,8 +3,6 @@ from typing import Any
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.utils.components import st_horizontal
-
 log = get_logger()
 
 # Height of the container for the details list (in pixels).
@@ -24,7 +22,7 @@ def render_preview_list(steps_info):
     else:
         with st.container(border=True):
             # Render list
-            with st_horizontal():
+            with st.container(horizontal=True):
                 for selected_step in st.session_state.preview_steps:
                     preview_step_info = steps_info[selected_step]
                     step_alias = selected_step.replace("data://", "")

@@ -132,7 +132,7 @@ class FAODataset:
                 "date_published": str(self.publication_date),
                 "date_accessed": VERSION,
                 "producer": SOURCE_NAME,
-                "citation_full": f"{SOURCE_NAME} - {self.dataset_name} ({self.publication_year}).",
+                "citation_full": f"{SOURCE_NAME} – {self.dataset_name} ({self.publication_year}).",
                 "attribution_short": ATTRIBUTION_SHORT,
                 "url_main": f"{FAO_DATA_URL}/{self.dataset_code}",
                 "url_download": self.source_data_url,

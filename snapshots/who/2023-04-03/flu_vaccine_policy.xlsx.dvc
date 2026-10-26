@@ -4,7 +4,7 @@ meta:
     title: WHO Influenza Vaccination Policy
     description: |-
       WHO/UNICEF Joint Reporting Form on Immunization (JRF) data on national influenza vaccination policies, eligible groups, vaccine types in use, and doses distributed.
-    citation_full: 'WHO and UNICEF (2023). WHO/UNICEF Joint Reporting Form on Immunization (JRF) - Influenza vaccination policy.'
+    citation_full: 'WHO and UNICEF (2023). WHO/UNICEF Joint Reporting Form on Immunization (JRF) – Influenza vaccination policy.'
     attribution_short: WHO/UNICEF
     url_main: https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
     date_accessed: '2023-04-03'

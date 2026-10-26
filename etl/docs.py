@@ -314,25 +314,25 @@ def render_grapher_config() -> str:
     return grapher_config
 
 
-def render_collection(level: int = 1) -> str:
-    """Render documentation for Collection (multidim) schema."""
+def render_chart(level: int = 1) -> str:
+    """Render documentation for Chart (multidim) schema."""
     # Use the generic recursive rendering like other schema functions
-    collection = MULTIDIM_SCHEMA
+    chart = MULTIDIM_SCHEMA
     documentation = render_props_recursive(
-        collection,
-        "collection",
+        chart,
+        "chart",
         level,
         "",
         ignore_fields=[
-            "collection.views.config",  # Too detailed, reference external schema
-            "collection.views.metadata",  # Too detailed, reference external schema
+            "chart.views.config",  # Too detailed, reference external schema
+            "chart.views.metadata",  # Too detailed, reference external schema
         ],
     )
     return documentation
 
 
-def render_collection_view_config(level: int = 1) -> str:
-    """Render documentation for Collection view config."""
+def render_chart_view_config(level: int = 1) -> str:
+    """Render documentation for Chart view config."""
     # Extract the config property from the views schema
     views_config = MULTIDIM_SCHEMA["properties"]["views"]["items"]["properties"]["config"]
     documentation = render_props_recursive(views_config, "view.config", level, "", render_top_as_scalar=False)
@@ -343,8 +343,8 @@ def render_collection_view_config(level: int = 1) -> str:
     return documentation
 
 
-def render_collection_view_metadata(level: int = 1) -> str:
-    """Render documentation for Collection view metadata."""
+def render_chart_view_metadata(level: int = 1) -> str:
+    """Render documentation for Chart view metadata."""
     # Extract the metadata property from the views schema
     views_metadata = MULTIDIM_SCHEMA["properties"]["views"]["items"]["properties"]["metadata"]
     documentation = render_props_recursive(views_metadata, "view.metadata", level, "", render_top_as_scalar=False)

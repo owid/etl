@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: OECD
-    title: Size of public procurement - Government at a glance indicators, Yearly updates
+    title: Size of public procurement – Government at a glance indicators, Yearly updates
     description: |-
       This dataset represents a selection of indicators as presented in the 2025 edition of the Government at a Glance publication related to the public procurement spending as estimated under the System of National Accounts (SNA). Government at a Glance provides a dashboard of indicators assembled to help decision makers and the public analyze and benchmark governments across OECD members and partner countries. With a growing emphasis on governance outcomes, this ninth edition presents the latest evidence on public governance tools and resources that can help public administrations address complex, long-term challenges, while allowing progress to be monitored over time. The Structure and indicators section of the Government at a Glance publication, describes its framework and the structure by chapters.
 
@@ -13,7 +13,7 @@ meta:
 
       Further information on Government at a Glance 2025 edition via a dedicated web platform, which includes a Government at a Glance Data dashboard (for a selection of indicators in an interactive format) as well as Country fact sheets (key data by country), can be found at: [Government at a Glance website](https://www.oecd.org/en/publications/government-at-a-glance-2025_0efd0bcd-en.html).
     citation_full: |-
-      OECD (2026). Size of public procurement - Government at a glance indicators, Yearly updates. OECD Data Explorer, https://data-explorer.oecd.org/.
+      OECD (2026). Size of public procurement – Government at a glance indicators, Yearly updates. OECD Data Explorer, https://data-explorer.oecd.org/.
     attribution_short: OECD
     url_main: https://data-explorer.oecd.org/
     url_download: |-

@@ -2,7 +2,7 @@ meta:
   origin:
     producer: World Bank
     title: World Bank country and lending groups
-    title_snapshot: World Bank country and lending groups - List of economies
+    title_snapshot: World Bank country and lending groups – List of economies
     citation_full: World Bank (2021). World Bank country and lending groups.
     url_main: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
     url_download: https://walden.owid.io/wb/2021-07-01/wb_income.xlsx

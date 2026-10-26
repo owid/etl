@@ -20,7 +20,7 @@ from collections.abc import Callable, Mapping
 from datetime import date
 from functools import cache, wraps
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Generic, TypeVar, cast
 
 import numpy as np
 import pandas as pd
@@ -30,7 +30,6 @@ from sentry_sdk import capture_exception
 from sqlalchemy.orm import Session
 from streamlit.runtime.runtime import Runtime
 from structlog import get_logger
-from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
@@ -135,17 +134,23 @@ def get_namespaces(step_type: str) -> list[str]:
     return namespaces
 
 
-class classproperty(property):
-    """Decorator."""
+T = TypeVar("T")
 
-    def __get__(self, owner_self: Self, owner_cls: Self):  # ty: ignore[invalid-method-override]
-        return self.fget(owner_cls)  # ty: ignore
+
+class classproperty(Generic[T]):
+    """Like `property`, but read on the class."""
+
+    def __init__(self, fget: Callable[[Any], T]) -> None:
+        self.fget = fget
+
+    def __get__(self, instance: object, owner: type | None = None) -> T:
+        return self.fget(owner)
 
 
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
+    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "chart"]
     dataset_edit: dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
@@ -153,7 +158,7 @@ class AppState:
         "grapher": None,
         "express": None,
         "data": None,
-        "collection": None,
+        "chart": None,
     }
     _previous_step: str | None = None
 

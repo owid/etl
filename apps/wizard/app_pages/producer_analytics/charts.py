@@ -148,7 +148,6 @@ class UIChartProducerAnalytics:
             gridOptions=grid_options,
             height=500,
             width="100%",
-            fit_columns_on_grid_load=True,
             allow_unsafe_jscode=True,
             theme="streamlit",
             # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?

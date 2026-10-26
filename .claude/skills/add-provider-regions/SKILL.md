@@ -3,6 +3,7 @@ name: add-provider-regions
 description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata — then register it in owid-grapher, including proposing each region's chart color (ContinentColors) and map color (MapContinentColors) for design sign-off and recording the agreed palette on the design team's Figma board. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, pick or fix the colors of a provider's regions, or migrate an in-dataset region variable to the shared regions dataset.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Add provider regions
@@ -55,8 +56,6 @@ print(sorted(c for c in tb["country"].unique() if "(" in str(c)))
 
 **If it is NOT in the data:** ask the user for a **reference** — a link, PDF, or doc where the provider publishes the classification (e.g. a "regional groupings" page or methodology annex). Fetch it with WebFetch and derive membership from there. Keep the reference URL; it becomes the origin `url_main` in Step 6.
 
-> Lesson: membership comes from the source and is verified by set-equality — not from judgment or memory.
-
 ---
 
 ## Step 2 — Resolve members to OWID region codes
@@ -100,7 +99,7 @@ Why split: the grapher step inverts *all* aggregates sharing a `defined_by` into
 
 Two rules for multi-tier providers:
 - **Completeness:** each kept tier must partition the provider's covered world. You cannot keep a sub-breakdown of one parent without its siblings — e.g. if you keep one parent's sub-regions, keep every parent's, so the tier still covers everyone. Drop intermediate levels that don't form a complete partition; keep only tiers that are both useful and complete.
-- **Region shared across tiers:** when one region exists at two levels (a broad region with no finer breakdown), it carries a single `defined_by`, so it appears natively in only one indicator. Tag it at one level, then **back-fill** it into the other level's indicator in the grapher step — mirror the existing `process_un_definitions` pattern in `grapher/regions/2023-01-01/regions.py` (one extra `fillna`/masked assignment after the inversion loop).
+- **Region shared across tiers:** when one region exists at two levels (a broad region with no finer breakdown), it carries a single `defined_by`, so it appears natively in only one indicator. Tag it at one level, then **back-fill** it into the other level's indicator in the grapher step (Step 6c).
 
 ---
 
@@ -141,7 +140,7 @@ For anything beyond a couple of regions, **regenerate the whole provider section
 ## Step 5 — Build and verify the garden step
 
 ```bash
-.venv/bin/etlr data://garden/regions/2023-01-01/regions --private
+.venv/bin/etlr data://garden/regions/2023-01-01/regions
 ```
 
 (No `--force` — editing the YAML is enough to trigger a rebuild.) The step runs sanity checks: unique codes/names, unique members within a region, all referenced codes exist, and cycle detection during aggregate expansion.
@@ -243,12 +242,12 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
 
 > **Reordering is only color-safe once the regions are pinned.** For a region with a `MapContinentColors` entry, `sort` moves legend positions and nothing else — the color follows the name. For a region **without** one, `OwidCategoricalMap` falls back to handing out palette colors *by position*, so reordering silently recolors the map. Check every region of the tier against `MapContinentColors` before touching `sort`: if any are unpinned, pin them first (Step 9, with the design sign-off) and reorder in the same change, or leave the order alone and say why in a `# NOTE:` beside it. The two edits look independent and are not.
 
-**6c. Cross-tier back-fill** — if Step 3 found a region shared across tiers, add the masked back-fill to `grapher/regions/2023-01-01/regions.py` after the inversion loop (see the existing `process_un_definitions` example for the shape).
+**6c. Cross-tier back-fill** — if Step 3 found a region shared across tiers, add the masked back-fill (one extra `fillna`/masked assignment) to `grapher/regions/2023-01-01/regions.py` after the inversion loop, mirroring the existing `process_un_definitions` pattern.
 
 **6d. Build and verify:**
 
 ```bash
-.venv/bin/etlr data://grapher/regions/2023-01-01/regions --private
+.venv/bin/etlr data://grapher/regions/2023-01-01/regions
 ```
 
 ```python
@@ -320,13 +319,13 @@ git commit -m "📊🤖 Add <Provider> regions to regions dataset"
 
 If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`, model name = the model actually generating the content) and keep any reviewer attribution out of committed code/YAML.
 
-> **Heads-up:** once this merges, the post-merge deploy is **slow** — editing the regions dataset invalidates much of the DAG, so it can take hours for the new regions to reach the production catalog. The owid-grapher follow-up (Step 9) can't start until they do, so don't expect to chain straight into it.
+> **Heads-up:** once this merges, the post-merge deploy is **slow** (often hours; see Step 9 → *Sequencing*), so don't expect to chain straight into Step 9.
 
 ---
 
 ## Step 9 — Register the provider in owid-grapher (separate repo + PR)
 
-The grapher frontend keeps its own copy of the regions and a few hand-maintained registries. The provider must be added there too, or its `(Provider)` entities won't be grouped/labelled correctly in entity selectors, map tooltips, and admin presets. Reference: [owid/owid-grapher#6465](https://github.com/owid/owid-grapher/pull/6465) (IEA).
+The grapher frontend keeps its own copy of the regions and a few hand-maintained registries. The provider must be added there too, or its `(Provider)` entities won't be grouped/labelled correctly in entity selectors, map tooltips, and admin presets.
 
 **Sequencing — and expect a long wait:** the frontend's `regions.data.ts` is regenerated from the **production** catalog (`https://catalog.ourworldindata.org/external/owid_grapher/latest/regions/regions.csv`). So do Step 9 **after** the ETL PR (Step 8) is merged *and* the `data://external/owid_grapher/latest/regions` step has rebuilt on prod. **That rebuild is slow — often hours, not minutes** — because editing the regions dataset invalidates a huge swath of the DAG (almost everything that aggregates by region or merges population/regions depends on it), so the post-merge deploy has a lot to rebuild before the new regions reach the catalog. Don't run `yarn runRegionsUpdater` until the regions are actually live there, or it'll regenerate from stale data. Verify first:
 
@@ -351,9 +350,9 @@ A non-zero count means it's ready. If you're waiting, poll this every few minute
 >   yarn runRegionsUpdater
 > ```
 >
-> Use this for previews and for the color review only — before merging the grapher PR, re-run `yarn runRegionsUpdater` with no env var so the committed file is prod-derived (see *Renaming existing regions* for why a stale/hand-edited `regions.data.ts` is a trap).
+> Use this for previews and for the color review only — never merge the grapher PR on a staging-derived `regions.data.ts`. Once the regions are live on prod, re-run `yarn runRegionsUpdater` with no env var so the committed file is prod-derived, and push that regeneration as the last commit (see *Renaming existing regions* for why a stale/hand-edited `regions.data.ts` is a trap). The colors don't change in that regeneration — only the region data does.
 
-Work in the `owid-grapher` repo on a new branch. There are two ways to register a provider — `regionGroupLabels` in `RegionGroups.ts` documents the split in its own comments: *"…where we have region definition about what constitutes these regions in regions.ts"* vs *"…we don't have region definitions … (we recognize them by their suffix)"*. They correspond to the `RegionDataProvider` and `AdditionalRegionDataProvider` types. *(Earlier drafts of this skill called these "Path A / Path B" — that's not a codebase term; ignore that wording.)*
+Work in the `owid-grapher` repo on a new branch. There are two ways to register a provider — `regionGroupLabels` in `RegionGroups.ts` documents the split in its own comments: *"…where we have region definition about what constitutes these regions in regions.ts"* vs *"…we don't have region definitions … (we recognize them by their suffix)"*. They correspond to the `RegionDataProvider` and `AdditionalRegionDataProvider` types.
 
 ### Full-definition provider — a `RegionDataProvider`
 
@@ -388,17 +387,16 @@ The frontend recognizes the provider's entities purely by the `(Provider)` name 
 When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) as a series, hovering its label shows a tooltip with a description, a mini world map, and a legend (`RegionTooltip.tsx` → `RegionMap.tsx`). Worth understanding because it surprises people:
 
 - **It is NOT tied to any published chart** and renders entirely from `regions.data.ts` + the registries — you don't need to publish a chart for hovers to work. The `descriptions` text *does* link into the `world-region-map-definitions` article (an anchor), so **add the matching section to that article (Step 10)** or the link lands on the page top. The tooltip itself renders regardless.
-- **It only exists for full-definition providers.** `TooltipKey = RegionDataProvider | "incomeGroups" | "continents"`, so suffix-only providers (`AdditionalRegionDataProvider`) get no tooltip — to give one, add the provider's definitions to `regions.data.ts`.
 - **The mini-map's configuration is computed in code, not taken from your ETL metadata or the chart's `customCategoryColors`:**
   - *Membership* (which country → which region) comes from `regions.data.ts` (`getCountriesByRegion`); no-data countries fall back to gray.
   - *Geometry* is owid-grapher's bundled world geojson (`getGeoFeaturesForMap`).
   - *Colors* come from `getRegionsForKey`, which looks up **`MapContinentColors[regionName]` first** and only falls back to `CategoricalMapPalette17[index]` for regions that aren't pinned (where `index` is the region's position in **`customRegionDisplayOrder[<provider>]`** in `RegionTooltipData.ts` — or alphabetical if you omit it). Pin the provider's regions (next section) and the hover follows automatically.
-- **So for a full-definition provider the hover is two required hand-edits in `RegionTooltipData.ts`** — `descriptions[<provider>]` (text + article link) and optionally `customRegionDisplayOrder[<provider>]` (left-to-right map order, which fixes the legend order and the fallback palette assignment) — **plus the color step below.** You can't set the hover's colors from the ETL side (it ignores the chart's `customCategoryColors`); they come from `MapContinentColors` in `CustomSchemes.ts`.
+- **So for a full-definition provider the hover is two required hand-edits in `RegionTooltipData.ts`** — `descriptions[<provider>]` (text + article link) and optionally `customRegionDisplayOrder[<provider>]` (left-to-right map order, which fixes the legend order and the fallback palette assignment) — **plus the color step below.**
 - **Which map a region shows is its own `defined_by` tier**, because `regionIconInfo` returns `tooltipKey: region.definedBy` (in `SeriesLabelState.ts`) — *not* the name suffix. So for a multi-tier provider each tier needs its own `descriptions[<provider>_1]` / `descriptions[<provider>_2]` entry, and a region tagged `<provider>_1` always hovers to the level-1 map, one tagged `<provider>_2` to the level-2 map.
 
 > **Shared-region caveat (multi-tier providers).** A region that exists in two tiers carries a *single* `defined_by`, so its hover only ever shows that one tier's map — the indicator-level back-fill (Step 3 / Step 6c) populates the *other* tier's map indicator but does **not** give the entity a second `defined_by` in `regions.data.ts`. Concrete consequence: in a chart built on the level-2 indicator, the shared region hovers to the level-1 map while its level-2 siblings hover to the level-2 map. It's not wrong (the level-1 map still highlights it), but the "belongs to a set of N regions" framing differs for that one entity. There's no way to make it show *both* — tagging it the other tier just flips which map it shows. (e.g. ILO's Arab States, tagged `ilo_1`, always hovers to the 5-region broad map.)
 
-> **And it leaves a gray hole in the *other* tier's hover map — fix with a frontend back-fill.** Because the shared region is absent from the other tier's provider set in `regions.data.ts` (`getAggregatesByProvider` filters by exact `definedBy`), its member countries are unmapped there and render gray (no-data) whenever you hover *another* region of that tier. Concretely: hovering any `ilo_2` subregion grays out the 12 Arab States countries, and the legend shows 10 regions instead of 11 — even though the ETL `ilo_2_region` *indicator* (and its published map) shows Arab States colored, because the ETL back-fill never reaches `regions.data.ts`. Mirror that back-fill **centrally**, in `getAggregatesByProvider` (`regionsUtils.ts`), via a data-driven map — `PROVIDER_REGION_BACKFILLS = { ilo_2: ["Arab States (ILO)"] }`, appended to the direct `definedBy` matches. Do it *there*, not in `getRegionsForKey` — `getAggregatesByProvider` feeds *every* consumer of the sub-tier (the hover **and** the admin entity presets, …), so a fix in `getRegionsForKey` alone leaves the presets still dropping the region (a real Codex catch). Add the shared region to `customRegionDisplayOrder[<tier>]` for a stable legend slot. Then that tier's hover is a complete partition matching the published map. (The shared region itself still hovers to its home tier — this only fills the hole the *other* regions' map would otherwise have.)
+> **And it leaves a gray hole in the *other* tier's hover map — fix with a frontend back-fill.** Because the shared region is absent from the other tier's provider set in `regions.data.ts` (`getAggregatesByProvider` filters by exact `definedBy`), its member countries are unmapped there and render gray (no-data) whenever you hover *another* region of that tier. Concretely: hovering any `ilo_2` subregion grays out the 12 Arab States countries, and the legend shows 10 regions instead of 11 — even though the ETL `ilo_2_region` *indicator* (and its published map) shows Arab States colored, because the ETL back-fill never reaches `regions.data.ts`. Mirror that back-fill **centrally**, in `getAggregatesByProvider` (`regionsUtils.ts`), via a data-driven map — `PROVIDER_REGION_BACKFILLS = { ilo_2: ["Arab States (ILO)"] }`, appended to the direct `definedBy` matches. Do it *there*, not in `getRegionsForKey` — `getAggregatesByProvider` feeds *every* consumer of the sub-tier (the hover **and** the admin entity presets, …), so a fix in `getRegionsForKey` alone leaves the presets still dropping the region. Add the shared region to `customRegionDisplayOrder[<tier>]` for a stable legend slot. Then that tier's hover is a complete partition matching the published map. (The shared region itself still hovers to its home tier — this only fills the hole the *other* regions' map would otherwise have.)
 
 ### Region colors — two dictionaries, two jobs
 
@@ -410,7 +408,7 @@ When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) a
 | owid-grapher staging (`staging-site-<grapher-branch>`) → `/admin/test-region-maps` | the real thing: your pinned map colors on a map, beside the chart colors on a line chart | **this is where you present the colors** |
 | Production `/admin/test-region-maps` | every provider as currently deployed | picking which provider to mirror, before you write a line |
 
-So the answer to *"where do I show the colors while I'm working in ETL?"* is: you don't — you open the grapher branch and show them from its staging server. You don't have to wait for the ETL PR to merge to do that; regenerate `regions.data.ts` from your ETL branch's staging catalog (see the `ETL_REGIONS_URL` note at the top of Step 9), push the grapher branch, and its test page renders the new provider with your proposed colors. Re-run the updater against prod before that PR merges.
+So the answer to *"where do I show the colors while I'm working in ETL?"* is: you don't — you open the grapher branch and show them from its staging server. You don't have to wait for the ETL PR to merge to do that; regenerate `regions.data.ts` from your ETL branch's staging catalog (see the `ETL_REGIONS_URL` note at the top of Step 9), push the grapher branch, and its test page renders the new provider with your proposed colors.
 
 Both dictionaries live in `packages/@ourworldindata/grapher/src/color/CustomSchemes.ts`, and every provider needs an entry in **both**:
 
@@ -447,7 +445,7 @@ Colors are looked up **by region name**, not by legend position (`ColorScale.ts`
 - **No two regions of one provider may share a color.** Where the table would collide, move to a neighboring hue or an extended map color, and prefer keeping the *broadest* region on the canonical hue. Precedents: UN M49 pushes `South-eastern Asia` to `DarkOrange`/`LightOrange` to clear `Eastern Asia`'s green; Maddison's `East Asia` is `Copper`/`LightCherry` because its greens are taken by `South and South East Asia`.
 - **Multi-tier providers get pinned too.** Because colors are name-keyed, a region shared across tiers (e.g. `Arab States (ILO)`, tagged `ilo_1` but back-filled into the `ilo_2` map) carries *one* color that is correct in both tiers. Pin every region of every tier; check the tiers for collisions independently, since each tier is its own legend.
 - Use the **named constants**, never raw hex — `"<Region> (<Provider>)": OwidDistinctColors.Peach` / `OwidMapColors.SoftOrange`. `OwidMapColors` is declared above both dictionaries, so it's available to each.
-- **Keep the comments to labels.** These dictionaries are dense lists, and their section headings are one line naming the block — `// FAO subregions (level 2)`, `// UN M49 regions (level 3)` — phrased like the headings already around them, tier number included. Resist explaining the choices in the file: why this provider mirrors that one, which region is listed in a different block, how many hues a continent's split needed. That reasoning is real and worth writing, but it belongs in the PR description and the commit message, where it is read once by a reviewer, not in a file that is read whenever someone adds a region. A review of a first attempt at this cut four-line rationales back to single-line labels, and the file is better for it.
+- **Keep the comments to labels.** These dictionaries are dense lists, and their section headings are one line naming the block — `// FAO subregions (level 2)`, `// UN M49 regions (level 3)` — phrased like the headings already around them, tier number included. Resist explaining the choices in the file: why this provider mirrors that one, which region is listed in a different block, how many hues a continent's split needed. That reasoning is real and worth writing, but it belongs in the PR description and the commit message, where it is read once by a reviewer, not in a file that is read whenever someone adds a region.
 - **The one comment worth keeping is the one that stops a future edit going wrong** — e.g. that new colors are deliberately outside the `CategoricalMapPalette` sets. Even that is a clause, not a paragraph.
 - **New palette colors go after the existing groups**, at the end of `OwidMapColors`, never inserted between the named ones. Slotting a color next to *Extended* or *Main* implies it belongs to the positional palette sets those groups feed, which is exactly what it must not do.
 
@@ -481,7 +479,7 @@ Colors are a design call, and what the skill produces is a **first stab** — it
 5. **Then request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
 6. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
 
-> **You can start this before the ETL PR merges** — the color review only needs `regions.data.ts` to know the new provider, and the `ETL_REGIONS_URL` preview gives you that from your ETL branch's staging catalog. What you must **not** do is merge the grapher PR on a staging-derived `regions.data.ts`: re-run `yarn runRegionsUpdater` against prod once the regions are live there, and push that regeneration as the last commit. The colors don't change in that regeneration — only the region data does.
+> **You can start this before the ETL PR merges** — see the `ETL_REGIONS_URL` note at the top of Step 9.
 
 ### Review the palette on the Figma board
 
@@ -495,7 +493,7 @@ How the board is laid out — match it rather than inventing a spot:
 
 - Frame 99 is **absolutely positioned** (`layoutMode: NONE`), one **row per provider tier**, so `fao_1` and `fao_2` are separate rows exactly as `ilo_1`/`ilo_2` already are.
 - Each row is a **594×419 map export**: the **BEFORE** column at `x = 1751`, the **AFTER** column at `x = 2420`, with a text note in the right-hand column at `x ≈ 3043` listing the changes as `Region: OldColor → NewColor`.
-- Rows run down the frame on a **481 px pitch**. Add yours below the last existing row and grow Frame 99's height to fit — don't overlap the bottom edge.
+- Rows run down the frame on a **481 px pitch**. Add yours below the last existing row.
 - **A fresh provider fills the AFTER column only**, and needs no note: there is no "before" when the regions were never colored. The BEFORE column and the note column are for *recolors* of already-published regions (see *Renaming existing regions*), where the point is the change.
 - Name the frame `<provider-full-name-slug>-regions-<defined_by>` — e.g. `food-and-agriculture-organization-regions-fao_2`, `united-nations-regions-un_m49_3`. (On the older paired rows a trailing ` 1`/` 2` distinguishes before/after; don't imitate it for a single new frame.)
 
@@ -545,7 +543,7 @@ Finish by screenshotting the row (`get_screenshot` on the node, or `await node.s
 
 If the provider has no published region chart to export, there is nothing to upload — build the chart first (Step 7) or skip the board and say so, rather than hand-drawing an approximation of a map.
 
-> **Trial runs are cheap; leaving debris is not.** This whole flow was validated by inserting a row and removing it again. If you do that, restore what you touched in the same breath — `node.remove()` **and** `frame99.resize(frame99.width, <original height>)`, since growing the board is a mutation the row's deletion doesn't undo. Record the original height before you change it.
+> **Trial runs are cheap; leaving debris is not.** If you test the flow by inserting a row and removing it again, restore what you touched in the same breath — `node.remove()` **and** `frame99.resize(frame99.width, <original height>)`, since growing the board is a mutation the row's deletion doesn't undo. Record the original height before you change it.
 
 #### Reading the designer's changes back out
 
@@ -574,7 +572,7 @@ Turning a returned hex into code is its own small step, and it is where a change
 
 Occasionally you're not adding a provider but **renaming** its already-published regions (e.g. WID's `MENA (WID)` → `Middle East and North Africa (WID)`, or `&` → `and`). The Step 9 flow is the same, with two wrinkles:
 
-- **Finish with `runRegionsUpdater` from prod — never merge on a hand-edit.** Renaming a region's `name` shifts the derived name / `RegionDataProvider` union types, so it's tempting to hand-edit the `name`s directly in `regions.data.ts` to keep `yarn typecheck` green before the prod catalog has rebuilt. That stopgap is **always incomplete**: the updater also regenerates each region's `shortName` and `slug` *from* the name, which a hand-edit silently misses (on the WID rename the stopgap kept the stale `mena-wid` slug and dropped MENA's `shortName`). Once the rename is live on prod, run `runRegionsUpdater` and let it overwrite the file — the diff exposes any derived field the stopgap got wrong. Treat the regenerated file as the source of truth, not the hand-edit.
+- **Finish with `runRegionsUpdater` from prod — never merge on a hand-edit.** Renaming a region's `name` shifts the derived name / `RegionDataProvider` union types, so it's tempting to hand-edit the `name`s directly in `regions.data.ts` to keep `yarn typecheck` green before the prod catalog has rebuilt. That stopgap is **always incomplete**: the updater also regenerates each region's `shortName` and `slug` *from* the name, which a hand-edit silently misses (it keeps the stale slug and can drop the `shortName`). Once the rename is live on prod, run `runRegionsUpdater` and let it overwrite the file — the diff exposes any derived field the stopgap got wrong. Treat the regenerated file as the source of truth, not the hand-edit.
 - **Ignore the "set up redirects" message for provider regions.** The updater unconditionally prints *"Be sure to set up redirects for any slugs that have changed"* on **any** change to `regions.data.ts`. But a `slug` only drives a URL for a **country** profile page (`/country/<slug>`, baked only for `regionType: "country"` — see `countries` in `regionsUtils.ts`). Provider regions are `regionType: "aggregate"` and have no country page, so their slug changes need **no** redirect. Only act on that warning if a real *country's* slug changed.
 
 ---

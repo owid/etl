@@ -27,7 +27,7 @@ exit 0
 # git push origin master -q || true
 
 # echo '--- Commit dataset to https://github.com/owid/monkeypox'
-# MONKEYPOX_COMMIT=1 uv run etlr github/who/latest/monkeypox --export --private
+# MONKEYPOX_COMMIT=1 uv run etlr github/who/latest/monkeypox --export
 
 # end_time=$(date +%s)
 

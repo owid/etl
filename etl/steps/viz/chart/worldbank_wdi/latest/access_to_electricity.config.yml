@@ -1,0 +1,99 @@
+grapher_schema: "011"
+title:
+  title: "Access to electricity"
+topic_tags:
+  - "Access to Energy"
+  - "Energy"
+default_selection:
+  - "Niger"
+  - "Malawi"
+  - "Ethiopia"
+  - "Kenya"
+  - "India"
+  - "Indonesia"
+default_dimensions:
+  metric: share_of_population
+  with_or_without_access: with_access
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+          - "SlopeChart"
+        hasMapTab: true
+        tab: "line"
+        hideAnnotationFieldsInTitle:
+          time: true
+        originUrl: "/energy-access"
+        yAxis:
+          min: 0
+      metadata:
+        description_key:
+          - "Access to electricity improves people's living conditions in many ways. [Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; refrigeration reduces food waste; and household appliances free up time from chores."
+          - "This data captures whether people have access to a basic electricity supply; this is defined as having enough to provide basic lighting, and charge a phone or power a radio for 4 hours per day. To learn more, read our article: [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)."
+          - "This data comes from the World Bank's World Development Indicators. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated by the source using a model based on trends across countries, regions, and time. Countries classified as “developed” by the United Nations are assumed to have universal access."
+          - "Universal access to electricity by 2030 is one of the United Nations [Sustainable Development Goals](https://ourworldindata.org/sdgs/affordable-clean-energy#sdg-indicator-7-1-1-access-to-electricity)."
+dimensions:
+  - slug: metric
+    name: "Metric"
+    choices:
+      - slug: share_of_population
+        name: "Share of population"
+      - slug: number_of_people
+        name: "Number of people"
+  - slug: with_or_without_access
+    name: "With or without access"
+    choices:
+      - slug: with_access
+        name: "With access"
+      - slug: without_access
+        name: "Without access"
+views:
+  - dimensions:
+      metric: share_of_population
+      with_or_without_access: with_access
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs"
+          display:
+            roundingMode: "significantFigures"
+            numSignificantFigures: 3
+    config:
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          binningStrategy: "equalSizeBins-few-bins"
+  - dimensions:
+      metric: share_of_population
+      with_or_without_access: without_access
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_without"
+          display:
+            roundingMode: "significantFigures"
+            numSignificantFigures: 3
+    config:
+      title: "Share of the population without access to electricity"
+      map:
+        colorScale:
+          baseColorScheme: "OrRd"
+          binningStrategy: "equalSizeBins-few-bins"
+  - dimensions:
+      metric: number_of_people
+      with_or_without_access: with_access
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_number"
+          display:
+            roundingMode: "significantFigures"
+            numSignificantFigures: 3
+  - dimensions:
+      metric: number_of_people
+      with_or_without_access: without_access
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_without_number"
+          display:
+            roundingMode: "significantFigures"
+            numSignificantFigures: 3

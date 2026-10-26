@@ -8,7 +8,6 @@ from pathlib import Path
 import pandas as pd
 from git.repo import Repo
 from owid.catalog import Dataset, DatasetMeta, Origin, Table
-from owid.datautils import io
 from rich.console import Console
 from sqlalchemy.orm import Session
 from structlog import get_logger
@@ -147,8 +146,7 @@ class FasttrackImport:
 
         # upload snapshot
         snap = self.snapshot
-        io.df_to_file(self.data, file_path=snap.path)
-        snap.dvc_add(upload=True)
+        snap.create_snapshot(data=self.data, upload=True)
 
         # save metadata
         self.__snapshot_path = snap.metadata_path

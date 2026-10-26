@@ -33,6 +33,7 @@ import structlog
 from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
+from owid.catalog.api.utils import session as catalog_session
 from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.orm import Session
 from tqdm import tqdm
@@ -42,10 +43,17 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
+from etl.grapher.entity_selection import UpsertPinsCheck
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
+
+# A forked step gets fresh copies of lib/catalog's pooled clients rather than its parent's open
+# connections, as `etl.http.make_session` does for ours (see `DataStep._run_py_fork`).
+# TODO: move these into lib/catalog with its next release.
+os.register_at_fork(after_in_child=catalog_session.close)
+os.register_at_fork(after_in_child=s3_utils._connect_r2_cached.cache_clear)
 
 DAG = dict[str, set[str]]
 
@@ -149,8 +157,16 @@ def filter_to_subgraph(
     elif exact_match:
         included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes_list]
-        included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
+        included = set()
+        for pattern in includes_list:
+            if pattern in all_steps:
+                # A full step name selects that step only: read as a regex, `data://garden/x/2024-01-01/foo`
+                # would also pull in `.../foo_extended`.
+                included.add(pattern)
+            else:
+                compiled = re.compile(pattern)
+                included.update(s for s in available_steps if compiled.search(s))
+        included &= available_steps
 
     if only:
         # Only include explicitly selected nodes, but filter out excluded steps
@@ -242,6 +258,9 @@ def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
 
     elif step_type == "export":
         step = ExportStep(path, dependencies)
+
+    elif step_type == "viz":
+        step = VizStep(path, dependencies)
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
@@ -732,16 +751,9 @@ class DataStep(Step):
         if pid == 0:
             # ---------- child process ----------
             try:
-                # Close all inherited file descriptors except stdin/stdout/stderr.
-                # The forked child inherits FDs for the multiprocessing Manager
-                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
-                # os._exit() later closes them implicitly it can confuse the
-                # Manager server and cause the parent worker to hang.
-                import resource as _resource
-
-                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
-                os.closerange(3, _max_fd)
-
+                # Don't close inherited descriptors: that never affects the parent's copies, and the
+                # pooled clients still holding them would fail. Those clients reset in the child
+                # instead (`etl.http.make_session`, and the catalog clients at the top of this module).
                 config.enable_structlog_filtering()
                 step_type, path = str(self).split("://", 1)
                 step_type = step_type.replace("-private", "")
@@ -1021,6 +1033,10 @@ class GrapherStep(Step):
 
         catalog_paths = []
 
+        # Before upserting, record what production has for indicators that charts pin entities of
+        pins_check = UpsertPinsCheck(engine, dataset_upsert_results.dataset_id)
+        pins_check.prepare()
+
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
             verbose = True
@@ -1077,6 +1093,7 @@ class GrapherStep(Step):
                     assert len(t.columns) == 1
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
                     catalog_paths.append(catalog_path)
+                    pins_check.add(catalog_path, t)
 
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
@@ -1101,6 +1118,9 @@ class GrapherStep(Step):
 
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
+
+        # Fail if the upsert removed entities that charts pin (the dataset checksum stays unset, so the step reruns)
+        pins_check.run()
 
         # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
         if INSTANT_METADATA_DIFF:
@@ -1165,40 +1185,85 @@ class GrapherStep(Step):
 
 class ExportStep(DataStep):
     """
-    A step which exports something once. For instance committing to a Github repository
-    or upserting an Explorer to DB.
+    A step which ships files to a shared, environment-less destination, e.g. committing to a
+    GitHub repository or uploading to R2. Its recipe lives in `etl/steps/export/<channel>/...`.
+
+    Runs with `--export`, which grants the write (`config.EXPORT_ENABLED`); named without it, the
+    step builds its files locally and skips the upload, see `publishes`.
     """
 
     path: str
     dependencies: list[Step]
+    # Step type: the URI scheme and the folder under `etl/steps/`.
+    step_type = "export"
 
     def __init__(self, path: str, dependencies: list[Step]) -> None:
         self.dependencies = dependencies
         self.path = path
 
     def __str__(self) -> str:
-        return f"export://{self.path}"
+        return f"{self.step_type}://{self.path}"
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
+        return super().can_execute(archive_ok=archive_ok)
 
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        # An output folder without index.json (an interrupted run, or a file dropped there by
+        # something else) would make create_dataset refuse to run; start from scratch instead.
+        self._clean_partial_output()
+
         from etl.helpers import create_dataset
 
-        # Create folder for the dataset, export step can save files there
+        # Create folder for the dataset, the step can save files there
         ds = create_dataset(self._dest_dir, tables=[])
 
-        sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            if config.DEBUG:
-                DataStep._run_py_isolated(self)  # ty: ignore
-            else:
-                DataStep._run_py(self)  # ty: ignore
+        self._run_recipe()
+
+        if not self.publishes:
+            # Leave the checksum unrecorded, so that the next run with the flag rebuilds and publishes.
+            log.warning(
+                "step.built_locally_only",
+                step=str(self),
+                hint=f"pass {self.permission_flag} to publish; the step stays dirty until then",
+            )
+            return
+
+        self._publish()
 
         # save checksum (only update index.json, don't call ds.save() which iterates
-        # table_names and would pick up custom JSON files written by the export script)
+        # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
+
+    # The etlr flag that grants this step's write.
+    permission_flag = "--export"
+
+    @property
+    def publishes(self) -> bool:
+        """Whether this run may write to the step's destination. Off, the recipe still runs (the steps
+        check the same `config` switch before uploading), but nothing leaves the machine."""
+        return config.EXPORT_ENABLED
+
+    def _publish(self) -> None:
+        """Ship what the recipe wrote, for step types whose destination the framework owns.
+
+        A no-op for `export://` steps: they write to destinations of their own choosing (a GitHub
+        repo, a public R2 path) from inside the recipe, which is why they exist as a separate step
+        type at all.
+        """
+
+    def _run_recipe(self) -> None:
+        if config.DEBUG:
+            DataStep._run_py_isolated(self)  # ty: ignore
+        else:
+            DataStep._run_py(self)  # ty: ignore
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients
@@ -1206,11 +1271,81 @@ class ExportStep(DataStep):
 
     @property
     def _search_path(self) -> Path:
-        return paths.STEP_DIR / "export" / self.path
+        return paths.STEP_DIR / self.step_type / self.path
 
     @property
     def _dest_dir(self) -> Path:
         return paths.EXPORT_DIR / self.path.lstrip("/")
+
+
+class VizStep(ExportStep):
+    """
+    A step which produces a visualization. Its channel says which kind:
+
+    - `viz://chart/...`: a chart or an MDIM (a chart is an MDIM with `dimensions: []`), upserted to the grapher DB.
+    - `viz://explorer/...`: an explorer, upserted to the grapher DB.
+    - `viz://static/...`: a static image (PNG/SVG), written next to the recipe.
+    - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
+
+    Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`. Every viz
+    step runs under `--grapher`, which grants the write (`config.GRAPHER_ENABLED`); named without it,
+    the step builds its output locally (the chart config under `viz/`, the bespoke feed) and skips
+    the upsert or upload, see `etl.command.construct_subdag`. Static steps only write local files,
+    so they publish regardless. A bespoke step's own upload is the framework's job (`_publish`), so
+    its feed lands in the R2 path of the environment being built, like every other output.
+    """
+
+    step_type = "viz"
+    permission_flag = "--grapher"
+
+    @property
+    def publishes(self) -> bool:
+        return config.GRAPHER_ENABLED or self.channel == "static"
+
+    def _publish(self) -> None:
+        """Sync a bespoke feed to the environment's R2 path.
+
+        Chart and explorer steps publish from inside their recipe (`chart.save()` upserts to the
+        grapher DB) and static steps only ever write local files. A bespoke step just writes JSON
+        into its output folder, and the framework ships it -- see `etl.viz.bespoke`.
+        """
+        if self.channel != "bespoke":
+            return
+
+        from etl.viz.bespoke import sync_feed
+
+        sync_feed(self.path, self._dest_dir)
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()
+
+    def _run_recipe(self) -> None:
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            super()._run_recipe()
+        elif self._is_chart_yaml_only():
+            # YAML-only chart/MDIM: no .py, just a .config.yml. Run the default
+            # boilerplate (load_config → create_chart → save).
+            self._run_chart_yaml_only(sp)
+
+    def _is_chart_yaml_only(self) -> bool:
+        """True if this is a `viz://chart/...` step backed only by a `.config.yml`."""
+        if self.channel != "chart":
+            return False
+        return self._search_path.with_suffix(".config.yml").exists()
+
+    def _run_chart_yaml_only(self, search_path: Path) -> None:
+        from etl.helpers import PathFinder
+
+        # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
+        # PathFinder only parses namespace/version/short_name out of the path components.
+        paths_ = PathFinder(str(search_path.with_suffix(".py")))
+        chart = paths_.create_chart(config=paths_.load_config())
+        chart.save()
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.VIZ_DIR / self.path.lstrip("/")
 
 
 @dataclass

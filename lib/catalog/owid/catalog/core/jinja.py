@@ -3,6 +3,7 @@ from functools import cache
 from typing import Any
 
 import jinja2
+from jinja2.sandbox import SandboxedEnvironment
 
 from owid.catalog.core.utils import remove_details_on_demand
 
@@ -22,7 +23,19 @@ _AS_VALUE_MARKER = "__OWID_AS_VALUE__:"
 # `_expand_jinja_text` for the split.
 _REMOVE_KEY = object()
 
-jinja_env = jinja2.Environment(
+# Sandboxed, not a plain Environment: most of the text rendered here is metadata we
+# did not write. `description_from_producer` and friends are assembled from producer
+# files — WDISeries.csv inside the World Bank WDI zip, for one — and any value that
+# happens to contain `<<` or `<%` reaches `.render()` below. In a plain Environment a
+# crafted value can walk `__class__`/`__subclasses__` to arbitrary code execution on
+# whatever runs the ETL. The sandbox blocks that attribute traversal and renders our
+# own templates identically, so it costs nothing here.
+#
+# It is not the only line of defence and shouldn't be treated as one: snapshots are
+# pinned by content hash in their `.dvc` file, so a producer file cannot change under
+# us after the snapshot is taken, and `StrictUndefined` below turns an accidental
+# `<< foo >>` in producer prose into a loud failure rather than a silent render.
+jinja_env = SandboxedEnvironment(
     block_start_string="<%",
     block_end_string="%>",
     variable_start_string="<<",

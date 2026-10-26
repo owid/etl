@@ -126,7 +126,7 @@ def run() -> None:
     # I detected spurious entries, e.g. "2 | 2".
     # Check that they are always the same value twice, and replace them by that value.
     for column in tb.columns:
-        _filter = tb[column].astype("string").str.contains("|", regex=False)
+        _filter = tb[column].astype("str").str.contains("|", regex=False)
         if _filter.any():
             assert all([len(set(case.replace("|", "").split())) == 1 for case in set(tb.loc[_filter, column])])
             tb[column] = tb[column].str.split(" | ").str[0]
@@ -193,7 +193,7 @@ def run() -> None:
         .melt(id_vars=["user"] + list(COLUMNS_DEMOGRAPHICS.values()), var_name="question", value_name="answer")
     )
     # Improve tables format.
-    tb = tb.format(["user", "question"]).astype({"answer": "string"})
+    tb = tb.format(["user", "question"]).astype({"answer": "str"})
 
     #
     # Save outputs.

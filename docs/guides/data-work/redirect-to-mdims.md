@@ -79,7 +79,7 @@ The skill reads the explorer's views and the target MDIM's views, then asks you 
 routing rules: which explorer view corresponds to which MDIM view. That is the only manual
 part, and it is per explorer.
 
-**Review the matches before applying.** `/review-explorer-mdim-mapping` builds an HTML page
+**Review the matches before applying.** Step 4 of `/map-explorer-to-mdim` builds an HTML page
 showing each explorer view beside the MDIM view it would redirect to, with approve/flag
 controls; decisions persist in the browser and export to JSON. You can let Claude know about
 these corrections in the matches.

@@ -24,7 +24,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
 
   # GHSL countries multidim
-  export://multidim/urbanization/latest/cities_towns_rural_areas:
+  viz://chart/urbanization/latest/cities_towns_rural_areas:
     - data://grapher/urbanization/2025-12-10/ghsl_countries:
       - data://garden/urbanization/2025-12-10/ghsl_countries
 

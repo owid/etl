@@ -65,7 +65,7 @@ Turn DAG entries into clickable links with visual status feedback:
 
 !!! note "How it works"
 
-    - Click any DAG entry to open its `.py` file (data/export steps) or `.dvc` file (snapshots)
+    - Click any DAG entry to open its recipe (`.py`, or `.config.yml` for YAML-only chart steps) or `.dvc` file (snapshots)
     - Status emoji appears based on step version and health
     - Works across all DAG files in the project
 
@@ -131,7 +131,8 @@ Catch outdated code patterns as you type with configurable warnings.
     - Patterns apply only to files in `etl/steps/data/**` (scope-based detection)
     - Yellow squiggles appear under outdated code
     - Hover for suggested alternatives
-    - Extensible: add new patterns in `src/extension.ts`
+    - Extensible: add new patterns in `src/detector.mts`
+    - Also runs from the command line: `node vscode_extensions/detect-outdated-practices/src/cli.mts <paths>`
 
 ### Chart Preview
 
@@ -166,7 +167,7 @@ The panel **auto-rebuilds** when you save the step file (uses `etlr --watch` in 
 
 #### Chart preview
 
-Embeds the staging admin chart viewer for `.chart.yml` and multidim export steps.
+Embeds the staging admin chart viewer for `.chart.yml` files and `viz://chart` steps (charts and MDIMs).
 
 !!! note "How it works"
 

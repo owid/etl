@@ -24,7 +24,7 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_title_with_expert
+from apps.wizard.utils.components import preview_file
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
@@ -76,7 +76,6 @@ def reset_states() -> None:
 CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 # Config style
-config_style_html()
 # Logger
 log = get_logger()
 
@@ -94,10 +93,7 @@ APP_STATE = wizard_utils.AppState()
 # MAIN ###################################################
 ##########################################################
 # TITLE & description
-st_title_with_expert(
-    "Fast-Track import",
-    icon=":material/fast_forward:",
-)
+st.title(":material/fast_forward: Fast-Track import")
 st.markdown(
     """
             Fast-track is a tool for importing datasets from Google Sheets. The idea is to keep all data and metadata there, and use this interface to import or update the data in grapher database where it can be used to create charts. Fast-track also commits your work to [ETL repository](https://github.com/owid/etl) where you can further process your data with Python.
@@ -148,7 +144,7 @@ IMPORT_OPTIONS = {
 #     horizontal=True,
 # )
 
-with st_horizontal(vertical_alignment="flex-end", justify_content="space-between"):
+with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
     import_method = st.segmented_control(
         label="How do you want to import the dataset?",
         options=IMPORT_OPTIONS.keys(),

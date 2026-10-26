@@ -2,7 +2,7 @@
 
 To download, visit https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/WPKNIT&version=3.0, and download LIED_6.5.xlsx file.
 
-NOTE: in case this site, please look for an alternative from the provider's main site: https://ps.au.dk/en/research/research-projects/dedere/datasets (also listed in the metadata)"""
+NOTE: in case this site, please look for an alternative from the producer's main site: https://ps.au.dk/en/research/research-projects/dedere/datasets (also listed in the metadata)"""
 
 from pathlib import Path
 

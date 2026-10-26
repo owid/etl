@@ -1,5 +1,7 @@
 """Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
+import pandas as pd
+
 from etl.catalog_helpers import last_date_accessed
 from etl.helpers import PathFinder
 
@@ -38,7 +40,9 @@ def run() -> None:
     tb = tb.drop(unused_columns, axis=1)
 
     # Ensure 'publication_date' column type is datetime64
-    assert tb["publication_date"].dtype == "datetime64[ns]", "publication_date column is not of type datetime64"
+    assert pd.api.types.is_datetime64_any_dtype(tb["publication_date"]), (
+        "publication_date column is not of type datetime64"
+    )
 
     # Extract the year from the 'publication_date' column
     tb["year"] = tb["publication_date"].dt.year

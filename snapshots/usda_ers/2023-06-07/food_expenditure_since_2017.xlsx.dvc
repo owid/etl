@@ -2,7 +2,7 @@ meta:
   origin:
     producer: USDA Economic Research Service
     title: Food expenditure
-    title_snapshot: Food expenditure - Expenditures on food and alcoholic beverages in selected countries
+    title_snapshot: Food expenditure – Expenditures on food and alcoholic beverages in selected countries
     citation_full: Economic Research Service of the United States Department of Agriculture (USDA/ERS) (2022). Food expenditure.
     attribution_short: USDA ERS
     url_main: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/

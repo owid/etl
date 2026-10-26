@@ -22,10 +22,13 @@ DATA_MEADOW_DIR = DATA_DIR / "meadow"
 DATA_GARDEN_DIR = DATA_DIR / "garden"
 DATA_GRAPHER_DIR = DATA_DIR / "grapher"
 
-# Export folder
+# Export folder (local outputs of export:// steps)
 EXPORT_DIR = BASE_DIR / "export"
-EXPORT_MDIMS_DIR = EXPORT_DIR / "multidim"
-EXPORT_EXPLORER_DIR = EXPORT_DIR / "explorers"
+
+# Viz folder (local outputs of viz:// steps)
+VIZ_DIR = BASE_DIR / "viz"
+VIZ_CHART_DIR = VIZ_DIR / "chart"
+VIZ_EXPLORER_DIR = VIZ_DIR / "explorer"
 
 # Snapshots
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"

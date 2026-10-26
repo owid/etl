@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Accounting for Wealth Inequality Dynamics - Methods, Estimates and Simulations for France (1800-2014)
+    title: Accounting for Wealth Inequality Dynamics – Methods, Estimates and Simulations for France (1800–2014)
     description: |-
       This dataset presents long-run homogeneous series on the distribution of personal wealth in France over the 1800-2014 period. Combining income tax, inheritance and wealth-survey data with national accounts, the authors estimate the share of total net personal wealth held by different groups of the adult population, together with average wealth levels and the wealth thresholds that define each group.
 

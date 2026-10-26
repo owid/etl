@@ -17,7 +17,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Use this to process a subset of data. Set a comma-separated list of countries. For example:
-# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp --private
+# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp
 SUBSET = os.environ.get("SUBSET")
 
 YEAR_SPLIT = 2024
@@ -241,6 +241,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
             "Low": "low",
             "High": "high",
             "Constant fertility": "constant_fertility",
+            "Zero migration": "zero_migration",
         },
     )
     tb_sex = harmonize_dimension(
@@ -251,6 +252,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
             "Low": "low",
             "High": "high",
             "Constant fertility": "constant_fertility",
+            "Zero migration": "zero_migration",
         },
     )
     tb = harmonize_dimension(
@@ -277,8 +279,8 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
     del tb_density
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
-    tb_sex["age"] = tb_sex["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
+    tb_sex["age"] = tb_sex["age"].astype("str")
     # Separate january and july data
     msk_jan = tb["month"] == "January"
     tb_jan = tb.loc[msk_jan]
@@ -407,7 +409,7 @@ def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
     tb["net_migration"] *= 1000
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     # Zero value for "World"
     tb.loc[tb["country"] == "World", ["net_migration", "net_migration_rate"]] = 0
@@ -476,17 +478,27 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_x = tb_x.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
     tb_limits = tb.loc[tb["age"].isin(["0", "100+"])].copy()
 
-    # Combine
-    tb = pr.concat([tb_total, tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
+    # Combine the age-disaggregated groups (the totals are added back after corrections, below)
+    tb = pr.concat([tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
 
     # Scale
     tb["deaths"] *= 1000
+    tb_total["deaths"] *= 1000
+
+    # Blank known upstream errors in the age distribution (see un_wpp.corrections.yml). Applied to the
+    # age-disaggregated rows only, on purpose: the errors misdistribute a year's deaths across age
+    # brackets while preserving its total, so `tb_total` (summed from the same source rows) is correct
+    # and must keep its values.
+    tb = paths.apply_corrections(tb)
+
+    # Add the totals back
+    tb = pr.concat([tb_total, tb], ignore_index=True)
 
     # Merge
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="outer")
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
     return tb
 
 
@@ -587,7 +599,7 @@ def process_fertility(tb: Table) -> Table:
     tb = tb.loc[tb["age"] != "55-59"]
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     return tb
 
@@ -641,7 +653,7 @@ def process_mortality(tb: Table) -> Table:
     tb["mortality_rate"] /= 10
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     return tb
 
@@ -673,6 +685,7 @@ def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> T
             "Medium": "medium",
             "Low": "low",
             "High": "high",
+            "Zero migration": "zero_migration",
         },
         strict=False,
     )
@@ -683,7 +696,7 @@ def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> T
     if "age" not in tb.columns:
         tb["age"] = "all"
 
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     return tb
 
@@ -712,7 +725,7 @@ def estimate_sex_ratio(tb: Table, age_groups: list[str] | None = None):
 
 def set_variant_to_estimates(tb: Table) -> Table:
     """For data before YEAR_SPLIT, make sure to have variant = 'estimates'."""
-    tb["variant"] = tb["variant"].astype("string")
+    tb["variant"] = tb["variant"].astype("str")
     tb.loc[tb["year"] < YEAR_SPLIT, "variant"] = "estimates"
     return tb
 

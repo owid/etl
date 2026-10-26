@@ -5,14 +5,14 @@
 """Declarative corrections for known upstream data errors.
 
 A `.corrections.yml` file sits next to a step (exactly like `.excluded_countries.json`) and records
-known errors in the *source* data together with the local fix we apply until the provider fixes them.
+known errors in the *source* data together with the local fix we apply until the producer fixes them.
 One entry per error. This replaces scattered inline `.loc[...]` / `.drop(...)` exceptions with a single
-auditable record that carries the reason, provider and reporting status.
+auditable record that carries the reason, producer and reporting status.
 
 The mechanism is channel-agnostic (it works wherever `PathFinder.apply_corrections` is called), but
 **garden is the default home**: a correction is a judgment about the data, its `entity`/`year` locators
 are only canonical after garden harmonization, and some corrections target derived/rescaled columns that
-don't exist upstream. Keep meadow/snapshot a faithful mirror of the provider — reserve them for raw
+don't exist upstream. Keep meadow/snapshot a faithful mirror of the producer — reserve them for raw
 transcription typos that are wrong before any OWID processing and shared across multiple consumers.
 
 Format (a list of entries)::
@@ -22,9 +22,20 @@ Format (a list of entries)::
       years: [2006, 2008, 2016]                 # list | all | latest | {after/before/from/to: Y}
       action: drop                              # drop | override | scale | flag
       reason: Negative consumption-based CO2 (physically impossible) in source data.
-      provider: Global Carbon Project
-      reported: 2024-11-13                       # optional — when we told the provider
+      producer: Global Carbon Project
+      reported: 2024-11-13                       # optional — when we told the producer
       status: reported                           # open | reported | acknowledged | fixed_upstream
+
+When the same error affects several columns of the same rows, ``indicator`` can be a list. The entry
+then applies to each column separately, as if written once per column (including its ``expect`` guard
+and the ``value`` shorthand in ``match``)::
+
+    - indicator: [arrivals_from_africa, arrivals_from_europe]
+      entity: Pakistan
+      years: {from: 2020}
+      action: override
+      value: null
+      ...
 
 Rows can also be located by their current value instead of entity+years::
 
@@ -40,6 +51,18 @@ a relationship between two columns rather than a fixed constant::
     - indicator: barn
       match: {country: Belgium, year: 2025, value: {column: free_range}}
       action: drop                                # drop the row where barn == free_range
+      ...
+
+In a table with more dimensions than entity and year, ``entity`` + ``years`` can be combined with a
+``match`` on the other columns, and the entry selects the rows that satisfy both. The entity and year
+are then given only once: a ``match`` that also names the entity or year column is rejected::
+
+    - indicator: death_rate
+      entity: Malta
+      years: {from: 1973, to: 1981}
+      match: {age_group: over 85 years}
+      action: override
+      value: null
       ...
 
 Actions:
@@ -66,9 +89,9 @@ self-validating (the row vanishing trips the no-match assertion), but ``override
 so ``expect`` is how they detect an upstream fix. It cannot be combined with ``flag``.
 
 There is intentionally no ``id`` field — a stable identifier is derived from the entry's target
-(provider / indicator / entity+years or match) for logs and error messages.
+(producer / indicator / entity+years or match) for logs and error messages.
 
-This module is the mechanism only. The cross-dataset dashboard, per-provider report generator and
+This module is the mechanism only. The cross-dataset dashboard, per-producer report generator and
 auto-expiry on re-ingestion are deliberately out of scope here.
 """
 
@@ -126,7 +149,15 @@ def load_corrections(path: Path | str) -> list[dict[str, Any]]:
     for correction in corrections:
         _validate_correction(correction, path)
 
-    return corrections
+    # Expand list-valued `indicator` entries into one entry per column, so everything downstream
+    # (applying, auditing, the CLI inventory) only ever sees a single indicator.
+    return [
+        {**correction, "indicator": indicator}
+        for correction in corrections
+        for indicator in (
+            correction["indicator"] if isinstance(correction["indicator"], list) else [correction["indicator"]]
+        )
+    ]
 
 
 def _label(correction: dict[str, Any]) -> str:
@@ -134,12 +165,12 @@ def _label(correction: dict[str, Any]) -> str:
 
     There is no `id` field to invent — we derive a label from what the correction targets.
     """
-    target = (
-        f"{correction.get('entity')} {correction.get('years')}"
-        if "entity" in correction
-        else f"match {correction.get('match')}"
-    )
-    return f"{correction.get('provider', '?')} / {correction.get('indicator', '?')} / {target}"
+    parts = []
+    if "entity" in correction:
+        parts.append(f"{correction.get('entity')} {correction.get('years')}")
+    if "match" in correction:
+        parts.append(f"match {correction.get('match')}")
+    return f"{correction.get('producer', '?')} / {correction.get('indicator', '?')} / {' '.join(parts)}"
 
 
 def _validate_correction(correction: Any, path: Path | str) -> None:
@@ -149,8 +180,15 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
 
     label = _label(correction)
 
-    for field in ("indicator", "action", "reason", "provider", "status"):
+    for field in ("indicator", "action", "reason", "producer", "status"):
         assert correction.get(field) not in (None, ""), f"Correction [{label}] in {path} is missing required '{field}'."
+
+    indicator = correction["indicator"]
+    indicators = indicator if isinstance(indicator, list) else [indicator]
+    assert indicators and all(isinstance(ind, str) and ind for ind in indicators), (
+        f"Correction [{label}]: 'indicator' must be a column name or a non-empty list of column names."
+    )
+    assert len(set(indicators)) == len(indicators), f"Correction [{label}]: 'indicator' lists a column twice."
 
     action = correction["action"]
     assert action in VALID_ACTIONS, (
@@ -160,9 +198,13 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
         f"Correction [{label}]: invalid status '{correction['status']}' (expected one of {VALID_STATUSES})."
     )
 
-    has_entity_years = "entity" in correction and "years" in correction
+    # `entity` and `years` only work as a pair; one without the other would be silently ignored.
+    assert ("entity" in correction) == ("years" in correction), (
+        f"Correction [{label}]: 'entity' and 'years' must be given together."
+    )
+    has_entity_years = "entity" in correction
     has_match = "match" in correction
-    assert has_entity_years ^ has_match, f"Correction [{label}]: specify exactly one of (entity + years) or match."
+    assert has_entity_years or has_match, f"Correction [{label}]: specify (entity + years), match, or both."
 
     if has_match:
         match = correction["match"]
@@ -171,10 +213,13 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
         assert isinstance(match, dict) and len(match) > 0, (
             f"Correction [{label}]: 'match' must be a non-empty mapping of column → value."
         )
-        # `entity`/`years` only apply to the entity+years form; mixing them with `match` is a mistake
-        # (they would be silently ignored), so reject the combination.
-        mixed = {"entity", "years"} & set(correction)
-        assert not mixed, f"Correction [{label}]: do not combine 'match' with {sorted(mixed)}."
+        # Combined with entity + years, `match` narrows the other dimensions only, so the entity and year
+        # are stated once. Custom entity/year column names are checked again when the correction is applied.
+        if has_entity_years:
+            duplicated = {DEFAULT_COUNTRY_COL, DEFAULT_YEAR_COL} & set(match)
+            assert not duplicated, (
+                f"Correction [{label}]: {sorted(duplicated)} given both in 'match' and as entity + years."
+            )
         # A match value may reference another column of the same row (`{column: <name>}`) instead of a
         # literal. Reject any other dict shape now, rather than letting it silently build an all-false
         # mask (a literal `==` against a dict never matches) that only surfaces as a confusing
@@ -290,18 +335,25 @@ def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col:
     index_names = [name for name in tb.index.names if name is not None]
     label = _label(correction)
 
+    mask = np.ones(len(tb), dtype=bool)
+
+    if "entity" in correction:
+        mask &= _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
+        mask &= _year_mask(correction["years"], _column_values(tb, year_col, index_names), label)
+
     if "match" in correction:
-        mask = np.ones(len(tb), dtype=bool)
+        if "entity" in correction:
+            duplicated = {country_col, year_col} & set(correction["match"])
+            assert not duplicated, (
+                f"Correction [{label}]: {sorted(duplicated)} given both in 'match' and as entity + years."
+            )
         for key, value in correction["match"].items():
             # `value` is shorthand for the indicator column; any other key matches that column by name.
             col = correction["indicator"] if key == "value" else key
             target = _resolve(tb, value, index_names, label)
             mask &= _eq_mask(_column_values(tb, col, index_names), target)
-        return mask
 
-    entity_mask = _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
-    year_values = _column_values(tb, year_col, index_names)
-    return entity_mask & _year_mask(correction["years"], year_values, label)
+    return mask
 
 
 def _check_expectation(tb: Table, correction: dict[str, Any], mask: np.ndarray, label: str) -> None:

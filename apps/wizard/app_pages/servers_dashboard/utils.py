@@ -1,10 +1,10 @@
 """Utilities for fetching and processing LXC staging server data."""
 
-import json
+import os
 import subprocess
-import time
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import quote
 
 import pandas as pd
 import requests
@@ -13,18 +13,20 @@ from structlog import get_logger
 
 from apps.owidbot.cli import get_cloudflare_subdomain
 from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
+from etl.http import session as http_session
 
 log = get_logger()
 
-# LXC host that staging servers live on. The fetch/destroy/stop/start commands all
-# target this host (matching ops/templates/lxc-manager/*), so keep it in one place.
-LXC_HOST = "gaia-1"
+# The staging API on lxc-manager-1 (ops: infra/staging_api). It lists, wakes, stops,
+# restarts and destroys the staging servers with owid-lxc, and reports their LXC host's
+# memory. Override STAGING_API_URL to point the dashboard at another instance.
+STAGING_API_URL = os.environ.get("STAGING_API_URL", "http://lxc-manager-1.tail6e23.ts.net:8090")
 
 # Auto-stop lifecycle, mirrored from the ops reaper cron
 # (ops/templates/lxc-manager/stop_staging_containers.py). A running container is stopped (idled,
-# data preserved) once its most recent sign of activity — max(latest commit, last *start*) — is
-# older than STOP_AFTER_DAYS. We recompute that here so the dashboard's "Auto-stop" column agrees
-# with what the cron will actually do. Keep these in sync with that script.
+# data preserved) once its most recent sign of activity — max(latest commit, last deliberate
+# *wake*) — is older than STOP_AFTER_DAYS. We recompute that here so the dashboard's "Auto-stop"
+# column agrees with what the cron will actually do. Keep these in sync with that script.
 STOP_AFTER_DAYS = 14
 # Container the reaper skips explicitly — never auto-stopped.
 PERSISTENT_CONTAINERS = {"staging-site-master"}
@@ -33,135 +35,55 @@ PERSISTENT_CONTAINERS = {"staging-site-master"}
 COMMIT_LOOKUP_FAILED = "Unable to retrieve"
 
 
-@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
-def fetch_host_memory_stats(host: str = "gaia-1") -> tuple[dict | None, str | None]:
-    """
-    Fetch host memory statistics from the LXC host.
+# (connect, read). The API bounds every step it runs and answers 504 when one hangs, so the
+# read timeout is only a backstop for a request that never returns; connecting fails fast.
+REQUEST_TIMEOUT = (10, 600)
 
-    Args:
-        host: LXC host to query (default: gaia-1)
 
-    Returns:
-        Tuple of (memory stats dict, error message if any)
-    """
+def _call_api(method: str, path: str, timeout: tuple[float, float] = REQUEST_TIMEOUT) -> tuple[Any, str | None]:
+    """Call the staging API. Returns (JSON body, None), or (None, an error message for the UI)."""
+    url = f"{STAGING_API_URL}{path}"
+    log.info("Staging API call", method=method, path=path)
     try:
-        cmd = f"ssh owid@{host} 'free -b'"  # Use bytes for precise calculation
-        log.info("Fetching host memory stats", command=cmd, host=host)
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=10)
-
-        if result.returncode != 0:
-            error_msg = f"SSH command failed with return code {result.returncode}: {result.stderr}"
-            log.error("Host memory command failed", error=error_msg)
-            return None, error_msg
-
-        # Parse free command output
-        lines = result.stdout.strip().split("\n")
-        if len(lines) < 3:
-            return None, "Invalid free command output - missing swap line"
-
-        # Parse memory line (second line)
-        mem_line = lines[1].split()
-        if len(mem_line) < 3:
-            return None, "Could not parse memory information"
-
-        # Parse swap line (third line)
-        swap_line = lines[2].split()
-        if len(swap_line) < 3:
-            return None, "Could not parse swap information"
-
-        # Memory calculations
-        total_bytes = int(mem_line[1])
-        # used_bytes = int(mem_line[2])
-        available_bytes = int(mem_line[6]) if len(mem_line) >= 7 else int(mem_line[3])
-
-        # Calculate "actually used" memory (total - available)
-        actually_used_bytes = total_bytes - available_bytes
-
-        # Swap calculations
-        swap_total_bytes = int(swap_line[1])
-        swap_used_bytes = int(swap_line[2])
-
-        memory_stats = {
-            "total_gb": round(total_bytes / (1024**3), 1),
-            "used_gb": round(actually_used_bytes / (1024**3), 1),
-            "available_gb": round(available_bytes / (1024**3), 1),
-            "usage_pct": round((actually_used_bytes / total_bytes) * 100, 1),
-            "swap_total_gb": round(swap_total_bytes / (1024**3), 1),
-            "swap_used_gb": round(swap_used_bytes / (1024**3), 1),
-            "swap_usage_pct": round((swap_used_bytes / swap_total_bytes) * 100, 1) if swap_total_bytes > 0 else 0,
-        }
-
-        log.info("Successfully fetched host memory stats", stats=memory_stats, host=host)
-        return memory_stats, None
-
-    except subprocess.TimeoutExpired:
-        error_msg = "SSH command timed out after 10 seconds"
-        log.error("Host memory command timeout", host=host)
-        return None, error_msg
-    except Exception as e:
-        error_msg = f"Unexpected error: {str(e)}"
-        log.error("Unexpected error fetching host memory", error=error_msg, host=host)
-        return None, error_msg
-
-
-@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
-def fetch_lxc_servers_data(host: str = "gaia-1") -> tuple[pd.DataFrame | None, str | None]:
-    """
-    Fetch LXC server information from the specified host.
-
-    Args:
-        host: LXC host to query (default: gaia-1)
-
-    Returns:
-        Tuple of (DataFrame with server data, error message if any)
-    """
+        # the API refuses changes without this header (it keeps cross-site pages out)
+        resp = http_session.request(method, url, timeout=timeout, headers={"X-Staging-Client": "wizard"})
+    except requests.RequestException as e:
+        log.error("Staging API unreachable", url=url, error=str(e))
+        return None, f"Staging API unreachable ({url}): {e}"
     try:
-        # Execute the LXC command to get server info
-        cmd = f"LXC_HOST={host} owid-lxc info $(LXC_HOST={host} owid-lxc list) --json"
-        log.info("Fetching LXC server data", command=cmd, host=host)
+        body = resp.json()
+    except ValueError:
+        body = None
+    if not resp.ok:
+        detail = body.get("detail", resp.text) if isinstance(body, dict) else resp.text
+        log.error("Staging API error", url=url, status=resp.status_code, detail=detail)
+        return None, f"Staging API returned {resp.status_code}: {detail}"
+    if body is None:
+        log.error("Staging API answered without JSON", url=url, preview=resp.text[:200])
+        return None, f"Staging API answered without JSON ({url})"
+    return body, None
 
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=30,  # 30 second timeout
-        )
 
-        if result.returncode != 0:
-            error_msg = f"Command failed with return code {result.returncode}: {result.stderr}"
-            log.error("LXC command failed", cmd=cmd, error=error_msg, stdout=result.stdout)
-            return None, error_msg
+@st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
+def fetch_host_memory_stats() -> tuple[dict | None, str | None]:
+    """Memory and swap of the LXC host the staging servers live on, in GB and percent."""
+    return _call_api("GET", "/host/memory")
 
-        # Parse JSON response
-        try:
-            data = json.loads(result.stdout)
-        except json.JSONDecodeError as e:
-            error_msg = f"Failed to parse JSON response: {e}"
-            log.error("JSON parsing failed", error=error_msg, stdout_preview=result.stdout[:200])
-            return None, error_msg
 
-        # Convert to DataFrame
-        df = pd.DataFrame(data)
+@st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
+def fetch_lxc_servers_data() -> tuple[pd.DataFrame | None, str | None]:
+    """Every staging server, as `owid-lxc info --json` reports it, processed for display."""
+    data, error = _call_api("GET", "/servers")
+    if error:
+        return None, error
 
-        if df.empty:
-            return df, None
-
-        # Process and enrich the data
-        df = _process_server_data(df)
-
-        log.info("Successfully fetched LXC server data", server_count=len(df), host=host)
+    df = pd.DataFrame(data)
+    if df.empty:
         return df, None
 
-    except subprocess.TimeoutExpired:
-        error_msg = "Command timed out after 30 seconds"
-        log.error("LXC command timeout", host=host)
-        return None, error_msg
-    except Exception as e:
-        error_msg = f"Unexpected error: {str(e)}"
-        log.error("Unexpected error fetching LXC data", error=error_msg, host=host)
-        return None, error_msg
+    df = _process_server_data(df)
+    log.info("Fetched staging server data", server_count=len(df))
+    return df, None
 
 
 def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -191,13 +113,18 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     df["etl_commit_parsed"] = pd.to_datetime(df["etl_last_commit"], errors="coerce")
     df["grapher_commit_parsed"] = pd.to_datetime(df["grapher_last_commit"], errors="coerce")
 
-    # Last *start* time (bumped by LXC only on container start, not exec/ssh). This is what the
-    # reaper counts alongside commits, so a freshly-woken server isn't stopped the same night.
-    if "last_used_at" not in df.columns:
-        df["last_used_at"] = None
-    # format="ISO8601" handles LXC's variable fractional-second precision (and None) without the
-    # per-element dateutil fallback that pandas warns about.
-    df["last_used_parsed"] = pd.to_datetime(df["last_used_at"], errors="coerce", format="ISO8601")
+    # Last deliberate wake, stamped on the container by `owid-lxc start` (which is what the Wake
+    # button runs). This is what the reaper counts alongside commits, so a freshly-woken server
+    # isn't stopped the same night.
+    #
+    # Not LXD's own `last_used_at`: that is bumped by *any* start, and the weekly gaia-1 reboot
+    # restores every running container, so it read as "restarted last Monday" fleet-wide and the
+    # reaper could never reach the 14-day threshold for anything.
+    if "woken_at" not in df.columns:
+        df["woken_at"] = None
+    # format="ISO8601" handles both the plain "…Z" stamp we write and any fractional-second
+    # variant (and None) without the per-element dateutil fallback that pandas warns about.
+    df["woken_parsed"] = pd.to_datetime(df["woken_at"], errors="coerce", format="ISO8601")
 
     # Calculate days since last commit
     df["etl_days_old"] = _calculate_days_since_commit(df["etl_commit_parsed"])
@@ -412,9 +339,9 @@ def _format_last_commit_neutral(row: pd.Series) -> str:
 def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
     """When (and why) the reaper will stop this server, mirroring stop_staging_containers.py.
 
-    The cron stops a running container once max(latest commit, last start) is older than
+    The cron stops a running container once max(latest commit, last wake) is older than
     STOP_AFTER_DAYS. We surface the countdown plus the reason it's still alive, so an old commit
-    next to a recent restart no longer reads as "should be dead".
+    next to a recent wake no longer reads as "should be dead".
     """
     # Idle servers are already stopped — the action is Wake, not a countdown.
     if row["status"] != "Running":
@@ -427,8 +354,8 @@ def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
         return "❓ won't auto-stop (commit unreadable)"
 
     commit_date = _latest_commit_date(row)
-    last_used = _as_utc(row["last_used_parsed"]) if pd.notna(row["last_used_parsed"]) else pd.NaT
-    candidates = [d for d in (commit_date, last_used) if pd.notna(d)]
+    woken = _as_utc(row["woken_parsed"]) if pd.notna(row["woken_parsed"]) else pd.NaT
+    candidates = [d for d in (commit_date, woken) if pd.notna(d)]
     # No commit date at all → cron can't judge and skips it; mirror that rather than guess.
     if pd.isna(commit_date) or not candidates:
         return "❓ won't auto-stop (no commit date)"
@@ -436,9 +363,9 @@ def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
     last_activity = max(candidates)
     days_left = STOP_AFTER_DAYS - (now - last_activity).days
 
-    # Which signal is keeping it alive — a recent restart or a recent commit?
-    if pd.notna(last_used) and last_used >= commit_date:
-        reason = f"restarted {last_used.strftime('%b %-d')}"
+    # Which signal is keeping it alive — a recent wake or a recent commit?
+    if pd.notna(woken) and woken >= commit_date:
+        reason = f"woken {woken.strftime('%b %-d')}"
     else:
         reason = f"commit {commit_date.strftime('%b %-d')}"
 
@@ -569,180 +496,54 @@ def reset_mysql_database(server_name: str) -> tuple[bool, str]:
         return False, error_msg
 
 
+def _server_path(server_name: str) -> str:
+    return f"/servers/{quote(server_name, safe='')}"
+
+
 def start_server(server_name: str) -> tuple[bool, str]:
     """
-    Wake up an idle (stopped) staging server with ``owid-lxc start``.
+    Wake up an idle (stopped) staging server.
 
     The container's data is preserved while it's stopped, so starting it brings the
     server back in seconds — no commit or rebuild needed. This replaces the obscure
     "push an empty commit" trick for idle servers.
-
-    Args:
-        server_name: Full server name (e.g., staging-site-branch-name)
-
-    Returns:
-        Tuple of (success, message)
     """
-    cmd = f"LXC_HOST={LXC_HOST} owid-lxc start {server_name}"
-    # Starting also runs a tailscale login and a short readiness delay, so allow time.
-    ok, msg = _run_lxc_command(cmd, server_name, action="start", timeout=180)
-    if not ok:
-        return ok, msg
-
-    # `owid-lxc start` re-authenticates the container to Tailscale, but that step can fail
-    # silently (it's only a warning in owid-lxc). When it does, the container is Running but
-    # logged out of Tailscale, so its hostname doesn't resolve and admin/SSH are unreachable —
-    # the wake looks successful but the server is effectively dead. Verify it actually rejoined
-    # the tailnet and report honestly instead of a misleading success.
-    if _is_on_tailnet(server_name):
-        return True, f"Server {server_name} is awake and on the tailnet."
-    return False, (
-        f"Server {server_name} started, but it is NOT on the Tailscale network, so it's "
-        "unreachable by hostname (admin/SSH won't work). Tailscale failed to re-authenticate on "
-        "wake. Try waking it again; if it keeps failing, Tailscale must be re-authenticated on the host."
-    )
-
-
-def _is_on_tailnet(server_name: str, attempts: int = 3, delay: int = 5) -> bool:
-    """
-    Return True if the container is logged into Tailscale (has a 100.x tailnet IP).
-
-    Uses ``owid-lxc exec`` (host-level ``lxc exec``, which works even when Tailscale is down), so
-    it can distinguish a container that's running-and-on-the-tailnet from one that started but
-    failed its Tailscale login. Retries briefly to absorb the race right after start.
-    """
-    for attempt in range(attempts):
-        try:
-            result = subprocess.run(
-                f"LXC_HOST={LXC_HOST} owid-lxc exec {server_name} -- tailscale ip -4",
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-            if result.returncode == 0 and result.stdout.strip().startswith("100."):
-                return True
-        except subprocess.TimeoutExpired:
-            log.warning("Tailscale check timed out", server=server_name, attempt=attempt)
-        if attempt < attempts - 1:
-            time.sleep(delay)
-    return False
+    # the API's start also logs the server in to Tailscale and fails if that fails, so a
+    # success means it's reachable by hostname
+    _, error = _call_api("POST", f"{_server_path(server_name)}/start")
+    if error:
+        return False, error
+    return True, f"Server {server_name} is awake and on the tailnet."
 
 
 def stop_server(server_name: str) -> tuple[bool, str]:
     """
     Put a running staging server to sleep (make it idle).
 
-    Mirrors the ops cron (``stop_staging_containers.py``): take a ``pre-stop`` snapshot
-    first so the state can be recovered, then stop the container. The data is preserved
-    and the server can be woken later with :func:`start_server`.
-
-    Args:
-        server_name: Full server name (e.g., staging-site-branch-name)
-
-    Returns:
-        Tuple of (success, message)
+    The API takes a ``pre-stop`` snapshot first, as the ops cron does, and doesn't stop the
+    server if the snapshot fails. The data is preserved and the server can be woken later
+    with :func:`start_server`.
     """
-    # Snapshot first (best-effort safety net), then stop — same order as the cron.
-    snapshot_ok, snapshot_msg = _run_lxc_command(
-        f"LXC_HOST={LXC_HOST} owid-lxc snapshot {server_name} pre-stop",
-        server_name,
-        action="snapshot",
-        timeout=120,
-    )
-    if not snapshot_ok:
-        return False, f"Could not take pre-stop snapshot, aborting stop: {snapshot_msg}"
-
-    return _run_lxc_command(
-        f"LXC_HOST={LXC_HOST} owid-lxc stop {server_name}",
-        server_name,
-        action="stop",
-        timeout=120,
-    )
+    _, error = _call_api("POST", f"{_server_path(server_name)}/stop")
+    if error:
+        return False, error
+    return True, f"Server {server_name} stop completed successfully"
 
 
 def restart_server(server_name: str) -> tuple[bool, str]:
-    """
-    Restart a running staging server (stop, then start).
-
-    Args:
-        server_name: Full server name (e.g., staging-site-branch-name)
-
-    Returns:
-        Tuple of (success, message)
-    """
-    stop_ok, stop_msg = _run_lxc_command(
-        f"LXC_HOST={LXC_HOST} owid-lxc stop {server_name}",
-        server_name,
-        action="stop",
-        timeout=120,
-    )
-    if not stop_ok:
-        return False, f"Could not stop server before restart: {stop_msg}"
-
-    return start_server(server_name)
-
-
-def _run_lxc_command(cmd: str, server_name: str, action: str, timeout: int) -> tuple[bool, str]:
-    """Run a simple ``owid-lxc`` action command and return (success, message)."""
-    try:
-        log.info(f"Running owid-lxc {action}", command=cmd, server=server_name)
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
-
-        if result.returncode != 0:
-            error_msg = f"`owid-lxc {action}` failed with return code {result.returncode}: {result.stderr.strip()}"
-            log.error("owid-lxc command failed", error=error_msg, server=server_name, stdout=result.stdout)
-            return False, error_msg
-
-        log.info(f"owid-lxc {action} completed", server=server_name)
-        return True, f"Server {server_name} {action} completed successfully"
-
-    except subprocess.TimeoutExpired:
-        error_msg = f"`owid-lxc {action}` timed out after {timeout} seconds"
-        log.error("owid-lxc command timeout", server=server_name, action=action)
-        return False, error_msg
+    """Restart a running staging server (stop, then start)."""
+    _, error = _call_api("POST", f"{_server_path(server_name)}/restart")
+    if error:
+        return False, error
+    return True, f"Server {server_name} restarted and is on the tailnet."
 
 
 def destroy_server(server_name: str) -> tuple[bool, str]:
-    """
-    Destroy a staging server completely.
-
-    Args:
-        server_name: Full server name (e.g., staging-site-branch-name)
-
-    Returns:
-        Tuple of (success, message)
-    """
-    try:
-        # Command to destroy the LXC container
-        cmd = f"LXC_HOST={LXC_HOST} owid-lxc destroy {server_name}"
-        log.info("Destroying server", command=cmd, server=server_name)
-
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=120,  # 2 minute timeout for destruction
-        )
-
-        if result.returncode != 0:
-            error_msg = f"Server destruction failed with return code {result.returncode}: {result.stderr}"
-            log.error("Server destruction failed", error=error_msg, server=server_name)
-            return False, error_msg
-
-        success_msg = f"Server {server_name} successfully destroyed"
-        log.info("Server destruction completed", server=server_name)
-        return True, success_msg
-
-    except subprocess.TimeoutExpired:
-        error_msg = "Server destruction timed out after 2 minutes"
-        log.error("Server destruction timeout", server=server_name)
-        return False, error_msg
-    except Exception as e:
-        error_msg = f"Unexpected error during server destruction: {str(e)}"
-        log.error("Server destruction error", error=error_msg, server=server_name)
-        return False, error_msg
+    """Destroy a staging server completely. Locked servers are refused."""
+    _, error = _call_api("DELETE", _server_path(server_name))
+    if error:
+        return False, error
+    return True, f"Server {server_name} successfully destroyed"
 
 
 def build_quick_links(branch: str) -> dict[str, str]:
@@ -785,7 +586,7 @@ def _fetch_prs(repo_name: str, params: str, headers: dict, max_pages: int) -> li
     return prs
 
 
-@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes alongside the server data
+@st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
 def fetch_server_owners() -> dict[str, str]:
     """
     Map each staging server's container name to the GitHub login of its PR author.

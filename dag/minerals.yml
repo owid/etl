@@ -34,10 +34,10 @@ steps:
   #
   # Minerals - Minerals explorer.
   #
-  export://explorers/minerals/latest/minerals:
+  viz://explorer/minerals/latest/minerals:
     - data://grapher/minerals/2025-12-15/minerals
   #
   # Minerals - Minerals explorer (multidim).
   #
-  export://multidim/minerals/latest/minerals:
+  viz://chart/minerals/latest/minerals:
     - data://grapher/minerals/2025-12-15/minerals

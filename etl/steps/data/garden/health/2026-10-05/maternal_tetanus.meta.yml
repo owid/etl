@@ -1,0 +1,45 @@
+definitions:
+  presentation:
+    topic_tags:
+      - Child & Infant Mortality
+      - Global Health
+      - Eradication of Diseases
+      - Vaccination
+
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Tuna Acisu
+
+
+tables:
+  maternal_tetanus:
+    variables:
+      elimination_status:
+        title: Elimination status of maternal and neonatal tetanus
+        description_short: Maternal neonatal tetanus is a life-threatening disease that occurs when newborns are infected with [tetanus](#dod:tetanus). It can be prevented through maternal vaccination and hygienic childbirth practices.
+        description_from_producer: |-
+          In many countries, deliveries take place in unhygienic circumstances, putting mothers and their newborn babies at risk of a variety of life-threatening infections.
+
+          Maternal and Neonatal Tetanus (MNT) has been among the most common life-threatening consequences of unclean deliveries and umbilical cord care practices, and are indicators of inequity in access to immunization and other maternal, newborn, and child health services. When tetanus develops, mortality rates are extremely high, especially when appropriate medical care is not available, as is often the case in low-income countries.
+
+          This happens despite the fact that MNT deaths can be easily prevented by hygienic delivery and cord care practices, and/or by immunizing children and women with Tetanus Toxoid Containing Vaccines (TTCV), that are inexpensive and very efficacious, through the life course.
+
+          The Maternal and Neonatal Tetanus Elimination (MNTE) initiative aims to reduce MNT cases to such low levels that the disease is no longer a major public health problem. Unlike polio and smallpox, tetanus cannot be eradicated (tetanus spores are present in the environment worldwide), but through immunization of children, mothers, other women of reproductive age (WRA) and promotion of more hygienic deliveries and cord care practices, MNT can be eliminated (defined as less than one case of neonatal tetanus per 1000 live births in every district).
+        unit: ""
+        presentation:
+          attribution: World Health Organization (2026)
+          topic_tags:
+            - Global Health
+            - Child & Infant Mortality
+            - Maternal Mortality
+          grapher_config:
+            note: The WHO defines elimination of maternal and neonatal tetanus as less than one case per 1,000 live births in every district of a country.
+
+      elimination_year:
+        title: Elimination year
+        description_short: The year in which maternal and neonatal tetanus was eliminated in the country, if applicable.
+        unit: "year"
+
+

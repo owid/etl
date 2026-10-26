@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -69,11 +68,8 @@ def main(upload: bool) -> None:
     period_df = get_aviation_data(url=snap_by_period.metadata.source.url)  # ty: ignore
     nature_df = get_aviation_data(url=snap_by_nature.metadata.source.url)  # ty: ignore
 
-    df_to_file(period_df, file_path=snap_by_period.path)
-    df_to_file(nature_df, file_path=snap_by_nature.path)
-
-    snap_by_period.dvc_add(upload=upload)
-    snap_by_nature.dvc_add(upload=upload)
+    snap_by_period.create_snapshot(data=period_df, upload=upload)
+    snap_by_nature.create_snapshot(data=nature_df, upload=upload)
 
 
 if __name__ == "__main__":

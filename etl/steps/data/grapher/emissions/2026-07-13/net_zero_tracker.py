@@ -35,8 +35,8 @@ def run() -> None:
     # Embed each country's target year in the status value so it shows in the map tooltip.
     status = tb["net_zero_status"]
     is_target = status != NO_TARGET_LABEL
-    with_year = status.astype("string") + " (" + tb["year"].astype("Int64").astype("string") + ")"
-    new_status = status.astype("string")
+    with_year = status.astype("str") + " (" + tb["year"].astype("Int64").astype("str") + ")"
+    new_status = status.astype("str")
     new_status[is_target] = with_year[is_target]
     tb["net_zero_status"] = new_status.copy_metadata(status)
 

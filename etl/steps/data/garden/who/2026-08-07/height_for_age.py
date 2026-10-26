@@ -66,11 +66,27 @@ COLUMNS_RENAME = {
 
 SEXES_RENAME = {"boys": "Boys", "girls": "Girls"}
 
-# The two documented steps down in the curves, as (day before, day after, description).
+# The two documented discontinuities in the curves, as (day before, day after, description).
 # Both are in the source data and are not artifacts of our processing.
 DISCONTINUITIES = [
     (730, 731, "measurement switches from recumbent length to standing height at age 2"),
     (1856, 1857, "the under-fives standards give way to the 5-19 reference at age 5"),
+]
+
+# What every published curve is allowed to do at each discontinuity, as (day after, low, high) in cm.
+# The two behave differently and only the first is a uniform shift, so bounding the median alone --
+# which is all this step used to do -- misses a curve that moves the wrong way at the splice.
+#
+# At age 2 WHO subtracts a single constant: "0.7 cm was therefore added to the cross-sectional height
+# values before merging ... the median curve was shifted back downwards by 0.7 cm for ages above two
+# years" (2006 methods report). Every curve therefore moves together, measured -0.664 to -0.679 cm.
+#
+# At age 5 the two products' fitted standard deviations differ slightly, so the move scales with the
+# z-score instead: measured -0.545 cm at +4 SD down to +0.080 cm at -4 SD for boys, i.e. the lower
+# tail moves *up*. The bounds are asymmetric for that reason.
+DISCONTINUITY_BOUNDS = [
+    (731, -0.80, -0.60),
+    (1857, -0.60, 0.10),
 ]
 
 # Tolerance for reproducing WHO's published values from L, M and S. The published tables
@@ -234,6 +250,7 @@ def sanity_check_inputs(
 def sanity_check_outputs(tb: Table) -> None:
     """Check the spliced table."""
     percentile_columns = [COLUMNS_RENAME[column] for column in PERCENTILES]
+    curve_columns = percentile_columns + [COLUMNS_RENAME[column] for column in ZSCORES]
 
     assert set(tb["sex"]) == {"Boys", "Girls"}, f"Unexpected sexes: {set(tb['sex'])}."
     assert len(tb) == 2 * 2025, f"Expected 4050 rows (2025 ages x 2 sexes), got {len(tb)}."
@@ -268,9 +285,18 @@ def sanity_check_outputs(tb: Table) -> None:
         assert found == expected, (
             f"Median height for {sex} steps down between {sorted(found)}, expected exactly {sorted(expected)}."
         )
-        for before, after, description in DISCONTINUITIES:
-            step = float(median[ages == after][0] - median[ages == before][0])
-            assert -1 < step < 0, f"Step of {step:.3f} cm for {sex} where {description} is out of range."
+        # Every published curve, not just the median, has to move by a documented amount at each
+        # discontinuity -- see DISCONTINUITY_BOUNDS for why the two have different bounds.
+        for (before, after, description), (_, low, high) in zip(DISCONTINUITIES, DISCONTINUITY_BOUNDS):
+            for column in curve_columns:
+                pair = tb_sex.loc[tb_sex["age_days"].isin([before, after]), column]
+                if pair.isna().any():
+                    continue  # -5 SD does not exist below day 1857.
+                step = float(pair.iloc[1] - pair.iloc[0])
+                assert low < step < high, (
+                    f"{column!r} moves {step:+.3f} cm for {sex} where {description}, "
+                    f"outside the documented ({low:+.2f}, {high:+.2f}) cm range."
+                )
 
     # Anchor values, read off WHO's published tables.
     anchors = {

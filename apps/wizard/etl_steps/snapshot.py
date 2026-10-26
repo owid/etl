@@ -11,7 +11,7 @@ from apps.utils.files import generate_step
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
-from apps.wizard.utils.components import preview_file, st_title_with_expert, st_wizard_page_link
+from apps.wizard.utils.components import preview_file, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.paths import SNAPSHOTS_DIR
 
@@ -207,7 +207,6 @@ def render_fields_init():
 
     cols = st.columns([2, 3])
     with cols[0]:
-        # with st_horizontal(vertical_alignment="flex-end"):
         key = "file_extension"
         args = {
             "st_widget": st.text_input,
@@ -370,7 +369,7 @@ def create_snapshot_command(form: SnapshotForm, manual_import_file: str | None =
 #########################################################
 
 # TITLE
-st_title_with_expert("Snapshot **:gray[Create step]**", icon=":material/photo_camera:")
+st.title(":material/photo_camera: Snapshot **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:
@@ -471,7 +470,7 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            st_wizard_page_link("data", width="stretch", border=True)
+            st_wizard_page_link("data-step", width="stretch", border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

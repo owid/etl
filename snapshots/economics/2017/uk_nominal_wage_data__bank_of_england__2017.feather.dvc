@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Bank of England
     title: A millennium of macroeconomic data
-    title_snapshot: A millennium of macroeconomic data - UK nominal wage, price, and real wage data
+    title_snapshot: A millennium of macroeconomic data – UK nominal wage, price, and real wage data
     description_snapshot: |-
       Data on nominal weekly wages was spliced by the Bank of England and is based on the following sources:
       N. Crafts and T. Mills Trends in Real Wages in Britain, 1750-1913, Explorations in Economic History (1994)

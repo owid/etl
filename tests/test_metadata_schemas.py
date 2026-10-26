@@ -351,30 +351,36 @@ def test_snapshot_license_lives_under_origin():
 
 
 def test_multidim_configs_pin_grapher_schema():
-    """Guardrail: every multidim collection config must pin `grapher_schema`.
+    """Guardrail: every multidim chart config must pin a valid `grapher_schema`.
 
-    Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config and
-    migrates outdated configs forward. When no version is given, ETL falls back to
-    `DEFAULT_GRAPHER_SCHEMA`, i.e. it tells Grapher the configs are already current — so a breaking
-    schema change upstream would silently skip the migration for those views.
+    Grapher injects the chart's `grapherConfigSchema` as the `$schema` of each view config
+    (single charts carry it as `$schema` directly) and migrates outdated configs forward. Without a
+    pin there is nothing recording what the config was authored against, and ETL refuses to guess —
+    see `etl.viz.chart.utils.resolve_grapher_schema` for the accepted forms.
 
-    Pinning records the version the config was actually authored against. See
-    `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
+    `Chart` enforces this at run time too (`validate_grapher_schema_pinned`, plus `required`
+    in multidim-schema.json). This test is the fast, offline version: it needs no step run, and it
+    catches a *malformed* pin (`grapher_schema:` with no value, an unquoted octal `011`) that a
+    key-presence check would wave through.
     """
-    missing = []
-    for config_path in sorted(Path(STEP_DIR / "export" / "multidim").glob("**/*.yml")):
+    from etl.viz.chart.utils import default_grapher_schema_version, resolve_grapher_schema
+
+    broken = []
+    for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.y*ml")):
         config = yaml.safe_load(config_path.read_text()) or {}
-        # Only collection configs are in scope; the directory also holds plain data yaml
+        # Only chart configs are in scope; the directory also holds plain data yaml
         # (e.g. un/latest/map_brackets.yml).
         if not isinstance(config, dict) or not {"dimensions", "views"} <= set(config):
             continue
-        if "grapher_schema" not in config:
-            missing.append(str(config_path.relative_to(BASE_DIR)))
+        try:
+            resolve_grapher_schema(config.get("grapher_schema"))
+        except ValueError as e:
+            broken.append(f"{config_path.relative_to(BASE_DIR)}: {e}")
 
-    assert not missing, (
-        "These multidim configs don't pin `grapher_schema`. Add the current version as a "
+    assert not broken, (
+        "These multidim configs don't pin a valid `grapher_schema`. Add the current version as a "
         f'**quoted** string (an unquoted `011` is parsed as octal) — `grapher_schema: "'
-        f'{DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]}"`:\n  ' + "\n  ".join(missing)
+        f'{default_grapher_schema_version()}"`:\n  ' + "\n  ".join(broken)
     )
 
 
@@ -406,12 +412,17 @@ def _local_enum_values(node) -> set | None:
     return values if has_enum_branch else None
 
 
-def _find_enum_drift(upstream_node, local_node, path="grapher_config") -> list[str]:
-    """Recursively compare enums between the upstream grapher schema and the local copy.
+def _find_schema_drift(upstream_node, local_node, path="grapher_config") -> list[str]:
+    """Recursively compare the upstream grapher schema with the local copy.
 
-    Returns drift messages for every upstream enum value that the local schema would reject.
-    Local relaxations (e.g. a field loosened to plain `string`) are skipped, and the local
-    schema is allowed to accept extra values (e.g. `WorldMap` in chartTypes).
+    Returns a drift message for everything upstream accepts that the local copy would reject:
+    - an upstream enum value missing from the local enum,
+    - an upstream nested property missing from a local object that lists its own properties,
+    - a key the local copy requires but upstream doesn't (e.g. upstream relaxing `variableId`).
+
+    Local relaxations are skipped: a node loosened to a plain type or swapped for a `$ref`
+    (no `properties`/`enum` of its own) isn't descended into. The local copy may also accept
+    more than upstream (extra enum values like `WorldMap`, extra properties).
     """
     errors = []
     if not isinstance(upstream_node, dict) or not isinstance(local_node, dict):
@@ -424,13 +435,21 @@ def _find_enum_drift(upstream_node, local_node, path="grapher_config") -> list[s
             if missing:
                 errors.append(f"{path}: local enum is missing upstream values {sorted(missing)}")
 
+    extra_required = set(local_node.get("required", [])) - set(upstream_node.get("required", []))
+    if extra_required:
+        errors.append(f"{path}: local copy requires {sorted(extra_required)}, upstream doesn't")
+
+    local_props = local_node.get("properties")
     for key, up_child in upstream_node.get("properties", {}).items():
-        loc_child = local_node.get("properties", {}).get(key)
-        if loc_child is not None:
-            errors += _find_enum_drift(up_child, loc_child, f"{path}.{key}")
+        if local_props is None:
+            break
+        if key not in local_props:
+            errors.append(f"{path}.{key}: upstream property missing from the local copy")
+        else:
+            errors += _find_schema_drift(up_child, local_props[key], f"{path}.{key}")
 
     if "items" in upstream_node and "items" in local_node:
-        errors += _find_enum_drift(upstream_node["items"], local_node["items"], f"{path}[]")
+        errors += _find_schema_drift(upstream_node["items"], local_node["items"], f"{path}[]")
 
     return errors
 
@@ -445,8 +464,9 @@ def _load_embedded_grapher_config() -> dict:
 
 def test_grapher_config_schema_sync():
     """Verify that the grapher_config block embedded in dataset-schema.json stays in sync with
-    the vendored grapher schema. Detects new properties we're missing and (recursively) enum
-    values the embedded copy would reject — e.g. a new chart type added upstream.
+    the vendored grapher schema. Detects new properties we're missing and, recursively, enum
+    values, nested properties and `required` keys the embedded copy would reject — e.g. a new
+    chart type added upstream.
 
     We maintain a local copy of grapher_config properties (rather than using $ref)
     because our meta.yml files use Jinja templates and {definitions...} references
@@ -488,18 +508,19 @@ def test_grapher_config_schema_sync():
             "from upstream, add it to LOCAL_ONLY_PROPERTIES in this test file."
         )
 
-    # Check that enum values inside shared properties haven't drifted (e.g. a new chart type
-    # added to `tab` or `sortBy` upstream that the embedded copy would reject).
+    # Check that shared properties haven't drifted below the top level: new enum values (e.g. a
+    # new chart type in `tab`), new nested properties (e.g. `map.globe`), or upstream dropping a
+    # `required` key the embedded copy still enforces.
     drift = []
     for prop, up_node in upstream["properties"].items():
         loc_node = local_gc["properties"].get(prop)
         if loc_node is not None:
-            drift += _find_enum_drift(up_node, loc_node, f"grapher_config.{prop}")
+            drift += _find_schema_drift(up_node, loc_node, f"grapher_config.{prop}")
     assert not drift, (
-        "Enum values in schemas/dataset-schema.json → grapher_config have drifted from the\n"
+        "schemas/dataset-schema.json → grapher_config has drifted from the\n"
         f"vendored grapher schema ({VENDORED_GRAPHER_SCHEMA.name}):\n  "
         + "\n  ".join(drift)
-        + "\n\nSync the listed enums (see the /sync-grapher-schema skill)."
+        + "\n\nMirror the listed upstream changes (see the /sync-grapher-schema skill)."
     )
 
     # Check for local properties removed from upstream (excluding known local-only ones)
@@ -509,6 +530,26 @@ def test_grapher_config_schema_sync():
             "Local grapher_config has properties not in upstream schema (may be deprecated)",
             properties=sorted(removed),
         )
+
+
+def test_schemas_have_no_duplicate_keys():
+    """`json.load` silently keeps the last of two same-named keys, so a stale duplicate block
+    (e.g. a property pasted twice while syncing) would hide the copy that actually gets edited."""
+
+    def _reject_duplicates(pairs):
+        keys = [k for k, _ in pairs]
+        dupes = sorted({k for k in keys if keys.count(k) > 1})
+        if dupes:
+            raise ValueError(f"duplicate keys {dupes}")
+        return dict(pairs)
+
+    broken = []
+    for path in sorted(SCHEMAS_DIR.glob("*.json")):
+        try:
+            json.loads(path.read_text(), object_pairs_hook=_reject_duplicates)
+        except ValueError as e:
+            broken.append(f"{path.name}: {e}")
+    assert not broken, "Schemas with duplicate keys:\n  " + "\n  ".join(broken)
 
 
 @pytest.mark.integration
@@ -541,14 +582,53 @@ def test_no_newer_grapher_schema_version():
     when that moves past DEFAULT_GRAPHER_SCHEMA, we should consider bumping. See the
     "Version bump" section of the /sync-grapher-schema skill.
     """
+    from etl.config import GRAPHER_SCHEMA_LATEST_URL
     from etl.http import session
 
-    latest_url = DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[0] + "/grapher-schema.latest.json"
-    resp = session.get(latest_url, timeout=30)
+    resp = session.get(GRAPHER_SCHEMA_LATEST_URL, timeout=30)
     resp.raise_for_status()
     latest_id = resp.json().get("$id")
     assert latest_id == DEFAULT_GRAPHER_SCHEMA, (
         f"Upstream published a newer grapher schema: {latest_id} "
         f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
-        "Follow the 'Version bump' section of the /sync-grapher-schema skill to upgrade."
+        "Run `python scripts/generate_schema_types.py --bump-version` and follow /sync-grapher-schema."
     )
+
+
+def test_default_grapher_schema_is_derived_from_the_vendored_copy():
+    """`DEFAULT_GRAPHER_SCHEMA` must name the schema we actually have on disk.
+
+    It is derived from the vendored file's own `$id` rather than written out in `etl/config.py`,
+    so the two can't drift apart. This test pins the contract the derivation provides: exactly one
+    vendored `grapher-schema.NNN.json`, whose filename matches its `$id`.
+    """
+    from etl.config import vendored_grapher_schema_id
+
+    vendored = sorted(SCHEMAS_DIR.glob("grapher-schema.[0-9][0-9][0-9].json"))
+    assert len(vendored) == 1, f"Expected exactly one vendored grapher schema, found {[p.name for p in vendored]}"
+    assert DEFAULT_GRAPHER_SCHEMA == vendored_grapher_schema_id()
+    assert DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1] == vendored[0].name
+    assert json.loads(vendored[0].read_text())["$id"] == DEFAULT_GRAPHER_SCHEMA
+
+
+def test_vendored_schema_id_rejects_broken_states(tmp_path, monkeypatch):
+    """The derivation fails loudly rather than guessing a version.
+
+    Two states that must not resolve silently: more than one (or no) vendored schema — the state a
+    half-done bump leaves behind — and a file whose `$id` disagrees with its filename, since
+    grapher migrates on the `$id` while ETL resolves `$schema` URLs to local files by basename.
+    """
+    import etl.config as config
+
+    monkeypatch.setattr(config, "SCHEMAS_DIR", tmp_path)
+
+    with pytest.raises(RuntimeError, match="Expected exactly one vendored grapher schema"):
+        config.vendored_grapher_schema_id()
+
+    (tmp_path / "grapher-schema.011.json").write_text(json.dumps({"$id": "https://x/grapher-schema.012.json"}))
+    with pytest.raises(RuntimeError, match="doesn't match its filename"):
+        config.vendored_grapher_schema_id()
+
+    (tmp_path / "grapher-schema.012.json").write_text("{}")
+    with pytest.raises(RuntimeError, match="Expected exactly one vendored grapher schema"):
+        config.vendored_grapher_schema_id()

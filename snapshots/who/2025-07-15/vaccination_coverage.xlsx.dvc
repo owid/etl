@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: WHO & UNICEF
-    title: WHO Immunization Data - Vaccination coverage
+    title: WHO Immunization Data – Vaccination coverage
     description: |-
       These estimates are based on quantitative data:
 
@@ -9,7 +9,7 @@ meta:
       2) Survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate).
 
       As such, these estimates are affected by the availability and quality of the underlying empirical data.
-    title_snapshot: Immunization data - Vaccination coverage
+    title_snapshot: Immunization data – Vaccination coverage
     citation_full: |-
       WHO/UNICEF Estimates of National Immunization Coverage (WUENIC), 2023 Revision (completed 15 July 2025), data from 1980-2024.
     attribution_short: WHO/UNICEF

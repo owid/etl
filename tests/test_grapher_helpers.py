@@ -2,6 +2,7 @@ from unittest import mock
 
 import numpy as np
 import pandas as pd
+import pytest
 from owid.catalog import (
     DatasetMeta,
     Table,
@@ -224,3 +225,44 @@ def test_adapt_table_with_dates_preserves_declared_interval():
     tb["value"].metadata.display = {"timeInterval": "month"}
     tb = gh.adapt_table_with_dates_to_grapher(tb)
     assert tb["value"].m.display["timeInterval"] == "month"
+
+
+class _FakeDataset:
+    """Minimal stand-in for catalog.Dataset: grapher_checks only needs a title and its tables."""
+
+    def __init__(self, tables):
+        self.metadata = DatasetMeta(title="Test dataset")
+        self._tables = tables
+
+    def __iter__(self):
+        return iter(self._tables)
+
+
+def test_grapher_checks_rejects_missing_year():
+    # A row with no year is not plottable, and its NA used to survive all the way to the MySQL
+    # upsert, where it failed with an unattributable "boolean value of NA is ambiguous".
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France"],
+            "year": pd.array([2020, None], dtype="Int64"),
+            "value": [1, 2],
+        }
+    )
+    tb = Table(df.set_index(["country", "year"]), short_name="tb")
+
+    with pytest.raises(AssertionError, match="1 row\\(s\\) with a missing `year`"):
+        gh.grapher_checks(_FakeDataset([tb]))
+
+
+def test_grapher_checks_rejects_missing_date():
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France"],
+            "date": pd.to_datetime(pd.Series(["2020-01-01", None])),
+            "value": [1, 2],
+        }
+    )
+    tb = Table(df.set_index(["country", "date"]), short_name="tb")
+
+    with pytest.raises(AssertionError, match="1 row\\(s\\) with a missing `date`"):
+        gh.grapher_checks(_FakeDataset([tb]))

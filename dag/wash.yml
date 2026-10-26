@@ -11,7 +11,7 @@ steps:
     - snapshot://wash/2025-12-08/definitions.xlsx
     - data://meadow/wash/2025-12-08/household:
       - snapshot://wash/2025-12-08/household.xlsx
-  export://explorers/wash/latest/water_and_sanitation:
+  viz://explorer/wash/latest/water_and_sanitation:
     - data://grapher/wash/2025-12-08/household:
       - data://garden/wash/2025-12-08/household
 

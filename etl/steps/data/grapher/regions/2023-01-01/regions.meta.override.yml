@@ -70,14 +70,14 @@ definitions:
     title: Energy Institute world regions
     url_main: https://www.energyinst.org/statistical-review/
     date_accessed: "2026-07-02"
-    citation_full: Energy Institute - Statistical Review of World Energy (2026).
+    citation_full: Energy Institute – Statistical Review of World Energy (2026).
     attribution_short: Energy Institute
   origins_ember: &origins_ember
     producer: Ember
     title: Ember world regions
     url_main: https://ember-energy.org/data/yearly-electricity-data/
     date_accessed: "2026-04-24"
-    citation_full: Ember - Yearly Electricity Data (2026).
+    citation_full: Ember – Yearly Electricity Data (2026).
     attribution_short: Ember
   origins_ihme_gbd: &origins_ihme_gbd
     producer: IHME, Global Burden of Disease
@@ -85,6 +85,12 @@ definitions:
     url_main: https://ghdx.healthdata.org/record/gbd-2023-cause-rei-and-location-hierarchies
     date_accessed: "2026-08-05"
     attribution_short: IHME-GBD
+  origins_ucdp: &origins_ucdp
+    producer: Uppsala Conflict Data Program
+    title: UCDP/PRIO Armed Conflict Dataset codebook
+    url_main: https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261.pdf
+    date_accessed: "2026-10-13"
+    attribution_short: UCDP
 
 tables:
   regions:
@@ -882,5 +888,42 @@ tables:
                   "High-income Asia Pacific (IHME GBD)": "High-income Asia Pacific"
                   "Australasia (IHME GBD)": "Australasia"
                   "Oceania (IHME GBD)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      # UCDP
+      ucdp_region:
+        title: World regions according to UCDP
+        description_short: |-
+          Regions as defined by the Uppsala Conflict Data Program (UCDP).
+        description_key:
+          - "UCDP groups countries into five regions by their number in Gleditsch and Ward's list of independent states: Europe (200–399), Africa (400–626), the Middle East (630–699), Asia (700–999) and the Americas (2–199)."
+          - Egypt (651) is part of the Middle East. The rest of North Africa (Morocco, Algeria, Tunisia, Libya and Sudan) is part of Africa.
+          - UCDP calls its fifth region "Asia". We label it "Asia and Oceania" because it also includes countries such as Australia and Papua New Guinea.
+        description_processing: |-
+          We assign each state in Gleditsch and Ward's list that existed in 1946 or later to its UCDP region. Gleditsch and Ward code 260 is West Germany until 1990 and reunified Germany since, so we assign Germany to Europe.
+        type: ordinal
+        sort:
+          - Americas (UCDP)
+          - Africa (UCDP)
+          - Middle East (UCDP)
+          - Europe (UCDP)
+          - Asia and Oceania (UCDP)
+        origins:
+          - *origins_ucdp
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
+              colorScale:
+                baseColorScheme: OwidCategoricalMap
+                customCategoryLabels:
+                  "Americas (UCDP)": "Americas"
+                  "Africa (UCDP)": "Africa"
+                  "Middle East (UCDP)": "Middle East"
+                  "Europe (UCDP)": "Europe"
+                  "Asia and Oceania (UCDP)": "Asia and Oceania"
                 customHiddenCategories:
                   "No data": true

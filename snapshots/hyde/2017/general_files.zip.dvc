@@ -2,7 +2,7 @@ meta:
   origin:
     producer: PBL Netherlands Environmental Assessment Agency
     title: History Database of the Global Environment
-    title_snapshot: History Database of the Global Environment - General files
+    title_snapshot: History Database of the Global Environment – General files
     description_snapshot: |-
       Metadata for the HYDE 3.2 dataset, such as country codes.
     citation_full: PBL Netherlands Environmental Assessment Agency (2017). History Database of the Global Environment (HYDE) 3.2.

@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: International Union for Conservation of Nature Red List of Threatened Species
-    title: IUCN Red List Summary Statistics - Total, threatened and extinct fish species in each country
+    title: IUCN Red List Summary Statistics – Total, threatened and extinct fish species in each country
     description: |-
       Total number of endemic, threatened endemic and extinct fish species recorded for each country for comprehensively assessed groups only.
     citation_full: |-
@@ -14,6 +14,6 @@ meta:
       name: © International Union for Conservation of Nature and Natural Resources
       url: https://www.iucnredlist.org/terms/terms-of-use
 outs:
-  - md5: 9924ed8bf91f100cac6338e93b5dc637
-    size: 12445
+  - md5: 12fbb41c025cb57280917e4f97ec0ec3
+    size: 14594
     path: endemic_fish.csv

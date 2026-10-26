@@ -801,6 +801,29 @@ steps:
     )
 
 
+def test_write_to_dag_file_add_comments_to_file_without_trailing_line_break():
+    # This is how `etl archive-dag` appends steps to an archive dag file. If the file has no trailing line break, the
+    # comment of the new step must not be glued onto the last line of the file.
+    old_content = """\
+steps:
+  meadow_a:
+    - snapshot_a"""
+    expected_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  # archived; last active in 0123456789ab on 2026-01-01
+  meadow_c:
+    - snapshot_c
+"""
+    _assert_write_to_dag_file(
+        old_content,
+        expected_content,
+        dag_part={"meadow_c": ["snapshot_c"]},
+        comments={"meadow_c": "# archived; last active in 0123456789ab on 2026-01-01"},
+    )
+
+
 def test_write_to_dag_file_with_include_section():
     old_content = """\
 steps:

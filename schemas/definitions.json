@@ -364,7 +364,7 @@
         "description": "Citation of the data product to be used when the automatic format `producer (year)` needs to be overridden.",
         "requirement_level": "optional",
         "examples": [
-          "Energy Institute - Statistical Review of World Energy (2023)"
+          "Energy Institute – Statistical Review of World Energy (2023)"
         ],
         "examples_bad": [
           [
@@ -395,7 +395,7 @@
             "Should only be used if the automatic attribution format `producer (year)` is considered uninformative. For example, when the title of the data product is well known and should be cited along with the producer, or when the original version of the data product should also be mentioned."
           ],
           [
-            "If this field is used to mention the data product, follow the preferred format `{producer} - {title} {version_producer} ({year})` (where `version_producer` may be omitted)."
+            "If this field is used to mention the data product, follow the preferred format `{producer} – {title} {version_producer} ({year})`, with a spaced en dash (–), not a hyphen (where `version_producer` may be omitted)."
           ],
           [
             "If the producer explicitly asked for a specific short citation, follow their guidelines and ignore the above."
@@ -519,9 +519,9 @@
         "type": "string",
         "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product).",
         "examples": [
-          "Penn World Table - National Accounts",
-          "War data - Inter-State Wars",
-          "Global Carbon Budget - Fossil fuels"
+          "Penn World Table – National Accounts",
+          "War data – Inter-State Wars",
+          "Global Carbon Budget – Fossil fuels"
         ],
         "examples_bad": [
           [
@@ -570,7 +570,7 @@
               "value": [
                 "The name of the origin is well known and includes other metadata fields.",
                 [
-                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'.",
+                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product – Specific slice', with a spaced en dash (–), not a hyphen.",
                   {
                     "type": "list",
                     "value": [

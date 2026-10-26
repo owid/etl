@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: WHO Mortality Database
+    title: ICD Codes
+    citation_full: WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2026)
+    attribution_short: WHO
+    url_main: |-
+      https://www.who.int/data/data-collection-tools/who-mortality-database#:~:text=The%20WHO%20Mortality%20Database%20is,death%20as%20reported%20by%20countries
+    url_download: |-
+      https://cdn.who.int/media/docs/default-source/world-health-data-platform/mortality-raw-data/mort_availability.zip?sfvrsn=23261e11_33
+    date_accessed: '2026-10-02'
+    date_published: '2026-02-23'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: c6fc0cda115be1a3a0f9e3bd5f0b17a1
+    size: 223741
+    path: icd_codes.zip

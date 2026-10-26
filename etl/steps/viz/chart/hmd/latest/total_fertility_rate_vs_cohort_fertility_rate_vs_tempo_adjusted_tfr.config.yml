@@ -1,0 +1,34 @@
+grapher_schema: "011"
+chart_config_id: 0193b6c7-f76f-7c98-971b-44581163bdc1
+slug: total-fertility-rate-vs-cohort-fertility-rate-vs-tempo-adjusted-tfr
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#tfr__birth_order_total
+          display:
+            name: Total fertility rate
+            color: '#4c6a9c'
+        - catalogPath: cohort#ccf_plus30y__birth_order_total
+          display:
+            name: Completed cohort fertility rate shifted +30 years
+            color: '#b13507'
+        - catalogPath: period#adjtfr__birth_order_total
+          display:
+            name: Tempo-adjusted total fertility rate
+            color: '#996d39'
+    config:
+      title: Total fertility rate  vs cohort fertility rate vs tempo-adjusted total fertility rate
+      subtitle: 'Three measures of fertility rate are compared: the [total fertility rate](#dod:fertility-rate) (a summary metric based on birth rates across different age groups of women in one particular year); the [completed cohort fertility rate](#dod:cohort-fertility-rate) (the average number of children born to a woman by the end of her childbearing years); and the [tempo-adjusted total fertility rate](#dod:tempo-adjusted-tfr) (which aims to adjust for changes in the timing of childbearing).'
+      note: The completed cohort fertility rate is typically given by the woman's birth year. In this chart, it has been shifted +30 years to see how the two measures compare at roughly the average age of mothers at childbirth.
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - Sweden
+      yAxis:
+        min: 0

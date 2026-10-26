@@ -175,6 +175,25 @@ SECTORS_DAC5 = {
 }
 
 
+# Recipients whose aid is not assigned to a single country: aid to a region as a whole (e.g. "Africa, regional (OECD)"),
+# or to a broader group (e.g. "Developing countries, unspecified (OECD)").
+SUFFIXES_NOT_ASSIGNED = (", regional (OECD)", ", unspecified (OECD)")
+# Annotation shown next to their names in charts.
+ANNOTATION_NOT_ASSIGNED = "not assigned to a single country"
+# Regions whose total is the sum of their subregions and of the aid to the region as a whole (in the OECD's data).
+REGIONS_WITH_PARTS = {
+    "Africa (OECD)": ["North of Sahara (OECD)", "South of Sahara (OECD)", "Africa, regional (OECD)"],
+}
+
+# Entity names this step filters on, as they are after harmonization with the countries.json mapping.
+# NOTE: At every update, check that these still match the mapping: a filter on a name that no longer exists matches
+# nothing and the step runs without error. `sanity_check_entity_names` asserts that each of them is in the data.
+ALL_RECIPIENTS = "All recipients (OECD)"
+MULTILATERAL_DONORS = "Multilateral organizations"
+EU_INSTITUTIONS = "EU institutions"
+NON_DAC_COUNTRIES = "Non-DAC countries"
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -240,6 +259,8 @@ def run() -> None:
         recipient_or_donor="donor",
     )
 
+    sanity_check_entity_names(tb_dac1=tb_dac1, tb_dac2a=tb_dac2a)
+
     tb_dac1 = create_indicators_per_capita(
         tb=tb_dac1, indicator_list=["i_oda_net_disbursements", "oda_grant_equivalents"]
     )
@@ -279,6 +300,7 @@ def run() -> None:
     tb = tb.replace([float("inf"), float("-inf")], None)
 
     sanity_check_outputs(tb=tb, subcomponent_list=INDONOR_SUBCOMPONENTS)
+    names_not_assigned = sanity_check_not_assigned(tb=tb)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -288,7 +310,14 @@ def run() -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_dac2a], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        tables=[tb, tb_dac2a],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        yaml_params={
+            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(
+                f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned
+            )
+        },
     )
 
     # Save changes in the new garden dataset.
@@ -312,7 +341,7 @@ def reformat_table_and_make_it_wide(
         tb = tb[tb[column].isin(CATEGORIES[short_name][column].keys())].reset_index(drop=True)
 
         # Make columns string
-        tb[column] = tb[column].astype("string")
+        tb[column] = tb[column].astype("str")
 
         for category, config in CATEGORIES[short_name][column].items():
             # Rename categories
@@ -393,7 +422,7 @@ def add_donor_data_from_recipient_dataset(tb_donor: Table, tb_recipient: Table) 
     ]
 
     # Select 'All Recipients, Total' in country column
-    tb_recipient = tb_recipient[tb_recipient["country"] == "All recipients (OECD)"].reset_index(drop=True)
+    tb_recipient = tb_recipient[tb_recipient["country"] == ALL_RECIPIENTS].reset_index(drop=True)
 
     # Drop country
     tb_recipient = tb_recipient.drop(columns="country")
@@ -413,8 +442,12 @@ def add_donor_data_from_recipient_dataset(tb_donor: Table, tb_recipient: Table) 
     tb = pr.merge(tb_donor, tb_recipient_grants_loans, on=["country", "year"], how="left")
     tb = pr.merge(tb, tb_recipient_oda, on=["country", "year"], how="outer")
 
-    # Use oda for country Multilaterals, Total
-    tb.loc[tb["country"] == "Multilateral organizations (OECD)", "i_oda_net_disbursements"] = tb["oda"]
+    # Take the ODA of all multilateral organizations from DAC2a. In DAC1, "Multilaterals, Total" only includes EU
+    # institutions, the only multilateral donor that reports to DAC1; the others report to the CRS, which feeds DAC2a.
+    # Years without DAC2a data (e.g. the preliminary latest year) are left empty rather than showing only EU institutions.
+    is_multilateral = tb["country"] == MULTILATERAL_DONORS
+    tb.loc[is_multilateral, "i_oda_net_disbursements"] = tb.loc[is_multilateral, "oda"]
+    sanity_check_multilateral_donors(tb=tb)
 
     # When i_oda_net_disbursements is missing, fill with oda
     tb["i_oda_net_disbursements_multilaterals_private_grants"] = tb["i_oda_net_disbursements"].fillna(tb["oda"])
@@ -602,7 +635,7 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
     # 2.7% of GNI, against a UN target of 0.7%. The mismatch persists in later years too, but only
     # distorts these two visibly. Re-check whether the source has filled in the missing GNI figures.
     tb.loc[
-        (tb["country"] == "Non-DAC countries") & (tb["year"] <= 1991),
+        (tb["country"] == NON_DAC_COUNTRIES) & (tb["year"] <= 1991),
         "i_oda_net_disbursements_share_gni",
     ] = None
 
@@ -746,6 +779,33 @@ def sanity_check_inputs(tb_dac1: Table, tb_dac2a: Table, tb_dac5: Table) -> None
             )
 
 
+def sanity_check_entity_names(tb_dac1: Table, tb_dac2a: Table) -> None:
+    """Check that every entity name this step filters on is in the data, after harmonization."""
+    expected = [
+        (tb_dac1, "country", [MULTILATERAL_DONORS, EU_INSTITUTIONS, NON_DAC_COUNTRIES]),
+        (tb_dac2a, "country", [ALL_RECIPIENTS] + list(REGIONS_WITH_PARTS) + sum(REGIONS_WITH_PARTS.values(), [])),
+        (tb_dac2a, "donor", [MULTILATERAL_DONORS, EU_INSTITUTIONS]),
+    ]
+    for tb, column, names in expected:
+        missing = sorted(set(names) - set(tb[column].astype(str).unique()))
+        assert not missing, (
+            f"Entity names this step filters on are missing from the {column} column: {missing}. They were probably "
+            "renamed in the countries.json mapping; update the constants at the top of this step."
+        )
+
+
+def sanity_check_multilateral_donors(tb: Table) -> None:
+    """All multilateral organizations must give more ODA than EU institutions alone (which are one of them)."""
+    tb_oda = tb[tb["country"].isin([MULTILATERAL_DONORS, EU_INSTITUTIONS])].pivot_table(
+        index="year", columns="country", values="i_oda_net_disbursements", observed=True
+    )
+    both = tb_oda.dropna()
+    assert len(both) > 0 and (both[MULTILATERAL_DONORS] > both[EU_INSTITUTIONS]).all(), (
+        "ODA of all multilateral organizations is not above that of EU institutions in every year: the multilateral "
+        "total is probably DAC1's again, which only includes EU institutions."
+    )
+
+
 def sanity_check_outputs(tb: Table, subcomponent_list: list[str]) -> None:
     """
     Check the combined output table before it is saved.
@@ -788,3 +848,30 @@ def sanity_check_outputs(tb: Table, subcomponent_list: list[str]) -> None:
             f"oda_indonor_{suffix} has a value in {sorted(incomplete_years)}, where the source "
             f"withdrew a component it reported the previous year."
         )
+
+
+def sanity_check_not_assigned(tb: Table) -> list[str]:
+    """Check the recipients whose aid is not assigned to a single country, and return their names.
+
+    Their aid is already included in the totals of their regions, which the metadata tells readers.
+    """
+    recipients = set(tb.loc[tb["oda_recipient"].notna(), "country"])
+    names_not_assigned = sorted(name for name in recipients if name.endswith(SUFFIXES_NOT_ASSIGNED))
+    assert "Africa, regional (OECD)" in names_not_assigned, "Africa, regional is missing from the recipients."
+    # Regional entities must not be named as whole regions.
+    assert not {"Central Asia (OECD)", "South Asia (OECD)"} & recipients, (
+        "A regional entity is named as a whole region."
+    )
+
+    # The total of a region includes the aid to the region as a whole.
+    tb_oda = tb[tb["oda_recipient"].notna()].pivot_table(
+        index=["donor", "year"], columns="country", values="oda_recipient", observed=True
+    )
+    for region, parts in REGIONS_WITH_PARTS.items():
+        both = tb_oda[[region] + parts].dropna()
+        difference = (both[parts].sum(axis=1) - both[region]).abs()
+        assert len(both) > 0 and (difference <= 1e-3 * both[region].abs() + 1e5).all(), (
+            f"{region} is not the sum of {parts}."
+        )
+
+    return names_not_assigned

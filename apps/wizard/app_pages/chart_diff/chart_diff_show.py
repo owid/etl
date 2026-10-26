@@ -6,9 +6,8 @@ If you want to learn more about it, start from its `show` method.
 
 import difflib
 import json
-import os
 from functools import cached_property
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 import streamlit as st
@@ -21,7 +20,7 @@ from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
 from apps.chart_sync.admin_api import AdminAPI
-from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
+from apps.utils.llms import claude
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.citations import st_show_citations
 from apps.wizard.app_pages.chart_diff.conflict_resolver import (
@@ -31,13 +30,13 @@ from apps.wizard.app_pages.chart_diff.conflict_resolver import (
 )
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.io import variable_metadata_df_from_s3
 
 log = get_logger()
 
-# GPT model default
-MODEL_DEFAULT = "gpt-5"
+# Model for the AI summary of metadata changes
+MODEL_DEFAULT = "claude-sonnet-5-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -95,12 +94,6 @@ class ChartDiffShow:
         self.target_session = target_session
         self.expander = expander
         self.show_link = show_link
-
-        # OpenAI
-        if "OPENAI_API_KEY" in os.environ:
-            self.openai_api = OpenAIWrapper()
-        else:
-            self.openai_api = None
 
     @property
     def box_icon(self) -> str:
@@ -484,7 +477,7 @@ class ChartDiffShow:
             st.success("No differences found in the metadata fields relevant for comparison.")
             return
 
-        # Placeholder for GPT summary (filled after the diffs render, so the user isn't blocked on the LLM)
+        # Placeholder for the AI summary (filled after the diffs render, so the user isn't blocked on the LLM)
         container = st.container()
 
         # Show diffs
@@ -496,19 +489,19 @@ class ChartDiffShow:
                 st_show_diff(meta_diff)
 
         with container:
-            self._show_metadata_diff_gpt_summary(meta_diffs)
+            self._show_metadata_diff_ai_summary(meta_diffs)
 
-    def _show_metadata_diff_gpt_summary(self, meta_diffs: dict[int, str]) -> None:
-        """Summarise differences in metadata using GPT."""
-        if self.openai_api is None:
-            st.info("Set `OPENAI_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
+    def _show_metadata_diff_ai_summary(self, meta_diffs: dict[int, str]) -> None:
+        """Summarise differences in metadata with an LLM."""
+        if not claude.has_api_key():
+            st.info("Set `ANTHROPIC_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
             return
 
         # Cache the summary in session state, keyed by the diff content, so re-opening the dialog
         # doesn't re-query the API but a changed diff does.
         # NOTE: Don't use `st.cache_data` here — caching a function that *renders* UI (and returns
         # None) makes the summary render once and then vanish on subsequent calls.
-        cache_key = f"gpt-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
+        cache_key = f"ai-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
         cached = st.session_state.get(cache_key)
 
         with st.chat_message("assistant"):
@@ -516,34 +509,16 @@ class ChartDiffShow:
                 response, cost_msg = cached
                 st.markdown(response)
             else:
-                messages = [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You will be presented with the metadata diffs of various indicators, as a dictionary "
-                            "mapping indicator ID to a unified diff (production → staging). Summarise the main "
-                            "changes at a high level, in a few short bullet points. Group similar changes across "
-                            "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": str(meta_diffs),
-                    },
-                ]
+                system = (
+                    "You will be presented with the metadata diffs of various indicators, as a dictionary "
+                    "mapping indicator ID to a unified diff (production → staging). Summarise the main "
+                    "changes at a high level, in a few short bullet points. Group similar changes across "
+                    "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
+                )
+                stream = claude.TextStream(MODEL_DEFAULT, system, str(meta_diffs), effort="low")
                 try:
-                    stream = self.openai_api.chat.completions.create(
-                        model=MODEL_DEFAULT,
-                        messages=messages,  # ty: ignore
-                        # NOTE: gpt-5 is a reasoning model and reasoning tokens count towards this
-                        # limit; keep it well above the expected summary length or the visible
-                        # output may be empty.
-                        max_completion_tokens=4000,
-                        reasoning_effort="low",
-                        stream=True,
-                    )
                     response = cast(str, st.write_stream(stream))
-                except Exception as e:
+                except claude.APIError as e:
                     st.error(f"AI summary failed: {e}")
                     return
 
@@ -551,12 +526,38 @@ class ChartDiffShow:
                     st.warning("The model returned an empty summary.")
                     return
 
-                # Cost information (estimated with tiktoken, hence lower bounds)
-                text_in = "\n".join([m["content"] for m in messages])
-                cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
-                cost_msg = f"Cost: ≥{cost} USD. Tokens: ≥{num_tokens}."
+                cost_msg = stream.summary
                 st.session_state[cache_key] = (response, cost_msg)
         st.caption(cost_msg)
+
+    def _chart_header_row(self, height: int | Literal["content"] = "content"):
+        """Row for a chart's header: title on the left, admin link pushed to the right.
+
+        A fixed `height` keeps both columns' headers the same size when one of them
+        shows the taller revision selectbox.
+        """
+        return st.container(
+            border=False,
+            height=height,
+            horizontal=True,
+            horizontal_alignment="distribute",
+            vertical_alignment="center",
+        )
+
+    def _show_edit_link(self, owid_env: OWIDEnv, chart_id: int | None) -> None:
+        """Link to a chart's edit page in the admin of the given environment.
+
+        `chart_id` must be the id the chart has *in that environment*: a chart created on
+        staging gets a fresh numeric id when it is synced to production, so the production
+        twin's id and `diff.chart_id` (always the source chart's) can differ.
+
+        Grapher's own "Edit" entry in the share menu never shows up here: we mount the
+        chart with the npm package inside a srcdoc iframe, where none of the signals it
+        uses to detect an internal user (admin cookie, host name) can apply.
+        """
+        if not chart_id:
+            return
+        st.markdown(f"[:material/edit: Edit]({owid_env.admin_site}/charts/{chart_id}/edit)")
 
     def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
@@ -564,7 +565,7 @@ class ChartDiffShow:
         def _show_chart_old():
             last_approved_revision = self.last_approved_revision
             if (last_approved_revision is not None) and (not self.diff.in_conflict):
-                with st.container(height=40, border=False):
+                with self._chart_header_row(height=40):
                     options = {
                         "prod": self._header_production_chart_plain,
                         "last": f"Last approved on staging ({prettify_date(last_approved_revision)} - REV {last_approved_revision.id})",
@@ -576,6 +577,11 @@ class ChartDiffShow:
                         key=f"prod-review-{self.diff.chart_id}",
                         label_visibility="collapsed",
                     )
+                    if option == "prod":
+                        assert self.diff.target_chart is not None
+                        self._show_edit_link(TARGET, self.diff.target_chart.id)
+                    else:
+                        self._show_edit_link(SOURCE, self.diff.chart_id)
 
                 if option == "prod":
                     self._show_tags_if_changed(self.diff.target_chart, self.target_session)
@@ -585,10 +591,13 @@ class ChartDiffShow:
                     grapher_chart(chart_config=last_approved_revision.config, owid_env=SOURCE)
                     return last_approved_revision.config, False
             else:
-                if self.diff.in_conflict:
-                    st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
-                else:
-                    st.markdown(self._header_production_chart)
+                with self._chart_header_row():
+                    if self.diff.in_conflict:
+                        st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
+                    else:
+                        st.markdown(self._header_production_chart)
+                    assert self.diff.target_chart is not None
+                    self._show_edit_link(TARGET, self.diff.target_chart.id)
 
                 self._show_tags_if_changed(self.diff.target_chart, self.target_session)
 
@@ -599,11 +608,12 @@ class ChartDiffShow:
             return self.diff.target_chart.config, True
 
         def _show_chart_new():
-            if self.last_approved_revision is None:
+            # Match the production column's fixed header height when it shows the
+            # revision selectbox, so both charts start at the same offset.
+            height = "content" if self.last_approved_revision is None else 40
+            with self._chart_header_row(height=height):
                 st.markdown(self._header_staging_chart)
-            else:
-                with st.container(height=40, border=False):
-                    st.markdown(self._header_staging_chart)
+                self._show_edit_link(SOURCE, self.diff.chart_id)
 
             self._show_tags_if_changed(self.diff.source_chart, self.source_session)
 
@@ -633,7 +643,9 @@ class ChartDiffShow:
         # Only one chart: new chart
         is_prod = True
         if self.diff.target_chart is None:
-            st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
+            with self._chart_header_row():
+                st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
+                self._show_edit_link(SOURCE, self.diff.chart_id)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
             config_ref = self.diff.source_chart.config
         # Two charts, actual diff

@@ -14,7 +14,7 @@ def run() -> None:
     #
     # Retrieve snapshot: current year (latest quarterly release).
     # NOTE: 2025 preliminary data is no longer needed — the stable 26.1 release covers it.
-    snap_curr = paths.load_snapshot(short_name="ucdp_ced_v26_01_26_03.csv")
+    snap_curr = paths.load_snapshot(short_name="ucdp_ced_v26_01_26_06.csv")
 
     # Read as table
     tb = snap_curr.read_csv()

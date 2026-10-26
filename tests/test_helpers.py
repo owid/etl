@@ -115,3 +115,52 @@ def test_end_with_punctuation(text, expected):
 def test_end_with_punctuation_missing_values(missing):
     # producer text read out of a table column is a pandas missing value, not None
     assert end_with_punctuation(missing) is missing
+
+
+def test_PathFinder_viz_step_names():
+    """A viz recipe under etl/steps/viz/<channel>/... maps to a `viz://<channel>/...` step name, and back."""
+    pf = PathFinder(str(paths.STEP_DIR / "viz/chart/animal_welfare/latest/banning_of_chick_culling.py"))
+    assert pf.step_type == "viz"
+    assert pf.channel == "chart"
+    assert pf._create_current_step_name() == "viz://chart/animal_welfare/latest/banning_of_chick_culling"
+    assert pf.dest_dir == paths.VIZ_DIR / "chart/animal_welfare/latest/banning_of_chick_culling"
+    assert pf.config_path == paths.STEP_DIR / "viz/chart/animal_welfare/latest/banning_of_chick_culling.config.yml"
+
+    pf = PathFinder(str(paths.STEP_DIR / "viz/static/population/2026-01-26/world_population_growth.py"))
+    assert pf._create_current_step_name() == "viz://static/population/2026-01-26/world_population_growth"
+
+    pf = PathFinder(str(paths.STEP_DIR / "export/github/co2_data/latest/owid_co2.py"))
+    assert pf._create_current_step_name() == "export://github/co2_data/latest/owid_co2"
+    assert pf.dest_dir == paths.EXPORT_DIR / "github/co2_data/latest/owid_co2"
+
+    assert PathFinder._get_attributes_from_step_name("viz://explorer/who/latest/influenza") == {
+        "channel": "explorer",
+        "namespace": "who",
+        "version": "latest",
+        "short_name": "influenza",
+        "is_private": False,
+    }
+    # A dependency step name for a chart is built as a `viz://` step.
+    assert (
+        PathFinder.create_step_name(
+            short_name="conflict_data_source", channel="explorer", namespace="war", version="latest", step_type="viz"
+        )
+        == "viz://explorer/war/latest/conflict_data_source"
+    )
+
+
+def test_create_dataset_does_not_inherit_another_datasets_changelog(tmp_path):
+    parent = catalog.DatasetMeta(
+        short_name="owid_energy",
+        version="2026-09-10",
+        changelog=[{"date": "2026-09-10", "changes": ["Updated."]}],
+    )
+    tb = catalog.Table({"country": ["Spain"], "year": [2020], "a": [1.0]}, short_name="derived").format(
+        ["country", "year"]
+    )
+    # A dataset built from another one's metadata doesn't present the parent's release history as its own.
+    ds = create_dataset(tmp_path / "garden/example/2026-12-01/derived", [tb], default_metadata=parent)
+    assert ds.metadata.changelog == []
+    # A step that keeps the short name (like the dataset's own grapher step) keeps it.
+    ds = create_dataset(tmp_path / "garden/example/2026-09-10/owid_energy", [tb], default_metadata=parent)
+    assert [entry.date for entry in ds.metadata.changelog] == ["2026-09-10"]

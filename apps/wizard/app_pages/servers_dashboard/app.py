@@ -16,7 +16,6 @@ from apps.wizard.app_pages.servers_dashboard.utils import (
     start_server,
     stop_server,
 )
-from apps.wizard.utils.components import st_title_with_expert
 
 # Configure page
 st.set_page_config(
@@ -94,7 +93,7 @@ st.session_state.setdefault("servers_metric_swap", None)
 
 
 # Header
-st_title_with_expert("Staging Servers Dashboard", icon=":material/computer:")
+st.title(":material/computer: Staging Servers Dashboard")
 
 # Add refresh button and auto-refresh controls
 with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
@@ -107,7 +106,7 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
     # Additional information section
     with st.popover("ℹ️ About this Dashboard"):
         st.markdown("""
-        **Data Source**: This dashboard fetches real-time data from LXC containers using the `owid-lxc` command.
+        **Data Source**: This dashboard reads the LXC staging containers through the staging API on `lxc-manager-1`, which runs `owid-lxc` on their host.
 
         **Status Indicators**:
         - 🟢 **Running**: Container is active and operational
@@ -116,10 +115,10 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
         **Last commit**: age of the newest ETL/Grapher commit. This is reference info only — it does **not** by itself decide when a server is stopped.
 
         **Auto-stop** — when (and why) the reaper will stop a server:
-        - A running server is auto-stopped once **max(last commit, last _start_) is older than 14 days**. Stopping just idles it (data preserved); it's not destroyed.
-        - Because *last start* counts, **waking or restarting a server resets the clock** — so a server with an old commit can still be far from being stopped. The column shows the reason (e.g. *restarted Jun 19* vs *commit Jun 19*).
+        - A running server is auto-stopped once **max(last commit, last _wake_) is older than 14 days**. Stopping just idles it (data preserved); it's not destroyed.
+        - Because a *wake* counts, **using the Wake button resets the clock** — so a server with an old commit can still be far from being stopped. The column shows the reason (e.g. *woken Jun 19* vs *commit Jun 19*).
         - 🟢 healthy · 🟡 stops within a few days · 🔴 stops on the next nightly run · ⏸️ already idle · ♾️ persistent (`master`, never auto-stopped) · ❓ can't be judged (commit unreadable).
-        - ⚠️ A **host restart bumps every container's last-start at once**, resetting the timer fleet-wide — so right after a `gaia-1` reboot most servers will read the same countdown regardless of commit age.
+        - Only a **deliberate** wake counts. The weekly `gaia-1` reboot restarts every container, but it does not reset anyone's countdown.
 
         **Destroy** (frees the disk) only happens after the **PR is merged/closed** (~3 days later) — auto-stop never destroys.
 
@@ -151,7 +150,9 @@ with st.spinner("Fetching staging server data...", show_time=True):
 # Handle errors
 if error:
     st.error(f"Failed to fetch server data: {error}")
-    st.info("Please ensure you have access to the LXC host and the `owid-lxc` command is available.")
+    st.info(
+        "The dashboard reads from the staging API on lxc-manager-1 (ops: infra/staging_api). Check that it's running and reachable from this machine."
+    )
     st.stop()
 
 if servers_df is None or servers_df.empty:
@@ -449,8 +450,8 @@ else:
             "Auto-stop": st.column_config.TextColumn(
                 "Auto-stop",
                 help="When the reaper will stop this server, and why it's still alive. A server is "
-                "auto-stopped once max(last commit, last start) exceeds 14 days — so a recent "
-                "restart keeps an old-commit server running. 🟢 healthy · 🟡 stops soon · "
+                "auto-stopped once max(last commit, last wake) exceeds 14 days — so a recent "
+                "wake keeps an old-commit server running. 🟢 healthy · 🟡 stops soon · "
                 "🔴 stops tonight · ⏸️ already idle · ♾️ persistent.",
                 width="medium",
             ),

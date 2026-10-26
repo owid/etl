@@ -7,7 +7,6 @@ import click
 import pandas as pd
 import requests
 from owid.catalog import fetch
-from owid.datautils.io import df_to_file
 from structlog import get_logger
 from tqdm import tqdm
 
@@ -163,11 +162,8 @@ def main(upload: bool) -> None:
 
     # Combine both fires and emissions data into a final DataFrame.
     df_final = pd.concat([dfs_fires, dfs_emissions])
-    # Save the final DataFrame to the specified file path in the snapshot.
-    df_to_file(df_final, file_path=snap.path)  # ty: ignore[invalid-argument-type]
-
-    # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
-    snap.dvc_add(upload=upload)
+    # Save the final DataFrame, add it to DVC and optionally upload it to S3, based on the `upload` parameter.
+    snap.create_snapshot(data=df_final, upload=upload)
 
 
 if __name__ == "__main__":

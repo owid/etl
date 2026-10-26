@@ -11,7 +11,7 @@ meta:
     # Citation
     producer: Eurostat
     citation_full: |-
-      Eurostat - Producer prices in industry, total (2025).
+      Eurostat – Producer prices in industry, total (2025).
 
     # Files
     url_main: https://ec.europa.eu/eurostat/databrowser/view/sts_inpp_m__custom_15280604/default/table?lang=en
