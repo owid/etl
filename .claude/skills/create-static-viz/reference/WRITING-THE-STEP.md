@@ -576,6 +576,14 @@ step's own render:
   17px a line (line height AUTO), while matplotlib's default line spacing lands imported lines about
   15px apart, so a re-import never matches a designer's typed label. With one call per line (above),
   place the lines 17px apart.
+- **Set an arrow's tail clearance from the Figma frame, after the label is re-anchored.** A
+  right-aligned label imports one TEXT per line, and re-anchoring each line on its right edge moves its
+  left end by however much wider Lato sets that line than the step's measuring face: about 3% on
+  average, more on a line with curly quotes or wide capitals. An arrow leaving from that end loses the
+  same air, so measure the tail-to-text gap on the frame, set the step's clearance from it, and measure
+  again after rewording the line. Write the label and aim its arrow by
+  `/owid-staff:create-figma-chart`'s `reference/ANNOTATIONS-AND-ARROWS.md`: no closing period, and a
+  chord that crosses the line it ends on at 45° or more.
 
 ### Porting a designer's rework
 
