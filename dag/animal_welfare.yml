@@ -122,6 +122,14 @@ steps:
   data://garden/defra/2026-10-18/uk_laying_hens_and_chicks:
     - data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks
   #
+  # Eurostat - Laying hen chicks hatched in European countries (activity of hatcheries).
+  #
+  data://meadow/eurostat/2026-10-18/poultry_hatcheries:
+    - snapshot://eurostat/2026-10-18/poultry_hatcheries.gz
+  data://garden/eurostat/2026-10-18/laying_hen_chicks:
+    - data://meadow/eurostat/2026-10-18/poultry_hatcheries
+    - data://garden/regions/2023-01-01/regions
+  #
   # USDA NASS - Laying hens and egg-type chicks in the United States (Quick Stats).
   #
   data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks:

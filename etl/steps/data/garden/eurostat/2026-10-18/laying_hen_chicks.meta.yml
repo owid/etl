@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    unit: chicks
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  laying_hen_chicks:
+    variables:
+      laying_hen_chicks_hatched:
+        title: Laying hen chicks hatched for use
+        description_short: Chicks of laying hen breeds hatched for use by hatcheries in the country during the year.
+      laying_hen_chicks_imported:
+        title: Laying hen chicks imported
+        description_short: Chicks of laying hen breeds imported during the year.
+      laying_hen_chicks_exported:
+        title: Laying hen chicks exported
+        description_short: Chicks of laying hen breeds exported during the year.
+      laying_hen_chicks_placed:
+        title: Laying hen chicks placed
+        description_short: Chicks of laying hen breeds hatched for use in the country, minus those exported, plus those imported, during the year.
+        description_processing: We subtract the chicks exported and add the chicks imported to the chicks hatched for use, in years where Eurostat reports the three.
+      cockerels_from_sexing_hatched:
+        title: Cockerels from sexing hatched for use
+        description_short: Male chicks of laying hen breeds (cockerels from sexing) hatched for use during the year.
