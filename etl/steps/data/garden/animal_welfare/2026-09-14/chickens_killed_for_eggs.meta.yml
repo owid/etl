@@ -60,12 +60,6 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-      chickens_killed_per_1000_eggs:
-        title: Estimated number of chickens killed to produce eggs per 1,000 eggs
-        unit: chickens per 1,000 eggs
-        short_unit: ""
-        display:
-          numDecimalPlaces: 1
       hens_killed_per_capita:
         title: Estimated number of hens killed to produce eggs per person
         unit: hens per person
