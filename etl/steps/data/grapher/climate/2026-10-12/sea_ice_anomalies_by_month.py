@@ -115,7 +115,7 @@ def run() -> None:
     # Process data.
     #
     # Rename locations conveniently.
-    tb = tb.astype({"location": "string"})
+    tb = tb.astype({"location": "str"})
     tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "Arctic"
     tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "Antarctic"
     assert set(tb["location"]) == {"Arctic", "Antarctic"}, "Unexpected locations."

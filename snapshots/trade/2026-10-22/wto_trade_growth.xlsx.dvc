@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: World Trade Organization
+    title: 'Evolution of trade under the WTO: handy statistics'
+    description: |-
+      Evolution of trade under the WTO: handy statistics is a page of summary statistics on how world trade has grown since 1950. It includes the volume of world merchandise trade each year, both as annual growth and as an index with 1950 = 100. Trade is calculated as average of exports and imports, and excludes significant re-exports or imports for re-exports.
+    citation_full: |-
+      World Trade Organization. Evolution of trade under the WTO: handy statistics. Retrieved from https://www.wto.org/english/res_e/statis_e/trade_evolution_e/evolution_trade_wto_e.htm (Accessed: 22 October 2026).
+    url_main: https://www.wto.org/english/res_e/statis_e/trade_evolution_e/evolution_trade_wto_e.htm
+    url_download: https://www.wto.org/english/res_e/statis_e/trade_evolution_e/world_trade_growth.xlsx
+    date_accessed: '2026-10-22'
+    # NOTE: The WTO replaces this file in place, without a version label, when it publishes its trade statistics
+    # (March–April) and its Global Trade Outlook update (October). The page states no release date: this is the file's HTTP
+    # Last-Modified header, which matches the WTO's October 2026 outlook release. Compare the md5 to detect a new file.
+    date_published: '2026-10-08'
+    license:
+      name: © World Trade Organization
+      url: https://www.wto.org/english/info_e/copyrights_permissions_e.htm
+outs:
+  - md5: bc7fb44dacdca9acb8526b1fc5a92171
+    size: 45923
+    path: wto_trade_growth.xlsx

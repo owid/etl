@@ -197,5 +197,5 @@ def add_suffix_to_regions(tb: Table, col: str) -> Table:
     The suffix matches the region names in OWID's regions dataset, so that grapher recognizes them as UCDP's regions
     (and not as OWID's continents). Other entities (countries, "World") are left untouched.
     """
-    tb[col] = tb[col].astype("string").replace({r: f"{r} (UCDP)" for r in REGIONS_UCDP})
+    tb[col] = tb[col].astype("str").replace({r: f"{r} (UCDP)" for r in REGIONS_UCDP})
     return tb

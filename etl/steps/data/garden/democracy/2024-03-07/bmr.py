@@ -568,7 +568,7 @@ def make_table_with_dummies(tb: Table, ds_regions: Dataset, indicators: list[dic
     indicator_names = [indicator["name"] for indicator in indicators]
 
     ## Replace NaNs with -1 (easier to process)
-    tb_[indicator_names] = tb_[indicator_names].astype("string").fillna("-1")
+    tb_[indicator_names] = tb_[indicator_names].astype("str").fillna("-1")
 
     ## Sanity checks
     for indicator in indicators:

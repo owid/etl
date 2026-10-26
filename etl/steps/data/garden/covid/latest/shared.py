@@ -93,7 +93,7 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     # Filter only years of interest
     population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
     # Create date column
-    population["date"] = pd.to_datetime(population["year"].astype("string") + "-07-01")
+    population["date"] = pd.to_datetime(population["year"].astype("str") + "-07-01")
     # Keep relevant columns
     population = population.loc[:, ["date", "country", "population"]]
     # Add missing dates

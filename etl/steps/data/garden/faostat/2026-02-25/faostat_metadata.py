@@ -257,7 +257,7 @@ def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short
         .reset_index(drop=True)
     )
     _tb_items = harmonize_items(tb=_tb_items, dataset_short_name=dataset_short_name, item_col="fao_item")
-    _tb_items["fao_item_description"] = _tb_items["fao_item_description"].astype("string")
+    _tb_items["fao_item_description"] = _tb_items["fao_item_description"].astype("str")
 
     # Add descriptions (from metadata) to items (from data).
     items_from_data = (
@@ -459,7 +459,7 @@ def create_elements_table_for_domain(table: Table, metadata: Dataset, dataset_sh
     _tb_elements = harmonize_elements(
         tb=_tb_elements, dataset_short_name=dataset_short_name, element_col="fao_element", unit_col=None
     )
-    _tb_elements["fao_element_description"] = _tb_elements["fao_element_description"].astype("string")
+    _tb_elements["fao_element_description"] = _tb_elements["fao_element_description"].astype("str")
 
     # Load units metadata.
     units_columns = {
@@ -474,7 +474,7 @@ def create_elements_table_for_domain(table: Table, metadata: Dataset, dataset_sh
         .sort_values(list(units_columns.values()))
         .reset_index(drop=True)
     )
-    _tb_units["fao_unit"] = _tb_units["fao_unit"].astype("string")
+    _tb_units["fao_unit"] = _tb_units["fao_unit"].astype("str")
 
     # Add element descriptions (from metadata).
     elements_from_data = (

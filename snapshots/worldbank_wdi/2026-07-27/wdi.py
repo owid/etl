@@ -16,8 +16,8 @@ You can also explore the WDI API directly at https://ddh-openapi.worldbank.org/d
    cd etl/steps/data/garden/worldbank_wdi/YYYY-MM-DD/
    python update_wdi_metadata.py update-titles --dry-run  # Preview changes
    python update_wdi_metadata.py update-titles            # Apply changes
-   python update_wdi_metadata.py update-sources --dry-run # Preview GPT-4o-mini source updates
-   python update_wdi_metadata.py update-sources           # Apply source updates (requires OPENAI_API_KEY)
+   python update_wdi_metadata.py update-sources --dry-run # Preview LLM source updates
+   python update_wdi_metadata.py update-sources           # Apply source updates (requires ANTHROPIC_API_KEY)
    # Or run all at once:
    python update_wdi_metadata.py all --dry-run
    python update_wdi_metadata.py all --skip-charts        # Skip chart updates (defer to follow-up)

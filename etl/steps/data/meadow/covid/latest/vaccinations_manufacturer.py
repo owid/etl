@@ -46,7 +46,7 @@ def set_dtypes(tb: Table) -> Table:
     tb = tb.astype(
         {
             "date": "datetime64[ns]",
-            "country": "string",
+            "country": "str",
             "total_vaccinations": int,
         }
     )

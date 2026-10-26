@@ -279,6 +279,7 @@ def mock_table() -> Table:
     return t
 
 
+@pytest.mark.integration
 def test_load_csv_table_over_http() -> None:
     Table.read_csv("https://catalog.ourworldindata.org/reference/countries_regions.csv")
 

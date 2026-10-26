@@ -33,6 +33,7 @@ import structlog
 from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
+from owid.catalog.api.utils import session as catalog_session
 from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.orm import Session
 from tqdm import tqdm
@@ -47,6 +48,12 @@ from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
+
+# A forked step gets fresh copies of lib/catalog's pooled clients rather than its parent's open
+# connections, as `etl.http.make_session` does for ours (see `DataStep._run_py_fork`).
+# TODO: move these into lib/catalog with its next release.
+os.register_at_fork(after_in_child=catalog_session.close)
+os.register_at_fork(after_in_child=s3_utils._connect_r2_cached.cache_clear)
 
 DAG = dict[str, set[str]]
 
@@ -744,16 +751,9 @@ class DataStep(Step):
         if pid == 0:
             # ---------- child process ----------
             try:
-                # Close all inherited file descriptors except stdin/stdout/stderr.
-                # The forked child inherits FDs for the multiprocessing Manager
-                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
-                # os._exit() later closes them implicitly it can confuse the
-                # Manager server and cause the parent worker to hang.
-                import resource as _resource
-
-                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
-                os.closerange(3, _max_fd)
-
+                # Don't close inherited descriptors: that never affects the parent's copies, and the
+                # pooled clients still holding them would fail. Those clients reset in the child
+                # instead (`etl.http.make_session`, and the catalog clients at the top of this module).
                 config.enable_structlog_filtering()
                 step_type, path = str(self).split("://", 1)
                 step_type = step_type.replace("-private", "")

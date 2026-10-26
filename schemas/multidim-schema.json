@@ -345,6 +345,41 @@
                 ]
             ]
         },
+        "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "The chart's public URL slug, as in `ourworldindata.org/grapher/<slug>`.",
+            "requirement_level": "required for single charts (`dimensions: []`), optional for multidims",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "guidelines": [
+                [
+                    "Lowercase words separated by dashes."
+                ],
+                [
+                    "Applied only when grapher creates the chart, or when the mdim has no slug yet. An existing slug is never changed from ETL: rename it in the admin, which also creates the redirect."
+                ],
+                [
+                    "A multidim without it gets its slug in the admin."
+                ],
+                [
+                    "The step's short name (its file name, e.g. `foreign_aid_given_climate`) should match the slug, with underscores instead of dashes. This is not required, but strongly recommended, so the file and the URL match."
+                ]
+            ],
+            "examples": [
+                "foreign-aid-given-climate",
+                "academic-performance"
+            ],
+            "examples_bad": [
+                [
+                    "foreign_aid_given_climate",
+                    "/grapher/foreign-aid-given-climate"
+                ],
+                [
+                    "Academic-Performance",
+                    "academic performance"
+                ]
+            ]
+        },
         "topic_tags": {
             "type": "array",
             "title": "Topic tags",

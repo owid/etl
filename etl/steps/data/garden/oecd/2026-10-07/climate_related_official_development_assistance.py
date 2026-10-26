@@ -33,6 +33,19 @@ CODE_ALL_RECIPIENTS = "DPGC"
 CODE_ALL_DONORS = "DAC_EC"
 CODE_ALL_SECTORS = "1000"
 
+# The European Investment Bank (EIB), one of the EU institutions, reports its climate finance with a different method
+# ("climate components"), not with Rio markers, so none of its aid is marked as climate-related. Like the OECD in its own
+# climate-related shares, we leave it out of all totals, so its aid does not lower them.
+CODE_EU_INSTITUTIONS = "4EU001"
+AGENCY_EXCLUDED = "European Investment Bank"
+
+# Codes of the DAC1 table: DAC countries (as a group), and measures of total ODA, bilateral ODA and contributions to EU
+# institutions (EU institutions use the same code as in the RioMarkers data).
+DAC1_DAC_COUNTRIES = "DAC"
+DAC1_TOTAL_ODA = 1010
+DAC1_BILATERAL_ODA = 1015
+DAC1_CONTRIBUTIONS_TO_EU = 2102
+
 # Groups of donors, defined in the OECD hierarchy of donors.
 DONOR_GROUPS = [
     "DAC_EC",  # DAC members: DAC countries and EU institutions
@@ -144,23 +157,29 @@ def run() -> None:
     # Read tables from meadow dataset.
     tb_totals = ds_meadow.read("totals", safe_types=False)
     tb_activities = ds_meadow.read("activities", safe_types=False)
+    tb_eu = ds_meadow.read("eu_institutions_activities")
     tb_codes = ds_meadow.read("codes")
     tb_groups = ds_meadow.read("groups")
     tb_bilateral = ds_meadow.read("bilateral_totals", safe_types=False)
+    tb_dac1 = ds_meadow.read("total_oda")
 
     #
     # Process data.
     #
     # Use plain strings for codes, to compare them across tables.
-    for tb in [tb_totals, tb_activities, tb_bilateral]:
+    for tb in [tb_totals, tb_activities, tb_eu, tb_bilateral]:
         for column in ["donor_code", "recipient_code", "sector_code"]:
             if column in tb.columns:
-                tb[column] = tb[column].astype("string")
+                tb[column] = tb[column].astype("str")
 
-    sanity_check_inputs(tb_totals=tb_totals, tb_activities=tb_activities)
+    sanity_check_inputs(tb_totals=tb_totals, tb_activities=tb_activities, tb_eu=tb_eu)
 
     # Step 1: Climate-related aid, from project-level rows, counting each project once.
     tb_climate = classify_climate_activities(tb_activities=tb_activities)
+
+    # Bilateral allocable ODA of the excluded agency (the EIB), by score, to subtract from the totals.
+    tb_excluded = tb_eu[tb_eu["donor_agency"] == AGENCY_EXCLUDED].drop(columns=["donor_agency", "activity_id"])
+    tb_excluded["marker"] = MARKER_MITIGATION
 
     # Step 2: Map each entity (donor, recipient or group) to its members in the data, to compute groups ourselves.
     # Individual donors: all donor codes except groups of donors (e.g. all DAC members).
@@ -188,6 +207,17 @@ def run() -> None:
     )
     # Our total for all DAC members must match the OECD's.
     sanity_check_donor_groups(tb_totals_given=tb_totals_given, tb_totals=tb_totals)
+    # Leave out the excluded agency (the EIB).
+    tb_excluded_given = aggregate_by_members(
+        tb=tb_excluded,
+        code_column="donor_code",
+        members=members_donors,
+        keys=["marker", "score", "year"],
+        columns=["value"],
+    )
+    tb_totals_given = subtract_excluded(
+        tb=tb_totals_given, tb_excluded=tb_excluded_given, keys=["entity_code", "marker", "score", "year"]
+    )
     # By recipient (from all DAC members, all sectors).
     tb_totals_by_recipient = tb_totals[
         (tb_totals["donor_code"] == CODE_ALL_DONORS) & (tb_totals["sector_code"] == CODE_ALL_SECTORS)
@@ -207,6 +237,16 @@ def run() -> None:
         name="bilateral allocable ODA",
         expected_differences=WORLD_BANK_INCOME_GROUPS,
     )
+    tb_excluded_received = aggregate_by_members(
+        tb=tb_excluded,
+        code_column="recipient_code",
+        members=members_recipients,
+        keys=["marker", "score", "year"],
+        columns=["value"],
+    )
+    tb_totals_received = subtract_excluded(
+        tb=tb_totals_received, tb_excluded=tb_excluded_received, keys=["entity_code", "marker", "score", "year"]
+    )
 
     # Step 4: Total bilateral ODA (including aid outside the scope of the Rio markers), from the CRS, as in step 3.
     tb_bilateral_given = aggregate_by_members(
@@ -219,6 +259,12 @@ def run() -> None:
         columns=["value"],
     )
     sanity_check_donor_groups_bilateral(tb_bilateral_given=tb_bilateral_given, tb_bilateral=tb_bilateral)
+    # NOTE: All bilateral ODA of the EIB is allocable (in the CRS, its total bilateral ODA commitments equal its bilateral
+    # allocable ODA here from 2011 on, and it reported only about $1 million a year in 2009-2010). So the same amounts are
+    # left out of total bilateral ODA.
+    tb_bilateral_given = subtract_excluded(
+        tb=tb_bilateral_given, tb_excluded=sum_over_scores(tb_excluded_given), keys=["entity_code", "year"]
+    )
     tb_bilateral_by_recipient = tb_bilateral[tb_bilateral["donor_code"] == CODE_ALL_DONORS]
     tb_bilateral_received = aggregate_by_members(
         tb=tb_bilateral_by_recipient[~tb_bilateral_by_recipient["recipient_code"].isin(groups_recipients)],
@@ -236,8 +282,16 @@ def run() -> None:
         # countries unspecified (DPGC_X), which its hierarchy (and the RioMarkers dataset) keep separate.
         expected_differences=WORLD_BANK_INCOME_GROUPS + ["INC_X"],
     )
+    tb_bilateral_received = subtract_excluded(
+        tb=tb_bilateral_received, tb_excluded=sum_over_scores(tb_excluded_received), keys=["entity_code", "year"]
+    )
 
-    # Step 5: Climate-related ODA by donor and recipient, combined with the totals of steps 3 and 4 (for shares).
+    # Step 5: All ODA of DAC members (DAC1), to show which share of it is bilateral.
+    tb_total_oda = create_total_oda_table(
+        tb_dac1=tb_dac1, tb_bilateral_given=tb_bilateral_given, tb_excluded=sum_over_scores(tb_excluded_given)
+    )
+
+    # Step 6: Climate-related ODA by donor and recipient, combined with the totals of steps 3 and 4 (for shares).
     tb_given = create_climate_related_table(
         tb_climate=aggregate_by_members(
             tb=tb_climate, code_column="donor_code", members=members_donors, keys=["year"], columns=CLIMATE_COLUMNS
@@ -257,18 +311,24 @@ def run() -> None:
         tb_bilateral=tb_bilateral_received,
     )
 
-    # Step 6: Climate-related ODA given by donor and sector, combined with bilateral allocable ODA in each sector.
+    # Step 7: Climate-related ODA given by donor and sector, combined with bilateral allocable ODA in each sector.
     tb_sectors = create_sectors_table(
-        tb_climate=tb_climate, tb_totals=tb_totals, tb_codes=tb_codes, members_donors=members_donors, donors=donors
+        tb_climate=tb_climate,
+        tb_totals=tb_totals,
+        tb_excluded=tb_excluded,
+        tb_codes=tb_codes,
+        members_donors=members_donors,
+        donors=donors,
     )
 
-    # Step 7: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
+    # Step 8: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
     names = tb_codes[tb_codes["codelist"] == "area"].set_index("code")["name"].to_dict()
     names.update(NAMES_BY_CODE)
     tables = {
         "climate_related_oda_by_donor": (tb_given, []),
         "climate_related_oda_by_recipient": (tb_received, []),
         "climate_related_oda_by_donor_and_sector": (tb_sectors, ["sector"]),
+        "total_oda": (tb_total_oda, []),
     }
     for short_name, (tb, dimensions) in tables.items():
         tb["country"] = tb["entity_code"].map(names)
@@ -441,26 +501,72 @@ def add_total_bilateral_oda(tb: Table, tb_bilateral: Table) -> Table:
     return tb
 
 
+def create_total_oda_table(tb_dac1: Table, tb_bilateral_given: Table, tb_excluded: Table) -> Table:
+    """All ODA commitments of DAC members (DAC countries and EU institutions), and the share of it that is bilateral.
+
+    EU institutions count as a donor here, as in the rest of the dataset. DAC countries' contributions to EU institutions
+    are part of the DAC countries' (multilateral) ODA, and EU institutions then commit them as their own ODA, so they are
+    subtracted once to avoid counting them twice. The excluded agency (the EIB) is subtracted, as everywhere else.
+    """
+
+    def series(donor: str, measure: int) -> Table:
+        tb = tb_dac1[(tb_dac1["donor_code"] == donor) & (tb_dac1["measure"] == measure)][["year", "value"]]
+        return tb.rename(columns={"value": f"{donor}_{measure}"}, errors="raise")
+
+    tb = series(DAC1_DAC_COUNTRIES, DAC1_TOTAL_ODA)
+    for donor, measure in [
+        (DAC1_DAC_COUNTRIES, DAC1_CONTRIBUTIONS_TO_EU),
+        (DAC1_DAC_COUNTRIES, DAC1_BILATERAL_ODA),
+        (CODE_EU_INSTITUTIONS, DAC1_TOTAL_ODA),
+        (CODE_EU_INSTITUTIONS, DAC1_BILATERAL_ODA),
+    ]:
+        tb = pr.merge(tb, series(donor, measure), on="year", how="inner")
+
+    # Bilateral ODA of all DAC members, from the CRS, after leaving out the excluded agency.
+    tb_bilateral = tb_bilateral_given[tb_bilateral_given["entity_code"] == CODE_ALL_DONORS][["year", "value"]]
+    tb = pr.merge(tb, tb_bilateral.rename(columns={"value": "bilateral"}), on="year", how="inner")
+    tb = pr.merge(
+        tb,
+        tb_excluded[tb_excluded["entity_code"] == CODE_ALL_DONORS][["year", "value"]].rename(
+            columns={"value": "excluded"}
+        ),
+        on="year",
+        how="left",
+    )
+    tb["excluded"] = tb["excluded"].fillna(0)
+    tb = tb[tb["year"] >= START_YEAR_ADAPTATION_MARKER].reset_index(drop=True)
+
+    # Bilateral ODA in DAC1 must match the CRS (before leaving out the excluded agency), so the share compares like
+    # with like.
+    dac1_bilateral = (
+        tb[f"{DAC1_DAC_COUNTRIES}_{DAC1_BILATERAL_ODA}"] + tb[f"{CODE_EU_INSTITUTIONS}_{DAC1_BILATERAL_ODA}"]
+    )
+    difference = (tb["bilateral"] + tb["excluded"]) / dac1_bilateral - 1
+    assert (difference.abs() < 0.01).all(), (
+        f"Bilateral ODA in DAC1 and the CRS differ by up to {difference.abs().max():.1%}."
+    )
+
+    tb["oda_total"] = (
+        tb[f"{DAC1_DAC_COUNTRIES}_{DAC1_TOTAL_ODA}"]
+        - tb[f"{DAC1_DAC_COUNTRIES}_{DAC1_CONTRIBUTIONS_TO_EU}"]
+        + tb[f"{CODE_EU_INSTITUTIONS}_{DAC1_TOTAL_ODA}"]
+        - tb["excluded"]
+    )
+    tb["oda_bilateral_share_of_total"] = share(tb["bilateral"], tb["oda_total"])
+    assert tb["oda_bilateral_share_of_total"].between(75, 95).all(), "Unexpected bilateral share of all ODA."
+    # Express amounts in US dollars (the source is in millions).
+    tb["oda_total"] *= 1e6
+    tb["entity_code"] = CODE_ALL_DONORS
+
+    return tb[["entity_code", "year", "oda_total", "oda_bilateral_share_of_total"]]
+
+
 def create_sectors_table(
-    tb_climate: Table, tb_totals: Table, tb_codes: Table, members_donors: Table, donors: list[str]
+    tb_climate: Table, tb_totals: Table, tb_excluded: Table, tb_codes: Table, members_donors: Table, donors: list[str]
 ) -> Table:
     """Climate-related ODA given by each donor and group of donors, by sector, and its share of each sector's aid."""
-    # Map the purpose code of each activity to its sector, up the hierarchy (e.g. 23210 -> 232 -> 230, energy).
-    parents = tb_codes[tb_codes["codelist"] == "sector"].dropna(subset=["parent_code"])
-    parents = parents.set_index("code")["parent_code"].to_dict()
-
-    def sector_of(code: str) -> str | None:
-        while code not in SECTORS and code not in SECTORS_IN_OTHER and code in parents:
-            code = parents[code]
-        if code in SECTORS_IN_OTHER:
-            return CODE_OTHER_SECTORS
-        return code if code in SECTORS else None
-
-    sector_by_code = {code: sector_of(code) for code in tb_climate["sector_code"].unique()}
-    unknown = sorted(code for code, sector in sector_by_code.items() if sector is None)
-    assert not unknown, f"Activities in purpose codes outside the expected sectors: {unknown}"
-    tb_climate = tb_climate.copy()
-    tb_climate["sector_code"] = tb_climate["sector_code"].map(sector_by_code)
+    # Map the purpose code of each activity to its sector.
+    tb_climate = map_to_sectors(tb=tb_climate, tb_codes=tb_codes)
 
     # Climate-related ODA by donor (and group of donors) and sector.
     keys = ["entity_code", "sector_code", "year"]
@@ -476,13 +582,19 @@ def create_sectors_table(
         & tb_totals["marker"].isin([MARKER_MITIGATION, MARKER_ADAPTATION])
     ]
     tb_totals = add_other_sectors(tb_totals=tb_totals)
+    keys_totals = ["sector_code", "marker", "score", "year"]
     tb_totals = aggregate_by_members(
-        tb=tb_totals,
+        tb=tb_totals, code_column="donor_code", members=members_donors, keys=keys_totals, columns=["value"]
+    )
+    # Leave out the excluded agency (the EIB).
+    tb_excluded = aggregate_by_members(
+        tb=map_to_sectors(tb=tb_excluded, tb_codes=tb_codes),
         code_column="donor_code",
         members=members_donors,
-        keys=["sector_code", "marker", "score", "year"],
+        keys=keys_totals,
         columns=["value"],
     )
+    tb_totals = subtract_excluded(tb=tb_totals, tb_excluded=tb_excluded, keys=["entity_code"] + keys_totals)
 
     tb = create_climate_related_table(tb_climate=tb_climate, tb_totals=tb_totals, keys=keys)
     # NOTE: The total of "Other" is a small difference between two large totals, too imprecise to divide by.
@@ -495,6 +607,42 @@ def create_sectors_table(
     tb["sector"] = tb["sector_code"].map(SECTORS).copy_metadata(tb["sector_code"])
 
     return tb[["entity_code", "sector", "year"] + INDICATORS_BY_SECTOR]
+
+
+def map_to_sectors(tb: Table, tb_codes: Table) -> Table:
+    """Replace the purpose code of each activity with its sector, up the hierarchy (e.g. 23210 -> 232 -> 230, energy)."""
+    parents = tb_codes[tb_codes["codelist"] == "sector"].dropna(subset=["parent_code"])
+    parents = parents.set_index("code")["parent_code"].to_dict()
+
+    def sector_of(code: str) -> str | None:
+        while code not in SECTORS and code not in SECTORS_IN_OTHER and code in parents:
+            code = parents[code]
+        if code in SECTORS_IN_OTHER:
+            return CODE_OTHER_SECTORS
+        return code if code in SECTORS else None
+
+    sector_by_code = {code: sector_of(code) for code in tb["sector_code"].unique()}
+    unknown = sorted(code for code, sector in sector_by_code.items() if sector is None)
+    assert not unknown, f"Activities in purpose codes outside the expected sectors: {unknown}"
+    tb = tb.copy()
+    tb["sector_code"] = tb["sector_code"].map(sector_by_code)
+    return tb
+
+
+def subtract_excluded(tb: Table, tb_excluded: Table, keys: list[str]) -> Table:
+    """Subtract the aid of the excluded agency (the EIB) from the totals with the same keys."""
+    tb_excluded = tb_excluded.rename(columns={"value": "value_excluded"}, errors="raise")
+    tb = tb.merge(tb_excluded, on=keys, how="left")
+    # Every amount to subtract needs a total to subtract it from, which it can't exceed.
+    assert tb["value_excluded"].notna().sum() == len(tb_excluded), "Aid of the excluded agency without a total."
+    assert (tb["value"] - tb["value_excluded"] >= -1e-3).all(), "Aid of the excluded agency above the total."
+    tb["value"] = tb["value"] - tb["value_excluded"].fillna(0)
+    return tb.drop(columns=["value_excluded"])
+
+
+def sum_over_scores(tb: Table) -> Table:
+    """Sum the values of a marker over its scores, by entity and year (which gives bilateral allocable ODA)."""
+    return tb.groupby(["entity_code", "year"], as_index=False, observed=True)["value"].sum()
 
 
 def add_other_sectors(tb_totals: Table) -> Table:
@@ -546,7 +694,7 @@ def share(numerator, denominator):
     return numerator / denominator.where(denominator > 0) * 100
 
 
-def sanity_check_inputs(tb_totals: Table, tb_activities: Table) -> None:
+def sanity_check_inputs(tb_totals: Table, tb_activities: Table, tb_eu: Table) -> None:
     # The marker attribute of each activity must match the marker it is listed under.
     for marker, column in [
         (MARKER_MITIGATION, "climate_mitigation_score"),
@@ -596,6 +744,31 @@ def sanity_check_inputs(tb_totals: Table, tb_activities: Table) -> None:
     # Negative commitments (cancellations) are rare and small.
     share_negative = (tb_activities["value"] < 0).mean()
     assert share_negative < 0.001, f"Unexpectedly many negative activities ({share_negative:.2%})."
+
+    # Activities of EU institutions must add up to their totals, by score and year.
+    totals = (
+        tb_totals[
+            (tb_totals["donor_code"] == CODE_EU_INSTITUTIONS)
+            & (tb_totals["recipient_code"] == CODE_ALL_RECIPIENTS)
+            & (tb_totals["sector_code"] == CODE_ALL_SECTORS)
+            & (tb_totals["marker"] == MARKER_MITIGATION)
+        ]
+        .groupby(["score", "year"], observed=True)["value"]
+        .sum()
+    )
+    sums = tb_eu.groupby(["score", "year"], observed=True)["value"].sum()
+    totals, sums = totals.align(sums, fill_value=0)
+    assert close(sums, totals), "Activities of EU institutions do not add up to their totals."
+    # The excluded agency must be in the latest year, with none of its aid marked as climate-related (so it only needs
+    # to be left out of the totals of all aid).
+    excluded = tb_eu[tb_eu["donor_agency"] == AGENCY_EXCLUDED]
+    assert excluded["year"].max() == tb_eu["year"].max(), f"No activities of {AGENCY_EXCLUDED} in the latest year."
+    assert not excluded["score"].isin([SCORE_SIGNIFICANT, SCORE_PRINCIPAL]).any(), (
+        f"Activities of {AGENCY_EXCLUDED} marked for climate change mitigation."
+    )
+    assert not (tb_activities["donor_agency"] == AGENCY_EXCLUDED).any(), (
+        f"Activities of {AGENCY_EXCLUDED} marked as climate-related."
+    )
 
 
 def sanity_check_donor_groups(tb_totals_given: Table, tb_totals: Table) -> None:

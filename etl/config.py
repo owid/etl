@@ -284,7 +284,7 @@ SUBSET = env.get("SUBSET", None)
 MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 5
+ETL_EPOCH = 6
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
@@ -523,10 +523,9 @@ class OWIDEnv:
     def engine(self) -> Engine:
         """Get engine for env.
 
-        Cached per process: a step forked by `etlr` inherits this object from its parent, but not
-        usable DB sockets (the child closes every inherited file descriptor), so an engine created
-        in the parent must not be reused in the child. `etl.db.get_engine` memoizes by pid for the
-        same reason.
+        Cached per process: a step forked by `etlr` inherits this object, and with it the parent's
+        pooled DB connections, which the child must not use as well. `etl.db.get_engine` memoizes
+        by pid for the same reason.
         """
         from etl.db import get_engine
 

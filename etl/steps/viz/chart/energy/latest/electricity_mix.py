@@ -1,6 +1,6 @@
 """Multidim for the electricity mix (source x metric, plus total-only metrics)."""
 
-# Force re-run to re-upsert view-level default entity selections (grapher #6922).
+# Rebuild with the shared chart-combining fix that preserves missing choice descriptions and groups.
 
 import math
 from copy import deepcopy

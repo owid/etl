@@ -356,9 +356,10 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
     tb = tb[tb[column].isin(COLUMN_CATEGORIES[column].keys())].reset_index(drop=True)
 
     # Assert that all renamed columns are the same as COLUMN_CATEGORIES[column].keys()
-    assert set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys()), (
-        f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) ^ set(COLUMN_CATEGORIES[column].keys())}"
-    )
+    # Compare non-missing values only: missing labels are NaN in the data but pd.NA in the mapping, and never equal.
+    values = set(tb[column].dropna().unique())
+    expected = {key for key in COLUMN_CATEGORIES[column] if pd.notna(key)}
+    assert values == expected, f"Some {column} are missing in the column categories mapping: {values ^ expected}"
 
     if column == "indicator":
         # Multiply observations by 1000 when the indicator is in thousands

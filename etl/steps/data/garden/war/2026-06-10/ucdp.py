@@ -640,7 +640,7 @@ def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) ->
     ctypes_all = list(set(tb_country["conflict_type"]))
     tb_alltypes = Table(pd.DataFrame({"conflict_type": ctypes_all}))
     tb_codes_ = tb_codes.reset_index().merge(tb_alltypes, how="cross")
-    tb_codes_["country"] = tb_codes_["country"].astype("string")
+    tb_codes_["country"] = tb_codes_["country"].astype("str")
 
     # Combine all GW entries with UCDP
     columns_idx = ["year", "country", "id", "conflict_type"]
@@ -737,7 +737,7 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
     # Prepare GW table
     tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
     tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
-    tb_codes["country"] = tb_codes["country"].astype("string")
+    tb_codes["country"] = tb_codes["country"].astype("str")
 
     # Combine all GW entries with UCDP/PRIO
     columns_idx = ["year", "country", "id", "conflict_type"]

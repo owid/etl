@@ -39,7 +39,8 @@ def run() -> None:
         for column in tb.columns:
             meta = tb[column].metadata
             cause = (meta.dimensions or {}).get("cause")
-            if cause is None:  # most_common_cancer: its cause is the value, not a dimension
+            # most_common_cancer: its cause is the value, not a dimension; broad_cause_groups: our groups, not WHO's.
+            if cause is None or name == "broad_cause_groups":
                 continue
             # A string, as the rendering of a one-item YAML list leaves it in the grapher channel.
             meta.description_key = ICD_SENTENCE.format(cause=cause_in_text(cause), codes=codes[cause])

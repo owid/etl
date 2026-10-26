@@ -2423,6 +2423,27 @@ def test_explorer_rejects_grapher_schema():
         Explorer.from_dict(_make_minimal_config(grapher_schema="011", config={"explorerTitle": "T"}))
 
 
+def test_chart_slug_is_format_checked_by_schema():
+    """
+    Test Chart.validate_schema - `slug` is accepted, and must be lowercase words separated by dashes.
+    """
+    Chart.from_dict(_make_minimal_config(grapher_schema="011", slug="academic-performance")).validate_schema()
+
+    chart = Chart.from_dict(_make_minimal_config(grapher_schema="011", slug="academic_performance"))
+    with pytest.raises(ValueError, match="must match pattern"):
+        chart.validate_schema()
+
+
+def test_explorer_rejects_slug():
+    """
+    Test Explorer - `slug` is multidim-only and must not be silently ignored.
+    """
+    from etl.viz.explorer import Explorer
+
+    with pytest.raises(ValueError, match="`slug` is only supported for multidim charts"):
+        Explorer.from_dict(_make_minimal_config(slug="my-explorer", config={"explorerTitle": "T"}))
+
+
 def test_warn_on_view_schema_overrides(capsys):
     """
     Test Chart.warn_on_view_schema_overrides - a view `$schema` shadowing the chart pin
@@ -2565,11 +2586,10 @@ def test_save_download_package_skips_explorers():
 
 def test_save_download_package_skips_unpublished_charts():
     """
-    Test Chart.save_download_package - a chart with no page slug builds nothing.
+    Test Chart.save_download_package - a chart with no public page builds nothing.
 
-    ETL never assigns the slug (`put_mdim_config` sends only the config); someone publishing
-    the MDIM in the admin does. So a step whose MDIM was never published has a
-    `multi_dim_data_pages` row and no slug, which is the normal state of 13 of the 59
+    Publishing happens in the admin, so a step whose MDIM was never published has a
+    `multi_dim_data_pages` row but no public page, which is the normal state of 13 of the 59
     multidim steps on a staging server. Since save() now builds packages by default, that
     has to be a skip rather than a failed step.
     """
