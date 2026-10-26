@@ -704,6 +704,59 @@
                   ],
                   "category": "metadata"
                 },
+                "annotations": {
+                  "title": "Indicator's annotations",
+                  "type": "array",
+                  "description": "Short notes shown on charts of the indicator, each optionally tied to some entities and to a point or range in time.",
+                  "requirement_level": "optional",
+                  "guidelines": [
+                    [
+                      "Omit `entities` for a note on the whole indicator."
+                    ],
+                    [
+                      "`time` alone is one year; with `time_end` it is a range of years. Omit both for a note on the whole series."
+                    ],
+                    [
+                      "Write times as years for yearly data, and as YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
+                    ],
+                    [
+                      "Must not be combined with `display.entityAnnotationsMap` on the same indicator."
+                    ]
+                  ],
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["text"],
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "description": "Text of the note, in markdown (links are allowed)."
+                      },
+                      "entities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Entities the note applies to."
+                      },
+                      "time": {
+                        "type": ["integer", "string"],
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
+                        "description": "Year (e.g. `2003`) or date (e.g. `2020-03-15`) the note applies to, or the start of a range. A year can also be injected with `yaml_params`, e.g. `\"{LATEST_YEAR}\"`."
+                      },
+                      "time_end": {
+                        "type": ["integer", "string"],
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
+                        "description": "End of the range that starts at `time`, in the same form."
+                      },
+                      "dimensions": {
+                        "type": "object",
+                        "description": "Only for long tables: values of the extra index levels the note applies to, e.g. `{cause: Maternal disorders}`. The grapher step keeps the note on the indicators of matching dimensions and removes this field when flattening the table."
+                      }
+                    }
+                  },
+                  "category": "metadata"
+                },
                 "description_processing": {
                   "title": "Indicator's processing description",
                   "type": "string",

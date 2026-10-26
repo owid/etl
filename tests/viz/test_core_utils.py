@@ -4,9 +4,12 @@ This module tests utility functions for processing charts and views,
 including the main chart creation function and view processing logic.
 """
 
+import datetime as dt
 from unittest.mock import Mock, patch
 
-from etl.viz.chart.core.utils import create_chart_from_config, process_views
+import pytest
+
+from etl.viz.chart.core.utils import create_chart_from_config, normalize_metadata_annotations, process_views
 from etl.viz.chart.model.core import Chart
 from etl.viz.chart.model.view import CommonView, View
 from etl.viz.explorer import Explorer
@@ -216,7 +219,10 @@ class TestCreateChartFromConfig:
         dependencies = set()
         catalog_path = "test/path#table"
 
-        with patch("etl.viz.chart.core.utils.process_views"):
+        with (
+            patch("etl.viz.chart.core.utils.process_views"),
+            patch("etl.viz.chart.core.utils.normalize_metadata_annotations"),
+        ):
             with patch.object(Chart, "from_dict") as mock_from_dict:
                 mock_from_dict.return_value = Mock(spec=Chart)
 
@@ -232,7 +238,10 @@ class TestCreateChartFromConfig:
         dependencies = set()
         catalog_path = "test/path#table"
 
-        with patch("etl.viz.chart.core.utils.process_views"):
+        with (
+            patch("etl.viz.chart.core.utils.process_views"),
+            patch("etl.viz.chart.core.utils.normalize_metadata_annotations"),
+        ):
             with patch.object(Explorer, "from_dict") as mock_from_dict:
                 mock_from_dict.return_value = Mock(spec=Explorer)
 
@@ -307,3 +316,26 @@ class TestIntegration:
 
                 # Verify process_views was called
                 mock_process.assert_called_once_with(explorer, dependencies=dependencies)
+
+
+class TestNormalizeMetadataAnnotations:
+    """Test suite for normalize_metadata_annotations function."""
+
+    def _chart_with_view_annotations(self, annotations):
+        config = create_test_config()
+        config["views"][0]["metadata"] = {"annotations": annotations}
+        return Chart.from_dict(dict(**config, catalog_path="test/latest/test#test"))
+
+    def test_dates_become_strings(self):
+        chart = self._chart_with_view_annotations([{"text": "Note.", "time": dt.date(2020, 3, 15), "time_end": 2020}])
+        with pytest.raises(ValueError, match="mixes a year and a date"):
+            normalize_metadata_annotations(chart)
+
+        chart = self._chart_with_view_annotations([{"text": "Note.", "time": dt.date(2020, 3, 15)}])
+        normalize_metadata_annotations(chart)
+        assert chart.views[0].metadata == {"annotations": [{"text": "Note.", "time": "2020-03-15"}]}
+
+    def test_rejects_dimensions(self):
+        chart = self._chart_with_view_annotations([{"text": "Note.", "dimensions": {"sex": "female"}}])
+        with pytest.raises(ValueError, match="only applies to indicators of long tables"):
+            normalize_metadata_annotations(chart)
