@@ -115,9 +115,6 @@ steps:
   data://grapher/health/2019/deaths_attributed_to_air_pollution__lelieveld_et_al__2019:
     - data://garden/health/2019/deaths_attributed_to_air_pollution__lelieveld_et_al__2019:
         - snapshot://health/2019/deaths_attributed_to_air_pollution__lelieveld_et_al__2019.feather
-  data://grapher/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
-    - data://garden/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
-        - snapshot://food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus.feather
   data://grapher/tourism/2019/air_travel_trips_per_capita__airbus__2019:
     - data://garden/tourism/2019/air_travel_trips_per_capita__airbus__2019:
         - snapshot://tourism/2019/air_travel_trips_per_capita__airbus__2019.feather

@@ -8,6 +8,9 @@ The snapshot is a zip with files from the OECD RioMarkers dataflow (all amounts 
 * activities.csv: Project-level rows of the activities marked as targeting climate change mitigation or adaptation, as a
   principal or significant objective. Each row carries the scores of all markers, which is what makes it possible to
   separate mitigation-only, adaptation-only and overlapping activities.
+* eu_institutions_activities.csv: Project-level rows of all activities of EU institutions under the climate change
+  mitigation marker, at all scores (so they add up to all their bilateral allocable ODA). Each row names the agency that
+  reports it, which identifies the projects of the European Investment Bank: the API has no dimension to select them.
 * structure.xml: Structure of the dataflow, including the names of donors, recipients and sectors, and the sector
   hierarchy.
 * recipient_groups.xml and donor_groups.xml: Hierarchies that define the members of each group of recipients
@@ -90,6 +93,8 @@ SECTORS = [
 KEY_TOTALS_BY_SECTOR = f".DPGC.{'+'.join(SECTORS)}.100.2.20+30..C.Q._T..USD"
 # Project-level rows of all donors, recipients and sectors, for the climate markers, principal and significant only.
 KEY_ACTIVITIES = "...100.2.20+30.1+2.C.Q.DD..USD"
+# Project-level rows of EU institutions, for the mitigation marker, at all scores.
+KEY_EU_INSTITUTIONS = "4EU001...100.2.20..C.Q.DD..USD"
 
 # The API allows only a few dozen downloads per hour, so activities are fetched in blocks of years (recent years are
 # ~50 MB each), and rate-limited requests are retried after a long wait.
@@ -132,26 +137,33 @@ def run(upload: bool = True) -> None:
 
             # Years covered by the totals define the years to fetch at project level.
             years = sorted(_years_in_csv(zf.read("totals_by_donor.csv")))
-            log.info(f"Downloading activities for {years[0]}-{years[-1]}.")
 
-            # Activities, in blocks of years, concatenated under a single header.
-            header = None
-            with zf.open("activities.csv", "w") as f:
-                for start in range(years[0], years[-1] + 1, YEARS_PER_REQUEST):
-                    end = min(start + YEARS_PER_REQUEST - 1, years[-1])
-                    content = fetch_data(
-                        version=version, key=KEY_ACTIVITIES, params={"startPeriod": start, "endPeriod": end}
-                    )
-                    block_header, _, rows = content.partition(b"\n")
-                    if header is None:
-                        header = block_header
-                        f.write(header + b"\n")
-                    assert block_header == header, f"Unexpected change in columns of activities for {start}-{end}."
-                    f.write(rows if rows.endswith(b"\n") else rows + b"\n")
-                    log.info(f"Downloaded activities for {start}-{end} ({len(content) / 1e6:.1f} MB).")
+            # Project-level rows, in blocks of years.
+            for name, key in [
+                ("activities.csv", KEY_ACTIVITIES),
+                ("eu_institutions_activities.csv", KEY_EU_INSTITUTIONS),
+            ]:
+                log.info(f"Downloading {name} for {years[0]}-{years[-1]}.")
+                with zf.open(name, "w") as f:
+                    fetch_data_in_blocks(file=f, version=version, key=key, years=years)
 
         # Save snapshot.
         snap.create_snapshot(filename=path_zip, upload=upload)
+
+
+def fetch_data_in_blocks(file, version: str, key: str, years: list[int]) -> None:
+    """Fetch a data query in blocks of years, and write them to a file under a single header."""
+    header = None
+    for start in range(years[0], years[-1] + 1, YEARS_PER_REQUEST):
+        end = min(start + YEARS_PER_REQUEST - 1, years[-1])
+        content = fetch_data(version=version, key=key, params={"startPeriod": start, "endPeriod": end})
+        block_header, _, rows = content.partition(b"\n")
+        if header is None:
+            header = block_header
+            file.write(header + b"\n")
+        assert block_header == header, f"Unexpected change in columns for {start}-{end}."
+        file.write(rows if rows.endswith(b"\n") else rows + b"\n")
+        log.info(f"Downloaded {start}-{end} ({len(content) / 1e6:.1f} MB).")
 
 
 def warn_if_newer_version() -> None:

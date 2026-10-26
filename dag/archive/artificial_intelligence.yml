@@ -1346,3 +1346,8 @@ steps:
     - data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
       - data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
         - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://grapher/gallup/2026-07-15/ai_indicator:
+    - data://garden/gallup/2026-07-15/ai_indicator:
+      - data://meadow/gallup/2026-07-15/ai_indicator:
+        - snapshot://gallup/2026-07-15/ai_indicator.csv

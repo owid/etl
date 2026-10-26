@@ -476,8 +476,8 @@ def _combine_dimensions(df_choices: pd.DataFrame, cols_choices: list[str], chart
         # Raw choices
         choices = df_dim_choices.to_dict("records")
 
-        # Build choices
-        dimension.choices = [DimensionChoice.from_dict(c) for c in choices]
+        # Omit pandas missing values before the metadata constructor coerces them to "nan" strings.
+        dimension.choices = [DimensionChoice.from_dict({k: v for k, v in c.items() if pd.notna(v)}) for c in choices]
 
     return dimensions
 

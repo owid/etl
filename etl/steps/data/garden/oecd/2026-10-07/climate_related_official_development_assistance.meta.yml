@@ -24,7 +24,7 @@ definitions:
     G7 countries: Canada, France, Germany, Italy, Japan, UK and US
 
   # Short descriptions, following those of our main ODA dataset.
-  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
+  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
   short_commitments: Monetary aid is estimated as commitments.
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
@@ -33,9 +33,9 @@ definitions:
     Official development assistance (ODA) is aid given to countries and territories on the OECD Development Assistance Committee (DAC) list of recipients and multilateral development institutions. To qualify as ODA, the aid has to serve the economic development and welfare of recipient countries and be either a grant or a loan with favorable terms.
   key_oda_list_of_countries_recipients: DAC country recipients are all low- and middle-income countries as defined by the World Bank, or least-developed countries as defined by the United Nations. All recipients are listed on [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
   key_bilateral_allocable: |-
-    This data covers bilateral allocable ODA from [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html), the major donor countries in the OECD and EU institutions. This is the bilateral aid that the Rio markers apply to. It excludes general budget support, debt relief (other than debt swaps), administrative costs, development awareness, and the costs of hosting refugees and students from developing countries in donor countries. It also excludes core contributions to multilateral organizations, such as the World Bank, and aid from donors outside the DAC.
+    This data covers bilateral allocable ODA from [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html), the major donor countries in the OECD and EU institutions. This is the bilateral aid that the Rio markers apply to. It excludes general budget support, debt relief (other than debt swaps), administrative costs, development awareness, and the costs of hosting refugees and students from developing countries in donor countries. It also excludes core contributions to multilateral organizations, such as the World Bank, and aid from donors outside the DAC. We also leave out the European Investment Bank, which doesn't use the Rio markers.
   key_bilateral_total: |-
-    Total bilateral ODA adds to bilateral allocable ODA the aid that the Rio markers don't apply to, such as general budget support, debt relief and the costs of hosting refugees in donor countries. It excludes core contributions to multilateral organizations and aid from donors outside the DAC.
+    Total bilateral ODA adds to bilateral allocable ODA the aid that the Rio markers don't apply to, such as general budget support, debt relief, and the costs of hosting refugees in donor countries. It excludes core contributions to multilateral organizations and aid from donors outside the DAC. We also leave out the European Investment Bank, which doesn't use the Rio markers.
   key_bilateral_total_denominator: |-
     This share divides climate-related aid by total bilateral ODA, which also includes the aid that the Rio markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries.
   key_outside_negative: |-
@@ -83,6 +83,8 @@ definitions:
     We calculated this indicator by dividing climate-related ODA in the sector by bilateral allocable ODA in the same sector, expressed as a percentage.
   processing_share_of_all_sectors: |-
     We calculated this indicator by dividing climate-related ODA in the sector by climate-related ODA in all sectors, expressed as a percentage.
+  processing_european_investment_bank: |-
+    We left out aid from the European Investment Bank (EIB), one of the EU institutions, as the OECD does in its own climate-related shares. The EIB tracks its climate finance with a different method, not with the Rio markers, so all its aid would otherwise count as non-climate aid.
   processing_per_capita: |-
     We calculated this indicator by dividing climate-related ODA received by the population of the recipient. We only calculated it for countries, not for groups of recipients.
 
@@ -108,7 +110,12 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_start_year}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Total bilateral ODA by donor"
           numDecimalPlaces: 0
@@ -127,7 +134,12 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_start_year}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Bilateral allocable ODA by donor"
           numDecimalPlaces: 0
@@ -147,7 +159,14 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_outside_rio_markers}\n\n{definitions.processing_start_year}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_outside_rio_markers}
+
+          {definitions.processing_start_year}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Bilateral ODA outside the scope of the Rio markers, by donor"
           numDecimalPlaces: 0
@@ -170,7 +189,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
@@ -193,7 +217,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "Mitigation only"
         display:
@@ -218,7 +247,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "Adaptation only"
         display:
@@ -243,7 +277,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "Mitigation and adaptation"
         display:
@@ -268,7 +307,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "Climate as principal objective"
         display:
@@ -293,7 +337,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "Climate as significant objective"
         display:
@@ -318,7 +367,14 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_non_climate}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Non-climate-related ODA by donor"
           numDecimalPlaces: 0
@@ -340,12 +396,19 @@ tables:
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_share}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           grapher_config:
             title: "Share of foreign aid given that is climate-related"
             subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA covered by the OECD's climate tracking."
-            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
+            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
             tab: "chart"
             hasMapTab: true
             chartTypes:
@@ -391,7 +454,14 @@ tables:
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_share_bilateral_total}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Climate-related ODA by donor (% of total bilateral ODA)"
           numDecimalPlaces: 1
@@ -414,7 +484,12 @@ tables:
           - "{definitions.key_regional}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_recipient_groups}"
+        description_processing: |-
+          {definitions.processing_start_year}
+
+          {definitions.processing_recipient_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Total bilateral ODA by recipient"
           numDecimalPlaces: 0
@@ -434,7 +509,12 @@ tables:
           - "{definitions.key_regional}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_recipient_groups}"
+        description_processing: |-
+          {definitions.processing_start_year}
+
+          {definitions.processing_recipient_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Bilateral allocable ODA by recipient"
           numDecimalPlaces: 0
@@ -458,7 +538,12 @@ tables:
           - "{definitions.key_regional}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_recipient_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           grapher_config:
             title: "Climate-related foreign aid received"
@@ -503,13 +588,20 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_regional}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_share}
+
+          {definitions.processing_recipient_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           grapher_config:
             title: "Share of foreign aid received that is climate-related"
             subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA received that is covered by the OECD's climate tracking."
-            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
-            tab: "map"
+            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief, and some costs in donor countries, such as hosting refugees."
+            tab: "chart"
             hasMapTab: true
             chartTypes:
               - "LineChart"
@@ -520,12 +612,18 @@ tables:
                 baseColorScheme: "YlGn"
                 binningStrategy: "manual"
                 customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+            hideFacetControl: false
+            selectedFacetStrategy: "entity"
             selectedEntityNames:
               - "India"
               - "Philippines"
               - "Bangladesh"
               - "Indonesia"
               - "Kenya"
+              - "Brazil"
+              - "Senegal"
+              - "Sierra Leone"
+              - "Cote d'Ivoire"
         display:
           name: "Climate-related ODA by recipient (% of bilateral allocable ODA)"
           numDecimalPlaces: 1
@@ -549,7 +647,14 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_regional}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_recipient_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_share_bilateral_total}
+
+          {definitions.processing_recipient_groups}
+
+          {definitions.processing_european_investment_bank}
         display:
           name: "Climate-related ODA by recipient (% of total bilateral ODA)"
           numDecimalPlaces: 1
@@ -572,7 +677,12 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_per_capita}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           grapher_config:
             title: "Climate-related foreign aid received per capita"
@@ -616,7 +726,14 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_start_year}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>>"
         display:
@@ -642,7 +759,14 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>>"
         display:
@@ -657,7 +781,14 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change mitigation, but not adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key: *key_sector_climate
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>> - Mitigation only"
         display:
@@ -672,7 +803,14 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change adaptation, but not mitigation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key: *key_sector_climate
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>> - Adaptation only"
         display:
@@ -687,7 +825,14 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\" that targets both climate change mitigation and adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key: *key_sector_climate
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>> - Mitigation and adaptation"
         display:
@@ -712,7 +857,16 @@ tables:
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_share_sector}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>>"
         display:
@@ -727,7 +881,16 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\", as a share of climate-related ODA in all sectors. {definitions.short_commitments}"
         description_key: *key_sector_climate_share
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_share_of_all_sectors}\n\n{definitions.processing_donor_groups}"
+        description_processing: |-
+          {definitions.processing_climate}
+
+          {definitions.processing_sector}
+
+          {definitions.processing_share_of_all_sectors}
+
+          {definitions.processing_donor_groups}
+
+          {definitions.processing_european_investment_bank}
         presentation:
           title_variant: "<<sector>>"
         display:
@@ -735,3 +898,27 @@ tables:
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+
+  # Not published in grapher: used by the static chart of climate-related bilateral aid.
+  total_oda:
+    variables:
+      oda_total:
+        title: "Total ODA given by DAC members"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "All [ODA](#dod:oda) from members of the OECD Development Assistance Committee (DAC), bilateral and multilateral. {definitions.short_commitments} {definitions.short_constant_usd}"
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator from the OECD DAC1 table as the total ODA of DAC countries, minus their contributions to EU institutions, plus the total ODA of EU institutions. EU institutions count as a donor here, as in the rest of this data, so we subtract the DAC countries' contributions to them, which would otherwise be counted twice.
+
+          {definitions.processing_european_investment_bank}
+      oda_bilateral_share_of_total:
+        title: "Bilateral ODA as a share of total ODA given by DAC members"
+        unit: "%"
+        short_unit: "%"
+        description_short: "Bilateral [ODA](#dod:oda) as a share of all ODA from members of the OECD Development Assistance Committee (DAC). {definitions.short_commitments}"
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator by dividing total bilateral ODA, from the OECD Creditor Reporting System, by total ODA, from the OECD DAC1 table, expressed as a percentage. Total ODA counts EU institutions as a donor and leaves out the DAC countries' contributions to them, which would otherwise be counted twice.
+
+          {definitions.processing_european_investment_bank}

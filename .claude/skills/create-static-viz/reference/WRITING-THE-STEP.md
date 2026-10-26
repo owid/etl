@@ -397,6 +397,12 @@ with its labels (`Note:`, `Data source:` — singular — the exact tagline and 
   so there is genuinely nothing left to explain.
 - A caveat about **what the chart claims** cannot go. Move it into the subtitle, which mobile does
   have. Dropping it silently reintroduces an over-claim.
+- A caveat too long for the subtitle can **stay a Note, drawn as the footer's first row**: one call
+  per line at the footer rows' pitch (two on the first line, the bold `Note:` lead-in and then the
+  rest in regular weight, since matplotlib has no rich text), its last line box one footer row gap
+  above `Data source:`, and the band ending at its top, with as much air below the last mark as above
+  the first. In Figma it then moves into the footer's auto-layout (`/owid-staff:create-figma-chart`'s
+  GOTCHAS.md).
 
 **Write a caveat in the chart's own categories, and check it against the producer's mapping.** A
 country note copied from the source's terms ("counts as unpaid work") can turn false once the chart

@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+# Rebuild with the shared chart-combining fix that preserves missing choice descriptions and groups.
+
 from etl.helpers import PathFinder
 from etl.viz import combine_charts
 

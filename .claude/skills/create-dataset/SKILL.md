@@ -54,7 +54,7 @@ If they have uncommitted local changes or a detached HEAD that blocks this, surf
 
 ### Step 1 — Get the data into reach and inspect it (no questions yet)
 
-If the input is a **web link**, first obtain the actual data file: download a direct CSV/Excel/JSON URL (use `etl.http`'s session for OWID hosts; plain download otherwise), or if it's a landing page, WebFetch it to find the download link. Save it locally so the snapshot can ingest it. If the input is already a **local file**, use it directly.
+If the input is a **web link**, first obtain the actual data file: download a direct CSV/Excel/JSON URL (use `etl.http`'s session for OWID hosts; plain download otherwise), or if it's a landing page, WebFetch it to find the download link (if the page blocks WebFetch or needs JavaScript, offer to open it in the user's Chrome through the Claude in Chrome extension). Save it locally so the snapshot can ingest it. If the input is already a **local file**, use it directly.
 
 Then read the file and figure out its shape. Do **not** ask the user anything in this step.
 
