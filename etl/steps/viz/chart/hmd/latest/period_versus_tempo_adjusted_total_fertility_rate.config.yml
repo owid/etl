@@ -1,0 +1,31 @@
+grapher_schema: "011"
+chart_config_id: 01935484-705d-733d-8838-4e6c3ad1ba10
+slug: period-versus-tempo-adjusted-total-fertility-rate
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#adjtfr__birth_order_total
+          display:
+            name: Tempo-adjusted TFR
+        - catalogPath: period#tfr__birth_order_total
+          display:
+            name: Total fertility rate (TFR)
+        - catalogPath: period#patfr__birth_order_total
+          display:
+            name: Parity and age-adjusted TFR
+            color: '#2c8465'
+    config:
+      title: Total fertility rate versus adjusted fertility rate
+      subtitle: 'The [total fertility rate](#dod:fertility-rate) is compared to two alternative metrics: (1) the tempo-adjusted total fertility rate, which is adjusted to account for delays or advances in childbearing; (2)'
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - Sweden
+      yAxis:
+        min: 0

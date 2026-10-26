@@ -362,3 +362,12 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/pew/latest/religious_composition:
     - data://grapher/pew/2025-10-31/religious_composition
+  # archived; last active in ee3a9edbbc5c on 2026-10-22
+  data://meadow/hmd/2025-10-22/hfd:
+    - snapshot://hmd/2025-10-22/hfd.zip
+  # archived; last active in ee3a9edbbc5c on 2026-10-22
+  data://garden/hmd/2025-10-22/hfd:
+    - data://meadow/hmd/2025-10-22/hfd
+  # archived; last active in ee3a9edbbc5c on 2026-10-22
+  data://grapher/hmd/2025-10-22/hfd:
+    - data://garden/hmd/2025-10-22/hfd

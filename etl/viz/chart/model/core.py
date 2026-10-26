@@ -135,6 +135,10 @@ class Chart(MDIMBase):
     # their catalog path instead. See `validate_chart_config_id()`.
     chart_config_id: str | None = None
 
+    # Public URL slug. Required for single charts; optional for mdims. Applied only when grapher
+    # creates the chart or the mdim has no slug yet; an existing slug is never changed from ETL.
+    slug: str | None = None
+
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
     # Grapher chart-config schema version that this chart's view configs were authored
@@ -321,6 +325,9 @@ class Chart(MDIMBase):
         # Single charts must declare their grapher identity (`chart_config_id`); mdims must not.
         self.validate_chart_config_id()
 
+        # Single charts must declare their slug.
+        self.validate_slug()
+
         # Run sanity checks on grouped views
         self.validate_grouped_views()
 
@@ -379,7 +386,7 @@ class Chart(MDIMBase):
 
         Two kinds of chart are skipped, both because there is no page to attach a
         package to: explorers, which have no `multi_dim_data_pages` row at all, and
-        MDIMs that have a row but no slug because nobody has published them yet. The
+        MDIMs that have a row but that nobody has published yet. The
         latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
         staging server -- so it must not fail the step. A chart published later
         gets its package on the next run.
@@ -445,15 +452,36 @@ class Chart(MDIMBase):
         config.pop("grapher_schema", None)
         config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
+        # The slug is not part of the mdim config; grapher stores it on the mdim row.
+        config.pop("slug", None)
+
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
-        admin_api.put_mdim_config(self.catalog_path, config)
+        mdim_id = admin_api.put_mdim_config(self.catalog_path, config)["id"]
+
+        if self.slug:
+            self._set_mdim_slug_if_missing(admin_api, mdim_id)
 
         # Link to preview
         log.info(f"PREVIEW: {owid_env.chart_preview(self.catalog_path)}")
+
+    def _set_mdim_slug_if_missing(self, admin_api: AdminAPI, mdim_id: int) -> None:
+        """Give the mdim the config's `slug` if it has none yet. Renaming stays an admin act."""
+        slug_in_grapher = admin_api.get_mdim(mdim_id)["slug"]
+        if not slug_in_grapher:
+            admin_api.set_mdim_slug(mdim_id, self.slug)
+            log.info("chart.mdim.slug_set", catalog_path=self.catalog_path, slug=self.slug)
+        elif slug_in_grapher != self.slug:
+            log.warning(
+                "chart.mdim.slug_not_applied",
+                catalog_path=self.catalog_path,
+                slug_in_grapher=slug_in_grapher,
+                slug_in_config=self.slug,
+                reason="an existing mdim's slug cannot be changed from ETL; rename it in the admin instead",
+            )
 
     def snake_case_slugs(self):
         """
@@ -859,6 +887,17 @@ class Chart(MDIMBase):
                     "`chart_config_id` is not a UUIDv7. Grapher generates v7 UUIDs for chart "
                     "configs — double-check this is the intended chart's `charts.configId`."
                 ),
+            )
+
+    def validate_slug(self):
+        """`slug` is required for single charts, since grapher cannot create a chart without one."""
+        if self._chart_type != "multidim" or self.dimensions:
+            return
+        if not self.slug:
+            raise ValueError(
+                f"Chart '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing a "
+                "top-level `slug`, the chart's public URL. For a chart that already exists, use its "
+                "current slug; for a new one, preferably the step's short name with dashes."
             )
 
     def validate_default_selection(self):

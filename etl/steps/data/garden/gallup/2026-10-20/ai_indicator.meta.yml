@@ -1,0 +1,77 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      attribution_short: Gallup
+      topic_tags:
+        - Artificial Intelligence
+
+  # See the Survey Methods sections in Gallup's workplace articles for more detail (sample size and fielding dates of each wave): https://www.gallup.com/workplace/712736/organizational-adoption-jumps-six-points.aspx.
+  # Question wording, response options and per-question respondent counts (up to Nov 2025) are in Gallup's topline PDF: https://www.gallup.com/file/workplace/701867/Workplace%20Q4%20Topline%20AI%20Trends.pdf
+  desc_key_question: &desc_key_question |-
+    The survey question asked: “How often do you use artificial intelligence in your role?”, with response options ranging from “Daily” to “Never”.
+  description_key_methodology: &methodology
+    - Based on online surveys of randomly selected adults aged 18 and older who work full time or part time for organizations in the United States.
+    - Gallup weights responses to match the US adult population by gender, age, race, Hispanic ethnicity, education, and region, using figures from the US Census Bureau’s Current Population Survey.
+    - Each survey round covered between about 19,000 and 24,000 employed US adults. Not all of them were asked this question. In the May 2023, May 2024, and May 2025 rounds, about 9,000 to 10,000 people answered it; in the August and November 2025 rounds, about 21,000 did.
+
+dataset:
+  update_period_days: 90
+
+  owners:
+    - Pablo Arriagada
+    - Edouard Mathieu
+tables:
+  ai_indicator:
+    variables:
+      daily_ai_users:
+        title: &daily_title Share of US employees who use AI at work daily
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of US employees who say they use artificial intelligence at work every day.
+        description_key:
+          - *desc_key_question
+          - Daily AI users are employees who say they use artificial intelligence in their role daily.
+          - *methodology
+        display:
+          numDecimalPlaces: 0
+          tolerance: 0
+          name: Daily AI users
+          timeInterval: quarter
+        presentation:
+          title_public: *daily_title
+
+      frequent_ai_users:
+        title: &frequent_title Share of US employees who use AI at work a few times a week or more
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of US employees who say they use artificial intelligence at work a few times a week or more.
+        description_key:
+          - *desc_key_question
+          - Frequent AI users are employees who say they use artificial intelligence in their role at least a few times a week. This includes employees who say they use it daily or a few times a week.
+          - *methodology
+        display:
+          numDecimalPlaces: 0
+          tolerance: 0
+          name: Frequent AI users
+          timeInterval: quarter
+        presentation:
+          title_public: *frequent_title
+
+      total_ai_users:
+        title: &total_title Share of US employees who use AI at work a few times a year or more
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of US employees who say they use artificial intelligence at work a few times a year or more.
+        description_key:
+          - *desc_key_question
+          - Total AI users are employees who say they use artificial intelligence in their role at least a few times a year. This includes employees who say they use it daily, a few times a week, a few times a month, or a few times a year.
+          - *methodology
+        display:
+          numDecimalPlaces: 0
+          tolerance: 0
+          name: Total AI users
+          timeInterval: quarter
+        presentation:
+          title_public: *total_title

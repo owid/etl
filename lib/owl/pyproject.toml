@@ -35,6 +35,9 @@ dev = [
 
 [tool.uv]
 exclude-newer = "3 days"
+# certifi is the CA trust store; its releases distrust compromised CAs, so a cooldown would
+# only keep forged certificates trusted for longer.
+exclude-newer-package = { certifi = false }
 
 [tool.uv.sources]
 owid-catalog = { path = "../catalog", editable = true }

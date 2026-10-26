@@ -145,10 +145,11 @@ async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUr
  * so preview them through the admin Grapher route (`admin/grapher/{slug}`), which can
  * render unpublished charts.
  *
- * We only classify as "chart" when the YAML has `dimensions: []` AND there is no sibling
- * `.py` file. A sibling `.py` can populate dimensions programmatically (e.g. the
- * air_pollution step uses `dimensions: []` as a placeholder), so the empty-list alone
- * isn't a reliable signal.
+ * We classify as "chart" when the YAML has `dimensions: []` AND either there is no sibling
+ * `.py` file or the YAML has a `chart_config_id`. A sibling `.py` can populate dimensions
+ * programmatically (e.g. the air_pollution step uses `dimensions: []` as a placeholder), so
+ * the empty-list alone isn't a reliable signal; a `chart_config_id` only exists on single charts.
+ * The slug comes from the YAML's `slug` when set, else from the short name.
  */
 async function parseExportMultidim(
 	filePath: string,
@@ -168,9 +169,13 @@ async function parseExportMultidim(
 	const pyPath = configPath.replace(/\.config\.yml$/, '.py');
 
 	let hasEmptyDimensions = false;
+	let hasChartConfigId = false;
+	let configSlug: string | undefined;
 	try {
 		const content = await readFile(configPath, 'utf8');
 		hasEmptyDimensions = /^dimensions:\s*\[\s*\]\s*(#.*)?$/m.test(content);
+		hasChartConfigId = /^chart_config_id:/m.test(content);
+		configSlug = content.match(/^slug:\s*["']?([^"'\s#]+)/m)?.[1];
 	} catch {
 		// No sibling .config.yml — can't classify, fall back to mdim.
 	}
@@ -183,8 +188,8 @@ async function parseExportMultidim(
 		// No sibling .py — fully-declarative step.
 	}
 
-	const isChart = hasEmptyDimensions && !hasPy;
-	return { stepUri: `viz://chart/${stepPath}`, catalogPath, isChart, chartSlug };
+	const isChart = hasEmptyDimensions && (!hasPy || hasChartConfigId);
+	return { stepUri: `viz://chart/${stepPath}`, catalogPath, isChart, chartSlug: configSlug ?? chartSlug };
 }
 
 /**
