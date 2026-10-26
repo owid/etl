@@ -91,7 +91,8 @@ exclude-newer = "3 days"
 # a cooldown would only make the cost estimates lag behind them.
 # certifi is the CA trust store; its releases distrust compromised CAs, so a cooldown would
 # only keep forged certificates trusted for longer.
-exclude-newer-package = { genai-prices = false, certifi = false }
+# grpcio ignores certifi and ships its own root certificates (roots.pem), so the same applies.
+exclude-newer-package = { genai-prices = false, certifi = false, grpcio = false }
 link-mode = "hardlink"
 
 # PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*
