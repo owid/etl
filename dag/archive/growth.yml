@@ -66,3 +66,12 @@ steps:
     - data://grapher/wb/2025-09-08/gender_statistics
     - data://garden/who/2026-05-22/gho
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://garden/imf/2026-04-22/world_economic_outlook:
+    - data://meadow/imf/2026-04-22/world_economic_outlook
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://grapher/imf/2026-04-22/world_economic_outlook:
+    - data://garden/imf/2026-04-22/world_economic_outlook
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://meadow/imf/2026-04-22/world_economic_outlook:
+    - snapshot://imf/2026-04-22/world_economic_outlook.csv

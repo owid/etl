@@ -95,8 +95,12 @@ Create the directory if it doesn't exist:
 mkdir -p etl/steps/viz/chart/{namespace}/latest
 ```
 
-The chart's public slug is derived from the short name with underscores replaced by dashes
-(`banning_of_chick_culling` → `banning-of-chick-culling`).
+The top-level `slug:` is the chart's public URL (`ourworldindata.org/grapher/<slug>`). Single charts must
+set it; a multidim without it gets its slug in the admin. Naming the step after the slug is not required,
+but strongly recommended, so the file and the URL match (`banning_of_chick_culling.config.yml` →
+`slug: banning-of-chick-culling`). Ask the user for the slug before merging: ETL applies it only when it
+creates the chart (or the multidim has no slug yet) and never renames one afterwards, so a later rename in
+the admin shows as drift.
 
 ### Python file: only when it does real work
 
@@ -214,6 +218,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ```yaml
 grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
+slug: banning-of-chick-culling
 topic_tags:
   - "Animal Welfare"
 dimensions: []
@@ -245,6 +250,8 @@ Key fields:
   authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required** for single charts, the chart's identity in grapher (`charts.configId`).
   See Step 4.
+- `slug` — **required** for single charts, optional for multidims: the chart's public URL. See "Directory
+  structure".
 - `topic_tags` — **required**, see "Topic tags".
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not a multidim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
@@ -495,13 +502,17 @@ the rendered config (charts.configId) = merge(indicator config, ETL layer, admin
 ```
 
 Admin overrides always win on a per-field basis. To "unlink" a field back to the ETL-authored value, click
-the chip next to the field in the admin editor — it clears that field from the admin layer.
+the chip next to the field in the admin editor — it clears that field from the admin layer. To go the other
+way, copying admin edits into the YAML so the chart is defined in ETL again, use the `pull-chart` skill
+(`etl chart-pull`).
 
 ### Adopting a chart that exists only in the admin
 
-Write the `.config.yml` (single-chart shape), then point it at the existing chart with
-`etl chart-config-id lookup <config.yml> --chart-id <id>` (see Step 4), and edit here from then on. Tooling
-to generate the rest of the YAML from the live config (`chart_pull` CLI) is a follow-up.
+Write a minimal `.config.yml` (single-chart shape with the chart's current `slug`, one empty view) and its DAG entry with the grapher
+dataset as dependency, then point it at the existing chart with
+`etl chart-config-id lookup <config.yml> --chart-id <id>` (see Step 4). Then run
+`etl chart-pull <config.yml> --env <production env file> --apply`, which copies the rest of the live config
+(indicators, FAUST, settings) into the YAML. Edit here from then on.
 
 ## Troubleshooting
 

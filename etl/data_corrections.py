@@ -53,6 +53,18 @@ a relationship between two columns rather than a fixed constant::
       action: drop                                # drop the row where barn == free_range
       ...
 
+In a table with more dimensions than entity and year, ``entity`` + ``years`` can be combined with a
+``match`` on the other columns, and the entry selects the rows that satisfy both. The entity and year
+are then given only once: a ``match`` that also names the entity or year column is rejected::
+
+    - indicator: death_rate
+      entity: Malta
+      years: {from: 1973, to: 1981}
+      match: {age_group: over 85 years}
+      action: override
+      value: null
+      ...
+
 Actions:
 - ``drop``     — remove the matched rows (use for long/tidy tables, where a row *is* one data point).
 - ``override`` — replace the indicator value of the matched rows with ``value``. Set ``value: null``
@@ -153,12 +165,12 @@ def _label(correction: dict[str, Any]) -> str:
 
     There is no `id` field to invent — we derive a label from what the correction targets.
     """
-    target = (
-        f"{correction.get('entity')} {correction.get('years')}"
-        if "entity" in correction
-        else f"match {correction.get('match')}"
-    )
-    return f"{correction.get('producer', '?')} / {correction.get('indicator', '?')} / {target}"
+    parts = []
+    if "entity" in correction:
+        parts.append(f"{correction.get('entity')} {correction.get('years')}")
+    if "match" in correction:
+        parts.append(f"match {correction.get('match')}")
+    return f"{correction.get('producer', '?')} / {correction.get('indicator', '?')} / {' '.join(parts)}"
 
 
 def _validate_correction(correction: Any, path: Path | str) -> None:
@@ -186,9 +198,13 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
         f"Correction [{label}]: invalid status '{correction['status']}' (expected one of {VALID_STATUSES})."
     )
 
-    has_entity_years = "entity" in correction and "years" in correction
+    # `entity` and `years` only work as a pair; one without the other would be silently ignored.
+    assert ("entity" in correction) == ("years" in correction), (
+        f"Correction [{label}]: 'entity' and 'years' must be given together."
+    )
+    has_entity_years = "entity" in correction
     has_match = "match" in correction
-    assert has_entity_years ^ has_match, f"Correction [{label}]: specify exactly one of (entity + years) or match."
+    assert has_entity_years or has_match, f"Correction [{label}]: specify (entity + years), match, or both."
 
     if has_match:
         match = correction["match"]
@@ -197,10 +213,13 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
         assert isinstance(match, dict) and len(match) > 0, (
             f"Correction [{label}]: 'match' must be a non-empty mapping of column → value."
         )
-        # `entity`/`years` only apply to the entity+years form; mixing them with `match` is a mistake
-        # (they would be silently ignored), so reject the combination.
-        mixed = {"entity", "years"} & set(correction)
-        assert not mixed, f"Correction [{label}]: do not combine 'match' with {sorted(mixed)}."
+        # Combined with entity + years, `match` narrows the other dimensions only, so the entity and year
+        # are stated once. Custom entity/year column names are checked again when the correction is applied.
+        if has_entity_years:
+            duplicated = {DEFAULT_COUNTRY_COL, DEFAULT_YEAR_COL} & set(match)
+            assert not duplicated, (
+                f"Correction [{label}]: {sorted(duplicated)} given both in 'match' and as entity + years."
+            )
         # A match value may reference another column of the same row (`{column: <name>}`) instead of a
         # literal. Reject any other dict shape now, rather than letting it silently build an all-false
         # mask (a literal `==` against a dict never matches) that only surfaces as a confusing
@@ -316,18 +335,25 @@ def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col:
     index_names = [name for name in tb.index.names if name is not None]
     label = _label(correction)
 
+    mask = np.ones(len(tb), dtype=bool)
+
+    if "entity" in correction:
+        mask &= _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
+        mask &= _year_mask(correction["years"], _column_values(tb, year_col, index_names), label)
+
     if "match" in correction:
-        mask = np.ones(len(tb), dtype=bool)
+        if "entity" in correction:
+            duplicated = {country_col, year_col} & set(correction["match"])
+            assert not duplicated, (
+                f"Correction [{label}]: {sorted(duplicated)} given both in 'match' and as entity + years."
+            )
         for key, value in correction["match"].items():
             # `value` is shorthand for the indicator column; any other key matches that column by name.
             col = correction["indicator"] if key == "value" else key
             target = _resolve(tb, value, index_names, label)
             mask &= _eq_mask(_column_values(tb, col, index_names), target)
-        return mask
 
-    entity_mask = _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
-    year_values = _column_values(tb, year_col, index_names)
-    return entity_mask & _year_mask(correction["years"], year_values, label)
+    return mask
 
 
 def _check_expectation(tb: Table, correction: dict[str, Any], mask: np.ndarray, label: str) -> None:

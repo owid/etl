@@ -89,7 +89,9 @@ dependencies = [
 exclude-newer = "3 days"
 # genai-prices is the LLM price table, re-released whenever a provider changes prices;
 # a cooldown would only make the cost estimates lag behind them.
-exclude-newer-package = { genai-prices = false }
+# certifi is the CA trust store; its releases distrust compromised CAs, so a cooldown would
+# only keep forged certificates trusted for longer.
+exclude-newer-package = { genai-prices = false, certifi = false }
 link-mode = "hardlink"
 
 # PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*

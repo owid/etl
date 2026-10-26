@@ -49,7 +49,7 @@ COLUMNS_INDEX_FORMAT_MONTH = [
     "age",
     "month",
 ]
-SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Estimates"]
+SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Zero migration", "Estimates"]
 LOCATION_TYPES_CSV = [
     "Country/Area",
     "Geographic region",
@@ -329,6 +329,8 @@ def make_tb_population(interim_csvs: dict[str, Table]) -> Table:
     tb_population_h["month"] = "July"
     tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv")
     tb_population_c["month"] = "July"
+    tb_population_z = read_from_csv("un_wpp_population_zero_migration.csv")
+    tb_population_z["month"] = "July"
     tb_population = combine_population(
         [
             tb_population,
@@ -338,9 +340,18 @@ def make_tb_population(interim_csvs: dict[str, Table]) -> Table:
             tb_population_m,
             tb_population_h,
             tb_population_c,
+            tb_population_z,
         ]
     )
-    del tb_population_l, tb_population_m, tb_population_h, tb_population_c, tb_population_jan, tb_population_jan_medium
+    del (
+        tb_population_l,
+        tb_population_m,
+        tb_population_h,
+        tb_population_c,
+        tb_population_z,
+        tb_population_jan,
+        tb_population_jan_medium,
+    )
     tb_population = tb_population.format(COLUMNS_INDEX_FORMAT_MONTH, short_name="population")
     return tb_population
 
@@ -566,6 +577,7 @@ def read_from_xlsx(short_name: str, interim_csvs: dict[str, Table] | None = None
     tb_projections_medium = snap.read(safe_types=False, sheet_name="Medium variant", skiprows=16)
     tb_projections_low = snap.read(safe_types=False, sheet_name="Low variant", skiprows=16)
     tb_projections_high = snap.read(safe_types=False, sheet_name="High variant", skiprows=16)
+    tb_projections_zero_migration = snap.read(safe_types=False, sheet_name="Zero-migration", skiprows=16)
     # Merge tables
     tb = concat(
         [
@@ -573,6 +585,7 @@ def read_from_xlsx(short_name: str, interim_csvs: dict[str, Table] | None = None
             tb_projections_medium,
             tb_projections_low,
             tb_projections_high,
+            tb_projections_zero_migration,
         ],
         ignore_index=True,
     )

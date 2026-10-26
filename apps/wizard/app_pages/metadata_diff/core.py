@@ -936,6 +936,76 @@ def edit_fingerprint(old: Any, new: Any) -> tuple[str, str]:
     return joined(inserted), joined(deleted)
 
 
+def is_scattered_edit(inserted: str, deleted: str, max_spans: int = 2, max_chars: int = 160) -> bool:
+    """Whether an edit's one-line summary would be fragments rather than a sentence.
+
+    `edit_fingerprint` joins every changed span with " … ". One or two spans read fine as "old → new"; a
+    rewritten paragraph produces a dozen ("borders. … To … compare … trade …") that nobody can parse, and
+    the interleaved context line beside it is no better. Those edits read as before and after instead.
+    """
+    spans = max(inserted.count(" … "), deleted.count(" … ")) + 1
+    return spans > max_spans or len(inserted) + len(deleted) > max_chars
+
+
+def changed_passages(old: Any, new: Any) -> list[tuple[str, str]]:
+    """(old, new) for each bullet or paragraph that changed, aligned so a reworded one pairs with itself.
+
+    A WYSK is a list of bullets and a description a few paragraphs, and an edit usually touches some of
+    them. Splitting there gives the reader whole sentences to compare, and leaving the untouched ones out
+    keeps the change from drowning in the text around it. An added passage pairs with "" and a removed one
+    with "".
+    """
+
+    def units(value: Any) -> list[str]:
+        value = as_bullets(value)
+        if isinstance(value, list):
+            return [str(v).strip() for v in value if str(v).strip()]
+        if value is None or _is_nan(value):
+            return []
+        return [p.strip() for p in str(value).split("\n") if p.strip()]
+
+    old_units, new_units = units(old), units(new)
+    matcher = difflib.SequenceMatcher(a=old_units, b=new_units, autojunk=False)
+    pairs: list[tuple[str, str]] = []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        olds, news = old_units[i1:i2], new_units[j1:j2]
+        for k in range(max(len(olds), len(news))):
+            pairs.append((olds[k] if k < len(olds) else "", news[k] if k < len(news) else ""))
+    return pairs
+
+
+def before_after_html(old: Any, new: Any, max_passages: int = 4) -> str:
+    """The changed passages as Before / After rows, each side highlighting only its own words.
+
+    The readable form of a scattered edit: the reader sees the old sentence with what was cut struck
+    through, and under it the new sentence with what was written highlighted — two texts they can read,
+    instead of one where deletions and insertions alternate word by word.
+
+    Past `max_passages` the rest fold into an expander rather than being dropped: the card's verdict covers
+    the whole edit, so every passage it covers has to be one click away.
+    """
+
+    def row(old_text: str, new_text: str) -> str:
+        before = inline_diff_html(old_text, new_text, side="old") if old_text else "<em>(not there before)</em>"
+        after = inline_diff_html(old_text, new_text, side="new") if new_text else "<em>(removed)</em>"
+        return (
+            '<div class="mdd-ba">'
+            f'<div class="mdd-ba-row"><span class="mdd-ba-label">Before</span><span>{before}</span></div>'
+            f'<div class="mdd-ba-row"><span class="mdd-ba-label">After</span><span>{after}</span></div>'
+            "</div>"
+        )
+
+    pairs = changed_passages(old, new)
+    shown = "".join(row(o, n) for o, n in pairs[:max_passages])
+    rest = pairs[max_passages:]
+    if rest:
+        label = f"… and {len(rest)} more changed passage{'s' if len(rest) != 1 else ''}"
+        shown += f'<details class="mdd-note"><summary>{label}</summary>{"".join(row(o, n) for o, n in rest)}</details>'
+    return shown
+
+
 def diff_window_html(old: Any, new: Any, max_chars: int = 240, lead: int = 70) -> str:
     """Word-level diff of one change, windowed on the first edit rather than cut from the start.
 

@@ -1,0 +1,50 @@
+grapher_schema: "011"
+chart_config_id: 0193919c-f286-7d5b-b52d-deaf5ab0f6e1
+slug: women-who-have-next-birth-parity-progression-ratio
+topic_tags:
+  - Fertility Rate
+  - Population Growth
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort#ppr__birth_order_1
+          display:
+            name: From 0 to 1 births
+            unit: '%'
+            color: '#016450'
+            conversionFactor: 100
+        - catalogPath: cohort#ppr__birth_order_2
+          display:
+            name: From 1 to 2 births
+            unit: '%'
+            color: '#02818a'
+            conversionFactor: 100
+        - catalogPath: cohort#ppr__birth_order_3
+          display:
+            name: From 2 to 3 births
+            unit: '%'
+            color: '#3690c0'
+            conversionFactor: 100
+        - catalogPath: cohort#ppr__birth_order_4
+          display:
+            name: From 3 to 4 births
+            unit: '%'
+            color: '#67a9cf'
+            conversionFactor: 100
+    config:
+      title: Share of women who have the next birth
+      subtitle: The share of women who progress to having the next birth, if they have already had a given number of births. This is also called the "parity progression ratio".
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - United States
+      selectedFacetStrategy: entity
+      xAxis:
+        label: Women's birth year
+      yAxis:
+        max: 100
+        min: 0

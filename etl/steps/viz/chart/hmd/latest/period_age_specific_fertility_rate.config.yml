@@ -1,0 +1,108 @@
+grapher_schema: "011"
+chart_config_id: 0193d6ce-4f8d-7124-9ac5-b2bd7739de21
+slug: period-age-specific-fertility-rate
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1925
+          display:
+            name: '1925'
+            color: '#e6e6e6'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1930
+          display:
+            name: '1930'
+            color: '#cccccc'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1935
+          display:
+            name: '1935'
+            color: '#b2b2b2'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1940
+          display:
+            name: '1940'
+            color: '#999999'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1945
+          display:
+            name: '1945'
+            color: '#808080'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1950
+          display:
+            name: '1950'
+            color: '#6c6c6c'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1955
+          display:
+            name: '1955'
+            color: '#595959'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1960
+          display:
+            name: '1960'
+            color: '#464646'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1965
+          display:
+            name: '1965'
+            color: '#333333'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1970
+          display:
+            name: '1970'
+            color: '#462d2d'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1975
+          display:
+            name: '1975'
+            color: '#592626'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1980
+          display:
+            name: '1980'
+            color: '#6c2020'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1985
+          display:
+            name: '1985'
+            color: '#801a1a'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1995
+          display:
+            name: '1995'
+            color: '#9f1313'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_1990
+          display:
+            name: '1990'
+            color: '#bf0d0d'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_2000
+          display:
+            name: '2000'
+            color: '#df0606'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_2005
+          display:
+            name: '2005'
+            color: '#ff2424'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_2015
+          display:
+            name: '2015'
+            color: '#ff5555'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_2020
+          display:
+            name: '2020'
+            color: '#ff7070'
+        - catalogPath: period_ages_years#asfr_period__year_as_dimension_2010
+          display:
+            name: '2010'
+            color: '#ff8a8a'
+    config:
+      title: Age of mothers at childbirth by year
+      subtitle: The age distribution of women giving birth in a particular year, shown for five year intervals. The vertical axis shows the [age-specific fertility rate](#dod:age-specific-fertility-rate) per woman.
+      variantName: HFD, calendar year
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      chartTypes:
+        - LineChart
+      facettingLabelByYVariables: year
+      hideAnnotationFieldsInTitle:
+        time: true
+      hideTimeline: true
+      selectedEntityNames:
+        - United States
+      xAxis:
+        label: Age of women
+      yAxis:
+        min: 0

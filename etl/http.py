@@ -34,6 +34,7 @@ For ``httpx`` clients, pass :data:`HEADERS` as the ``headers=`` kwarg::
 
 from __future__ import annotations
 
+import os
 import platform
 
 import requests
@@ -51,11 +52,21 @@ HEADERS = {"User-Agent": USER_AGENT}
 STORAGE_OPTIONS = {"User-Agent": USER_AGENT}
 
 
-def _make_session() -> requests.Session:
+def make_session() -> requests.Session:
+    """Create a long-lived session that a forked child doesn't share with its parent.
+
+    ETL runs each step in a forked child, which inherits a copy of every pooled socket. A
+    connection used from both processes breaks (TLS keeps its state in process memory), so the
+    child empties its pool right after the fork; the parent's connections stay open. DB engines
+    solve the same problem by caching per pid (`etl.db.get_engine`).
+
+    The fork hook keeps the session alive for good, so create one per process, not per call.
+    """
     s = requests.Session()
     s.headers["User-Agent"] = USER_AGENT
+    os.register_at_fork(after_in_child=s.close)
     return s
 
 
 #: Module-level session — reuse for connection pooling.
-session = _make_session()
+session = make_session()

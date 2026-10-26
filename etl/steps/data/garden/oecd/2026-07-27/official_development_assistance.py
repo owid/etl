@@ -185,6 +185,14 @@ REGIONS_WITH_PARTS = {
     "Africa (OECD)": ["North of Sahara (OECD)", "South of Sahara (OECD)", "Africa, regional (OECD)"],
 }
 
+# Entity names this step filters on, as they are after harmonization with the countries.json mapping.
+# NOTE: At every update, check that these still match the mapping: a filter on a name that no longer exists matches
+# nothing and the step runs without error. `sanity_check_entity_names` asserts that each of them is in the data.
+ALL_RECIPIENTS = "All recipients (OECD)"
+MULTILATERAL_DONORS = "Multilateral organizations"
+EU_INSTITUTIONS = "EU institutions"
+NON_DAC_COUNTRIES = "Non-DAC countries"
+
 
 def run() -> None:
     #
@@ -250,6 +258,8 @@ def run() -> None:
         columns_in_current_prices=[],
         recipient_or_donor="donor",
     )
+
+    sanity_check_entity_names(tb_dac1=tb_dac1, tb_dac2a=tb_dac2a)
 
     tb_dac1 = create_indicators_per_capita(
         tb=tb_dac1, indicator_list=["i_oda_net_disbursements", "oda_grant_equivalents"]
@@ -412,7 +422,7 @@ def add_donor_data_from_recipient_dataset(tb_donor: Table, tb_recipient: Table) 
     ]
 
     # Select 'All Recipients, Total' in country column
-    tb_recipient = tb_recipient[tb_recipient["country"] == "All recipients (OECD)"].reset_index(drop=True)
+    tb_recipient = tb_recipient[tb_recipient["country"] == ALL_RECIPIENTS].reset_index(drop=True)
 
     # Drop country
     tb_recipient = tb_recipient.drop(columns="country")
@@ -432,8 +442,12 @@ def add_donor_data_from_recipient_dataset(tb_donor: Table, tb_recipient: Table) 
     tb = pr.merge(tb_donor, tb_recipient_grants_loans, on=["country", "year"], how="left")
     tb = pr.merge(tb, tb_recipient_oda, on=["country", "year"], how="outer")
 
-    # Use oda for country Multilaterals, Total
-    tb.loc[tb["country"] == "Multilateral organizations (OECD)", "i_oda_net_disbursements"] = tb["oda"]
+    # Take the ODA of all multilateral organizations from DAC2a. In DAC1, "Multilaterals, Total" only includes EU
+    # institutions, the only multilateral donor that reports to DAC1; the others report to the CRS, which feeds DAC2a.
+    # Years without DAC2a data (e.g. the preliminary latest year) are left empty rather than showing only EU institutions.
+    is_multilateral = tb["country"] == MULTILATERAL_DONORS
+    tb.loc[is_multilateral, "i_oda_net_disbursements"] = tb.loc[is_multilateral, "oda"]
+    sanity_check_multilateral_donors(tb=tb)
 
     # When i_oda_net_disbursements is missing, fill with oda
     tb["i_oda_net_disbursements_multilaterals_private_grants"] = tb["i_oda_net_disbursements"].fillna(tb["oda"])
@@ -621,7 +635,7 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
     # 2.7% of GNI, against a UN target of 0.7%. The mismatch persists in later years too, but only
     # distorts these two visibly. Re-check whether the source has filled in the missing GNI figures.
     tb.loc[
-        (tb["country"] == "Non-DAC countries") & (tb["year"] <= 1991),
+        (tb["country"] == NON_DAC_COUNTRIES) & (tb["year"] <= 1991),
         "i_oda_net_disbursements_share_gni",
     ] = None
 
@@ -763,6 +777,33 @@ def sanity_check_inputs(tb_dac1: Table, tb_dac2a: Table, tb_dac5: Table) -> None
                 f"source data: {sorted(missing)}. The OECD has most likely renamed them; update the "
                 f"mapping (and the matching indicator names in the .meta.yml) to the new labels."
             )
+
+
+def sanity_check_entity_names(tb_dac1: Table, tb_dac2a: Table) -> None:
+    """Check that every entity name this step filters on is in the data, after harmonization."""
+    expected = [
+        (tb_dac1, "country", [MULTILATERAL_DONORS, EU_INSTITUTIONS, NON_DAC_COUNTRIES]),
+        (tb_dac2a, "country", [ALL_RECIPIENTS] + list(REGIONS_WITH_PARTS) + sum(REGIONS_WITH_PARTS.values(), [])),
+        (tb_dac2a, "donor", [MULTILATERAL_DONORS, EU_INSTITUTIONS]),
+    ]
+    for tb, column, names in expected:
+        missing = sorted(set(names) - set(tb[column].astype(str).unique()))
+        assert not missing, (
+            f"Entity names this step filters on are missing from the {column} column: {missing}. They were probably "
+            "renamed in the countries.json mapping; update the constants at the top of this step."
+        )
+
+
+def sanity_check_multilateral_donors(tb: Table) -> None:
+    """All multilateral organizations must give more ODA than EU institutions alone (which are one of them)."""
+    tb_oda = tb[tb["country"].isin([MULTILATERAL_DONORS, EU_INSTITUTIONS])].pivot_table(
+        index="year", columns="country", values="i_oda_net_disbursements", observed=True
+    )
+    both = tb_oda.dropna()
+    assert len(both) > 0 and (both[MULTILATERAL_DONORS] > both[EU_INSTITUTIONS]).all(), (
+        "ODA of all multilateral organizations is not above that of EU institutions in every year: the multilateral "
+        "total is probably DAC1's again, which only includes EU institutions."
+    )
 
 
 def sanity_check_outputs(tb: Table, subcomponent_list: list[str]) -> None:
