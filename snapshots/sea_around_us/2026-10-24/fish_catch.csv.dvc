@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Sea Around Us reconstructed marine fisheries catch"
+    description: |-
+      Sea Around Us, a research initiative at the University of British Columbia, estimates how much fish and other marine animals the world’s fishers catch each year, from 1950 onward.
+
+      Most countries report their catch to the Food and Agriculture Organization of the United Nations (FAO), but these official figures leave out a lot: much of the catch by small-scale, subsistence, and recreational fishers, unreported catch by industrial fleets, and the fish thrown back into the sea. Sea Around Us attempts to reconstruct the full catch of each country by combining the official figures with estimates of these missing parts, drawn from scientific studies, government reports, and local experts.
+
+      The catch is given in tonnes and broken down by fishing country (the country of the fleet doing the fishing), by fishing sector (industrial, artisanal, subsistence, recreational), by type of fishing gear, by what the catch is used for (eaten directly by people, turned into fishmeal and fish oil, mostly for animal feed, or other uses), by whether it was brought to land or thrown back, and by whether it appears in official statistics.
+
+      The catch of marine mammals, reptiles, corals, sponges, and seaweed is not included, nor is fish farming (aquaculture).
+    # Date of the Sea Around Us news post announcing the update of the catch data to 2019.
+    # NOTE: The citation year (2020) differs from date_published on purpose: it is the citation Sea Around Us asks for
+    # (https://www.seaaroundus.org/citation-policy/), and it has not changed with the data updates.
+    date_published: "2022-11-17"
+
+    # Citation
+    producer: "Sea Around Us"
+    citation_full: |-
+      Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
+
+    # Files
+    # The data is fetched automatically by fish_catch.py from the Sea Around Us API (https://api.seaaroundus.org/api/v1/).
+    # NOTE: The API also offers other breakdowns that are not snapshotted (as of 2026-10-24): catch by taxon, commercial
+    # group and functional group, landed values, and catch by EEZ, Large Marine Ecosystem, high seas and FAO area.
+    url_main: https://www.seaaroundus.org/data/#/global
+    date_accessed: "2026-10-24"
+
+    # License
+    license:
+      name: "CC BY-NC 4.0"
+      url: https://www.seaaroundus.org/citation-policy/
+outs:
+  - md5: 32493b27b3fbae1f3cb37020aad63764
+    size: 12892955
+    path: fish_catch.csv
