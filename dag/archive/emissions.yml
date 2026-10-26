@@ -671,3 +671,16 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://explorers/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+  # archived; last active in 0b8787d99261 on 2026-10-26
+  data://grapher/gcp/2025-11-13/global_carbon_budget:
+    - data://garden/gcp/2025-11-13/global_carbon_budget:
+      - data://garden/energy/2026-05-05/primary_energy_consumption
+      - data://garden/ggdc/2024-04-26/maddison_project_database
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/gcp/2025-11-13/global_carbon_budget:
+        - snapshot://gcp/2025-11-13/global_carbon_budget_national_emissions.xlsx
+        - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
+        - snapshot://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
+        - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
+      - data://garden/demography/2024-07-15/population
+      - data://garden/wb/2026-07-01/income_groups
