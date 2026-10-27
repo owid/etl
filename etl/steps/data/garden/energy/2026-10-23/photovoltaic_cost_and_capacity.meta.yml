@@ -24,7 +24,7 @@ tables:
         description_key:
           - "Solar photovoltaic module prices refer to the cost of the solar panel itself, and do not include installation or other system components."
           - "Prices are compiled from four sources: Nemet (2009) for 1975–2003, Farmer & Lafond (2016) for 2004–2009, IRENA's Renewable Power Generation Costs in 2024 report for 2010–2019, and IRENA's Renewable Power Generation Costs in 2025 report for 2020 onward."
-          - "Due to limited data availability, from 2010 onward we use benchmark prices for modules sold in Europe, which IRENA reports based on data from the trading platform pvXchange. Up to 2019, we use IRENA's global module price index. IRENA has stopped publishing this index, so from 2020 we use its price for mainstream modules, which are standard crystalline silicon modules."
+          - "Due to limited data availability, from 2010 onward we use benchmark prices for modules sold in Europe, which IRENA reports based on data from the trading platform pvXchange. Up to 2019, we use IRENA's module prices, which are based on thin-film modules until late 2013 and on a global price index after that. IRENA has stopped publishing this index, so from 2020 we use its price for mainstream modules, which are standard crystalline silicon modules."
           - "Historical prices have been adjusted for inflation using the [World Bank's US GDP deflator (linked series)](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US)."
         display:
           name: Solar PV module cost

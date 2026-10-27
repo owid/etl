@@ -111,7 +111,7 @@ def sanity_check_irena_inputs(tb_irena_index: Table, tb_irena_by_technology: Tab
     assert set(tb_technology["year"]) == set(range(FIRST_YEAR_BY_TECHNOLOGY, LATEST_YEAR + 1)), error
 
     # The two series should agree within 20% in the overlapping years, so that they can be joined without rescaling.
-    # NOTE: 2024 is excluded, since the index fell much less than every technology.
+    # NOTE: 2024 is excluded, since the index only covers January to March of that year.
     index = tb_irena_index.set_index("year")["cost"]
     technology = tb_technology.set_index("year")["cost"]
     for year in [2020, 2021, 2022, 2023]:
