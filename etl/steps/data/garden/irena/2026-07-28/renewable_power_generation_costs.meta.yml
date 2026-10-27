@@ -85,3 +85,14 @@ tables:
           - The data (expressed in constant 2024 US dollars) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator (linked series)](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation.
         display:
           shortUnit: "$"
+  solar_photovoltaic_module_prices_by_technology:
+    title: Solar photovoltaic module prices by technology
+    variables:
+      cost:
+        title: Solar photovoltaic module prices by technology
+        unit: "constant {LATEST_YEAR} US$ per watt"
+        short_unit: "$/W"
+        description_processing: |-
+          - This data is taken from the Renewable Power Generation Costs in 2025 report.
+        display:
+          shortUnit: "$"

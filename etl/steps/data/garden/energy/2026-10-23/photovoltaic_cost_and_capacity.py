@@ -37,10 +37,6 @@ LATEST_YEAR = 2025
 FIRST_YEAR_BY_TECHNOLOGY = 2020
 # Module technology (as named by IRENA) used from FIRST_YEAR_BY_TECHNOLOGY onwards.
 MODULE_TECHNOLOGY = "Mainstream"
-# Years where the global price index and the chosen technology should agree closely, and the allowed range of their
-# ratio. Later overlapping years (2023 and 2024) are excluded, since the index fell much less than every technology.
-SPLICE_CHECK_YEARS = [2020, 2021, 2022]
-SPLICE_CHECK_RATIO_RANGE = (0.8, 1.2)
 
 
 def get_usd_conversion_factor(from_year: int) -> float:
@@ -114,13 +110,14 @@ def sanity_check_irena_inputs(tb_irena_index: Table, tb_irena_by_technology: Tab
     error = f"'{MODULE_TECHNOLOGY}' module prices should cover {FIRST_YEAR_BY_TECHNOLOGY} to {LATEST_YEAR}."
     assert set(tb_technology["year"]) == set(range(FIRST_YEAR_BY_TECHNOLOGY, LATEST_YEAR + 1)), error
 
-    # The two series should agree closely in the first overlapping years, so that they can be joined without rescaling.
+    # The two series should agree within 20% in the overlapping years, so that they can be joined without rescaling.
+    # NOTE: 2024 is excluded, since the index fell much less than every technology.
     index = tb_irena_index.set_index("year")["cost"]
     technology = tb_technology.set_index("year")["cost"]
-    for year in SPLICE_CHECK_YEARS:
+    for year in [2020, 2021, 2022, 2023]:
         ratio = technology.loc[year] / index.loc[year]
         error = f"'{MODULE_TECHNOLOGY}' module price in {year} is {ratio:.2f} times IRENA's global price index."
-        assert SPLICE_CHECK_RATIO_RANGE[0] <= ratio <= SPLICE_CHECK_RATIO_RANGE[1], error
+        assert 0.8 <= ratio <= 1.2, error
 
 
 def prepare_irena_cost_data(tb_irena_index: Table, tb_irena_by_technology: Table) -> Table:
@@ -214,14 +211,11 @@ def run() -> None:
     ds_irena_capacity = paths.load_dataset("renewable_energy_statistics")
     tb_irena_capacity = ds_irena_capacity.read("renewable_energy_statistics")
 
-    # Load IRENA's global module price index (discontinued after 2024), from the garden dataset on costs.
-    ds_irena_cost = paths.load_dataset("renewable_power_generation_costs", channel="garden")
+    # Load IRENA dataset on cost from garden, and read its global module price index (discontinued after 2024) and its
+    # yearly module prices by technology (from 2020 onwards).
+    ds_irena_cost = paths.load_dataset("renewable_power_generation_costs")
     tb_irena_index = ds_irena_cost.read("solar_photovoltaic_module_prices")
-
-    # Load IRENA's yearly module prices by technology, from the meadow dataset on costs.
-    # NOTE: The garden dataset does not include them, and they need no processing (they are already in LATEST_YEAR US$).
-    ds_irena_cost_meadow = paths.load_dataset("renewable_power_generation_costs", channel="meadow")
-    tb_irena_by_technology = ds_irena_cost_meadow.read("solar_photovoltaic_module_prices")
+    tb_irena_by_technology = ds_irena_cost.read("solar_photovoltaic_module_prices_by_technology")
 
     sanity_check_irena_inputs(tb_irena_index=tb_irena_index, tb_irena_by_technology=tb_irena_by_technology)
 
