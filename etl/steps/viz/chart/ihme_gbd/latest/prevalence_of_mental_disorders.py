@@ -6,7 +6,7 @@ paths = PathFinder(__file__)
 
 # Disorders, keyed by their slug in the source: name used in titles, glossary link (if any), and map palette.
 DISORDERS = {
-    "depressive_disorders": ("depressive disorders", "depressive_disorders", "YlGnBu"),
+    "depressive_disorders": ("depression", "depressive_disorders", "YlGnBu"),
     "anxiety_disorders": ("anxiety disorders", "anxiety_disorders", "PuBu"),
     "bipolar_disorder": ("bipolar disorder", "bipolar_disorder", "RdPu"),
     "schizophrenia": ("schizophrenia", "schizophrenia", "YlOrBr"),
