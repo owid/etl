@@ -53,6 +53,8 @@ definitions:
       A value of 0 means that the Internal Displacement Monitoring Centre (IDMC) is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
     idmc_na_processing: |-
       IDMC uses “N/A” to denote that no displacements or IDPs were recorded for that year. In our dataset, we convert these “N/A” values to 0 to make this more transparent and the data easier to interpret.
+    idmc_na_processing_disaster_stock: |-
+      IDMC uses “N/A” to denote that no displacements or IDPs were recorded for that year. From 2019, we convert these “N/A” values to 0. Before 2019, IDMC only has figures on people displaced by disasters for some countries, so we leave the missing values blank (no data).
     idmc_rounded: &idmc_rounded |-
       The data source provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
     idmc_criteria: &idmc_criteria |-
@@ -182,7 +184,7 @@ tables:
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
-          - {definitions.processing_notes.idmc_na_processing}
+          - {definitions.processing_notes.idmc_na_processing_disaster_stock}
         presentation:
           grapher_config:
             note: *footnote_zero_idps
@@ -205,7 +207,7 @@ tables:
         description_processing: |-
           - {definitions.processing_notes.population_share}
           - {definitions.processing_notes.population_projections}
-          - {definitions.processing_notes.idmc_na_processing}
+          - {definitions.processing_notes.idmc_na_processing_disaster_stock}
         presentation:
           grapher_config:
             note: *footnote_zero_idps
