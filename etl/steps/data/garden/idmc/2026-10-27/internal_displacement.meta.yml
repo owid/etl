@@ -31,25 +31,30 @@ definitions:
       Internal displacements triggered by conflict and violence include international armed conflict, non-international armed conflict, communal violence, crime-related violence, civilian-state violence and other forms of violence.
     disaster: &disaster |-
       Movements of people triggered by disasters are grouped into two categories: weather-related and geophysical. Weather-related displacements, for example, include hazards such as floods, droughts, landslides, storms – including cyclones and other storms –, wildfires and extreme temperatures. Geophysical displacements include, for example, earthquakes, volcanic eruptions and landslides.
+  description_keys:
+    conflict: &conflict_key |-
+      Internal displacements triggered by conflict and violence include international armed conflict, non-international armed conflict, communal violence, crime-related violence, civilian-state violence, and other forms of violence.
+    disaster: &disaster_key |-
+      Movements of people triggered by disasters are grouped into two categories: weather-related and geophysical. Weather-related displacements, for example, include hazards such as floods, droughts, landslides, storms — including cyclones and other storms — wildfires, and extreme temperatures. Geophysical displacements include, for example, earthquakes, volcanic eruptions, and landslides.
   processing_notes:
     stock_data: &stock_data |-
       This data represents the total number of internally displaced people living in a region at the end of the year.
     flow_data: &flow_data |-
-      This data represents the total number of internal displacements that occurred during the year. A displacement occurs every time a person is forced to leave their home but remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+      This data represents the total number of internal displacements that occurred during the year. A displacement occurs every time a person is forced to leave their home but remains within their country’s borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     population_share: |-
       We calculate this by taking the total rounded number of internally displaced people divided by the total population of the country and multiply this by 1,000. For this we use our long-term population data set, which can be explored in the [population data explorer](https://ourworldindata.org/explorers/population-and-demography).
     footnote_displacements: |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     footnote_zero_displacements: &footnote_zero_displacements |-
-      A value of 0 means that IDMC is not aware of any internal displacements in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no displacements.
+      A value of 0 means that the Internal Displacement Monitoring Centre (IDMC) is not aware of any internal displacements in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no displacements.
     footnote_zero_idps: &footnote_zero_idps |-
-      A value of 0 means that IDMC is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
+      A value of 0 means that the Internal Displacement Monitoring Centre (IDMC) is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
     idmc_na_processing: |-
-      IDMC uses "N/A" to denote that no displacements or IDPs were recorded for that year. In our dataset, we convert these "N/A" values to 0 to make this more transparent and the data easier to interpret.
+      IDMC uses “N/A” to denote that no displacements or IDPs were recorded for that year. In our dataset, we convert these “N/A” values to 0 to make this more transparent and the data easier to interpret.
     idmc_rounded: &idmc_rounded |-
       The data source provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
     idmc_criteria: &idmc_criteria |-
-      A displaced person is included in the IDMC if their displacement was forced/ involuntary, they have left their habitual residence and they have not crossed an international border.
+      The Internal Displacement Monitoring Centre (IDMC) counts a person as internally displaced if their displacement was forced or involuntary, they have left their habitual residence, and they have not crossed an international border.
 
 
 dataset:
@@ -87,7 +92,7 @@ tables:
           grapher_config:
             note: *footnote_zero_idps
       total_displacement_rounded_per_thousand:
-        title: Internally displaced people per 1000 inhabitants
+        title: Internally displaced people per 1,000 inhabitants
         description_short: |-
           [Internally displaced people](#dod:internally-displaced) are those who had to leave their homes because of violence or [disaster](#dod:idmc-disaster) and have not crossed an international state border. This includes all individuals who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: |-
@@ -125,7 +130,7 @@ tables:
           {definitions.idmc_definitions.conflict}
         description_key:
           - *stock_data
-          - *conflict
+          - *conflict_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -134,7 +139,7 @@ tables:
           grapher_config:
             note: *footnote_zero_idps
       conflict_total_displacement_rounded_per_thousand:
-        title: Internally displaced people due to conflict per 1000 inhabitants
+        title: Internally displaced people due to conflict per 1,000 inhabitants
         description_short: |-
           [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an international state border. This includes all individuals who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: |-
@@ -146,7 +151,7 @@ tables:
         processing_level: major
         description_key:
           - *stock_data
-          - *conflict
+          - *conflict_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -169,7 +174,7 @@ tables:
           {definitions.idmc_definitions.disaster}
         description_key:
           - *stock_data
-          - *disaster
+          - *disaster_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -178,7 +183,7 @@ tables:
           grapher_config:
             note: *footnote_zero_idps
       disaster_total_displacement_rounded_per_thousand:
-        title: Internally displaced people due to disaster per 1000 inhabitants
+        title: Internally displaced people due to disaster per 1,000 inhabitants
         description_short: |-
           [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This includes all individuals who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: |-
@@ -190,7 +195,7 @@ tables:
         processing_level: major
         description_key:
           - *stock_data
-          - *disaster
+          - *disaster_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -203,7 +208,7 @@ tables:
       total_new_displacement_rounded:
         title: Total internal displacements
         description_short: |-
-          [Internal displacements](#dod:displacements) due to both conflict and violence and [disaster](#dod:idmc-disaster). This is the movement of a person who is forced to leave their home but remains within their country's borders. One person can be displaced multiple times within a calendar year; this is counted multiple times in the data.
+          [Internal displacements](#dod:displacements) due to both conflict and violence and [disaster](#dod:idmc-disaster). This is the movement of a person who is forced to leave their home but remains within their country’s borders. One person can be displaced multiple times within a calendar year; this is counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -226,9 +231,9 @@ tables:
           grapher_config:
             note: *footnote_zero_displacements
       total_new_displacement_rounded_per_thousand:
-        title: Internal displacements per 1000 people
+        title: Internal displacements per 1,000 people
         description_short: |-
-          [Internal displacements](#dod:displacements) due to both conflict and [disaster](#dod:idmc-disaster), per 1000 people living in the country. This is the movement of a person who is forced to leave their home but remains within their country's borders. One person can be displaced multiple times within a calendar year; this is counted multiple times in the data.
+          [Internal displacements](#dod:displacements) due to both conflict and [disaster](#dod:idmc-disaster), per 1,000 people living in the country. This is the movement of a person who is forced to leave their home but remains within their country’s borders. One person can be displaced multiple times within a calendar year; this is counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -255,7 +260,7 @@ tables:
       conflict_new_displacement_rounded:
         title: Internal displacements due to conflict
         description_short: |-
-          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country’s borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -266,7 +271,7 @@ tables:
           {definitions.idmc_definitions.conflict}
         description_key:
           - *flow_data
-          - *conflict
+          - *conflict_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -275,9 +280,9 @@ tables:
           grapher_config:
             note: *footnote_zero_displacements
       conflict_new_displacement_rounded_per_thousand:
-        title: Internal displacements due to conflict per 1000 people
+        title: Internal displacements due to conflict per 1,000 people
         description_short: |-
-          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country’s borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -289,7 +294,7 @@ tables:
         processing_level: major
         description_key:
           - *flow_data
-          - *conflict
+          - *conflict_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -301,7 +306,7 @@ tables:
       disaster_new_displacement_rounded:
         title: Internal displacements due to disaster
         description_short: |-
-          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country’s borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -312,7 +317,7 @@ tables:
           {definitions.idmc_definitions.disaster}
         description_key:
           - *flow_data
-          - *disaster
+          - *disaster_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -321,9 +326,9 @@ tables:
           grapher_config:
             note: *footnote_zero_displacements
       disaster_new_displacement_rounded_per_thousand:
-        title: Internal displacements due to disaster per 1000 people
+        title: Internal displacements due to disaster per 1,000 people
         description_short: |-
-          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country’s borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -335,7 +340,7 @@ tables:
         processing_level: major
         description_key:
           - *flow_data
-          - *disaster
+          - *disaster_key
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
@@ -350,7 +355,7 @@ tables:
         unit: people
         short_unit: ""
       total_displacement_per_thousand:
-        title: Internally displaced people per 1000 inhabitants (raw values)
+        title: Internally displaced people per 1,000 inhabitants (raw values)
         unit: people
         short_unit: ""
 
@@ -359,7 +364,7 @@ tables:
         unit: people
         short_unit: ""
       conflict_total_displacement_per_thousand:
-        title: Internally displaced people due to conflict per 1000 inhabitants (raw values)
+        title: Internally displaced people due to conflict per 1,000 inhabitants (raw values)
         unit: people
         short_unit: ""
       disaster_total_displacement:
@@ -367,7 +372,7 @@ tables:
         unit: people
         short_unit: ""
       disaster_total_displacement_per_thousand:
-        title: Internally displaced people due to disaster per 1000 inhabitants (raw values)
+        title: Internally displaced people due to disaster per 1,000 inhabitants (raw values)
         unit: people
         short_unit: ""
 
@@ -376,7 +381,7 @@ tables:
         unit: displacements
         short_unit: ""
       total_new_displacement_per_thousand:
-        title: Internal displacements per 1000 people (raw values)
+        title: Internal displacements per 1,000 people (raw values)
         unit: displacements
         short_unit: ""
       conflict_new_displacement:
@@ -384,7 +389,7 @@ tables:
         unit: displacements
         short_unit: ""
       conflict_new_displacement_per_thousand:
-        title: Internal displacements due to conflict per 1000 people (raw values)
+        title: Internal displacements due to conflict per 1,000 people (raw values)
         unit: displacements
         short_unit: ""
       disaster_new_displacement:
@@ -392,6 +397,6 @@ tables:
         unit: displacements
         short_unit: ""
       disaster_new_displacement_per_thousand:
-        title: Internal displacements due to disaster per 1000 people (raw values)
+        title: Internal displacements due to disaster per 1,000 people (raw values)
         unit: displacements
         short_unit: ""

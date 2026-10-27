@@ -1,10 +1,4 @@
 steps:
-  # Internal displacement monitoring centre
-  data://grapher/idmc/2024-08-02/internal_displacement:
-    - data://meadow/idmc/2024-08-02/internal_displacement:
-        - snapshot://idmc/2024-08-02/internal_displacement.xlsx
-        - data://garden/demography/2024-07-15/population
-
   # UNHCR refugee data
   data://grapher/un/2024-07-25/refugee_data:
     - data://garden/un/2024-07-25/refugee_data:
@@ -113,13 +107,6 @@ steps:
     - data://garden/idmc/2026-10-27/internal_displacement:
         - data://meadow/idmc/2026-10-27/internal_displacement:
             - snapshot://idmc/2026-10-27/internal_displacement.csv
-        - data://garden/demography/2024-07-15/population
-
-  # IDMC Internal Displacement Data (2025 update)
-  data://grapher/idmc/2026-01-19/internal_displacement:
-    - data://garden/idmc/2026-01-19/internal_displacement:
-        - data://meadow/idmc/2026-01-19/internal_displacement:
-            - snapshot://idmc/2026-01-19/internal_displacement.csv
         - data://garden/demography/2024-07-15/population
 
   #

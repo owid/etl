@@ -3,11 +3,11 @@ meta:
     producer: Internal Displacement Monitoring Centre
     title: Global Internal Displacement Database (GIDD)
     description: |-
-      The GIDD is an annual dataset that provides validated and peer-reviewed estimates of internal displacement resulting from conflict and disasters. Conflict-related displacement figures are reported at the national level by calendar year, while disaster-related displacement is recorded at the event level. Since 2023, the dataset includes additional disaggregation by location, displacement cause, and event.
+      The Global Internal Displacement Database (GIDD) is an annual dataset that provides validated and peer-reviewed estimates of internal displacement resulting from conflict and disasters. Conflict-related displacement figures are reported at the national level by calendar year, while disaster-related displacement is recorded at the event level. Since 2023, the dataset includes additional disaggregation by location, displacement cause, and event.
 
       The GIDD captures both population flows (new displacements during the year) and stocks (total number of people living in displacement at the end of the year), covering the period from 1 January to 31 December.
 
-      Additional methodological notes, caveats, and information on historical revisions are available through the Public Figure Analysis API, which complements the main dataset with detailed contextual insights. This dataset is available since 2008 for both conflict and disaster induced displacement.
+      Additional methodological notes, caveats, and information on historical revisions are available through the Public Figure Analysis API, which complements the main dataset with detailed contextual insights. This dataset is available since 2008 for both conflict- and disaster-induced displacement.
     citation_full: |-
       Internal Displacement Monitoring Centre. Global Internal Displacement Database. IDMC (2026). Available at: https://www.internal-displacement.org/database/displacement-data/ (Accessed: 2026-10-27).
     attribution_short: IDMC
