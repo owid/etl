@@ -2,7 +2,6 @@
 
 import pandas as pd
 from owid.catalog import Table
-from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -166,11 +165,16 @@ def na_to_zero(tb):
     - 2008: natural disaster displacements, conflict displacements + conflict IDPs
     - 2019: disaster IDPs (before 2019, IDMC reports them only for some countries, so blanks stay as no data)
     """
-    tb_countries = tb["country"].unique()
-    tb_years = tb["year"].unique()
-    all_combinations = [(country, year) for country in tb_countries for year in tb_years]
+    if tb["year"].min() < 2008:
+        raise ValueError(f"Year {tb['year'].min()} is before 2008, which is not expected in the dataset.")
 
-    # first, fill existing NaN values with 0 for years where data is expected to exist
+    # first, add a row for every country-year combination that is missing (reindexing keeps the columns' metadata)
+    all_combinations = pd.MultiIndex.from_product(
+        [tb["country"].unique(), tb["year"].unique()], names=["country", "year"]
+    )
+    tb = tb.set_index(["country", "year"]).reindex(all_combinations).reset_index()
+
+    # then, fill NaN values with 0 for years where data is expected to exist
     # 2008 and onwards has natural disaster displacements
     tb.loc[tb["year"] >= 2008, D_N_D_R] = tb.loc[tb["year"] >= 2008, D_N_D_R].fillna(0)
     tb.loc[tb["year"] >= 2008, D_N_D] = tb.loc[tb["year"] >= 2008, D_N_D].fillna(0)
@@ -185,41 +189,4 @@ def na_to_zero(tb):
     tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
     tb.loc[tb["year"] >= 2019, D_T_D] = tb.loc[tb["year"] >= 2019, D_T_D].fillna(0)
 
-    # then, create rows for country-year combinations that are missing
-    new_rows = []
-    for country, year in all_combinations:
-        if not ((tb["country"] == country) & (tb["year"] == year)).any():
-            if year < 2008:
-                raise ValueError(f"Year {year} is before 2008, which is not expected in the dataset.")
-            # 2008-2018 has both conflict and disaster displacements and conflict IDPs
-            elif year < 2019:
-                new_row = {
-                    "country": country,
-                    "year": year,
-                    C_T_D: 0,
-                    C_N_D: 0,
-                    D_N_D: 0,
-                    C_T_D_R: 0,
-                    C_N_D_R: 0,
-                    D_N_D_R: 0,
-                }
-            # 2019 and onwards has all data
-            else:
-                new_row = {
-                    "country": country,
-                    "year": year,
-                    C_T_D: 0,
-                    C_N_D: 0,
-                    D_T_D: 0,
-                    D_N_D: 0,
-                    C_T_D_R: 0,
-                    C_N_D_R: 0,
-                    D_T_D_R: 0,
-                    D_N_D_R: 0,
-                }
-            new_rows.append(new_row)
-
-    if new_rows:
-        tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
-        tb = pr.concat([tb, tb_new], ignore_index=True)
     return tb
