@@ -18,6 +18,9 @@ C_T_D = "conflict_total_displacement"
 C_N_D_R = "conflict_new_displacement_rounded"
 C_N_D = "conflict_new_displacement"
 
+# NOTE: Bump this to the new release's latest year on each update.
+LATEST_EXPECTED_YEAR = 2025
+
 
 def return_if_na(col, na_col, tb):
     """return the table filtered for rows where na_col is na and col is not na"""
@@ -101,6 +104,9 @@ def sanity_check_inputs(tb: Table) -> None:
     assert tb["year"].min() >= 2008, (
         f"Data before 2008 found ({tb['year'].min()}); the zero-filling assumes 2008 is the first year."
     )
+    # A stale or truncated API response would otherwise publish without the new year.
+    missing_years = set(range(2008, LATEST_EXPECTED_YEAR + 1)) - set(tb["year"])
+    assert not missing_years, f"Years missing from IDMC data: {sorted(missing_years)}"
     value_columns = sorted(expected_columns - {"country_name", "year", "iso3"})
     assert (tb[value_columns].min() >= 0).all(), "Negative displacement figures found."
 

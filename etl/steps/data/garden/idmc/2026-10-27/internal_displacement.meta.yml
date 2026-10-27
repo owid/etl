@@ -1,6 +1,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: IDMC
       topic_tags:
         - Migration
         - War & Peace
