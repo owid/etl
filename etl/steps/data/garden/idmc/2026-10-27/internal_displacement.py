@@ -46,8 +46,6 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    tb = paths.regions.add_population(tb)
-
     # fill rounded columns with non-rounded values where rounded values are na
     tb[C_T_D_R] = tb[C_T_D_R].fillna(tb[C_T_D])
     tb[C_N_D_R] = tb[C_N_D_R].fillna(tb[C_N_D])
@@ -75,6 +73,9 @@ def run() -> None:
     tb.loc[tb["year"] >= 2008, "total_new_displacement_rounded"] = tb.loc[
         tb["year"] >= 2008, "total_new_displacement_rounded"
     ].fillna(0)
+
+    # Add population after na_to_zero, so the rows it creates also get per-1,000 values.
+    tb = paths.regions.add_population(tb)
 
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
 
