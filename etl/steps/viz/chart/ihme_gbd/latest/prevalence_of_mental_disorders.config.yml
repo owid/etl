@@ -16,7 +16,7 @@ default_selection:
   - High-income countries
 
 default_dimensions:
-  disorder: mental_disorders
+  disorder: depressive_disorders
   sex: both
   age: all_ages
   metric: share_age_standardized
@@ -36,15 +36,11 @@ definitions:
         description_key:
           - These estimates come from the Institute for Health Metrics and Evaluation's (IHME) Global Burden of Disease study. They are based on representative surveys, medical data and statistical modelling, and include people who have not been diagnosed.
           - Age-standardized figures adjust for differences in the age structure of populations, so they can be compared between countries and over time. Crude figures show the actual share of the population with the disorder.
-          - In this data, mental disorders do not include alcohol and drug use disorders, which IHME counts separately.
 
 dimensions:
   - slug: disorder
     name: Disorder
     choices:
-      - slug: mental_disorders
-        name: Any mental disorder
-        description: Excludes alcohol and drug use disorders
       - slug: depressive_disorders
         name: Depressive disorders
       - slug: anxiety_disorders

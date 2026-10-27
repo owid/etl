@@ -6,7 +6,6 @@ paths = PathFinder(__file__)
 
 # Disorders, keyed by their slug in the source: name used in titles, glossary link (if any), and map palette.
 DISORDERS = {
-    "mental_disorders": ("any mental disorder", None, "BuGn"),
     "depressive_disorders": ("depressive disorders", "depressive_disorders", "YlGnBu"),
     "anxiety_disorders": ("anxiety disorders", "anxiety_disorders", "PuBu"),
     "bipolar_disorder": ("bipolar disorder", "bipolar_disorder", "RdPu"),
@@ -15,7 +14,6 @@ DISORDERS = {
 }
 # Extra subtitle sentences, for disorders whose name alone doesn't say what's included.
 DISORDER_NOTES = {
-    "mental_disorders": "This does not include alcohol and drug use disorders.",
     "eating_disorders": "This only includes anorexia nervosa and bulimia nervosa.",
 }
 # Sexes: slug in the MDim and the source, and who it refers to in titles, for children (under 15), adults and all ages.
@@ -62,6 +60,7 @@ def run() -> None:
                             source_age,
                             title_end=f"{who}{age_text} with {name}",
                             subtitle_end=f"{who}{age_text} who have {disorder_text}",
+                            prevalence_end=f"experiencing {name}",
                             display_name=disorder_names[disorder],
                             palette=palette,
                         )
@@ -73,7 +72,9 @@ def run() -> None:
     c.save()
 
 
-def _view(disorder, sex, age, metric, source_age, title_end, subtitle_end, display_name, palette) -> dict:
+def _view(
+    disorder, sex, age, metric, source_age, title_end, subtitle_end, prevalence_end, display_name, palette
+) -> dict:
     """One view's indicator and chart text."""
     if metric == "share_age_standardized":
         source_metric, source_age = "share", "age_standardized"
@@ -88,6 +89,10 @@ def _view(disorder, sex, age, metric, source_age, title_end, subtitle_end, displ
     )
     if disorder in DISORDER_NOTES:
         subtitle += " " + DISORDER_NOTES[disorder]
+    subtitle += (
+        f" Prevalence is measured as the {measure} {prevalence_end} at a given point in time."
+        " It does not measure lifetime prevalence."
+    )
     note = {"share_age_standardized": NOTE_AGE_STANDARDIZED, "share_crude": NOTE_CRUDE, "number": NOTE_NUMBER}[metric]
 
     return {
