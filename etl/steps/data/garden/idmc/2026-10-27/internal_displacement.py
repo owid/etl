@@ -34,6 +34,7 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("internal_displacement")
+    sanity_check_inputs(tb)
 
     tb = tb.rename(columns={"country_name": "country"}, errors="raise")
 
@@ -78,6 +79,7 @@ def run() -> None:
     columns_to_calculate = [col for col in tb.columns if col not in ["country", "year", "population"]]
 
     tb = calculate_shares(tb, columns_to_calculate)
+    sanity_check_outputs(tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
@@ -90,6 +92,50 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    expected_columns = {"country_name", "year", "iso3", C_T_D_R, C_T_D, C_N_D_R, C_N_D, D_T_D_R, D_T_D, D_N_D_R, D_N_D}
+    assert set(tb.columns) == expected_columns, f"Unexpected columns: {set(tb.columns) ^ expected_columns}"
+    assert not tb.duplicated(subset=["country_name", "year"]).any(), "Duplicate (country, year) rows in IDMC data."
+    assert tb["year"].min() >= 2008, (
+        f"Data before 2008 found ({tb['year'].min()}); the zero-filling assumes 2008 is the first year."
+    )
+    value_columns = sorted(expected_columns - {"country_name", "year", "iso3"})
+    assert (tb[value_columns].min() >= 0).all(), "Negative displacement figures found."
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    # Conflict figures and disaster displacements are complete from 2008, disaster IDPs from 2019.
+    for col in [C_T_D, C_T_D_R, C_N_D, C_N_D_R, D_N_D, D_N_D_R, "total_new_displacement_rounded"]:
+        assert tb[col].notna().all(), f"Missing values in {col}."
+    recent = tb["year"] >= 2019
+    for col in [D_T_D, D_T_D_R, "total_displacement", "total_displacement_rounded"]:
+        assert tb.loc[recent, col].notna().all(), f"Missing values in {col} from 2019."
+    # Before 2019, disaster IDPs are only reported for some countries, so they must not be zero-filled, and no total is calculated.
+    assert not (tb.loc[~recent, D_T_D] == 0).any(), "Disaster IDPs before 2019 were filled with zeros."
+    assert tb.loc[~recent, ["total_displacement", "total_displacement_rounded"]].isna().all().all(), (
+        "Total IDPs calculated before 2019."
+    )
+
+    # Totals are the sum of their parts (cast to float, as the source columns are unsigned integers).
+    total = tb.loc[recent, C_T_D].astype(float) + tb.loc[recent, D_T_D].astype(float)
+    assert (tb.loc[recent, "total_displacement"].astype(float) == total).all(), (
+        "Total IDPs don't equal conflict + disaster IDPs."
+    )
+    total_new = tb[C_N_D].astype(float) + tb[D_N_D].astype(float)
+    assert (tb["total_new_displacement"].astype(float) == total_new).all(), (
+        "Total new displacements don't equal conflict + disaster."
+    )
+
+    # Rounded totals stay within IDMC's rounding (2 significant digits, i.e. at most 5% off).
+    for col in ["total_displacement", "total_new_displacement"]:
+        raw, rounded = tb[col].astype(float), tb[f"{col}_rounded"].astype(float)
+        rel_diff = ((rounded - raw).abs() / raw.clip(lower=1)).max()
+        assert rel_diff <= 0.05, f"Rounded {col} differs from the raw value by {rel_diff:.1%}."
+
+    value_columns = [col for col in tb.columns if col not in ["country", "year"]]
+    assert (tb[value_columns].min() >= 0).all(), "Negative values in output."
 
 
 def calculate_shares(tb, columns_to_calculate):

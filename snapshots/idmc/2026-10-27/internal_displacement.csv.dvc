@@ -7,13 +7,13 @@ meta:
 
       The GIDD captures both population flows (new displacements during the year) and stocks (total number of people living in displacement at the end of the year), covering the period from 1 January to 31 December.
 
-      Additional methodological notes, caveats, and information on historical revisions are available through the Public Figure Analysis API, which complements the main dataset with detailed contextual insights. This dataset is available since 2009 for conflict and 2008 for disaster induced displacement.
+      Additional methodological notes, caveats, and information on historical revisions are available through the Public Figure Analysis API, which complements the main dataset with detailed contextual insights. This dataset is available since 2008 for both conflict and disaster induced displacement.
     citation_full: |-
-      Internal Displacement Monitoring Centre. Global Internal Displacement Database. IDMC (2026). Available at: https://www.internal-displacement.org/database/displacement-data/ (Accessed: 2026-01-19).
+      Internal Displacement Monitoring Centre. Global Internal Displacement Database. IDMC (2026). Available at: https://www.internal-displacement.org/database/displacement-data/ (Accessed: 2026-10-27).
     attribution_short: IDMC
     url_main: https://www.internal-displacement.org/database/displacement-data/
     date_accessed: '2026-10-27'
-    date_published: '2026'
+    date_published: '2026-05-12'
     license:
       name: CC BY 3.0 IGO
       url: https://www.internal-displacement.org/terms-of-use/

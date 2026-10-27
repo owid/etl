@@ -195,7 +195,7 @@ tables:
           - *idmc_rounded
         description_processing: |-
           - {definitions.processing_notes.population_share}
-          - This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
+          - {definitions.processing_notes.idmc_na_processing}
         presentation:
           grapher_config:
             note: *footnote_zero_idps
