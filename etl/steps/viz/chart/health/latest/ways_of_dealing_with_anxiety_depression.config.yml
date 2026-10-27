@@ -67,6 +67,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8a__talked_to_mental_health_professional_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Talked to a mental health professional
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -83,6 +84,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8d__took_prescribed_medication_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Took prescribed medication
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -99,6 +101,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8c__talked_to_friends_or_family_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Talked to friends or family
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -115,6 +118,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8b__engaged_in_religious_spiritual_activities_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Engaged in religious or spiritual activities
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -131,6 +135,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8e__improved_healthy_lifestyle_behaviors_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Improved healthy lifestyle behaviors
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -147,6 +152,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8h__spent_time_in_nature_the_outdoors_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Spent time in nature or the outdoors
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -163,6 +169,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8f__made_a_change_to_work_situation_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Made a change to work situation
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
@@ -179,6 +186,7 @@ views:
     y:
     - catalogPath: wgm_mental_health#share__question_mh8g__made_a_change_to_personal_relationships_when_anxious_depressed__answer_yes__gender_all__age_group_all
       display:
+        name: Made a change to personal relationships
         roundingMode: significantFigures
         numSignificantFigures: 2
   config:
