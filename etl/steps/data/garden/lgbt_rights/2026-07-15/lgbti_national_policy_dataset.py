@@ -163,15 +163,6 @@ def _pair_map(*, key_a, key_b, both_label, a_only_label, b_only_label, neither_l
     }
 
 
-# (law, status) sources whose enforcement refinement was retired because the source no longer
-# codes them with Evidence_of_Enforcement == 0. Maps each to the indicator that used to carry it.
-# `_check_retired_enforcement_refinements` asserts they stay empty.
-# NOTE: Version 3.0 brings back Evidence_of_Enforcement == 0 on a few military-ban series (LGB: Venezuela
-# 2000-2022, Lithuania 2002, Nigeria 1993; transgender: the Netherlands 2016-2021, Armenia 2022), none in 2025.
-# We keep publishing them as plain "Banned" rather than restoring a "Banned but not enforced" category for
-# so few cases, so the military bans are no longer audited here. Add them back to restore the check.
-RETIRED_ENFORCEMENT_REFINEMENTS: dict[tuple[str, str], str] = {}
-
 # Per-indicator config for combined-categorical indicators.
 # Each entry says which (law, status) proportion columns feed the bucket key,
 # which label each bucket gets via the bucket-key string, and the final category map.
@@ -195,15 +186,9 @@ COMBINED_CONFIGS = [
         ],
         "category_map": MARRIAGE_MAP,
     },
-    # NOTE: enforcement_refinement ("…but not enforced") is set on same_sex_acts and
-    # morality_propaganda. Evidence_of_Enforcement is on a five-point scale {0, 0.25, 0.5, 0.75, 1}
-    # (codebook §2.6, §3.7); 0 means the law is documented as never applied, or the years between
-    # its adoption and entry into force. EoE=0 rows also appear in other (law, status) combos (e.g.
-    # death_penalty, age_of_consent/unequal); extending the refinement to them is an editorial
-    # decision (it changes chart legends) that hasn't been taken.
-    # NOTE: lgb_military_join and transgender_military used to carry the refinement too. Version 3.0
-    # has only a few military-ban rows with EoE=0 (none in 2025), which we publish as plain "Banned"
-    # — see RETIRED_ENFORCEMENT_REFINEMENTS.
+    # NOTE: We don't publish Velasco's Evidence_of_Enforcement (codebook §2.6, §3.7), so no indicator has a
+    # "…but not enforced" category. Few laws are recorded as not enforced, and the evidence is hard to code
+    # consistently, so a law on the books counts as in effect.
     {
         "short_name": "lgb_military_join",
         "sources": [
@@ -227,11 +212,6 @@ COMBINED_CONFIGS = [
             neither_label="No legal provisions",
             mixed_label="Varies by region",
         ),
-        "enforcement_refinement": {
-            "eoe_source": ("same_sex_acts", "illegal"),
-            "from_label": "Criminalized",
-            "to_label": "Criminalized but not enforced",
-        },
     },
     {
         "short_name": "blood_donations",
@@ -425,11 +405,6 @@ COMBINED_CONFIGS = [
             neither_label="No restrictions",
             mixed_label="Laws vary by region",
         ),
-        "enforcement_refinement": {
-            "eoe_source": ("morality_propaganda", "legal"),
-            "from_label": "Restrictions exist",
-            "to_label": "Restrictions exist but not enforced",
-        },
     },
     {
         "short_name": "lgbtq_civil_society_restrictions",
@@ -586,11 +561,6 @@ def _build_one_combined(wide, config):
     for "Varies by region or other" buckets where enumerating every pattern is noisy);
     if `default_category` is unset, unmapped keys are left as their raw bucket string,
     which surfaces them as a sanity check rather than silently dropping.
-
-    If `enforcement_refinement` is set, country-years whose bucketed label equals
-    `from_label` and whose `evidence_of_enforcement` for the configured (law, status)
-    is exactly 0 are reassigned to `to_label`. EoE NaN or 1 keeps `from_label`
-    (codebook default-1 rule).
     """
     parts = []
     for col, label in config["sources"]:
@@ -610,15 +580,6 @@ def _build_one_combined(wide, config):
             warn_on_missing_mappings=False,
             warn_on_unused_mappings=False,
         )
-    # Apply optional enforcement refinement: split `from_label` into `to_label` where
-    # EoE for the configured (law, status) source is 0. Strict equality so NaN keeps
-    # the unrefined label.
-    refinement = config.get("enforcement_refinement")
-    if refinement is not None:
-        law, status = refinement["eoe_source"]
-        eoe = wide[f"{law}__{status}__eoe"]
-        unenforced_mask = (result == refinement["from_label"]) & (eoe == 0)
-        result = result.where(~unenforced_mask, refinement["to_label"])
 
     _warn_on_unmapped_bucket_patterns(config, keys)
     return result.copy_metadata(wide["country"])
@@ -659,12 +620,8 @@ def run() -> None:
     #
     # Keep the columns we publish (drop sources, ISO/COW codes, most supplementary
     # metadata) but retain `gender_change_requirement` (used by the GMC combined
-    # indicator to refine "legal" countries into procedural categories) and
-    # `evidence_of_enforcement` (used by 4 combined indicators to surface
-    # "X but not enforced" categories — see COMBINED_CONFIGS for the affected set).
-    tb = tb[
-        ["country", "year", "law", "status", "proportion", "gender_change_requirement", "evidence_of_enforcement"]
-    ].copy()
+    # indicator to refine "legal" countries into procedural categories).
+    tb = tb[["country", "year", "law", "status", "proportion", "gender_change_requirement"]].copy()
 
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
@@ -684,13 +641,9 @@ def run() -> None:
     # Warn on country-years coded fully legal AND fully illegal at once (see _binary_map docstring).
     _warn_on_simultaneous_legal_illegal(tb)
 
-    # Fail if the source reintroduces enforcement data where a refinement was retired.
-    _check_retired_enforcement_refinements(tb)
-
-    # Country-level table — drop the requirement and enforcement columns here; they're
-    # only used to build combined indicators and aren't published as per-row long-table
-    # indicators.
-    tb_country = tb.drop(columns=["gender_change_requirement", "evidence_of_enforcement"]).copy()
+    # Country-level table — drop the requirement column here; it's only used to build the
+    # gender marker combined indicator and isn't published as a per-row long-table indicator.
+    tb_country = tb.drop(columns=["gender_change_requirement"]).copy()
 
     # Regional aggregates table (counts of countries + population by status per region).
     tb_regions = _build_regional_aggregates(tb_country)
@@ -758,10 +711,9 @@ def run() -> None:
 
 
 def sanity_check_proportions(tb):
-    """Validate the value columns of the long policy table (codebook §2.3, §2.6).
+    """Validate the value columns of the long policy table (codebook §2.3).
 
-    `proportion` is a population share in [0, 1]; `evidence_of_enforcement` is a five-anchor
-    scale {0, 0.25, 0.5, 0.75, 1} (or blank); `gender_change_requirement` uses the codebook's
+    `proportion` is a population share in [0, 1]; `gender_change_requirement` uses the codebook's
     controlled vocabulary (REQ_LABELS in `_build_gmc_combined` guards its coverage separately).
     """
     assert tb["proportion"].notna().all(), "NaN proportions — the balanced panel should carry explicit zeros."
@@ -769,9 +721,6 @@ def sanity_check_proportions(tb):
         f"Proportion outside [0, 1]: max={tb['proportion'].max()}, min={tb['proportion'].min()} — "
         "a share of the population can't exceed 1."
     )
-    eoe = tb["evidence_of_enforcement"].dropna()
-    bad_eoe = sorted(set(eoe[~eoe.isin([0, 0.25, 0.5, 0.75, 1])]))
-    assert not bad_eoe, f"Evidence_of_Enforcement off the five-anchor scale: {bad_eoe[:5]}."
 
 
 def _add_regional_composite_index(tb):
@@ -852,30 +801,6 @@ def _detect_structural_placeholders(tb):
     return placeholders
 
 
-def _check_retired_enforcement_refinements(tb):
-    """Fail if the source reintroduces EoE == 0 rows where an enforcement refinement was retired.
-
-    `lgb_military_join` and `transgender_military` used to split "Banned" into "Banned but not
-    enforced" via `enforcement_refinement`. A June 2026 revision left their illegal directions
-    with no `Evidence_of_Enforcement == 0` rows, so both refinements (and the corresponding
-    metadata blocks) were dropped. Without this check, a release that reintroduces such rows would
-    silently publish them as plain "Banned" — the enforcement information would be discarded with
-    nothing in the build to show for it, and `lgbt_military` would stay a duplicate of
-    `lgbt_military_no_enforcement`. Restore the refinement (and its metadata) when this fires.
-    """
-    reintroduced = {}
-    for (law, status), indicator in RETIRED_ENFORCEMENT_REFINEMENTS.items():
-        n = int(((tb["law"] == law) & (tb["status"] == status) & (tb["evidence_of_enforcement"] == 0)).sum())
-        if n:
-            reintroduced[f"{law}/{status} (indicator {indicator})"] = n
-    assert not reintroduced, (
-        f"Evidence_of_Enforcement == 0 rows reappeared where the enforcement refinement was retired: "
-        f"{reintroduced}. Restore the 'but not enforced' refinement on the affected COMBINED_CONFIGS "
-        f"entry and add its metadata block, or drop the entry from RETIRED_ENFORCEMENT_REFINEMENTS if "
-        f"the topic owner decides not to surface the distinction."
-    )
-
-
 def _warn_on_simultaneous_legal_illegal(tb):
     """Warn for any (country, year, law) coded fully legal AND fully illegal in the same year.
 
@@ -947,13 +872,6 @@ def _build_combined_categorical_table(tb):
     wide.columns = [f"{law}__{status}" for law, status in wide.columns]
     wide = wide.reset_index()
 
-    # Pivot `evidence_of_enforcement` on the same (law, status) axes and merge side
-    # columns into `wide` with naming `<law>__<status>__eoe`. Used by the
-    # enforcement_refinement field on COMBINED_CONFIGS entries.
-    eoe_wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="evidence_of_enforcement")
-    eoe_wide.columns = [f"{law}__{status}__eoe" for law, status in eoe_wide.columns]
-    wide = wide.merge(eoe_wide.reset_index(), on=["country", "year"], how="left")
-
     # Extract the per-(country, year) GMC requirement and merge into wide as a side column.
     gmc_req = tb[(tb["law"] == "gender_marker_change") & (tb["status"] == "legal")][
         ["country", "year", "gender_change_requirement"]
@@ -966,17 +884,12 @@ def _build_combined_categorical_table(tb):
     for config in COMBINED_CONFIGS:
         wide[config["short_name"]] = _build_one_combined(wide, config)
 
-    # Combined LGBT military service indicators — built AFTER the loop because they read
+    # Combined LGBT military service indicator — built AFTER the loop because it reads
     # the outputs of `lgb_military_join` and `transgender_military` (also categorical).
-    # Two variants: one preserves the enforcement refinement (8 categories), the other
-    # folds enforcement away (7 categories, legal-status only).
     wide["lgbt_military"] = _build_lgbt_military_combined(wide)
-    wide["lgbt_military_no_enforcement"] = _build_lgbt_military_no_enforcement_combined(wide)
 
     output_cols = (
-        ["country", "year", "gender_marker_change"]
-        + [c["short_name"] for c in COMBINED_CONFIGS]
-        + ["lgbt_military", "lgbt_military_no_enforcement"]
+        ["country", "year", "gender_marker_change"] + [c["short_name"] for c in COMBINED_CONFIGS] + ["lgbt_military"]
     )
     return wide[output_cols]
 
@@ -1053,11 +966,6 @@ def _build_lgbt_military_combined(wide):
     which group(s) are affected. Only the combinations that actually occur in the data have
     explicit labels; anything unexpected falls back to a descriptive "Other (lgb / t)"
     placeholder, which surfaces as a sanity check rather than silently aggregating.
-
-    NOTE: the military indicators carry no "Banned but not enforced" category (see
-    RETIRED_ENFORCEMENT_REFINEMENTS), so this indicator is identical to
-    `lgbt_military_no_enforcement`. Both are kept so the enforcement-aware variant comes back
-    automatically if the refinement is restored.
     """
     from owid.catalog import Variable
 
@@ -1080,39 +988,6 @@ def _build_lgbt_military_combined(wide):
     return result.copy_metadata(wide["lgb_military__legal"])
 
 
-def _build_lgbt_military_no_enforcement_combined(wide):
-    """Combine `lgb_military_join` and `transgender_military` into a single LGBT military indicator,
-    collapsing any enforcement refinement back to legal-status only.
-
-    Same shape as `_build_lgbt_military_combined` but `"Banned but not enforced"` folds into
-    `"Banned"` on each side before mapping. The inputs currently carry no enforcement
-    categories, so the fold is a no-op and this indicator equals `lgbt_military`; kept so the
-    legal-status-only view survives if the military refinement is restored.
-    """
-    from owid.catalog import Variable
-
-    def _fold(label):
-        return "Banned" if label == "Banned but not enforced" else label
-
-    lgb = [_fold(x) for x in wide["lgb_military_join"]]
-    t = [_fold(x) for x in wide["transgender_military"]]
-
-    LABEL_MAP = {
-        ("Allowed", "Allowed"): "Open service permitted",
-        ("Allowed", "No policy"): "Allowed for LGB only",
-        ("No policy", "Allowed"): "Allowed for transgender only",
-        ("Allowed", "Banned"): "Mixed (LGB allowed, transgender banned)",
-        ("No policy", "No policy"): "No policy",
-        ("No policy", "Banned"): "Banned for transgender only",
-        ("Banned", "No policy"): "Banned for LGB only",
-        ("Banned", "Banned"): "Service banned",
-    }
-
-    out = [LABEL_MAP.get((a, b), f"Other ({a} / {b})") for a, b in zip(lgb, t)]
-    result = Variable(out, index=wide.index, name="lgbt_military_no_enforcement")
-    return result.copy_metadata(wide["lgb_military__legal"])
-
-
 def _build_combined_categorical_regional_aggregates(tb_combined):
     """Build regional aggregates for the three combined ordinal indicators.
 
@@ -1131,7 +1006,6 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
     indicator_cols = [c["short_name"] for c in COMBINED_CONFIGS] + [
         "gender_marker_change",
         "lgbt_military",
-        "lgbt_military_no_enforcement",
     ]
 
     new_cols = []
