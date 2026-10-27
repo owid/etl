@@ -1,0 +1,191 @@
+grapher_schema: '011'
+slug: ways-of-dealing-with-anxiety-depression
+title:
+  title: How do people deal with anxiety or depression?
+topic_tags:
+- Mental Health
+default_selection:
+- United Kingdom
+- Italy
+- Canada
+- United States
+- France
+- South Korea
+- India
+- South Africa
+- Brazil
+- Indonesia
+- China
+- Uganda
+- Bangladesh
+default_dimensions:
+  approach: took_prescribed_medication
+definitions:
+  common_views:
+  - config:
+      chartTypes:
+      - DiscreteBar
+      hasMapTab: true
+      tab: map
+      hideAnnotationFieldsInTitle:
+        time: false
+      originUrl: /mental-health
+      yAxis:
+        min: 0
+    metadata:
+      description_key:
+      - Respondents were first asked whether they had 'felt so anxious or depressed that they could not continue their regular
+        daily activities as they normally would for two weeks or longer'. Those who replied "yes" were then asked about different
+        approaches to dealing with this anxiety or depression.
+      - Answers from demographic groups with fewer than 100 participants were left out of this data.
+      - This data comes from the Wellcome Global Monitor 2020, a survey that Wellcome ran with Gallup. It asked about views
+        and experiences of mental health in 113 countries and territories.
+dimensions:
+- slug: approach
+  name: Approach
+  choices:
+  - slug: talked_to_a_mental_health_professional
+    name: Talked to a mental health professional
+  - slug: took_prescribed_medication
+    name: Took prescribed medication
+  - slug: talked_to_friends_or_family
+    name: Talked to friends or family
+  - slug: engaged_in_religious_or_spiritual_activities
+    name: Engaged in religious or spiritual activities
+  - slug: improved_healthy_lifestyle_behaviors
+    name: Improved healthy lifestyle behaviors
+  - slug: spent_time_in_nature_or_the_outdoors
+    name: Spent time in nature or the outdoors
+  - slug: made_a_change_to_work_situation
+    name: Made a change to work situation
+  - slug: made_a_change_to_personal_relationships
+    name: Made a change to personal relationships
+views:
+- dimensions:
+    approach: talked_to_a_mental_health_professional
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8a__talked_to_mental_health_professional_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by talking to a mental health professional
+    subtitle: Share of respondents with anxiety or depression who said they had ever talked to a mental health professional
+      to make themselves feel better.
+    map:
+      colorScale:
+        baseColorScheme: YlGn
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: took_prescribed_medication
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8d__took_prescribed_medication_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by taking prescribed medication
+    subtitle: Share of respondents with anxiety or depression who said they had ever taken prescribed medication to make themselves
+      feel better.
+    map:
+      colorScale:
+        baseColorScheme: BuPu
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: talked_to_friends_or_family
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8c__talked_to_friends_or_family_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by talking to friends or family
+    subtitle: Share of respondents with anxiety or depression who said they had ever talked to friends or family to make themselves
+      feel better.
+    map:
+      colorScale:
+        baseColorScheme: Purples
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: engaged_in_religious_or_spiritual_activities
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8b__engaged_in_religious_spiritual_activities_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by engaging in religious/spiritual activities
+    subtitle: Share of respondents with anxiety or depression who said they had ever engaged in religious/spiritual activities
+      to make themselves feel better.
+    map:
+      colorScale:
+        baseColorScheme: Blues
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: improved_healthy_lifestyle_behaviors
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8e__improved_healthy_lifestyle_behaviors_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by improving healthy lifestyle behaviors
+    subtitle: Share of respondents with anxiety or depression who said they had ever improved healthy lifestyle behaviors
+      to make themselves feel better.
+    map:
+      colorScale:
+        baseColorScheme: GnBu
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: spent_time_in_nature_or_the_outdoors
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8h__spent_time_in_nature_the_outdoors_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by spending time in nature or the outdoors
+    subtitle: Share of respondents with anxiety or depression who said they had ever spent time in nature or the outdoors
+      to make themselves feel better.
+    map:
+      colorScale:
+        baseColorScheme: Greens
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: made_a_change_to_work_situation
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8f__made_a_change_to_work_situation_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by making a change to their work situation
+    subtitle: Share of respondents with anxiety or depression who said they had ever made a change to their work situation
+      to make themselves feel better.
+    map:
+      colorScale:
+        baseColorScheme: YlGn
+        binningStrategy: equalSizeBins-normal
+- dimensions:
+    approach: made_a_change_to_personal_relationships
+  indicators:
+    y:
+    - catalogPath: wgm_mental_health#share__question_mh8g__made_a_change_to_personal_relationships_when_anxious_depressed__answer_yes__gender_all__age_group_all
+      display:
+        roundingMode: significantFigures
+        numSignificantFigures: 2
+  config:
+    title: Dealt with anxiety or depression by making a change to their personal relationships
+    subtitle: Share of respondents with anxiety or depression who said they had ever made a change to their personal relationships
+      to make themselves feel better.
+    map:
+      colorScale:
+        baseColorScheme: BuPu
+        binningStrategy: equalSizeBins-normal
