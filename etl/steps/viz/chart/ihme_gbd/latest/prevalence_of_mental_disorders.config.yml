@@ -81,11 +81,11 @@ dimensions:
         name: All ages
       - slug: under_5
         name: Under 5
-      - slug: 5_14
+      - slug: age_5_14
         name: 5–14 years
-      - slug: 15_49
+      - slug: age_15_49
         name: 15–49 years
-      - slug: 50_69
+      - slug: age_50_69
         name: 50–69 years
       - slug: 70_plus
         name: 70+ years

@@ -30,9 +30,9 @@ SEXES = {"both": "people", "female": "females", "male": "males"}
 AGES = {
     "all_ages": ("all_ages", ""),
     "under_5": ("_lt_5_years", " under 5"),
-    "5_14": ("5_14_years", " aged 5–14"),
-    "15_49": ("15_49_years", " aged 15–49"),
-    "50_69": ("50_69_years", " aged 50–69"),
+    "age_5_14": ("5_14_years", " aged 5–14"),
+    "age_15_49": ("15_49_years", " aged 15–49"),
+    "age_50_69": ("50_69_years", " aged 50–69"),
     "70_plus": ("70plus_years", " aged 70 and older"),
 }
 NOTE_AGE_STANDARDIZED = "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
