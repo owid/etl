@@ -42,7 +42,7 @@ dimensions:
     name: Disorder
     choices:
       - slug: depressive_disorders
-        name: Depression
+        name: Depressive disorders
       - slug: anxiety_disorders
         name: Anxiety disorders
       - slug: bipolar_disorder
