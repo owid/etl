@@ -12,28 +12,26 @@ DISORDERS = {
     "bipolar_disorder": ("bipolar disorder", "bipolar_disorder", "RdPu"),
     "schizophrenia": ("schizophrenia", "schizophrenia", "YlOrBr"),
     "eating_disorders": ("an eating disorder", "eating_disorder", "OrRd"),
-    "attention_deficit_hyperactivity_disorder": ("attention-deficit/hyperactivity disorder (ADHD)", None, "Purples"),
-    "autism_spectrum_disorders": ("autism spectrum disorders", None, "Blues"),
-    "conduct_disorder": ("conduct disorder", None, "Oranges"),
-    "idiopathic_developmental_intellectual_disability": ("an intellectual disability", None, "PuBuGn"),
-    "other_mental_disorders": ("other mental disorders", None, "Greys"),
 }
 # Extra subtitle sentences, for disorders whose name alone doesn't say what's included.
 DISORDER_NOTES = {
     "mental_disorders": "This does not include alcohol and drug use disorders.",
     "eating_disorders": "This only includes anorexia nervosa and bulimia nervosa.",
-    "idiopathic_developmental_intellectual_disability": "This is intellectual disability with no known cause, defined by delayed or impaired speech, language, motor and visuo-spatial skills.",
 }
-# Sexes: slug in the MDim and the source, and who it refers to in titles.
-SEXES = {"both": "people", "female": "females", "male": "males"}
-# Ages: slug in the MDim -> (slug in the source, phrase used in titles).
+# Sexes: slug in the MDim and the source, and who it refers to in titles, for children (under 15), adults and all ages.
+SEXES = {
+    "both": {"child": "people", "adult": "people", "all": "people"},
+    "female": {"child": "girls", "adult": "women", "all": "women and girls"},
+    "male": {"child": "boys", "adult": "men", "all": "men and boys"},
+}
+# Ages: slug in the MDim -> (slug in the source, phrase used in titles, age bracket for SEXES).
 AGES = {
-    "all_ages": ("all_ages", ""),
-    "under_5": ("_lt_5_years", " under 5"),
-    "age_5_14": ("5_14_years", " aged 5–14"),
-    "age_15_49": ("15_49_years", " aged 15–49"),
-    "age_50_69": ("50_69_years", " aged 50–69"),
-    "70_plus": ("70plus_years", " aged 70 and older"),
+    "all_ages": ("all_ages", "", "all"),
+    "under_5": ("_lt_5_years", " under 5", "child"),
+    "age_5_14": ("5_14_years", " aged 5–14", "child"),
+    "age_15_49": ("15_49_years", " aged 15–49", "adult"),
+    "age_50_69": ("50_69_years", " aged 50–69", "adult"),
+    "age_70_plus": ("70plus_years", " aged 70 and older", "adult"),
 }
 NOTE_AGE_STANDARDIZED = "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
 NOTE_CRUDE = "This metric is not age-standardized, so differences between countries partly reflect differences in their age structure."
@@ -48,8 +46,9 @@ def run() -> None:
     views = []
     for disorder, (name, dod, palette) in DISORDERS.items():
         disorder_text = f"[{name}](#dod:{dod})" if dod else name
-        for sex, who in SEXES.items():
-            for age, (source_age, age_text) in AGES.items():
+        for sex, who_by_age in SEXES.items():
+            for age, (source_age, age_text, bracket) in AGES.items():
+                who = who_by_age[bracket]
                 metrics = ["share_crude", "number"]
                 if age == "all_ages":
                     metrics = ["share_age_standardized"] + metrics

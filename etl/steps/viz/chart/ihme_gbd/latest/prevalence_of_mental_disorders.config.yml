@@ -55,16 +55,6 @@ dimensions:
         name: Schizophrenia
       - slug: eating_disorders
         name: Eating disorders
-      - slug: attention_deficit_hyperactivity_disorder
-        name: ADHD
-      - slug: autism_spectrum_disorders
-        name: Autism spectrum disorders
-      - slug: conduct_disorder
-        name: Conduct disorder
-      - slug: idiopathic_developmental_intellectual_disability
-        name: Intellectual disability
-      - slug: other_mental_disorders
-        name: Other mental disorders
   - slug: sex
     name: Sex
     choices:
@@ -87,7 +77,7 @@ dimensions:
         name: 15–49 years
       - slug: age_50_69
         name: 50–69 years
-      - slug: 70_plus
+      - slug: age_70_plus
         name: 70+ years
   - slug: metric
     name: Metric
