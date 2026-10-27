@@ -82,7 +82,7 @@ steps:
     - data://grapher/regions/2023-01-01/regions
 
   viz://chart/migration/latest/internal_displacement:
-    - data://grapher/idmc/2026-01-19/internal_displacement
+    - data://grapher/idmc/2026-10-27/internal_displacement
     - data://grapher/un/2025-07-03/refugee_data
     - data://grapher/unicef/2026-01-07/child_migration
     - data://grapher/regions/2023-01-01/regions
@@ -107,6 +107,13 @@ steps:
 
   data://grapher/un/2025-03-12/migrant_stock:
     - data://garden/un/2025-03-12/migrant_stock
+
+  # IDMC Internal Displacement Data (2026 update)
+  data://grapher/idmc/2026-10-27/internal_displacement:
+    - data://garden/idmc/2026-10-27/internal_displacement:
+        - data://meadow/idmc/2026-10-27/internal_displacement:
+            - snapshot://idmc/2026-10-27/internal_displacement.csv
+        - data://garden/demography/2024-07-15/population
 
   # IDMC Internal Displacement Data (2025 update)
   data://grapher/idmc/2026-01-19/internal_displacement:
