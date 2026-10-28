@@ -41,6 +41,12 @@ TABLES_BY_GENDER = {
 MISSING_MARKERS = {"m", "c"}
 # The report marks countries that didn't meet one or more PISA sampling standards in 2025 with a trailing "*".
 FLAG_SAMPLING_STANDARDS = "*"
+# Countries whose results under "PISA 2018" are from the PISA for Development assessment, held in 2017 (per the note
+# under each trend table). Garden moves them to 2017.
+PISA_FOR_DEVELOPMENT_NOTE = re.compile(
+    r"For (.+?), results reported under PISA 2018 refer to the results of the PISA for Development assessment, in 2017"
+)
+EXPECTED_PISA_FOR_DEVELOPMENT = {"Cambodia", "Ecuador", "Guatemala", "Paraguay", "Zambia"}
 
 
 def run() -> None:
@@ -86,6 +92,7 @@ def read_cycle_table(snap, sheet: str, column: str, suffix: str = "") -> Table:
     """
     tb_raw = snap.read_excel(sheet_name=sheet, header=None)
     rows = tb_raw.astype(object).where(tb_raw.notna(), None).values.tolist()
+    check_pisa_for_development_note(rows, sheet)
 
     # Find the header row with the PISA cycles, and the columns of each cycle's mean score.
     header = next(i for i, row in enumerate(rows) if any(_is_cycle(cell) for cell in row))
@@ -116,6 +123,15 @@ def read_cycle_table(snap, sheet: str, column: str, suffix: str = "") -> Table:
     tb = snap.read_from_records(records)
     tb = tb.dropna(subset=[f"{column}_average{suffix}"])
     return tb
+
+
+def check_pisa_for_development_note(rows: list, sheet: str) -> None:
+    """Assert the table note on PISA for Development lists the expected countries (garden relies on it)."""
+    notes = [row[0] for row in rows if isinstance(row[0], str) and PISA_FOR_DEVELOPMENT_NOTE.search(row[0])]
+    assert len(notes) == 1, f"{sheet}: note on PISA for Development not found."
+    countries = PISA_FOR_DEVELOPMENT_NOTE.search(notes[0]).group(1)
+    countries = {c.strip() for c in re.split(r",| and ", countries) if c.strip()}
+    assert countries == EXPECTED_PISA_FOR_DEVELOPMENT, f"{sheet}: PISA for Development countries changed: {countries}."
 
 
 def read_data_explorer_exports() -> Table:
