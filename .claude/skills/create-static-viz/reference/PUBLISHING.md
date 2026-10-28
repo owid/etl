@@ -1,6 +1,6 @@
 # Publishing a static viz on the site
 
-Read this at Step 9, item 7, once the Figma frames are final. A flagship static viz goes on the site as
+Read this at Step 9, items 7 to 9, once the Figma frames are final. A flagship static viz goes on the site as
 a **static viz** (Admin → Static viz, `/admin/static-viz/`), not as a bare image. The `{.static-viz}`
 gdoc block renders the image like `{.image}` does, and adds a Download button whose modal shows the
 description, both image versions and the data link. The admin is behind Cloudflare Access, so a cloud
@@ -108,3 +108,31 @@ proposed one, and repeat the unsettled ones in every reply until the user decide
 image go live together, because a new image under an uncorrected description reads as an error. A
 fragment that no published data page shows is low priority, but its text gets the same read when it
 is repointed.
+
+## 5. Announce it in #data-updates-comms
+
+Once the pages show the new viz and their text matches it, draft a short message for the user to
+post, at `ai/<slug>_slack_announcement.md`. It is not the data-update form
+(`/draft-data-update-slack-post`): a refresh that keeps the data needs only a brief note of what was
+done, comparing the old version with the new one.
+
+- **One opening sentence, in bold** (`**…**`: a single `*…*` shows as italic once pasted): what was
+  done, such as "We refreshed our static chart of …". Keep links out of it. The next sentence names
+  the pages that show it, linked, and whether the data changed.
+- **Three or four bullets** on what changed between the two versions: the layout, the encoding, the
+  labels, a title word dropped and why. Take them from the step's docstring, and read any number off
+  the step's data.
+- **One closing sentence:** it is published as a static viz (downloads and data link), and the text
+  around it was revised.
+- **The images, attached before then after:** the published image it replaces
+  (`scripts/fetch_original_image.py <old filename>`), then the new desktop and mobile PNGs from
+  section 1. Gather the three in one folder under `ai/` and list them, in that order, above the message.
+
+With the Slack connector, save it as a draft (`slack_send_message_draft`), whose Markdown renders
+named links (a Markdown link on the page's name) and `**bold**`, with the attribution line first.
+Save it in the user's DM with themselves, not in the channel: a channel holds one draft, so one
+there clashes with whatever the user is already typing in it. They copy it into #data-updates-comms,
+attach the images and send it. Never send it yourself, since images cannot be added to a sent
+message. Without the connector, hand over the text to paste: Slack's message box renders neither
+`<url|text>` nor Markdown links, so write each link as the page's name followed by its bare URL in
+parentheses, and use `•` bullets.

@@ -512,6 +512,8 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 8. Accompanying text edited (Bertha and the author). **Read the prose beside each placement against
    the new frames** ([reference/PUBLISHING.md](reference/PUBLISHING.md) → *Check the text around
    it*) and hand the author each sentence that no longer matches, with a proposed rewrite.
+9. **Announce it in #data-updates-comms** once it is live: a short before-and-after message for the
+   user to post ([reference/PUBLISHING.md](reference/PUBLISHING.md) → *Announce it*).
 
 Report which of these are done and which are outstanding — the surrounding prose in particular
 tends to be forgotten, and a corrected chart under an uncorrected caption is worse than neither.
