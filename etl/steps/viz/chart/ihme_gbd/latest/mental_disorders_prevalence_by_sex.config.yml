@@ -2,8 +2,7 @@ grapher_schema: "011"
 slug: mental-health-prevalence-by-sex
 
 title:
-  title: Prevalence of mental disorders, women vs. men
-  title_variant: by disorder
+  title: Prevalence of mental health disorders by sex
 
 topic_tags:
   - Mental Health

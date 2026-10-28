@@ -40,7 +40,6 @@ def run() -> None:
                 "indicators": {
                     "x": _share(disorder, "female"),
                     "y": [_share(disorder, "male")],
-                    "size": "historical#population_historical",
                     "color": "regions#owid_region",
                 },
                 "config": {
