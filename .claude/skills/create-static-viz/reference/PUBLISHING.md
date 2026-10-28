@@ -26,7 +26,9 @@ session cannot reach it: prepare the files and the texts, and the user enters th
 (Admin → Static viz → its name) rather than creating one. Keep its name, so every `{.static-viz}`
 block already pointing at it picks up the change. Set the new images, and revise the description and
 data source if the refresh changed them. Then skip section 3, apart from any page still showing an
-`{.image}` block. Otherwise create the entry:
+`{.image}` block. Sections 3 and 4 find a `{.static-viz}` block through the images the entry holds,
+so give both commands the new filenames as well as the old ones: once the entry is saved, only the
+new ones lead to it. Otherwise create the entry:
 
 | Field | What goes in |
 |---|---|

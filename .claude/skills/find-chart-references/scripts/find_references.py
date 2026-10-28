@@ -633,7 +633,9 @@ def sweep_images(filenames: list[str]) -> list[dict]:
         fragment = r["post_type"] == "fragment"
         for filename in files[r["name"]]:
             out.append(
-                rec(
+                # The block names the viz, not the file: kept so a fragment's FAQ can be matched by it.
+                {"static_viz": r["name"]}
+                | rec(
                     "image",
                     filename,
                     None,
@@ -647,6 +649,22 @@ def sweep_images(filenames: list[str]) -> list[dict]:
                 )  # fmt: skip
             )
     return out
+
+
+def static_viz_names_in(node) -> set[str]:
+    """Every static viz a `{.static-viz}` block names in a gdoc subtree."""
+    found: set[str] = set()
+    if isinstance(node, dict):
+        if node.get("type") == "static-viz":
+            value = node.get("value") if isinstance(node.get("value"), dict) else node
+            if isinstance(value.get("name"), str):
+                found.add(value["name"])
+        for child in node.values():
+            found |= static_viz_names_in(child)
+    elif isinstance(node, list):
+        for child in node:
+            found |= static_viz_names_in(child)
+    return found
 
 
 def image_filenames_in(node) -> set[str]:
@@ -682,7 +700,10 @@ def sweep_fragment_data_pages(image_rows: list[dict]) -> list[dict]:
             "SELECT content->>'$.parsedFaqs' AS faqs FROM posts_gdocs WHERE id = %(g)s", params={"g": f["surface_id"]}
         )["faqs"].iloc[0]
         faqs = parse_json_obj(content)
-        frags = [k for k, v in faqs.items() if f["subject"] in image_filenames_in(v)]
+        if f.get("static_viz"):
+            frags = [k for k, v in faqs.items() if f["static_viz"] in static_viz_names_in(v)]
+        else:
+            frags = [k for k, v in faqs.items() if f["subject"] in image_filenames_in(v)]
         # The page type stays last, in parentheses: the report reads it from there.
         block, _, ptype = f["context"].rpartition(" (")
         note = f"FAQ {', '.join(frags)}" if frags else "in no FAQ entry"
@@ -1881,7 +1902,8 @@ def main() -> int:
         print(f"\n-> {args.json_out}")
     if args.csv_out:
         with open(args.csv_out, "w", newline="") as f:
-            w = csv.DictWriter(f, fieldnames=COLUMNS)
+            # Helper keys a row carries for later sweeps (a static-viz block's `static_viz`) stay out of the CSV.
+            w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")
             w.writeheader()
             w.writerows(findings)
         print(f"-> {args.csv_out}")
