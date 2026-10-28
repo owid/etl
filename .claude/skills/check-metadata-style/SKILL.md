@@ -46,11 +46,13 @@ Read the **grapher** step even when the edit was to a garden `.meta.yml` (e.g. y
 
 ## Implementation
 
-### 1. Check the guide is fresh
+### 1. Check the rulebooks are fresh
+
+Each rulebook carries its own sync date, so check [STYLE_GUIDE.md](STYLE_GUIDE.md) and [HARMONIZED_FAUST.md](HARMONIZED_FAUST.md) independently: a fresh one never excuses refreshing the other.
 
 Read the `> Last synced from Notion: YYYY-MM-DD` line in the header of [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
-- If the date is **less than two weeks** before today, skip to step 2 — no fetch needed.
+- If the date is **less than two weeks** before today, no fetch is needed: move on to `HARMONIZED_FAUST.md` below.
 - If the line is missing or the date is **two weeks old or more**, refresh the snapshot, trying in order:
 
 1. **Notion MCP.** Load the Notion tools with `ToolSearch` (query `+notion fetch`) and fetch the [Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). Use the result only if it looks complete: all sections present (Branding, Capitalization, Grammar and syntax, Short citations for charts, Writing in GDoc, Descriptions, Dates, Punctuation, Spelling) with the ❌/✅ examples intact. Note: authorizing the connector **mid-session doesn't help** — MCP tool lists are fixed at session start (subagents inherit the same registry, and resuming the session doesn't refresh it either), so a newly authorized connector is only reachable from a brand-new session.
@@ -67,7 +69,7 @@ On a successful fetch/export:
 
 > Plain `WebFetch`/`curl` does **not** work for the refresh: `app.notion.com` serves a JavaScript shell with no page content. Don't waste time trying it.
 
-Then do the same for [HARMONIZED_FAUST.md](HARMONIZED_FAUST.md), whose header carries a `> Last synced from Google Doc: YYYY-MM-DD` line. Refresh it with the Google Docs connector (`ToolSearch` query `select:mcp__claude_ai_Google_Docs__read_doc`, document id `1tcknTryJAxOR0yv8x38s3jkONq-TY3T4HNCEcZQ_c-s`); the JSON is too large to read inline, so extract the text from the saved result with a short script. Otherwise ask the user for a download (**File → Download → Markdown**), or skip with a warning. When converting:
+Then, whatever the date of `STYLE_GUIDE.md`, read the `> Last synced from Google Doc: YYYY-MM-DD` line in the header of [HARMONIZED_FAUST.md](HARMONIZED_FAUST.md) and apply the same two-week rule. When it is stale, refresh it with the Google Docs connector (`ToolSearch` query `select:mcp__claude_ai_Google_Docs__read_doc`, document id `1tcknTryJAxOR0yv8x38s3jkONq-TY3T4HNCEcZQ_c-s`); the JSON is too large to read inline, so extract the text from the saved result with a short script. Otherwise ask the user for a download (**File → Download → Markdown**), or skip with a warning. When converting:
 
 - Keep the file's structure: one section per metric, with `Title`, `Subtitle`, `Footnote` and unit bullets, and the `## Measures in various currencies and prices` section first.
 - Leave out the doc's bulk-editor chart links, its history of earlier documents, and the names of people. This repo is public.
@@ -161,7 +163,7 @@ print('---')
 
 # Step 5b: indicators measured in money, for the currency rules of HARMONIZED_FAUST.md.
 import re
-money = re.compile(r'\\\$|US\\\$|€|£|¥|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
+money = re.compile(r'\\\$|€|£|¥|\b(?:USD|EUR|GBP|JPY|CNY|INR|LCU)\b|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
 money_rows = [r for r in rows if money.search(r['fields'].get('unit', '') + ' ' + r['fields'].get('short_unit', ''))]
 print(f'MONEY INDICATORS: {len(money_rows)}')
 for r in money_rows:
@@ -266,7 +268,7 @@ Check each indicator that is one of the metrics in `HARMONIZED_FAUST.md` against
 - The subtitle has no index year and no "constant", "current" or "international-$". Those go in the footnote.
 - The footnote gives the technical unit (e.g. "constant 2019 US$", "[international-$](#dod:int_dollar_abbreviation) at 2021 prices") and, when OWID adjusted for inflation, the deflator.
 - The title mentions none of it.
-- `unit` and `short_unit` follow the case: `current US$` / `$`, `constant 2019 US$` / `$`, `international-$ in 2017 prices` / `$`, `current international-$` / `$`.
+- `unit` and `short_unit` follow the case: `current US$` / `$`, `constant 2019 US$` / `$`, `international-$ in 2017 prices` / `$`, `current international-$` / `$`. These are the currency part only: keep any scale, denominator or per-capita qualifier the unit already carries (`million current US$`, `constant 2024 US$ per kilowatt-hour`, `current US$ per capita`), in `short_unit` too, and flag only the currency part.
 
 Also flag any indicator whose unit is a share of GDP but is written as `%` alone: the long unit must be `% of GDP`.
 
