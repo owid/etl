@@ -57,7 +57,7 @@ Assumptions:
 - [ ] Run the adversarial review (`/fact-check-dataset`) as a background agent once the garden step is built, with effort scaled to the update (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
-- [ ] Pull admin edits of the dataset's ETL-authored single charts into ETL (`/pull-chart`) before pushing their `viz://chart` steps: pull admin drift into the YAML, list it in the PR description, and confirm `in sync` on staging afterwards (see step 7)
+- [ ] Pull admin edits of the dataset's ETL-authored single charts into ETL (`/pull-chart`) before pushing their `viz://chart` steps: pull admin drift into the YAML, clear admin fields that do nothing (also on the dataset's inheritance charts, with `etl chart-clean`), list both in the PR description, and confirm `in sync` on staging afterwards (see step 7)
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Run `check-hardcoded-years` after all remaps — numeric time pins below the new data's latest time hide the update; propose `"latest"` fixes with user sign-off (see step 7)
 - [ ] Run the empty-entity audit (`check-empty-entities`) as a background agent after the indicator upgrade: full automated pass, scaled follow-up; regressions vs production = fix, pre-existing = document (see step 7)
@@ -675,6 +675,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
      If the count is 0, the upgrade did not run — re-run it.
+   - **Clear admin fields that do nothing from the dataset's ETL-owned charts (mandatory check; warn when it finds anything).** Run a dry run against production:
+     ```bash
+     .venv/bin/etl chart-clean --dataset <namespace>/<short_name> --env <production env file>
+     ```
+     Its report gives each chart's kind. ETL owns the config of **ETL** charts (an ETL-authored config) and **inheritance** charts (they inherit their indicator's `grapher_config`, which this update writes). A no-op field on one of those changes nothing on screen, but it shows as drift and hides the admin overrides that matter. Warn the user, list the fields in the PR description, and clear them on this branch's staging server (`--apply --branch <branch>`, scoped to those charts by id), so chart-diff carries the change to production. `chart-pull` (next bullet) already leaves these fields out of the YAML. Charts of kind `admin` (no ETL config) only need a mention. The rules are described in the `pull-chart` skill.
    - **Pull admin edits of ETL-authored single charts into ETL first (mandatory when the dataset has any).** A single chart in `etl/steps/viz/chart/` (one with `chart_config_id`) can carry edits made in the admin, and those win over ETL. A `dimensions` override is the dangerous one: it keeps the chart on the **old** variable ids after its step is repointed, because the admin copy of the array wins whole. Before pushing the chart steps below, run the **`pull-chart` skill**:
      ```bash
      .venv/bin/etl chart-pull --dataset <namespace>/<short_name> --env <production env file> --apply

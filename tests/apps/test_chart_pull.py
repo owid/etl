@@ -90,9 +90,9 @@ def _step(repo):
     return step
 
 
-def _pull(step, patch, skip_fields=(), edited_after_adoption=None, pull_leftovers=False):
+def _pull(step, patch, skip_fields=(), edited_after_adoption=None, pull_leftovers=False, full=None):
     config = load_config(step.config_path)
-    layers = ChartLayers(chart_id=9287, patch=patch, edited_after_adoption=edited_after_adoption)
+    layers = ChartLayers(chart_id=9287, patch=patch, full=full or {}, edited_after_adoption=edited_after_adoption)
     layers.variable_paths = {i: VARIABLE_PATHS.get(i) for i in variable_ids_in_patch(patch)}
     result = Result(step=step)
     pull_fields(step, config, layers, result, skip_fields, pull_leftovers)
@@ -249,6 +249,40 @@ def test_stale_pin_leaves_a_column_the_yaml_already_sets(repo):
     assert view_config["map"]["colorScale"]["binningStrategy"] == "manual"
     assert result.stale_pins == ["sortColumnSlug", "map.columnSlug"]
     assert result.pulled == ["map"]
+
+
+def _rendered(*variable_ids, **extra):
+    """A rendered line-chart config plotting the given variables on y."""
+    return {
+        "chartTypes": ["LineChart"],
+        "dimensions": [{"variableId": v, "property": "y"} for v in variable_ids],
+        **extra,
+    }
+
+
+def test_admin_fields_with_no_effect_are_left_out(repo):
+    # A color scale on a line chart without a color dimension, and a map column repeating the first y.
+    patch = {
+        "title": "New title",
+        "colorScale": {"baseColorScheme": "Oranges"},
+        "map": {"columnSlug": "1", "colorScale": {"binningStrategy": "manual"}},
+    }
+    config, result = _pull(_step(repo), patch, full=_rendered(1, 2, hasMapTab=True))
+    view_config = config["views"][0]["config"]
+    assert result.noop == ["map.columnSlug", "colorScale"]
+    assert result.pulled == ["title", "map"]
+    assert "colorScale" not in view_config
+    assert "columnSlug" not in view_config["map"]
+    assert view_config["map"]["colorScale"]["binningStrategy"] == "manual"
+    assert "no-op fields" in result.status
+
+
+def test_stale_map_pin_on_a_single_indicator_map_is_a_no_op(repo):
+    # Grapher falls back to the chart's own indicator, so the pin is cleared rather than repointed.
+    config, result = _pull(_step(repo), {"map": {"columnSlug": "6"}}, full=_rendered(1, hasMapTab=True))
+    assert result.noop == ["map.columnSlug"]
+    assert not result.pulled and not result.stale_pins
+    assert "columnSlug" not in config["views"][0]["config"]["map"]
 
 
 def test_empty_dimensions_need_manual_fix(repo):

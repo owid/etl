@@ -4,11 +4,14 @@ description: >-
   Bring admin edits of ETL-authored single charts (viz://chart steps with chart_config_id) back
   into their ETL config, so the chart is defined in ETL again and the admin's ETL badge stops
   showing it as drifted. Wraps the deterministic `etl chart-pull` command, which copies every
-  field set in the admin into the chart's .config.yml. Works on all ETL-authored charts, on the
-  charts of one dataset, or on chosen charts.
+  field set in the admin into the chart's .config.yml. Admin fields that have no effect on the chart
+  are left out and cleared from the admin with `etl chart-clean`, which also works on charts with
+  inheritance and admin-only charts. Works on all ETL-authored charts, on the charts of one dataset, or on
+  chosen charts.
   Use when the user says a chart "drifted", "is out of sync with ETL", "has admin edits", asks to
-  "copy the admin config to ETL", "reconcile", "undrift", or pastes an admin link of an
-  ETL-authored chart; /update-dataset runs it on every update. Not for multidims or explorers.
+  "copy the admin config to ETL", "reconcile", "undrift", asks to "clean" a chart's admin config or
+  drop "useless", "redundant" or "no-op" settings, or pastes an admin link of an ETL-authored
+  chart; /update-dataset runs it on every update. Not for multidims or explorers.
 metadata:
   internal: true
   owner: paarriagadap
@@ -22,7 +25,7 @@ An ETL-authored single chart renders as merge(indicator config, ETL layer, admin
 
 ## What counts as drift
 
-- **Field drift.** The admin badge's main check: any top-level key in the admin patch besides the identity keys every patch carries (`$schema`, `id`, `slug`, `version`, `isPublished`). The command copies each one into the chart's `.config.yml`:
+- **Field drift.** The admin badge's main check: any top-level key in the admin patch besides the identity keys every patch carries (`$schema`, `id`, `slug`, `version`, `isPublished`). The command copies each one into the chart's `.config.yml`, except fields that do nothing (see below):
   - `dimensions` replace `views[0].indicators`, in the admin's order and with its `display`.
   - Variable ids (`dimensions`, `sortColumnSlug`, `map.columnSlug`) are written back as the catalog paths the YAML already uses.
   - Everything else is merged into `views[0].config`: nested objects merge, arrays and scalars replace.
@@ -32,6 +35,23 @@ An ETL-authored single chart renders as merge(indicator config, ETL layer, admin
 - **Admin leftovers.** When an existing chart moves into ETL, its whole old admin config stays in the admin layer, and a push only drops the values that equal ETL's. Every value ETL changed during the move stays masked, so the new ETL text never reaches readers. The command treats an override as a leftover when nobody has saved the chart in the admin since its ETL layer was created (no `chart_revisions` row by a user other than ETL), and when the override would replace a value the YAML already sets. It leaves those out (`--pull-leftovers` copies them anyway). Clear them in the admin so the ETL values show. Overrides on fields the YAML doesn't set are still copied, since they mask nothing. Inside an object, only the leaves that replace a YAML value are leftovers, reported by dotted path (e.g. `map.colorScale.baseColorScheme`); the object's other keys are copied, so unset exactly those paths.
 
 Out of scope: slugs (a config's `slug:` only applies when ETL creates a chart, so a chart renamed in the admin keeps its new slug; set `slug:` by hand if you want the config to match), multidims and explorers (no `chart_config_id`), and charts that exist only in the admin (adopt them first with `/create-chart`).
+
+## Admin fields that do nothing
+
+Some admin fields are read by nothing: a color scale on a line chart without a color dimension, a map indicator that repeats the default (or names an indicator the chart doesn't plot), scatter settings on a bar chart, map settings on a chart without a map tab. They count as drift, but they belong cleared from the admin, not copied into ETL. `chart-pull` leaves them out and reports them as `no-op fields`, and `etl chart-clean` clears them. Both use the same fixed rules, taken from grapher's code (`apps/chart_clean/rules.py`). Clearing one never changes how the chart looks, so it needs no decision. Every admin value that does change the chart is kept.
+
+```bash
+# Dry run: each no-op field, with the rule behind it.
+.venv/bin/etl chart-clean <chart ids> --env <production env file>
+.venv/bin/etl chart-clean --dataset <namespace>/<short_name> --etl-only --env <production env file>
+
+# Clear them on the branch's staging server (never production); chart-diff carries it to production.
+.venv/bin/etl chart-clean <chart ids> --apply --branch <branch>
+```
+
+`chart-clean` also covers charts `chart-pull` doesn't touch:
+- **Charts with inheritance enabled** (`--inheritance-only`): their parent is the indicator's `grapher_config`, which ETL owns. Clear their no-op fields whenever you touch their dataset, so the overrides that matter stand out. They aren't pulled.
+- **Admin-only charts:** report them, but leave bulk cleanup to grapher. `--all` finds about 2,000, so `--apply` stops at 50 charts unless `--max` raises the limit (each needs a chart-diff approval). Use the `--json` report for a grapher migration instead.
 
 ## Run it
 
@@ -57,9 +77,10 @@ Statuses in the report:
 | `in sync` | No admin override | Nothing |
 | `fields pulled` | Admin fields copied into the YAML | Review the diff (below) |
 | `already in ETL` | The YAML already holds the admin value; the admin layer clears on the next push | Push |
-| `stale variable pins` | The admin pins `dimensions`, `sortColumnSlug` or `map.columnSlug` to an older version of an indicator the YAML names (an update that didn't remap the admin layer). No push clears the pin. On `dimensions` the chart plots the old variables. A `map.columnSlug` or `sortColumnSlug` that names a variable outside the chart's dimensions is often just a grapher artifact, since grapher falls back to the chart's own indicator (e.g. on a single-indicator map). It still counts as drift | Clear it in the admin (below). When the YAML doesn't set that `sortColumnSlug` or `map.columnSlug` yet, the command copies the current path into it, so clearing the pin keeps the chart's sort or map column: commit that first. When stale `dimensions` also carry other admin edits (order, display, indicators), the command copies those edits as usual (`pulled` or `admin leftovers`) and still lists the pin: commit the copied edits first, then clear the pin |
+| `stale variable pins` | The admin pins `dimensions`, `sortColumnSlug` or `map.columnSlug` to an older version of an indicator the YAML names (an update that didn't remap the admin layer). No push clears the pin. On `dimensions` the chart plots the old variables. (A `map.columnSlug` or `sortColumnSlug` pin to a variable outside the chart's dimensions does nothing, since grapher falls back to the chart's own indicator, so it is reported as a `no-op field` instead) | Clear it in the admin (below). When the YAML doesn't set that `sortColumnSlug` or `map.columnSlug` yet, the command copies the current path into it, so clearing the pin keeps the chart's sort or map column: commit that first. When stale `dimensions` also carry other admin edits (order, display, indicators), the command copies those edits as usual (`pulled` or `admin leftovers`) and still lists the pin: commit the copied edits first, then clear the pin |
 | `needs manual` | An indicator from a dataset the step doesn't depend on, or a field ETL can't express | Fix by hand, then re-run |
 | `fields skipped` | Left out with `--skip-field`; still set in the admin | Clear it in the admin (below) |
+| `no-op fields` | Admin fields that have no effect on the chart; left out | Clear them with `etl chart-clean --apply` (below) |
 | `admin leftovers` | Set in the admin before the move to ETL, masking a different ETL value; left out | Clear it in the admin (below) |
 
 ## Judge the diff before committing
@@ -80,8 +101,8 @@ Also check:
 ## Ship it
 
 1. Work in a worktree and open the PR with the usual flow. If nothing but pulled charts changes, it's a small standalone PR.
-2. PR description: for each chart, its admin link, the fields pulled, and the skipped fields and leftovers with both values. Say that nothing reader-visible changes, except fields cleared in the admin.
-3. **Clear leftovers, stale variable pins and agreed skipped fields on the branch's staging server**, never on production. Use dotted paths for nested ones (`--unset map.columnSlug`). Run a dry run first and show the user the diff:
+2. PR description: for each chart, its admin link, the no-op fields cleared, the fields pulled, and the skipped fields and leftovers with both values. Say that nothing reader-visible changes, except fields cleared in the admin.
+3. **Clear no-op fields, leftovers, stale variable pins and agreed skipped fields on the branch's staging server**, never on production. No-op fields need no decision: `.venv/bin/etl chart-clean <chart ids> --apply --branch <branch>`. For the rest, use dotted paths for nested ones (`--unset map.columnSlug`). Run a dry run first and show the user the diff:
 
    ```bash
    .venv/bin/python .claude/skills/edit-faust-metadata/scripts/update_chart_config.py \
@@ -102,6 +123,7 @@ Also check:
 
 Follow `.claude/docs/open-items.md`. Typical items:
 
-- leftovers, stale variable pins and skipped fields cleared on staging, waiting for chart-diff approval;
+- no-op fields, leftovers, stale variable pins and skipped fields cleared on staging, waiting for chart-diff approval;
+- no-op fields on admin-only charts that were reported but left alone;
 - `needs manual` findings;
 - the post-merge production check.

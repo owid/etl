@@ -20,6 +20,7 @@ from typing import Any, cast
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
+from apps.chart_clean.rules import find_noop_fields, remove_paths
 from etl.dag_helpers import load_single_dag_file
 from etl.files import ruamel_dump, ruamel_load
 
@@ -62,6 +63,8 @@ class ChartLayers:
 
     chart_id: int
     patch: dict[str, Any]
+    # The rendered config, which tells which admin fields have no effect (apps/chart_clean/rules.py).
+    full: dict[str, Any] = field(default_factory=dict)
     # variableId -> catalogPath, for every variable id the patch references.
     variable_paths: dict[int, str | None] = field(default_factory=dict)
     # Whether a person (not ETL) saved the chart in the admin after its ETL layer was created.
@@ -80,6 +83,8 @@ class Result:
     # Pulled fields that replace a value the YAML already set, rather than adding one.
     overrides_etl: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
+    # Admin fields with no effect on the chart: left out, to clear in the admin with `etl chart-clean`.
+    noop: list[str] = field(default_factory=list)
     # Admin values set before the chart moved to ETL that would replace a newer ETL value: left out.
     leftovers: list[str] = field(default_factory=list)
     # Admin pins to an older version of an indicator the YAML already names: no push clears them.
@@ -98,6 +103,8 @@ class Result:
             labels.append("fields pulled")
         if self.skipped:
             labels.append("fields skipped")
+        if self.noop:
+            labels.append("no-op fields")
         if self.leftovers:
             labels.append("admin leftovers")
         if self.stale_pins:
@@ -118,6 +125,7 @@ class Result:
             "fields_pulled": self.pulled,
             "fields_overriding_etl": self.overrides_etl,
             "fields_skipped": self.skipped,
+            "fields_noop": self.noop,
             "fields_admin_leftovers": self.leftovers,
             "fields_stale_variable_pins": self.stale_pins,
             "fields_already_in_etl": self.already_in_etl,
@@ -201,9 +209,14 @@ def pull_fields(
     equal to ETL's drop out on push. So if no person has saved the chart since its ETL layer was
     created, an admin value that differs from the YAML's is a leftover from before the move, masking
     the newer ETL value. Those are left out (`result.leftovers`) unless `pull_leftovers` is set.
+
+    Admin fields that have no effect on the chart (`etl chart-clean`'s rules) are left out too
+    (`result.noop`): they belong cleared in the admin, not copied into ETL.
     """
     view = config["views"][0]
-    overrides = field_overrides(layers.patch)
+    if layers.full:
+        result.noop = [f.path for f in find_noop_fields(layers.full, layers.patch)]
+    overrides = field_overrides(remove_paths(layers.patch, result.noop))
     resolver = _PathResolver(view, layers.variable_paths, step.dependencies)
     leftovers_possible = layers.edited_after_adoption is False and not pull_leftovers
 
@@ -259,7 +272,7 @@ def pull_fields(
             result.stale_pins.append(key)
             if yaml_config.get(key) is not None:
                 continue
-        if key == "map" and _pins_stale_id(layers.patch["map"].get("columnSlug"), resolver):
+        if key == "map" and "columnSlug" in value and _pins_stale_id(layers.patch["map"].get("columnSlug"), resolver):
             result.stale_pins.append("map.columnSlug")
             if (yaml_config.get("map") or {}).get("columnSlug") is not None:
                 del value["columnSlug"]

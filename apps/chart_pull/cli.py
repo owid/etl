@@ -36,7 +36,6 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 from sqlalchemy import bindparam, text
-from sqlalchemy.exc import OperationalError
 
 from apps.chart_config_id.cli import _load_config as load_single_chart_config
 from apps.chart_pull.pull import (
@@ -49,7 +48,7 @@ from apps.chart_pull.pull import (
     pull_fields,
     variable_ids_in_patch,
 )
-from etl import config
+from apps.chart_pull.source import fetch_rows, source_env, warn_master_copy_age
 from etl.config import ETL_GRAPHER_USER_ID, OWIDEnv
 from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
 
@@ -104,10 +103,10 @@ def cli(
     if not (select_all or dataset or chart_ids or targets):
         raise click.UsageError("Name the charts: --all, --dataset, --chart-id, or config files / step URIs.")
 
-    owid_env, is_master_copy = _source_env(env_name)
+    owid_env, is_master_copy = source_env(env_name)
     console.print(f"Reading admin layers from [bold]{owid_env.conf.DB_NAME}[/bold] on {owid_env.conf.DB_HOST}")
     if is_master_copy:
-        _warn_master_copy_age(owid_env)
+        warn_master_copy_age(owid_env)
 
     steps = find_chart_steps(Path(STEP_DIR), Path(DAG_DIR))
     selected = _select(steps, select_all, dataset, targets)
@@ -126,27 +125,6 @@ def cli(
     if json_path:
         json_path.write_text(json.dumps([r.to_dict() for r in results], indent=2) + "\n")
         console.print(f"Report written to {json_path}")
-
-
-def _source_env(env_name: str | None) -> tuple[OWIDEnv, bool]:
-    """The environment to read admin layers from, and whether it's the staging-site-master copy."""
-    if env_name:
-        return OWIDEnv.from_staging_or_env_file(env_name), False
-    if config.OWID_ENV.env_remote == "production":
-        return config.OWID_ENV, False
-    if config.ENV_FILE_PROD:
-        return OWIDEnv.from_env_file(str(config.ENV_FILE_PROD)), False
-    return OWIDEnv.from_staging("master"), True
-
-
-def _warn_master_copy_age(owid_env: OWIDEnv) -> None:
-    """staging-site-master's database is a periodic copy of production: say how old it is."""
-    latest = _query(owid_env, text("SELECT MAX(updatedAt) AS latest FROM chart_configs"), {})[0].latest
-    console.print(
-        f"[yellow]staging-site-master is a copy of production whose newest chart edit is from {latest} (UTC). "
-        "Admin edits made since are missed: pass `--env <production env file>` or set ENV_FILE_PROD to read "
-        "production.[/yellow]"
-    )
 
 
 def _select(steps: list[ChartStep], select_all: bool, dataset: str | None, targets: tuple[str, ...]) -> list[ChartStep]:
@@ -174,7 +152,7 @@ def _select(steps: list[ChartStep], select_all: bool, dataset: str | None, targe
 
 def _select_by_chart_id(owid_env: OWIDEnv, steps: list[ChartStep], chart_ids: tuple[int, ...]) -> list[ChartStep]:
     query = text("SELECT id, configId FROM charts WHERE id IN :ids").bindparams(bindparam("ids", expanding=True))
-    rows = _query(owid_env, query, {"ids": list(chart_ids)})
+    rows = fetch_rows(owid_env, query, {"ids": list(chart_ids)})
     found = {row.id: _step_for_config_id(steps, str(row.configId).lower()) for row in rows}
     unknown = [str(i) for i in chart_ids if found.get(i) is None]
     if unknown:
@@ -193,7 +171,7 @@ def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLa
     # A plain SELECT, not the ORM `Chart`, as in `etl chart-config-id lookup`.
     # `last_human_edit` is the latest admin save by a person; ETL pushes are saved as the ETL user.
     query = text(
-        "SELECT c.id, c.configId, pa.config AS patch, pe.createdAt AS etl_created, "
+        "SELECT c.id, c.configId, cc.config AS full, pa.config AS patch, pe.createdAt AS etl_created, "
         "(SELECT MAX(r.createdAt) FROM chart_revisions r WHERE r.chartId = c.id AND r.userId <> :etl_user) "
         "AS last_human_edit "
         "FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
@@ -202,13 +180,14 @@ def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLa
         "WHERE c.configId IN :ids"
     ).bindparams(bindparam("ids", expanding=True))
     layers = {}
-    for row in _query(owid_env, query, {"ids": config_ids, "etl_user": ETL_GRAPHER_USER_ID}):
+    for row in fetch_rows(owid_env, query, {"ids": config_ids, "etl_user": ETL_GRAPHER_USER_ID}):
         patch = row.patch if isinstance(row.patch, dict) else json.loads(row.patch or "{}")
+        full = row.full if isinstance(row.full, dict) else json.loads(row.full or "{}")
         edited_after_adoption = None
         if row.etl_created is not None:
             edited_after_adoption = row.last_human_edit is not None and row.last_human_edit > row.etl_created
         layers[str(row.configId).lower()] = ChartLayers(
-            chart_id=row.id, patch=patch, edited_after_adoption=edited_after_adoption
+            chart_id=row.id, patch=patch, full=full, edited_after_adoption=edited_after_adoption
         )
 
     variable_ids = sorted(set().union(*(variable_ids_in_patch(layer.patch) for layer in layers.values())))
@@ -216,20 +195,10 @@ def _fetch_layers(owid_env: OWIDEnv, config_ids: list[str]) -> dict[str, ChartLa
         query = text("SELECT id, catalogPath FROM variables WHERE id IN :ids").bindparams(
             bindparam("ids", expanding=True)
         )
-        paths = {row.id: row.catalogPath for row in _query(owid_env, query, {"ids": variable_ids})}
+        paths = {row.id: row.catalogPath for row in fetch_rows(owid_env, query, {"ids": variable_ids})}
         for layer in layers.values():
             layer.variable_paths = {i: paths.get(i) for i in variable_ids_in_patch(layer.patch)}
     return layers
-
-
-def _query(owid_env: OWIDEnv, query, params: dict):
-    try:
-        with owid_env.engine.connect() as con:
-            return con.execute(query, params).all()
-    except OperationalError as e:
-        raise click.ClickException(
-            f"Could not reach the grapher database at {owid_env.conf.DB_HOST} (db '{owid_env.conf.DB_NAME}'): {e.orig}"
-        ) from None
 
 
 def _pull(
@@ -280,6 +249,8 @@ def _print_report(results: list[Result], apply: bool) -> None:
             details.append(f"admin value replaces an ETL value (check it isn't stale): {', '.join(r.overrides_etl)}")
         if r.skipped:
             details.append(f"skipped, still set in the admin: {', '.join(r.skipped)}")
+        if r.noop:
+            details.append(f"left out, no effect on the chart; clear with `etl chart-clean`: {', '.join(r.noop)}")
         if r.leftovers:
             details.append(
                 f"left out, set in the admin before the move to ETL and masking ETL's value; "
