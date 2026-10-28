@@ -128,6 +128,8 @@ for table_name in ds.table_names:
 
         display = getattr(m, 'display', None) or {}
         put('display.name', display.get('name'))
+        put('display.unit', display.get('unit'))  # harmonized-FAUST pass only; Grapher shows it over unit
+        put('display.shortUnit', display.get('shortUnit'))  # harmonized-FAUST pass only; Grapher shows it over short_unit
 
         pres = getattr(m, 'presentation', None)
         if pres is not None:
@@ -163,12 +165,24 @@ print('---')
 
 # Step 5b: indicators measured in money, for the currency rules of HARMONIZED_FAUST.md.
 import re
-money = re.compile(r'\\\$|€|£|¥|\b(?:USD|EUR|GBP|JPY|CNY|INR|LCU)\b|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
-money_rows = [r for r in rows if money.search(r['fields'].get('unit', '') + ' ' + r['fields'].get('short_unit', ''))]
+money = re.compile(r'\\\$|€|£|¥|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
+try:
+    from babel.numbers import list_currencies  # every ISO 4217 code; babel ships with the full dev venv
+    codes = list_currencies() | {'LCU'}
+except ImportError:
+    print('WARNING: babel is not installed, so units written only as an ISO currency code (SEK, DKK, ...) are missed')
+    codes = {'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'LCU'}
+code = re.compile(r'\b(?:' + '|'.join(sorted(codes)) + r')\b')  # case-sensitive: codes are upper case
+# Grapher shows display.unit and display.shortUnit over unit and short_unit, so scan what it shows.
+shown = lambda f: (f.get('display.unit') or f.get('unit', ''), f.get('display.shortUnit') or f.get('short_unit', ''))
+money_rows = [r for r in rows if any(money.search(u) or code.search(u) for u in shown(r['fields']))]
 print(f'MONEY INDICATORS: {len(money_rows)}')
 for r in money_rows:
     f = r['fields']
-    print(f\"  {r['table']}.{r['variable']}: unit={f.get('unit')!r} short_unit={f.get('short_unit')!r}\")
+    u, s = shown(f)
+    under = (f.get('unit', ''), f.get('short_unit', ''))
+    note = '' if (u, s) == under else f'  (display overrides unit={under[0]!r} short_unit={under[1]!r})'
+    print(f\"  {r['table']}.{r['variable']}: unit={u!r} short_unit={s!r}{note}\")
 print('---')
 
 # Step 5: strings for the style audit
@@ -182,6 +196,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 |---|---|
 | `title` | Variable short title; shows in the catalog and some chart views |
 | `unit`, `short_unit` | Axis and tooltip units; checked only in the harmonized-FAUST pass (e.g. `current US$`, `% of GDP`) |
+| `display.unit`, `display.shortUnit` | Override `unit` and `short_unit` in Grapher when set, so the harmonized-FAUST pass checks these instead |
 | `description_short` | One-liner rendered under chart titles |
 | `description_processing` | Processing note on data pages; collected for the whitespace pass only, the style rules skip it |
 | `description_key[i]` | Key information on chart data pages (markdown string, or legacy bullet list) |
@@ -260,7 +275,7 @@ Group the blocks by variable for readability. End with a summary count.
 
 ### 5b. Evaluate against the harmonized FAUST
 
-Check each indicator that is one of the metrics in `HARMONIZED_FAUST.md` against that metric's section, field by field: title, subtitle (`grapher_config.subtitle`, else `description_short`), footnote (`grapher_config.note`), `unit` and `short_unit`. Match an indicator to a metric only when it clearly is that metric (a GDP series, an extreme poverty share, a death rate, a "% of GDP" spending share); when unsure, don't flag. Use the same report format as step 5, with `Rule:` naming the `HARMONIZED_FAUST.md` section.
+Check each indicator that is one of the metrics in `HARMONIZED_FAUST.md` against that metric's section, field by field: title, subtitle (`grapher_config.subtitle`, else `description_short`), footnote (`grapher_config.note`), `unit` and `short_unit`. For the units, check what Grapher shows: `display.unit` and `display.shortUnit` when set, else `unit` and `short_unit`, and put any fix in the field that is shown. Match an indicator to a metric only when it clearly is that metric (a GDP series, an extreme poverty share, a death rate, a "% of GDP" spending share); when unsure, don't flag. Use the same report format as step 5, with `Rule:` naming the `HARMONIZED_FAUST.md` section.
 
 **Every indicator in the `MONEY INDICATORS` block gets the currency rules**, whatever metric it is. Read its `description_key` and `description_processing`, and the producer's documentation where they don't settle it, to place it in one of the four cases (current or constant national currency, current or constant international-$). A unit converted to US dollars at market exchange rates is a national currency (US$), not international-$. Then check:
 
