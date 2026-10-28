@@ -18,7 +18,7 @@ tables:
       cost:
         title: Solar photovoltaic module price
         description_short: |-
-          This data is expressed in US dollars per watt, adjusted for inflation.
+          Average price of solar photovoltaic modules, in US dollars per watt, adjusted for inflation.
         unit: "constant {LATEST_YEAR} US$ per watt"
         short_unit: "$/W"
         description_key:
