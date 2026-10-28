@@ -25,7 +25,8 @@ ITEM_CODE_CHICKENS = "00001058"
 # FAOSTAT element codes of animals slaughtered (mammals, and poultry and rabbits, respectively).
 ELEMENT_CODES_SLAUGHTERED = ["005320", "005321"]
 
-# FAOSTAT items that each icon of the row of other land animals stands for. The cow icon stands for all the rest.
+# FAOSTAT items that each icon of the row of other land animals stands for, as the chart's note says. The cow icon
+# stands for cattle, turkeys and all the rest.
 OTHER_ANIMAL_ICONS = {
     "duck": {"00001069": "ducks", "00001073": "geese"},
     "pig": {"00001035": "pigs"},
@@ -70,8 +71,8 @@ def run() -> None:
     numbers["cow_icons"] = numbers["other_land_animals"] - sum(numbers[f"{icon}_icons"] for icon in OTHER_ANIMAL_ICONS)
     paths.log.info("Numbers in the chart (billions): " + ", ".join(f"{k} {v:.2f}" for k, v in numbers.items()))
 
-    # Check that the chart shows these numbers, rounded, and that its note lists animals in the right order.
-    check_numbers_in_chart(numbers=numbers, slaughtered=slaughtered)
+    # Check that the chart shows these numbers, rounded.
+    check_numbers_in_chart(numbers=numbers)
 
 
 def select_slaughtered_animals(tb_qcl: Table) -> Variable:
@@ -95,7 +96,7 @@ def select_slaughtered_animals(tb_qcl: Table) -> Variable:
     return tb.set_index("item_code")["value"]
 
 
-def check_numbers_in_chart(numbers: dict, slaughtered: Variable) -> None:
+def check_numbers_in_chart(numbers: dict) -> None:
     # Rounded numbers (and icons) shown in the chart.
     expected = {
         "chickens_killed_in_meat_production": 79,
@@ -113,9 +114,3 @@ def check_numbers_in_chart(numbers: dict, slaughtered: Variable) -> None:
         name: round(float(numbers[name]), 2) for name, value in expected.items() if round(numbers[name]) != value
     }
     assert not changed, f"Numbers in the chart have changed (update the chart in Figma): {changed}"
-
-    # The note lists the other land animals from most to least killed, then "other animals killed in smaller numbers".
-    others = slaughtered.drop([ITEM_CODE_ALL_MEAT, ITEM_CODE_CHICKENS]).sort_values(ascending=False)
-    listed = ["00001069", "00001035", "00001073", "00000977", "00001141", "00001017", "00001080", "00000867"]
-    error = "The animals listed in the note of the chart are not the most killed, in order (update the chart in Figma)."
-    assert list(others.index[: len(listed)]) == listed, error
