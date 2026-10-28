@@ -1,6 +1,6 @@
 # Publishing a static viz on the site
 
-Read this at Step 9, item 7, once the Figma frames are final. A flagship static viz goes on the site as
+Read this at Step 9, items 7 to 9, once the Figma frames are final. A flagship static viz goes on the site as
 a **static viz** (Admin → Static viz, `/admin/static-viz/`), not as a bare image. The `{.static-viz}`
 gdoc block renders the image like `{.image}` does, and adds a Download button whose modal shows the
 description, both image versions and the data link. The admin is behind Cloudflare Access, so a cloud
@@ -108,3 +108,44 @@ proposed one, and repeat the unsettled ones in every reply until the user decide
 image go live together, because a new image under an uncorrected description reads as an error. A
 fragment that no published data page shows is low priority, but its text gets the same read when it
 is repointed.
+
+## 5. Announce it in #data-updates-comms
+
+Once the pages show the new viz and their text matches it, announce it. **When the refresh brought
+new data**, the dataset update's form is the announcement (`/update-dataset` hands it to
+`/draft-data-update-slack-post`): name the viz among the charts it affected, and attach the images
+below. **When the data is the same**, the refresh is a redesign, and the form's dataset fields have
+nothing to say: draft a short message instead, at `ai/<slug>_slack_announcement.md`, comparing the
+old version with the new one. A brand-new viz replaces nothing: its message has the same shape, with
+the bullets on what the chart shows and only the new images attached.
+
+- **One opening sentence, in bold, on a line of its own** with a blank line after it (`**…**`: a
+  single `*…*` shows as italic once pasted): what was done, such as "We refreshed our static chart
+  of …". Keep links out of it.
+- **A paragraph** naming the pages that show it, linked, and the data it uses, unchanged, ending by
+  introducing the images ("Old version first, then the new desktop and mobile ones:", or "then the
+  new one:" for a viz with no mobile frame).
+- **Three or four bullets** right under it, on what changed between the two versions: the layout,
+  the encoding, the labels, a title word dropped and why. Take them from the step's docstring, and
+  read any number off the step's data.
+- **One sentence right under the bullets:** it is published as a static viz (downloads and data
+  link), and the text around it was revised.
+- **After a blank line, thanks** to the people who reviewed it, by first name (the Step 9 review
+  chain), for the user to adjust.
+- **The images, attached before then after:** for a refresh, the published image it replaces
+  (`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <old filename>`);
+  then, for any viz, the new desktop PNG from section 1, and the mobile one when the viz has a mobile
+  frame. Gather them in one folder under `ai/` and list them, in that order, above the message.
+
+With the Slack connector, save it as a draft (`slack_send_message_draft`), whose Markdown renders
+named links (a Markdown link on the page's name) and `**bold**`, with the attribution line first.
+First search #data-updates-comms for a message about the viz: the user may have posted one already.
+If one is there, save the draft in the user's DM with themselves, never in the channel, and tell
+them the viz is already announced, with the post's link: the draft is there to compare or edit the
+post with, not to send again. If the channel already holds a draft (the call fails with
+`attached_draft_exists`, since a channel holds one), save it in their DM too, so it never lands on
+top of theirs, and tell them to copy it from there into #data-updates-comms. Otherwise save it in
+the channel. In the channel, they attach the images and send it. Never send
+it yourself, since images cannot be added to a sent message. Without the connector, hand over the
+text to paste: Slack's message box renders neither `<url|text>` nor Markdown links, so write each
+link as the page's name followed by its bare URL in parentheses, and use `•` bullets.
