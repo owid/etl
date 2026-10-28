@@ -167,8 +167,13 @@ print('---')
 import re
 money = re.compile(r'\\\$|€|£|¥|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
 try:
-    from babel.numbers import list_currencies  # every ISO 4217 code; babel ships with the full dev venv
-    codes = list_currencies() | {'LCU'}
+    # ISO 4217 codes legal tender somewhere today; babel ships with the full dev venv. Withdrawn codes are left
+    # out because some collide with acronyms in units (SDP, the old Sudanese pound, vs surplus domestic product).
+    import datetime
+    from babel.core import get_global
+    from babel.numbers import get_territory_currencies
+    today = datetime.date.today()
+    codes = {c for t in get_global('territory_currencies') for c in get_territory_currencies(t, today)} | {'LCU'}
 except ImportError:
     print('WARNING: babel is not installed, so units written only as an ISO currency code (SEK, DKK, ...) are missed')
     codes = {'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'LCU'}
