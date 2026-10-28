@@ -311,6 +311,7 @@ def add_dimension_labels(tb: Table) -> Table:
 
     # Earnings levels are encoded at the end of the measure code (e.g. GPRR50).
     tb["earnings"] = tb["measure"].str.extract(r"^(?:GPRR|NPRR|GPW|NPW)(\d+)$", expand=False).map(EARNINGS)
+    tb["earnings"] = tb["earnings"].copy_metadata(tb["measure"])
 
     tb.loc[tb["measure"].isin(MEASURES_WITHOUT_SEX), "sex"] = "_Z"
     tb["sex"] = tb["sex"].map(SEX)
