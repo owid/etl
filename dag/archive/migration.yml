@@ -101,3 +101,31 @@ steps:
   # archived; last active in 3f8110fb3d60 on 2026-10-27
   data://meadow/idmc/2026-01-19/internal_displacement:
     - snapshot://idmc/2026-01-19/internal_displacement.csv
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://grapher/un/2025-07-03/refugee_data:
+    - data://garden/un/2025-07-03/refugee_data
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://meadow/un/2024-07-25/resettlement:
+    - snapshot://un/2024-07-25/resettlement.zip
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://meadow/un/2025-07-03/refugee_data:
+    - snapshot://un/2025-07-03/refugee_data.zip
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://meadow/un/2024-07-25/refugee_data:
+    - snapshot://un/2024-07-25/refugee_data.zip
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://garden/un/2025-07-03/refugee_data:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/un/2025-07-03/refugee_data
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://garden/un/2024-07-25/resettlement:
+    - data://meadow/un/2024-07-25/resettlement
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://grapher/un/2024-07-25/refugee_data:
+    - data://garden/un/2024-07-25/refugee_data
+  # archived; last active in 274982d3cba6 on 2026-10-27
+  data://garden/un/2024-07-25/refugee_data:
+    - data://meadow/un/2024-07-25/refugee_data
+    - data://garden/un/2024-07-25/resettlement
+    - data://garden/demography/2024-07-15/population

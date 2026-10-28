@@ -1,14 +1,29 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 VERBOSE = False
+
+# Indicator columns expected in the meadow table.
+EXPECTED_COLUMNS = {
+    "refugees",
+    "returned_refugees",
+    "asylum_seekers",
+    "idps",
+    "returned_idps",
+    "stateless",
+    "hst",
+    "ooc",
+    "oip",
+}
+# Minimum number of countries expected in each output table (counts in the 2025-07-03 version).
+MIN_COUNTRIES = {"asylum": 196, "origin": 215}
 
 
 def run() -> None:
@@ -20,6 +35,7 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("refugee_data")
+    sanity_check_inputs(tb)
 
     # filter out data before data availability starts (s. https://www.unhcr.org/refugee-statistics/methodology/, "Data publication timeline")
     tb["asylum_seekers"] = tb["asylum_seekers"].where(tb["year"] >= 2000, pd.NA)
@@ -28,7 +44,12 @@ def run() -> None:
     tb["idps"] = tb["idps"].where(tb["year"] >= 1993, pd.NA)
     tb["stateless"] = tb["stateless"].where(tb["year"] >= 2004, pd.NA)
     # others of concern
-    tb["ooc"] = tb["ooc"].where(tb["year"] >= 2018, pd.NA)
+    tb["ooc"] = tb["ooc"].where(tb["year"] >= 1997, pd.NA)
+    # other people in need of international protection (category reported since 2018)
+    # NOTE: People can move between oip and refugees (e.g. ~1M Afghans, mostly in Iran, were reclassified from
+    # refugee-like situations to oip in 2025). Check for new reclassifications on every update and caveat them in the
+    # description_key of both indicators.
+    tb["oip"] = tb["oip"].where(tb["year"] >= 2018, pd.NA)
     tb["returned_idps"] = tb["returned_idps"].where(tb["year"] >= 1997, pd.NA)
 
     if VERBOSE:
@@ -78,16 +99,11 @@ def run() -> None:
     tb_asylum = tb_asylum.rename(columns={"country_of_asylum": "country"})
 
     # harmonize countries
-    tb_asylum = geo.harmonize_countries(
-        df=tb_asylum,
-        countries_file=paths.country_mapping_path,
-        warn_on_unused_countries=False,
+    tb_asylum = paths.regions.harmonize_names(
+        tb_asylum, country_col="country", countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
-
-    tb_origin = geo.harmonize_countries(
-        df=tb_origin,
-        countries_file=paths.country_mapping_path,
-        warn_on_unused_countries=False,
+    tb_origin = paths.regions.harmonize_names(
+        tb_origin, country_col="country", countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
 
     # Add population to table
@@ -118,6 +134,8 @@ def run() -> None:
     tb_asylum["country"] = tb_asylum["country"].replace("Unknown", "Unknown Destination")
     tb_origin["country"] = tb_origin["country"].replace("Unknown", "Unknown Origin")
 
+    sanity_check_outputs(tb_asylum, tb_origin)
+
     # Improve table format.
     tb_asylum = tb_asylum.format(["country", "year"], short_name="refugee_data_asylum")
     tb_origin = tb_origin.format(["country", "year"], short_name="refugee_data_origin")
@@ -130,3 +148,25 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    columns = set(tb.columns) - {"country_of_origin", "country_of_asylum", "year"}
+    assert columns == EXPECTED_COLUMNS, f"Unexpected meadow columns: {sorted(columns ^ EXPECTED_COLUMNS)}"
+    assert not tb.duplicated(subset=["country_of_origin", "country_of_asylum", "year"]).any(), "Duplicate rows."
+    assert (tb[list(EXPECTED_COLUMNS)].fillna(0) >= 0).all().all(), "Negative counts in meadow table."
+
+
+def sanity_check_outputs(tb_asylum: Table, tb_origin: Table) -> None:
+    for name, tb in [("asylum", tb_asylum), ("origin", tb_origin)]:
+        assert not tb.duplicated(subset=["country", "year"]).any(), f"Duplicate (country, year) rows in {name} table."
+        n_countries = tb["country"].nunique()
+        assert n_countries >= MIN_COUNTRIES[name], f"Only {n_countries} countries in {name} table."
+        rate_cols = [c for c in tb.columns if c.endswith(("_per_100k", "_per_1000"))]
+        assert (tb[rate_cols].fillna(0) >= 0).all().all(), f"Negative rates in {name} table."
+        # Refugees should not exceed the population of the country, except for Western Sahara as an origin: its
+        # refugees (mostly in camps in Algeria) are not counted in the territory's population.
+        msk = tb["refugees_per_1000"] > 1000
+        if name == "origin":
+            msk &= tb["country"] != "Western Sahara"
+        assert not msk.any(), f"Refugee rate above 1,000 per 1,000 in {name} table: {set(tb.loc[msk, 'country'])}"
