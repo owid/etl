@@ -29,7 +29,7 @@ definitions:
       metadata:
         description_key:
           - These estimates come from the Institute for Health Metrics and Evaluation's (IHME) Global Burden of Disease study. They are based on representative surveys, medical data and statistical modelling, and include people who have not been diagnosed.
-          - Age-standardized figures adjust for differences in the age structure of populations, so they can be compared between countries and over time. Crude figures show the actual share of the population with the disorder.
+          - Data availability and quality varies significantly across countries. For some disorders, particularly schizophrenia, eating disorders, and bipolar, many countries lack detailed population surveys. Their estimates are modeled based on assumptions and extrapolations from other countries, and come with significant uncertainty.
 
 dimensions:
   - slug: disorder
