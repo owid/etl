@@ -3,7 +3,7 @@ meta:
     producer: UNHCR
     title: Refugee Population Statistics Database
     description: |-
-      The database contains information about forcibly displaced populations spanning more than 70 years of statistical activities. It covers displaced populations such as refugees, asylum-seekers and internally displaced people, including their demographics. Stateless people are also included, most of who have never been displaced. The database also reflects the different types of solutions for displaced populations such as repatriation or resettlement.
+      The database contains information about forcibly displaced populations spanning more than 70 years of statistical activities. It covers displaced populations such as refugees, asylum-seekers and internally displaced people, including their demographics. Stateless people are also included, most of whom have never been displaced. The database also reflects the different types of solutions for displaced populations such as repatriation or resettlement.
 
       It includes UNHCR data collected through its annual statistical activities with some data going back as far as 1951, the year UNHCR was created.
     citation_full: Refugee Population Statistics Database, UNHCR, 2025 (https://www.unhcr.org/refugee-statistics/)

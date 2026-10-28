@@ -37,11 +37,6 @@ def run() -> None:
     tb = ds_meadow.read("refugee_data")
     sanity_check_inputs(tb)
 
-    # NOTE: "Other people in need of international protection" (oip) is reported separately by UNHCR, but we don't
-    # publish it yet, so it is dropped here. People can move between oip and refugees (e.g. ~1M Afghans in Iran were
-    # reclassified from refugees to oip in 2025), so check this choice on every update.
-    tb = tb.drop(columns=["oip"])
-
     # filter out data before data availability starts (s. https://www.unhcr.org/refugee-statistics/methodology/, "Data publication timeline")
     tb["asylum_seekers"] = tb["asylum_seekers"].where(tb["year"] >= 2000, pd.NA)
     tb["refugees"] = tb["refugees"].where(tb["year"] >= 1951, pd.NA)
@@ -49,7 +44,12 @@ def run() -> None:
     tb["idps"] = tb["idps"].where(tb["year"] >= 1993, pd.NA)
     tb["stateless"] = tb["stateless"].where(tb["year"] >= 2004, pd.NA)
     # others of concern
-    tb["ooc"] = tb["ooc"].where(tb["year"] >= 2018, pd.NA)
+    tb["ooc"] = tb["ooc"].where(tb["year"] >= 1997, pd.NA)
+    # other people in need of international protection (category reported since 2018)
+    # NOTE: People can move between oip and refugees (e.g. ~1M Afghans, mostly in Iran, were reclassified from
+    # refugee-like situations to oip in 2025). Check for new reclassifications on every update and caveat them in the
+    # description_key of both indicators.
+    tb["oip"] = tb["oip"].where(tb["year"] >= 2018, pd.NA)
     tb["returned_idps"] = tb["returned_idps"].where(tb["year"] >= 1997, pd.NA)
 
     if VERBOSE:
