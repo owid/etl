@@ -55,6 +55,10 @@ def run() -> None:
     c.save()
 
 
-def _share(disorder: str, sex: str) -> str:
-    """Age-standardized share of the population with the disorder, for one sex."""
-    return f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_{sex}__age_age_standardized"
+def _share(disorder: str, sex: str) -> dict:
+    """Age-standardized share of the population with the disorder, for one sex, with a short name for tooltips."""
+    who = {"female": "women and girls", "male": "men and boys"}[sex]
+    return {
+        "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_{sex}__age_age_standardized",
+        "display": {"name": f"Share of {who}"},
+    }
