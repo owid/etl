@@ -1004,6 +1004,9 @@ steps:
   viz://chart/ihme_gbd/latest/mental_disorders_prevalence_by_sex:
     - data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health
     - data://grapher/regions/2023-01-01/regions
+  # Multi-dim indicators - prevalence of mental disorders by age
+  viz://chart/ihme_gbd/latest/mental_disorders_prevalence_by_age:
+    - data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health
   viz://chart/ihme_gbd/latest/air_pollution:
     - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
         - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths

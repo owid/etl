@@ -1,0 +1,50 @@
+grapher_schema: "011"
+slug: mental-disorders-prevalence-by-age
+
+title:
+  title: Prevalence of mental health disorders by age
+
+topic_tags:
+  - Mental Health
+
+default_selection:
+  - World
+
+default_dimensions:
+  disorder: depressive_disorders
+
+definitions:
+  common_views:
+    - config:
+        originUrl: /mental-health
+        chartTypes:
+          - DiscreteBar
+          - LineChart
+        tab: discrete-bar
+        hasMapTab: false
+        addCountryMode: change-country
+        sortBy: custom
+        note: This metric is not age-standardized, so differences between countries partly reflect differences in their age structure.
+        yAxis:
+          min: 0
+      metadata:
+        description_key:
+          - These estimates come from the Institute for Health Metrics and Evaluation's (IHME) Global Burden of Disease study. They are based on representative surveys, medical data and statistical modelling, and include people who have not been diagnosed.
+
+dimensions:
+  - slug: disorder
+    name: Disorder
+    choices:
+      - slug: depressive_disorders
+        name: Depressive disorders
+      - slug: anxiety_disorders
+        name: Anxiety disorders
+      - slug: bipolar_disorder
+        name: Bipolar disorder
+      - slug: schizophrenia
+        name: Schizophrenia
+      - slug: eating_disorders
+        name: Eating disorders
+
+# Views (one per disorder, with one bar per age group) are added in the step's Python file.
+views: []
