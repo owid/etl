@@ -2,11 +2,14 @@
 name: check-metadata-style
 description: >-
   Check user-facing indicator and chart metadata (titles, subtitles, descriptions,
-  description_key/WYSK, display names) against OWID's Writing and Style Guide, after a
-  mechanical pass for whitespace artifacts left by Jinja templates (double spaces, stray
-  newlines, leading or trailing whitespace). Use when the user mentions the style guide,
-  writing guide, chart copy quality, title/subtitle/WYSK review, spacing, whitespace or Jinja
-  rendering, or after editing any .meta.yml under etl/steps/data/, garden or grapher. Most
+  description_key/WYSK, display names) against OWID's Writing and Style Guide and the
+  harmonized FAUST for common metrics (money in national currency or international-$, % of
+  GDP, GDP, poverty, inequality, death rates and others), after a mechanical pass for
+  whitespace artifacts left by Jinja templates (double spaces, stray newlines, leading or
+  trailing whitespace). Use when the user mentions the style guide, writing guide, harmonized
+  FAUST, chart copy quality, title/subtitle/WYSK review, units, inflation or living-cost
+  wording, spacing, whitespace or Jinja rendering, or after editing any .meta.yml under
+  etl/steps/data/, garden or grapher. Most
   user-facing text is authored in garden and inherited by grapher; this skill reads the
   resolved metadata off the built grapher dataset, so garden-authored text is in scope.
 metadata:
@@ -16,17 +19,21 @@ metadata:
 
 # Check Metadata Style
 
-Audit a dataset's user-facing text in two passes: a mechanical one for whitespace artifacts left by Jinja templates, then a rule-driven one against OWID's Writing and Style Guide. Flags fields that break the rules and offers to rewrite them.
+Audit a dataset's user-facing text in three passes: a mechanical one for whitespace artifacts left by Jinja templates, a rule-driven one against OWID's Writing and Style Guide, and one against the harmonized FAUST for metrics OWID uses many times over (money measures above all). Flags fields that break the rules and offers to rewrite them.
 
 The text itself is usually authored in the **garden** `.meta.yml` (`description_key`/WYSK, `description_short`, `title`, `display.name`) and inherited by grapher; a smaller share is set or overridden in the grapher step. This skill reads the **resolved** metadata off the built grapher dataset, so it covers both — you point it at the grapher step, and any fix it proposes goes back to whichever layer authored the field.
 
-Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). Step 1 keeps it fresh.
+Rules live in two files next to this one, each a committed snapshot that step 1 keeps fresh:
+
+- [STYLE_GUIDE.md](STYLE_GUIDE.md): the [Writing and Style Guide](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c) (Notion).
+- [HARMONIZED_FAUST.md](HARMONIZED_FAUST.md): [Harmonizing FAUST across OWID](https://docs.google.com/document/d/1tcknTryJAxOR0yv8x38s3jkONq-TY3T4HNCEcZQ_c-s/edit?tab=t.0) (Google Doc), the title, subtitle, footnote and units to use for common metrics.
 
 ## When to use
 
 - After editing a `.meta.yml` under `etl/steps/data/` — **garden or grapher**.
 - After editing Jinja templates in a `.meta.yml` (`<%- if %>`, `<<variable>>`, `{definitions.xxx}`), or when the user asks to check for spacing or whitespace issues in metadata.
 - When the user asks to check chart copy / titles / subtitles / descriptions / WYSK against the style guide.
+- After writing metadata for an indicator measured in money, or one of the metrics in `HARMONIZED_FAUST.md`.
 - As part of pre-PR QA for a dataset update.
 
 ## Scope
@@ -60,15 +67,22 @@ On a successful fetch/export:
 
 > Plain `WebFetch`/`curl` does **not** work for the refresh: `app.notion.com` serves a JavaScript shell with no page content. Don't waste time trying it.
 
-### 2. Read the Writing and Style Guide
+Then do the same for [HARMONIZED_FAUST.md](HARMONIZED_FAUST.md), whose header carries a `> Last synced from Google Doc: YYYY-MM-DD` line. Refresh it with the Google Docs connector (`ToolSearch` query `select:mcp__claude_ai_Google_Docs__read_doc`, document id `1tcknTryJAxOR0yv8x38s3jkONq-TY3T4HNCEcZQ_c-s`); the JSON is too large to read inline, so extract the text from the saved result with a short script. Otherwise ask the user for a download (**File → Download → Markdown**), or skip with a warning. When converting:
 
-Read [STYLE_GUIDE.md](STYLE_GUIDE.md) in this skill's folder. That file is the source of truth the skill evaluates against — do not fall back to memory.
+- Keep the file's structure: one section per metric, with `Title`, `Subtitle`, `Footnote` and unit bullets, and the `## Measures in various currencies and prices` section first.
+- Leave out the doc's bulk-editor chart links, its history of earlier documents, and the names of people. This repo is public.
+- Preserve rules marked `NOTE: local addition`, as for `STYLE_GUIDE.md`.
+- Diff, summarize and stamp the date as for `STYLE_GUIDE.md`.
 
-If the file is missing, rebuild it from Notion via the refresh flow in step 1 (treat it as stale).
+### 2. Read the rules
+
+Read [STYLE_GUIDE.md](STYLE_GUIDE.md) and [HARMONIZED_FAUST.md](HARMONIZED_FAUST.md) in this skill's folder. These files are the source of truth the skill evaluates against — do not fall back to memory.
+
+If either file is missing, rebuild it from its source via the refresh flow in step 1 (treat it as stale).
 
 ### 3. Collect user-facing strings from the step
 
-Prefer the **rendered** (post-Jinja) metadata from the built catalog, so template artifacts are included in the check. The same collected strings feed both passes (steps 4 and 5).
+Prefer the **rendered** (post-Jinja) metadata from the built catalog, so template artifacts are included in the check. The same collected strings feed every pass (steps 4, 5 and 5b).
 
 Accept the step path in any of these forms and normalize it before loading:
 
@@ -99,6 +113,8 @@ for table_name in ds.table_names:
                 entry['fields'][key] = val
 
         put('title', getattr(m, 'title', None))
+        put('unit', getattr(m, 'unit', None))  # harmonized-FAUST pass only
+        put('short_unit', getattr(m, 'short_unit', None))  # harmonized-FAUST pass only
         put('description_short', getattr(m, 'description_short', None))
         put('description_processing', getattr(m, 'description_processing', None))  # whitespace pass only
 
@@ -133,12 +149,24 @@ for table_name in ds.table_names:
             rows.append(entry)
 
 # Step 4: whitespace artifacts in the rendered strings
-# A source description is multi-paragraph by design, so newlines don't count as artifacts there.
+# A source description and a markdown description_key are multi-paragraph by design, so newlines don't count as
+# artifacts there.
+multi_paragraph = lambda k: k.endswith('.description') or k.startswith('description_key')
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
-      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not k.endswith('.description')))]
+      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k)))]
 print(f'WHITESPACE ISSUES: {len(ws)}')
 for t, var, k, v in ws:
     print(f'  {t}.{var}.{k}: {v[:150]!r}')
+print('---')
+
+# Step 5b: indicators measured in money, for the currency rules of HARMONIZED_FAUST.md.
+import re
+money = re.compile(r'\\\$|US\\\$|€|£|¥|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
+money_rows = [r for r in rows if money.search(r['fields'].get('unit', '') + ' ' + r['fields'].get('short_unit', ''))]
+print(f'MONEY INDICATORS: {len(money_rows)}')
+for r in money_rows:
+    f = r['fields']
+    print(f\"  {r['table']}.{r['variable']}: unit={f.get('unit')!r} short_unit={f.get('short_unit')!r}\")
 print('---')
 
 # Step 5: strings for the style audit
@@ -151,6 +179,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | Field | Why it matters |
 |---|---|
 | `title` | Variable short title; shows in the catalog and some chart views |
+| `unit`, `short_unit` | Axis and tooltip units; checked only in the harmonized-FAUST pass (e.g. `current US$`, `% of GDP`) |
 | `description_short` | One-liner rendered under chart titles |
 | `description_processing` | Processing note on data pages; collected for the whitespace pass only, the style rules skip it |
 | `description_key[i]` | Key information on chart data pages (markdown string, or legacy bullet list) |
@@ -170,7 +199,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 
 - `description_from_producer` — verbatim text from the source, not OWID copy.
 - `citation_full` — follows the producer's requested citation, so its wording and capitalization are theirs, not ours to restyle. (Dash typography is the one exception: a spaced hyphen separating producer from data product is an en dash everywhere, per the style guide.)
-- `unit`, `short_unit`, `processing_level`, internal names — not user-facing prose.
+- `processing_level`, internal names — not user-facing prose.
 - `description_long` — technical, de-prioritized (re-enable later if needed).
 
 **Fallback if the dataset isn't built:**
@@ -227,6 +256,20 @@ Group the blocks by variable for readability. End with a summary count.
 
 **Exception:** when the producer explicitly asked for a specific short citation, `schemas/definitions.json` says to follow it. Report a matching `origins[i].attribution` as producer-prescribed rather than as a violation, and don't offer a fix.
 
+### 5b. Evaluate against the harmonized FAUST
+
+Check each indicator that is one of the metrics in `HARMONIZED_FAUST.md` against that metric's section, field by field: title, subtitle (`grapher_config.subtitle`, else `description_short`), footnote (`grapher_config.note`), `unit` and `short_unit`. Match an indicator to a metric only when it clearly is that metric (a GDP series, an extreme poverty share, a death rate, a "% of GDP" spending share); when unsure, don't flag. Use the same report format as step 5, with `Rule:` naming the `HARMONIZED_FAUST.md` section.
+
+**Every indicator in the `MONEY INDICATORS` block gets the currency rules**, whatever metric it is. Read its `description_key` and `description_processing`, and the producer's documentation where they don't settle it, to place it in one of the four cases (current or constant national currency, current or constant international-$). A unit converted to US dollars at market exchange rates is a national currency (US$), not international-$. Then check:
+
+- The subtitle says whether the data is adjusted for inflation when it covers several years, and whether it's adjusted for differences in living costs between countries when it covers several countries. Check the years and countries in the built data, not in the text. A subtitle that mentions inflation for single-year data, or living costs for single-country data, is a finding too.
+- The subtitle has no index year and no "constant", "current" or "international-$". Those go in the footnote.
+- The footnote gives the technical unit (e.g. "constant 2019 US$", "[international-$](#dod:int_dollar_abbreviation) at 2021 prices") and, when OWID adjusted for inflation, the deflator.
+- The title mentions none of it.
+- `unit` and `short_unit` follow the case: `current US$` / `$`, `constant 2019 US$` / `$`, `international-$ in 2017 prices` / `$`, `current international-$` / `$`.
+
+Also flag any indicator whose unit is a share of GDP but is written as `%` alone: the long unit must be `% of GDP`.
+
 If no violations are found, say so and list the fields that were inspected — the user should know what was checked, not just that nothing came up.
 
 ### 6. Offer to fix
@@ -261,7 +304,7 @@ After fixes:
    ```bash
    .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --force --only
    ```
-2. Re-run steps 3–5 of this skill on the same step. Expect zero whitespace issues and zero violations.
+2. Re-run steps 3–5b of this skill on the same step. Expect zero whitespace issues and zero violations.
 3. Run `make check` to confirm no lint/format regressions from the YAML edits.
 
 ---
