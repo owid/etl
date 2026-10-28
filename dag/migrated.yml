@@ -169,9 +169,6 @@ steps:
   data://grapher/labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017:
     - data://garden/labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017:
         - snapshot://labor/2017/womens_weekly_earnings__bureau_of_labor_statistics__2017.feather
-  data-private://grapher/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
-    - data-private://garden/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
-        - snapshot-private://labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018.feather
   data://grapher/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011:
     - data://garden/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011:
         - snapshot://health/2011/air_pollution_by_city__fouquet_and_dpcc__2011.feather

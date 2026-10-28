@@ -1,0 +1,208 @@
+grapher_schema: "011"
+slug: pension-replacement-rates
+
+title:
+  title: Pension replacement rate
+  title_variant: ""
+topic_tags:
+  - Government Spending
+  - Work & Employment
+
+default_selection:
+  - OECD (average)
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Netherlands
+  - Denmark
+
+default_dimensions:
+  measure: net
+  earnings: average
+  schemes: mandatory
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["DiscreteBar"]
+        map:
+          hideTimeline: true
+          colorScale:
+            baseColorScheme: Blues
+
+dimensions:
+  - slug: measure
+    name: Measure
+    choices:
+      - slug: gross
+        name: Gross (before taxes)
+        description: Pension and earnings before taxes and social security contributions
+      - slug: net
+        name: Net (after taxes)
+        description: Pension and earnings after taxes and social security contributions
+  - slug: earnings
+    name: Earnings
+    choices:
+      - slug: half
+        name: Half the average wage
+      - slug: average
+        name: Average wage
+      - slug: twice
+        name: Twice the average wage
+  - slug: schemes
+    name: Pension schemes
+    choices:
+      - slug: mandatory
+        name: Mandatory
+        description: Mandatory schemes, and schemes that cover nearly all workers
+      - slug: mandatory_and_voluntary
+        name: Mandatory and voluntary
+        description: Also includes voluntary private schemes where many workers have them; only available for net rates for men
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+
+views:
+  - dimensions:
+      measure: gross
+      earnings: half
+      schemes: mandatory
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: gross
+      earnings: half
+      schemes: mandatory
+      sex: women
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_women__earnings_50pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: gross
+      earnings: average
+      schemes: mandatory
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: gross
+      earnings: average
+      schemes: mandatory
+      sex: women
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_women__earnings_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: gross
+      earnings: twice
+      schemes: mandatory
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: gross
+      earnings: twice
+      schemes: mandatory
+      sex: women
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_women__earnings_200pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: half
+      schemes: mandatory
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: half
+      schemes: mandatory
+      sex: women
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_women__earnings_50pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: average
+      schemes: mandatory
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: average
+      schemes: mandatory
+      sex: women
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_women__earnings_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: twice
+      schemes: mandatory
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: twice
+      schemes: mandatory
+      sex: women
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_women__earnings_200pct_of_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: net
+      earnings: half
+      schemes: mandatory_and_voluntary
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory_and_voluntary
+
+  - dimensions:
+      measure: net
+      earnings: average
+      schemes: mandatory_and_voluntary
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory_and_voluntary
+
+  - dimensions:
+      measure: net
+      earnings: twice
+      schemes: mandatory_and_voluntary
+      sex: men
+    indicators:
+      y:
+        - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory_and_voluntary

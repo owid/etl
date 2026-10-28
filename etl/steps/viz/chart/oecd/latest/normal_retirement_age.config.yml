@@ -1,0 +1,81 @@
+grapher_schema: "011"
+slug: normal-retirement-age
+
+title:
+  title: Normal retirement age
+  title_variant: ""
+topic_tags:
+  - Work & Employment
+  - Government Spending
+
+default_selection:
+  - OECD (average)
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Italy
+  - Denmark
+
+default_dimensions:
+  timing: current
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["DiscreteBar"]
+        map:
+          hideTimeline: true
+          colorScale:
+            baseColorScheme: Purples
+
+dimensions:
+  - slug: timing
+    name: Retirement
+    choices:
+      - slug: current
+        name: Today
+        description: For people retiring in 2024
+      - slug: future
+        name: In the future
+        description: For people who start working in 2024, under the rules already legislated
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+
+views:
+  - dimensions:
+      timing: current
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_men
+
+  - dimensions:
+      timing: current
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_women
+
+  - dimensions:
+      timing: future
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#future_normal_retirement_age__sex_men
+
+  - dimensions:
+      timing: future
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#future_normal_retirement_age__sex_women

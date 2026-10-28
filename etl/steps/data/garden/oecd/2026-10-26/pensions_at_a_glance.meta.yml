@@ -23,6 +23,8 @@ definitions:
     The OECD assumes annual inflation of 2%, real wage growth of 1.25% per year, and a real return of 2.5% per year on funded pension savings. Life expectancy comes from UN mortality projections for each country.
   description_key_average_wage: |-
     In this data, the average wage is the average gross earnings of full-time adult workers in most sectors of the economy. It is the same for men and women.
+  schemes_phrase: <% if pension_schemes == "Mandatory and voluntary" %>mandatory and voluntary pension schemes<% else %>mandatory pension schemes<% endif %>
+  note_modeled_pensions: The OECD models these values for a person who starts working at age 22 in 2024 and works without interruption until the normal retirement age, under the pension rules each country has already legislated. They are not the pensions that today’s retirees receive.
   earnings_phrase: <% if earnings == "50% of average wage" %>half the average wage<% elif earnings == "Average wage" %>the average wage<% elif earnings == "200% of average wage" %>twice the average wage<% endif %>
   description_key_earnings: |-
     <% if earnings == "50% of average wage" %>
@@ -104,6 +106,9 @@ tables:
           tolerance: 0
         presentation:
           title_public: Current normal retirement age (<<sex.lower()>>)
+          grapher_config:
+            title: Normal retirement age for <<sex.lower()>> today
+            subtitle: Age at which <<sex.lower()>> can start receiving a full pension, without penalty, in 2024, after a career that started at age 22.
 
       future_normal_retirement_age:
         title: Future normal retirement age (<<sex.lower()>>)
@@ -122,6 +127,9 @@ tables:
           tolerance: 0
         presentation:
           title_public: Future normal retirement age (<<sex.lower()>>)
+          grapher_config:
+            title: Future normal retirement age for <<sex.lower()>>
+            subtitle: Age at which <<sex.lower()>> who start working at age 22 in 2024 will be able to receive a full pension, without penalty, under the rules already legislated.
 
       effective_labor_market_exit_age:
         title: Average age of leaving the labor market (<<sex.lower()>>)
@@ -131,7 +139,11 @@ tables:
         description_key: |-
           The OECD calls this the effective age of labor market exit. It is the average age at which workers aged 40 and older leave the labor force, meaning that they stop working or looking for work.
 
-          The OECD estimates it from changes in the share of people in the labor force in each five-year age group, rather than from data on individual people. It gives each age group the same weight in all countries, so that differences in the age structure of the population don’t affect comparisons.
+          It isn’t the same as the age at which people retire or start receiving a pension. It counts everyone who leaves the labor force, whatever the reason: retirement, but also, for example, disability.
+
+          The OECD estimates it from changes in the share of people in the labor force in each five-year age group, rather than from data on individual people. It compares the share of each age group in the labor force with the share of the next-younger age group five years earlier. So the value for each year reflects the five years leading up to it. The OECD gives each age group the same weight in all countries, so that differences in the age structure of the population don’t affect comparisons.
+
+          The OECD revised its method in 2021, to better account for the age structure of the population. Its earlier estimates, which it called the “average effective age of retirement”, were usually higher, by about two years on average.
 
           The OECD notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
 
@@ -146,6 +158,10 @@ tables:
           tolerance: 0
         presentation:
           title_public: Average age of leaving the labor market (<<sex.lower()>>)
+          grapher_config:
+            title: Average age at which <<sex.lower()>> leave the labor market
+            subtitle: Estimated average age at which <<sex.lower()>> aged 40 and older stop working or looking for work. This includes people who leave for reasons other than retirement, such as disability.
+            note: The value for each year is based on changes over the five years leading up to it.
 
       expected_years_after_labor_market_exit:
         title: Expected years of life after leaving the labor market (<<sex.lower()>>)
@@ -162,6 +178,10 @@ tables:
           tolerance: 0
         presentation:
           title_public: Expected years of life after leaving the labor market (<<sex.lower()>>)
+          grapher_config:
+            title: Years that <<sex.lower()>> can expect to live after leaving the labor market
+            subtitle: Remaining life expectancy at the average age at which <<sex.lower()>> aged 40 and older stop working or looking for work. This includes people who leave for reasons other than retirement, such as disability.
+            note: The age of leaving the labor market for each year is based on changes over the five years leading up to it.
 
   replacement_rates:
     common:
@@ -205,6 +225,10 @@ tables:
           tolerance: 0
         presentation:
           title_public: Gross pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+          grapher_config:
+            title: Gross pension replacement rate for <<sex.lower()>> earning {definitions.earnings_phrase}
+            subtitle: Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured before taxes.
+            note: "{definitions.note_modeled_pensions}"
 
       net_replacement_rate:
         title: Net pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
@@ -243,6 +267,10 @@ tables:
           tolerance: 0
         presentation:
           title_public: Net pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+          grapher_config:
+            title: Net pension replacement rate for <<sex.lower()>> earning {definitions.earnings_phrase}
+            subtitle: Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured after taxes.
+            note: "{definitions.note_modeled_pensions}"
 
   pension_wealth:
     common:

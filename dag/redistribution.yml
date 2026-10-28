@@ -43,6 +43,15 @@ steps:
       - data://meadow/oecd/2026-10-26/pensions_at_a_glance:
         - snapshot://oecd/2026-10-26/pensions_at_a_glance.csv
         - snapshot://oecd/2026-10-26/pensions_at_a_glance_tax_rates.xlsx
+  #
+  # OECD Pensions at a Glance multidims — authored in ETL.
+  #
+  viz://chart/oecd/latest/labor_market_exit_age:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+  viz://chart/oecd/latest/normal_retirement_age:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+  viz://chart/oecd/latest/pension_replacement_rates:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
 
   #
   # Social expenditure OMM
