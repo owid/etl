@@ -420,17 +420,17 @@ tables:
           title_public: Average tax rate of pensioners with a pension equal to the average wage
 
       average_wage_usd:
-        title: Average annual wage (US dollars)
+        title: Average annual wage
         unit: current US$
         short_unit: $
         description_short: |-
-          Average gross annual earnings of full-time adult workers, converted to US dollars at market exchange rates. This data is not adjusted for differences in living costs between countries.
+          Average gross annual earnings of full-time adult workers, in US dollars. This data is not adjusted for differences in living costs between countries.
         description_key: |-
           {definitions.description_key_average_wage} It includes overtime pay, bonuses, and extra monthly payments, and it is measured before any deductions.
 
           Not all countries can include overtime pay, holiday pay, and bonuses, or exclude part-time workers. So the OECD’s figures can differ from national estimates, sometimes by a lot.
 
-          The OECD converts the wages to US dollars at market exchange rates of 2024, without adjusting for inflation or for differences in living costs between countries.
+          The OECD converts the wages to US dollars at market exchange rates of 2024, without adjusting for differences in living costs between countries.
 
           The data comes from the OECD’s Taxing Wages 2025 report and national accounts. For countries outside the OECD, it comes from the International Labour Organization’s Global Wage Report 2024–25.
         display:
@@ -439,6 +439,8 @@ tables:
           tolerance: 0
         presentation:
           title_public: Average annual wage
+          grapher_config:
+            note: This data is expressed in current US$, converted at 2024 market exchange rates.
 
   employment_rates:
     common:
@@ -642,7 +644,7 @@ tables:
         unit: "% of GDP"
         short_unit: "%"
         description_short: |-
-          Government spending on old-age and survivors’ pensions paid in cash, as a share of [GDP](#dod:gdp).
+          Government spending on old-age and survivors’ pensions paid in cash, divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key: |-
           This includes public pensions paid to older people and to the surviving partners of people who have died. It doesn’t include benefits in kind, such as care services, and it is measured before taxes.
 
@@ -661,7 +663,7 @@ tables:
         unit: "% of GDP"
         short_unit: "%"
         description_short: |-
-          Projected government spending on pensions, as a share of [GDP](#dod:gdp).
+          Projected government spending on pensions, divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key: |-
           {definitions.description_key_projections_sources}
 
