@@ -76,6 +76,12 @@ def test_color_scale_needs_a_color_dimension_and_a_reading_chart_type(chart_type
     assert _paths(_full(chart_types=chart_types, dims=dims), {"colorScale": {"baseColorScheme": "Oranges"}}) == expected
 
 
+def test_default_chart_types_include_discrete_bar():
+    # Without `chartTypes`, grapher shows LineChart and DiscreteBar, so DiscreteBar-only fields stay.
+    full = {"dimensions": [{"variableId": 1, "property": "y"}]}
+    assert _paths(full, {"showYearLabels": True, "zoomToSelection": True}) == ["zoomToSelection"]
+
+
 def test_scatter_only_fields_on_a_line_chart():
     patch = {"zoomToSelection": True, "hideConnectedScatterLines": True, "stackMode": "relative"}
     # stackMode is read by line charts, so it stays.
@@ -122,9 +128,11 @@ def test_remove_paths_keeps_the_rest_of_an_object():
 @pytest.mark.parametrize(
     "dataset, pattern",
     [
-        ("demography/2025-10-22/efr_malani_jacob", "grapher/demography/2025-10-22/efr_malani_jacob/%"),
-        ("demography/efr_malani_jacob", "grapher/demography/%/efr_malani_jacob/%"),
-        ("data://grapher/demography/efr_malani_jacob", "grapher/demography/%/efr_malani_jacob/%"),
+        # `_` is a LIKE wildcard, so it is escaped (with the query's ESCAPE character `!`) to match literally.
+        ("demography/2025-10-22/efr_malani_jacob", "grapher/demography/2025-10-22/efr!_malani!_jacob/%"),
+        ("demography/efr_malani_jacob", "grapher/demography/%/efr!_malani!_jacob/%"),
+        ("data://grapher/demography/efr_malani_jacob", "grapher/demography/%/efr!_malani!_jacob/%"),
+        ("ns/a%b!c", "grapher/ns/%/a!%b!!c/%"),
     ],
 )
 def test_dataset_selection_pattern(dataset, pattern):

@@ -27,6 +27,7 @@ production, and each changed chart needs approving there. `--apply` therefore st
 """
 
 import json
+import re
 import subprocess
 from collections import Counter
 from dataclasses import dataclass, field
@@ -173,7 +174,7 @@ def fetch_charts(
         if dataset:
             selectors.append(
                 "c.id IN (SELECT cd.chartId FROM chart_dimensions cd JOIN variables v ON v.id = cd.variableId "
-                "WHERE v.catalogPath LIKE :dataset_path)"
+                "WHERE v.catalogPath LIKE :dataset_path ESCAPE '!')"
             )
             params["dataset_path"] = dataset_path_pattern(dataset)
         conditions.append("(" + " OR ".join(selectors) + ")")
@@ -208,11 +209,14 @@ def fetch_charts(
 
 
 def dataset_path_pattern(dataset: str) -> str:
-    """LIKE pattern for the catalog paths of a grapher dataset's variables (any version for `ns/short`)."""
+    """LIKE pattern for the catalog paths of a grapher dataset's variables (any version for `ns/short`).
+
+    `_` and `%` in the names are escaped with `!` (the query's ESCAPE character), so they match literally.
+    """
     dataset = dataset.removeprefix("data://grapher/").removeprefix("data-private://grapher/")
-    parts = dataset.split("/")
+    parts = [re.sub(r"([!%_])", r"!\1", part) for part in dataset.split("/")]
     if len(parts) == 3:
-        return f"grapher/{dataset}/%"
+        return f"grapher/{'/'.join(parts)}/%"
     if len(parts) == 2:
         return f"grapher/{parts[0]}/%/{parts[1]}/%"
     raise click.UsageError(

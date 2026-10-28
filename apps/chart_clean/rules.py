@@ -14,8 +14,8 @@ import copy
 from dataclasses import dataclass
 from typing import Any
 
-# Chart types grapher assumes when a config doesn't set `chartTypes` (schema default).
-DEFAULT_CHART_TYPES = ("LineChart",)
+# Chart types grapher assumes when a config doesn't set `chartTypes` (schema default, defaultGrapherConfig.ts).
+DEFAULT_CHART_TYPES = ("LineChart", "DiscreteBar")
 
 # Top-level fields read only by some chart types, and the types that read them. A field set on a chart
 # none of whose types reads it does nothing.
@@ -63,6 +63,7 @@ FIELD_READERS: dict[str, frozenset[str]] = {
 COLOR_SCALE_READERS = frozenset({"LineChart", "DiscreteBar", "ScatterPlot", "Marimekko"})
 
 # Chart types that sort by `sortColumnSlug` (sortBy "column"): StackedDiscreteBarChartState, DumbbellChartState.
+# DiscreteBar accepts sortBy "column" but sorts by the bar's own value (DiscreteBarChartState.sortedRawSeries).
 SORT_COLUMN_READERS = frozenset({"StackedDiscreteBar", "Dumbbell"})
 
 # `map.*` settings only read on the map tab (GrapherState: map time, tolerance and timeline are
