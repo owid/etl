@@ -9,8 +9,8 @@ import pytest
 from click.exceptions import UsageError
 from click.testing import CliRunner
 
-from apps.chart_clean.cli import cli, dataset_path_pattern, staging_env
-from apps.chart_clean.rules import find_noop_fields, remove_paths
+from apps.chart_clean.cli import ChartFindings, clear_fields, cli, dataset_path_pattern, staging_env
+from apps.chart_clean.rules import find_noop_fields, keep_paths, remove_paths
 
 
 def _full(chart_types=("LineChart",), dims=((1, "y"),), **extra):
@@ -118,6 +118,44 @@ def test_remove_paths_drops_nested_keys_and_empty_objects():
     assert cleaned == {"title": "T"}
     # The input is left as it was.
     assert config["map"] == {"columnSlug": "1", "time": 2020}
+
+
+def test_keep_paths_picks_present_paths_only():
+    config = {"title": "T", "map": {"columnSlug": "1", "time": 2020}, "zoomToSelection": True}
+    kept = keep_paths(config, ["map.time", "zoomToSelection", "colorScale", "map.region"])
+    assert kept == {"map": {"time": 2020}, "zoomToSelection": True}
+
+
+class _FakeAdminAPI:
+    def __init__(self, configs):
+        self.configs = configs
+        self.updates = {}
+
+    def get_chart_config(self, chart_id):
+        return self.configs[chart_id]
+
+    def update_chart(self, chart_id, config):
+        self.updates[chart_id] = config
+
+
+def test_clear_fields_rechecks_the_latest_config():
+    # Both fields were no-ops when selected; the map tab was switched on since, so map.time now matters.
+    finding = find_noop_fields(_full(), {"map": {"time": 2020}, "zoomToSelection": True})
+    chart = ChartFindings(1, "slug", etl_authored=False, inheritance=False, published=True, findings=finding)
+    latest = _full(hasMapTab=True, map={"time": 2020}, zoomToSelection=True)
+    api = _FakeAdminAPI({1: latest})
+    clear_fields(api, [chart])  # type: ignore[arg-type]
+    assert [f.path for f in chart.findings] == ["zoomToSelection"]
+    assert api.updates[1] == _full(hasMapTab=True, map={"time": 2020})
+    assert chart.cleared
+
+
+def test_clear_fields_skips_a_chart_with_nothing_left_to_clear():
+    finding = find_noop_fields(_full(), {"map": {"time": 2020}})
+    chart = ChartFindings(1, "slug", etl_authored=False, inheritance=False, published=True, findings=finding)
+    api = _FakeAdminAPI({1: _full(hasMapTab=True, map={"time": 2020})})
+    clear_fields(api, [chart])  # type: ignore[arg-type]
+    assert chart.findings == [] and not chart.cleared and api.updates == {}
 
 
 def test_remove_paths_keeps_the_rest_of_an_object():

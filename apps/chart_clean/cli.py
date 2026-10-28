@@ -39,7 +39,7 @@ from rich.console import Console
 from rich.table import Table
 from sqlalchemy import bindparam, text
 
-from apps.chart_clean.rules import Finding, find_noop_fields, remove_paths
+from apps.chart_clean.rules import Finding, find_noop_fields, keep_paths, remove_paths
 from apps.chart_pull.source import fetch_rows, source_env, warn_master_copy_age
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWIDEnv
@@ -138,6 +138,7 @@ def cli(
                 "chart-diff: narrow the selection, raise --max, or clean them with a grapher migration instead."
             )
         clear_fields(AdminAPI(owid_env), flagged)
+        flagged = [c for c in flagged if c.cleared]
 
     _print_report(charts, flagged, apply)
     if json_path:
@@ -225,11 +226,19 @@ def dataset_path_pattern(dataset: str) -> str:
 
 
 def clear_fields(admin_api: AdminAPI, charts: list[ChartFindings]) -> None:
-    """Remove each chart's no-op fields from its config; grapher recomputes the admin patch on save."""
+    """Remove each chart's no-op fields from its config; grapher recomputes the admin patch on save.
+
+    The rules run again on the config fetched right before the write, so a field the chart started reading
+    after the selection (say `map.time` on a chart whose map tab was switched on since) is kept. Each
+    chart's findings become the fields actually cleared.
+    """
     for chart in charts:
         config = admin_api.get_chart_config(chart.chart_id)
-        admin_api.update_chart(chart.chart_id, remove_paths(config, [f.path for f in chart.findings]))
-        chart.cleared = True
+        flagged = [f.path for f in chart.findings]
+        chart.findings = [f for f in find_noop_fields(config, keep_paths(config, flagged)) if f.path in flagged]
+        if chart.findings:
+            admin_api.update_chart(chart.chart_id, remove_paths(config, [f.path for f in chart.findings]))
+            chart.cleared = True
 
 
 def _print_report(charts: list[ChartFindings], flagged: list[ChartFindings], apply: bool) -> None:

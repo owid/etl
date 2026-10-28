@@ -147,6 +147,20 @@ def remove_paths(config: dict[str, Any], paths: list[str]) -> dict[str, Any]:
     return result
 
 
+def keep_paths(config: dict[str, Any], paths: list[str]) -> dict[str, Any]:
+    """Only the given dotted paths of `config` (the ones it has), nested as in `config`."""
+    result: dict[str, Any] = {}
+    for path in paths:
+        *parents, last = path.split(".")
+        source, target = config, result
+        for key in parents:
+            source = source.get(key) if isinstance(source, dict) else None
+            target = target.setdefault(key, {})
+        if isinstance(source, dict) and last in source:
+            target[last] = copy.deepcopy(source[last])
+    return result
+
+
 def _remove_path(node: dict[str, Any], keys: list[str]) -> None:
     head, rest = keys[0], keys[1:]
     if not rest:
