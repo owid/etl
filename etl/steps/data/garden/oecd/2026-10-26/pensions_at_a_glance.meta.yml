@@ -1,0 +1,667 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      attribution_short: OECD
+      topic_tags:
+        - Government Spending
+    display:
+      numDecimalPlaces: 1
+      tolerance: 0
+
+  #
+  # Reusable bullets for the modeled pension entitlements (replacement rates and pension wealth).
+  #
+  description_key_modeled_worker: |-
+    The OECD doesn’t measure these pensions from data on actual pensioners. It calculates them with a model of each country’s pension rules, for a worker who enters the labor market at age 22 in 2024 and works without interruption until the normal retirement age. The worker earns the same multiple of the average wage throughout their career.
+  description_key_year_of_entry: |-
+    The year in this data, 2024, is the year the worker enters the labor market. The rules are those that each country had legislated by the time the OECD published its report in 2025, including reforms that are phased in over time. This worker would retire decades later: around 2068, on average across OECD countries.
+  description_key_schemes_covered: |-
+    The OECD includes all mandatory pension schemes for private-sector workers, and schemes that cover at least 85% of workers without being mandatory, in Denmark, Iceland, the Netherlands, Sweden, and the United Kingdom. Special schemes for civil servants, public-sector workers, and particular professions are not included.
+  description_key_assumptions: |-
+    The OECD assumes annual inflation of 2%, real wage growth of 1.25% per year, and a real return of 2.5% per year on funded pension savings. Life expectancy comes from UN mortality projections for each country.
+  description_key_average_wage: |-
+    In this data, the average wage is the average gross earnings of full-time adult workers in most sectors of the economy. It is the same for men and women.
+  earnings_phrase: <% if earnings == "50% of average wage" %>half the average wage<% elif earnings == "Average wage" %>the average wage<% elif earnings == "200% of average wage" %>twice the average wage<% endif %>
+  description_key_earnings: |-
+    <% if earnings == "50% of average wage" %>
+    This indicator is for a low earner, who earns half of the average wage. In Colombia, New Zealand, and Slovenia, the OECD models low earners at 64%, 61%, and 55% of the average wage instead, because the minimum wage there is higher than half of the average wage.
+    <%- elif earnings == "Average wage" %>
+    This indicator is for a worker who earns the average wage.
+    <%- elif earnings == "200% of average wage" %>
+    This indicator is for a high earner, who earns twice the average wage.
+    <%- endif %>
+  description_key_sex_replacement_rates: |-
+    <% if sex == "Women" %>
+    The OECD models women with the same career and earnings as men. Their replacement rates only differ from men’s where pension rules differ by sex: for example, lower retirement ages for women in Colombia, Costa Rica, Hungary, Israel, Poland, and Turkey, how means-tested benefits are calculated in Chile, and sex-specific life expectancy used to turn savings into a pension in Mexico.
+    <%- elif sex == "Men" %>
+    The OECD models men and women with the same career and earnings. Replacement rates only differ by sex where pension rules do, for example in countries where women can retire earlier.
+    <%- endif %>
+  description_key_pension_schemes: |-
+    <% if pension_schemes == "Mandatory" %>
+    This indicator only includes mandatory pension schemes, and schemes that cover nearly all workers.
+    <%- elif pension_schemes == "Mandatory and voluntary" %>
+    This indicator also includes voluntary private pension schemes in countries where many workers have them: Belgium, Canada, Estonia, Germany, Ireland, Lithuania, New Zealand, the United States, and South Africa. It assumes the worker pays into them for their whole career, at a typical contribution rate. For Israel and Mexico, it also includes savings in severance and housing accounts that are moved into the pension at retirement. For other countries, it is the same as the value for mandatory schemes only.
+    <%- endif %>
+  description_key_above_100: |-
+    Values above 100% mean that the pension is higher than what the person earned while working. This mostly happens for low earners in countries with generous minimum pensions, such as Denmark and Mexico.
+
+  #
+  # Reusable bullets for household income data.
+  #
+  description_key_income_survey_years: |-
+    The data comes from household income surveys, collected in the OECD Income Distribution Database. The OECD shows each survey under one of the years 2014, 2016, 2018, 2020, or 2022. For 2022, the data refers to 2023 in Canada, Costa Rica, Finland, Latvia, the Netherlands, Sweden, the United Kingdom, and the United States, and to 2021 in Germany and Japan. Iceland’s latest survey is from 2017, and Australia’s from 2020.
+  description_key_disposable_income: |-
+    Disposable income is household income after taxes and social security contributions, including pensions and other government benefits. The OECD adjusts it for household size, dividing it by the square root of the number of people in the household, and gives this income to each member of the household.
+  description_key_household_level: |-
+    Because the OECD measures income at the household level, older people living with younger relatives share their incomes. Some of the income of older people, especially from work, can come from younger household members.
+  description_key_wealth_not_included: |-
+    These figures only count income. Older people in some countries own a lot more wealth, such as housing, than in others, and this doesn’t show up in their incomes.
+  description_processing_repeated_surveys: |-
+    When the OECD repeats a country’s values from one survey year in the next ones, because there was no new survey, we keep only the first year. We treat a year as repeated when at least 75% of its values (across all income indicators, ages, and sexes) are the same as in the previous survey year. We also remove Colombia’s values for 2020, which the OECD publishes as 0 although the data is missing.
+
+  #
+  # Reusable bullets for pension spending.
+  #
+  description_key_projections_sources: |-
+    The projections come from the European Commission’s 2024 Ageing Report for EU countries and Norway, and from each government’s own estimates for other countries (for example, the 2025 Social Security Trustees Report in the United States). Countries differ in whether they include pension schemes for public-sector workers and means-tested benefits, so the values for 2023 may differ from the past spending in this data.
+
+    The OECD average of the projections only includes the 32 OECD countries with projections, while the average of past spending includes all 38.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Pensions at a Glance
+  update_period_days: 730
+  owners:
+    - Pablo Arriagada
+
+
+tables:
+  retirement:
+    common:
+      presentation:
+        topic_tags:
+          - Work & Employment
+          - Age Structure
+    variables:
+      current_normal_retirement_age:
+        title: Current normal retirement age (<<sex.lower()>>)
+        unit: years
+        description_short: |-
+          Age at which <<sex.lower()>> can start receiving a full pension, without penalty, in 2024, after a career that started at age 22.
+        description_key: |-
+          The normal retirement age is the earliest age at which a person can receive their full pension in all schemes, after a full career that started at age 22. Where it differs across schemes, the OECD uses the highest one.
+
+          The current normal retirement age applies to people retiring in 2024. Periods spent in education don’t count toward the career.
+
+          In some countries, people with long careers can retire earlier. In Luxembourg, for example, people can retire at 57 after 40 years of contributions.
+        display:
+          name: <<sex>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Current normal retirement age (<<sex.lower()>>)
+
+      future_normal_retirement_age:
+        title: Future normal retirement age (<<sex.lower()>>)
+        unit: years
+        description_short: |-
+          Age at which <<sex.lower()>> who start working at age 22 in 2024 will be able to receive a full pension, without penalty, under the rules already legislated.
+        description_key: |-
+          The normal retirement age is the earliest age at which a person can receive their full pension in all schemes, after a full career. Where it differs across schemes, the OECD uses the highest one.
+
+          This indicator is for a person who enters the labor market at age 22 in 2024. They would retire around 2068, on average across OECD countries. The year in this data, 2024, is the year they enter the labor market.
+
+          The OECD includes all changes that are already legislated, such as gradual increases in the retirement age. This includes the links between the retirement age and life expectancy in countries that have them, such as Denmark, Estonia, Italy, the Netherlands, and Sweden.
+        display:
+          name: <<sex>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Future normal retirement age (<<sex.lower()>>)
+
+      effective_labor_market_exit_age:
+        title: Average age of leaving the labor market (<<sex.lower()>>)
+        unit: years
+        description_short: |-
+          Average age at which <<sex.lower()>> aged 40 and older stop working or looking for work.
+        description_key: |-
+          The OECD calls this the effective age of labor market exit. It is the average age at which workers aged 40 and older leave the labor force, meaning that they stop working or looking for work.
+
+          The OECD estimates it from changes in the share of people in the labor force in each five-year age group, rather than from data on individual people. It gives each age group the same weight in all countries, so that differences in the age structure of the population don’t affect comparisons.
+
+          The OECD notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
+
+          The data comes from national labor force surveys, the EU Labour Force Survey and, for early years, population censuses.
+
+          For some countries outside the OECD, the values drop sharply in 2023 or 2024, by 5 to 15 years: Argentina (women), Brazil, India, Russia (women), and South Africa. This likely reflects a change in the OECD’s data sources or methods rather than a real change, so comparisons across these years should be made with caution.
+        description_processing: |-
+          We remove Croatia’s values for women in 1990 and 1992, which the OECD publishes as 0 although the data is missing.
+        display:
+          name: <<sex>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Average age of leaving the labor market (<<sex.lower()>>)
+
+      expected_years_after_labor_market_exit:
+        title: Expected years of life after leaving the labor market (<<sex.lower()>>)
+        unit: years
+        description_short: |-
+          Number of years that <<sex.lower()>> can expect to live after they leave the labor market.
+        description_key: |-
+          The OECD measures this as the remaining life expectancy at the average age at which people aged 40 and older leave the labor force (the effective age of labor market exit).
+
+          Remaining life expectancy comes from the UN World Population Prospects 2024. It assumes that people experience the death rates of that year for the rest of their lives.
+        display:
+          name: <<sex>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Expected years of life after leaving the labor market (<<sex.lower()>>)
+
+  replacement_rates:
+    common:
+      presentation:
+        topic_tags:
+          - Government Spending
+          - Poverty
+    variables:
+      gross_replacement_rate:
+        title: Gross pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured before taxes.
+        description_key: |-
+          The gross replacement rate is the pension a person receives when they retire, as a share of their earnings before retirement. Both are measured before taxes and social security contributions. Because the modeled worker always earns the same share of the average wage, this is the same as their pension as a share of their lifetime earnings.
+
+          {definitions.description_key_earnings}
+
+
+          {definitions.description_key_pension_schemes}
+
+
+          {definitions.description_key_modeled_worker}
+
+          {definitions.description_key_year_of_entry}
+
+          {definitions.description_key_schemes_covered}
+
+          {definitions.description_key_assumptions}
+
+          {definitions.description_key_average_wage}
+
+          {definitions.description_key_sex_replacement_rates}
+
+
+          {definitions.description_key_above_100}
+        display:
+          name: <<sex>>, <<earnings.lower()>>, <<pension_schemes.lower()>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Gross pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+
+      net_replacement_rate:
+        title: Net pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured after taxes.
+        description_key: |-
+          The net replacement rate is the pension a person receives when they retire, as a share of their earnings before retirement. Both are measured after the income taxes and social security contributions that workers and pensioners pay.
+
+          Net replacement rates are usually higher than gross rates, because pensioners pay lower contributions than workers, pensions are lower than earnings and so are taxed at lower rates, and some countries tax pensions more lightly.
+
+          {definitions.description_key_earnings}
+
+
+          {definitions.description_key_pension_schemes}
+
+
+          {definitions.description_key_modeled_worker}
+
+          {definitions.description_key_year_of_entry}
+
+          {definitions.description_key_schemes_covered}
+
+          {definitions.description_key_assumptions}
+
+          {definitions.description_key_average_wage}
+
+          {definitions.description_key_sex_replacement_rates}
+
+
+          {definitions.description_key_above_100}
+        display:
+          name: <<sex>>, <<earnings.lower()>>, <<pension_schemes.lower()>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Net pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+
+  pension_wealth:
+    common:
+      presentation:
+        topic_tags:
+          - Government Spending
+          - Poverty
+    variables:
+      gross_pension_wealth:
+        title: Gross pension wealth (<<sex.lower()>>, <<earnings.lower()>>)
+        unit: times annual earnings
+        short_unit: ×
+        description_short: |-
+          Total value of the pensions that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive over their retirement, measured in years of their earnings before retirement. Both are measured before taxes.
+        description_key: |-
+          Pension wealth is the total value of all the pension payments a person can expect to receive over their retirement, measured at the time they retire. It is expressed as a multiple of their annual earnings before retirement: a value of 10 means that their pensions are worth ten years of earnings. It is like the lump sum a person would need when they retire to buy an annuity that pays the same pension.
+
+          Pension wealth takes into account how long people of each age and sex are expected to live in each country. Future payments are discounted at a real rate of 1.5% per year, lower than the 2% used in previous editions of the OECD report, which raises pension wealth by about 6%.
+
+          It doesn’t take into account that people with low incomes tend to live shorter lives, so it overstates the pension wealth of low earners and understates that of high earners.
+
+          {definitions.description_key_earnings}
+
+
+          {definitions.description_key_modeled_worker}
+
+          {definitions.description_key_year_of_entry}
+
+          {definitions.description_key_schemes_covered} Voluntary schemes are not included.
+
+          {definitions.description_key_assumptions}
+
+          {definitions.description_key_average_wage}
+
+          The OECD models men and women with the same career and earnings. Pension wealth is usually higher for women, because they live longer and so receive their pensions for more years, and in some countries because they can retire earlier.
+        display:
+          name: <<sex>>, <<earnings.lower()>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Gross pension wealth (<<sex.lower()>>, <<earnings.lower()>>)
+
+      net_pension_wealth:
+        title: Net pension wealth (<<sex.lower()>>, <<earnings.lower()>>)
+        unit: times annual earnings
+        short_unit: ×
+        description_short: |-
+          Total value of the pensions that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive over their retirement, measured in years of their earnings before retirement. Both are measured after taxes.
+        description_key: |-
+          Net pension wealth is the total value of all the pension payments a person can expect to receive over their retirement, measured at the time they retire, after the taxes and social security contributions they pay on their pensions. It is expressed as a multiple of their annual net earnings before retirement: a value of 10 means that their pensions are worth ten years of earnings. The OECD includes all standard tax allowances and reliefs, including those for pension income and for older people.
+
+          Pension wealth takes into account how long people of each age and sex are expected to live in each country. Future payments are discounted at a real rate of 1.5% per year, lower than the 2% used in previous editions of the OECD report, which raises pension wealth by about 6%.
+
+          It doesn’t take into account that people with low incomes tend to live shorter lives, so it overstates the pension wealth of low earners and understates that of high earners.
+
+          {definitions.description_key_earnings}
+
+
+          {definitions.description_key_modeled_worker}
+
+          {definitions.description_key_year_of_entry}
+
+          {definitions.description_key_schemes_covered} Voluntary schemes are not included.
+
+          {definitions.description_key_assumptions}
+
+          {definitions.description_key_average_wage}
+
+          The OECD models men and women with the same career and earnings. Pension wealth is usually higher for women, because they live longer and so receive their pensions for more years, and in some countries because they can retire earlier.
+        display:
+          name: <<sex>>, <<earnings.lower()>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Net pension wealth (<<sex.lower()>>, <<earnings.lower()>>)
+
+  taxes_and_wages:
+    common:
+      presentation:
+        topic_tags:
+          - Taxation
+          - Work & Employment
+    variables:
+      average_tax_rate_workers:
+        title: Average tax rate of workers earning the average wage
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Income taxes and social security contributions paid by a worker earning the average wage, as a share of their gross earnings.
+        description_key: |-
+          This rate includes the income taxes and social security contributions that workers pay. It doesn’t include the contributions that employers pay.
+
+          It is calculated under the tax rules of 2024.
+
+          {definitions.description_key_average_wage}
+
+          The OECD calculates these tax rates with its pension models and the tax and benefit rules in its Taxing Wages 2025 report.
+        description_processing: |-
+          We take this rate from the data behind Figure 4.3 of the OECD’s Pensions at a Glance 2025 report. The OECD’s indicator database publishes, under this name, the difference between the tax rates of workers and pensioners instead.
+        display:
+          name: Workers
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Average tax rate of workers earning the average wage
+
+      average_tax_rate_pensioners_average_earner:
+        title: Average tax rate of pensioners who earned the average wage
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Income taxes and social security contributions paid by a pensioner who worked a full career at the average wage, as a share of their pension.
+        description_key: |-
+          This rate is for a pensioner who receives the pension of a person who worked a full career earning the average wage. It includes the income taxes and social security contributions that they pay on their pension.
+
+          It is calculated under the tax rules of 2024. The OECD includes all standard tax allowances and reliefs, including those for pension income and for older people.
+
+          {definitions.description_key_average_wage}
+
+          The OECD calculates these tax rates with its pension models and the tax and benefit rules in its Taxing Wages 2025 report.
+        display:
+          name: Pensioners who earned the average wage
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Average tax rate of pensioners who earned the average wage
+
+      average_tax_rate_pensioners_income_equal_to_average_wage:
+        title: Average tax rate of pensioners with a pension equal to the average wage
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Income taxes and social security contributions that a pensioner would pay if their pension were equal to the average wage, as a share of that pension.
+        description_key: |-
+          This rate shows how much tax a pensioner would pay if their pension, before taxes, were equal to the average wage. Comparing it with the tax rate of workers earning the average wage shows whether a country taxes pensions more lightly than earnings of the same size.
+
+          It is calculated under the tax rules of 2024. The OECD includes all standard tax allowances and reliefs, including those for pension income and for older people.
+
+          {definitions.description_key_average_wage}
+
+          The OECD calculates these tax rates with its pension models and the tax and benefit rules in its Taxing Wages 2025 report.
+        display:
+          name: Pensioners with a pension equal to the average wage
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Average tax rate of pensioners with a pension equal to the average wage
+
+      average_wage_usd:
+        title: Average annual wage (US dollars)
+        unit: current US$
+        short_unit: $
+        description_short: |-
+          Average gross annual earnings of full-time adult workers, converted to US dollars at market exchange rates. This data is not adjusted for differences in living costs between countries.
+        description_key: |-
+          {definitions.description_key_average_wage} It includes overtime pay, bonuses, and extra monthly payments, and it is measured before any deductions.
+
+          Not all countries can include overtime pay, holiday pay, and bonuses, or exclude part-time workers. So the OECD’s figures can differ from national estimates, sometimes by a lot.
+
+          The OECD converts the wages to US dollars at market exchange rates of 2024, without adjusting for inflation or for differences in living costs between countries.
+
+          The data comes from the OECD’s Taxing Wages 2025 report and national accounts. For countries outside the OECD, it comes from the International Labour Organization’s Global Wage Report 2024–25.
+        display:
+          name: Average wage
+          numDecimalPlaces: 0
+          tolerance: 0
+        presentation:
+          title_public: Average annual wage
+
+      average_wage_national_currency:
+        title: Average annual wage (national currency)
+        unit: current local currency units
+        description_short: |-
+          Average gross annual earnings of full-time adult workers, in the country’s own currency.
+        description_key: |-
+          {definitions.description_key_average_wage} It includes overtime pay, bonuses, and extra monthly payments, and it is measured before any deductions.
+
+          Not all countries can include overtime pay, holiday pay, and bonuses, or exclude part-time workers. So the OECD’s figures can differ from national estimates, sometimes by a lot.
+
+          The values are in each country’s currency at 2024 prices, so they can’t be compared between countries.
+
+          The data comes from the OECD’s Taxing Wages 2025 report and national accounts. For countries outside the OECD, it comes from the International Labour Organization’s Global Wage Report 2024–25.
+        display:
+          name: Average wage
+          numDecimalPlaces: 0
+          tolerance: 0
+        presentation:
+          title_public: Average annual wage in national currency
+
+  employment_rates:
+    common:
+      presentation:
+        topic_tags:
+          - Work & Employment
+          - Age Structure
+    variables:
+      employment_rate:
+        title: Employment rate (<<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of people aged <<age.replace(" years", "")>> who have a job.
+        description_key: |-
+          In this data, a person counts as employed if they worked for pay or profit for at least one hour in the week before the survey, or if they had a job but were temporarily away from it.
+
+          The data comes from labor force surveys collected by the OECD.
+        description_processing: |-
+          The OECD labels all values as 2024, but notes that they refer to 2023 in Argentina and 2019 in Indonesia. We assign them to those years.
+        display:
+          name: <<age>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Employment rate (<<age>>)
+
+  incomes_of_older_people:
+    common:
+      presentation:
+        topic_tags:
+          - Poverty
+          - Economic Inequality
+      display:
+        numDecimalPlaces: 1
+        tolerance: 2
+    variables:
+      relative_disposable_income:
+        title: Income of older people relative to the whole population (<<age>>, <<sex.lower()>>)
+        unit: "% of the population’s average income"
+        short_unit: "%"
+        description_short: |-
+          Average disposable income of <% if sex != "Both sexes" %><<sex.lower()>> <% else %>people <% endif %>aged <<age.replace(" years", "")>>, as a share of the average disposable income of the whole population.
+        description_key: |-
+          A value of 90% means that the incomes of people in this group are 10% lower than the average for the whole population.
+
+          {definitions.description_key_disposable_income}
+
+          {definitions.description_key_income_survey_years}
+
+          {definitions.description_key_household_level}
+
+          {definitions.description_key_wealth_not_included}
+        description_processing: "{definitions.description_processing_repeated_surveys}"
+        display:
+          name: <<age>>, <<sex.lower()>>
+          numDecimalPlaces: 1
+          tolerance: 2
+        presentation:
+          title_public: Income of older people relative to the whole population (<<age>>, <<sex.lower()>>)
+
+      poverty_rate:
+        title: |-
+          <% if age == "Total population" %>
+          Income poverty rate (total population)
+          <%- else %>
+          Old-age income poverty rate (<<age>>, <<sex.lower()>>)
+          <%- endif %>
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <% if age == "Total population" %>
+          Share of the whole population living in households with an income below half of the national median income.
+          <%- else %>
+          Share of <% if sex != "Both sexes" %><<sex.lower()>> <% else %>people <% endif %>aged <<age.replace(" years", "")>> living in households with an income below half of the national median income.
+          <%- endif %>
+        description_key: |-
+          In this data, a person is poor if their household’s disposable income is below half of the median for the whole population of their country. This is a relative measure of poverty: it shows how many people have incomes far below the typical income in their country, not how many can’t afford basic needs.
+
+          {definitions.description_key_disposable_income}
+
+          {definitions.description_key_income_survey_years}
+
+          {definitions.description_key_wealth_not_included}
+        description_processing: "{definitions.description_processing_repeated_surveys}"
+        display:
+          name: <% if age == "Total population" %>Total population<% else %><<age>>, <<sex.lower()>><% endif %>
+          numDecimalPlaces: 1
+          tolerance: 2
+        presentation:
+          title_public: |-
+            <% if age == "Total population" %>
+            Income poverty rate (total population)
+            <%- else %>
+            Old-age income poverty rate (<<age>>, <<sex.lower()>>)
+            <%- endif %>
+
+  income_sources_of_older_people:
+    common:
+      presentation:
+        topic_tags:
+          - Poverty
+          - Economic Inequality
+      display:
+        numDecimalPlaces: 1
+        tolerance: 2
+    variables:
+      share_of_income_from_public_transfers:
+        title: Share of older people’s income from public transfers
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of the gross income of people aged over 65 that comes from public pensions and other government benefits.
+        description_key: |-
+          Public transfers include all public pensions, such as earnings-related pensions, and benefits for people with low incomes.
+
+          {definitions.description_key_income_survey_years}
+
+          {definitions.description_key_household_level}
+        description_processing: "{definitions.description_processing_repeated_surveys}"
+        display:
+          name: Public transfers
+          numDecimalPlaces: 1
+          tolerance: 2
+        presentation:
+          title_public: Share of older people’s income from public transfers
+
+      share_of_income_from_occupational_transfers:
+        title: Share of older people’s income from occupational pensions
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of the gross income of people aged over 65 that comes from employer-provided pensions and other payments from former employers.
+        description_key: |-
+          Occupational transfers include pensions provided through employers, severance payments, and death grants.
+
+          The OECD notes that only 14 countries report occupational transfers separately. In the other countries, this income shows as 0%, even if older people receive it.
+
+          {definitions.description_key_income_survey_years}
+
+          {definitions.description_key_household_level}
+        description_processing: "{definitions.description_processing_repeated_surveys}"
+        display:
+          name: Occupational pensions
+          numDecimalPlaces: 1
+          tolerance: 2
+        presentation:
+          title_public: Share of older people’s income from occupational pensions
+
+      share_of_income_from_capital:
+        title: Share of older people’s income from capital
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of the gross income of people aged over 65 that comes from personal pensions and the returns on their savings.
+        description_key: |-
+          Capital income includes private personal pensions and income from savings, such as interest and dividends.
+
+          {definitions.description_key_income_survey_years}
+
+          {definitions.description_key_household_level}
+        description_processing: "{definitions.description_processing_repeated_surveys}"
+        display:
+          name: Capital
+          numDecimalPlaces: 1
+          tolerance: 2
+        presentation:
+          title_public: Share of older people’s income from capital
+
+      share_of_income_from_work:
+        title: Share of older people’s income from work
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of the gross income of people aged over 65 that comes from wages and self-employment.
+        description_key: |-
+          Income from work includes earnings from employment and from self-employment.
+
+          {definitions.description_key_income_survey_years}
+
+          {definitions.description_key_household_level}
+        description_processing: "{definitions.description_processing_repeated_surveys}"
+        display:
+          name: Work
+          numDecimalPlaces: 1
+          tolerance: 2
+        presentation:
+          title_public: Share of older people’s income from work
+
+  pension_expenditure:
+    common:
+      presentation:
+        topic_tags:
+          - Government Spending
+      display:
+        numDecimalPlaces: 1
+        tolerance: 0
+    variables:
+      public_pension_expenditure:
+        title: Public spending on pensions
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: |-
+          Government spending on old-age and survivors’ pensions paid in cash, as a share of [GDP](#dod:gdp).
+        description_key: |-
+          This includes public pensions paid to older people and to the surviving partners of people who have died. It doesn’t include benefits in kind, such as care services, and it is measured before taxes.
+
+          The OECD takes this data from its Social Expenditure Database (SOCX).
+        description_processing: |-
+          The OECD labels its latest values as 2021, but notes that they refer to 2022 in Australia, Canada, France, Japan, New Zealand, South Korea, and the United Kingdom, and to 2023 in Chile, Colombia, Costa Rica, Israel, Mexico, and the United States. We assign them to those years.
+        display:
+          name: Past spending
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Public spending on pensions
+
+      public_pension_expenditure_projected:
+        title: Public spending on pensions (projections)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: |-
+          Projected government spending on pensions, as a share of [GDP](#dod:gdp).
+        description_key: |-
+          {definitions.description_key_projections_sources}
+
+          The first year in this data, 2023, refers to 2023 or 2024, depending on the country.
+        display:
+          name: Projections
+          numDecimalPlaces: 1
+          tolerance: 0
+          isProjection: true
+        presentation:
+          title_public: Public spending on pensions (projections)

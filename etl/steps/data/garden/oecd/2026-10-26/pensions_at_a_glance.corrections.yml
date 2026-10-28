@@ -1,0 +1,69 @@
+# Known errors in the OECD Pensions at a Glance data, patched locally until the producer fixes them.
+# They are applied to the long table (one row per measure), so `indicator` is always `value` and `measure` selects the source measure.
+# See etl/data_corrections.py for the format.
+#
+# Colombia 2020: every income measure of older people is 0, which the 2025 report marks as not available (Table 7.1, Figure 7.1).
+- indicator: value
+  entity: Colombia
+  years: [2020]
+  match: {measure: EDIOP}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (the 2025 report shows Colombia's income data as not available).
+  producer: OECD
+  status: open
+- indicator: value
+  entity: Colombia
+  years: [2020]
+  match: {measure: OAIP}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (the 2025 report shows Colombia's income data as not available).
+  producer: OECD
+  status: open
+- indicator: value
+  entity: Colombia
+  years: [2020]
+  match: {measure: PTOP}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (the 2025 report shows Colombia's income data as not available).
+  producer: OECD
+  status: open
+- indicator: value
+  entity: Colombia
+  years: [2020]
+  match: {measure: OCOP}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (the 2025 report shows Colombia's income data as not available).
+  producer: OECD
+  status: open
+- indicator: value
+  entity: Colombia
+  years: [2020]
+  match: {measure: CIOP}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (the 2025 report shows Colombia's income data as not available).
+  producer: OECD
+  status: open
+- indicator: value
+  entity: Colombia
+  years: [2020]
+  match: {measure: EIOP}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (the 2025 report shows Colombia's income data as not available).
+  producer: OECD
+  status: open
+# Croatia: an effective age of labor market exit of 0 for women in 1990 and 1992 (the series for men starts in 1995).
+- indicator: value
+  entity: Croatia
+  years: [1990, 1992]
+  match: {measure: ELMEA, sex: F}
+  action: drop
+  expect: {eq: 0}
+  reason: Missing value published as 0 (an exit age of 0 is impossible).
+  producer: OECD
+  status: open
