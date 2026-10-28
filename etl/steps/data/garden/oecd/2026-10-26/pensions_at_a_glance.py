@@ -204,7 +204,7 @@ def run() -> None:
     # Create one wide table per group of indicators that share the same dimensions.
     tables = create_tables(tb=tb)
 
-    # Take the tax rate of workers from the data of Figure 4.3, since the source doesn't publish it.
+    # Take the tax rate of workers from the data of Figure 4.3, since the source publishes it wrongly.
     tables["taxes_and_wages"] = add_tax_rate_of_workers(tb=tables["taxes_and_wages"], tb_taxes=tb_taxes)
 
     # Improve table formats.
@@ -289,10 +289,17 @@ def drop_wrong_series(tb: Table) -> Table:
 
 
 def add_tax_rate_of_workers(tb: Table, tb_taxes: Table) -> Table:
-    """Replace the tax rate of workers with the one in the data of Figure 4.3.
+    """Replace the tax rate of workers, which the source publishes wrongly, with the one in the data of Figure 4.3.
 
-    The source's "average tax rate of workers" is the difference between the rates of workers and pensioners, as shown
-    by the stacked bars of Figure 4.3 (e.g. 16.4% in Germany, where workers pay 38.0% and pensioners 21.6%).
+    This works around an error in the OECD's data. Figure 4.3 of the report shows the tax rates of workers and
+    pensioners as stacked bars, and the source's "average tax rate of workers" (ATRW) holds the length of the workers'
+    segment, i.e. the workers' rate minus the pensioners' rate (or 0 where pensioners pay more), not the rate itself.
+    In Germany, for example, workers pay 38.0% and pensioners 21.6%, and the source gives 16.4%. The report's text gives
+    27% for the OECD average, while the source gives 16.9%.
+
+    So we take the workers' rate from the figure's data instead. The function first checks that the figure and the
+    source agree on the pensioners' rates, and that the source's ATRW is still the difference, so that it fails once
+    the OECD fixes the series.
     """
     tb_taxes = tb_taxes.copy()
     for column in tb_taxes.columns:
