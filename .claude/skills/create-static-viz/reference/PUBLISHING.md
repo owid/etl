@@ -52,9 +52,12 @@ STAGING=<any live staging server> .venv/bin/python \
 A staging server's database is a recent copy of production's. `--host` points the page links at the
 live site; the admin preview links still open that staging server, so hand on the Google Doc and
 page links. A filename the library does not hold is reported as a coverage gap, never as unused.
-Give the user the Google Doc and published-page links for every article and topic page. For a
-fragment, say which FAQ holds the image and whether a published data page shows it. In each article
-and topic page, replace
+Give the user the Google Doc and published-page links for every article and topic page. A row whose
+context says `featured image` holds the image in the gdoc's `featured-image:` front matter, not in a
+body block: point that field at the new upload, which for a thumbnail-sized slot is the viz's own
+thumbnail export rather than the chart PNG, and leave the body alone. For a
+fragment, say which FAQ holds the image and whether a published data page shows it. For every
+`image block` row in an article or topic page, replace
 
 ```archie
 {.image}
