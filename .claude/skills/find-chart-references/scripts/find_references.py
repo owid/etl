@@ -566,7 +566,9 @@ def sweep_images(filenames: list[str]) -> list[dict]:
     `posts_gdocs_x_images` records each image a gdoc renders, whatever block holds it (an
     `{.image}` block, a featured image, an image inside a fragment). A fragment has no page of its
     own: a data page shows it as an FAQ, so its rows carry no public path, and
-    `sweep_fragment_data_pages` adds the data pages that show it.
+    `sweep_fragment_data_pages` adds the data pages that show it. A `{.static-viz}` block writes
+    no image row: it is a `posts_gdocs_links` row naming the static viz, found through the static
+    viz built on the image.
     """
     df = OWID_ENV.read_sql(
         "SELECT i.id AS image_id, i.filename, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, "
@@ -617,6 +619,33 @@ def sweep_images(filenames: list[str]) -> list[dict]:
                 context="desktop or mobile image of the static viz",
             )  # fmt: skip
         )
+    if sv.empty:
+        return out
+    # Gdocs showing those static viz: they pick up new images by name, but their prose still needs reading.
+    links = OWID_ENV.read_sql(
+        "SELECT DISTINCT pgl.target AS name, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published "
+        "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'static-viz' AND pgl.target IN %(n)s ORDER BY pg.slug",
+        params={"n": tuple(sv["name"].unique())},
+    )
+    files = sv.groupby("name")["filename"].apply(list).to_dict()
+    for r in links.to_dict("records"):
+        fragment = r["post_type"] == "fragment"
+        for filename in files[r["name"]]:
+            out.append(
+                rec(
+                    "image",
+                    filename,
+                    None,
+                    "gdoc fragment" if fragment else "gdoc",
+                    EMBED,
+                    r["post_slug"],
+                    "" if fragment else gdoc_path(r),
+                    surface_id=r["gdoc_id"],
+                    context=f"static-viz block {r['name']} ({r['post_type']})",
+                    published=r["published"],
+                )  # fmt: skip
+            )
     return out
 
 
@@ -644,7 +673,8 @@ def sweep_fragment_data_pages(image_rows: list[dict]) -> list[dict]:
 
     A fragment gdoc holds many FAQs (`parsedFaqs`, keyed by fragment id); only the ones whose
     content names the image matter. A data page shows an FAQ through
-    `posts_gdocs_variables_faqs`, on every published chart that plots one of its variables.
+    `posts_gdocs_variables_faqs`, on every published chart that plots one of its variables
+    (live state from the config's `isPublished`, as in `sweep_charts_of_indicators`).
     """
     out = []
     for f in [r for r in image_rows if r["surface"] == "gdoc fragment"]:
@@ -661,7 +691,8 @@ def sweep_fragment_data_pages(image_rows: list[dict]) -> list[dict]:
                 "SELECT DISTINCT faq.fragmentId, cc.slug, c.id AS chart_id FROM posts_gdocs_variables_faqs faq "
                 "JOIN chart_dimensions cd ON cd.variableId = faq.variableId JOIN charts c ON c.id = cd.chartId "
                 "JOIN chart_configs cc ON cc.id = c.configId "
-                "WHERE faq.gdocId = %(g)s AND faq.fragmentId IN %(fr)s AND c.publishedAt IS NOT NULL ORDER BY cc.slug",
+                "WHERE faq.gdocId = %(g)s AND faq.fragmentId IN %(fr)s "
+                "AND COALESCE(cc.config->>'$.isPublished', 'false') = 'true' ORDER BY cc.slug",
                 params={"g": f["surface_id"], "fr": tuple(frags)},
             )
             if frags

@@ -324,6 +324,10 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
                     {"image_id": 7, "filename": "old.png", "gdoc_id": "texts", "post_slug": "data-pages-texts", "post_type": "fragment", "published": 1, "featured": None, "body": '[{"type": "image", "filename": "old.png"}]'},
                 ]
             )  # fmt: skip
+        if "posts_gdocs_links" in sql:
+            # A {.static-viz} block writes no image row, only a link to the static viz by name.
+            assert params["n"] == ("a-static-viz",)
+            return pd.DataFrame([{"name": "a-static-viz", "gdoc_id": "di", "post_slug": "a-data-insight", "post_type": "data-insight", "published": 1}])  # fmt: skip
         if "static_viz" in sql:
             return pd.DataFrame([{"id": 3, "name": "a-static-viz", "filename": "old.png"}])
         if "parsedFaqs" in sql:
@@ -337,6 +341,8 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
             return pd.DataFrame([{"faqs": faqs}])
         if "posts_gdocs_variables_faqs" in sql:
             assert params["fr"] == ("stunting",)
+            # Live state: publishedAt survives an unpublish.
+            assert "isPublished" in sql and "publishedAt" not in sql
             return pd.DataFrame([{"fragmentId": "stunting", "slug": "share-stunted", "chart_id": 42}])
         raise AssertionError(sql)
 
@@ -352,6 +358,8 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
     assert by_where["share-stunted"]["surface"] == "data page FAQ"
     assert by_where["share-stunted"]["where_path"] == "/grapher/share-stunted"
     assert by_where["a-static-viz"]["where_path"] == "/admin/static-viz/3/edit"
+    assert by_where["a-data-insight"]["where_path"] == "/data-insights/a-data-insight"
+    assert by_where["a-data-insight"]["context"] == "static-viz block a-static-viz (data-insight)"
     article = sorted(r["context"] for r in rows if r["where"] == "an-article")
     assert article == ["featured image (article)", "image block (article)"]
 

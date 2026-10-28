@@ -13,9 +13,10 @@ session cannot reach it: prepare the files and the texts, and the user enters th
   the 540-wide mobile ones). From a session, clone the frame, `rescale` the clone, `get_screenshot` it
   at its natural size, and delete the clone. Save the files under the user's `ai/` folder.
 - **Upload them in Admin → Images under a filename the library does not hold yet**: each frame's name
-  plus `.png` the first time, and the frame's name plus the refresh's year (`<frame name>-2027.png`)
-  when a later refresh finds that taken. The library rejects a duplicate filename, and the old file
-  has to stay reachable for anything still pointing at it.
+  plus `.png` the first time, and the frame's name plus the refresh's date
+  (`<frame name>-2027-03-14.png`) when a later refresh finds that taken; if that is taken too, add
+  `-2`, `-3` until the upload goes through. The library rejects a duplicate filename, and the old
+  file has to stay reachable for anything still pointing at it.
 - **Write each image's alt text** (its default alt): what the chart shows, how to read it, and one or
   two values read off the data, not off the render.
 
@@ -29,7 +30,7 @@ data source if the refresh changed them. Then skip section 3, apart from any pag
 
 | Field | What goes in |
 |---|---|
-| Name | The desktop frame's slug. Lowercase letters and hyphens only (no digits or underscores), and unique. The site saves downloads as `<name>-desktop.png` and `<name>-mobile.png`, so the name itself carries no `-desktop` or `-mobile`. |
+| Name | The desktop frame's slug, made valid: lowercase letters and single hyphens only, so drop any digits with the hyphen next to them (a year or a count: `poverty-2025-update` → `poverty-update`) and turn underscores into hyphens. It must be unique: if another static viz holds it, add a word that tells the two apart. The site saves downloads as `<name>-desktop.png` and `<name>-mobile.png`, so the name itself carries no `-desktop` or `-mobile`. |
 | Desktop image | The desktop PNG. |
 | Mobile image | The mobile PNG, when the viz has a mobile frame. |
 | Description | Markdown, shown publicly under "How this visualization was made". Say where the data comes from, linking each product; what is plotted, and any quantity derived from it; the processing a reader can see on the chart (a join between two products, interpolation, values shown selectively); and how it was made, linking the step on GitHub `master` and saying the design was finished in Figma. Follow `.claude/rules/plain-writing.md`. |
@@ -73,7 +74,9 @@ name: <static viz name>
 {}
 ```
 
-keeping any `size`, `hasOutline` and `caption` the old block set. Omitted, `size` is `wide` and the
+keeping any `size`, `hasOutline` and `caption` the old block set. A `static-viz block` row already
+shows the static viz built on the image and picks up its new images by name: it needs no swap, only
+the text check below. Omitted, `size` is `wide` and the
 outline is drawn, the same as an `{.image}` block. A fragment (a data page's FAQ or text, such as
 `gcp-faqs`) keeps an `{.image}` block, repointed to the new filename with the mobile file as its
 `smallFilename`, until a `{.static-viz}` block is confirmed to render there. An article needs its
@@ -85,7 +88,8 @@ refresh updates the same entry rather than creating a second one.
 ## 4. Check the text around it
 
 The paragraphs beside the image describe the old chart, and the swap puts the new one under them. Read
-them against the new frames before the swap goes live. For each gdoc that shows the image,
+them against the new frames before the swap goes live. For each gdoc that shows the image, or a
+`{.static-viz}` block of the static viz built on it,
 `scripts/image_context.py <every filename of the viz>` prints its title, its Google Doc and page links,
 and the blocks just before and after each placement. Check every sentence that describes the chart:
 

@@ -12,7 +12,10 @@ Usage:
     STAGING=<branch> .venv/bin/python .claude/skills/create-static-viz/scripts/image_context.py \\
         <filename> [<filename> ...] [--blocks 4]
 
-For a fragment (a data page FAQ doc), only the FAQ entries holding the image are read.
+A gdoc showing a static viz built on the image (a `{.static-viz}` block) is read too: it
+picks up new images by name, but its prose still has to match them.
+
+For a fragment (a data page FAQ doc), only the FAQ entries holding the image are read, plus its body.
 """
 
 import argparse
@@ -76,13 +79,28 @@ def main() -> None:
     args = ap.parse_args()
     names = set(args.filenames)
 
-    df = OWID_ENV.read_sql(
-        "SELECT DISTINCT pg.id, pg.slug, pg.type, pg.published, pg.content FROM posts_gdocs pg "
-        "JOIN posts_gdocs_x_images x ON x.gdocId = pg.id JOIN images i ON i.id = x.imageId "
-        "WHERE i.filename IN %(f)s ORDER BY pg.slug",
-        params={"f": tuple(names)},
+    # A `{.static-viz}` block records no image row, only a link to the static viz by name.
+    viz = set(
+        OWID_ENV.read_sql(
+            "SELECT DISTINCT sv.name FROM static_viz sv JOIN images i ON i.id IN (sv.imageId, sv.mobileImageId) "
+            "WHERE i.filename IN %(f)s",
+            params={"f": tuple(names)},
+        )["name"]
     )
-    print(f"grapher DB: {OWID_ENV.name} — {len(df)} gdoc(s) show {', '.join(sorted(names))}")
+    df = OWID_ENV.read_sql(
+        "SELECT pg.id, pg.slug, pg.type, pg.published, pg.content FROM posts_gdocs pg WHERE pg.id IN ("
+        "  SELECT x.gdocId FROM posts_gdocs_x_images x JOIN images i ON i.id = x.imageId WHERE i.filename IN %(f)s"
+        "  UNION SELECT pgl.sourceId FROM posts_gdocs_links pgl"
+        "  WHERE pgl.linkType = 'static-viz' AND pgl.target IN %(v)s"
+        ") ORDER BY pg.slug",
+        params={"f": tuple(names), "v": tuple(viz) or ("",)},
+    )
+    static = f" or static viz {', '.join(sorted(viz))}" if viz else ""
+    print(f"grapher DB: {OWID_ENV.name} — {len(df)} gdoc(s) show {', '.join(sorted(names))}{static}")
+
+    def placed(kind: str, name: str) -> bool:
+        return (kind == "IMAGE" and name in names) or (kind == "STATIC VIZ" and name in viz)
+
     for r in df.to_dict("records"):
         content = json.loads(r["content"])
         path = f"/data-insights/{r['slug']}" if r["type"] == "data-insight" else f"/{r['slug']}"
@@ -98,14 +116,14 @@ def main() -> None:
             for k, v in content["parsedFaqs"].items():
                 blocks: list[tuple[str, str]] = []
                 flatten(v, names, blocks)
-                if any(kind == "IMAGE" and name in names for kind, name in blocks):
+                if any(placed(kind, name) for kind, name in blocks):
                     sections.append((f"FAQ {k}", v))
         # A fragment can also hold the image in its ordinary body, outside any FAQ entry.
         sections.append(("body", content.get("body", [])))
         for label, node in sections:
             blocks: list[tuple[str, str]] = []
             flatten(node, names, blocks)
-            for i in [i for i, (kind, name) in enumerate(blocks) if kind == "IMAGE" and name in names]:
+            for i in [i for i, (kind, name) in enumerate(blocks) if placed(kind, name)]:
                 print(f"--- {label}, block {i + 1} of {len(blocks)}")
                 for kind, txt in blocks[max(0, i - args.blocks) : i + args.blocks + 1]:
                     plain = WHITESPACE.sub(" ", txt).strip()
