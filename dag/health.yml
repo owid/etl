@@ -54,6 +54,9 @@ steps:
             - snapshot://health/2023-04-18/wgm_mental_health.zip
         - data://garden/regions/2023-01-01/regions
         - data://garden/wb/2021-07-01/wb_income
+  # Multi-dim indicators - ways of dealing with anxiety or depression
+  viz://chart/health/latest/ways_of_dealing_with_anxiety_depression:
+    - data://grapher/health/2023-04-19/wgm_mental_health
   # WGM 2018
   data://grapher/health/2023-04-26/wgm_2018:
     - data://garden/health/2023-04-25/wgm_2018:
@@ -994,6 +997,9 @@ steps:
         - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_deaths.feather
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2024-07-12/un_wpp
+  # Multi-dim indicators - prevalence of mental disorders
+  viz://chart/ihme_gbd/latest/prevalence_of_mental_disorders:
+    - data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health
   viz://chart/ihme_gbd/latest/air_pollution:
     - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
         - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
