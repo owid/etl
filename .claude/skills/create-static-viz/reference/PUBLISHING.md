@@ -12,12 +12,20 @@ session cannot reach it: prepare the files and the texts, and the user enters th
   `reference/NODE-MAP.md` → *Export scale per family*: 2× for the 850-wide desktop frames, 3× for
   the 540-wide mobile ones). From a session, clone the frame, `rescale` the clone, `get_screenshot` it
   at its natural size, and delete the clone. Save the files under the user's `ai/` folder.
-- **Upload them in Admin → Images under each frame's name plus `.png`**, a new filename: the old file
+- **Upload them in Admin → Images under a filename the library does not hold yet**: each frame's name
+  plus `.png` the first time, and the frame's name plus the refresh's year (`<frame name>-2027.png`)
+  when a later refresh finds that taken. The library rejects a duplicate filename, and the old file
   has to stay reachable for anything still pointing at it.
 - **Write each image's alt text** (its default alt): what the chart shows, how to read it, and one or
   two values read off the data, not off the render.
 
-## 2. Create the static viz
+## 2. Create the static viz, or update the existing one
+
+**If the step's docstring already records a static viz name, the viz is published: edit that entry**
+(Admin → Static viz → its name) rather than creating one. Keep its name, so every `{.static-viz}`
+block already pointing at it picks up the change. Set the new images, and revise the description and
+data source if the refresh changed them. Then skip section 3, apart from any page still showing an
+`{.image}` block. Otherwise create the entry:
 
 | Field | What goes in |
 |---|---|
@@ -29,8 +37,10 @@ session cannot reach it: prepare the files and the texts, and the user enters th
 
 ## 3. Swap the block in every gdoc that shows the old image
 
-List them from the `posts_gdocs_x_images` join on the old filename (`/query-grapher-db`), or with
-`/find-chart-references`. In each article and topic page, replace
+List them with `/query-grapher-db` on a database that has the gdocs (a staging server's is a recent
+copy of production): `posts_gdocs_x_images` joined to `images` on the old filename and to
+`posts_gdocs` for each gdoc's slug and type. `/find-chart-references` does not look up images. In
+each article and topic page, replace
 
 ```archie
 {.image}
