@@ -550,7 +550,9 @@ def resolve_image_filenames(filenames: list[str]) -> list[str]:
     A typo or a file missing from this database would otherwise return no rows, and an empty
     report reads as "nothing shows this image".
     """
-    df = OWID_ENV.read_sql("SELECT DISTINCT filename FROM images WHERE filename IN %(f)s", params={"f": tuple(filenames)})
+    df = OWID_ENV.read_sql(
+        "SELECT DISTINCT filename FROM images WHERE filename IN %(f)s", params={"f": tuple(filenames)}
+    )
     found = set(df["filename"])
     for name in filenames:
         if name not in found:
@@ -612,6 +614,25 @@ def sweep_images(filenames: list[str]) -> list[dict]:
     return out
 
 
+def image_filenames_in(node) -> set[str]:
+    """Every filename an image block names in a gdoc subtree, its `smallFilename` included.
+
+    Compared exactly: a substring test on the serialized JSON matches `population.png` inside
+    `world-population.png`, and sends the audit to the wrong FAQ entry.
+    """
+    found: set[str] = set()
+    if isinstance(node, dict):
+        if node.get("type") == "image":
+            value = node.get("value") if isinstance(node.get("value"), dict) else node
+            found |= {value[k] for k in ("filename", "smallFilename") if isinstance(value.get(k), str)}
+        for child in node.values():
+            found |= image_filenames_in(child)
+    elif isinstance(node, list):
+        for child in node:
+            found |= image_filenames_in(child)
+    return found
+
+
 def sweep_fragment_data_pages(image_rows: list[dict]) -> list[dict]:
     """The data pages that show a fragment holding the image: its FAQ entries, by chart.
 
@@ -625,7 +646,7 @@ def sweep_fragment_data_pages(image_rows: list[dict]) -> list[dict]:
             "SELECT content->>'$.parsedFaqs' AS faqs FROM posts_gdocs WHERE id = %(g)s", params={"g": f["surface_id"]}
         )["faqs"].iloc[0]
         faqs = parse_json_obj(content)
-        frags = [k for k, v in faqs.items() if f["subject"] in json.dumps(v)]
+        frags = [k for k, v in faqs.items() if f["subject"] in image_filenames_in(v)]
         # The page type stays last, in parentheses: the report reads it from there.
         block, _, ptype = f["context"].rpartition(" (")
         note = f"FAQ {', '.join(frags)}" if frags else "in no FAQ entry"

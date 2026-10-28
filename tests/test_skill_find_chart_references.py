@@ -325,7 +325,13 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
         if "static_viz" in sql:
             return pd.DataFrame([{"id": 3, "name": "a-static-viz", "filename": "old.png"}])
         if "parsedFaqs" in sql:
-            faqs = '{"stunting": {"content": "old.png"}, "other": {"content": "x"}}' if params["g"] == "faqs" else "{}"
+            # "other" holds a file whose name merely contains the subject's: it must not match.
+            faqs = (
+                '{"stunting": {"content": [{"type": "image", "filename": "new.png", "smallFilename": "old.png"}]},'
+                ' "other": {"content": [{"type": "image", "filename": "world-old.png"}]}}'
+                if params["g"] == "faqs"
+                else "{}"
+            )
             return pd.DataFrame([{"faqs": faqs}])
         if "posts_gdocs_variables_faqs" in sql:
             assert params["fr"] == ("stunting",)

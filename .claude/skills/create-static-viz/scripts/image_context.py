@@ -44,7 +44,10 @@ def flatten(node, filenames: set[str], out: list[tuple[str, str]]) -> None:
         if kind in ("image", "static-viz"):
             value = node.get("value") if isinstance(node.get("value"), dict) else node
             if kind == "image":
-                out.append(("IMAGE", value.get("filename", "")))
+                # The mobile `smallFilename` is the same placement: name the block by whichever
+                # of its two files was asked for, so a mobile-only use is found too.
+                fn, small = value.get("filename", ""), value.get("smallFilename", "")
+                out.append(("IMAGE", small if fn not in filenames and small in filenames else fn))
             else:
                 out.append(("STATIC VIZ", value.get("name", "")))
             caption = value.get("caption")
@@ -92,9 +95,11 @@ def main() -> None:
             print("[featured image: the page's thumbnail, set in its front matter]")
         sections: list[tuple[str, object]] = []
         if r["type"] == "fragment" and isinstance(content.get("parsedFaqs"), dict):
-            sections = [
-                (f"FAQ {k}", v) for k, v in content["parsedFaqs"].items() if any(n in json.dumps(v) for n in names)
-            ]
+            for k, v in content["parsedFaqs"].items():
+                blocks: list[tuple[str, str]] = []
+                flatten(v, names, blocks)
+                if any(kind == "IMAGE" and name in names for kind, name in blocks):
+                    sections.append((f"FAQ {k}", v))
         else:
             sections = [("body", content.get("body", []))]
         for label, node in sections:
