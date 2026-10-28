@@ -111,28 +111,32 @@ is repointed.
 
 ## 5. Announce it in #data-updates-comms
 
-Once the pages show the new viz and their text matches it, draft a short message for the user to
-post, at `ai/<slug>_slack_announcement.md`. It is not the data-update form
-(`/draft-data-update-slack-post`): a refresh that keeps the data needs only a brief note of what was
-done, comparing the old version with the new one.
+Once the pages show the new viz and their text matches it, announce it. **When the refresh brought
+new data**, the dataset update's form is the announcement (`/update-dataset` hands it to
+`/draft-data-update-slack-post`): name the viz among the charts it affected, and attach the images
+below. **When the data is the same**, the refresh is a redesign, and the form's dataset fields have
+nothing to say: draft a short message instead, at `ai/<slug>_slack_announcement.md`, comparing the
+old version with the new one.
 
 - **One opening sentence, in bold** (`**…**`: a single `*…*` shows as italic once pasted): what was
   done, such as "We refreshed our static chart of …". Keep links out of it. The next sentence names
-  the pages that show it, linked, and whether the data changed.
+  the pages that show it, linked, and the data it uses, unchanged.
 - **Three or four bullets** on what changed between the two versions: the layout, the encoding, the
   labels, a title word dropped and why. Take them from the step's docstring, and read any number off
   the step's data.
 - **One closing sentence:** it is published as a static viz (downloads and data link), and the text
   around it was revised.
 - **The images, attached before then after:** the published image it replaces
-  (`scripts/fetch_original_image.py <old filename>`), then the new desktop and mobile PNGs from
-  section 1. Gather the three in one folder under `ai/` and list them, in that order, above the message.
+  (`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <old filename>`),
+  then the new desktop and mobile PNGs from section 1. Gather the three in one folder under `ai/` and
+  list them, in that order, above the message.
 
 With the Slack connector, save it as a draft (`slack_send_message_draft`), whose Markdown renders
 named links (a Markdown link on the page's name) and `**bold**`, with the attribution line first.
-Save it in the user's DM with themselves, not in the channel: a channel holds one draft, so one
-there clashes with whatever the user is already typing in it. They copy it into #data-updates-comms,
-attach the images and send it. Never send it yourself, since images cannot be added to a sent
-message. Without the connector, hand over the text to paste: Slack's message box renders neither
-`<url|text>` nor Markdown links, so write each link as the page's name followed by its bare URL in
-parentheses, and use `•` bullets.
+First search #data-updates-comms for a message about the viz: the user may have posted one already.
+If one is there, or the channel already holds a draft (the call fails with `attached_draft_exists`,
+since a channel holds one), save it in the user's DM with themselves instead, so it never lands on
+top of their own; otherwise save it in the channel. They attach the images and send it. Never send
+it yourself, since images cannot be added to a sent message. Without the connector, hand over the
+text to paste: Slack's message box renders neither `<url|text>` nor Markdown links, so write each
+link as the page's name followed by its bare URL in parentheses, and use `•` bullets.
