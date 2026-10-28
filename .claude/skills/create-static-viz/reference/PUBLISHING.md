@@ -122,7 +122,8 @@ old version with the new one.
   single `*…*` shows as italic once pasted): what was done, such as "We refreshed our static chart
   of …". Keep links out of it.
 - **A paragraph** naming the pages that show it, linked, and the data it uses, unchanged, ending by
-  introducing the images ("Old version first, then the new desktop and mobile ones:").
+  introducing the images ("Old version first, then the new desktop and mobile ones:", or "then the
+  new one:" for a viz with no mobile frame).
 - **Three or four bullets** right under it, on what changed between the two versions: the layout,
   the encoding, the labels, a title word dropped and why. Take them from the step's docstring, and
   read any number off the step's data.
@@ -132,8 +133,8 @@ old version with the new one.
   chain), for the user to adjust.
 - **The images, attached before then after:** the published image it replaces
   (`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <old filename>`),
-  then the new desktop and mobile PNGs from section 1. Gather the three in one folder under `ai/` and
-  list them, in that order, above the message.
+  then the new desktop PNG from section 1, and the mobile one when the viz has a mobile frame. Gather
+  them in one folder under `ai/` and list them, in that order, above the message.
 
 With the Slack connector, save it as a draft (`slack_send_message_draft`), whose Markdown renders
 named links (a Markdown link on the page's name) and `**bold**`, with the attribution line first.
