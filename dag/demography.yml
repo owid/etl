@@ -1,9 +1,9 @@
 steps:
-  ########################################################################
-  # Population                                                           #
-  ########################################################################
+  ##########
+  # Population
+  ##########
 
-  # Population OMM #############################
+  # Population OMM
   # 2023-03-31: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2023-03-31/population:
     - data://garden/hyde/2017/baseline
@@ -32,7 +32,7 @@ steps:
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 
-  # WPP ########################################
+  # WPP
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
     # Main indicators
@@ -87,7 +87,7 @@ steps:
     - data://garden/un/2024-03-14/un_wpp_most:
       - data://garden/un/2024-07-12/un_wpp
 
-  # HYDE ########################################
+  # HYDE
   # HYDE 3.5
   data://garden/hyde/2026-06-08/all_indicators:
     - data://meadow/hyde/2026-06-08/all_indicators:
@@ -113,20 +113,20 @@ steps:
       - data://meadow/hyde/2017/general_files:
         - snapshot://hyde/2017/general_files.zip
 
-  # others #######################################
+  # others
   # Population (Fariss et al.)
   data://garden/demography/2023-12-20/population_fariss:
     - data://meadow/demography/2023-12-20/population_fariss:
       - snapshot://demography/2023-12-20/population_fariss.rds
     - data://garden/countries/2024-01-08/gleditsch_no_population
 
-  ## Population doubling times
+  # # Population doubling times
   data://garden/demography/2024-07-18/population_doubling_times:
     - data://garden/demography/2024-07-15/population
   data://grapher/demography/2024-07-18/population_doubling_times:
     - data://garden/demography/2024-07-18/population_doubling_times
 
-  ## Population comparison
+  # # Population comparison
   data://grapher/demography/2023-07-03/world_population_comparison:
     - data://garden/demography/2023-06-27/world_population_comparison:
       - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
@@ -140,16 +140,14 @@ steps:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper:
       - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
 
-  #
   # Population of the Republic of Ireland territory between 1841 and 2006 (Central Statistics Office of Ireland)
-  #
   data://garden/demography/2025-12-10/population_ireland:
     - data://meadow/demography/2025-12-10/population_ireland:
       - snapshot://demography/2025-12-10/population_ireland.csv
 
-  ########################################################################
-  # Life expectancy                                                      #
-  ########################################################################
+  ##########
+  # Life expectancy
+  ##########
 
   # Zijdeman et al
   data://garden/demography/2023-10-10/zijdeman_et_al_2015:
@@ -232,9 +230,9 @@ steps:
       - data://meadow/demography/2023-11-08/modal_age_death:
         - snapshot://demography/2023-11-08/modal_age_death.xlsx
 
-  ########################################################################
-  # Fertility                                                            #
-  ########################################################################
+  ##########
+  # Fertility
+  ##########
 
   # Mothers by decadal age-group
   data://grapher/un/2024-10-01/births_by_age:
@@ -246,9 +244,8 @@ steps:
     - data://garden/hmd/2026-10-22/hfd:
       - data://meadow/hmd/2026-10-22/hfd:
         - snapshot://hmd/2026-10-22/hfd.zip
-  #
+
   # Human Fertility Database charts — authored in ETL.
-  #
   viz://chart/hmd/latest/age_adjusted_total_fertility_rate_after_a_given_number_of_births:
     - data://grapher/hmd/2026-10-22/hfd
   viz://chart/hmd/latest/average_age_of_mothers_birth_cohort:
@@ -302,9 +299,8 @@ steps:
     - data://garden/demography/2025-10-22/fertility_rate:
       - data://garden/hmd/2026-10-22/hfd
       - data://garden/un/2024-07-12/un_wpp
-  #
+
   # Fertility rate (OMM) charts — authored in ETL.
-  #
   viz://chart/demography/latest/age_of_mothers_at_childbirth_by_year:
     - data://grapher/demography/2025-10-22/fertility_rate
   viz://chart/demography/latest/children_born_per_woman:
@@ -339,17 +335,14 @@ steps:
       - data://meadow/demography/2024-12-05/paternal_ages:
         - snapshot://demography/2024-12-04/paternal_ages.rdata
 
-  #
   # Effective Fertility Rate (Malani & Jacob)
-  #
   data://grapher/demography/2025-10-22/efr_malani_jacob:
     - data://garden/demography/2025-10-22/efr_malani_jacob:
       - data://garden/un/2024-12-02/un_wpp_lt
       - data://garden/un/2024-07-12/un_wpp
       - data://garden/hmd/2025-10-22/hmd
-  #
+
   # Effective fertility rate by age — chart authored in ETL.
-  #
   viz://chart/demography/latest/effective_fertility_rates_malani_and_jacob:
     - data://grapher/demography/2025-10-22/efr_malani_jacob
 
@@ -358,15 +351,14 @@ steps:
     - data://garden/demography/2025-10-22/mean_age_childbearing:
       - data://garden/un/2024-07-12/un_wpp
       - data://garden/hmd/2026-10-22/hfd
-  #
+
   # Mean age at childbearing (OMM) charts — authored in ETL.
-  #
   viz://chart/demography/latest/period_average_age_of_mothers:
     - data://grapher/demography/2025-10-22/mean_age_childbearing
 
-  ########################################################################
-  # Mortality                                                            #
-  ########################################################################
+  ##########
+  # Mortality
+  ##########
 
   # Death rate
   data://grapher/demography/2025-10-22/deaths:
@@ -375,9 +367,10 @@ steps:
       - data://garden/un/2024-12-02/un_wpp_lt
       - data://garden/hmd/2025-10-22/hmd
 
-  ########################################################################
+  ##########
   # OTHERS
-  ########################################################################
+  ##########
+
   # Wittgenstein Centre (Projections + Historical)
   data://grapher/demography/2026-02-11/wittgenstein_human_capital:
     - data://garden/demography/2026-02-11/wittgenstein_human_capital:
@@ -392,9 +385,7 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
-  #
   # US State Population
-  #
   data://garden/demography/2025-01-23/us_state_population:
     - data://meadow/demography/2025-01-23/us_state_population:
       - snapshot://demography/2025-01-23/us_state_population.csv
@@ -403,9 +394,7 @@ steps:
   data://external/demography/latest/un_wpp_subset:
     - data://garden/un/2024-07-12/un_wpp
 
-  #
   # PEW: Global Religious Composition
-  #
   viz://chart/pew/latest/religious_composition:
     - data://grapher/pew/2025-10-31/religious_composition:
       - data://garden/pew/2025-10-31/religious_composition:
@@ -414,9 +403,7 @@ steps:
         - data://garden/regions/2023-01-01/regions
         - data://garden/demography/2024-07-15/population
 
-  #
   # International Database (US Census Bureau)
-  #
   data://grapher/demography/2026-02-04/census_us_idb:
     - data://garden/demography/2026-02-04/census_us_idb:
       - data://meadow/demography/2026-02-04/census_us_idb:
@@ -424,9 +411,7 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
-  #
   # TODO: add step name (just something recognizable)
-  #
   data://grapher/demography/2026-02-05/ihme_2020:
     - data://garden/demography/2026-02-05/ihme_2020:
       - data://meadow/demography/2026-02-05/ihme_2020:
@@ -441,9 +426,10 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
-  ########################################################################
+  ##########
   # OTHERS (legacy, used downstream -- regularly check)
-  ########################################################################
+  ##########
+
   # Wittgenstein Centre (Projections + Historical)
   data://garden/demography/2024-12-06/wittgenstein_human_capital:
     # Wittgenstein Centre (Historical)
@@ -459,9 +445,10 @@ steps:
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
 
-  ########################################################################
+  ##########
   # BESPOKE VISUALIZATIONS
-  ########################################################################
+  ##########
+
   # UN WPP demography JSON feed.
   viz://bespoke/un_wpp/latest/demography:
     - data://garden/un/2024-07-12/un_wpp

@@ -33,18 +33,14 @@ steps:
       - data://meadow/imf/2026-10-20/world_economic_outlook:
         - snapshot://imf/2026-10-20/world_economic_outlook.csv
 
-  #
   # Average working hours - Huberman and Minns (2007)
-  #
   data://garden/working_hours/2025-08-05/huberman_minns:
     - data://meadow/working_hours/2025-08-05/huberman_minns:
       - snapshot://working_hours/2025-08-05/huberman_minns.csv
   data://grapher/working_hours/2025-08-05/huberman_minns:
     - data://garden/working_hours/2025-08-05/huberman_minns
 
-  #
   # Working hours OMM
-  #
   data://grapher/working_hours/2025-08-05/working_hours_omm:
     - data://garden/working_hours/2025-08-05/working_hours_omm:
       - data://garden/ggdc/2025-10-09/penn_world_table
@@ -70,35 +66,27 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
 
-  #
   # A millennium of macroeconomic data (Bank of England)
-  #
   data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data:
     - data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data:
       - snapshot://bank_of_england/2025-12-29/millennium_macroeconomic_data.xlsx
-  #
+
   # CPI UK (ONS)
-  #
   data://garden/ons/2025-12-31/cpi_uk:
     - data://meadow/ons/2025-12-31/cpi_uk:
       - snapshot://ons/2025-12-31/cpi_uk.csv
 
-  #
   # Real average weekly earnings UK (ONS)
-  #
   data://garden/ons/2025-12-31/average_weekly_earnings_uk:
     - data://meadow/ons/2025-12-31/average_weekly_earnings_uk:
       - snapshot://ons/2025-12-31/average_weekly_earnings_uk.xlsx
-  #
+
   # A millennium of macroeconomic data (Bank of England) - Version 4 (extract)
-  #
   data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data:
     - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data:
       - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
 
-  #
   # Long-run structural transformation: sector employment and GDP shares (historical sources + WDI)
-  #
   data://garden/growth/2026-07-02/structural_transformation_historical:
     - data://meadow/papers/2026-07-02/herrendorf_rogerson_valentinyi:
       - snapshot://papers/2026-07-02/herrendorf_rogerson_valentinyi.zip
