@@ -1,13 +1,11 @@
 # This one includes datasets on spending and revenue, for the government spending and taxes topic pages
 
 steps:
-  ############################################################
+  ##########
   # GENERAL
-  ############################################################
+  ##########
 
-  #
   # OECD Government at a Glance
-  #
   data://grapher/oecd/2026-04-01/government_at_a_glance:
     - data://garden/oecd/2026-04-01/government_at_a_glance:
       - data://meadow/oecd/2026-04-01/government_at_a_glance:
@@ -28,16 +26,14 @@ steps:
       - data://meadow/imf/2026-06-12/public_finances_modern_history:
         - snapshot://imf/2026-06-12/public_finances_modern_history.xlsx
 
-    # OECD Social Expenditure Database
+  # OECD Social Expenditure Database
   data://garden/oecd/2025-12-11/social_expenditure:
     - data://meadow/oecd/2025-12-11/social_expenditure:
       - snapshot://oecd/2025-12-11/social_expenditure.csv
   data://grapher/oecd/2025-12-11/social_expenditure:
     - data://garden/oecd/2025-12-11/social_expenditure
 
-  #
   # Social expenditure OMM
-  #
   data://grapher/social_expenditure/2025-03-07/social_expenditure_omm:
     - data://garden/social_expenditure/2025-03-07/social_expenditure_omm:
       - data://garden/oecd/2025-12-11/social_expenditure
@@ -50,9 +46,9 @@ steps:
         - data://meadow/social_expenditure/2025-03-07/lindert:
           - snapshot://social_expenditure/2025-03-07/lindert.csv
 
-  ############################################################
+  ##########
   # HEALTH
-  ############################################################
+  ##########
 
   # OECD Health Expenditure and Financing Database
   data://garden/oecd/2026-08-27/health_expenditure:
@@ -62,9 +58,7 @@ steps:
   data://grapher/oecd/2026-08-27/health_expenditure:
     - data://garden/oecd/2026-08-27/health_expenditure
 
-  #
   # Health expenditure as a share of GDP (OMM)
-  #
   data://grapher/health_expenditure/2026-08-27/health_expenditure_omm:
     - data://garden/health_expenditure/2026-08-27/health_expenditure_omm:
       - data://garden/oecd/2026-08-27/health_expenditure
@@ -77,9 +71,9 @@ steps:
         - data://meadow/health_expenditure/2025-03-04/lindert:
           - snapshot://health_expenditure/2025-03-04/lindert.csv
 
-  ############################################################
+  ##########
   # MILITARY
-  ############################################################
+  ##########
 
   # SIPRI Military Expenditure Database
   data://grapher/sipri/2026-04-27/military_expenditure:

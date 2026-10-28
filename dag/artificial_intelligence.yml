@@ -1,5 +1,8 @@
 steps:
-  ###########  UPDATED MONTHLY #############################################################################
+  ##########
+  # UPDATED MONTHLY
+  ##########
+
   # FrontierMath Benchmark (EPOCH)
   data://grapher/artificial_intelligence/2026-09-07/frontiermath:
     - data://garden/artificial_intelligence/2026-09-07/frontiermath:
@@ -39,14 +42,14 @@ steps:
   data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive:
     - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
-
   # EPOCH dataset on Compute Intensive AI, aggregates by country
   data://grapher/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
     - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
       - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
-  ############### OTHERS #####################################################################################
-
+  ##########
+  # OTHERS
+  ##########
 
   # Dataset on AI performance across different benchmarks from Dynabench
   data://grapher/artificial_intelligence/2024-04-02/dynabench:
@@ -54,14 +57,12 @@ steps:
       - data://meadow/artificial_intelligence/2024-04-02/dynabench:
         - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx
 
-
   # Chess dataset (ELO ratings)
   data://grapher/artificial_intelligence/2024-02-05/chess:
     - data://garden/artificial_intelligence/2024-02-05/chess:
       - snapshot://artificial_intelligence/2024-02-05/chess.csv
-  #
+
   # AI polls
-  #
 
   # YouGov AI surveys
   data://grapher/artificial_intelligence/2026-03-23/yougov_robots:
@@ -72,8 +73,6 @@ steps:
     - data://garden/artificial_intelligence/2026-03-23/yougov_job_automation:
       - data://meadow/artificial_intelligence/2026-03-23/yougov_job_automation:
         - snapshot://artificial_intelligence/2026-03-23/yougov_job_automation.xlsx
-
-
 
   # Datacenter construction spending (U.S. Census Bureau)
   data://grapher/us_census_bureau/2026-10-02/datacenter_construction:
@@ -137,9 +136,11 @@ steps:
     - data://garden/gallup/2026-10-20/ai_indicator:
       - data://meadow/gallup/2026-10-20/ai_indicator:
         - snapshot://gallup/2026-10-20/ai_indicator.csv
-  ########################
+
+  ##########
   # AI Index Report 2026
-  ############################
+  ##########
+
   data://grapher/artificial_intelligence/2026-04-20/ai_index:
     - data://garden/artificial_intelligence/2026-04-20/ai_index_report:
       - data://meadow/artificial_intelligence/2026-04-20/ai_index_report:
@@ -149,9 +150,8 @@ steps:
         - snapshot://artificial_intelligence/2025-04-08/ai_adoption.csv
         - snapshot://artificial_intelligence/2024-06-28/ai_adoption_2023.csv
       - data://garden/bls/2026-03-20/us_consumer_prices
-  #
+
   # CSET datasets
-  #
   # CSET data on articles, patents and investment
   data://grapher/artificial_intelligence/2026-04-27/cset:
     - data://garden/artificial_intelligence/2026-04-27/cset:
