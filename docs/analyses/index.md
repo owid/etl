@@ -7,6 +7,16 @@ This is just a sneak peek into some of our data work. But note that all our code
 
 !!! note ""
 
+    ## [Animals killed to produce eggs](animals_killed_for_eggs/animals_killed_for_eggs.html)
+    This technical publication explains how we estimate the number of chickens killed to produce eggs, based on different pieces of information from FAOSTAT and other sources.
+
+    [:material-notebook: View notebook](animals_killed_for_eggs/animals_killed_for_eggs.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/animals_killed_for_eggs/animals_killed_for_eggs.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/animals_killed_for_eggs/animals_killed_for_eggs.ipynb){ .md-button }
+
+
+!!! note ""
+
     ## [Does the news reflect what we die from?](media_deaths/methodology.md)
 
     This analysis accompanies the article "[Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)". It compares the leading causes of death in the United States in 2023 with the amount of media coverage each receives.
