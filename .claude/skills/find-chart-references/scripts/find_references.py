@@ -570,7 +570,7 @@ def sweep_images(filenames: list[str]) -> list[dict]:
     """
     df = OWID_ENV.read_sql(
         "SELECT i.id AS image_id, i.filename, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, "
-        "       pg.published, pg.content->>'$.\"featured-image\"' AS featured "
+        "       pg.published, pg.content->>'$.\"featured-image\"' AS featured, pg.content->>'$.body' AS body "
         "FROM posts_gdocs_x_images x JOIN images i ON i.id = x.imageId JOIN posts_gdocs pg ON pg.id = x.gdocId "
         "WHERE i.filename IN %(f)s ORDER BY pg.slug",
         params={"f": tuple(filenames)},
@@ -578,21 +578,27 @@ def sweep_images(filenames: list[str]) -> list[dict]:
     out = []
     for r in df.to_dict("records"):
         fragment = r["post_type"] == "fragment"
-        block = "featured image" if r["featured"] == r["filename"] else "image block"
-        out.append(
-            rec(
-                "image",
-                r["filename"],
-                r["image_id"],
-                "gdoc fragment" if fragment else "gdoc",
-                EMBED,
-                r["post_slug"],
-                "" if fragment else gdoc_path(r),
-                surface_id=r["gdoc_id"],
-                context=f"{block} ({r['post_type']})",
-                published=r["published"],
-            )  # fmt: skip
-        )
+        # One row per way the page holds the image, since each needs a different edit: the
+        # featured image is front matter, an image block is body. A page can do both. An image
+        # the body does not show either way (a fragment's FAQ entry) counts as an image block.
+        featured = r["featured"] == r["filename"]
+        in_body = r["filename"] in image_filenames_in(parse_json_list(r["body"]))
+        blocks = (["featured image"] if featured else []) + (["image block"] if in_body or not featured else [])
+        for block in blocks:
+            out.append(
+                rec(
+                    "image",
+                    r["filename"],
+                    r["image_id"],
+                    "gdoc fragment" if fragment else "gdoc",
+                    EMBED,
+                    r["post_slug"],
+                    "" if fragment else gdoc_path(r),
+                    surface_id=r["gdoc_id"],
+                    context=f"{block} ({r['post_type']})",
+                    published=r["published"],
+                )  # fmt: skip
+            )
     sv = OWID_ENV.read_sql(
         "SELECT sv.id, sv.name, i.filename FROM static_viz sv JOIN images i ON i.id IN (sv.imageId, sv.mobileImageId) "
         "WHERE i.filename IN %(f)s",

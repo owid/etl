@@ -100,8 +100,8 @@ def main() -> None:
                 flatten(v, names, blocks)
                 if any(kind == "IMAGE" and name in names for kind, name in blocks):
                     sections.append((f"FAQ {k}", v))
-        else:
-            sections = [("body", content.get("body", []))]
+        # A fragment can also hold the image in its ordinary body, outside any FAQ entry.
+        sections.append(("body", content.get("body", [])))
         for label, node in sections:
             blocks: list[tuple[str, str]] = []
             flatten(node, names, blocks)

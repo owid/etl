@@ -317,9 +317,11 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
         if "posts_gdocs_x_images" in sql:
             return pd.DataFrame(
                 [
-                    {"image_id": 7, "filename": "old.png", "gdoc_id": "topic", "post_slug": "human-height", "post_type": "linear-topic-page", "published": 1, "featured": None},
-                    {"image_id": 7, "filename": "old.png", "gdoc_id": "faqs", "post_slug": "gcp-faqs", "post_type": "fragment", "published": 1, "featured": None},
-                    {"image_id": 7, "filename": "old.png", "gdoc_id": "texts", "post_slug": "data-pages-texts", "post_type": "fragment", "published": 1, "featured": None},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "topic", "post_slug": "human-height", "post_type": "linear-topic-page", "published": 1, "featured": None, "body": '[{"type": "image", "filename": "old.png"}]'},
+                    # Both the page's featured image and a body block: two placements, two edits.
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "art", "post_slug": "an-article", "post_type": "article", "published": 1, "featured": "old.png", "body": '[{"type": "image", "filename": "old.png"}]'},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "faqs", "post_slug": "gcp-faqs", "post_type": "fragment", "published": 1, "featured": None, "body": "[]"},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "texts", "post_slug": "data-pages-texts", "post_type": "fragment", "published": 1, "featured": None, "body": '[{"type": "image", "filename": "old.png"}]'},
                 ]
             )  # fmt: skip
         if "static_viz" in sql:
@@ -350,6 +352,8 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
     assert by_where["share-stunted"]["surface"] == "data page FAQ"
     assert by_where["share-stunted"]["where_path"] == "/grapher/share-stunted"
     assert by_where["a-static-viz"]["where_path"] == "/admin/static-viz/3/edit"
+    article = sorted(r["context"] for r in rows if r["where"] == "an-article")
+    assert article == ["featured image (article)", "image block (article)"]
 
 
 def test_unresolved_image_filename_is_a_coverage_gap(mod, monkeypatch):
