@@ -305,3 +305,42 @@ def test_data_insight_placing_narrative_chart_in_front_matter_is_found(mod, monk
     paths = sorted((r["where"], r["where_path"]) for r in refs)
     assert paths == [("an-article", "/an-article"), ("an-insight", "/data-insights/an-insight")]
     assert all(r["surface"] == "gdoc (narrative chart)" and r["subject"] == "nc-a" for r in refs)
+
+
+def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeypatch):
+    """An image is found in the gdocs that place it. A fragment has no page of its own, so the data
+    pages showing its FAQ are listed instead, and a fragment that no FAQ uses says so.
+    """
+
+    def fake_read_sql(sql, params=None):
+        params = params or {}
+        if "posts_gdocs_x_images" in sql:
+            return pd.DataFrame(
+                [
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "topic", "post_slug": "human-height", "post_type": "linear-topic-page", "published": 1, "featured": None},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "faqs", "post_slug": "gcp-faqs", "post_type": "fragment", "published": 1, "featured": None},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "texts", "post_slug": "data-pages-texts", "post_type": "fragment", "published": 1, "featured": None},
+                ]
+            )  # fmt: skip
+        if "static_viz" in sql:
+            return pd.DataFrame([{"id": 3, "name": "a-static-viz", "filename": "old.png"}])
+        if "parsedFaqs" in sql:
+            faqs = '{"stunting": {"content": "old.png"}, "other": {"content": "x"}}' if params["g"] == "faqs" else "{}"
+            return pd.DataFrame([{"faqs": faqs}])
+        if "posts_gdocs_variables_faqs" in sql:
+            assert params["fr"] == ("stunting",)
+            return pd.DataFrame([{"fragmentId": "stunting", "slug": "share-stunted", "chart_id": 42}])
+        raise AssertionError(sql)
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    rows = mod.sweep_images(["old.png"])
+    hops = mod.sweep_fragment_data_pages(rows)
+    by_where = {r["where"]: r for r in rows + hops}
+    assert by_where["human-height"]["where_path"] == "/human-height"
+    assert by_where["gcp-faqs"]["surface"] == "gdoc fragment" and by_where["gcp-faqs"]["where_path"] == ""
+    assert "FAQ stunting" in by_where["gcp-faqs"]["context"]
+    assert "in no FAQ entry" in by_where["data-pages-texts"]["context"]
+    assert by_where["data-pages-texts"]["context"].endswith("(fragment)")
+    assert by_where["share-stunted"]["surface"] == "data page FAQ"
+    assert by_where["share-stunted"]["where_path"] == "/grapher/share-stunted"
+    assert by_where["a-static-viz"]["where_path"] == "/admin/static-viz/3/edit"

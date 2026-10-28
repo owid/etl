@@ -19,6 +19,7 @@ Subjects (at least one; they can be combined):
     --chart-ids 123,456        --chart-slugs a,b,c
     --variable-ids 1,2         --dataset-id 6789
     --mdim <slug|catalogPath>  --explorer <slug>
+    --image-filenames a.png,b.png   (an image in the admin library, e.g. a static viz being replaced)
 
 Chart subjects are expanded to every old slug that still reaches them
 (`chart_slug_redirects`), because references written before a rename point at the
@@ -291,9 +292,7 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
     # The front-matter value is usually the name, but authors also paste the admin edit URL
     # (`.../admin/narrative-charts/<id>/edit`), so match the id in a URL to the name as well.
     name_by_id = {
-        str(f["surface_id"]): str(f["where"])
-        for f in findings
-        if f["surface"] == "narrative chart" and f.get("where")
+        str(f["surface_id"]): str(f["where"]) for f in findings if f["surface"] == "narrative chart" and f.get("where")
     }
     df_front_matter = OWID_ENV.read_sql(
         "SELECT pg.content->>'$.\"narrative-chart\"' AS target, pg.id AS gdoc_id, pg.slug AS post_slug,"
@@ -543,6 +542,108 @@ def sweep_static_viz(by_slug: dict[str, dict]) -> list[dict]:
         )  # fmt: skip
         for r in df.to_dict("records")
     ]
+
+
+def sweep_images(filenames: list[str]) -> list[dict]:
+    """Every gdoc that shows an image from the library, and every static viz built on it.
+
+    `posts_gdocs_x_images` records each image a gdoc renders, whatever block holds it (an
+    `{.image}` block, a featured image, an image inside a fragment). A fragment has no page of its
+    own: a data page shows it as an FAQ, so its rows carry no public path, and
+    `sweep_fragment_data_pages` adds the data pages that show it.
+    """
+    df = OWID_ENV.read_sql(
+        "SELECT i.id AS image_id, i.filename, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, "
+        "       pg.published, pg.content->>'$.\"featured-image\"' AS featured "
+        "FROM posts_gdocs_x_images x JOIN images i ON i.id = x.imageId JOIN posts_gdocs pg ON pg.id = x.gdocId "
+        "WHERE i.filename IN %(f)s ORDER BY pg.slug",
+        params={"f": tuple(filenames)},
+    )
+    out = []
+    for r in df.to_dict("records"):
+        fragment = r["post_type"] == "fragment"
+        block = "featured image" if r["featured"] == r["filename"] else "image block"
+        out.append(
+            rec(
+                "image",
+                r["filename"],
+                r["image_id"],
+                "gdoc fragment" if fragment else "gdoc",
+                EMBED,
+                r["post_slug"],
+                "" if fragment else gdoc_path(r),
+                surface_id=r["gdoc_id"],
+                context=f"{block} ({r['post_type']})",
+                published=r["published"],
+            )  # fmt: skip
+        )
+    sv = OWID_ENV.read_sql(
+        "SELECT sv.id, sv.name, i.filename FROM static_viz sv JOIN images i ON i.id IN (sv.imageId, sv.mobileImageId) "
+        "WHERE i.filename IN %(f)s",
+        params={"f": tuple(filenames)},
+    )
+    for r in sv.to_dict("records"):
+        out.append(
+            rec(
+                "image",
+                r["filename"],
+                None,
+                "static viz",
+                EMBED,
+                r["name"],
+                f"/admin/static-viz/{r['id']}/edit",
+                context="desktop or mobile image of the static viz",
+            )  # fmt: skip
+        )
+    return out
+
+
+def sweep_fragment_data_pages(image_rows: list[dict]) -> list[dict]:
+    """The data pages that show a fragment holding the image: its FAQ entries, by chart.
+
+    A fragment gdoc holds many FAQs (`parsedFaqs`, keyed by fragment id); only the ones whose
+    content names the image matter. A data page shows an FAQ through
+    `posts_gdocs_variables_faqs`, on every published chart that plots one of its variables.
+    """
+    out = []
+    for f in [r for r in image_rows if r["surface"] == "gdoc fragment"]:
+        content = OWID_ENV.read_sql(
+            "SELECT content->>'$.parsedFaqs' AS faqs FROM posts_gdocs WHERE id = %(g)s", params={"g": f["surface_id"]}
+        )["faqs"].iloc[0]
+        faqs = parse_json_obj(content)
+        frags = [k for k, v in faqs.items() if f["subject"] in json.dumps(v)]
+        # The page type stays last, in parentheses: the report reads it from there.
+        block, _, ptype = f["context"].rpartition(" (")
+        note = f"FAQ {', '.join(frags)}" if frags else "in no FAQ entry"
+        charts = (
+            OWID_ENV.read_sql(
+                "SELECT DISTINCT faq.fragmentId, cc.slug, c.id AS chart_id FROM posts_gdocs_variables_faqs faq "
+                "JOIN chart_dimensions cd ON cd.variableId = faq.variableId JOIN charts c ON c.id = cd.chartId "
+                "JOIN chart_configs cc ON cc.id = c.configId "
+                "WHERE faq.gdocId = %(g)s AND faq.fragmentId IN %(fr)s AND c.publishedAt IS NOT NULL ORDER BY cc.slug",
+                params={"g": f["surface_id"], "fr": tuple(frags)},
+            )
+            if frags
+            else None
+        )
+        if charts is None or charts.empty:
+            note += ", shown on no published data page"
+        f["context"] = f"{block}, {note} ({ptype}"
+        for r in [] if charts is None else charts.to_dict("records"):
+            out.append(
+                rec(
+                    "image",
+                    f["subject"],
+                    f["subject_id"],
+                    "data page FAQ",
+                    EMBED,
+                    r["slug"],
+                    f"/grapher/{r['slug']}",
+                    surface_id=r["chart_id"],
+                    context=f"FAQ {r['fragmentId']} from {f['where']}",
+                )  # fmt: skip
+            )
+    return out
 
 
 def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
@@ -1269,7 +1370,7 @@ GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 # locate an article edit, so it needs those links — but it stays OUT of `GDOC_SURFACES`,
 # which consumers use to COUNT a subject's own article references: a placement references
 # the narrative chart, not the chart under audit, so counting it there would overstate both.
-GDOC_RENDERED_SURFACES = (*GDOC_SURFACES, "gdoc (narrative chart)")
+GDOC_RENDERED_SURFACES = (*GDOC_SURFACES, "gdoc (narrative chart)", "gdoc fragment")
 
 
 def gdoc_preview_url(f: dict, admin: str) -> str:
@@ -1343,7 +1444,7 @@ def add_admin_urls(findings: list[dict]) -> None:
             f["admin_url"] = f"{admin}/featured-metrics"
         elif f["surface"] == "narrative chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
-        elif f["surface"] == "chart" and f["surface_id"]:
+        elif f["surface"] in ("chart", "data page FAQ") and f["surface_id"]:
             f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
         elif f["subject_type"] == "narrative chart" and f["subject_id"]:
             # An article placing a narrative chart: the editable object is the narrative
@@ -1378,7 +1479,7 @@ def add_preview_urls(findings: list[dict], host: str) -> None:
             f["preview_url"] = f"{host}/grapher/{f['subject']}{qs}"
         elif f["subject_type"] == "explorer":
             f["preview_url"] = f"{host}/explorers/{f['subject']}{qs}"
-        elif f["surface"] == "chart" and f["where_path"]:
+        elif f["surface"] in ("chart", "data page FAQ") and f["where_path"]:
             f["preview_url"] = f"{host}{f['where_path']}{qs}"
 
 
@@ -1420,7 +1521,7 @@ def search_hint(f: dict) -> str:
     if anchor:
         safe = cell(anchor, 55).replace("`", "'")
         return f"`{safe}`"
-    if f["subject_type"] in ("chart", "narrative chart"):
+    if f["subject_type"] in ("chart", "narrative chart", "image"):
         return f"`{cell(f['subject'], 55)}`"
     return "—"
 
@@ -1481,7 +1582,13 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
             rows = by_surface[surface]
             lines += [f"### {surface} ({len(rows)})", ""]
             if surface in GDOC_RENDERED_SURFACES:
-                subject_col = "Narrative chart" if surface == "gdoc (narrative chart)" else "Chart"
+                subject_col = (
+                    "Narrative chart"
+                    if surface == "gdoc (narrative chart)"
+                    else "Image"
+                    if rows[0]["subject_type"] == "image"
+                    else "Chart"
+                )
                 lines += [
                     f"| {subject_col} | Article | Open | Find in the doc |",
                     "|---|---|---|---|",
@@ -1492,8 +1599,13 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                     # the fix; the block type does not, and `kind` already implies it.
                     ptype = f["context"].split("(")[-1].rstrip(")") if "(" in f["context"] else ""
                     page_type = f" _{ptype}_" if ptype else ""
+                    if surface == "gdoc fragment":
+                        # Which FAQ holds the image, and whether a live data page shows it.
+                        page_type += f" · {cell(f['context'].rpartition(' (')[0], 90)}"
                     preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
-                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host, admin)})"
+                    # A fragment has no page of its own; its data pages are listed separately.
+                    page = f" · [🔗 page]({deep_link(f, host, admin)})" if f["where_path"] else ""
+                    links = f"[📄 doc]({doc_url(f)}){preview}{page}"
                     if f["admin_url"]:
                         # A placement row's editor opens the narrative chart, not a chart —
                         # same mislabel `build_reference_handoff.open_links` already avoids.
@@ -1557,6 +1669,7 @@ def main() -> int:
     ap.add_argument("--dataset-id", type=int, help="all variables of this dataset")
     ap.add_argument("--mdim", action="append", default=[], help="MDIM slug or catalogPath (repeatable)")
     ap.add_argument("--explorer", action="append", default=[], help="explorer slug (repeatable)")
+    ap.add_argument("--image-filenames", help="comma-separated filenames of images in the admin library")
     ap.add_argument("--include-all-charts", action="store_true",
                     help="keep topic pages' auto-generated 'All charts' entries (excluded by default)")  # fmt: skip
     ap.add_argument("--transitive", action="store_true",
@@ -1578,9 +1691,10 @@ def main() -> int:
 
     chart_ids, chart_slugs = ints(args.chart_ids), strs(args.chart_slugs)
     variable_ids = resolve_variable_ids(ints(args.variable_ids), args.dataset_id)
-    if not any([chart_ids, chart_slugs, variable_ids, args.mdim, args.explorer]):
+    image_filenames = strs(args.image_filenames)
+    if not any([chart_ids, chart_slugs, variable_ids, args.mdim, args.explorer, image_filenames]):
         raise SystemExit("Give at least one subject: --chart-ids / --chart-slugs / --variable-ids / "
-                         "--dataset-id / --mdim / --explorer")  # fmt: skip
+                         "--dataset-id / --mdim / --explorer / --image-filenames")  # fmt: skip
 
     print(f"grapher DB: {OWID_ENV.name}")
     findings: list[dict] = []
@@ -1653,6 +1767,15 @@ def main() -> int:
         findings += sweep_mdim_subject(mdim)
     for explorer in args.explorer:
         findings += sweep_explorer_subject(explorer)
+    if image_filenames:
+        print(f"image subjects: {len(image_filenames)} filename(s)")
+        image_rows = sweep_images(image_filenames)
+        findings += image_rows
+        findings += sweep_fragment_data_pages(image_rows)
+        caveats.append(
+            "Images are found where a gdoc places them from the library (`posts_gdocs_x_images`). An image "
+            "reached by a hard-coded URL, or set in a chart or explorer config, is not searched."
+        )
 
     all_charts = [f for f in findings if is_all_charts(f)]
     if all_charts and not args.include_all_charts:

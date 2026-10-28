@@ -37,10 +37,21 @@ data source if the refresh changed them. Then skip section 3, apart from any pag
 
 ## 3. Swap the block in every gdoc that shows the old image
 
-List them with `/query-grapher-db` on a database that has the gdocs (a staging server's is a recent
-copy of production): `posts_gdocs_x_images` joined to `images` on the old filename and to
-`posts_gdocs` for each gdoc's slug and type. `/find-chart-references` does not look up images. In
-each article and topic page, replace
+List them, with the links to open each one, by running `/find-chart-references` on the old file:
+
+```bash
+STAGING=<any live staging server> .venv/bin/python \
+  .claude/skills/find-chart-references/scripts/find_references.py \
+  --image-filenames <old filename> --host https://ourworldindata.org \
+  --markdown ai/<slug>_image_references.md
+```
+
+A staging server's database is a recent copy of production's. `--host` points the page links at the
+live site; the admin preview links still open that staging server, so hand on the Google Doc and
+page links.
+Give the user the Google Doc and published-page links for every article and topic page. For a
+fragment, say which FAQ holds the image and whether a published data page shows it. In each article
+and topic page, replace
 
 ```archie
 {.image}

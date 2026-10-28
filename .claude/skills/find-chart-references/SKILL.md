@@ -1,14 +1,14 @@
 ---
 name: find-chart-references
 description: >-
-  Find every OWID surface that references a chart, indicator, MDIM, or explorer —
-  articles (links vs embeds), explorers, narrative charts, data insights, static viz,
-  key-chart slots, MDIM views. Answers "what breaks or goes stale if
+  Find every OWID surface that references a chart, indicator, MDIM, explorer, or
+  library image — articles (links vs embeds), explorers, narrative charts, data
+  insights, static viz, key-chart slots, MDIM views, data-page FAQs. Answers "what breaks or goes stale if
   this changes or goes away", and distinguishes surfaces a URL redirect fixes from
   surfaces that render the object themselves. Read-only, pure SQL. Trigger when the
   user asks "what references this chart/indicator", "where is this chart embedded",
   "what's the blast radius of this change", "which articles link to X", "what do I
-  have to update if I retire this chart", or when another skill needs the surface
+  have to update if I retire this chart", "which pages show this image", or when another skill needs the surface
   sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
   update-dataset).
 metadata:
@@ -50,7 +50,9 @@ ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
 ```
 
 Subjects (combinable): `--chart-ids` · `--chart-slugs` · `--variable-ids` ·
-`--dataset-id` · `--mdim <slug|catalogPath>` · `--explorer <slug>`.
+`--dataset-id` · `--mdim <slug|catalogPath>` · `--explorer <slug>` ·
+`--image-filenames <a.png,b.png>` (an image in the admin library, such as a static viz
+being replaced).
 
 `--transitive` adds a second hop for indicator subjects **only**: after finding the
 charts that render an indicator, sweep the articles referencing those charts. Off by
@@ -180,6 +182,14 @@ multi-dims are served from `/grapher/`. A row with no query string names the def
 `country=`/`time=` pins the downstream audits grade. Also featured metrics, under
 `/explorers/<slug>`; an explorer's row always carries a query string, since the admin
 refuses one without it.
+
+**Image subjects**: every gdoc that places the image from the library
+(`posts_gdocs_x_images`, so an `{.image}` block, a featured image or an image inside a
+fragment), and every static viz built on it. A fragment has no page of its own, so its row
+names the FAQ entry holding the image (`parsedFaqs`) and the published data pages that show
+that FAQ (`posts_gdocs_variables_faqs` → the charts plotting its variables), or says that none
+does. An image reached by a hard-coded URL, or set in a chart or explorer config, is not
+searched, and the report says so.
 
 Raw-URL targets are un-wrapped before matching: a link pasted through Google Docs can
 arrive as `google.com/url?q=<encoded>` (or `?url=<encoded>`), with the real URL and its
