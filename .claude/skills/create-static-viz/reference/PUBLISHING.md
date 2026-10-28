@@ -118,14 +118,18 @@ below. **When the data is the same**, the refresh is a redesign, and the form's 
 nothing to say: draft a short message instead, at `ai/<slug>_slack_announcement.md`, comparing the
 old version with the new one.
 
-- **One opening sentence, in bold** (`**…**`: a single `*…*` shows as italic once pasted): what was
-  done, such as "We refreshed our static chart of …". Keep links out of it. The next sentence names
-  the pages that show it, linked, and the data it uses, unchanged.
-- **Three or four bullets** on what changed between the two versions: the layout, the encoding, the
-  labels, a title word dropped and why. Take them from the step's docstring, and read any number off
-  the step's data.
-- **One closing sentence:** it is published as a static viz (downloads and data link), and the text
-  around it was revised.
+- **One opening sentence, in bold, on a line of its own** with a blank line after it (`**…**`: a
+  single `*…*` shows as italic once pasted): what was done, such as "We refreshed our static chart
+  of …". Keep links out of it.
+- **A paragraph** naming the pages that show it, linked, and the data it uses, unchanged, ending by
+  introducing the images ("Old version first, then the new desktop and mobile ones:").
+- **Three or four bullets** right under it, on what changed between the two versions: the layout,
+  the encoding, the labels, a title word dropped and why. Take them from the step's docstring, and
+  read any number off the step's data.
+- **One sentence right under the bullets:** it is published as a static viz (downloads and data
+  link), and the text around it was revised.
+- **After a blank line, thanks** to the people who reviewed it, by first name (the Step 9 review
+  chain), for the user to adjust.
 - **The images, attached before then after:** the published image it replaces
   (`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <old filename>`),
   then the new desktop and mobile PNGs from section 1. Gather the three in one folder under `ai/` and
