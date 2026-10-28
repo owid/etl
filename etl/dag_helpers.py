@@ -1,3 +1,4 @@
+import io
 import re
 from pathlib import Path
 from typing import Any
@@ -414,11 +415,7 @@ def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments
     existing structure and comments are preserved while replacing dependency
     lists structurally.
     """
-    yaml_rt = YAML(typ="rt")
-    yaml_rt.preserve_quotes = True
-    yaml_rt.indent(mapping=2, sequence=2, offset=2)
-    yaml_rt.width = 4096
-    yaml_rt.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
+    yaml_rt = _dag_round_trip_yaml()
 
     with open(dag_file) as istream:
         doc = yaml_rt.load(istream)
@@ -446,6 +443,67 @@ def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments
 
     with open(dag_file, "w") as ostream:
         yaml_rt.dump(doc, ostream)
+
+
+def _dag_round_trip_yaml() -> YAML:
+    """Return the ruamel loader/dumper that defines the standard DAG file format."""
+    yaml_rt = YAML(typ="rt")
+    yaml_rt.preserve_quotes = True
+    yaml_rt.indent(mapping=2, sequence=2, offset=2)
+    yaml_rt.width = 4096
+    yaml_rt.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
+    return yaml_rt
+
+
+def _standardize_dag_text(text: str) -> str:
+    """Return ``text`` in the standard DAG format.
+
+    Indentation is what ``_dag_round_trip_yaml`` emits, so ``write_to_dag_file`` can later rewrite the file without
+    touching unrelated lines. Ruamel keeps comments at their original column, so each comment line is then indented
+    like the next non-blank, non-comment line (the step or dependency it describes).
+    """
+    yaml_rt = _dag_round_trip_yaml()
+    ostream = io.StringIO()
+    yaml_rt.dump(yaml_rt.load(text), ostream)
+    lines = ostream.getvalue().split("\n")
+
+    next_indent = None
+    for i in range(len(lines) - 1, -1, -1):
+        stripped = lines[i].lstrip()
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
+            if next_indent is not None:
+                lines[i] = " " * next_indent + stripped
+        else:
+            next_indent = len(lines[i]) - len(stripped)
+
+    return "\n".join(lines)
+
+
+def standardize_dag_file(dag_file: Path, dry_run: bool = False) -> bool:
+    """Rewrite ``dag_file`` in the standard DAG format, without changing its content.
+
+    Returns ``True`` if the file was (or, with ``dry_run``, would be) changed.
+    """
+    dag_file = Path(dag_file)
+    original = dag_file.read_text()
+    standardized = _standardize_dag_text(original)
+    if standardized == original:
+        return False
+    if yaml.safe_load(standardized) != yaml.safe_load(original):
+        raise ValueError(f"Standardizing {dag_file} would change its content.")
+    if not dry_run:
+        dag_file.write_text(standardized)
+    return True
+
+
+def standardize_dag_files(dag_dir: Path = paths.DAG_DIR, dry_run: bool = False) -> list[Path]:
+    """Standardize every active DAG file in ``dag_dir`` (archive files are left as they are).
+
+    Returns the files that were (or, with ``dry_run``, would be) changed.
+    """
+    return [dag_file for dag_file in sorted(Path(dag_dir).glob("*.yml")) if standardize_dag_file(dag_file, dry_run)]
 
 
 def _normalise_ruamel_comment(comment: str) -> str:

@@ -1,7 +1,9 @@
 import tempfile
+import warnings
 from pathlib import Path
 
 import pytest
+import yaml
 
 from etl.dag_helpers import (
     _parse_dag_yaml,
@@ -10,6 +12,8 @@ from etl.dag_helpers import (
     load_dag,
     load_single_dag_file,
     remove_steps_from_dag_file,
+    standardize_dag_file,
+    standardize_dag_files,
     write_to_dag_file,
 )
 
@@ -1229,3 +1233,82 @@ steps:
         assert "data://garden/un/2022-07-11/un_wpp" in graph
         assert "data://meadow/un/2022-07-11/un_wpp" in graph
         assert graph["data://meadow/un/2022-07-11/un_wpp"] == {"snapshot://un/2022-07-11/un_wpp.zip"}
+
+
+STANDARD_DAG = """\
+steps:
+  # UN WPP (2022)
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      # Raw data.
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+      - data://garden/regions/2023-01-01/regions
+
+  # Flat step.
+  data://garden/foo/2024/bar:
+    - snapshot://foo/2024/bar.csv
+"""
+
+
+MISINDENTED_DAG = """\
+steps:
+    # UN WPP (2022)
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+          # Raw data.
+        - data://meadow/un/2022-07-11/un_wpp:
+            - snapshot://un/2022-07-11/un_wpp.zip
+        - data://garden/regions/2023-01-01/regions
+
+# Flat step.
+  data://garden/foo/2024/bar:
+    - snapshot://foo/2024/bar.csv
+"""
+
+
+def test_standardize_dag_file_fixes_indentation_and_comments():
+    old_content = MISINDENTED_DAG
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        assert standardize_dag_file(p)
+        assert p.read_text() == STANDARD_DAG
+        assert load_dag(p) == _parse_dag_yaml(yaml.safe_load(old_content))
+
+
+def test_standardize_dag_file_is_noop_on_standard_file():
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(STANDARD_DAG)
+        assert not standardize_dag_file(p)
+        assert p.read_text() == STANDARD_DAG
+
+
+def test_standardize_dag_file_dry_run_does_not_write():
+    old_content = MISINDENTED_DAG
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        assert standardize_dag_file(p, dry_run=True)
+        assert p.read_text() == old_content
+
+
+def test_write_to_dag_file_on_standardized_file_only_adds_new_lines():
+    # A standardized file round-trips through the nested writer, so adding a step leaves every other line untouched.
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(STANDARD_DAG)
+        write_to_dag_file(p, dag_part={"data://meadow/new/2025/baz": ["snapshot://new/2025/baz.csv"]})
+        assert p.read_text() == STANDARD_DAG + "  data://meadow/new/2025/baz:\n    - snapshot://new/2025/baz.csv\n"
+
+
+def test_active_dag_files_are_standardized():
+    # Warn (don't fail) when hand edits drift from the standard format, which `write_to_dag_file` relies on to leave
+    # unrelated lines untouched.
+    changed = standardize_dag_files(dry_run=True)
+    if changed:
+        warnings.warn(
+            f"DAG files not in the standard format (fix with etl.dag_helpers.standardize_dag_files()): "
+            f"{[f.name for f in changed]}"
+        )

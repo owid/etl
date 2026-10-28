@@ -27,7 +27,7 @@ steps:
   data://grapher/ggdc/2025-10-09/penn_world_table:
     - data://garden/ggdc/2025-10-09/penn_world_table
 
-      # IMF World Economic Outlook
+  # IMF World Economic Outlook
   data://grapher/imf/2026-10-20/world_economic_outlook:
     - data://garden/imf/2026-10-20/world_economic_outlook:
       - data://meadow/imf/2026-10-20/world_economic_outlook:
@@ -50,7 +50,7 @@ steps:
       - data://garden/ggdc/2025-10-09/penn_world_table
       - data://garden/working_hours/2025-08-05/huberman_minns
 
-    # GDP per capita vs. living conditions indicators
+  # GDP per capita vs. living conditions indicators
   data://garden/growth/2026-10-13/gdppc_vs_living_conditions:
     - data://garden/worldbank_wdi/2026-07-27/wdi
     - data://garden/un/2024-07-12/un_wpp
