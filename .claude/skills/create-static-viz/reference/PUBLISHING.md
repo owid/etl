@@ -140,7 +140,8 @@ named links (a Markdown link on the page's name) and `**bold**`, with the attrib
 First search #data-updates-comms for a message about the viz: the user may have posted one already.
 If one is there, or the channel already holds a draft (the call fails with `attached_draft_exists`,
 since a channel holds one), save it in the user's DM with themselves instead, so it never lands on
-top of their own; otherwise save it in the channel. They attach the images and send it. Never send
+top of their own, and tell them to copy it from there into #data-updates-comms; otherwise save it
+in the channel. In the channel, they attach the images and send it. Never send
 it yourself, since images cannot be added to a sent message. Without the connector, hand over the
 text to paste: Slack's message box renders neither `<url|text>` nor Markdown links, so write each
 link as the page's name followed by its bare URL in parentheses, and use `•` bullets.
