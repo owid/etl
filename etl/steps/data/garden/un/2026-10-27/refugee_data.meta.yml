@@ -56,6 +56,8 @@ definitions:
 
   description_key_refugee: |-
     A refugee is a person in need of international protection, who had to flee their home country because of serious threats against which the authorities of their home country cannot or will not protect them.
+  key_refugee_vs_asylum: |-
+    UNHCR only considers a person a refugee if they have been granted protection in a foreign country. If a person has fled their home country and applied for asylum in another country, but is still waiting for a decision on their application, they are considered an asylum seeker.
   key_afghans_refugees: |-
     In 2025, UNHCR started counting about 1 million Afghans, most of them in Iran, as "other people in need of international protection" instead of as refugees. Part of the fall in refugee numbers for Iran and Afghanistan in 2025 comes from this change rather than from people leaving.
   key_afghans_oip: |-
@@ -91,6 +93,7 @@ tables:
         description_from_producer: "{definitions.description_unhcr_refugee}"
         description_key:
           - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
@@ -102,6 +105,7 @@ tables:
         unit: people per 1,000 inhabitants
         description_key:
           - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
         presentation:
           grapher_config:
@@ -116,6 +120,7 @@ tables:
         unit: people per 100,000 inhabitants
         description_key:
           - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
         presentation:
           grapher_config:
@@ -228,6 +233,7 @@ tables:
         description_from_producer: "{definitions.description_unhcr_refugee}"
         description_key:
           - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
       refugees_per_1000:
         title: Refugees by country of asylum per 1,000 people
@@ -239,6 +245,7 @@ tables:
         unit: people per 1,000 inhabitants
         description_key:
           - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
         presentation:
           grapher_config:
@@ -253,6 +260,7 @@ tables:
         unit: people per 100,000 inhabitants
         description_key:
           - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
         presentation:
           grapher_config:
