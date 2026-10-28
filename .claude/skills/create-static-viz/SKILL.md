@@ -506,7 +506,12 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
    final review with @edomt. Each round's feedback goes through the Step 6 ledger.
 7. **Upload the refreshed image under a new filename** and repoint the references. The API rejects
    a duplicate name, and the old file must stay reachable for anything still pointing at it.
-8. Accompanying text edited (Bertha and the author).
+   **Register it as a static viz** (`/admin/static-viz/`) and swap each `{.image}` block for a
+   `{.static-viz}` one, so readers get its description and data link:
+   [reference/PUBLISHING.md](reference/PUBLISHING.md) has the export, the fields and the swap.
+8. Accompanying text edited (Bertha and the author). **Read the prose beside each placement against
+   the new frames** ([reference/PUBLISHING.md](reference/PUBLISHING.md) → *Check the text around
+   it*) and hand the author each sentence that no longer matches, with a proposed rewrite.
 
 Report which of these are done and which are outstanding — the surrounding prose in particular
 tends to be forgotten, and a corrected chart under an uncorrected caption is worse than neither.
