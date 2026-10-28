@@ -2,7 +2,7 @@ grapher_schema: "011"
 slug: chickens-killed-for-eggs
 
 title:
-  title: Chickens killed to produce eggs
+  title: Chickens killed in egg production
   title_variant: ""
 topic_tags:
   - Animal Welfare
@@ -41,7 +41,7 @@ views:
       y:
         - catalogPath: chickens_killed_for_eggs#chickens_killed
     config:
-      title: Chickens killed to produce eggs
+      title: Chickens killed in egg production
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -55,7 +55,7 @@ views:
       y:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_capita
     config:
-      title: Chickens killed to produce eggs per person
+      title: Chickens killed in egg production per person
       map:
         colorScale:
           baseColorScheme: OrRd

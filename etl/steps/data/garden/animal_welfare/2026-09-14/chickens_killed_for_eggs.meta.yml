@@ -14,7 +14,7 @@ dataset:
 
 tables:
   chickens_killed_for_eggs:
-    title: Chickens killed for eggs
+    title: Chickens killed in egg production
     variables:
       laying_hens:
         title: Number of laying hens
@@ -31,19 +31,19 @@ tables:
         display:
           numDecimalPlaces: 0
       hens_killed:
-        title: Estimated number of hens killed to produce eggs
+        title: Estimated number of hens killed in egg production
         unit: hens
         short_unit: ""
         display:
           numDecimalPlaces: 0
       male_chickens_killed:
-        title: Estimated number of male chickens killed to produce eggs
+        title: Estimated number of male chickens killed in egg production
         unit: chickens
         short_unit: ""
         display:
           numDecimalPlaces: 0
       chickens_killed:
-        title: Estimated number of chickens killed to produce eggs
+        title: Estimated number of chickens killed in egg production
         unit: chickens
         short_unit: ""
         display:
@@ -61,19 +61,19 @@ tables:
         display:
           numDecimalPlaces: 1
       hens_killed_per_capita:
-        title: Estimated number of hens killed to produce eggs per person
+        title: Estimated number of hens killed in egg production per person
         unit: hens per person
         short_unit: ""
         display:
           numDecimalPlaces: 2
       male_chickens_killed_per_capita:
-        title: Estimated number of male chickens killed to produce eggs per person
+        title: Estimated number of male chickens killed in egg production per person
         unit: chickens per person
         short_unit: ""
         display:
           numDecimalPlaces: 2
       chickens_killed_per_capita:
-        title: Estimated number of chickens killed to produce eggs per person
+        title: Estimated number of chickens killed in egg production per person
         unit: chickens per person
         short_unit: ""
         display:
