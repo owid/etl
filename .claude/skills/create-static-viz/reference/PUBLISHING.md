@@ -116,7 +116,8 @@ new data**, the dataset update's form is the announcement (`/update-dataset` han
 `/draft-data-update-slack-post`): name the viz among the charts it affected, and attach the images
 below. **When the data is the same**, the refresh is a redesign, and the form's dataset fields have
 nothing to say: draft a short message instead, at `ai/<slug>_slack_announcement.md`, comparing the
-old version with the new one.
+old version with the new one. A brand-new viz replaces nothing: its message has the same shape, with
+the bullets on what the chart shows and only the new images attached.
 
 - **One opening sentence, in bold, on a line of its own** with a blank line after it (`**…**`: a
   single `*…*` shows as italic once pasted): what was done, such as "We refreshed our static chart
