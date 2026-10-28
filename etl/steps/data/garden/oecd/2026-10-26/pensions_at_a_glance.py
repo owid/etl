@@ -11,38 +11,65 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# For each source measure (and unit), the garden table it goes to and the indicator name it gets there.
-# Measures that only differ by earnings level (50%, 100% and 200% of the average wage) become one indicator with an "earnings" dimension.
+# For each source measure, the garden table it goes to and the indicator name it gets there.
+# Keys are (MEASURE, UNIT_MEASURE) codes of the OECD dataflow; each comment gives the OECD's labels for both.
+# Measures that only differ by earnings level (50%, 100% and 200% of the average wage) become one indicator with an
+# "earnings" dimension.
 MEASURES = {
+    # "Current retirement age for a person who entered the labour force at age 22" (Years).
     ("CRPLF22", "Y"): ("retirement", "current_normal_retirement_age"),
+    # "Future retirement age for a person who entered the labour force at age 22" (Years).
     ("FRPLF22", "Y"): ("retirement", "future_normal_retirement_age"),
+    # "Effective labour market exit age" (Years).
     ("ELMEA", "Y"): ("retirement", "effective_labor_market_exit_age"),
+    # "Expected years after labour market exit" (Years).
     ("EYLME", "Y"): ("retirement", "expected_years_after_labor_market_exit"),
+    # "Gross pension replacement rate at 50% / 100% / 200% of average wage"
+    # (Percentage of gross pre-retirement earnings at the same income level).
     ("GPRR50", "PT_EARN_G_PRE_RET_INC"): ("replacement_rates", "gross_replacement_rate"),
     ("GPRR100", "PT_EARN_G_PRE_RET_INC"): ("replacement_rates", "gross_replacement_rate"),
     ("GPRR200", "PT_EARN_G_PRE_RET_INC"): ("replacement_rates", "gross_replacement_rate"),
+    # "Net pension replacement rate at 50% / 100% / 200% of average wage"
+    # (Percentage of net pre-retirement earnings at the same income level).
     ("NPRR50", "PT_EARN_N_PRE_RET_INC"): ("replacement_rates", "net_replacement_rate"),
     ("NPRR100", "PT_EARN_N_PRE_RET_INC"): ("replacement_rates", "net_replacement_rate"),
     ("NPRR200", "PT_EARN_N_PRE_RET_INC"): ("replacement_rates", "net_replacement_rate"),
+    # "Gross pension wealth at 50% / 100% / 200% of average wage"
+    # (Factor of gross individual wage at the same income level).
     ("GPW50", "FCTR_WG_SAL_G_I_INC"): ("pension_wealth", "gross_pension_wealth"),
     ("GPW100", "FCTR_WG_SAL_G_I_INC"): ("pension_wealth", "gross_pension_wealth"),
     ("GPW200", "FCTR_WG_SAL_G_I_INC"): ("pension_wealth", "gross_pension_wealth"),
+    # "Net pension wealth at 50% / 100% / 200% of average wage"
+    # (Factor of net individual wage at the same income level).
     ("NPW50", "FCTR_WG_SAL_N_I_INC"): ("pension_wealth", "net_pension_wealth"),
     ("NPW100", "FCTR_WG_SAL_N_I_INC"): ("pension_wealth", "net_pension_wealth"),
     ("NPW200", "FCTR_WG_SAL_N_I_INC"): ("pension_wealth", "net_pension_wealth"),
+    # "Average tax rate of workers" (Percentage of average earnings).
     ("ATRW", "PT_EARN_A"): ("taxes_and_wages", "average_tax_rate_workers"),
+    # "Average tax rate of average earner pensioners" (Percentage of pension).
     ("ATRAEP", "PT_PENS"): ("taxes_and_wages", "average_tax_rate_pensioners_average_earner"),
+    # "Average tax rate of pensioners with pension equal to average earnings" (Percentage of average earnings).
     ("ATRPPAE", "PT_EARN_A"): ("taxes_and_wages", "average_tax_rate_pensioners_income_equal_to_average_wage"),
+    # "Average worker gross wage" (US dollars, exchange rate converted).
     ("AWGW", "USD_EXC"): ("taxes_and_wages", "average_wage_usd"),
+    # "Average worker gross wage" (National currency).
     ("AWGW", "XDC"): ("taxes_and_wages", "average_wage_national_currency"),
+    # "Employment rate" (Percentage of population in the same age).
     ("ER", "PT_POP_AGE"): ("employment_rates", "employment_rate"),
+    # "Equivalised disposable income of older people" (Percentage of average disposable income).
     ("EDIOP", "PT_B6N_A"): ("incomes_of_older_people", "relative_disposable_income"),
+    # "Old age income poverty rate below 50% of median income" (Percentage of population in the same sex and age).
     ("OAIP", "PT_POP_SEX_AGE"): ("incomes_of_older_people", "poverty_rate"),
+    # "Public transfers to older people", "Occupational transfers to older people", "Capital income of older people"
+    # and "Employment income of older people"
+    # (Percentage of gross disposable income of the population aged over 65 years).
     ("PTOP", "PT_B6G_A_POP_Y_GT65"): ("income_sources_of_older_people", "share_of_income_from_public_transfers"),
     ("OCOP", "PT_B6G_A_POP_Y_GT65"): ("income_sources_of_older_people", "share_of_income_from_occupational_transfers"),
     ("CIOP", "PT_B6G_A_POP_Y_GT65"): ("income_sources_of_older_people", "share_of_income_from_capital"),
     ("EIOP", "PT_B6G_A_POP_Y_GT65"): ("income_sources_of_older_people", "share_of_income_from_work"),
+    # "Public expenditure on pensions" (Percentage of GDP).
     ("PEP", "PT_B1GQ"): ("pension_expenditure", "public_pension_expenditure"),
+    # "Projections of public expenditure on pensions" (Percentage of GDP).
     ("PPEP", "PT_B1GQ"): ("pension_expenditure", "public_pension_expenditure_projected"),
 }
 
