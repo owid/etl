@@ -173,7 +173,7 @@ for e in entities:
     else: unmatched.append(e)  # decide these by hand: typo, alias, custom aggregate, or exclude
 ```
 
-Resolve `unmatched` by hand against canonical regions; follow the harmonization-audit guidance in `/update-dataset` (Step 5c). Residual aggregates the producer defines (e.g. `Rest of World`, `European Union (27)`) can be kept as custom entities (map to themselves) — they won't join with population/region data, so note that in the review. Don't silently drop countries — if you exclude any, list them.
+Resolve `unmatched` by hand against canonical regions; follow the harmonization-audit guidance in `/update-dataset` (Step 5c). Residual aggregates the producer defines (e.g. `Rest of World`, `European Union (27)`) can be kept as custom entities — they won't join with population/region data, so note that in the review. Name them as the producer's other datasets already do, rather than inventing a name (an OECD-wide aggregate is `OECD countries`; see `/update-dataset` §5c). Don't silently drop countries — if you exclude any, list them.
 
 After the garden step builds, also run the **garden-output entity check** from `/update-dataset` §5c (Python check #5): load the built garden tables and confirm every `country` value is canonical (regions + latest income groups). It catches what the mapping file can't see — inline `tb["country"] = ...` assignments and post-harmonization mutations. List any non-canonical entity (including the custom aggregates you kept) in the Step 7 review and the PR body as living outside the canonical system.
 
