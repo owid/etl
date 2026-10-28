@@ -40,6 +40,7 @@ steps:
       - data://meadow/plastic_waste/2023-09-26/geyer_2017:
         - snapshot://plastic_waste/2023-09-26/geyer_2017.pdf
       - data://garden/oecd/2023-09-21/plastic_use_application
+
   # UN plastic trade dataset 2023-2024
   data://grapher/un/2025-09-25/plastic_waste_2023_2024:
     - data://garden/un/2025-09-25/plastic_waste_2023_2024:
@@ -70,9 +71,7 @@ steps:
   viz://chart/plastic_waste/latest/plastic_waste_generation:
     - data://grapher/plastic_waste/2026-01-14/cottom_plastic_waste
 
-  #
   # Plastic pollution explorer.
-  #
   viz://explorer/plastic_waste/latest/plastic_pollution:
     - data://grapher/plastic_pollution/2021-04-30/plastic_ocean_pollution__meijer_et_al__2021
     - data://grapher/plastic_waste/2017-11-22/plastic_waste__jambeck_et_al__2015
