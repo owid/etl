@@ -1312,3 +1312,48 @@ def test_active_dag_files_are_standardized():
             f"DAG files not in the standard format (fix with etl.dag_helpers.standardize_dag_files()): "
             f"{[f.name for f in changed]}"
         )
+
+
+def _write_chain_like_etl_update(p: Path) -> None:
+    # `etl update` writes the new meadow, garden and grapher steps one call at a time.
+    write_to_dag_file(p, {"data://meadow/foo/2025/bar": ["snapshot://foo/2025/bar.csv"]}, separate_new_blocks=True)
+    write_to_dag_file(p, {"data://garden/foo/2025/bar": ["data://meadow/foo/2025/bar"]}, separate_new_blocks=True)
+    write_to_dag_file(
+        p,
+        {"data://grapher/foo/2025/bar": ["data://garden/foo/2025/bar"]},
+        comments={"data://grapher/foo/2025/bar": "# Foo bar\n"},
+        separate_new_blocks=True,
+    )
+
+
+NEW_CHAIN = """
+  data://meadow/foo/2025/bar:
+    - snapshot://foo/2025/bar.csv
+  data://garden/foo/2025/bar:
+    - data://meadow/foo/2025/bar
+  # Foo bar
+  data://grapher/foo/2025/bar:
+    - data://garden/foo/2025/bar
+"""
+
+
+def test_write_to_dag_file_separate_new_blocks_nested_file():
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(STANDARD_DAG)
+        _write_chain_like_etl_update(p)
+        assert p.read_text() == STANDARD_DAG + NEW_CHAIN
+
+
+def test_write_to_dag_file_separate_new_blocks_flat_file():
+    old_content = """\
+steps:
+  # Old block
+  data://meadow/old/2024/bar:
+    - snapshot://old/2024/bar.csv
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        _write_chain_like_etl_update(p)
+        assert p.read_text() == old_content + NEW_CHAIN
