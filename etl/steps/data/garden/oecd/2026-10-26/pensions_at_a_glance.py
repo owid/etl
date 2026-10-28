@@ -141,10 +141,24 @@ ACTUAL_YEARS = {
 }
 
 # Measures from household income surveys. For years without a new survey, the source repeats the previous values.
-INCOME_SURVEY_MEASURES = ["EDIOP", "OAIP", "PTOP", "OCOP", "CIOP", "EIOP"]
-# Share of a country-year's income values that must equal the previous survey year's for us to treat it as repeated.
-# Repeated years sometimes have one or two series revised (e.g. Australia 2022 repeats 2020 in 10 of 13 series).
-REPEATED_SURVEY_MIN_SHARE_EQUAL = 0.75
+INCOME_SURVEY_MEASURES = [
+    # "Equivalised disposable income of older people".
+    "EDIOP",
+    # "Old age income poverty rate below 50% of median income".
+    "OAIP",
+    # "Public transfers to older people".
+    "PTOP",
+    # "Occupational transfers to older people".
+    "OCOP",
+    # "Capital income of older people".
+    "CIOP",
+    # "Employment income of older people".
+    "EIOP",
+]
+# A country-year counts as a copy of the previous survey year when at least this share of its income series (among
+# those with a value in both years) are identical. Not 100%, because a copied year can have a few series revised:
+# Australia 2022 matches 2020 in 10 of 13 series. Years with a real new survey match in at most 1 of 13.
+REPEATED_SURVEY_MIN_SHARE_EQUAL = 0.5
 
 
 def run() -> None:
