@@ -33,6 +33,10 @@ FAOSTAT_ELEMENT_CODE_EGGS_PRODUCED = "005513"
 # laying period (a few percent), as we do for animals slaughtered for meat.
 WEEKS_IN_LAY = 65
 
+# First year of our estimates. Until the late 1980s, a large share of the world's hens were in backyard flocks, which are
+# kept for much longer than WEEKS_IN_LAY, as explained in the notebook docs/analyses/animals_killed_for_eggs.
+FIRST_YEAR = 1990
+
 # Name of the EU aggregate in the FAOSTAT data.
 EU = "European Union (27)"
 
@@ -95,6 +99,9 @@ def run() -> None:
 
     # Fill gaps in country series with the latest reported value.
     tb = fill_gaps(tb=tb)
+
+    # Keep only years from FIRST_YEAR on (after filling gaps, so that gaps in the first years are filled too).
+    tb = tb[tb["year"] >= FIRST_YEAR].reset_index(drop=True)
 
     # Keep only countries (drop FAOSTAT's regions, and the OWID regions included in the FAOSTAT dataset, which are
     # recomputed below).
@@ -220,6 +227,9 @@ def estimate_chickens_killed(tb: Table) -> Table:
 def sanity_check_outputs(tb: Table, tb_qcl: Table, tb_usda: Table) -> None:
     # Aggregates can be missing in years without country data; the checks below apply to informed rows.
     tb = tb.dropna(subset=["laying_hens"] + COUNT_COLUMNS)
+    error = f"Estimates should start in {FIRST_YEAR}."
+    assert tb["year"].min() == FIRST_YEAR, error
+
     error = "All numbers should be non-negative."
     assert (tb[["laying_hens"] + COUNT_COLUMNS] >= 0).all().all(), error
 
