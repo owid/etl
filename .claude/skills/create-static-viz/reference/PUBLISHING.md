@@ -138,10 +138,12 @@ old version with the new one.
 With the Slack connector, save it as a draft (`slack_send_message_draft`), whose Markdown renders
 named links (a Markdown link on the page's name) and `**bold**`, with the attribution line first.
 First search #data-updates-comms for a message about the viz: the user may have posted one already.
-If one is there, or the channel already holds a draft (the call fails with `attached_draft_exists`,
-since a channel holds one), save it in the user's DM with themselves instead, so it never lands on
-top of their own, and tell them to copy it from there into #data-updates-comms; otherwise save it
-in the channel. In the channel, they attach the images and send it. Never send
+If one is there, save the draft in the user's DM with themselves, never in the channel, and tell
+them the viz is already announced, with the post's link: the draft is there to compare or edit the
+post with, not to send again. If the channel already holds a draft (the call fails with
+`attached_draft_exists`, since a channel holds one), save it in their DM too, so it never lands on
+top of theirs, and tell them to copy it from there into #data-updates-comms. Otherwise save it in
+the channel. In the channel, they attach the images and send it. Never send
 it yourself, since images cannot be added to a sent message. Without the connector, hand over the
 text to paste: Slack's message box renders neither `<url|text>` nor Markdown links, so write each
 link as the page's name followed by its bare URL in parentheses, and use `•` bullets.
