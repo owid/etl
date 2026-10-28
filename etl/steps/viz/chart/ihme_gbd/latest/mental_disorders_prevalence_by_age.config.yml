@@ -19,7 +19,6 @@ definitions:
         originUrl: /mental-health
         chartTypes:
           - DiscreteBar
-          - LineChart
         tab: discrete-bar
         hasMapTab: false
         addCountryMode: change-country
