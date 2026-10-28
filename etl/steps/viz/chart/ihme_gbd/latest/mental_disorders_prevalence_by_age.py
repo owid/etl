@@ -4,17 +4,13 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Disorders, keyed by their slug in the source: name used in titles and glossary link.
+# Disorders, keyed by their slug in the source: name used in titles, how the subtitle describes it, and bar color.
 DISORDERS = {
-    "depressive_disorders": ("depression", "depressive_disorders"),
-    "anxiety_disorders": ("anxiety disorders", "anxiety_disorders"),
-    "bipolar_disorder": ("bipolar disorder", "bipolar_disorder"),
-    "schizophrenia": ("schizophrenia", "schizophrenia"),
-    "eating_disorders": ("an eating disorder", "eating_disorder"),
-}
-# Extra subtitle sentences, for disorders whose name alone doesn't say what's included.
-DISORDER_NOTES = {
-    "eating_disorders": "This only includes anorexia nervosa and bulimia nervosa.",
+    "depressive_disorders": ("depression", "[depression](#dod:depressive_disorders)", "#286BBB"),
+    "anxiety_disorders": ("anxiety disorders", "[anxiety disorders](#dod:anxiety_disorders)", "#6D3E91"),
+    "bipolar_disorder": ("bipolar disorder", "[bipolar disorder](#dod:bipolar_disorder)", "#C05917"),
+    "schizophrenia": ("schizophrenia", "[schizophrenia](#dod:schizophrenia)", "#58AC8C"),
+    "eating_disorders": ("an eating disorder", "anorexia or bulimia nervosa", "#C15065"),
 }
 # Age groups shown as bars, in order: slug in the source -> label.
 AGES_YOUNG = {
@@ -44,17 +40,13 @@ AGES_OLD_EATING = {
 def run() -> None:
     config = paths.load_config()
 
-    # Step 1: Build one view per disorder, with one indicator (bar) per age group.
+    # Step 1: Build one view per disorder, with one indicator (bar) per age group, all in the disorder's color.
     views = []
-    for disorder, (name, dod) in DISORDERS.items():
+    for disorder, (name, subtitle_name, color) in DISORDERS.items():
         ages = AGES_YOUNG | (AGES_OLD_EATING if disorder == "eating_disorders" else AGES_OLD)
         subtitle = (
-            f"Estimated share of people in each age group who have [{name}](#dod:{dod}), whether or not they are "
+            f"Estimated share of people in each age group who have {subtitle_name}, whether or not they are "
             "diagnosed, based on representative surveys, medical data and statistical modelling."
-        )
-        if disorder in DISORDER_NOTES:
-            subtitle += " " + DISORDER_NOTES[disorder]
-        subtitle += (
             f" Prevalence is measured as the share experiencing {name} at a given point in time."
             " It does not measure lifetime prevalence."
         )
@@ -65,7 +57,7 @@ def run() -> None:
                     "y": [
                         {
                             "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_both__age_{age}",
-                            "display": {"name": label},
+                            "display": {"name": label, "color": color},
                         }
                         for age, label in ages.items()
                     ]
