@@ -40,14 +40,14 @@ def run() -> None:
     #
     # Process data.
     #
-    # Step 1: Check that the columns we drop carry no information.
+    # Check that the columns we drop carry no information.
     for column, expected in {"OBS_STATUS": "A", "UNIT_MULT": 0, "FREQ": "A"}.items():
         assert set(tb[column].unique()) == {expected}, f"Unexpected values in {column}: {set(tb[column].unique())}"
 
-    # Step 2: Keep and rename relevant columns.
+    # Keep and rename relevant columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
-    # Step 3: Use categoricals for low-cardinality columns, and improve table format.
+    # Use categoricals for low-cardinality columns, and improve table format.
     for column in ["country", "measure", "unit_measure", "sex", "age", "optionality"]:
         tb[column] = tb[column].astype("category")
     tables = [

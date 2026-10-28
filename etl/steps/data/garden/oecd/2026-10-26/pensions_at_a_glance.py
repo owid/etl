@@ -172,42 +172,42 @@ def run() -> None:
     tb = ds_meadow.read("pensions_at_a_glance")
     tb_taxes = ds_meadow.read("tax_rates")
 
-    # Step 1: Check that the source has the expected measures and dimensions.
+    # Check that the source has the expected measures and dimensions.
     sanity_check_inputs(tb=tb)
 
     #
     # Process data.
     #
-    # Step 2: Drop the measures we don't ingest (matched on measure and unit, since a measure can come in several units).
+    # Drop the measures we don't ingest (matched on measure and unit, since a measure can come in several units).
     keep = [(m, u) not in EXCLUDED_MEASURES for m, u in zip(tb["measure"].astype(str), tb["unit_measure"].astype(str))]
     tb = tb[keep].reset_index(drop=True)
 
-    # Step 3: Harmonize country names.
+    # Harmonize country names.
     tb = paths.regions.harmonize_names(tb)
     tb_taxes = paths.regions.harmonize_names(tb_taxes)
 
-    # Step 4: Drop known errors in the source data (missing values published as zeros).
+    # Drop known errors in the source data (missing values published as zeros).
     tb = paths.apply_corrections(tb)
 
-    # Step 5: Drop series that the source publishes wrongly.
+    # Drop series that the source publishes wrongly.
     tb = drop_wrong_series(tb=tb)
 
-    # Step 6: Drop survey years where the source repeats the previous survey's values.
+    # Drop survey years where the source repeats the previous survey's values.
     tb = drop_repeated_survey_years(tb=tb)
 
-    # Step 7: Assign values that the source labels with a common year to the year they actually refer to.
+    # Assign values that the source labels with a common year to the year they actually refer to.
     tb = assign_actual_years(tb=tb)
 
-    # Step 8: Replace dimension codes with labels and split earnings levels out of the measure codes.
+    # Replace dimension codes with labels and split earnings levels out of the measure codes.
     tb = add_dimension_labels(tb=tb)
 
-    # Step 9: Create one wide table per group of indicators that share the same dimensions.
+    # Create one wide table per group of indicators that share the same dimensions.
     tables = create_tables(tb=tb)
 
-    # Step 10: Take the tax rate of workers from the data of Figure 4.3, since the source doesn't publish it.
+    # Take the tax rate of workers from the data of Figure 4.3, since the source doesn't publish it.
     tables["taxes_and_wages"] = add_tax_rate_of_workers(tb=tables["taxes_and_wages"], tb_taxes=tb_taxes)
 
-    # Step 11: Improve table formats.
+    # Improve table formats.
     tables = {
         name: tb_.format(["country", "year"] + TABLE_DIMENSIONS[name], short_name=name) for name, tb_ in tables.items()
     }
