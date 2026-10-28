@@ -52,8 +52,6 @@ MEASURES = {
     ("ATRPPAE", "PT_EARN_A"): ("taxes_and_wages", "average_tax_rate_pensioners_income_equal_to_average_wage"),
     # "Average worker gross wage" (US dollars, exchange rate converted).
     ("AWGW", "USD_EXC"): ("taxes_and_wages", "average_wage_usd"),
-    # "Average worker gross wage" (National currency).
-    ("AWGW", "XDC"): ("taxes_and_wages", "average_wage_national_currency"),
     # "Employment rate" (Percentage of population in the same age).
     ("ER", "PT_POP_AGE"): ("employment_rates", "employment_rate"),
     # "Equivalised disposable income of older people" (Percentage of average disposable income).
@@ -73,9 +71,12 @@ MEASURES = {
     ("PPEP", "PT_B1GQ"): ("pension_expenditure", "public_pension_expenditure_projected"),
 }
 
-# Measures we don't ingest, because the OECD takes them from the UN World Population Prospects 2024, which we import
-# directly: fertility rate, life expectancy, and old-age to working-age ratio.
-EXCLUDED_MEASURES = {("FR", "CH_W"), ("LE", "Y"), ("OAWAR", "PT_POP_Y20T64")}
+# Measures we don't ingest:
+# - "Fertility rate", "Life expectancy" and "Old-age to working-age ratio": the OECD takes them from the UN World
+#   Population Prospects 2024, which we import directly.
+# - "Average worker gross wage" (National currency): amounts in national currency can't be compared between
+#   countries, so we keep only the US dollar version.
+EXCLUDED_MEASURES = {("FR", "CH_W"), ("LE", "Y"), ("OAWAR", "PT_POP_Y20T64"), ("AWGW", "XDC")}
 
 # Dimensions each garden table keeps (besides country and year).
 TABLE_DIMENSIONS = {
@@ -163,9 +164,9 @@ def run() -> None:
     #
     # Process data.
     #
-    # Step 2: Drop the measures that come from UN World Population Prospects.
-    excluded = [measure for measure, _ in EXCLUDED_MEASURES]
-    tb = tb[~tb["measure"].isin(excluded)].reset_index(drop=True)
+    # Step 2: Drop the measures we don't ingest (matched on measure and unit, since a measure can come in several units).
+    keep = [(m, u) not in EXCLUDED_MEASURES for m, u in zip(tb["measure"].astype(str), tb["unit_measure"].astype(str))]
+    tb = tb[keep].reset_index(drop=True)
 
     # Step 3: Harmonize country names.
     tb = paths.regions.harmonize_names(tb)

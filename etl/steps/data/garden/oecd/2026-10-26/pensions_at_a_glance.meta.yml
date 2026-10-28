@@ -440,26 +440,6 @@ tables:
         presentation:
           title_public: Average annual wage
 
-      average_wage_national_currency:
-        title: Average annual wage (national currency)
-        unit: current local currency units
-        description_short: |-
-          Average gross annual earnings of full-time adult workers, in the country’s own currency.
-        description_key: |-
-          {definitions.description_key_average_wage} It includes overtime pay, bonuses, and extra monthly payments, and it is measured before any deductions.
-
-          Not all countries can include overtime pay, holiday pay, and bonuses, or exclude part-time workers. So the OECD’s figures can differ from national estimates, sometimes by a lot.
-
-          The values are in each country’s currency at 2024 prices, so they can’t be compared between countries.
-
-          The data comes from the OECD’s Taxing Wages 2025 report and national accounts. For countries outside the OECD, it comes from the International Labour Organization’s Global Wage Report 2024–25.
-        display:
-          name: Average wage
-          numDecimalPlaces: 0
-          tolerance: 0
-        presentation:
-          title_public: Average annual wage in national currency
-
   employment_rates:
     common:
       presentation:
