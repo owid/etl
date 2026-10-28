@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Defra
+    title: Poultry and poultry meat statistics
+    title_snapshot: Poultry and poultry meat statistics - UK poultry slaughterings, weights and poultry meat production
+    description: |-
+      Monthly statistics on the activity of UK hatcheries and poultry slaughterhouses, published by the Department for Environment, Food & Rural Affairs (Defra) of the United Kingdom.
+    description_snapshot: |-
+      Poultry slaughtered in the UK (broilers, boiling fowl and turkeys), their average live weights, and poultry meat production, per month and per year. Boiling fowl includes spent hens and spent breeders.
+    citation_full: |-
+      Department for Environment, Food & Rural Affairs (2026). Poultry and poultry meat statistics: UK poultry slaughterings, weights and poultry meat production - monthly dataset.
+    url_main: https://www.gov.uk/government/statistics/poultry-and-poultry-meat-statistics
+    url_download: https://assets.publishing.service.gov.uk/media/6aaa66d444ec1aa417346b1b/Poultry_slaughter_dataset_20260917.ods
+    date_accessed: '2026-10-18'
+    date_published: '2026-09-17'
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.gov.uk/government/statistics/poultry-and-poultry-meat-statistics
+outs:
+  - md5: 1023edd30a29776de5687cf4c5b7e303
+    size: 189060
+    path: uk_poultry_slaughterings.ods

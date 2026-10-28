@@ -105,6 +105,51 @@ steps:
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
   #
+  # In-ovo sexing market penetration.
+  #
+  data://garden/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration:
+    - data://meadow/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration:
+      - snapshot://animal_welfare/2026-09-14/in_ovo_sexing_market_penetration.csv
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Defra - Laying hens and chicks in the United Kingdom (poultry and poultry meat statistics, and June survey).
+  #
+  data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks:
+    - snapshot://defra/2026-10-18/uk_poultry_placings.ods
+    - snapshot://defra/2026-10-18/uk_poultry_slaughterings.ods
+    - snapshot://animal_welfare/2026-04-16/uk_livestock_populations.ods
+  data://garden/defra/2026-10-18/uk_laying_hens_and_chicks:
+    - data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks
+  #
+  # Eurostat - Laying hen chicks hatched in European countries (activity of hatcheries).
+  #
+  data://meadow/eurostat/2026-10-18/poultry_hatcheries:
+    - snapshot://eurostat/2026-10-18/poultry_hatcheries.gz
+  data://garden/eurostat/2026-10-18/laying_hen_chicks:
+    - data://meadow/eurostat/2026-10-18/poultry_hatcheries
+    - data://garden/regions/2023-01-01/regions
+  #
+  # USDA NASS - Laying hens and egg-type chicks in the United States (Quick Stats).
+  #
+  data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks:
+    - snapshot://usda_nass/2026-10-18/us_laying_hens_and_chicks.csv
+  data://garden/usda_nass/2026-10-18/us_laying_hens_and_chicks:
+    - data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks
+  #
+  # Chickens killed for eggs (OWID estimate based on FAOSTAT and in-ovo sexing market penetration).
+  #
+  data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs:
+    - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs:
+      - data://garden/faostat/2026-02-25/faostat_qcl
+      - data://garden/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration
+      - data://garden/usda_nass/2026-10-18/us_laying_hens_and_chicks
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+  viz://chart/animal_welfare/latest/chickens_killed_for_eggs:
+    - data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs
+  #
   # Banning of chick culling — chart authored in ETL.
   #
   viz://chart/animal_welfare/latest/banning_of_chick_culling:
