@@ -37,18 +37,21 @@ data source if the refresh changed them. Then skip section 3, apart from any pag
 
 ## 3. Swap the block in every gdoc that shows the old image
 
-List them, with the links to open each one, by running `/find-chart-references` on the old file:
+The same viz is often in the library under more than one name: an older version, a copy re-uploaded
+as `-v2` or `-new`, a mobile file. The static viz report (the artifact Step 9 links) merges those into
+one row, and its filenames for the viz (`all_filenames` in the report's CSV) are the ones to search.
+List the pages, with the links to open each one, by running `/find-chart-references` on all of them:
 
 ```bash
 STAGING=<any live staging server> .venv/bin/python \
   .claude/skills/find-chart-references/scripts/find_references.py \
-  --image-filenames <old filename> --host https://ourworldindata.org \
+  --image-filenames <every filename of the viz, comma-separated> --host https://ourworldindata.org \
   --markdown ai/<slug>_image_references.md
 ```
 
 A staging server's database is a recent copy of production's. `--host` points the page links at the
 live site; the admin preview links still open that staging server, so hand on the Google Doc and
-page links.
+page links. A filename the library does not hold is reported as a coverage gap, never as unused.
 Give the user the Google Doc and published-page links for every article and topic page. For a
 fragment, say which FAQ holds the image and whether a published data page shows it. In each article
 and topic page, replace

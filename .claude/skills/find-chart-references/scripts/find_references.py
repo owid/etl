@@ -544,6 +544,20 @@ def sweep_static_viz(by_slug: dict[str, dict]) -> list[dict]:
     ]
 
 
+def resolve_image_filenames(filenames: list[str]) -> list[str]:
+    """The requested filenames that exist in the images library; a gap for each one that does not.
+
+    A typo or a file missing from this database would otherwise return no rows, and an empty
+    report reads as "nothing shows this image".
+    """
+    df = OWID_ENV.read_sql("SELECT DISTINCT filename FROM images WHERE filename IN %(f)s", params={"f": tuple(filenames)})
+    found = set(df["filename"])
+    for name in filenames:
+        if name not in found:
+            gap(f"image `{name}` is not in this database's images library, so no surface was swept for it")
+    return [name for name in filenames if name in found]
+
+
 def sweep_images(filenames: list[str]) -> list[dict]:
     """Every gdoc that shows an image from the library, and every static viz built on it.
 
@@ -1767,9 +1781,10 @@ def main() -> int:
         findings += sweep_mdim_subject(mdim)
     for explorer in args.explorer:
         findings += sweep_explorer_subject(explorer)
-    if image_filenames:
-        print(f"image subjects: {len(image_filenames)} filename(s)")
-        image_rows = sweep_images(image_filenames)
+    resolved_images = resolve_image_filenames(image_filenames) if image_filenames else []
+    if resolved_images:
+        print(f"image subjects: {len(resolved_images)} of {len(image_filenames)} filename(s) resolved")
+        image_rows = sweep_images(resolved_images)
         findings += image_rows
         findings += sweep_fragment_data_pages(image_rows)
         caveats.append(

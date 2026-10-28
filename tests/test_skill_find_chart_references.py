@@ -344,3 +344,11 @@ def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeyp
     assert by_where["share-stunted"]["surface"] == "data page FAQ"
     assert by_where["share-stunted"]["where_path"] == "/grapher/share-stunted"
     assert by_where["a-static-viz"]["where_path"] == "/admin/static-viz/3/edit"
+
+
+def test_unresolved_image_filename_is_a_coverage_gap(mod, monkeypatch):
+    """A filename absent from the library must be reported as unswept, not as an unused image."""
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", lambda sql, params=None: pd.DataFrame({"filename": ["real.png"]}))
+    monkeypatch.setattr(mod, "COVERAGE_GAPS", [])
+    assert mod.resolve_image_filenames(["real.png", "typo.png"]) == ["real.png"]
+    assert len(mod.COVERAGE_GAPS) == 1 and "typo.png" in mod.COVERAGE_GAPS[0]
