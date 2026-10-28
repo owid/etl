@@ -1,0 +1,53 @@
+grapher_schema: "011"
+slug: mental-health-prevalence-by-sex
+
+title:
+  title: Prevalence of mental disorders, women vs. men
+  title_variant: by disorder
+
+topic_tags:
+  - Mental Health
+
+default_dimensions:
+  disorder: depressive_disorders
+
+definitions:
+  common_views:
+    - config:
+        originUrl: /mental-health
+        chartTypes:
+          - ScatterPlot
+        hasMapTab: false
+        minTime: latest
+        note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+        comparisonLines:
+          - yEquals: x
+        xAxis:
+          min: 0
+          label: Women and girls
+        yAxis:
+          min: 0
+          label: Men and boys
+      metadata:
+        description_key:
+          - These estimates come from the Institute for Health Metrics and Evaluation's (IHME) Global Burden of Disease study. They are based on representative surveys, medical data and statistical modelling, and include people who have not been diagnosed.
+          - Age-standardized figures adjust for differences in the age structure of populations, so they can be compared between countries and over time.
+          - The dotted line shows where the share is the same for both sexes. Countries above the line have a higher share among men and boys; countries below it have a higher share among women and girls.
+
+dimensions:
+  - slug: disorder
+    name: Disorder
+    choices:
+      - slug: depressive_disorders
+        name: Depressive disorders
+      - slug: anxiety_disorders
+        name: Anxiety disorders
+      - slug: bipolar_disorder
+        name: Bipolar disorder
+      - slug: schizophrenia
+        name: Schizophrenia
+      - slug: eating_disorders
+        name: Eating disorders
+
+# Views (one per disorder) are added in the step's Python file.
+views: []
