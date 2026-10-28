@@ -35,15 +35,23 @@ def span_text(span) -> str:
 
 
 def flatten(node, filenames: set[str], out: list[tuple[str, str]]) -> None:
-    """Body blocks in reading order, as (kind, text): prose and headings by text, images by filename."""
+    """Body blocks in reading order, as (kind, text): prose and headings by text, images by filename.
+
+    An image's caption follows it as its own block, since a caption usually describes the chart.
+    """
     if isinstance(node, dict):
         kind = node.get("type")
-        if kind == "image":
+        if kind in ("image", "static-viz"):
             value = node.get("value") if isinstance(node.get("value"), dict) else node
-            out.append(("IMAGE", value.get("filename", "")))
-            return
-        if kind == "static-viz":
-            out.append(("STATIC VIZ", node.get("name", "")))
+            if kind == "image":
+                out.append(("IMAGE", value.get("filename", "")))
+            else:
+                out.append(("STATIC VIZ", value.get("name", "")))
+            caption = value.get("caption")
+            if isinstance(caption, list):
+                out.append(("caption", "".join(span_text(s) for s in caption)))
+            elif isinstance(caption, str) and caption.strip():
+                out.append(("caption", caption))
             return
         if kind == "text" and isinstance(node.get("value"), list):
             out.append(("text", "".join(span_text(s) for s in node["value"])))
