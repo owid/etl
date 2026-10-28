@@ -81,3 +81,24 @@ author's agreement before the swap (Step 9, item 3).
 
 Then record the static viz's name in the step's docstring, beside the frames' slugs, so the next
 refresh updates the same entry rather than creating a second one.
+
+## 4. Check the text around it
+
+The paragraphs beside the image describe the old chart, and the swap puts the new one under them. Read
+them against the new frames before the swap goes live. For each gdoc that shows the image,
+`scripts/image_context.py <every filename of the viz>` prints its title, its Google Doc and page links,
+and the blocks just before and after each placement. Check every sentence that describes the chart:
+
+- **What it says the chart shows:** its subject, its range, and any word the new title or subtitle
+  dropped on purpose ("healthy", "global"). The step's docstring records why each was dropped.
+- **The marks it names** ("the thick line", "the ribbons", "the dotted line"): does the new frame
+  still draw them, and under the same name?
+- **Every number or comparison read off the chart:** recompute it from the step's data.
+- **The sources it credits**, against the viz's data source.
+
+As in `/update-dataset`'s referencing-prose audit, never edit published prose yourself, since it
+belongs to its author. Report each finding with its page and Doc links, the current sentence and a
+proposed one, and repeat the unsettled ones in every reply until the user decides. The text and the
+image go live together, because a new image under an uncorrected description reads as an error. A
+fragment that no published data page shows is low priority, but its text gets the same read when it
+is repointed.
