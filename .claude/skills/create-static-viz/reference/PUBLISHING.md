@@ -132,10 +132,10 @@ the bullets on what the chart shows and only the new images attached.
   link), and the text around it was revised.
 - **After a blank line, thanks** to the people who reviewed it, by first name (the Step 9 review
   chain), for the user to adjust.
-- **The images, attached before then after:** the published image it replaces
-  (`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <old filename>`),
-  then the new desktop PNG from section 1, and the mobile one when the viz has a mobile frame. Gather
-  them in one folder under `ai/` and list them, in that order, above the message.
+- **The images, attached before then after:** for a refresh, the published image it replaces
+  (`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <old filename>`);
+  then, for any viz, the new desktop PNG from section 1, and the mobile one when the viz has a mobile
+  frame. Gather them in one folder under `ai/` and list them, in that order, above the message.
 
 With the Slack connector, save it as a draft (`slack_send_message_draft`), whose Markdown renders
 named links (a Markdown link on the page's name) and `**bold**`, with the attribution line first.
