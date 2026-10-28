@@ -183,6 +183,13 @@ def run() -> None:
     tb = tb[keep].reset_index(drop=True)
 
     # Harmonize country names.
+    # The .countries.json maps two source labels to each of these entities:
+    # - "OECD average country" (dataflow) and "OECD" (Figure 4.3 data) are the same OECD average, so both become
+    #   "OECD countries", the name our other OECD datasets use.
+    # - The dataflow labels some years of women's exit age "European Union (28 countries)" and the rest
+    #   "European Union (27 countries)", with no break in the values (men's series is EU27 throughout). So both become
+    #   "European Union (27)".
+    # NOTE: Check whether the source still mixes the two EU labels; if it labels the series consistently, keep only one.
     tb = paths.regions.harmonize_names(tb)
     tb_taxes = paths.regions.harmonize_names(tb_taxes)
 
