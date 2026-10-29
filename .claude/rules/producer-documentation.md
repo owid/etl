@@ -19,6 +19,7 @@ Before writing or judging a sentence, look for the producer's documentation of t
 |--------|--------------|-----------------|
 | Dataset page | the landing page (`url_main`): "about", indicator descriptions, notes | what the dataset is, coverage, cadence, often the definitions too |
 | Methodology | methodology, technical notes, sources and methods, definitions | what each indicator measures, units, how it is estimated, coverage |
+| Indicator definitions | indicator pages, metadata or "definition and measurement" boxes, glossary, series notes, notes under a table or figure | what exactly each indicator measures, its unit and caveats: the passage to cite for its `description_short` and `description_key` |
 | Codebook | codebook, data dictionary, variable list, readme, a notes sheet inside the file | what each column and code means, how missing values are marked |
 | Main report | flagship report, publication, paper | context, the producer's own reading of the data, the citation they ask for |
 | What's new | release notes, changelog, revisions, "what's new in this edition" | what changed since the previous release: revisions, new or dropped indicators, method changes |
@@ -27,7 +28,9 @@ Where to look: the dataset page and the pages it links to; the data files themse
 
 **Make sure it is the latest.** The document's edition or year must match the data you are ingesting. A methodology labeled for an earlier edition, or dated before a revision of the method, is stale: look for the newer one. On an update, the links carried over in the old `.dvc` and `.meta.yml` point at the previous edition, so search again instead of reusing them.
 
-**Record what you found**, one line per source: link and edition, or "not found", or "not accessible" with the reason. Put the list where the workflow keeps its notes: the PR description for dataset work, Part 0 of a `/fact-check-dataset` report.
+**Record what you found**, one line per source: link and edition, or "not found", or "not accessible" with the reason. For the indicator definitions, say where each indicator, or group of indicators, is explained (page, section, box or sheet). A workflow that writes or edits metadata shows the list to the user as links at its first briefing or checkpoint, so they know where to read up, and puts it where it keeps its notes: the PR description for dataset work. A review or audit that only checks metadata records the list in its report instead (Part 0 of a `/fact-check-dataset` report, the review's findings), without a briefing of its own.
+
+**Say what the metadata rests on.** When you hand over metadata you wrote or changed, say for each indicator (or field, where they differ) which source it comes from and where in it: the document and its section, table or page, e.g. "`description_key`: report, 'Definition and measurement' box, p. 164". Mark the rest as inferred from the data, or as unverified, so the reader knows which text to check. Before citing a passage, read your new text against it as you would existing text (next section): cite it only when it supports the claim.
 
 **Snapshots need less.** A `.dvc` origin usually needs only what the dataset page says. When the page covers the fields you are writing, it is enough: look for the other sources only for what it leaves open, and note which ones exist for the later steps. The full search applies from the garden metadata onward.
 
