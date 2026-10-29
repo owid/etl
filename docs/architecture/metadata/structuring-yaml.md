@@ -210,15 +210,19 @@ tables:
     variables:
       current_normal_retirement_age:
         title: Current normal retirement age
-        description_key:
-          - "{definitions.description_key_normal_retirement_age_definition}"
-          - "{definitions.description_key_normal_retirement_age_current_year}"
+        description_key: |-
+          {definitions.description_key_normal_retirement_age_definition}
+
+          {definitions.description_key_normal_retirement_age_current_year}
       future_normal_retirement_age:
         title: Future normal retirement age
-        description_key:
-          - "{definitions.description_key_normal_retirement_age_definition}"
-          - "{definitions.description_key_normal_retirement_age_future_year}"
+        description_key: |-
+          {definitions.description_key_normal_retirement_age_definition}
+
+          {definitions.description_key_normal_retirement_age_future_year}
 ```
+
+Here `description_key` is one Markdown string with a reference per paragraph, the current format. In a file that still writes `description_key` as a YAML list (rendered as bullets), use one `- "{definitions.…}"` entry per piece instead.
 
 A simple dataset, with a few indicators that share no text, can keep its text directly under each indicator. Large files that already write their text inline throughout don't need to be reorganized.
 
