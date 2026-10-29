@@ -157,8 +157,8 @@ for table_name in ds.table_names:
 # A source description and a markdown description_key are multi-paragraph by design, so newlines don't count as
 # artifacts there.
 multi_paragraph = lambda k: k.endswith('.description') or k.startswith('description_key')
-# In a description_key, a single line break that doesn't start a list item or table row is two paragraphs rendered as
-# one (a conditional closed with <%- endif %> instead of <%- endif +%>).
+# In a description_key, a single line break that doesn't start a list item or table row renders two paragraphs as one.
+# It comes from a conditional closed with <%- endif %> before a paragraph, or from a line break written in the text.
 merged_paragraphs = re.compile(r'(?<!\n)\n(?!\n|[ \t]*(?:[-*+]|\d+\.)[ \t]|[ \t]*\|)')
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
       if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k))
@@ -246,7 +246,7 @@ Drop `--only` here on purpose: when the catalog is missing, upstream meadow/gard
 
 ### 4. Mechanical pass: whitespace artifacts
 
-Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a template defect that only shows in the rendered text, never in the YAML:
+Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a defect that is hard to spot in the YAML and plain in the rendered text, usually left by a template:
 
 | Pattern | Example | Why it's a problem |
 |---------|---------|-------------------|
@@ -254,9 +254,9 @@ Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a tem
 | Leading whitespace | ` Share of children` | Template newline rendered as leading space |
 | Trailing whitespace | `Share of children ` | Template block left trailing space |
 | Embedded newline | `Share of\nchildren` | Multi-line Jinja block not properly trimmed |
-| Merged paragraphs | `…the average wage.\nThe OECD…` in a `description_key` | A conditional closed with `<%- endif %>` before a paragraph; close it with `<%- endif +%>` |
+| Merged paragraphs | `…the average wage.\nThe OECD…` in a `description_key` | Markdown renders paragraphs separated by one line break as one. After a conditional, close it with `<%- endif +%>`; in text written across lines (a multi-line `\|-` definition), put a blank line between the paragraphs |
 
-Report them grouped by table and field, showing the rendered value with `repr()` so the whitespace is visible. The fix is in the template, not in the rendered string:
+Report them grouped by table and field, showing the rendered value with `repr()` so the whitespace is visible. The fix is in the YAML source, not in the rendered string:
 
 - Use `<%-` and `-%>` trim markers instead of `<%` and `%>` to strip whitespace around control blocks.
 - Use a `|-` YAML block scalar for multi-line definitions to control trailing newlines.
