@@ -45,6 +45,9 @@ dimensions:
       - slug: net
         name: Net (after taxes)
         description: Pension and earnings after taxes and social security contributions
+      - slug: gross_vs_net
+        name: Gross vs. net
+        description: Compare the rates before and after taxes
   - slug: earnings
     name: Earnings
     choices:
@@ -54,6 +57,9 @@ dimensions:
         name: Average wage
       - slug: twice
         name: Twice the average wage
+      - slug: all_earnings
+        name: Half vs. average vs. twice
+        description: Compare workers earning half the average wage, the average wage, and twice the average wage
   - slug: schemes
     name: Pension schemes
     choices:
@@ -63,6 +69,9 @@ dimensions:
       - slug: mandatory_and_voluntary
         name: Mandatory and voluntary
         description: Also includes voluntary private schemes where many workers have them; only available for net rates for men
+      - slug: mandatory_vs_voluntary
+        name: Mandatory vs. mandatory and voluntary
+        description: Compare mandatory schemes alone with mandatory and voluntary schemes; only available for net rates for men
   - slug: sex
     name: Sex
     choices:
@@ -70,6 +79,9 @@ dimensions:
         name: Men
       - slug: women
         name: Women
+      - slug: men_vs_women
+        name: Men vs. women
+        description: Compare the rates of men and women
 
 views:
   - dimensions:
