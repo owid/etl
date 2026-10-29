@@ -130,9 +130,9 @@ definitions:
   description_key_exit_age_definition: |-
     The OECD calls this the effective age of labor market exit. It is the average age at which workers aged 40 and older leave the labor force, meaning that they stop working or looking for work.
   description_key_exit_age_not_retirement: |-
-    It isn’t the same as the age at which people retire or start receiving a pension. It counts everyone who leaves the labor force, whatever the reason: retirement, but also, for example, disability.
+    The age of leaving the labor market isn’t the same as the age at which people retire or start receiving a pension. It counts everyone who leaves the labor force, whatever the reason: retirement, but also, for example, disability.
   description_key_exit_age_method: |-
-    The OECD doesn’t track individual people. Instead, it compares the same generation at two points in time: for example, the share of people aged 55 to 59 who were working or looking for work five years ago, and the share of people aged 60 to 64 who are doing so today. A drop in that share means that some of them left the labor market during those five years. The OECD does this for each five-year age group from age 40 onward and averages the ages at which people left, so the value for each year reflects the five years leading up to it. Because it compares shares rather than numbers of people, people who die or migrate don’t count as leaving the labor market. It also uses the same age structure of the population for every country, so that countries with older or younger populations can be compared fairly.
+    The OECD estimates the age of leaving the labor market without tracking individual people. Instead, it compares the same generation at two points in time: for example, the share of people aged 55 to 59 who were working or looking for work five years ago, and the share of people aged 60 to 64 who are doing so today. A drop in that share means that some of them left the labor market during those five years. The OECD does this for each five-year age group from age 40 onward and averages the ages at which people left, so the value for each year reflects the five years leading up to it. Because it compares shares rather than numbers of people, people who die or migrate don’t count as leaving the labor market. It also uses the same age structure of the population for every country, so that countries with older or younger populations can be compared fairly.
   description_key_exit_age_revision_and_caution: |-
     The OECD introduced this method in 2021, replacing its earlier estimates of the “average effective age of retirement”. It notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
   description_key_exit_age_sources: |-
@@ -386,6 +386,12 @@ tables:
           {definitions.description_short_expected_years_after_labor_market_exit}
         description_key: |-
           {definitions.description_key_years_after_exit_definition}
+
+          {definitions.description_key_exit_age_not_retirement}
+
+          {definitions.description_key_exit_age_method}
+
+          {definitions.description_key_exit_age_revision_and_caution}
 
           {definitions.description_key_years_after_exit_life_expectancy}
         display:
