@@ -40,7 +40,7 @@ Use WebFetch to fetch `url_main`. From the page content, extract as much metadat
 
 Leave fields blank if they cannot be inferred — the user will fill them in.
 
-**The dataset page is the main source for a snapshot** (`.claude/rules/producer-documentation.md`, "Snapshots need less"). Look for the producer's other documentation (methodology, codebook, main report, what's new) only for fields the page leaves open. Note which of those exist, with their links, so the later steps start from them. In step 2, ask about a missing or inaccessible source only when a `.dvc` field depends on it.
+**The dataset page is the main source for a snapshot** (`.claude/rules/producer-documentation.md`, "Snapshots need less"). Look for the producer's other documentation (methodology, indicator definitions, codebook, main report, what's new) only for fields the page leaves open. Note which of those exist, with their links, so the later steps start from them. In step 2, ask about a missing or inaccessible source only when a `.dvc` field depends on it.
 
 ### 2. Confirm metadata and path with the user
 
