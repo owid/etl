@@ -132,11 +132,9 @@ definitions:
   description_key_exit_age_not_retirement: |-
     It isn’t the same as the age at which people retire or start receiving a pension. It counts everyone who leaves the labor force, whatever the reason: retirement, but also, for example, disability.
   description_key_exit_age_method: |-
-    The OECD estimates it from changes in the share of people in the labor force in each five-year age group, rather than from data on individual people. It compares the share of each age group in the labor force with the share of the next-younger age group five years earlier. So the value for each year reflects the five years leading up to it. The OECD gives each age group the same weight in all countries, so that differences in the age structure of the population don’t affect comparisons.
-  description_key_exit_age_revision: |-
-    The OECD revised its method in 2021, to better account for the age structure of the population. Its earlier estimates, which it called the “average effective age of retirement”, were usually higher, by about two years on average.
-  description_key_exit_age_caution: |-
-    The OECD notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
+    The OECD estimates it from changes in the share of people in the labor force in each five-year age group, rather than from data on individual people. It compares the share of each age group in the labor force with the share of the next-younger age group five years earlier, so the value for each year reflects the five years leading up to it. Because it uses shares rather than numbers of people, deaths and migration don’t count as people leaving the labor market. The OECD gives each age group the same weight in all countries, so that differences in the age structure of the population don’t affect comparisons.
+  description_key_exit_age_revision_and_caution: |-
+    The OECD introduced this method in 2021, to better account for the age structure of the population, replacing its earlier estimates of the “average effective age of retirement”. It notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
   description_key_exit_age_sources: |-
     The data comes from national labor force surveys, the EU Labour Force Survey and, for early years, population censuses.
   description_key_exit_age_breaks: |-
@@ -363,9 +361,7 @@ tables:
 
           {definitions.description_key_exit_age_method}
 
-          {definitions.description_key_exit_age_revision}
-
-          {definitions.description_key_exit_age_caution}
+          {definitions.description_key_exit_age_revision_and_caution}
 
           {definitions.description_key_exit_age_sources}
 

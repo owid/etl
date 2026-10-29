@@ -46,7 +46,12 @@ definitions:
       config:
         hasMapTab: false
         selectedFacetStrategy: entity
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "Dumbbell"]
+        dumbbell:
+          connectorStyle: line
+        # Sort countries by men's value (the first indicator), highest first; the years-after-exit view sorts by women's.
+        sortBy: startValue
+        sortOrder: desc
 
 dimensions:
   - slug: metric
@@ -117,6 +122,7 @@ views:
         - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
         - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
     config:
+      sortBy: endValue
       title: Years that men and women can expect to live after leaving the labor market
       subtitle: Remaining life expectancy at the average age at which people aged 40 and older stop working or looking for work. This includes people who leave for reasons other than retirement, such as disability.
       note: The age of leaving the labor market for each year is based on changes over the five years leading up to it.

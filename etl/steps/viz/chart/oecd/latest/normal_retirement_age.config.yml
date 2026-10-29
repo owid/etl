@@ -134,7 +134,6 @@ views:
             name: Women
     config:
       <<: *dumbbell
-      # Men and women aren't a before and after, so join them with a plain line instead of an arrow.
       dumbbell:
         connectorStyle: line
       title: Normal retirement age for men and women today
