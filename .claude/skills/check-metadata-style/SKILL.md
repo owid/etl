@@ -159,7 +159,7 @@ for table_name in ds.table_names:
 multi_paragraph = lambda k: k.endswith('.description') or k.startswith('description_key')
 # In a description_key, a single line break that doesn't start a list item or table row renders two paragraphs as one.
 # It comes from a conditional closed with <%- endif %> before a paragraph, or from a line break written in the text.
-merged_paragraphs = re.compile(r'(?<!\n)\n(?!\n|[ \t]*(?:[-*+]|\d+\.)[ \t]|[ \t]*\|)')
+merged_paragraphs = re.compile(r'(?<!\n)\n(?!\n|[ \t]*(?:[-*+]|\d+[.)])[ \t]|[ \t]*\|)')
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
       if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k))
                                  or (k.startswith('description_key') and merged_paragraphs.search(v)))]
