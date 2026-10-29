@@ -1,0 +1,326 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+        - War & Peace
+      grapher_config:
+        originUrl: "https://ourworldindata.org/migration"
+    unit: people
+    short_unit: ""
+    processing_level: major
+    description_processing: |-
+      - The United Nations High Commissioner for Refugees (UNHCR) collects data on refugee populations for each country of origin and country of asylum separately. To calculate the total number of refugees living in a country, we sum up the data from all origin countries. To calculate the total number of refugees from a country, we sum up the data from all asylum countries.
+      - To calculate the number of refugees per 1,000 or 100,000 people in a country, we divide the number of refugees by the total population of the country (for the same year) and multiply by the factor. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+      - We remove refugee populations where the country of origin and country of asylum are the same, as refugees are defined as people who have fled their country and crossed an international border. We also remove asylum seekers where the country of origin and country of asylum are the same.
+      - We remove data for China after 2020 due to a large data discontinuity.
+    display:
+      numDecimalPlaces: 0
+  description_unhcr_ooc: |-
+    Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of these groups above but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
+  description_unhcr_oip: |-
+    Other people in need of international protection refers to people who are outside their country or territory of origin, typically because they have been forcibly displaced across international borders, who have not been reported under other categories (asylum-seekers, refugees, people in refugee-like situations) but who likely need international protection, including protection against forced return, as well as access to basic services on a temporary or longer-term basis.
+  description_unhcr_idp: |-
+    Internally displaced persons (IDPs) are persons or groups of persons who have been forced or obliged to flee or to leave their homes or places of habitual residence, in particular as a result of, or in order to avoid the effects of armed conflict, situations of generalized violence, violations of human rights or natural or human-made disasters, and who have not crossed an internationally recognized State border.
+
+    For the purposes of UNHCR’s statistics, this population includes only conflict-generated IDPs to whom the Office extends protection and/or assistance. The IDP population also includes people in an IDP-like situation.
+  description_unhcr_stateless: |-
+    Individuals under UNHCR’s statelessness mandate are defined under the 1954 Convention Relating to the Status of Stateless People as those not considered as nationals by any State under the operation of its law.
+
+    In other words, they do not possess the nationality of any State.
+
+    UNHCR statistics refer to people who fall under the organization’s statelessness mandate as those who are stateless according to this international definition.
+
+    Data from some countries may also include people with undetermined nationality. These are people who lack proof of possession of any nationality and at the same time have or are regarded as having important links to more than one State.
+
+    UNHCR also works with populations at risk of statelessness, but persons at risk of statelessness are not reported on under the statistical category of individuals under UNHCR’s statelessness mandate.
+  description_unhcr_asylum: |-
+    Persons who have filed an application for asylum in a country other than their own and whose claims have not yet been determined.
+
+    These include those filing primary applications or subsequent applications following an appeal. The date on which the application for asylum is filed marks their entry into the status of asylum seeker.
+
+    They remain in the status of asylum seeker until their application is considered and adjudicated.
+  description_unhcr_refugee: |-
+    Refugees include individuals recognized under the 1951 Convention relating to the Status of Refugees, its 1967 Protocol, the 1969 Organization of African Unity (OAU) Convention Governing the Specific Aspects of Refugee Problems in Africa, the refugee definition contained in the 1984 Cartagena Declaration on Refugees as incorporated into national laws, those recognized in accordance with the UNHCR Statute, individuals granted complementary forms of protection, and those enjoying temporary protection.
+
+    The refugee population also includes people in refugee-like situations.
+  description_unhcr_host: |-
+    Host community refers to a community that hosts large populations of refugees or internally displaced persons, whether in camps, integrated into households, or independently.
+
+    UNHCR reports on host communities in countries with substantive programs focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
+  description_unhcr_return: |-
+    Returned [refugees](#dod:refugee) are former refugees who have returned to their countries of origin, either spontaneously or in an organized fashion, but are yet to be fully integrated. Such returns would ideally take place only under conditions of safety and dignity. For the purpose of UNHCR's statistics, only refugees who returned during the calendar year are included, although in practice, operations may assist returnees for longer periods.
+  description_unhcr_idp_return: |-
+    Returned [internally displaced people](#dod:internally-displaced) refers to those IDPs who were beneficiaries of UNHCR’s protection and assistance activities, and who returned to their areas of origin or habitual residence during the calendar year. In practice, however, operations may assist IDP returnees for longer periods.
+
+
+  description_key_refugee: |-
+    A refugee is a person in need of international protection, who had to flee their home country because of serious threats against which the authorities of their home country cannot or will not protect them.
+  key_refugee_vs_asylum: |-
+    UNHCR only considers a person a refugee if they have been granted protection in a foreign country. If a person has fled their home country and applied for asylum in another country, but is still waiting for a decision on their application, they are considered an asylum seeker.
+  key_afghans_refugees: |-
+    In 2025, UNHCR started counting about 1 million Afghans, most of them in Iran, as "other people in need of international protection" instead of as refugees. Part of the fall in refugee numbers for Iran and Afghanistan in 2025 comes from this change rather than from people leaving.
+  key_afghans_oip: |-
+    In 2025, UNHCR started counting about 1 million Afghans, most of them in Iran, in this group. Before, it had counted them as refugees. So part of the rise in 2025, especially for Iran and Afghanistan, comes from this change rather than from new arrivals.
+  key_us_asylum: |-
+    Some US data for asylum seekers in 2025 is based on government sources that don't report the country of origin. Therefore a much higher number of asylum seekers in the United States have an unknown country of origin for 2025. The drop in asylum seekers from origin countries can be due to this data quality issue rather than an actual decrease.
+  key_forced_returns: |-
+    Not all returns are voluntary. UNHCR's numbers include people who returned because they were deported or pressured to leave their host country. Returning doesn't always mean they've settled back home for good, but UNHCR may assist returnees for longer periods.
+
+  footnote_refugees: |-
+    This data includes all refugees, not just those who fled that year.
+  footnote_asylum: |-
+    This data includes all asylum seekers, not just those who fled or applied for asylum that year.
+  footnote_idp: |-
+    This data includes all internally displaced people, not just those who were displaced that year.
+  footnote_refugees_asylum: |-
+    This data includes all refugees who live in this country, not just those who arrived that year.
+  footnote_asylum_asylum: |-
+    This data includes all asylum seekers who live in this country, not just those who arrived or applied for asylum that year.
+
+dataset:
+  update_period_days: 365
+
+  owners:
+    - Tuna Acisu
+tables:
+  refugee_data_origin:
+    variables:
+      refugees:
+        title: Refugees by country of origin
+        description_short: |-
+          [People](#dod:refugee) who fled their country of origin and are in need of international protection. Refugees are those who have already been granted asylum status in the country they moved to. This includes all refugees, not just those who fled that year.
+        description_from_producer: "{definitions.description_unhcr_refugee}"
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
+          - '{definitions.key_afghans_refugees}'
+      refugees_per_1000:
+        title: Refugees by country of origin per 1,000 people
+        description_short: |-
+          [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 1,000 people in their country of origin.
+        description_from_producer: "{definitions.description_unhcr_refugee}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 1,000 inhabitants
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
+          - '{definitions.key_afghans_refugees}'
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_refugees}"
+      refugees_per_100k:
+        title: Refugees by country of origin per 100,000 people
+        description_short: |-
+          [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 100,000 people in their country of origin.
+        description_from_producer: "{definitions.description_unhcr_refugee}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
+          - '{definitions.key_afghans_refugees}'
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_refugees}"
+      asylum_seekers:
+        title: Asylum seekers by country of origin
+        description_short: |-
+          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in any country. This includes all asylum seekers living abroad, not just those who fled that year.
+        description_from_producer: "{definitions.description_unhcr_asylum}"
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_asylum}"
+        description_key:
+          - '{definitions.key_us_asylum}'
+      asylum_seekers_per_100k:
+        title: Asylum seekers by country of origin per 100,000 people
+        description_short: |-
+          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in any country. This is given as the rate of asylum seekers per 100,000 people living in the origin country.
+        description_from_producer: "{definitions.description_unhcr_asylum}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_asylum}"
+        description_key:
+          - '{definitions.key_us_asylum}'
+      idps:
+        title: Internally displaced people due to conflict
+        description_short: |-
+          [People](#dod:internally-displaced) who were forced to leave their homes due to armed conflict or violence.
+        description_from_producer: "{definitions.description_unhcr_idp}"
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_idp}"
+      idps_per_100k:
+        title: Internally displaced people due to conflict, per 100,000 people
+        description_short: |-
+          [People](#dod:internally-displaced) who were forced to leave their homes due to armed conflict or violence, per 100,000 people living in that country. All displaced people are included, not just people displaced that year.
+        description_from_producer: "{definitions.description_unhcr_idp}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_idp}"
+      stateless:
+        title: Stateless persons
+        description_short: |-
+          [People](#dod:stateless) who are not considered nationals of any state. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
+        description_from_producer: "{definitions.description_unhcr_stateless}"
+      hst:
+        title: People in host communities by country of origin
+        description_short: |-
+          A [host community](#dod:host-community) is a community that hosts many people who had to flee their homes, such as [refugees](#dod:refugee) or [internally displaced people](#dod:internally-displaced). These people may live in camps, in local households, or on their own within the community.
+        description_from_producer: "{definitions.description_unhcr_host}"
+      ooc:
+        title: Other persons of concern to UNHCR by country of origin
+        description_short: |-
+          [People](#dod:unhcr-concern) who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
+        description_from_producer: "{definitions.description_unhcr_ooc}"
+        description_key:
+          - Before 2025, UNHCR counted some groups of Afghans in Pakistan (Afghan Citizen Card holders) as others of concern. From 2025, it counts them as "other people in need of international protection", which we show separately.
+      oip:
+        title: Other people in need of international protection by country of origin
+        description_short: |-
+          People who left their country, often because they were forced to, and likely need international protection, but whom UNHCR doesn't count as [refugees](#dod:refugee) or [asylum seekers](#dod:asylumseeker). This is given by the country they come from.
+        description_from_producer: '{definitions.description_unhcr_oip}'
+        description_key:
+          - UNHCR introduced this group in 2022 and applied it to its data back to 2018. It replaced an earlier group, "Venezuelans displaced abroad", made up of Venezuelans who had left their country but hadn't applied for asylum or been recognized as refugees. In 2025, most people in this group were Venezuelans or Afghans.
+          - '{definitions.key_afghans_oip}'
+      # solutions (return)
+      returned_refugees:
+        title: Returned refugees by country of origin
+        description_short: |-
+          [Refugees](#dod:refugee) who returned to their country of origin. This only includes people who returned that year, not all former refugees.
+        description_from_producer: |-
+          - {definitions.description_unhcr_return}
+          - {definitions.description_unhcr_refugee}
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - '{definitions.key_forced_returns}'
+      returned_idps:
+        title: Returned internally displaced people
+        description_short: |-
+          [People](#dod:internally-displaced) who had been forced to leave their homes within their country because of armed conflict or violence, and who returned home during that year.
+        description_from_producer: |-
+          - {definitions.description_unhcr_idp_return}
+          - {definitions.description_unhcr_idp}
+      returned_idps_per_100k:
+        title: Returned internally displaced people per 100,000 people
+        description_short: |-
+          [People](#dod:internally-displaced) who had been forced to leave their homes within their country because of armed conflict or violence, and who returned home during that year, per 100,000 people living in that country.
+        description_from_producer: |-
+          - {definitions.description_unhcr_idp_return}
+          - {definitions.description_unhcr_idp}
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+
+
+
+  # populations by asylum country
+  refugee_data_asylum:
+    variables:
+      refugees:
+        title: Refugees by country of asylum
+        description_short: |-
+          [People](#dod:refugee) who fled their country of origin and are in need of international protection. Refugees are those who have already been granted asylum status in the country they moved to. This includes all refugees who live in this country, not just those who arrived that year.
+        description_from_producer: "{definitions.description_unhcr_refugee}"
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
+          - '{definitions.key_afghans_refugees}'
+      refugees_per_1000:
+        title: Refugees by country of asylum per 1,000 people
+        description_short: |-
+          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This is given per 1,000 people living in the country of asylum.
+        description_from_producer: "{definitions.description_unhcr_refugee}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 1,000 inhabitants
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
+          - '{definitions.key_afghans_refugees}'
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_refugees_asylum}"
+      refugees_per_100k:
+        title: Refugees by country of asylum per 100,000 people
+        description_short: |-
+          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the country of asylum.
+        description_from_producer: "{definitions.description_unhcr_refugee}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - "{definitions.key_refugee_vs_asylum}"
+          - '{definitions.key_afghans_refugees}'
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_refugees_asylum}"
+      asylum_seekers:
+        title: Asylum seekers by country they live in
+        description_short: |-
+          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This includes all asylum seekers, not just those who applied for asylum that year.
+        description_from_producer: "{definitions.description_unhcr_asylum}"
+      asylum_seekers_per_100k:
+        title: Asylum seekers by country they live in per 100,000 people
+        description_short: |-
+          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This data is given per 100,000 people living in the country of asylum.
+        description_from_producer: "{definitions.description_unhcr_asylum}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote_asylum_asylum}"
+      stateless:
+        title: Stateless people by country they live in
+        description_short: |-
+          [People](#dod:stateless) who are not considered nationals of any state, by the country they live in. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
+        description_from_producer: "{definitions.description_unhcr_stateless}"
+      stateless_per_100k:
+        title: Stateless people by country they live in, per 100,000 people
+        description_short: |-
+          [People](#dod:stateless) who are not considered nationals of any state, by the country they live in. This data is given per 100,000 inhabitants. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
+        description_from_producer: "{definitions.description_unhcr_stateless}"
+        display:
+          numDecimalPlaces: 1
+        unit: people per 100,000 inhabitants
+      hst:
+        title: People in host communities by country of residence
+        description_short: |-
+          A [host community](#dod:host-community) is a community that hosts many people who had to flee their homes, such as [refugees](#dod:refugee) or [internally displaced people](#dod:internally-displaced). These people may live in camps, in local households, or on their own within the community.
+        description_from_producer: "{definitions.description_unhcr_host}"
+      ooc:
+        title: Other persons of concern to UNHCR by country they live in
+        description_short: |-
+          [People](#dod:unhcr-concern) who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
+        description_key:
+          - Before 2025, UNHCR counted some groups of Afghans in Pakistan (Afghan Citizen Card holders) as others of concern. From 2025, it counts them as "other people in need of international protection", which we show separately.
+        description_from_producer: "{definitions.description_unhcr_ooc}"
+      oip:
+        title: Other people in need of international protection by country they live in
+        description_short: |-
+          People who left their country, often because they were forced to, and likely need international protection, but whom UNHCR doesn't count as [refugees](#dod:refugee) or [asylum seekers](#dod:asylumseeker). This is given by the country they live in.
+        description_from_producer: '{definitions.description_unhcr_oip}'
+        description_key:
+          - UNHCR introduced this group in 2022 and applied it to its data back to 2018. It replaced an earlier group, "Venezuelans displaced abroad", made up of Venezuelans who had left their country but hadn't applied for asylum or been recognized as refugees. In 2025, most people in this group were Venezuelans or Afghans.
+          - '{definitions.key_afghans_oip}'
+      returned_refugees:
+        title: Returned refugees by country they returned from
+        description_short: |-
+          [Refugees](#dod:refugee) who returned to their country of origin during that year, by the country they returned from.
+        description_from_producer: |-
+          - {definitions.description_unhcr_return}
+          - {definitions.description_unhcr_refugee}
+        description_key:
+          - "{definitions.description_key_refugee}"
+          - '{definitions.key_forced_returns}'

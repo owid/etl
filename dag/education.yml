@@ -83,48 +83,41 @@ steps:
     - data://garden/education/2018-04-18/literacy_rates
   data://grapher/wb/2024-11-04/edstats:
     - data://garden/wb/2024-11-04/edstats
-  #
+
   # Mdim for enrolment rates
-  #
   viz://chart/education/latest/enrolment_rates:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/worldbank_wdi/2026-07-27/wdi
     - data://grapher/unesco/2026-05-12/education_opri
-  #
+
   # Buringh and van Zanden literacy rates between 1451 and 1800
-  #
   data://garden/education/2025-06-09/literacy_1451_1800:
     - data://meadow/education/2025-06-09/literacy_1451_1800:
       - snapshot://education/2025-06-09/literacy_1451_1800.pdf
   data://grapher/education/2025-06-09/literacy_1451_1800:
     - data://garden/education/2025-06-09/literacy_1451_1800
-  #
+
   # World illiteracy at mid-century
-  #
   data://garden/education/2025-06-10/literacy_1950:
     - data://meadow/education/2025-06-10/literacy_1950:
       - snapshot://education/2025-06-10/literacy_1950.csv
   data://grapher/education/2025-06-10/literacy_1950:
     - data://garden/education/2025-06-10/literacy_1950
-  #
+
   #  Progress of literacy in various countries (1900-1950)
-  #
   data://garden/education/2025-06-10/literacy_1900_1950:
     - data://meadow/education/2025-06-10/literacy_1900_1950:
       - snapshot://education/2025-06-10/literacy_1900_1950.csv
   data://grapher/education/2025-06-10/literacy_1900_1950:
     - data://garden/education/2025-06-10/literacy_1900_1950
-  #
+
   # Mdim for expected years of schooling
-  #
   viz://chart/education/latest/years_of_schooling:
     - data://grapher/un/2025-05-07/undp_hdr
     - data://grapher/unesco/2026-05-12/education_opri
     - data://grapher/wb/2025-09-08/gender_statistics
 
-  #
   # Literacy OMM
-  #
   data://garden/literacy/2026-05-12/historic_literacy_omm:
     - data://garden/education/2025-06-10/literacy_1900_1950
     - data://garden/education/2025-06-10/literacy_1950
@@ -134,42 +127,29 @@ steps:
   data://grapher/literacy/2026-05-12/historic_literacy_omm:
     - data://garden/literacy/2026-05-12/historic_literacy_omm
 
-  #
   # Mdim for completion rates
-  #
   viz://chart/education/latest/completion_rates:
     - data://grapher/unesco/2026-05-12/education_sdgs
 
-  #
   # Mdim for education spending
-  #
   viz://chart/education/latest/education_spending:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/unesco/2026-05-12/education_opri
 
-  #
   # Mdim for literacy rates
-  #
   viz://chart/education/latest/literacy:
     - data://grapher/unesco/2026-05-12/education_sdgs
 
-  #
   # Mdim for children out of school
-  #
   viz://chart/education/latest/children_out_of_school:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/unesco/2026-05-12/education_opri
 
-  #
   # Mdim for proficiency levels in different subjects
-  #
   viz://chart/education/latest/proficiency:
     - data://grapher/unesco/2026-05-12/education_sdgs
 
-
-  #
   # Mdim for PISA scores
-  #
   viz://chart/education/latest/pisa_performance:
     # OECD PISA data on educational attainment in mathematics, science, and reading
     - data://grapher/oecd/2023-12-06/pisa:
@@ -182,22 +162,16 @@ steps:
           - snapshot://oecd/2023-12-06/pisa_science_boys_girls.xls
           - snapshot://oecd/2023-12-06/pisa_reading_boys_girls.xls
 
-  #
   # Mdim for qualified/trained teachers
-  #
   viz://chart/education/latest/teachers:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/worldbank_wdi/2026-07-27/wdi
 
-  #
   # Mdim for women teachers
-  #
   viz://chart/education/latest/women_teachers:
     - data://grapher/unesco/2026-05-12/education_opri
 
-  #
   # Harmonized test scores
-  #
   data://garden/education/2025-08-20/harmonized_scores:
     - data://meadow/education/2025-08-20/harmonized_scores:
       - snapshot://education/2025-08-20/harmonized_scores.csv

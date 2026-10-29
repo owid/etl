@@ -15,12 +15,12 @@ meta:
     citation_full: 'Karlinsky, A. and Kobak, D. (2021). Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset. eLife. https://doi.org/10.7554/eLife.69336.'
     url_main: https://github.com/akarlinsky/world_mortality/
     url_download: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
-    date_accessed: '2026-10-26'
+    date_accessed: '2026-10-29'
     date_published: '2021-06-30'
     license:
       name: MIT License
       url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
 outs:
-  - md5: e4695b56ef9c0a770e8bbe00660db5d7
+  - md5: b696a5b62724f650642f7390727b1e8f
     size: 1133106
     path: wmd.csv

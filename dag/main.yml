@@ -1,19 +1,20 @@
 steps:
-  #
   # Regions.
-  #
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/2023-01-01/regions:
     - data://garden/regions/2023-01-01/regions
+
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2026-07-01/income_groups
+
   # Create steps with latest population and GDP per capita for Grapher (entity sorting, peer countries).
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
     - data://grapher/worldbank_wdi/2026-07-27/wdi
+
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -34,9 +35,7 @@ steps:
       - data://garden/worldbank_wdi/2026-07-27/wdi
       - data://garden/un/2024-07-12/un_wpp
 
-  #
   # UN SDG - current
-  #
   data://meadow/un/2023-08-16/un_sdg:
     - snapshot://un/2023-08-16/un_sdg.feather
   data://grapher/un/2023-08-16/un_sdg:
@@ -65,7 +64,6 @@ steps:
     - data://garden/technology/2023-03-16/hcctad:
       - data://meadow/technology/2023-03-16/hcctad:
         - snapshot://technology/2023-03-16/hcctad.txt
-
 
   # U.S. patent activity since 1790 (USPTO)
   data://grapher/research_development/2023-05-25/us_patents:
@@ -104,7 +102,7 @@ steps:
         - snapshot://ahdi/2023-09-08/augmented_hdi.xlsx
         - snapshot://ahdi/2023-09-08/augmented_hdi_region.xlsx
 
-  # Older vintage UN IGME (with longer time-series)
+  #  Older vintage UN IGME (with longer time-series)
   data://garden/un/2018/igme:
     - data://meadow/un/2018/igme:
       - snapshot://un/2018/igme.csv
@@ -233,9 +231,7 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
-  #
   # Aviation Safety Network - Aviation Statistics.
-  #
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics:
       - data://meadow/aviation_safety_network/2024-06-05/aviation_statistics:
@@ -378,7 +374,6 @@ steps:
       - data://garden/demography/2024-07-15/population
 
   # WB income groups 2026-07-01
-
   data://garden/wb/2026-07-01/income_groups:
     - data://meadow/wb/2026-07-01/income_groups:
       - snapshot://wb/2026-07-01/income_groups.xlsx
@@ -390,9 +385,7 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
 
-
   # Integrated Values Survey (also builds the World Values Survey table from its own snapshot/meadow)
-
   data://grapher/ivs/2025-06-27/integrated_values_surveys:
     - data://garden/ivs/2025-06-27/integrated_values_surveys:
       - data://meadow/ivs/2025-06-27/integrated_values_surveys:
@@ -400,9 +393,7 @@ steps:
       - data://meadow/wvs/2026-06-30/world_values_survey:
         - snapshot://wvs/2026-06-30/world_values_survey.csv
 
-  #
   # Media deaths
-  #
   data://grapher/media_cloud/2025-05-19/media_deaths:
     - data://garden/media_cloud/2025-05-19/media_deaths:
       - data://meadow/media_cloud/2025-05-19/media_deaths:
@@ -419,23 +410,19 @@ steps:
       - snapshot://oecd/2025-07-03/affordable_housing_income.xlsx
       - snapshot://oecd/2025-07-03/affordable_housing.xlsx
 
-  #
   # Housing indicators from Korevaar et al.
-  #
   data://grapher/housing/2025-07-11/korevaar:
     - data://garden/housing/2025-07-11/korevaar:
       - data://meadow/housing/2025-07-11/korevaar:
         - snapshot://housing/2025-07-11/korevaar.xlsx
       - data://meadow/housing/2025-07-11/korevaar_quality:
         - snapshot://housing/2025-07-11/korevaar_quality.xlsx
-  #
+
   # Gallup World Poll: Life in Five Years and Life Today
-  #
   data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
     - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today:
       - data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today:
         - snapshot-private://happiness/2025-07-22/life_in_five_years_and_life_today.xlsx
-
 
   # Ethnologue
   data-private://grapher/language/2025-09-03/ethnologue:
@@ -444,9 +431,7 @@ steps:
       - data-private://meadow/language/2025-09-03/ethnologue:
         - snapshot-private://language/2025-09-03/ethnologue.zip
 
-  #
   # IMF Trade Data - Regional
-  #
   data://grapher/imf/2026-10-05/trade:
     - data://garden/imf/2026-10-05/trade:
       - data://meadow/imf/2026-10-05/trade:
@@ -454,22 +439,17 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/worldbank_wdi/2026-07-27/wdi
 
-  #
   # Trade Volume Index - WTO Trade Growth
-  #
   data://grapher/trade/2026-10-22/wto_trade_growth:
     - data://garden/trade/2026-10-22/wto_trade_growth:
       - data://meadow/trade/2026-10-22/wto_trade_growth:
         - snapshot://trade/2026-10-22/wto_trade_growth.xlsx
-      #
       # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
-      #
       - data://garden/trade/2025-09-22/historic_trade:
         - data://meadow/trade/2025-09-22/historic_trade:
           - snapshot://trade/2025-09-22/historic_trade.xlsx
-  #
+
   # UN SDG (2024)
-  #
   data://grapher/un/2025-10-29/un_sdg:
     - data://garden/un/2025-10-29/un_sdg:
       - data://meadow/un/2025-10-29/un_sdg:
@@ -477,23 +457,19 @@ steps:
       - snapshot://un/2025-10-29/un_sdg_dimension.json
       - snapshot://un/2025-10-29/un_sdg_unit.csv
 
-  #
   # England and Wales Crime Survey
-  #
   data://grapher/ons/2025-11-26/crime_survey:
     - data://garden/ons/2025-11-26/crime_survey:
       - data://meadow/ons/2025-11-26/crime_survey:
         - snapshot://ons/2025-11-26/crime_survey.csv
-  #
+
   # FBI crime data - Summary Reporting System Estimates
-  #
   data://grapher/fbi/2025-11-21/summary_reporting_system_estimates:
     - data://garden/fbi/2025-11-21/summary_reporting_system_estimates:
       - data://meadow/fbi/2025-11-21/summary_reporting_system_estimates:
         - snapshot://fbi/2025-11-21/summary_reporting_system_estimates.csv
 
   # OECD Official Development Assistance (ODA)
-
   data://grapher/oecd/2026-07-27/official_development_assistance:
     - data://garden/oecd/2026-07-27/official_development_assistance:
       - data://meadow/oecd/2026-07-27/official_development_assistance:
@@ -513,9 +489,7 @@ steps:
         - snapshot://oecd/2026-10-07/total_official_development_assistance_commitments.csv
       - data://garden/demography/2024-07-15/population
 
-  #
   # Climate-related ODA charts — authored in ETL.
-  #
   viz://chart/oecd/latest/aid_climate_mitigation_adaptation:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
   viz://chart/oecd/latest/foreign_aid_climate_main_secondary:
@@ -531,27 +505,21 @@ steps:
   viz://chart/oecd/latest/share_foreign_aid_received_climate:
     - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
 
-  #
   # CORE Econ - Growth rate of GDP per capita and productivity
-  #
   data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
     - data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity:
       - data://meadow/core_econ/2026-01-07/growth_rate_gdp_productivity:
         - snapshot://core_econ/2026-01-07/growth_rate_productivity.csv
         - snapshot://core_econ/2026-01-07/growth_rate_gdp_pc.csv
 
-  #
   # World Prison Brief
-  #
   data://grapher/crime/2026-01-21/prison_rates:
     - data://garden/crime/2026-01-21/prison_rates:
       - data://meadow/crime/2026-01-21/prison_rates:
         - snapshot://crime/2026-01-20/prison_rates.csv
       - data://garden/demography/2024-07-15/population
 
-  #
   # CORE Econ - Unemployment rate and unemployment benefit replacement rate
-  #
   data://grapher/core_econ/2026-01-30/unemployment_rate_benefits:
     - data://garden/core_econ/2026-01-30/unemployment_rate_benefits:
       - data://meadow/core_econ/2026-01-30/unemployment_rate_benefits:
@@ -578,33 +546,25 @@ steps:
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
 
-  #
   # Trust in US government - Pew Research Center
-  #
   data://grapher/pew/2026-02-16/trust_us_government:
     - data://garden/pew/2026-02-16/trust_us_government:
       - data://meadow/pew/2026-02-16/trust_us_government:
         - snapshot://pew/2026-02-16/trust_us_government.csv
 
-
-  #
   # OECD - Trust in government
-  #
   data://grapher/oecd/2026-02-17/trust_in_government:
     - data://garden/oecd/2026-02-17/trust_in_government:
       - data://meadow/oecd/2026-02-17/trust_in_government:
         - snapshot://oecd/2026-02-17/trust_in_government.csv
 
-  #
   # OECD - Time Use Database
-  #
   data://grapher/oecd/2026-08-14/time_use:
     - data://garden/oecd/2026-08-14/time_use:
       - data://meadow/oecd/2026-08-14/time_use:
         - snapshot://oecd/2026-08-14/time_use.xlsx
 
   # World Development Indicators - WDI
-
   data://garden/worldbank_wdi/2026-02-27/wdi:
     - data://meadow/worldbank_wdi/2026-02-27/wdi:
       - snapshot://worldbank_wdi/2026-02-27/wdi.zip
@@ -624,9 +584,7 @@ steps:
   data://grapher/bls/2026-03-20/us_consumer_prices:
     - data://garden/bls/2026-03-20/us_consumer_prices
 
-  #
   # World Happiness Report (2026)
-  #
   data://garden/happiness/2026-03-16/happiness:
     - snapshot://happiness/2026-03-16/happiness.xlsx
     - data://garden/demography/2024-07-15/population
@@ -635,9 +593,7 @@ steps:
   data://grapher/happiness/2026-03-16/happiness:
     - data://garden/happiness/2026-03-16/happiness
 
-  #
   # ATUS - American Time Use Survey (incl 2024 data)
-  #
   data://grapher/atus/2026-03-10/atus_time_spent_with:
     - data://garden/atus/2026-03-10/atus_time_spent_with:
       - data://meadow/atus/2026-03-10/atus_time_spent_with:
@@ -646,29 +602,23 @@ steps:
         - snapshot://atus/2026-03-10/atus_sum.zip
         - snapshot://atus/2024-12-10/activity_codes_2023.xls
 
-
   # USA PPI New Nonresidential Building Construction (US Bureau of Labor Statistics)
   data://garden/bls/2026-10-02/us_ppi_construction:
     - snapshot://bls/2026-10-02/us_ppi_construction.csv
 
-  #
   # World Airlines Traffic and Capacity
-  #
-
   data://grapher/aviation/2026-04-02/air_traffic:
     - data://garden/aviation/2026-04-02/air_traffic:
       - data://meadow/aviation/2026-04-02/air_traffic:
         - snapshot://aviation/2026-04-02/air_traffic.csv
 
   # Oil Spills
-
   data://grapher/itopf/2026-05-06/oil_spills:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
-  #
+
   # UN SDG (2026)
-  #
   data://grapher/un/2026-07-31/un_sdg:
     - data://garden/un/2026-07-31/un_sdg:
       - data://meadow/un/2026-07-31/un_sdg:
