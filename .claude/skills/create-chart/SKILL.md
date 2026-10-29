@@ -440,7 +440,8 @@ Key fields for `config` in views or `common_views`:
 
 | What | Field | Notes |
 |---|---|---|
-| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko` |
+| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko`, `Dumbbell` |
+| Dumbbell connector | `dumbbell: { connectorStyle: line }` | The default arrow reads as a change from the first series to the second, so keep it only for a before and after (two dates, before vs. after tax). Use `line` for categories with no order, such as men vs. women |
 | Default tab | `tab: "chart"` | `chart`, `map`, `table`, `line`, `slope`, `discrete-bar`, `marimekko` |
 | Map tab visible? | `hasMapTab: true` | Set with `tab: "map"` for map-by-default charts; avoid with multi-indicator views |
 | Facet strategy | `selectedFacetStrategy: entity` | `entity`, `metric`, `none` — how to facet multi-indicator charts |
