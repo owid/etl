@@ -4,7 +4,12 @@ Data content:
 * Nemet (2009) provides cumulative capacity data between 1975 and 2003.
 * Nemet (2009) provides cost data between 1975 and 2003.
 * IRENA provides cumulative capacity data from 2000 onwards.
-* IRENA provides cost data from 2010 onwards.
+* IRENA provides cost data from 2010 onwards, in two series:
+  - A global module price index, from 2010 to 2024 (Renewable Power Generation Costs in 2024 report). IRENA
+    discontinued it in the following report.
+  - Yearly prices by module technology sold in Europe, from 2020 onwards (Renewable Power Generation Costs in 2025
+    report). We use the "Mainstream" technology (standard crystalline modules), which is the closest to the index
+    where both overlap.
 * Farmer & Lafond (2016) provide cost data between 1980 and 2013.
 
 For each informed year, we need to combine these sources with the following two constraints:
@@ -12,8 +17,8 @@ For each informed year, we need to combine these sources with the following two 
 * Avoid (as much as possible) having cost and capacity data on a given year from different sources.
 
 Therefore, for capacity data, we use Nemet (2009) between 1975 and 2003, and IRENA from 2004 onwards.
-For cost data, we use Nemet (2009) between 1975 and 2003, Farmer & Lafond (2016) between 2004 and 2009, and IRENA
-from 2010 onwards.
+For cost data, we use Nemet (2009) between 1975 and 2003, Farmer & Lafond (2016) between 2004 and 2009, IRENA's
+global price index between 2010 and 2019, and IRENA's mainstream module price from 2020 onwards.
 
 """
 
@@ -28,6 +33,10 @@ paths = PathFinder(__file__)
 
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
 LATEST_YEAR = 2025
+# First year of IRENA's module prices by technology, from which they replace the discontinued global price index.
+FIRST_YEAR_BY_TECHNOLOGY = 2020
+# Module technology (as named by IRENA) used from FIRST_YEAR_BY_TECHNOLOGY onwards.
+MODULE_TECHNOLOGY = "Mainstream"
 
 
 def get_usd_conversion_factor(from_year: int) -> float:
@@ -85,6 +94,51 @@ def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
     return cumulative_capacity
 
 
+def sanity_check_irena_inputs(tb_irena_index: Table, tb_irena_by_technology: Table) -> None:
+    expected_unit = f"constant {LATEST_YEAR} US$ per watt"
+    for tb in [tb_irena_index, tb_irena_by_technology]:
+        assert tb["cost"].metadata.unit == expected_unit, "IRENA data has changed, prices may need to be deflated."
+        assert set(tb["country"]) == {"World"}, "Unexpected regions in IRENA module prices."
+        assert (tb["cost"] > 0).all(), "Non-positive IRENA module prices."
+
+    error = f"IRENA's global price index should cover 2010 to {FIRST_YEAR_BY_TECHNOLOGY - 1} without gaps."
+    assert set(range(2010, FIRST_YEAR_BY_TECHNOLOGY)) <= set(tb_irena_index["year"]), error
+
+    assert MODULE_TECHNOLOGY in set(tb_irena_by_technology["technology"]), "IRENA module technologies have changed."
+    tb_technology = tb_irena_by_technology[tb_irena_by_technology["technology"] == MODULE_TECHNOLOGY]
+    assert not tb_technology.duplicated(subset=["year"]).any(), "Duplicate years in IRENA module prices."
+    error = f"'{MODULE_TECHNOLOGY}' module prices should cover {FIRST_YEAR_BY_TECHNOLOGY} to {LATEST_YEAR}."
+    assert set(tb_technology["year"]) == set(range(FIRST_YEAR_BY_TECHNOLOGY, LATEST_YEAR + 1)), error
+
+    # The two series should agree within 20% in the overlapping years, so that they can be joined without rescaling.
+    # NOTE: 2024 is excluded, since the index only covers January to March of that year.
+    index = tb_irena_index.set_index("year")["cost"]
+    technology = tb_technology.set_index("year")["cost"]
+    for year in [2020, 2021, 2022, 2023]:
+        ratio = technology.loc[year] / index.loc[year]
+        error = f"'{MODULE_TECHNOLOGY}' module price in {year} is {ratio:.2f} times IRENA's global price index."
+        assert 0.8 <= ratio <= 1.2, error
+
+
+def prepare_irena_cost_data(tb_irena_index: Table, tb_irena_by_technology: Table) -> Table:
+    """Join IRENA's global module price index (until it was discontinued) with its price of mainstream modules."""
+    # Global price index, until the year before prices by technology start.
+    tb_irena_index = tb_irena_index[tb_irena_index["year"] < FIRST_YEAR_BY_TECHNOLOGY][["year", "cost"]].reset_index(
+        drop=True
+    )
+    tb_irena_index["cost_source"] = "IRENA (global price index)"
+
+    # Price of the chosen module technology from then on.
+    tb_irena_technology = tb_irena_by_technology[tb_irena_by_technology["technology"] == MODULE_TECHNOLOGY][
+        ["year", "cost"]
+    ].reset_index(drop=True)
+    tb_irena_technology["cost_source"] = f"IRENA ({MODULE_TECHNOLOGY.lower()} modules)"
+
+    tb_irena_cost = pr.concat([tb_irena_index, tb_irena_technology], ignore_index=True).astype({"year": int})
+
+    return tb_irena_cost
+
+
 def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: Table) -> Table:
     tb_nemet = tb_nemet.copy()
     tb_irena_cost = tb_irena_cost.copy()
@@ -109,15 +163,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     tb_farmer_lafond["cost"] *= get_usd_conversion_factor(from_year=2013)
     tb_farmer_lafond["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per watt"
 
-    # Prepare solar photovoltaic cost data from IRENA.
-    tb_irena_cost = tb_irena_cost.drop(columns="country", errors="raise")
-
-    tb_irena_cost["cost_source"] = "IRENA"
-    # Costs are given in latest year "USD/W", so we do not need to correct them.
-    # NOTE: The series ends in 2024 (IRENA discontinued the global module price index after the Renewable Power
-    #  Generation Costs in 2024 report), but its values are expressed in constant US$ of LATEST_YEAR.
-    error = "IRENA data has changed, prices may need to be deflated to the latest year."
-    assert tb_irena_cost["cost"].metadata.unit == f"constant {LATEST_YEAR} US$ per watt", error
+    # IRENA costs (already joined, with their sources) are given in latest year "USD/W", so we do not correct them.
 
     # Combine Nemet (2009) and Farmer & Lafond (2016), prioritizing the former.
     combined = combine_two_overlapping_dataframes(df1=tb_nemet_cost, df2=tb_farmer_lafond, index_columns="year")
@@ -130,6 +176,23 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     combined["cost_source"].metadata.origins = combined["cost"].metadata.origins.copy()
 
     return combined
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    tb_cost = tb.dropna(subset="cost")
+    error = f"Cost data should cover every year from 1975 to {LATEST_YEAR}."
+    assert sorted(tb_cost["year"]) == list(range(1975, LATEST_YEAR + 1)), error
+    assert (tb_cost["cost"] > 0).all(), "Non-positive costs."
+    assert tb_cost["cost_source"].notna().all(), "Some costs have no source."
+    expected_sources = {
+        "Nemet (2009)",
+        "Farmer & Lafond (2016)",
+        "IRENA (global price index)",
+        f"IRENA ({MODULE_TECHNOLOGY.lower()} modules)",
+    }
+    assert set(tb_cost["cost_source"]) == expected_sources, "Unexpected cost sources."
+    error = "Module prices should have fallen by a factor of more than 100 since 1975."
+    assert tb_cost.set_index("year")["cost"].loc[1975] / tb_cost.set_index("year")["cost"].loc[LATEST_YEAR] > 100, error
 
 
 def run() -> None:
@@ -148,15 +211,24 @@ def run() -> None:
     ds_irena_capacity = paths.load_dataset("renewable_energy_statistics")
     tb_irena_capacity = ds_irena_capacity.read("renewable_energy_statistics")
 
-    # Load IRENA dataset on cost from garden and read its main table.
+    # Load IRENA dataset on cost from garden, and read its global module price index (discontinued after 2024) and its
+    # yearly module prices by technology (from 2020 onwards).
     ds_irena_cost = paths.load_dataset("renewable_power_generation_costs")
-    tb_irena_cost = ds_irena_cost.read("solar_photovoltaic_module_prices")
+    tb_irena_index = ds_irena_cost.read("solar_photovoltaic_module_prices")
+    tb_irena_by_technology = ds_irena_cost.read("solar_photovoltaic_module_prices_by_technology")
+
+    sanity_check_irena_inputs(tb_irena_index=tb_irena_index, tb_irena_by_technology=tb_irena_by_technology)
 
     #
     # Process data.
     #
     # Create a table of cumulative solar photovoltaic capacity, by combining Nemet (2009) and IRENA data.
     cumulative_capacity = prepare_capacity_data(tb_nemet=tb_nemet, tb_irena_capacity=tb_irena_capacity)
+
+    # Join IRENA's global price index and its price of mainstream modules.
+    tb_irena_cost = prepare_irena_cost_data(
+        tb_irena_index=tb_irena_index, tb_irena_by_technology=tb_irena_by_technology
+    )
 
     # Create a table of solar photovoltaic cost, by combining Nemet (2009), Farmer & Lafond (2016) and IRENA data.
     cost = prepare_cost_data(tb_nemet=tb_nemet, tb_irena_cost=tb_irena_cost, tb_farmer_lafond=tb_farmer_lafond)
@@ -166,6 +238,8 @@ def run() -> None:
 
     # Add column for region.
     tb_combined = tb_combined.assign(**{"country": "World"})
+
+    sanity_check_outputs(tb=tb_combined)
 
     # Format table conveniently.
     tb_combined = tb_combined.format(short_name=paths.short_name)

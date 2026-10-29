@@ -227,7 +227,7 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 
 ### Comments in steps
 
-Label each stage of `run()` with a short comment, so a reader can follow the step without reading every line, e.g. `# Step 2: Add regional aggregates.`. Add the *why* where the code doesn't show it (e.g. why a value is computed rather than taken from the source). Keep comments short: one line where possible, labels rather than paragraphs, so the code isn't buried under comments. A worked example belongs once, in the docstring of the helper it explains. Instructions for the next update go in `# NOTE:` comments (see `/create-dataset`).
+Label each stage of `run()` with a short comment, so a reader can follow the step without reading every line, e.g. `# Add regional aggregates.`. Don't number the labels (`# Step 2: ...`): the prefix repeats on every line and has to be renumbered whenever a stage is added. Add the *why* where the code doesn't show it (e.g. why a value is computed rather than taken from the source). Keep comments short: one line where possible, labels rather than paragraphs, so the code isn't buried under comments. A worked example belongs once, in the docstring of the helper it explains. Instructions for the next update go in `# NOTE:` comments (see `/create-dataset`).
 
 ### Preserving metadata/origins in steps
 

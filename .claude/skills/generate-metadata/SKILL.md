@@ -104,6 +104,7 @@ title: Number of neutron star mergers (NASA, 2023)
 - `short_unit` is only needed when there's an actual unit to abbreviate. Omit it for dimensionless indicators -- it defaults to `None` and grapher won't show a unit label.
 - Use "person" not "capita" (`kilowatts per person`)
 - Choose human-friendly scales -- if most values are below 1 tonne per person, use "kilograms per person" instead
+- For money measures and other metrics OWID uses many times (GDP, poverty, "% of GDP", death rates), take the units, subtitle and footnote from [HARMONIZED_FAUST.md](../check-metadata-style/HARMONIZED_FAUST.md). A money measure's subtitle says whether it's adjusted for inflation (when it covers several years) and for living costs between countries (when it covers several countries), the one exception to not mentioning units there.
 
 **Decimal precision:** 0 for counts, 1 for percentages, 2 for economic/per-capita values. Be consistent across related variables. Always set `numDecimalPlaces` explicitly -- it's a frequent source of review feedback.
 
