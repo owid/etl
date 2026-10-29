@@ -192,6 +192,38 @@ tables:
           { additional_info }
 ```
 
+### Recommended layout: text in definitions, structure in the indicator
+
+When a dataset has several indicators that share text, keep its prose in `definitions:` (`description_short`, each `description_key` paragraph, `description_processing`, and chart subtitles and notes), and let each indicator list the pieces it uses. Split `description_key` into paragraph-sized pieces named after what they say, so indicators that share a paragraph reference the same piece. This keeps the dataset's important text in one place you can read end to end. Titles and display names stay with the indicator.
+
+```yaml
+definitions:
+  description_key_nra_definition: |-
+    The normal retirement age is the earliest age at which a person can receive their full pension in all schemes.
+  description_key_nra_current_year: |-
+    The current normal retirement age applies to people retiring in 2024.
+  description_key_nra_future_year: |-
+    This indicator is for a person who enters the labor market at age 22 in 2024.
+
+tables:
+  retirement:
+    variables:
+      current_normal_retirement_age:
+        title: Current normal retirement age
+        description_key: |-
+          {definitions.description_key_nra_definition}
+
+          {definitions.description_key_nra_current_year}
+      future_normal_retirement_age:
+        title: Future normal retirement age
+        description_key: |-
+          {definitions.description_key_nra_definition}
+
+          {definitions.description_key_nra_future_year}
+```
+
+A simple dataset, with a few indicators that share no text, can keep its text directly under each indicator. Large files that already write their text inline throughout don't need to be reorganized.
+
 ## Using Jinja Templates for Advanced Cases
 
 Even more complex metadata can be generated with [:octicons-link-external-16:  Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
