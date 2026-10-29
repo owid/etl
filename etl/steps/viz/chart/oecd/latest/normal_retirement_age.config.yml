@@ -43,6 +43,9 @@ dimensions:
       - slug: future
         name: In the future
         description: For people who start working in 2024, under the rules already legislated
+      - slug: today_vs_future
+        name: Today vs. in the future
+        description: Compare today's normal retirement age with the one already legislated for the future
   - slug: sex
     name: Sex
     choices:
@@ -50,6 +53,9 @@ dimensions:
         name: Men
       - slug: women
         name: Women
+      - slug: men_vs_women
+        name: Men vs. women
+        description: Compare the normal retirement age of men and women
 
 views:
   - dimensions:
@@ -79,3 +85,75 @@ views:
     indicators:
       y:
         - catalogPath: retirement#future_normal_retirement_age__sex_women
+
+  # Comparison views: one dot per series, joined by a line for each country.
+  - dimensions:
+      timing: today_vs_future
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_men
+          display:
+            name: Today
+        - catalogPath: retirement#future_normal_retirement_age__sex_men
+          display:
+            name: In the future
+    config: &dumbbell
+      hasMapTab: false
+      tab: chart
+      chartTypes: ["Dumbbell"]
+      title: Normal retirement age for men, today and in the future
+      subtitle: Age at which men can start receiving a full pension, without penalty, after a career that started at age 22. Today's age is for people retiring in 2024; the future age is for people who start working in 2024, under the rules already legislated.
+
+  - dimensions:
+      timing: today_vs_future
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_women
+          display:
+            name: Today
+        - catalogPath: retirement#future_normal_retirement_age__sex_women
+          display:
+            name: In the future
+    config:
+      <<: *dumbbell
+      title: Normal retirement age for women, today and in the future
+      subtitle: Age at which women can start receiving a full pension, without penalty, after a career that started at age 22. Today's age is for people retiring in 2024; the future age is for people who start working in 2024, under the rules already legislated.
+
+  - dimensions:
+      timing: current
+      sex: men_vs_women
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_men
+          display:
+            name: Men
+        - catalogPath: retirement#current_normal_retirement_age__sex_women
+          display:
+            name: Women
+    config:
+      <<: *dumbbell
+      # Men and women aren't a before and after, so join them with a plain line instead of an arrow.
+      dumbbell:
+        connectorStyle: line
+      title: Normal retirement age for men and women today
+      subtitle: Age at which men and women can start receiving a full pension, without penalty, in 2024, after a career that started at age 22.
+
+  - dimensions:
+      timing: future
+      sex: men_vs_women
+    indicators:
+      y:
+        - catalogPath: retirement#future_normal_retirement_age__sex_men
+          display:
+            name: Men
+        - catalogPath: retirement#future_normal_retirement_age__sex_women
+          display:
+            name: Women
+    config:
+      <<: *dumbbell
+      dumbbell:
+        connectorStyle: line
+      title: Future normal retirement age for men and women
+      subtitle: Age at which men and women who start working at age 22 in 2024 will be able to receive a full pension, without penalty, under the rules already legislated.
