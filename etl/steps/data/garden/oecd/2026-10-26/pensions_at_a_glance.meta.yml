@@ -75,7 +75,6 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: Pensions at a Glance
   update_period_days: 730
   owners:
     - Pablo Arriagada

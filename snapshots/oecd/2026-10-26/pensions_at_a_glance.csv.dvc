@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "Pensions at a Glance"
+    title: "OECD Pensions at a Glance"
     description: |-
       The OECD Pensions at a Glance database provides internationally comparable indicators on pension policies and their outcomes for OECD countries and, where possible, for other members of the G20 and the European Union. It accompanies the OECD report of the same name, published every two years, and this release matches the 2025 edition.
 
