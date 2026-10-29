@@ -85,7 +85,7 @@ Write a one-paragraph internal summary of what you found before moving on.
 Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Before listing the specifics, set expectations in one plain sentence so the end isn't a surprise — e.g. *"I'll build the dataset and put it on a staging server for you to review; once you're happy you merge the PR and it goes live."* Then keep the questions to the few things that genuinely can't be guessed or that would be expensive to get wrong:
 
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
-- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). List the documentation you found in Step 1 and ask for anything missing, insufficient or inaccessible that the metadata depends on (a methodology to define the indicators, a codebook for unclear columns).
+- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). List the documentation you found in Step 1 as links, one line per source (dataset page, methodology, codebook, main report, what's new), saying when one wasn't found, and ask for anything missing, insufficient or inaccessible that the metadata depends on (a methodology to define the indicators, a codebook for unclear columns).
 - **License** — show your best guess (default `CC BY 4.0` for academic/IGO sources if unknown) and let them correct.
 - **Other data files the source ships** — when the landing page or repository carries several data files (a companion index, summary tables), list them with a default of "not ingesting these" so the user can opt in with one word. Persist the skips as the companion-files `# NOTE:` in the snapshot `.dvc` (Step 4 follows `/create-snapshot`'s convention) — that NOTE, not the PR body, is the baseline the update and review workflows diff against; mention them in the PR body as well for the reviewer.
 - **Any column meanings you couldn't infer** — only ask about the genuinely ambiguous ones (e.g. "is `ev_sales_share` a percentage 0–100 or a fraction 0–1?"). Don't ask about columns you're confident on.
@@ -203,8 +203,10 @@ Review all indicators when there are few. This catches the two things the Step 7
 3. Update the PR description (attribution blockquote per CLAUDE.md "Team"; what the dataset is, source, coverage, indicator count). Then post `@codex review` as a separate PR comment; while the user reviews, address any valid findings and resolve the threads per `/update-dataset` step 10 — don't block the handoff on the review round.
 4. **Hand the user a review** — this is the second and final checkpoint. Present a compact table they can scan and correct:
 
-   | Indicator (column) | Title | Unit | Decimals | Inferred? |
+   | Indicator (column) | Title | Unit | Decimals | Based on |
    |---|---|---|---|---|
+
+   In **Based on**, name the documentation each indicator's metadata comes from and where in it (e.g. "report, 'Definition and measurement' box, p. 164"), or say "inferred from the data" (`.claude/rules/producer-documentation.md`, "Say what the metadata rests on").
 
    Plus a short list of:
    - **Things I guessed** (units, descriptions, license, topic tags) — "tell me if any are wrong."
