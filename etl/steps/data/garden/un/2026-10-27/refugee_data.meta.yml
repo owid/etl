@@ -15,9 +15,6 @@ definitions:
       - We remove refugee populations where the country of origin and country of asylum are the same, as refugees are defined as people who have fled their country and crossed an international border. We also remove asylum seekers where the country of origin and country of asylum are the same.
     display:
       numDecimalPlaces: 0
-  description_processing_asylum: |-
-    {definitions.common.description_processing}
-    - We remove data for China after 2020 due to a large data discontinuity.
   description_unhcr_ooc: |-
     Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of these groups above but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
   description_unhcr_oip: |-
@@ -233,7 +230,6 @@ tables:
         description_short: |-
           [People](#dod:refugee) who fled their country of origin and are in need of international protection. Refugees are those who have already been granted asylum status in the country they moved to. This includes all refugees who live in this country, not just those who arrived that year.
         description_from_producer: "{definitions.description_unhcr_refugee}"
-        description_processing: "{definitions.description_processing_asylum}"
         description_key:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
@@ -243,7 +239,6 @@ tables:
         description_short: |-
           [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This is given per 1,000 people living in the country of asylum.
         description_from_producer: "{definitions.description_unhcr_refugee}"
-        description_processing: "{definitions.description_processing_asylum}"
         display:
           numDecimalPlaces: 1
         unit: people per 1,000 inhabitants
@@ -259,7 +254,6 @@ tables:
         description_short: |-
           [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the country of asylum.
         description_from_producer: "{definitions.description_unhcr_refugee}"
-        description_processing: "{definitions.description_processing_asylum}"
         display:
           numDecimalPlaces: 1
         unit: people per 100,000 inhabitants
@@ -275,13 +269,11 @@ tables:
         description_short: |-
           [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This includes all asylum seekers, not just those who applied for asylum that year.
         description_from_producer: "{definitions.description_unhcr_asylum}"
-        description_processing: "{definitions.description_processing_asylum}"
       asylum_seekers_per_100k:
         title: Asylum seekers by country they live in per 100,000 people
         description_short: |-
           [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This data is given per 100,000 people living in the country of asylum.
         description_from_producer: "{definitions.description_unhcr_asylum}"
-        description_processing: "{definitions.description_processing_asylum}"
         display:
           numDecimalPlaces: 1
         unit: people per 100,000 inhabitants
