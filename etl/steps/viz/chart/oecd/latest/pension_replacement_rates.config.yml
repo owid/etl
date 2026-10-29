@@ -41,13 +41,13 @@ dimensions:
     choices:
       - slug: gross
         name: Gross (before taxes)
-        description: Pension and earnings before taxes and social security contributions
+        description: Pension and earnings before income taxes and social security contributions
       - slug: net
         name: Net (after taxes)
-        description: Pension and earnings after taxes and social security contributions
+        description: Pension and earnings after income taxes and social security contributions
       - slug: gross_vs_net
         name: Gross vs. net
-        description: Compare the rates before and after taxes
+        description: Compare the rates before and after income taxes and social security contributions
   - slug: earnings
     name: Earnings
     choices:

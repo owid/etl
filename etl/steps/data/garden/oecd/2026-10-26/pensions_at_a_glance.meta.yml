@@ -193,19 +193,19 @@ definitions:
   description_key_replacement_rate_definition: |-
     The replacement rate is the pension a person receives when they retire, as a share of what they earned while working.
   description_short_gross_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured before taxes.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured before income taxes and social security contributions.
   description_key_gross_replacement_rate_taxes: |-
-    In the gross rate, both are measured before taxes and social security contributions.
+    In the gross rate, both are measured before income taxes and social security contributions.
   subtitle_gross_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured before taxes.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured before income taxes and social security contributions.
   description_short_net_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured after taxes.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured after income taxes and social security contributions.
   description_key_net_replacement_rate_taxes: |-
     In the net rate, both are measured after the income taxes and social security contributions that workers and pensioners pay.
   description_key_net_vs_gross_replacement_rates: |-
     Net rates are usually higher than gross rates, mainly because pensioners pay less in taxes and contributions than workers.
   subtitle_net_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured after taxes.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured after income taxes and social security contributions.
 
   #
   # Text for the indicators in the pension_wealth table.

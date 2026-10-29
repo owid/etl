@@ -43,9 +43,9 @@ EARNINGS_CONFIG = {
 # Wording of each choice in the titles and subtitles of the comparison views.
 MEASURE = {"gross": "Gross", "net": "Net", "gross_vs_net": "Gross and net"}
 TAXES = {
-    "gross": "Both are measured before taxes.",
-    "net": "Both are measured after taxes.",
-    "gross_vs_net": "The gross rate measures both before taxes, and the net rate after taxes.",
+    "gross": "Both are measured before income taxes and social security contributions.",
+    "net": "Both are measured after income taxes and social security contributions.",
+    "gross_vs_net": "The gross rate measures both before income taxes and social security contributions, and the net rate after them.",
 }
 EARNINGS = {
     "half": "half the average wage",
