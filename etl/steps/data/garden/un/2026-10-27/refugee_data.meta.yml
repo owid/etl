@@ -65,6 +65,8 @@ definitions:
     Some US data for asylum seekers in 2025 is based on government sources that don't report the country of origin. Therefore a much higher number of asylum seekers in the United States have an unknown country of origin for 2025. The drop in asylum seekers from origin countries can be due to this data quality issue rather than an actual decrease.
   key_forced_returns: |-
     Not all returns are voluntary. UNHCR's numbers include people who returned because they were deported or pressured to leave their host country. Returning doesn't always mean they've settled back home for good, but UNHCR may assist returnees for longer periods.
+  key_china_indochinese: |-
+    A large group of refugees from the former colonies of Indochina (mainly from current-day Vietnam), settled in China in the 1970s after the Vietnam War. These refugees and their descendants are [de facto integrated into Chinese society](https://www.unhcr.org/asia/where-we-work/countries/china), have full access to public services and enjoy the same rights as Chinese nationals. They are therefore no longer considered part of the current refugee population in these statistics by the UNHCR.
 
   footnote_refugees: |-
     This data includes all refugees, not just those who fled that year.
@@ -94,6 +96,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
         description_short: |-
@@ -106,6 +109,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees}"
@@ -121,6 +125,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees}"
@@ -234,6 +239,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
       refugees_per_1000:
         title: Refugees by country of asylum per 1,000 people
         description_short: |-
@@ -246,6 +252,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees_asylum}"
@@ -261,6 +268,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees_asylum}"
