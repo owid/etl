@@ -198,11 +198,11 @@ When a dataset has several indicators that share text, keep its prose in `defini
 
 ```yaml
 definitions:
-  description_key_nra_definition: |-
+  description_key_normal_retirement_age_definition: |-
     The normal retirement age is the earliest age at which a person can receive their full pension in all schemes.
-  description_key_nra_current_year: |-
+  description_key_normal_retirement_age_current_year: |-
     The current normal retirement age applies to people retiring in 2024.
-  description_key_nra_future_year: |-
+  description_key_normal_retirement_age_future_year: |-
     This indicator is for a person who enters the labor market at age 22 in 2024.
 
 tables:
@@ -210,16 +210,14 @@ tables:
     variables:
       current_normal_retirement_age:
         title: Current normal retirement age
-        description_key: |-
-          {definitions.description_key_nra_definition}
-
-          {definitions.description_key_nra_current_year}
+        description_key:
+          - "{definitions.description_key_normal_retirement_age_definition}"
+          - "{definitions.description_key_normal_retirement_age_current_year}"
       future_normal_retirement_age:
         title: Future normal retirement age
-        description_key: |-
-          {definitions.description_key_nra_definition}
-
-          {definitions.description_key_nra_future_year}
+        description_key:
+          - "{definitions.description_key_normal_retirement_age_definition}"
+          - "{definitions.description_key_normal_retirement_age_future_year}"
 ```
 
 A simple dataset, with a few indicators that share no text, can keep its text directly under each indicator. Large files that already write their text inline throughout don't need to be reorganized.
