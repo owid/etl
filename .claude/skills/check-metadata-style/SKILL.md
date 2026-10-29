@@ -104,6 +104,7 @@ ds = Dataset(DATA_DIR / step_path)
 
 import json
 import re
+from markdown_it import MarkdownIt
 rows = []
 for table_name in ds.table_names:
     tb = ds[table_name]
@@ -157,12 +158,15 @@ for table_name in ds.table_names:
 # A source description and a markdown description_key are multi-paragraph by design, so newlines don't count as
 # artifacts there.
 multi_paragraph = lambda k: k.endswith('.description') or k.startswith('description_key')
-# In a description_key, a single line break that doesn't start a list item or table row renders two paragraphs as one.
-# It comes from a conditional closed with <%- endif %> before a paragraph, or from a line break written in the text.
-merged_paragraphs = re.compile(r'(?<!\n)\n(?!\n|[ \t]*(?:[-*+]|\d+[.)])[ \t]|[ \t]*\|)')
+# In a description_key, a paragraph holding a single line break is two paragraphs rendered as one. It comes from a
+# conditional closed with <%- endif %> before a paragraph, or from a line break written in the text. Parsing the
+# markdown leaves alone the line breaks that start a list item, table row, heading, quote or code block.
+md = MarkdownIt('commonmark').enable('table')
+merged_paragraphs = lambda v: any(t.type == 'inline' and any(c.type == 'softbreak' for c in t.children or [])
+                                  for t in md.parse(v))
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
       if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k))
-                                 or (k.startswith('description_key') and merged_paragraphs.search(v)))]
+                                 or (k.startswith('description_key') and merged_paragraphs(v)))]
 print(f'WHITESPACE ISSUES: {len(ws)}')
 for t, var, k, v in ws:
     print(f'  {t}.{var}.{k}: {v[:150]!r}')
