@@ -103,6 +103,7 @@ step_path = raw.removeprefix('data://').removeprefix('etl/steps/data/').strip('/
 ds = Dataset(DATA_DIR / step_path)
 
 import json
+import re
 rows = []
 for table_name in ds.table_names:
     tb = ds[table_name]
@@ -156,15 +157,18 @@ for table_name in ds.table_names:
 # A source description and a markdown description_key are multi-paragraph by design, so newlines don't count as
 # artifacts there.
 multi_paragraph = lambda k: k.endswith('.description') or k.startswith('description_key')
+# In a description_key, a single line break that doesn't start a list item or table row is two paragraphs rendered as
+# one (a conditional closed with <%- endif %> instead of <%- endif +%>).
+merged_paragraphs = re.compile(r'(?<!\n)\n(?!\n|[ \t]*(?:[-*+]|\d+\.)[ \t]|[ \t]*\|)')
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
-      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k)))]
+      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k))
+                                 or (k.startswith('description_key') and merged_paragraphs.search(v)))]
 print(f'WHITESPACE ISSUES: {len(ws)}')
 for t, var, k, v in ws:
     print(f'  {t}.{var}.{k}: {v[:150]!r}')
 print('---')
 
 # Step 5b: indicators measured in money, for the currency rules of HARMONIZED_FAUST.md.
-import re
 money = re.compile(r'\\\$|€|£|¥|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
 try:
     # ISO 4217 codes legal tender somewhere today; babel ships with the full dev venv. Withdrawn codes are left
@@ -250,6 +254,7 @@ Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a tem
 | Leading whitespace | ` Share of children` | Template newline rendered as leading space |
 | Trailing whitespace | `Share of children ` | Template block left trailing space |
 | Embedded newline | `Share of\nchildren` | Multi-line Jinja block not properly trimmed |
+| Merged paragraphs | `…the average wage.\nThe OECD…` in a `description_key` | A conditional closed with `<%- endif %>` before a paragraph; close it with `<%- endif +%>` |
 
 Report them grouped by table and field, showing the rendered value with `repr()` so the whitespace is visible. The fix is in the template, not in the rendered string:
 
