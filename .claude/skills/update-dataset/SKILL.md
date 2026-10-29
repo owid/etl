@@ -35,7 +35,7 @@ Assumptions:
 
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
-- [ ] Pipeline refresher: run `scripts/pipeline_overview.py`, brief the user on the chain (what each step does, external inputs, consumers, who last updated it) and give a provisional structure verdict — re-confirm it after the snapshot + meadow diffs (see 0b)
+- [ ] Pipeline refresher: run `scripts/pipeline_overview.py`, brief the user on the chain (what each step does, external inputs, consumers, who last updated it), link the producer's main documentation (methodology, codebook, main report), and give a provisional structure verdict — re-confirm it after the snapshot + meadow diffs (see 0b)
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
 - [ ] Add yourself to `dataset.owners` in the new garden `.meta.yml` (don't reorder; preserve existing names and markers)
 - [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
@@ -147,6 +147,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       - what each non-trivial step does, in plain words ("meadow reshapes wide → long; garden harmonizes countries, adds population-weighted regional aggregates and per-capita columns");
       - key external inputs (population, regions, income groups, other datasets) and who consumes the output (counted by type; name the `viz://` ones). The script only sees DAG steps, so when it lists none, say that admin-built charts still read the grapher dataset directly — don't let "no consumers" read as "unused";
       - who did the last update and when (the creating commit, with its PR number). When the script says the step was *first built* (no earlier version, active or archived), say this is the dataset's first update and name who built it, not who "last updated" it.
+
+      After those lines, list the producer's main documentation as links, one line per source (dataset page, methodology, codebook, main report, what's new), so the user knows where to read up. Take them from the old `.dvc` and `.meta.yml`, plus anything a quick search turns up, and mark carried-over links as the previous edition until step 3 finds the current one. Say so when a source wasn't found.
    4. Close with a **provisional structure verdict**: usually *"Expected: no structural change — drop-in version bump."* If there's already evidence of a restructure (the triggers in "When the update isn't a drop-in version bump": a renamed `short_name`, a new file format or schema, a changed indicator set, changed score semantics), name it. Sources: the scheduled-issue body, the producer's release notes, or the new file's column list if it's cheap to fetch.
 
    Don't pause for approval here. Keep going unless a restructure is already visible, which is an existing stop condition. The verdict is provisional, because the real evidence (column sets, shape, row counts) only appears at steps 3–4. Re-confirm it there. Record the final verdict as `update_summary.pipeline_structure` in `update-context.yml`, and put one line in the PR Summary: `Pipeline structure: unchanged` or `Pipeline structure: changed — <what and why>`.
