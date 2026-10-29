@@ -95,6 +95,6 @@ tables:
 
           FAOSTAT has no data on laying hens for some countries in some years. Those gaps are filled by repeating the latest reported value, for at most five years.
 
-          All other countries and years are assigned a share of zero, since in-ovo sexing is not used there.
+          All other countries and years are assigned a share of zero, since in-ovo sexing is not used there. The series ends in the latest year with FAOSTAT data on laying hens.
         display:
           numDecimalPlaces: 1

@@ -216,13 +216,14 @@ def estimate_shares_by_country(tb: Table, tb_laying_hens: Table) -> Table:
 def extend_to_all_countries_and_years(tb_shares: Table, tb_laying_hens: Table) -> Table:
     """Extend the table to all countries (including historical ones) and all years, with zeros where not used.
 
-    The years span the FAOSTAT laying hens series and the producer's estimates.
+    The years span the FAOSTAT laying hens series. Later years are left out, since the EU total cannot be allocated to
+    countries without their number of laying hens.
     """
     tb_regions = paths.regions.tb_regions
     countries = sorted(tb_regions[tb_regions["region_type"] == "country"]["name"])
     error = f"Unknown countries in the in-ovo sexing shares: {set(tb_shares['country']) - set(countries)}"
     assert set(tb_shares["country"]) <= set(countries), error
-    years = range(tb_laying_hens["year"].min(), max(tb_laying_hens["year"].max(), tb_shares["year"].max()) + 1)
+    years = range(tb_laying_hens["year"].min(), tb_laying_hens["year"].max() + 1)
 
     tb_all = Table(pd.MultiIndex.from_product([countries, years], names=["country", "year"]).to_frame(index=False))
     tb_all = tb_all.merge(tb_shares, on=["country", "year"], how="left")
