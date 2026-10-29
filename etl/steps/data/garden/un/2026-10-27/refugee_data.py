@@ -78,10 +78,6 @@ def run() -> None:
     tb.loc[msk_r, "refugees"] = pd.NA
     tb.loc[msk_a, "asylum_seekers"] = pd.NA
 
-    # remove (for now) china after 2020 because of weird measurements
-    msk_china = (tb["country_of_asylum"] == "China") & (tb["year"] > 2020)
-    tb = tb[~(msk_china)]
-
     tb_origin = (
         tb.drop(columns=["country_of_asylum"])
         .groupby(["country_of_origin", "year"], observed=True)

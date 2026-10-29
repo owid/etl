@@ -13,7 +13,6 @@ definitions:
       - The United Nations High Commissioner for Refugees (UNHCR) collects data on refugee populations for each country of origin and country of asylum separately. To calculate the total number of refugees living in a country, we sum up the data from all origin countries. To calculate the total number of refugees from a country, we sum up the data from all asylum countries.
       - To calculate the number of refugees per 1,000 or 100,000 people in a country, we divide the number of refugees by the total population of the country (for the same year) and multiply by the factor. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
       - We remove refugee populations where the country of origin and country of asylum are the same, as refugees are defined as people who have fled their country and crossed an international border. We also remove asylum seekers where the country of origin and country of asylum are the same.
-      - We remove data for China after 2020 due to a large data discontinuity.
     display:
       numDecimalPlaces: 0
   description_unhcr_ooc: |-
@@ -66,6 +65,8 @@ definitions:
     Some US data for asylum seekers in 2025 is based on government sources that don't report the country of origin. Therefore a much higher number of asylum seekers in the United States have an unknown country of origin for 2025. The drop in asylum seekers from origin countries can be due to this data quality issue rather than an actual decrease.
   key_forced_returns: |-
     Not all returns are voluntary. UNHCR's numbers include people who returned because they were deported or pressured to leave their host country. Returning doesn't always mean they've settled back home for good, but UNHCR may assist returnees for longer periods.
+  key_china_indochinese: |-
+    A large group of refugees from current-day Vietnam settled in China after the Vietnam War in the late 1970s and early 1980s. These refugees and their descendants are [de facto integrated into Chinese society](https://www.unhcr.org/asia/where-we-work/countries/china), have full access to public services, and enjoy the same rights as Chinese nationals. UNHCR therefore stopped counting them in the refugee population in 2022.
 
   footnote_refugees: |-
     This data includes all refugees, not just those who fled that year.
@@ -95,6 +96,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
         description_short: |-
@@ -107,6 +109,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees}"
@@ -122,6 +125,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees}"
@@ -235,6 +239,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
       refugees_per_1000:
         title: Refugees by country of asylum per 1,000 people
         description_short: |-
@@ -247,6 +252,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees_asylum}"
@@ -262,6 +268,7 @@ tables:
           - "{definitions.description_key_refugee}"
           - "{definitions.key_refugee_vs_asylum}"
           - '{definitions.key_afghans_refugees}'
+          - '{definitions.key_china_indochinese}'
         presentation:
           grapher_config:
             note: "{definitions.footnote_refugees_asylum}"
