@@ -161,16 +161,18 @@ definitions:
   #
   # Text for the indicators in the replacement_rates table.
   #
+  description_key_replacement_rate_definition: |-
+    The replacement rate is the pension a person receives when they retire, as a share of their earnings before retirement.
   description_short_gross_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured before taxes.
-  description_key_gross_replacement_rate_definition: |-
-    The gross replacement rate is the pension a person receives when they retire, as a share of their earnings before retirement. Both are measured before taxes and social security contributions. Because the modeled worker always earns the same share of the average wage, this is the same as their pension as a share of their lifetime earnings.
+  description_key_gross_replacement_rate_taxes: |-
+    In the gross replacement rate, the pension and the earnings are both measured before taxes and social security contributions. Because the modeled worker always earns the same share of the average wage, this is the same as their pension as a share of their lifetime earnings.
   subtitle_gross_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured before taxes.
   description_short_net_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured after taxes.
-  description_key_net_replacement_rate_definition: |-
-    The net replacement rate is the pension a person receives when they retire, as a share of their earnings before retirement. Both are measured after the income taxes and social security contributions that workers and pensioners pay.
+  description_key_net_replacement_rate_taxes: |-
+    In the net replacement rate, the pension and the earnings are both measured after the income taxes and social security contributions that workers and pensioners pay.
   description_key_net_vs_gross_replacement_rates: |-
     Net replacement rates are usually higher than gross rates, because pensioners pay lower contributions than workers, pensions are lower than earnings and so are taxed at lower rates, and some countries tax pensions more lightly.
   subtitle_net_replacement_rate: |-
@@ -415,7 +417,9 @@ tables:
         description_short: |-
           {definitions.description_short_gross_replacement_rate}
         description_key: |-
-          {definitions.description_key_gross_replacement_rate_definition}
+          {definitions.description_key_replacement_rate_definition}
+
+          {definitions.description_key_gross_replacement_rate_taxes}
 
           {definitions.description_key_earnings}
 
@@ -452,7 +456,9 @@ tables:
         description_short: |-
           {definitions.description_short_net_replacement_rate}
         description_key: |-
-          {definitions.description_key_net_replacement_rate_definition}
+          {definitions.description_key_replacement_rate_definition}
+
+          {definitions.description_key_net_replacement_rate_taxes}
 
           {definitions.description_key_net_vs_gross_replacement_rates}
 
