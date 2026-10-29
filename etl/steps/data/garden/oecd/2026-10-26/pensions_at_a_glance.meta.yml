@@ -25,14 +25,12 @@ definitions:
   #
   # Reusable bullets for the modeled pension entitlements (replacement rates and pension wealth).
   #
-  description_key_modeled_worker: |-
-    The OECD doesn’t measure these pensions from data on actual pensioners. It calculates them with a model of each country’s pension rules, for a worker who enters the labor market at age 22 in 2024 and works without interruption until the normal retirement age. The worker earns the same multiple of the average wage throughout their career.
-  description_key_year_of_entry: |-
-    The year in this data, 2024, is the year the worker enters the labor market. The rules are those that each country had legislated by the time the OECD published its report in 2025, including reforms that are phased in over time. This worker would retire decades later: around 2068, on average across OECD countries.
+  description_key_cohort_model: |-
+    The OECD calculates these pensions with its cohort-based pension models. Instead of measuring the pensions of today’s retirees, it applies each country’s pension rules to one generation of workers: people who start working at age 22 in 2024, and so were born in 2002. It follows them over a full career, earning the same share of the average wage every year, until the normal retirement age, around 2068 on average. The year in this data is the year they start working. The rules are those legislated before the report was published in 2025, including reforms that are phased in over time.
   description_key_schemes_covered: |-
-    The OECD includes all mandatory pension schemes for private-sector workers, and schemes that cover at least 85% of workers without being mandatory, in Denmark, Iceland, the Netherlands, Sweden, and the United Kingdom. Special schemes for civil servants, public-sector workers, and particular professions are not included.
+    The OECD includes mandatory pension schemes for private-sector workers, and schemes that cover at least 85% of workers without being mandatory, in Denmark, Iceland, the Netherlands, Sweden, and the United Kingdom. It doesn’t include special schemes for civil servants, public-sector workers, or particular professions.
   description_key_assumptions: |-
-    The OECD assumes annual inflation of 2%, real wage growth of 1.25% per year, and a real return of 2.5% per year on funded pension savings. Life expectancy comes from UN mortality projections for each country.
+    The OECD uses the same economic assumptions for every country, so that differences between countries reflect their pension rules rather than their economies: 2% inflation, 1.25% real wage growth, and a 2.5% real return on pension savings each year. Life expectancy comes from UN projections.
   description_key_average_wage: |-
     In this data, the average wage is the average gross earnings of full-time adult workers in most sectors of the economy. It is the same for men and women.
   schemes_phrase: |-
@@ -57,19 +55,21 @@ definitions:
     This indicator is for a worker who earns the average wage.
     <%- elif earnings == "200% of average wage" %>
     This indicator is for a high earner, who earns twice the average wage.
-    <%- endif %>
+    <%- endif +%>
   description_key_sex_replacement_rates: |-
     <% if sex == "Women" %>
-    The OECD models women with the same career and earnings as men. Their replacement rates only differ from men’s where pension rules differ by sex: for example, lower retirement ages for women in Colombia, Costa Rica, Hungary, Israel, Poland, and Turkey, how means-tested benefits are calculated in Chile, and sex-specific life expectancy used to turn savings into a pension in Mexico.
+    The OECD models women with the same career and earnings as men, so their replacement rates only differ where pension rules differ by sex, for example where women can retire earlier.
     <%- elif sex == "Men" %>
-    The OECD models men and women with the same career and earnings. Replacement rates only differ by sex where pension rules do, for example in countries where women can retire earlier.
-    <%- endif %>
-  description_key_pension_schemes: |-
+    The OECD models men and women with the same career and earnings, so replacement rates only differ by sex where pension rules do, for example where women can retire earlier.
+    <%- endif +%>
+  description_key_voluntary_schemes: |-
+    It also includes voluntary private schemes in the countries where many workers have them: Belgium, Canada, Estonia, Germany, Ireland, Lithuania, New Zealand, the United States, and South Africa. It assumes the worker pays into them for their whole career. For other countries, it is the same as for mandatory schemes only.
+  description_key_schemes_covered_mandatory_or_voluntary: |-
     <% if pension_schemes == "Mandatory" %>
-    This indicator only includes mandatory pension schemes, and schemes that cover nearly all workers.
+    {definitions.description_key_schemes_covered}
     <%- elif pension_schemes == "Mandatory and voluntary" %>
-    This indicator also includes voluntary private pension schemes in countries where many workers have them: Belgium, Canada, Estonia, Germany, Ireland, Lithuania, New Zealand, the United States, and South Africa. It assumes the worker pays into them for their whole career, at a typical contribution rate. For Israel and Mexico, it also includes savings in severance and housing accounts that are moved into the pension at retirement. For other countries, it is the same as the value for mandatory schemes only.
-    <%- endif %>
+    {definitions.description_key_schemes_covered} {definitions.description_key_voluntary_schemes}
+    <%- endif +%>
   description_key_above_100: |-
     Values above 100% mean that the pension is higher than what the person earned while working. This mostly happens for low earners in countries with generous minimum pensions, such as Denmark and Mexico.
 
@@ -172,19 +172,19 @@ definitions:
   # Text for the indicators in the replacement_rates table.
   #
   description_key_replacement_rate_definition: |-
-    The replacement rate is the pension a person receives when they retire, as a share of their earnings before retirement.
+    The replacement rate is the pension a person receives when they retire, as a share of what they earned while working.
   description_short_gross_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured before taxes.
   description_key_gross_replacement_rate_taxes: |-
-    In the gross replacement rate, the pension and the earnings are both measured before taxes and social security contributions. Because the modeled worker always earns the same share of the average wage, this is the same as their pension as a share of their lifetime earnings.
+    In the gross rate, both are measured before taxes and social security contributions.
   subtitle_gross_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured before taxes.
   description_short_net_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured after taxes.
   description_key_net_replacement_rate_taxes: |-
-    In the net replacement rate, the pension and the earnings are both measured after the income taxes and social security contributions that workers and pensioners pay.
+    In the net rate, both are measured after the income taxes and social security contributions that workers and pensioners pay.
   description_key_net_vs_gross_replacement_rates: |-
-    Net replacement rates are usually higher than gross rates, because pensioners pay lower contributions than workers, pensions are lower than earnings and so are taxed at lower rates, and some countries tax pensions more lightly.
+    Net rates are usually higher than gross rates, mainly because pensioners pay less in taxes and contributions than workers.
   subtitle_net_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured after taxes.
 
@@ -431,23 +431,15 @@ tables:
         description_short: |-
           {definitions.description_short_gross_replacement_rate}
         description_key: |-
-          {definitions.description_key_replacement_rate_definition}
+          {definitions.description_key_replacement_rate_definition} {definitions.description_key_gross_replacement_rate_taxes}
 
-          {definitions.description_key_gross_replacement_rate_taxes}
-
-          {definitions.description_key_earnings}
-
-          {definitions.description_key_pension_schemes}
-
-          {definitions.description_key_modeled_worker}
-
-          {definitions.description_key_year_of_entry}
-
-          {definitions.description_key_schemes_covered}
+          {definitions.description_key_cohort_model}
 
           {definitions.description_key_assumptions}
 
-          {definitions.description_key_average_wage}
+          {definitions.description_key_earnings} {definitions.description_key_average_wage}
+
+          {definitions.description_key_schemes_covered_mandatory_or_voluntary}
 
           {definitions.description_key_sex_replacement_rates}
 
@@ -470,25 +462,15 @@ tables:
         description_short: |-
           {definitions.description_short_net_replacement_rate}
         description_key: |-
-          {definitions.description_key_replacement_rate_definition}
+          {definitions.description_key_replacement_rate_definition} {definitions.description_key_net_replacement_rate_taxes} {definitions.description_key_net_vs_gross_replacement_rates}
 
-          {definitions.description_key_net_replacement_rate_taxes}
-
-          {definitions.description_key_net_vs_gross_replacement_rates}
-
-          {definitions.description_key_earnings}
-
-          {definitions.description_key_pension_schemes}
-
-          {definitions.description_key_modeled_worker}
-
-          {definitions.description_key_year_of_entry}
-
-          {definitions.description_key_schemes_covered}
+          {definitions.description_key_cohort_model}
 
           {definitions.description_key_assumptions}
 
-          {definitions.description_key_average_wage}
+          {definitions.description_key_earnings} {definitions.description_key_average_wage}
+
+          {definitions.description_key_schemes_covered_mandatory_or_voluntary}
 
           {definitions.description_key_sex_replacement_rates}
 
@@ -526,9 +508,7 @@ tables:
 
           {definitions.description_key_earnings}
 
-          {definitions.description_key_modeled_worker}
-
-          {definitions.description_key_year_of_entry}
+          {definitions.description_key_cohort_model}
 
           {definitions.description_key_schemes_covered_except_voluntary}
 
@@ -559,9 +539,7 @@ tables:
 
           {definitions.description_key_earnings}
 
-          {definitions.description_key_modeled_worker}
-
-          {definitions.description_key_year_of_entry}
+          {definitions.description_key_cohort_model}
 
           {definitions.description_key_schemes_covered_except_voluntary}
 
