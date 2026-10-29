@@ -33,6 +33,7 @@ definitions:
           colorScale:
             baseColorScheme: Purples
 
+# NOTE: Update the year (2024) in the choice descriptions and in the subtitles of the comparison views to the new edition's.
 dimensions:
   - slug: timing
     name: Retirement
