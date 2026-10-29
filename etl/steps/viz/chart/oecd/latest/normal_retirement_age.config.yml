@@ -102,6 +102,9 @@ views:
       hasMapTab: false
       tab: chart
       chartTypes: ["Dumbbell"]
+      # Sort countries by the first indicator (today; men), highest first.
+      sortBy: startValue
+      sortOrder: desc
       title: Normal retirement age for men, today and in the future
       subtitle: Age at which men can start receiving a full pension, without penalty, after a career that started at age 22. Today's age is for people retiring in 2024; the future age is for people who start working in 2024, under the rules already legislated.
 
