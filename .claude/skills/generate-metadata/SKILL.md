@@ -325,6 +325,6 @@ Items that are easy to miss (obvious rules like "set title" are omitted — see 
 - [ ] `numDecimalPlaces` set and consistent across related variables
 - [ ] `display.name` paired with `title_public` when set
 - [ ] No TODO/FIXME, no copy-paste errors, no producer names/years in titles
-- [ ] Prose lives in `definitions:` as paragraph-sized pieces, and each variable lists its own references (no per-variable wrapper); Jinja for 10+ similar variables
+- [ ] Prose lives in `definitions:` as paragraph-sized pieces, and each variable lists its own references (no per-variable wrapper), unless the file is one of the inline exceptions under "YAML Efficiency Patterns"; Jinja for 10+ similar variables
 - [ ] Prose uses curly apostrophes/quotes (`’ “ ”`), not straight (`' "`) — straight marks are an LLM tell; see [check-metadata-style/STYLE_GUIDE.md](../check-metadata-style/STYLE_GUIDE.md)
 - [ ] Typo check passed
