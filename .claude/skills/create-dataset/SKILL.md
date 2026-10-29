@@ -206,7 +206,7 @@ Review all indicators when there are few. This catches the two things the Step 7
    | Indicator (column) | Title | Unit | Decimals | Based on |
    |---|---|---|---|---|
 
-   In **Based on**, name the documentation each indicator's metadata comes from and where in it (e.g. "report, 'Definition and measurement' box, p. 164"), or say "inferred from the data" (`.claude/rules/producer-documentation.md`, "Say what the metadata rests on").
+   In **Based on**, name the documentation each indicator's metadata comes from and where in it (e.g. "report, 'Definition and measurement' box, p. 164"), or say "inferred from the data" (`.claude/rules/producer-documentation.md`, "Say what the metadata rests on"). Add the same per-indicator sources to the PR description, so the reviewer sees them too.
 
    Plus a short list of:
    - **Things I guessed** (units, descriptions, license, topic tags) — "tell me if any are wrong."
