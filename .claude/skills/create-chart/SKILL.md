@@ -432,6 +432,8 @@ Inheritance is from `grapher_config` only — there is no fallback to the indica
 template), rebuild the grapher step, and leave the view configs thin. To verify what will actually render,
 read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
+Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
+
 ## Chart config options
 
 Key fields for `config` in views or `common_views`:
