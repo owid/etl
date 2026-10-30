@@ -112,9 +112,11 @@ definitions:
   description_key_income_survey_years: |-
     The data comes from household income surveys, collected in the OECD Income Distribution Database. The OECD shows each survey under one of the years 2014, 2016, 2018, 2020, or 2022. For 2022, the data refers to 2023 in Canada, Costa Rica, Finland, Latvia, the Netherlands, Sweden, the United Kingdom, and the United States, and to 2021 in Germany and Japan. Iceland’s latest survey is from 2017, and Australia’s from 2020.
   description_key_disposable_income: |-
-    Disposable income is household income after taxes and social security contributions, including pensions and other government benefits. The OECD adjusts it for household size, dividing it by the square root of the number of people in the household, and gives this income to each member of the household.
+    Disposable income is household income after taxes and social security contributions, including pensions and other government benefits.
   description_key_household_level: |-
     Because the OECD measures income at the household level, older people living with younger relatives share their incomes. Some of the income of older people, especially from work, can come from younger household members.
+  description_key_equivalization: |-
+    The income data has been [equivalized](#dod:equivalization), that is, adjusted for household size. This makes living standards more comparable across households of different sizes, since people sharing a household can split costs like rent and heating. To make the adjustment, the OECD uses the square root equivalence scale: it divides the total household income by the square root of the number of people in the household.
   description_key_wealth_not_included: |-
     These figures only count income. Older people in some countries own a lot more wealth, such as housing, than in others, and this doesn’t show up in their incomes.
   # NOTE: Check that Colombia's 2020 values are still published as 0; keep in sync with the .corrections.yml.
@@ -303,10 +305,10 @@ definitions:
   description_short_share_of_income_from_occupational_transfers: |-
     Share of the gross income of people aged over 65 that comes from employer-provided pensions and other payments from former employers.
   description_key_occupational_transfers_definition: |-
-    Occupational transfers include pensions provided through employers, severance payments, and death grants.
+    Occupational pensions and transfers include pensions provided through employers, severance payments, and death grants.
   # NOTE: Update the number of countries that report occupational transfers (14).
   description_key_occupational_transfers_reporting: |-
-    The OECD notes that only 14 countries report occupational transfers separately. In the other countries, this income shows as 0%, even if older people receive it.
+    The OECD notes that only 14 countries report occupational pensions and transfers separately. In the other countries, this income shows as 0%, even if older people receive it.
   description_short_share_of_income_from_capital: |-
     Share of the gross income of people aged over 65 that comes from personal pensions and the returns on their savings.
   description_key_capital_income_definition: |-
@@ -319,7 +321,7 @@ definitions:
   description_processing_income_sources: |-
     {definitions.description_processing_repeated_surveys}
 
-    The four shares the OECD publishes (public transfers, occupational pensions, capital, and work) don’t always add up to exactly 100%. For countries, they add up to between 99.9% and 100.1%, because the OECD rounds each share to one decimal. For the OECD average in 2020, they add up to 97.4%. So we rescale them: we divide each share by the sum of the four and multiply it by 100. This changes country values by about 0.1 percentage points at most, and the OECD average for 2020 by up to 1.5 points: public transfers, for example, go from 55.8% to 57.3%.
+    The four shares the OECD publishes (public transfers, occupational pensions and transfers, capital income, and work) don’t always add up to exactly 100%. For countries, they add up to between 99.9% and 100.1%, because the OECD rounds each share to one decimal. For the OECD average in 2020, they add up to 97.4%. So we rescale them: we divide each share by the sum of the four and multiply it by 100. This changes country values by about 0.1 percentage points at most, and the OECD average for 2020 by up to 1.5 points: public transfers, for example, go from 55.8% to 57.3%.
 
   #
   # Text for the indicators in the pension_expenditure table.
@@ -767,6 +769,8 @@ tables:
 
           {definitions.description_key_disposable_income}
 
+          {definitions.description_key_equivalization}
+
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
@@ -802,6 +806,8 @@ tables:
           {definitions.description_key_poverty_line}
 
           {definitions.description_key_disposable_income}
+
+          {definitions.description_key_equivalization}
 
           {definitions.description_key_income_survey_years}
 
@@ -855,6 +861,8 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
+
+          {definitions.description_key_equivalization}
         description_processing: "{definitions.description_processing_income_sources}"
         display:
           name: Public transfers
@@ -864,7 +872,7 @@ tables:
           title_public: Share of older people’s income from public transfers
 
       share_of_income_from_occupational_transfers:
-        title: Share of older people’s income from occupational pensions
+        title: Share of older people’s income from occupational pensions and transfers
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -877,13 +885,15 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
+
+          {definitions.description_key_equivalization}
         description_processing: "{definitions.description_processing_income_sources}"
         display:
-          name: Occupational pensions
+          name: Occupational pensions and transfers
           numDecimalPlaces: 1
           tolerance: 2
         presentation:
-          title_public: Share of older people’s income from occupational pensions
+          title_public: Share of older people’s income from occupational pensions and transfers
 
       share_of_income_from_capital:
         title: Share of older people’s income from capital
@@ -897,9 +907,11 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
+
+          {definitions.description_key_equivalization}
         description_processing: "{definitions.description_processing_income_sources}"
         display:
-          name: Capital
+          name: Capital income
           numDecimalPlaces: 1
           tolerance: 2
         presentation:
@@ -917,6 +929,8 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
+
+          {definitions.description_key_equivalization}
         description_processing: "{definitions.description_processing_income_sources}"
         display:
           name: Work
