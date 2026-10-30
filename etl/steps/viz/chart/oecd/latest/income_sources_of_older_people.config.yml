@@ -24,7 +24,7 @@ views:
             color: "#C8A47E"
     config:
       title: Where older people’s income comes from
-      subtitle: "Share of the gross income of people aged over 65 that comes from public transfers (public pensions and other government benefits), occupational pensions and transfers (pensions and other payments through employers), capital income (personal pensions and income from savings), and work (earnings and self-employment)."
+      subtitle: "Share of the gross income of people aged over 65 that comes from public transfers (public pensions and other government benefits), occupational pensions and transfers (private pensions and other payments through employers), capital income (personal pensions and income from savings), and work (earnings and self-employment)."
       note: Incomes are measured for the whole household, so income from work can come from younger people living with older people. Only 14 countries report occupational pensions and transfers separately; in the others, they show as 0%.
       tab: chart
       hasMapTab: false

@@ -303,7 +303,7 @@ definitions:
   description_key_public_transfers_definition: |-
     Public transfers include all public pensions, such as earnings-related pensions, and benefits for people with low incomes.
   description_short_share_of_income_from_occupational_transfers: |-
-    Share of the gross income of people aged over 65 that comes from employer-provided pensions and other payments from former employers.
+    Share of the gross income of people aged over 65 that comes from private pensions and other payments through employers, such as severance payments.
   description_key_occupational_transfers_definition: |-
     Occupational pensions and transfers include pensions provided through employers, severance payments, and death grants.
   # NOTE: Update the number of countries that report occupational transfers (14).
