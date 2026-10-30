@@ -206,6 +206,17 @@ definitions:
     Net rates are usually higher than gross rates, mainly because pensioners pay less in taxes and contributions than workers.
   subtitle_net_replacement_rate: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured after income taxes and social security contributions.
+  description_short_gross_replacement_rate_at_age_80: |-
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive at age 80, as a share of the average wage at that time. Both are measured before income taxes and social security contributions.
+  subtitle_gross_replacement_rate_at_age_80: |-
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} at age 80, as a share of the average wage at that time. Both are measured before income taxes and social security contributions.
+  description_key_replacement_rate_at_age_80_definition: |-
+    This is the pension a person receives at age 80, as a share of the average wage in the economy that year. At retirement, the replacement rate compares the pension with what the person earned while working. At age 80, the OECD compares it with the average wage projected for that year, which keeps growing after the person retires.
+  description_key_replacement_rate_at_age_80_indexation: |-
+    The rate at age 80 is lower than at retirement in countries where pensions rise in line with prices rather than wages after people retire, because the OECD assumes that wages grow faster than prices. It is the same where pensions rise in line with wages, and it can be higher where some benefits increase with age, as in Australia and Ireland.
+  # NOTE: Check whether the new edition also publishes rates at age 80 for women, other earnings levels or net rates.
+  description_key_replacement_rate_at_age_80_coverage: |-
+    The OECD only publishes this rate for men earning the average wage in mandatory schemes.
 
   #
   # Text for the indicators in the pension_wealth table.
@@ -513,6 +524,37 @@ tables:
             subtitle: '{definitions.subtitle_net_replacement_rate}'
             note: "{definitions.note_modeled_pensions}"
 
+      gross_replacement_rate_at_age_80:
+        title: Gross pension replacement rate at age 80 (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          {definitions.description_short_gross_replacement_rate_at_age_80}
+        description_key: |-
+          {definitions.description_key_replacement_rate_at_age_80_definition} {definitions.description_key_gross_replacement_rate_taxes}
+
+          {definitions.description_key_replacement_rate_at_age_80_indexation}
+
+          {definitions.description_key_cohort_model}
+
+          {definitions.description_key_assumptions}
+
+          {definitions.description_key_earnings} {definitions.description_key_average_wage}
+
+          {definitions.description_key_schemes_covered} {definitions.description_key_replacement_rate_at_age_80_coverage}
+        description_processing: |-
+          The OECD doesn’t publish this rate in its Data Explorer, so we take it from the data behind Figure 4.2 of Pensions at a Glance 2025. The figure doesn’t say which worker it models; we checked that its rates at retirement match those of men earning the average wage in mandatory schemes.
+        display:
+          name: <<sex>>, <<earnings.lower()>>, <<pension_schemes.lower()>>
+          numDecimalPlaces: 1
+          tolerance: 0
+        presentation:
+          title_public: Gross pension replacement rate at age 80 (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
+          grapher_config:
+            title: Gross pension replacement rate at age 80 for <<sex.lower()>> earning {definitions.earnings_phrase}
+            subtitle: '{definitions.subtitle_gross_replacement_rate_at_age_80}'
+            note: "{definitions.note_modeled_pensions}"
+
   pension_wealth:
     common:
       presentation:
@@ -736,6 +778,13 @@ tables:
           tolerance: 2
         presentation:
           title_public: Income of older people relative to the whole population (<<age>>, <<sex.lower()>>)
+          grapher_config:
+            title: |-
+              <% if sex == "Both sexes" %>
+              Average income of people aged <<age.replace(" years", "")>>, relative to the whole population
+              <%- else %>
+              Average income of <<sex.lower()>> aged <<age.replace(" years", "")>>, relative to the whole population
+              <%- endif %>
 
       poverty_rate:
         title: |-
@@ -773,6 +822,15 @@ tables:
             <%- else %>
             Old-age income poverty rate (<<age>>, <<sex.lower()>>)
             <%- endif %>
+          grapher_config:
+            title: |-
+              <% if age == "Total population" %>
+              Share of the population living in relative poverty
+              <%- elif sex == "Both sexes" %>
+              Share of people aged <<age.replace(" years", "")>> living in relative poverty
+              <%- else %>
+              Share of <<sex.lower()>> aged <<age.replace(" years", "")>> living in relative poverty
+              <%- endif %>
 
   income_sources_of_older_people:
     common:

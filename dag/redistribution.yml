@@ -43,6 +43,7 @@ steps:
       - data://meadow/oecd/2026-10-26/pensions_at_a_glance:
         - snapshot://oecd/2026-10-26/pensions_at_a_glance.csv
         - snapshot://oecd/2026-10-26/pensions_at_a_glance_tax_rates.xlsx
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance_replacement_rates_at_age_80.xlsx
   #
   # OECD Pensions at a Glance multidims — authored in ETL.
   #
@@ -53,6 +54,12 @@ steps:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
     - data://grapher/regions/2023-01-01/regions
   viz://chart/oecd/latest/pension_replacement_rates:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/old_age_poverty_rate:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/old_age_relative_income:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
     - data://grapher/regions/2023-01-01/regions
 

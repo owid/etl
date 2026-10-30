@@ -171,6 +171,7 @@ def run() -> None:
     # Read tables from meadow dataset.
     tb = ds_meadow.read("pensions_at_a_glance")
     tb_taxes = ds_meadow.read("tax_rates")
+    tb_age_80 = ds_meadow.read("replacement_rates_at_age_80")
 
     # Check that the source has the expected measures and dimensions.
     sanity_check_inputs(tb=tb)
@@ -189,9 +190,11 @@ def run() -> None:
     # - The dataflow labels some years of women's exit age "European Union (28 countries)" and the rest
     #   "European Union (27 countries)", with no break in the values (men's series is EU27 throughout). So both become
     #   "European Union (27)".
+    # - The Figure 4.2 data labels countries by ISO code, which the .countries.json also maps.
     # NOTE: Check whether the source still mixes the two EU labels; if it labels the series consistently, keep only one.
     tb = paths.regions.harmonize_names(tb)
     tb_taxes = paths.regions.harmonize_names(tb_taxes)
+    tb_age_80 = paths.regions.harmonize_names(tb_age_80)
 
     # Drop known errors in the source data (missing values published as zeros).
     tb = paths.apply_corrections(tb)
@@ -213,6 +216,11 @@ def run() -> None:
 
     # Take the tax rate of workers from the data of Figure 4.3, since the source publishes it wrongly.
     tables["taxes_and_wages"] = add_tax_rate_of_workers(tb=tables["taxes_and_wages"], tb_taxes=tb_taxes)
+
+    # Add the gross replacement rate at age 80 from the data of Figure 4.2, which the source doesn't publish.
+    tables["replacement_rates"] = add_replacement_rate_at_age_80(
+        tb=tables["replacement_rates"], tb_age_80=tb_age_80, tb_retirement=tables["retirement"]
+    )
 
     # Improve table formats.
     tables = {
@@ -344,6 +352,37 @@ def add_tax_rate_of_workers(tb: Table, tb_taxes: Table) -> Table:
     return tb
 
 
+def add_replacement_rate_at_age_80(tb: Table, tb_age_80: Table, tb_retirement: Table) -> Table:
+    """Add the gross replacement rate at age 80 of Figure 4.2, for men earning the average wage in mandatory schemes.
+
+    The figure doesn't say which worker it models. Its rates at retirement match those of men earning the average wage
+    in mandatory schemes (e.g. Australia 40.8%, against 38.5% for women), and its retirement ages match men's future
+    normal retirement ages, which the function checks before adding the rates.
+    """
+    mask = (tb["sex"] == "Men") & (tb["earnings"] == "Average wage") & (tb["pension_schemes"] == "Mandatory")
+    tb_check = pr.merge(tb_age_80, tb[mask], on=["country", "year"], how="left")
+    assert tb_check["gross_replacement_rate"].notna().all(), (
+        "Countries in the Figure 4.2 data are missing from the source."
+    )
+    difference = (tb_check["gross_replacement_rate_at_retirement"] - tb_check["gross_replacement_rate"]).abs()
+    assert (difference < 0.1).all(), (
+        "The rates at retirement of Figure 4.2 differ from those of men at the average wage."
+    )
+
+    tb_ages = tb_retirement[tb_retirement["sex"] == "Men"][["country", "future_normal_retirement_age"]].dropna()
+    tb_check = pr.merge(tb_age_80, tb_ages, on="country", how="inner")
+    difference = (tb_check["normal_retirement_age"] - tb_check["future_normal_retirement_age"]).abs()
+    assert (difference.dropna() < 1).all(), "The retirement ages of Figure 4.2 differ from men's future ones."
+
+    tb_age_80 = tb_age_80[["country", "year", "gross_replacement_rate_at_age_80"]].copy()
+    tb_age_80["sex"] = "Men"
+    tb_age_80["earnings"] = "Average wage"
+    tb_age_80["pension_schemes"] = "Mandatory"
+    tb = pr.merge(tb, tb_age_80, on=["country", "year", "sex", "earnings", "pension_schemes"], how="left")
+
+    return tb
+
+
 def assign_actual_years(tb: Table) -> Table:
     for (measure, year_in_source), actual_years in ACTUAL_YEARS.items():
         mask = (tb["measure"] == measure) & (tb["year"] == year_in_source)
@@ -410,6 +449,7 @@ def sanity_check_outputs(tables: dict[str, Table]) -> None:
         ("retirement", "expected_years_after_labor_market_exit"): (3, 35),
         ("replacement_rates", "gross_replacement_rate"): (0, 150),
         ("replacement_rates", "net_replacement_rate"): (0, 150),
+        ("replacement_rates", "gross_replacement_rate_at_age_80"): (0, 150),
         ("pension_wealth", "gross_pension_wealth"): (0, 40),
         ("pension_wealth", "net_pension_wealth"): (0, 40),
         ("taxes_and_wages", "average_tax_rate_workers"): (0, 60),

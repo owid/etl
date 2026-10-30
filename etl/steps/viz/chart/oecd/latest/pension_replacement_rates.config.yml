@@ -23,6 +23,7 @@ default_dimensions:
   earnings: average
   schemes: mandatory
   sex: men
+  age: at_retirement
 
 definitions:
   common_views:
@@ -84,6 +85,18 @@ dimensions:
       - slug: men_vs_women
         name: Men vs. women
         description: Compare the rates of men and women
+  - slug: age
+    name: Age
+    choices:
+      - slug: at_retirement
+        name: At retirement
+        description: Pension when people retire, as a share of what they earned while working
+      - slug: at_80
+        name: At age 80
+        description: Pension at age 80, as a share of the average wage at that time; only available for gross rates for men earning the average wage in mandatory schemes
+      - slug: retirement_vs_80
+        name: At retirement vs. at age 80
+        description: Compare the rates at retirement and at age 80; only available for gross rates for men earning the average wage in mandatory schemes
 
 views:
   - dimensions:
@@ -91,6 +104,7 @@ views:
       earnings: half
       schemes: mandatory
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory
@@ -100,6 +114,7 @@ views:
       earnings: half
       schemes: mandatory
       sex: women
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate__sex_women__earnings_50pct_of_average_wage__pension_schemes_mandatory
@@ -109,6 +124,7 @@ views:
       earnings: average
       schemes: mandatory
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory
@@ -118,6 +134,7 @@ views:
       earnings: average
       schemes: mandatory
       sex: women
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate__sex_women__earnings_average_wage__pension_schemes_mandatory
@@ -127,6 +144,7 @@ views:
       earnings: twice
       schemes: mandatory
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory
@@ -136,6 +154,7 @@ views:
       earnings: twice
       schemes: mandatory
       sex: women
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate__sex_women__earnings_200pct_of_average_wage__pension_schemes_mandatory
@@ -145,6 +164,7 @@ views:
       earnings: half
       schemes: mandatory
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory
@@ -154,6 +174,7 @@ views:
       earnings: half
       schemes: mandatory
       sex: women
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_women__earnings_50pct_of_average_wage__pension_schemes_mandatory
@@ -163,6 +184,7 @@ views:
       earnings: average
       schemes: mandatory
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory
@@ -172,6 +194,7 @@ views:
       earnings: average
       schemes: mandatory
       sex: women
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_women__earnings_average_wage__pension_schemes_mandatory
@@ -181,6 +204,7 @@ views:
       earnings: twice
       schemes: mandatory
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory
@@ -190,6 +214,7 @@ views:
       earnings: twice
       schemes: mandatory
       sex: women
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_women__earnings_200pct_of_average_wage__pension_schemes_mandatory
@@ -199,6 +224,7 @@ views:
       earnings: half
       schemes: mandatory_and_voluntary
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory_and_voluntary
@@ -208,6 +234,7 @@ views:
       earnings: average
       schemes: mandatory_and_voluntary
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory_and_voluntary
@@ -217,6 +244,17 @@ views:
       earnings: twice
       schemes: mandatory_and_voluntary
       sex: men
+      age: at_retirement
     indicators:
       y:
         - catalogPath: replacement_rates#net_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory_and_voluntary
+
+  - dimensions:
+      measure: gross
+      earnings: average
+      schemes: mandatory
+      sex: men
+      age: at_80
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate_at_age_80__sex_men__earnings_average_wage__pension_schemes_mandatory

@@ -19,6 +19,7 @@ COMPARISONS = {
         {"mandatory": "Mandatory", "mandatory_and_voluntary": "Mandatory and voluntary"},
     ),
     "sex": ("men_vs_women", {"men": "Men", "women": "Women"}),
+    "age": ("retirement_vs_80", {"at_retirement": "At retirement", "at_80": "At age 80"}),
 }
 
 # Two-way comparisons as dumbbells, sorted by the first choice, highest first. Mandatory vs. voluntary schemes and men
@@ -32,8 +33,9 @@ DUMBBELL_CONFIG = {
     "sortOrder": "desc",
 }
 
-# Gross and net are the rate before and after taxes, so an arrow points from the gross to the net rate.
-GROSS_VS_NET_CONFIG = {**DUMBBELL_CONFIG, "dumbbell": {"connectorStyle": "arrow"}}
+# Gross and net are the rate before and after taxes, and the rates at retirement and at age 80 are one after the
+# other, so an arrow points from the first to the second.
+ARROW_CONFIG = {**DUMBBELL_CONFIG, "dumbbell": {"connectorStyle": "arrow"}}
 
 # Three earnings levels don't fit a dumbbell, so they go side by side, one panel per country. The custom sort keeps
 # the bars in the order of the indicators (half, average, twice), instead of sorting them by value in each panel.
@@ -47,7 +49,7 @@ EARNINGS_CONFIG = {
 }
 
 # Chart settings of each comparison, other than the plain dumbbell.
-CONFIGS = {"measure": GROSS_VS_NET_CONFIG, "earnings": EARNINGS_CONFIG}
+CONFIGS = {"measure": ARROW_CONFIG, "earnings": EARNINGS_CONFIG, "age": ARROW_CONFIG}
 
 # Wording of each choice in the titles and subtitles of the comparison views.
 MEASURE = {"gross": "Gross", "net": "Net", "gross_vs_net": "Gross and net"}
@@ -79,11 +81,15 @@ def run() -> None:
 
     # Add a comparison view for every combination of the other selectors.
     subtitle = "Pension that {sex} earning {earnings} can expect to receive from {schemes} when they retire, as a share of what they earned while working. {taxes}"
+    subtitles = {
+        "age": "Pension that {sex} earning {earnings} can expect to receive from {schemes} when they retire, as a share of what they earned while working, and at age 80, as a share of the average wage at that time. {taxes}"
+    }
     titles = {
         "measure": "Gross and net pension replacement rates for {sex} earning {earnings}",
         "earnings": "{measure} pension replacement rates for {sex}, by earnings",
         "schemes": "Net pension replacement rates for {sex} earning {earnings}, with and without voluntary schemes",
         "sex": "{measure} pension replacement rates for men and women earning {earnings}",
+        "age": "{measure} pension replacement rate for {sex} earning {earnings}, at retirement and at age 80",
     }
     c.group_views(
         groups=[
@@ -94,10 +100,10 @@ def run() -> None:
                 "view_config": {
                     **CONFIGS.get(dimension, DUMBBELL_CONFIG),
                     "title": titles[dimension],
-                    "subtitle": subtitle,
+                    "subtitle": subtitles.get(dimension, subtitle),
                     "note": note,
                 },
-                "view_metadata": {"description_short": subtitle},
+                "view_metadata": {"description_short": subtitles.get(dimension, subtitle)},
             }
             for dimension, (slug, labels) in COMPARISONS.items()
         ],
@@ -132,7 +138,8 @@ def keep_view(view) -> bool:
 
     Mandatory and voluntary schemes are only published for net rates for men, so the comparisons of gross and net, or
     of men and women, have only one side for those schemes, and so has the comparison of schemes for women or for
-    gross rates.
+    gross rates. Likewise, rates at age 80 are only published for gross rates for men earning the average wage in
+    mandatory schemes.
     """
     for dimension, (slug, labels) in COMPARISONS.items():
         if view.dimensions[dimension] == slug:
