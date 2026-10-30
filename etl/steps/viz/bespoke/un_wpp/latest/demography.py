@@ -36,6 +36,27 @@ paths = PathFinder(__file__)
 # The file that indexes the rest of the feed.
 INDEX_FILENAME = "demography.metadata.json"
 
+# What the viz shows about the tool itself. It describes the tool, not one column, so it is set
+# here rather than in the garden metadata (which a feed combining several columns doesn't carry).
+DESCRIPTION_KEY = """\
+We’ve built this tool to be deliberately simple: small enough to run in a browser and nevertheless capable of modeling whole populations based on the key demographic inputs.
+
+It is less detailed than the models expert demographers use, and our aim is not to replace them. We hope it’s useful for developing an understanding of the difference that changes in demographic variables can make to the size and structure of future populations.
+
+In our [technical documentation](https://docs.owid.io/projects/etl/analyses/population_tool/), we provide a much more detailed walkthrough of our methodology and its limitations. Here, we’ll provide a much more brief summary.
+
+The model draws on historical population and demographic data from the United Nations (UN).
+
+The tool uses the UN’s historical data for 2023 for these metrics, then allows the user to select values for three metrics — fertility rates, life expectancy, and net migration — at three points in time: 2030, 2050, and 2100.
+
+The model then shows what would happen to the total population and age structure of that country over the course of this century.
+
+Our model applies the cohort-component method. This approach is also used by the UN in its forecasts, and is commonly used by expert demographers, researchers, and statistical offices.
+
+The approach follows groups of people — cohorts — over time, and applies the expected inputs for fertility, mortality, and migration to each cohort.
+
+Cohorts are broken down by age and sex. The projected change for the first year is then based on four changes: deaths, aging, migration, and births. The output of this model run for one year then becomes the population cohort input for the next year, and this repeats."""
+
 # The five-year bands the visualization draws its population pyramid from. `un_wpp` also carries
 # single years of age and wider bands over the same people (`0-14`, `15-64`), which would double
 # count if they came along.
@@ -268,6 +289,7 @@ def run() -> None:
         },
         update_period_days=ds_garden.metadata.update_period_days,
     )
+    feed_metadata["descriptionKey"] = DESCRIPTION_KEY
 
     manifest = {"countries": entities, "slugs": {entity: slugify(entity) for entity in entities}}
     save_json(add_feed_metadata(manifest, feed_metadata), INDEX_FILENAME)
