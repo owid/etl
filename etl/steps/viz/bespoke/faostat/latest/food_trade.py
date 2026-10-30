@@ -55,7 +55,7 @@ Importantly, when digging into this data, we found that what exporting countries
 Pablo Rosado, our data scientist behind this work, explains how we processed the original FAO data in more detail in our [technical documentation](https://docs.owid.io/projects/etl/analyses/food_trade/food_trade)."""
 
 # Fields the garden column carries that the viz does not show.
-FIELDS_NOT_SHOWN = ["descriptionShort", "unit", "shortUnit"]
+FIELDS_NOT_SHOWN = ["descriptionShort", "unit", "shortUnit", "descriptionProcessing"]
 
 
 def _build_product_data(df: pd.DataFrame, product: str, entity_to_id: dict) -> dict:
