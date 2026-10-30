@@ -85,13 +85,13 @@ definitions:
   #
   description_key_schemes_covered_except_voluntary: |-
     {definitions.description_key_schemes_covered} Voluntary schemes are not included.
-  # NOTE: Check the discount rate (1.5%), the previous one (2%) and its effect (about 6%); drop the comparison if the rate didn't change.
+  description_key_pension_wealth_drivers: |-
+    Pension wealth is higher where people live longer after they retire and where pensions rise in line with wages rather than prices. With the same career, women usually have more pension wealth than men, because they live longer, and in some countries because they can retire earlier.
   description_key_pension_wealth_life_expectancy: |-
-    Pension wealth takes into account how long people of each age and sex are expected to live in each country. Future payments are discounted at a real rate of 1.5% per year, lower than the 2% used in previous editions of the OECD report, which raises pension wealth by about 6%.
-  description_key_pension_wealth_low_earners: |-
-    It doesn’t take into account that people with low incomes tend to live shorter lives, so it overstates the pension wealth of low earners and understates that of high earners.
-  description_key_pension_wealth_sex: |-
-    The OECD models men and women with the same career and earnings. Pension wealth is usually higher for women, because they live longer and so receive their pensions for more years, and in some countries because they can retire earlier.
+    The OECD uses UN projections of how long people of each age and sex live in each country, but not differences by income. People with low incomes tend to live shorter lives, so this overstates the pension wealth of low earners and understates that of high earners.
+  # NOTE: Check the economic assumptions (2%, 1.25%, 2.5%) and the discount rate (1.5%, down from 2%) against the new edition's “Methodology and assumptions”; drop the comparison if the rate didn't change.
+  description_key_pension_wealth_assumptions: |-
+    The OECD uses the same economic assumptions for every country: 2% inflation, 1.25% real wage growth, and a 2.5% real return on pension savings each year. Pension payments further in the future count for less: each year ahead lowers their value by 1.5% (2% in earlier editions of the report).
 
   #
   # Reusable bullets for tax rates.
@@ -224,11 +224,11 @@ definitions:
   description_short_gross_pension_wealth: |-
     Total value of the pensions that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive over their retirement, measured in years of their earnings before retirement. Both are measured before taxes.
   description_key_gross_pension_wealth_definition: |-
-    Pension wealth is the total value of all the pension payments a person can expect to receive over their retirement, measured at the time they retire. It is expressed as a multiple of their annual earnings before retirement: a value of 10 means that their pensions are worth ten years of earnings. It is like the lump sum a person would need when they retire to buy an annuity that pays the same pension.
+    Pension wealth adds up all the pension payments a person can expect to receive over their retirement, valued at the time they retire. It is measured in years of their earnings before retirement: a value of 10 means that their pensions are worth ten years of earnings.
   description_short_net_pension_wealth: |-
     Total value of the pensions that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive over their retirement, measured in years of their earnings before retirement. Both are measured after taxes.
   description_key_net_pension_wealth_definition: |-
-    Net pension wealth is the total value of all the pension payments a person can expect to receive over their retirement, measured at the time they retire, after the taxes and social security contributions they pay on their pensions. It is expressed as a multiple of their annual net earnings before retirement: a value of 10 means that their pensions are worth ten years of earnings. {definitions.description_key_tax_allowances}
+    Net pension wealth adds up all the pension payments a person can expect to receive over their retirement, after the taxes and social security contributions they pay on them, valued at the time they retire. It is measured in years of their earnings before retirement, also after taxes and contributions: a value of 10 means that their pensions are worth ten years of earnings. {definitions.description_key_tax_allowances}
 
   #
   # Text for the indicators in the taxes_and_wages table.
@@ -571,9 +571,9 @@ tables:
         description_key: |-
           {definitions.description_key_gross_pension_wealth_definition}
 
-          {definitions.description_key_pension_wealth_life_expectancy}
+          {definitions.description_key_pension_wealth_drivers}
 
-          {definitions.description_key_pension_wealth_low_earners}
+          {definitions.description_key_pension_wealth_life_expectancy}
 
           {definitions.description_key_earnings}
 
@@ -581,11 +581,9 @@ tables:
 
           {definitions.description_key_schemes_covered_except_voluntary}
 
-          {definitions.description_key_assumptions}
+          {definitions.description_key_pension_wealth_assumptions}
 
           {definitions.description_key_average_wage}
-
-          {definitions.description_key_pension_wealth_sex}
         display:
           name: <<sex>>, <<earnings.lower()>>
           numDecimalPlaces: 1
@@ -602,9 +600,9 @@ tables:
         description_key: |-
           {definitions.description_key_net_pension_wealth_definition}
 
-          {definitions.description_key_pension_wealth_life_expectancy}
+          {definitions.description_key_pension_wealth_drivers}
 
-          {definitions.description_key_pension_wealth_low_earners}
+          {definitions.description_key_pension_wealth_life_expectancy}
 
           {definitions.description_key_earnings}
 
@@ -612,11 +610,9 @@ tables:
 
           {definitions.description_key_schemes_covered_except_voluntary}
 
-          {definitions.description_key_assumptions}
+          {definitions.description_key_pension_wealth_assumptions}
 
           {definitions.description_key_average_wage}
-
-          {definitions.description_key_pension_wealth_sex}
         display:
           name: <<sex>>, <<earnings.lower()>>
           numDecimalPlaces: 1
