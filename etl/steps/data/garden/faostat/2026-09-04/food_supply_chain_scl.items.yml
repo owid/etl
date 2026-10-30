@@ -1,0 +1,190 @@
+# Manual inputs of the food supply chain step based on FAO's Supply Utilization Accounts (SCL).
+#
+# Item codes are FAO SCL (SUA) item codes; names are asserted against the data. Everything not listed here comes
+# from the data itself: the item list and the crop/animal/processed roles come from FAO's item groups, and energy
+# densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
+
+# 1. Energy (kcal per 100 g) and protein (g per 100 g) for items with too little food use to derive a reliable
+#    density from their reported food quantities (assumption 5). The values are read from two snapshots:
+#    - FAO's 2024 Global nutrient conversion table for SUA (snapshot faostat/2026-10-14/nutrient_conversion_table),
+#      matched to each item by its CPC code: energy and protein per 100 g, times the edible-portion coefficient.
+#    - Feedipedia's feed composition tables (snapshot feedipedia/2026-10-14/feed_composition), for the items the
+#      table does not cover: dry matter, in % of the item as fed, and protein (crude protein), fat (ether extract),
+#      ash and fibre, in % of dry matter. Fibre is neutral detergent fibre, or crude fibre where the table publishes
+#      no NDF. The step converts each composition to energy and protein with the NCT's own energy formula (see
+#      `composition_density`).
+fixed_densities:
+  # Cakes not listed individually take the average density of the Feedipedia cakes listed below. 'Cake of' matches no
+  # item in this release (it is the default for a cake FAO adds later), and 'Cake,' only matches 'Cake, oilseeds nes'.
+  unlisted_cake_patterns: ["Cake of", "Cake,"]
+  nutrient_conversion_table:
+    - {code: 158, name: "Cane sugar, centrifugal"}
+    - {code: 17, name: "Bran of wheat"}
+    - {code: 35, name: "Bran of rice"}
+    - {code: 47, name: "Bran of barley"}
+    - {code: 59, name: "Bran of maize"}
+    - {code: 73, name: "Bran of rye"}
+    - {code: 77, name: "Bran of oats"}
+    - {code: 81, name: "Bran of millet"}
+    - {code: 85, name: "Bran of sorghum"}
+    - {code: 91, name: "Bran of buckwheat"}
+    - {code: 96, name: "Bran of fonio"}
+    - {code: 99, name: "Bran of triticale"}
+    - {code: 105, name: "Bran of mixed grain"}
+    - {code: 112, name: "Bran of cereals n.e.c."}
+    - {code: 337, name: "Oil of hempseed"}
+    - {code: 1225, name: "Tallow"}
+    # Acid oils from refining are the fatty acids removed from crude oils, mostly palm oil, when they are refined.
+    # Residues of fatty substances are traded mostly as the oil recovered from palm oil mill effluent, which goes to
+    # biodiesel in Europe. The table has neither, so both take the table's values for palm oil.
+    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", value_of: {257: "Palm oil"}}
+    - {code: 1277, name: "Residues of fatty substances", value_of: {257: "Palm oil"}}
+  feedipedia:
+    # Meals below 47% protein include the hulls (Feedipedia), and SCL's World crush in 2023 (oil 18.6%, cake 77.7% of
+    # the beans) leaves no room for removed hulls.
+    - {code: 238, name: "Cake of soya beans", node: 11682, table: "Soybean meal, low protein, type 44-46 and similar"}
+    - {code: 272, name: "Cake of rapeseed", node: 12503, table: "Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction"}
+    - {code: 269, name: "Cake of sunflower seed", node: 12663, table: "Sunflower meal, solvent-extracted, dehulled or non-dehulled"}
+    # The high-fibre meal is made with little dehulling; SCL's World cake in 2023 is 55.8% of the seed crushed, more
+    # than the 45.5% of a dehulling crush (O'Brien et al., cited by Feedipedia).
+    - {code: 332, name: "Cake of cottonseed", node: 16275, table: "Cottonseed meal, high fibre, low oil"}
+    # The published components add up to more than the dry matter, so the available carbohydrate would be slightly
+    # negative; the step sets it to zero (see `composition_density`).
+    - {code: 259, name: "Cake of palm kernel", node: 12420, table: "Palm kernel meal, mechanical extraction"}
+    - {code: 245, name: "Cake of groundnuts", node: 12159, table: "Peanut meal, oil > 5%"}
+    # Feedipedia (citing Göhl 1982) gives rice bran 10-15% crude fibre, and removing the oil raises it, hence the
+    # 11-20% class.
+    - {code: 37, name: "Cake of rice bran", node: 11640, table: "Rice bran, defatted, fibre 11-20%"}
+    - {code: 61, name: "Cake of maize", node: 20332, table: "Maize germ meal, protein 20-30%, oil < 5%"}
+    - {code: 253, name: "Cake of copra", node: 11997, table: "Coconut, copra, oilmeal, expeller extraction"}
+    - {code: 291, name: "Cake of sesame seed", node: 12577, table: "Sesame meal, mechanical extraction"}
+    - {code: 335, name: "Cake of linseed", node: 12262, table: "Linseed meal, cold-pressed"}
+    - {code: 282, name: "Cake of safflowerseed", node: 12552, table: "Safflower (Carthamus tinctorius), meal, expeller extraction"}
+    - {code: 338, name: "Cake of hempseed", node: 11694, table: "Hemp oil meal, mechanical extraction"}
+    - {code: 298, name: "Cake, poppy seed", node: 12463, table: "Poppy (Papaver somniferum), oil meal, mechanical extraction"}
+    # Corn gluten feed, the larger volume; gluten meal has more protein.
+    - {code: 846, name: "Gluten feed and meal", node: 12287, table: "Corn gluten feed"}
+    # Feedipedia has no pea bran; lentil bran is the pulse bran with a measured fibre value.
+    - {code: 213, name: Bran of pulses, node: 12246, table: "Lentil bran"}
+    - {code: 336, name: "Hempseed", node: 11696, table: "Hemp seeds"}
+
+# 2. Items that are never food, whatever happens to them. They are left out of the chain altogether, in all three
+#    tables. Fuel ethanol is the one that matters: the crops sent to distilleries leave the chain where FAO records
+#    them, as other uses of the crop (Brazil, United States) or as processing (Pakistan, India). Counting the ethanol as
+#    a processed product would credit those calories back into processing and then count them a second time as
+#    ethanol exports and ethanol burned, and it would bring fuel imports into the chain of the importing countries.
+never_food:
+  - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher"}
+  - {code: 265, name: "Castor oil seeds"}
+  - {code: 266, name: "Oil of castor beans"}
+  - {code: 1273, name: "Castor oil, hydrogenated"}
+  - {code: 275, name: "Tung nuts"}
+  - {code: 276, name: "Oil of tung nuts"}
+  - {code: 305, name: "Tallowtree seeds"}
+  - {code: 306, name: "Vegetable tallow"}
+  - {code: 310, name: "Kapok fruit"}
+  - {code: 311, name: "Kapokseed in shell"}
+  - {code: 312, name: "Kapokseed, shelled"}
+  - {code: 313, name: "Oil of kapok"}
+  - {code: 314, name: "Cake of kapok"}
+  - {code: 277, name: "Jojoba seeds"}
+  - {code: 278, name: "Jojoba oil"}
+  - {code: 994, name: "Wool grease and lanolin"}
+  - {code: 1222, name: "Degras"}
+  - {code: 663, name: "Cocoa husks and shells"}
+
+# 3. Crops that are not eaten as harvested (assumption 7). FAO's 2024 nutrient conversion table values each crop at
+#    the part of it that people eat (its edible-portion coefficient): sunflower seed without the hull, sugar cane as
+#    its juice, paddy as husked rice, rapeseed as its oil, coconuts as the meat and water of young and mature nuts,
+#    cotton seed as its kernels. Factories process the whole crop and make recorded products from the parts FAO
+#    leaves out (cake, bran, molasses), so at FAO's density these crops would appear to gain calories in processing.
+#    Each crop listed here is instead valued by its products: each year, the nutrient of the family's products made by
+#    the world's factories, minus that of the intermediates (products processed further within the family), divided
+#    by the tonnes of the family's crops the world processes. That World ratio is applied to every country. Sugar cane
+#    and sugar beet share their products and get one value together. Their family ends at sugar and molasses:
+#    the raw sugar that is refined is subtracted, but refined sugar sent into drinks and sweets keeps its value as
+#    sugar. Mixed downstream products (160, 167, 168) are excluded from this density calculation; their other
+#    ingredients cannot be attributed to cane and beet. They remain in the food chain with their own food-based densities.
+#    Rice ends at grain and bran products (bran, oil and cake). Husked rice milled into grain, and bran pressed into
+#    oil and cake, are subtracted. Grain sent to make broken rice, flour, starch or drinks keeps its value as grain;
+#    those later products remain in the food chain but are excluded from the crop's density calculation.
+#    Families are read in the order below, and each family's values are used by the next ones: palm kernels, made
+#    from oil palm fruit, are valued before it, so that
+#    the oil palm fruit family counts its kernels at their new value.
+output_implied_densities:
+  - crops: {156: "Sugar cane", 157: "Sugar beet"}
+    products: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 163: "Cane sugar, non-centrifugal", 164: "Refined sugar", 165: "Molasses"}
+    intermediates: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)"}
+  - crops: {27: "Rice"}
+    products: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 35: "Bran of rice", 36: "Oil of rice bran", 37: "Cake of rice bran"}
+    intermediates: {28: "Husked rice", 35: "Bran of rice"}
+  - crops: {256: "Palm kernels"}
+    products: {258: "Oil of palm kernel", 259: "Cake of palm kernel"}
+    intermediates: {}
+  - crops: {254: "Oil palm fruit"}
+    products: {256: "Palm kernels", 257: "Palm oil", 258: "Oil of palm kernel", 259: "Cake of palm kernel"}
+    intermediates: {256: "Palm kernels"}
+  - crops: {270: "Rape or colza seed"}
+    products: {271: "Rapeseed or canola oil, crude", 272: "Cake of rapeseed"}
+    intermediates: {}
+  - crops: {329: "Cotton seed"}
+    products: {331: "Cottonseed oil", 332: "Cake of cottonseed"}
+    intermediates: {}
+  - crops: {267: "Sunflower seed"}
+    products: {268: "Sunflower-seed oil, crude", 269: "Cake of sunflower seed"}
+    intermediates: {}
+  - crops: {249: "Coconuts, in shell"}
+    products: {250: "Coconuts, desiccated", 251: "Copra", 252: "Coconut oil", 253: "Cake of copra"}
+    intermediates: {251: "Copra"}
+  - crops: {260: "Olives"}
+    products: {261: "Olive oil", 262: "Olives preserved", 274: "Oil of olive residues"}
+    intermediates: {}
+  - crops: {57: "Germ of maize"}
+    products: {60: "Oil of maize", 61: "Cake of maize"}
+    intermediates: {}
+
+# 4. Role overrides. FAO tags cotton seed as processed (it comes out of ginning seed cotton), but seed cotton is a
+#    fibre crop and not in SCL, so cotton seed is the first point where its calories exist.
+role_overrides:
+  - {code: 329, name: "Cotton seed", role: crop}
+
+# 5. Fish and seafood are not in SCL. These FBS items are spliced in, converted with their FBS densities.
+#    Body oil and liver oil enter animal_products alongside fish. The FBS rows used here contain no matching
+#    fish processing inputs, so counting oil production as processed would create an artificial processing gain.
+#    The animal role sets the waterfall's production stage; these oils are physically processed products.
+#    See assumption 9 and known problem 4 (fish oil partly counted twice) in the step's docstring.
+fish_from_fbs:
+  - {code: 2761, name: "Freshwater Fish", role: animal}
+  - {code: 2762, name: "Demersal Fish", role: animal}
+  - {code: 2763, name: "Pelagic Fish", role: animal}
+  - {code: 2764, name: "Marine Fish, Other", role: animal}
+  - {code: 2765, name: "Crustaceans", role: animal}
+  - {code: 2766, name: "Cephalopods", role: animal}
+  - {code: 2767, name: "Molluscs, Other", role: animal}
+  - {code: 2768, name: "Meat, Aquatic Mammals", role: animal}
+  - {code: 2769, name: "Aquatic Animals, Others", role: animal}
+  - {code: 2781, name: "Fish, Body Oil", role: animal}
+  - {code: 2782, name: "Fish, Liver Oil", role: animal}
+
+# 6. Country-specific densities (assumption 3). FAO uses one density per item in every country and year, except for
+#    these country-items, which keep the density of each year. Any other country-item whose density differs from
+#    the item's density stops the step, so a new exception cannot pass unnoticed.
+country_specific_densities:
+  - {country: Afghanistan, code: 16, name: "Wheat and meslin flour"}
+  - {country: Bangladesh, code: 31, name: "Rice, milled"}
+  - {country: Ethiopia, code: 474, name: "Other vegetables provisionally preserved"}
+  - {country: Namibia, code: 888, name: "Skim milk of cows"}
+  - {country: North Korea, code: 31, name: "Rice, milled"}
+  - {country: Peru, code: 125, name: "Cassava, fresh"}
+  - {country: Peru, code: 1058, name: "Meat of chickens, fresh or chilled"}
+  - {country: Peru, code: 116, name: "Potatoes"}
+  - {country: Peru, code: 31, name: "Rice, milled"}
+
+# 7. Processing families used only as a check: for World, the calories coming out of processing as products should
+#    be close to the calories going in (a few percent are lost in milling, crushing and brewing).
+processing_families_for_checks:
+  wheat: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 41, 110, 113]
+  rice: [27, 28, 29, 31, 32, 34, 35, 36, 37, 38]
+  soybeans: [236, 237, 238, 239, 240, 241]
+  cow milk: [882, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 897, 898, 900, 901, 903, 904, 907, 173]
+  barley: [44, 45, 46, 47, 48, 49, 50, 51]

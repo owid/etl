@@ -130,6 +130,7 @@ nav = [
         { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
         { "Global food trade data" = "analyses/food_trade/food_trade.html" },
         { "Population projection tool" = "analyses/population_tool/index.md" },
+        { "Food balances in calories and protein, from crops to food" = "analyses/food_supply_chain/food_supply_chain.html" },
     ] },
 ]
 
