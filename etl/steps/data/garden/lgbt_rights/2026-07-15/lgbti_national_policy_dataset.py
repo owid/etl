@@ -1,4 +1,4 @@
-"""Build garden tables for the LGBTI National Policy Dataset (Velasco, v2.0).
+"""Build garden tables for the LGBTI National Policy Dataset (Velasco, Version 3.0).
 
 The source is long format: one row per (country, year, law, status). We:
   1. Harmonize country names.
@@ -93,15 +93,13 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
       - Progressive 0, regressive 1  → reg_label
       - Any partial (subnational variation) or both = 1 → mixed_label
 
-    Note on `both = 1`: codebook §2.3 / §5.2.15 calls these "transition-year artefacts"
-    (a mid-year policy change recorded as both directions for the calendar year) and
-    recommends using the end-of-year status to disambiguate. In v2.0.x the producer
-    cleaned up almost all of these (we counted 1 stray row across the panel, in Brazil
-    GAC 2025), and the v2.0+ subnational coverage means most countries with both
-    directions populated are real subnational mixes. For both interpretations,
-    "Varies by region" is a safer default than picking one direction arbitrarily.
+    Note on `both = 1`: earlier releases carried a few "transition-year artefacts" (a mid-year
+    policy change recorded in both directions for the calendar year); the producer has since
+    cleaned them up, and the subnational coverage means most countries with both directions
+    populated are real subnational mixes. For both interpretations, "Varies by region" is a
+    safer default than picking one direction arbitrarily.
 
-    NOTE (future updates): as of v2.0 the `both = 1` branch fires on ZERO country-years, so no row
+    NOTE (future updates): as of Version 3.0 the `both = 1` branch fires on ZERO country-years, so no row
     is currently labelled "Varies by region" without partial data. `_warn_on_simultaneous_legal_illegal`
     logs a warning (generically, for any law) if a future source version reintroduces `legal: 1
     illegal: 1` rows, so each can be re-checked by hand: confirm it is a genuine transition-year
@@ -117,7 +115,7 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
         f"{prog_key}: 0.5 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 1 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 0.5 {reg_key}: 1": mixed_label,
-        # NOTE: transition-year artefact; 0 rows in v2.0 — re-check each occurrence on future updates (see docstring).
+        # NOTE: transition-year artefact; 0 rows in Version 3.0 — re-check each occurrence on future updates (see docstring).
         f"{prog_key}: 1 {reg_key}: 1": mixed_label,
     }
     return m
@@ -188,12 +186,9 @@ COMBINED_CONFIGS = [
         ],
         "category_map": MARRIAGE_MAP,
     },
-    # NOTE: enforcement_refinement is set on the 4 combined indicators whose source
-    # (law, status) has any `Evidence_of_Enforcement == 0` rows in v2.0 — same_sex_acts,
-    # transgender_military, lgb_military_join, morality_propaganda. Every other policy
-    # has EoE uniformly 1 (codebook default). On each new data release, audit whether
-    # other indicators acquire EoE=0 cases; if so, add `enforcement_refinement` entries
-    # below and corresponding sort/description_key/region YAML entries.
+    # NOTE: We don't publish Velasco's Evidence_of_Enforcement (codebook §2.6, §3.7), so no indicator has a
+    # "…but not enforced" category. Few laws are recorded as not enforced, and the evidence is hard to code
+    # consistently, so a law on the books counts as in effect.
     {
         "short_name": "lgb_military_join",
         "sources": [
@@ -201,11 +196,6 @@ COMBINED_CONFIGS = [
             ("lgb_military__illegal", "illegal"),
         ],
         "category_map": LGB_MILITARY_MAP,
-        "enforcement_refinement": {
-            "eoe_source": ("lgb_military", "illegal"),
-            "from_label": "Banned",
-            "to_label": "Banned but not enforced",
-        },
     },
     # ── Two-direction policies (both Legal and Illegal carry substantive data) ──────────
     {
@@ -222,11 +212,6 @@ COMBINED_CONFIGS = [
             neither_label="No legal provisions",
             mixed_label="Varies by region",
         ),
-        "enforcement_refinement": {
-            "eoe_source": ("same_sex_acts", "illegal"),
-            "from_label": "Criminalized",
-            "to_label": "Criminalized but not enforced",
-        },
     },
     {
         "short_name": "blood_donations",
@@ -257,11 +242,6 @@ COMBINED_CONFIGS = [
             neither_label="No policy",
             mixed_label="Varies by region",
         ),
-        "enforcement_refinement": {
-            "eoe_source": ("transgender_military", "illegal"),
-            "from_label": "Banned",
-            "to_label": "Banned but not enforced",
-        },
     },
     # ── Single-direction progressive policies (Legal carries the substantive data) ──────
     {
@@ -425,11 +405,6 @@ COMBINED_CONFIGS = [
             neither_label="No restrictions",
             mixed_label="Laws vary by region",
         ),
-        "enforcement_refinement": {
-            "eoe_source": ("morality_propaganda", "legal"),
-            "from_label": "Restrictions exist",
-            "to_label": "Restrictions exist but not enforced",
-        },
     },
     {
         "short_name": "lgbtq_civil_society_restrictions",
@@ -527,12 +502,12 @@ COMBINED_CONFIGS = [
     # _warn_on_unmapped_bucket_patterns keeps flagging anything new); nothing is silently
     # swept into the catch-all.
     #
-    # NOTE: the "Varies by region or other" default holds only (a) genuinely partial/
-    # subnational country-years (e.g. Canada, United States) and (b) the lone Brazil 2025
-    # transition-year artefact (adults covered=1 AND restricted=1). On each new data release,
-    # re-check what reaches the default and what the unmapped-bucket warning surfaces: give a
-    # new stable state its own category, and treat covered+restricted (or legal+illegal)
-    # contradictions via the codebook's end-of-year recoding rule.
+    # NOTE: as of Version 3.0 the "Varies by region or other" default holds the partial/subnational
+    # country-years (Canada, Iraq, Mexico, Spain, the United Kingdom and the United States) plus
+    # Sweden 2022-2025, where care for minors is coded both covered and restricted (publicly funded,
+    # with some treatments restricted by clinical guideline); the unmapped-bucket warning flags
+    # that case. On each new data release, re-check what reaches the default and what the warning
+    # surfaces, and give a new stable state its own category.
     {
         "short_name": "gender_affirming_care",
         "sources": [
@@ -586,11 +561,6 @@ def _build_one_combined(wide, config):
     for "Varies by region or other" buckets where enumerating every pattern is noisy);
     if `default_category` is unset, unmapped keys are left as their raw bucket string,
     which surfaces them as a sanity check rather than silently dropping.
-
-    If `enforcement_refinement` is set, country-years whose bucketed label equals
-    `from_label` and whose `evidence_of_enforcement` for the configured (law, status)
-    is exactly 0 are reassigned to `to_label`. EoE NaN or 1 keeps `from_label`
-    (codebook default-1 rule).
     """
     parts = []
     for col, label in config["sources"]:
@@ -610,15 +580,6 @@ def _build_one_combined(wide, config):
             warn_on_missing_mappings=False,
             warn_on_unused_mappings=False,
         )
-    # Apply optional enforcement refinement: split `from_label` into `to_label` where
-    # EoE for the configured (law, status) source is 0. Strict equality so NaN keeps
-    # the unrefined label.
-    refinement = config.get("enforcement_refinement")
-    if refinement is not None:
-        law, status = refinement["eoe_source"]
-        eoe = wide[f"{law}__{status}__eoe"]
-        unenforced_mask = (result == refinement["from_label"]) & (eoe == 0)
-        result = result.where(~unenforced_mask, refinement["to_label"])
 
     _warn_on_unmapped_bucket_patterns(config, keys)
     return result.copy_metadata(wide["country"])
@@ -659,15 +620,18 @@ def run() -> None:
     #
     # Keep the columns we publish (drop sources, ISO/COW codes, most supplementary
     # metadata) but retain `gender_change_requirement` (used by the GMC combined
-    # indicator to refine "legal" countries into procedural categories) and
-    # `evidence_of_enforcement` (used by 4 combined indicators to surface
-    # "X but not enforced" categories — see COMBINED_CONFIGS for the affected set).
-    tb = tb[
-        ["country", "year", "law", "status", "proportion", "gender_change_requirement", "evidence_of_enforcement"]
-    ].copy()
+    # indicator to refine "legal" countries into procedural categories).
+    tb = tb[["country", "year", "law", "status", "proportion", "gender_change_requirement"]].copy()
 
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
+
+    # NOTE: We ship Velasco's Version 3.0 exactly as published — no local data corrections are applied.
+    # Source issues found in review are reported to the producer rather than patched here, so it stays
+    # unambiguous which values come from Velasco and which from OWID.
+
+    # Validate the value columns.
+    sanity_check_proportions(tb)
 
     # Drop structural-placeholder (law, status) combinations — combos that are all-zero per the codebook.
     placeholders = _detect_structural_placeholders(tb)
@@ -677,10 +641,9 @@ def run() -> None:
     # Warn on country-years coded fully legal AND fully illegal at once (see _binary_map docstring).
     _warn_on_simultaneous_legal_illegal(tb)
 
-    # Country-level table — drop the requirement and enforcement columns here; they're
-    # only used to build combined indicators and aren't published as per-row long-table
-    # indicators.
-    tb_country = tb.drop(columns=["gender_change_requirement", "evidence_of_enforcement"]).copy()
+    # Country-level table — drop the requirement column here; it's only used to build the
+    # gender marker combined indicator and isn't published as a per-row long-table indicator.
+    tb_country = tb.drop(columns=["gender_change_requirement"]).copy()
 
     # Regional aggregates table (counts of countries + population by status per region).
     tb_regions = _build_regional_aggregates(tb_country)
@@ -691,6 +654,28 @@ def run() -> None:
 
     # Regional aggregates of the combined-categorical indicators (counts + population by category).
     tb_combined_regions = _build_combined_categorical_regional_aggregates(tb_combined)
+
+    # Composite-index table (pre-built by the producer; see codebook §5). Passthrough:
+    # harmonize countries, drop the ISO helper column, verify internal consistency.
+    tb_index = ds_meadow.read("lgbti_composite_index", safe_types=False)
+    # Version 3.0 renamed the index columns. Keep our indicator names (the LGBT+ Rights Index chart uses
+    # composite_index): the producer's preferred additive index is our composite index, and the national
+    # index is our unweighted index. The factor-analytic variant (cfa_index) isn't published.
+    tb_index = tb_index.rename(
+        columns={
+            "additive_index": "composite_index",
+            "national_index": "unweighted_index",
+            "progressive_index": "progressive_score",
+            "regressive_index": "regressive_score",
+        },
+        errors="raise",
+    ).drop(columns=["iso3", "cfa_index"])
+    tb_index = paths.regions.harmonize_names(tb=tb_index)
+    sanity_check_index(tb_index)
+
+    # Population-weighted regional means of the composite index (mirrors the retired v1
+    # lgbti_policy_index step, whose regional series the lgbt-rights-index chart displays).
+    tb_index = _add_regional_composite_index(tb_index)
 
     # Format and short-name all tables.
     tb_country = tb_country.format(
@@ -713,27 +698,105 @@ def run() -> None:
         short_name="lgbti_national_policy_dataset_combined_regions",
         sort_columns=True,
     )
+    tb_index = tb_index.format(["country", "year"], short_name="lgbti_composite_index", sort_columns=True)
 
     #
     # Save outputs.
     #
     ds_garden = paths.create_dataset(
-        tables=[tb_country, tb_regions, tb_combined, tb_combined_regions],
+        tables=[tb_country, tb_regions, tb_combined, tb_combined_regions, tb_index],
         default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
 
 
+def sanity_check_proportions(tb):
+    """Validate the value columns of the long policy table (codebook §2.3).
+
+    `proportion` is a population share in [0, 1]; `gender_change_requirement` uses the codebook's
+    controlled vocabulary (REQ_LABELS in `_build_gmc_combined` guards its coverage separately).
+    """
+    assert tb["proportion"].notna().all(), "NaN proportions — the balanced panel should carry explicit zeros."
+    assert tb["proportion"].between(0, 1).all(), (
+        f"Proportion outside [0, 1]: max={tb['proportion'].max()}, min={tb['proportion'].min()} — "
+        "a share of the population can't exceed 1."
+    )
+
+
+def _add_regional_composite_index(tb):
+    """Append population-weighted regional means of `composite_index` for the standard REGIONS.
+
+    Only the composite index gets regional rows (it's what the lgbt-rights-index chart shows,
+    matching the retired v1 step's population-weighted regional policy-index series); the other
+    three columns stay country-only, so region rows carry NaN there.
+    """
+    tb_w = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
+    tb_w["composite_index_weighted"] = tb_w["composite_index"] * tb_w["population"]
+    tb_w = paths.regions.add_aggregates(
+        tb=tb_w,
+        index_columns=["country", "year"],
+        regions=REGIONS,
+        aggregations={"composite_index_weighted": "sum", "population": "sum"},
+    )
+    region_mask = tb_w["country"].isin(REGIONS)
+    tb_w.loc[region_mask, "composite_index"] = (
+        tb_w.loc[region_mask, "composite_index_weighted"] / tb_w.loc[region_mask, "population"]
+    )
+    tb_w = tb_w.drop(columns=["composite_index_weighted", "population"])
+    assert tb_w.loc[region_mask, "composite_index"].notna().all(), "NaN regional composite index."
+    # A weighted mean must lie within the range of the values it averages: every regional value
+    # must sit between that year's country minimum and maximum.
+    country_rng = (
+        tb_w.loc[~region_mask].groupby("year")["composite_index"].agg(["min", "max"]).rename(columns=lambda c: f"c_{c}")
+    )
+    regions_yr = tb_w.loc[region_mask, ["year", "composite_index"]].join(country_rng, on="year")
+    out_of_range = regions_yr[
+        (regions_yr["composite_index"] < regions_yr["c_min"]) | (regions_yr["composite_index"] > regions_yr["c_max"])
+    ]
+    assert out_of_range.empty, (
+        f"Regional composite index outside country range in years {sorted(set(out_of_range['year']))}."
+    )
+    return tb_w
+
+
+def sanity_check_index(tb):
+    """Verify the producer's pre-built composite-index table (codebook §5).
+
+    Bounds are theoretical: each policy scores between 0 and 1 (its population coverage times the
+    mean of its other indicators), across 23 progressive and 12 regressive combinations; the
+    unweighted (national) index counts ±1 per fully-in-force national law over the same combinations.
+    """
+    consistency = (tb["composite_index"] - (tb["progressive_score"] - tb["regressive_score"])).abs()
+    assert consistency.max() < 0.001, "Composite index no longer equals progressive minus regressive score."
+    assert tb["progressive_score"].between(0, 23).all(), "Progressive score outside [0, 23]."
+    assert tb["regressive_score"].between(0, 12).all(), "Regressive score outside [0, 12]."
+    assert tb["composite_index"].between(-12, 23).all(), "Composite index outside its theoretical bounds [-12, 23]."
+    assert tb["unweighted_index"].between(-12, 23).all(), "Unweighted index outside its theoretical bounds."
+    assert (tb["unweighted_index"] % 1 == 0).all(), "Unweighted index has non-integer values (it's a ±1 count)."
+    # The two indices measure the same construct (the producer's script reports a Spearman correlation of
+    # 0.99 between them); a collapse below 0.9 means one of them broke.
+    worst_corr = min(float(g["composite_index"].corr(g["unweighted_index"])) for _, g in tb.groupby("year"))
+    assert worst_corr > 0.9, f"Composite and unweighted index diverged (min yearly correlation {worst_corr:.3f} < 0.9)."
+    assert tb["country"].nunique() >= 195, f"Index coverage shrank: {tb['country'].nunique()} countries (had 195)."
+    per_year = tb.groupby("year")["country"].nunique()
+    assert per_year.min() >= 190, (
+        f"Per-year coverage dropped to {per_year.min()} countries (194-195 across 1991-2025; only South Sudan "
+        "is missing before 2008, its first coded year)."
+    )
+    assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in index table."
+
+
 def _detect_structural_placeholders(tb):
     """Return the set of (law, status) combos that are zero for every country and year.
 
-    Codebook v2.0 §1.1 reports 18 placeholders and 36 active combinations. We detect them
-    dynamically and assert the count to surface any source-side coding changes.
+    There are 18 such combos, matching the producer's own `row_type` column (`placeholder` on exactly
+    those 18) and the codebook's count of 36 substantive and 18 placeholder combinations.
     """
     placeholder_series = tb.groupby(["law", "status"], observed=True)["proportion"].max()
     placeholders = set(placeholder_series[placeholder_series == 0].index)
     assert len(placeholders) == 18, (
-        f"Expected 18 placeholder (law, status) combos per codebook v2.0 §1.1; found {len(placeholders)}."
+        f"Expected 18 placeholder (law, status) combos (the producer's row_type column and codebook both "
+        f"say 18); found {len(placeholders)}."
     )
     return placeholders
 
@@ -745,7 +808,7 @@ def _warn_on_simultaneous_legal_illegal(tb):
     (a mid-year change logged in both directions). It carries no partial/subnational signal yet
     feeds the combined indicators (folding into "Varies by region" or an unmapped bucket), so it
     should be re-checked by hand. Generic across every law — no hard-coded list — so future source
-    versions that introduce such rows in any law surface automatically. As of v2.0 there are none.
+    versions that introduce such rows in any law surface automatically. As of Version 3.0 there are none.
     """
     wide = tb.pivot_table(index=["country", "year", "law"], columns="status", values="proportion", aggfunc="first")
     if "legal" not in wide.columns or "illegal" not in wide.columns:
@@ -809,13 +872,6 @@ def _build_combined_categorical_table(tb):
     wide.columns = [f"{law}__{status}" for law, status in wide.columns]
     wide = wide.reset_index()
 
-    # Pivot `evidence_of_enforcement` on the same (law, status) axes and merge side
-    # columns into `wide` with naming `<law>__<status>__eoe`. Used by the
-    # enforcement_refinement field on COMBINED_CONFIGS entries.
-    eoe_wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="evidence_of_enforcement")
-    eoe_wide.columns = [f"{law}__{status}__eoe" for law, status in eoe_wide.columns]
-    wide = wide.merge(eoe_wide.reset_index(), on=["country", "year"], how="left")
-
     # Extract the per-(country, year) GMC requirement and merge into wide as a side column.
     gmc_req = tb[(tb["law"] == "gender_marker_change") & (tb["status"] == "legal")][
         ["country", "year", "gender_change_requirement"]
@@ -828,17 +884,12 @@ def _build_combined_categorical_table(tb):
     for config in COMBINED_CONFIGS:
         wide[config["short_name"]] = _build_one_combined(wide, config)
 
-    # Combined LGBT military service indicators — built AFTER the loop because they read
+    # Combined LGBT military service indicator — built AFTER the loop because it reads
     # the outputs of `lgb_military_join` and `transgender_military` (also categorical).
-    # Two variants: one preserves the enforcement refinement (8 categories), the other
-    # folds enforcement away (7 categories, legal-status only).
     wide["lgbt_military"] = _build_lgbt_military_combined(wide)
-    wide["lgbt_military_no_enforcement"] = _build_lgbt_military_no_enforcement_combined(wide)
 
     output_cols = (
-        ["country", "year", "gender_marker_change"]
-        + [c["short_name"] for c in COMBINED_CONFIGS]
-        + ["lgbt_military", "lgbt_military_no_enforcement"]
+        ["country", "year", "gender_marker_change"] + [c["short_name"] for c in COMBINED_CONFIGS] + ["lgbt_military"]
     )
     return wide[output_cols]
 
@@ -852,22 +903,42 @@ def _build_gmc_combined(wide):
     Categories:
       - Not legally possible            : proportion = 0
       - Varies by region             : 0 < proportion < 1
-      - Self-declaration                : proportion = 1, requirement in {Self-ID, Self-Declaration}
-      - Medical/psychological diagnosis : proportion = 1, requirement = Medical/Psychological
-      - Surgery required                : proportion = 1, requirement = Surgery
-      - Surgery and sterilization       : proportion = 1, requirement = Surgery+Sterilization
+      - Self-declaration                : proportion = 1, requirement = Self-declaration
+      - Court order required            : proportion = 1, requirement = Court order (judicial, non-medical)
+      - Medical/psychological diagnosis : proportion = 1, requirement in {Medical diagnosis, Psychological assessment}
+      - Surgery required                : proportion = 1, requirement in {Surgery, Surgery and psychological assessment}
+      - Surgery and sterilization       : proportion = 1, requirement = Surgery and sterilization
       - Legally possible, requirement unknown : proportion = 1, requirement is NaN
+
+    The label set follows the codebook's Gender_Change_Requirement vocabulary (§2.5); its index scores
+    "Surgery and psychological assessment" in the same tier as "Surgery", so both map to "Surgery required".
     """
     prop = wide["gender_marker_change__legal"]
     req = wide["gender_marker_change_requirement"]
 
     REQ_LABELS = {
-        "Self-ID": "Self-declaration is enough",
-        "Self-Declaration": "Self-declaration is enough",
-        "Medical/Psychological": "Diagnosis required",
+        "Self-declaration": "Self-declaration is enough",
+        # "Court order" is a procedural (judicial) requirement with no medical, psychological or surgical
+        # condition (e.g. France after Loi 2016-1547, Greece after Law 4491/2017). We give it its own category
+        # rather than folding it into a medical tier.
+        "Court order": "Court order required",
+        "Medical diagnosis": "Diagnosis required",
+        "Psychological assessment": "Diagnosis required",
         "Surgery": "Surgery required",
-        "Surgery+Sterilization": "Surgery and sterilization required",
+        # Combined surgical and psychological regimes short of sterilization sit in the surgery tier (ease of
+        # access 0.25, the same as "Surgery").
+        "Surgery and psychological assessment": "Surgery required",
+        "Surgery and sterilization": "Surgery and sterilization required",
     }
+
+    # Only a blank requirement may fall into "Legally possible, requirement unknown" — a *labeled*
+    # requirement outside the codebook's Gender_Change_Requirement vocabulary means the source changed and REQ_LABELS
+    # must be extended, not silently published as unknown (this bit us in the June 2026 revision).
+    unknown_labels = set(req.dropna().unique()) - set(REQ_LABELS)
+    assert not unknown_labels, (
+        f"Unmapped Gender_Change_Requirement label(s) {sorted(unknown_labels)} — extend REQ_LABELS; "
+        "otherwise these country-years silently publish as 'Legally possible, requirement unknown'."
+    )
 
     def classify(p, r):
         if p == 0:
@@ -891,11 +962,10 @@ def _build_lgbt_military_combined(wide):
     """Combine `lgb_military_join` and `transgender_military` into a single LGBT military indicator.
 
     Reads the already-built combined-categorical outputs of the two source indicators
-    (Allowed / No policy / Banned but not enforced / Banned each) and maps the
-    cross-product to a label that names which group(s) are affected. Only the 8
-    combinations that actually occur in the v2.0 data have explicit labels; anything
-    unexpected falls back to a descriptive "Other (lgb / t)" placeholder, which surfaces
-    as a sanity check rather than silently aggregating.
+    (Allowed / No policy / Banned each) and maps the cross-product to a label that names
+    which group(s) are affected. Only the combinations that actually occur in the data have
+    explicit labels; anything unexpected falls back to a descriptive "Other (lgb / t)"
+    placeholder, which surfaces as a sanity check rather than silently aggregating.
     """
     from owid.catalog import Variable
 
@@ -906,47 +976,15 @@ def _build_lgbt_military_combined(wide):
         ("Allowed", "Allowed"): "Open service permitted",
         ("Allowed", "No policy"): "Allowed for LGB only",
         ("No policy", "Allowed"): "Allowed for transgender only",
-        ("Allowed", "Banned but not enforced"): "Mixed (LGB allowed, transgender banned but not enforced)",
+        ("Allowed", "Banned"): "Mixed (LGB allowed, transgender banned)",
         ("No policy", "No policy"): "No policy",
-        ("Banned but not enforced", "No policy"): "Banned for LGB only, not enforced",
+        ("No policy", "Banned"): "Banned for transgender only",
         ("Banned", "No policy"): "Banned for LGB only",
         ("Banned", "Banned"): "Service banned",
     }
 
     out = [LABEL_MAP.get((a, b), f"Other ({a} / {b})") for a, b in zip(lgb, t)]
     result = Variable(out, index=wide.index, name="lgbt_military")
-    return result.copy_metadata(wide["lgb_military__legal"])
-
-
-def _build_lgbt_military_no_enforcement_combined(wide):
-    """Combine `lgb_military_join` and `transgender_military` into a single LGBT military indicator,
-    collapsing the enforcement refinement back to legal-status only.
-
-    Same shape as `_build_lgbt_military_combined` but `"Banned but not enforced"` folds into
-    `"Banned"` on each side before mapping. Drops from 8 to 7 categories: removes the
-    `"Banned for LGB only, not enforced"` bucket and collapses the US-2025 case into
-    `"Mixed (LGB allowed, transgender banned)"`.
-    """
-    from owid.catalog import Variable
-
-    def _fold(label):
-        return "Banned" if label == "Banned but not enforced" else label
-
-    lgb = [_fold(x) for x in wide["lgb_military_join"]]
-    t = [_fold(x) for x in wide["transgender_military"]]
-
-    LABEL_MAP = {
-        ("Allowed", "Allowed"): "Open service permitted",
-        ("Allowed", "No policy"): "Allowed for LGB only",
-        ("No policy", "Allowed"): "Allowed for transgender only",
-        ("Allowed", "Banned"): "Mixed (LGB allowed, transgender banned)",
-        ("No policy", "No policy"): "No policy",
-        ("Banned", "No policy"): "Banned for LGB only",
-        ("Banned", "Banned"): "Service banned",
-    }
-
-    out = [LABEL_MAP.get((a, b), f"Other ({a} / {b})") for a, b in zip(lgb, t)]
-    result = Variable(out, index=wide.index, name="lgbt_military_no_enforcement")
     return result.copy_metadata(wide["lgb_military__legal"])
 
 
@@ -968,7 +1006,6 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
     indicator_cols = [c["short_name"] for c in COMBINED_CONFIGS] + [
         "gender_marker_change",
         "lgbt_military",
-        "lgbt_military_no_enforcement",
     ]
 
     new_cols = []

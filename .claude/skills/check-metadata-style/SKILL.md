@@ -103,6 +103,8 @@ step_path = raw.removeprefix('data://').removeprefix('etl/steps/data/').strip('/
 ds = Dataset(DATA_DIR / step_path)
 
 import json
+import re
+from markdown_it import MarkdownIt
 rows = []
 for table_name in ds.table_names:
     tb = ds[table_name]
@@ -156,15 +158,21 @@ for table_name in ds.table_names:
 # A source description and a markdown description_key are multi-paragraph by design, so newlines don't count as
 # artifacts there.
 multi_paragraph = lambda k: k.endswith('.description') or k.startswith('description_key')
+# In a description_key, a paragraph holding a single line break is two paragraphs rendered as one. It comes from a
+# conditional closed with <%- endif %> before a paragraph, or from a line break written in the text. Parsing the
+# markdown leaves alone the line breaks that start a list item, table row, heading, quote or code block.
+md = MarkdownIt('commonmark').enable('table')
+merged_paragraphs = lambda v: any(t.type == 'inline' and any(c.type == 'softbreak' for c in t.children or [])
+                                  for t in md.parse(v))
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
-      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k)))]
+      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not multi_paragraph(k))
+                                 or (k.startswith('description_key') and merged_paragraphs(v)))]
 print(f'WHITESPACE ISSUES: {len(ws)}')
 for t, var, k, v in ws:
     print(f'  {t}.{var}.{k}: {v[:150]!r}')
 print('---')
 
 # Step 5b: indicators measured in money, for the currency rules of HARMONIZED_FAUST.md.
-import re
 money = re.compile(r'\\\$|€|£|¥|currency|dollar|euro|pound|yen|yuan|rupee|peso', re.I)
 try:
     # ISO 4217 codes legal tender somewhere today; babel ships with the full dev venv. Withdrawn codes are left
@@ -242,7 +250,7 @@ Drop `--only` here on purpose: when the catalog is missing, upstream meadow/gard
 
 ### 4. Mechanical pass: whitespace artifacts
 
-Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a template defect that only shows in the rendered text, never in the YAML:
+Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a defect that is hard to spot in the YAML and plain in the rendered text, usually left by a template:
 
 | Pattern | Example | Why it's a problem |
 |---------|---------|-------------------|
@@ -250,8 +258,9 @@ Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a tem
 | Leading whitespace | ` Share of children` | Template newline rendered as leading space |
 | Trailing whitespace | `Share of children ` | Template block left trailing space |
 | Embedded newline | `Share of\nchildren` | Multi-line Jinja block not properly trimmed |
+| Merged paragraphs | `…the average wage.\nThe OECD…` in a `description_key` | Markdown renders paragraphs separated by one line break as one. After a conditional, close it with `<%- endif +%>`; in text written across lines (a multi-line `\|-` definition), put a blank line between the paragraphs |
 
-Report them grouped by table and field, showing the rendered value with `repr()` so the whitespace is visible. The fix is in the template, not in the rendered string:
+Report them grouped by table and field, showing the rendered value with `repr()` so the whitespace is visible. The fix is in the YAML source, not in the rendered string:
 
 - Use `<%-` and `-%>` trim markers instead of `<%` and `%>` to strip whitespace around control blocks.
 - Use a `|-` YAML block scalar for multi-line definitions to control trailing newlines.
@@ -302,7 +311,7 @@ Match the pattern in [check-metadata-typos](../check-metadata-typos/SKILL.md) §
 - **Review each** — step through one at a time, user confirms/rejects/edits each.
 - **Cancel** — exit without changes.
 
-A fix that changes what the text claims, not just how it is worded, has to rest on the producer's documentation (`.claude/rules/producer-documentation.md`). Check it there before applying it, and ask the user when the documentation is missing or inaccessible.
+A fix that changes what the text claims, not just how it is worded, has to rest on the producer's documentation (`.claude/rules/producer-documentation.md`). Check it there before applying it, cite the passage in the finding's `Why:` line, and ask the user when the documentation is missing or inaccessible.
 
 Apply fixes to the `.meta.yml` file with `ruamel_load` / `ruamel_dump` so comments and key ordering are preserved (see `CLAUDE.md` → *YAML Editing*):
 
