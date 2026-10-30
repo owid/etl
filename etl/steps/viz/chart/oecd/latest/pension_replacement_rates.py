@@ -37,6 +37,12 @@ DUMBBELL_CONFIG = {
 # other, so an arrow points from the first to the second.
 ARROW_CONFIG = {**DUMBBELL_CONFIG, "dumbbell": {"connectorStyle": "arrow"}}
 
+# Gross vs. net is sorted by the net rate (the end of the arrow), since it's what pensioners actually receive.
+GROSS_VS_NET_CONFIG = {**ARROW_CONFIG, "sortBy": "endValue"}
+
+# Mandatory vs. voluntary schemes is sorted by the rate from mandatory and voluntary schemes together (the second choice).
+SCHEMES_CONFIG = {**DUMBBELL_CONFIG, "sortBy": "endValue"}
+
 # Three earnings levels don't fit a dumbbell, so they go side by side, one panel per country. The custom sort keeps
 # the bars in the order of the indicators (half, average, twice), instead of sorting them by value in each panel.
 EARNINGS_CONFIG = {
@@ -49,7 +55,12 @@ EARNINGS_CONFIG = {
 }
 
 # Chart settings of each comparison, other than the plain dumbbell.
-CONFIGS = {"measure": ARROW_CONFIG, "earnings": EARNINGS_CONFIG, "age": ARROW_CONFIG}
+CONFIGS = {
+    "measure": GROSS_VS_NET_CONFIG,
+    "schemes": SCHEMES_CONFIG,
+    "earnings": EARNINGS_CONFIG,
+    "age": ARROW_CONFIG,
+}
 
 # Wording of each choice in the titles and subtitles of the comparison views.
 MEASURE = {"gross": "Gross", "net": "Net", "gross_vs_net": "Gross and net"}
