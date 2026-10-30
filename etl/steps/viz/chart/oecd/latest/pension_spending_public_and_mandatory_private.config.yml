@@ -21,8 +21,8 @@ views:
             color: "#A2557C"
             tolerance: 2
     config:
-      title: Spending on pensions, public and mandatory private
-      subtitle: Spending on pensions and other cash benefits for older people and survivors, as a share of [gross domestic product](#dod:gdp). Mandatory private spending comes from private schemes that people are required to join.
+      title: Public and mandatory private spending on pensions as share of GDP
+      subtitle: Spending on pensions and other cash benefits for older people and survivors, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Mandatory private spending comes from private schemes that people are required to join.
       note: Voluntary private pensions aren’t included. In the Netherlands, for example, occupational pensions that cover almost all workers count as voluntary.
       tab: chart
       hasMapTab: false
