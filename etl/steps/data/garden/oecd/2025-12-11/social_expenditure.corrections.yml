@@ -1,0 +1,166 @@
+# Known errors in the OECD Social Expenditure Database (SOCX) that we remove locally until the producer
+# fixes them. See etl/data_corrections.py for the format; `etl corrections --charts` inventories them.
+#
+# Chile 1986, mandatory private old-age spending in cash, "Other cash benefits": SOCX reports 21.15% of
+# GDP (US$1,506 per person), against 0.02% in 1987 and 0.04% in 1988. Chile's mandatory private
+# pension system was only a few years old in 1986, so this is about a thousand times too large. The
+# same value feeds every total built from it, in each source that includes mandatory private spending:
+#
+#   share of GDP, Chile, in cash             1986     1987
+#   Mandatory private, old age (other cash)  21.15     0.02
+#   Mandatory private, old age and survivors 21.22     0.10
+#   Mandatory private, all programs          21.44     0.35
+#   Public and mandatory private, old age    30.89     8.49
+#   Public and mandatory private, all        34.22    11.36
+#
+# So we drop the cell and the six totals that contain it (in cash, and in cash and in kind), in the three
+# sources that contain mandatory private spending: "Mandatory private", "Mandatory private and voluntary
+# private" and "Public and mandatory private". Public spending is kept (it is consistent with 1987), and
+# so are the other Chile 1986 programs (incapacity, survivors), which look normal. Dropping the combined
+# series too matters: keeping them would leave a spike to 32% of GDP in public and mandatory private
+# pension spending, and the garden step would recalculate mandatory private from it.
+#
+# Every entry repeats the first one (YAML merge key) and only changes `match`. `expect` checks that the
+# value is still above 20% of GDP, so the step fails once SOCX fixes it.
+
+- &chile_1986
+  indicator: share_gdp
+  entity: Chile
+  years: [1986]
+  match:
+    {
+      expenditure_source: Mandatory private,
+      spending_type: In-cash spending,
+      programme_type_category: Old age,
+      programme_type: Other cash benefits,
+    }
+  action: drop
+  expect: {gt: 20}
+  reason: >-
+    Mandatory private old-age spending in cash (other cash benefits) is 21.15% of GDP in 1986, against
+    0.02% in 1987. The error also inflates every total that includes it.
+  producer: OECD
+  status: open
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private, spending_type: In-cash spending, programme_type_category: Old age, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private, spending_type: In-cash spending, programme_type_category: Old age and survivors, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private, spending_type: In-cash spending, programme_type_category: All, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private, spending_type: In-cash and in-kind spending, programme_type_category: Old age, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private, spending_type: In-cash and in-kind spending, programme_type_category: Old age and survivors, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private, spending_type: In-cash and in-kind spending, programme_type_category: All, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash spending, programme_type_category: Old age, programme_type: Other cash benefits}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash spending, programme_type_category: Old age, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash spending, programme_type_category: Old age and survivors, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash spending, programme_type_category: All, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash and in-kind spending, programme_type_category: Old age, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash and in-kind spending, programme_type_category: Old age and survivors, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Mandatory private and voluntary private, spending_type: In-cash and in-kind spending, programme_type_category: All, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash spending, programme_type_category: Old age, programme_type: Other cash benefits}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash spending, programme_type_category: Old age, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash spending, programme_type_category: Old age and survivors, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash spending, programme_type_category: All, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash and in-kind spending, programme_type_category: Old age, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash and in-kind spending, programme_type_category: Old age and survivors, programme_type: Total}
+- <<: *chile_1986
+  match: {expenditure_source: Public and mandatory private, spending_type: In-cash and in-kind spending, programme_type_category: All, programme_type: Total}
+
+# Finland and Poland 2022, public and mandatory private spending on all programs (in cash and in kind):
+# SOCX reports 0.03% (Finland) and 0.02% (Poland) of GDP, the same as their mandatory private spending
+# alone, while public spending in the same year is 29.6% and 20.7%. The public part is missing from the
+# combined total; 2021 is 31.05% and 22.18%. We drop the row (all three units), so mandatory private
+# spending for 2022 is SOCX's own published value. This is the only row where the combined total is
+# meaningfully below public spending for a country, which is why the garden step needs it removed.
+#
+# NOTE: SOCX has the same pattern (combined total = mandatory private only) in rows where it publishes
+# no public value, e.g. Finland and Poland 2022 health and in-kind totals, or Colombia and Costa Rica
+# health 2000-2010. Those don't break the calculation of mandatory private spending and are left as
+# published.
+
+- &total_2022
+  indicator: share_gdp
+  entity: Finland
+  years: [2022]
+  match:
+    {
+      expenditure_source: Public and mandatory private,
+      spending_type: In-cash and in-kind spending,
+      programme_type_category: All,
+      programme_type: Total,
+    }
+  action: drop
+  expect: {lt: 1}
+  reason: >-
+    Public and mandatory private spending on all programs in 2022 equals mandatory private spending
+    alone (under 0.1% of GDP), while public spending is above 20% of GDP. The public part is missing.
+  producer: OECD
+  status: open
+- <<: *total_2022
+  entity: Poland
+
+# Shares of government spending that imply an impossible total government spending. Dividing the share of GDP
+# by the share of government spending gives government spending as a share of GDP, which SOCX's values put at:
+#
+#   Japan 2004             8.8%   (2005: 34.9%)
+#   United Kingdom 1989   10.3%   (1990: 38.9%)
+#   Mexico 2020           45.1%   (2019: 27.1%, 2021: 26.7%; the OECD's national accounts give 29.3% for 2020)
+#
+# The shares of GDP and the US dollars per person for those years are consistent with the neighboring years,
+# so only the share of government spending is wrong. We drop it for every program in those years. The garden
+# step checks that these are the only years with an implausible share of government spending, so it fails
+# once SOCX fixes them (see GOVERNMENT_SPENDING_ERRORS).
+
+- &government_spending
+  indicator: share_gov_expenditure
+  entity: Japan
+  years: [2004]
+  action: drop
+  reason: >-
+    The shares of government spending in this year imply total government spending of 8.8% of GDP, against
+    34.9% the year after, so the denominator looks wrong.
+  producer: OECD
+  status: open
+- <<: *government_spending
+  entity: United Kingdom
+  years: [1989]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 10.3% of GDP, against
+    38.9% the year after, so the denominator looks wrong.
+- <<: *government_spending
+  entity: Mexico
+  years: [2020]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 45.1% of GDP, against
+    27.1% in 2019 and 29.3% in the OECD's national accounts for 2020, so the denominator looks wrong.
+# Two more country-years, found by comparing the government spending implied by SOCX with the OECD's national
+# accounts (as published in Government at a Glance). For the other 642 country-years compared, they agree within
+# about 3 points of GDP; these two differ by 11 and 12 points.
+- <<: *government_spending
+  entity: Japan
+  years: [2022]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 32.1% of GDP, against
+    43.3% in the OECD's national accounts and 43.9% the year before, so the denominator looks wrong.
+- <<: *government_spending
+  entity: Mexico
+  years: [2023]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 39.9% of GDP, against
+    27.4% in the OECD's national accounts and 26.5% the year before, so the denominator looks wrong.
