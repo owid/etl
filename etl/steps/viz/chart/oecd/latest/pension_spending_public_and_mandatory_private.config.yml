@@ -28,7 +28,6 @@ views:
       hasMapTab: false
       chartTypes:
         - StackedDiscreteBar
-        - StackedBar
       stackMode: absolute
       # The OECD average, large economies and the countries with the most mandatory private spending.
       selectedEntityNames:
