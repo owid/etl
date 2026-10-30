@@ -19,33 +19,33 @@ definitions:
   gross_income: |-
     Income here is measured before taxes and after benefits.
   equivalization: |-
-    Income has been equivalized — adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    The income data has been [equivalized](#dod:equivalization), that is, adjusted for household size. This makes living standards more comparable across households of different sizes, since people sharing a household can split costs like rent and heating. To make the adjustment, the OECD uses the square root equivalence scale: it divides the total household income by the square root of the number of people in the household.
   additional_info: |-
-    {definitions.age_groups}, and also the income definition is the newest from the OECD since 2012. For more information on the methodology, visit the [OECD Income Distribution Database (IDD)](http://www.oecd.org/social/income-distribution-database.htm).
+    {definitions.age_groups}, and uses the OECD’s income definition since 2012. For more information on the methodology, see the [OECD Income Distribution Database (IDD)](http://www.oecd.org/social/income-distribution-database.htm).
   covid: |-
     Survey estimates for 2020 are subject to additional uncertainty and are to be treated with extra caution, as in most countries the survey fieldwork was affected by the Coronavirus (COVID-19) pandemic.
 
   age_groups: |-
     <% if age == "Total" %>
-    The entire population of each country is considered
+    This data covers the whole population of each country
     <%- elif age == "Working population" %>
-    Only working-age population is considered (from 18 to 65 years old)
+    This data covers people of working age (18 to 65)
     <%- elif age == "Over 65 years" %>
-    Only population over 65 years old is considered
+    This data covers people over 65
     <%- elif age == "Under 18 years" %>
-    Only population under 18 years old is considered
+    This data covers people under 18
     <%- elif age == "18 to 25 years" %>
-    Only population from 18 to 25 years old is considered
+    This data covers people aged 18 to 25
     <%- elif age == "26 to 40 years" %>
-    Only population from 26 to 40 years old is considered
+    This data covers people aged 26 to 40
     <%- elif age == "41 to 50 years" %>
-    Only population from 41 to 50 years old is considered
+    This data covers people aged 41 to 50
     <%- elif age == "51 to 65 years" %>
-    Only population from 51 to 65 years old is considered
+    This data covers people aged 51 to 65
     <%- elif age == "66 to 75 years" %>
-    Only population from 66 to 75 years old is considered
+    This data covers people aged 66 to 75
     <%- elif age == "76 years and older" %>
-    Only population 76 years old and older is considered
+    This data covers people aged 76 and older
     <%- endif %>
 
   source_gini: |-
