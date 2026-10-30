@@ -55,6 +55,10 @@ MEASURE_WITH_DETAILED_AGES = (
     "50% of the national\xa0median disposable income",
 )
 
+# Measure and statistic used to calculate the income of each age group relative to the whole population.
+INCOME_MEASURE = "Disposable income"
+INCOME_STATISTIC = "Arithmetic mean"
+
 # Set table format when printing
 TABLEFMT = "pretty"
 
@@ -71,9 +75,18 @@ def run() -> None:
 
     #
     # Process data.
+    # Calculate the income of each age group relative to the whole population, and keep the other measures.
+    tb_income = create_relative_income_column(tb)
+    tb = tb[tb["measure"] != INCOME_MEASURE].reset_index(drop=True)
+    assert set(tb["statistical_operation"].str.strip("\u200b")) == {"Not applicable"}, "Unexpected statistics."
+    tb = tb.drop(columns=["statistical_operation"])
+    tb["measure"] = tb["measure"].cat.remove_unused_categories()
+
     tb = rename_and_create_columns(tb)
 
     tb = create_relative_poverty_columns(tb)
+
+    tb = pr.merge(tb, tb_income, on=["country", "year", "age"], how="outer")
 
     tb = paths.regions.harmonize_names(tb)
 
@@ -133,6 +146,30 @@ def rename_and_create_columns(tb: Table) -> Table:
     tb["gini_reduction"] = (tb["gini_market"] - tb["gini_disposable"]) / tb["gini_market"] * 100
 
     return tb
+
+
+def create_relative_income_column(tb: Table) -> Table:
+    """Calculate the average disposable income of each age group as a share of that of the whole population.
+
+    The source publishes the average income of each age group in national currency, which can't be compared between
+    countries, so we only keep the ratio, in percent.
+    """
+    tb_income = tb[(tb["measure"] == INCOME_MEASURE) & (tb["statistical_operation"] == INCOME_STATISTIC)]
+    assert set(tb_income["age"]) == set(AGE_GROUPS), "The average income doesn't cover every age group."
+    tb_income = tb_income[["country", "year", "age", "value"]].copy()
+    tb_income["age"] = tb_income["age"].cat.rename_categories(AGE_GROUPS)
+
+    tb_total = tb_income[tb_income["age"] == "Total"][["country", "year", "value"]].rename(columns={"value": "total"})
+    tb_income = pr.merge(tb_income[tb_income["age"] != "Total"], tb_total, on=["country", "year"], how="left")
+    assert tb_income["total"].notna().all(), "Some age groups have an average income but the whole population doesn't."
+    tb_income["relative_disposable_income"] = tb_income["value"] / tb_income["total"] * 100
+    tb_income = tb_income.drop(columns=["value", "total"])
+
+    # Average incomes by age stay within a plausible range of the population's average.
+    values = tb_income["relative_disposable_income"]
+    assert ((values > 30) & (values < 200)).all(), f"Relative incomes out of range: {values.describe()}"
+
+    return tb_income
 
 
 def create_relative_poverty_columns(tb: Table) -> Table:

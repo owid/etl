@@ -64,8 +64,6 @@ definitions:
     The S80/S20 ratio is the share of all income received by the top quintile divided by the share of the first, or the ratio of the average income of the top quintile to that of the first.
   source_headcount_ratio_market: |-
     Data for Hungary, Mexico and Turkey as well as data for Greece from the Household Budget Survey refer to the income post taxes and before transfers.
-  source_income_definition_2012: |-
-    Data calculated according to the new OECD Terms of reference. Compared to previous terms of reference, these include a more detailed breakdown of current transfers received and paid by households as well as a revised definition of household income, including the value of goods produced for own consumption as an element of self-employed income.
   source_recommended_uses_and_limitations: |-
     The OECD Income Distribution database (IDD) has been developed to benchmark and monitor countries’ performance in the field of income inequality and poverty. It contains a number of standardized indicators based on the central concept of “equivalised household disposable income”, i.e. the total income received by the households less the current taxes and transfers they pay, adjusted for household size with an equivalence scale. While household income is only one of the factors shaping people’s economic well-being, it is also the one for which comparable data for all OECD countries are most common. Income distribution has a long-standing tradition among household-level statistics, with regular data collections going back to the 1980s (and sometimes earlier) in many OECD countries.
 
@@ -99,8 +97,6 @@ tables:
         description_from_producer: |-
           {definitions.source_gini}
 
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: Gini coefficient (disposable income)
@@ -119,8 +115,6 @@ tables:
           - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_gini}
-
-          {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
         display:
@@ -143,8 +137,6 @@ tables:
 
           {definitions.source_gini_market}
 
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: Gini coefficient (market income)
@@ -163,8 +155,6 @@ tables:
           - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_p50_p10_ratio}
-
-          {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
         display:
@@ -185,8 +175,6 @@ tables:
         description_from_producer: |-
           {definitions.source_p90_p10_ratio}
 
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: P90/P10 ratio (disposable income)
@@ -205,8 +193,6 @@ tables:
           - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_p90_p50_ratio}
-
-          {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
         display:
@@ -227,8 +213,6 @@ tables:
         description_from_producer: |-
           {definitions.source_palma_ratio}
 
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: Palma ratio (disposable income)
@@ -248,8 +232,6 @@ tables:
         description_from_producer: |-
           {definitions.source_s80_s20_ratio}
 
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: S80/S20 ratio (disposable income)
@@ -267,11 +249,29 @@ tables:
           - "{definitions.additional_info}"
           - "{definitions.covid}"
         description_from_producer: |-
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: 50% of median - Share of population in poverty (disposable income)
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      relative_disposable_income:
+        title: Average income relative to the whole population (disposable income) - <<age>>
+        unit: "% of the population’s average income"
+        short_unit: "%"
+        description_short: Average disposable income of people in this age group, as a share of the average disposable income of the whole population.
+        description_key:
+          - A value of 90% means that the incomes of people in this age group are 10% lower than the average for the whole population.
+          - "{definitions.disposable_income}"
+          - "{definitions.equivalization}"
+          - "{definitions.additional_info}"
+          - "{definitions.covid}"
+        description_processing: |-
+          The OECD publishes the average disposable income of each age group in national currency. We divide it by the average disposable income of the whole population of the same country and year.
+        description_from_producer: |-
+          {definitions.source_recommended_uses_and_limitations}
+        display:
+          name: Average income relative to the whole population (disposable income)
           numDecimalPlaces: 1
           <<: *common-display
 
@@ -286,8 +286,6 @@ tables:
           - "{definitions.additional_info}"
           - "{definitions.covid}"
         description_from_producer: |-
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: 60% of median - Share of population in poverty (disposable income)
@@ -306,8 +304,6 @@ tables:
           - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_headcount_ratio_market}
-
-          {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
         display:
@@ -328,8 +324,6 @@ tables:
         description_from_producer: |-
           {definitions.source_headcount_ratio_market}
 
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: 60% of median - Share of population in poverty (market income)
@@ -346,8 +340,6 @@ tables:
           - "{definitions.additional_info}"
           - "{definitions.covid}"
         description_from_producer: |-
-          {definitions.source_income_definition_2012}
-
           {definitions.source_recommended_uses_and_limitations}
         display:
           name: Percentage reduction in Gini coefficient

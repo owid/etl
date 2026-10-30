@@ -6,7 +6,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Define variables to keep
-VARS_TO_KEEP = ["Reference area", "TIME_PERIOD", "Measure", "Poverty line", "Age", "OBS_VALUE"]
+VARS_TO_KEEP = ["Reference area", "TIME_PERIOD", "Measure", "Statistical operation", "Poverty line", "Age", "OBS_VALUE"]
 
 # Define new names for columns
 INDICATOR_NAMES = {"Reference area": "country", "TIME_PERIOD": "year", "OBS_VALUE": "value"}
@@ -31,7 +31,7 @@ def run() -> None:
     tb = tb.rename(columns=INDICATOR_NAMES, errors="raise")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "measure", "poverty_line", "age"])
+    tb = tb.format(["country", "year", "measure", "statistical_operation", "poverty_line", "age"])
 
     #
     # Save outputs.

@@ -120,7 +120,10 @@ steps:
     - data://garden/oecd/2026-10-30/income_distribution_database:
       - data://meadow/oecd/2026-10-30/income_distribution_database:
         - snapshot://oecd/2026-10-30/income_distribution_database.csv
-  viz://chart/oecd/latest/poverty_rate_by_age:
+  viz://chart/oecd/latest/old_age_poverty_rate_income_distribution_database:
+    - data://grapher/oecd/2026-10-30/income_distribution_database
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/old_age_relative_income_income_distribution_database:
     - data://grapher/oecd/2026-10-30/income_distribution_database
     - data://grapher/regions/2023-01-01/regions
 
