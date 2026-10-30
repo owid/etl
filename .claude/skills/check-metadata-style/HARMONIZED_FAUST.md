@@ -58,9 +58,11 @@ Principles:
 
 Most "% of GDP" indicators are not part of GDP: GDP is a separate variable used to scale for the size of the economy, as population is in "per capita". So always write the long unit as "% of GDP", never just "%", especially where a reader could assume part-to-whole (public spending).
 
+- Title: <indicator> as share of GDP (e.g. "Public spending on pensions as share of GDP"). (NOTE: local addition, not in the Google Doc yet. Keep it on refresh.)
 - Subtitle: <indicator> divided by [gross domestic product](#dod:gdp), expressed as a percentage.
 - Long unit: `% of GDP`
 - Short unit: `%`
+- Other denominators, such as total government spending, follow the same pattern: title "<indicator> as share of government spending", subtitle "<indicator> divided by total government spending, expressed as a percentage". (NOTE: local addition.)
 
 ## GDP and GDP per capita (PPP-adjusted)
 
