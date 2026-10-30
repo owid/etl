@@ -43,6 +43,20 @@ FILE_SLUG = "food-trade"
 # while keeping the files compact.
 NUM_DECIMALS = 3
 
+# What the viz shows about the data and how we processed it. It is set here, not in the garden
+# metadata, so that it only changes this feed.
+DESCRIPTION_KEY = """\
+This tool is built from country-to-country [trade data](https://www.fao.org/faostat/en/#data/TM) from the Food and Agriculture Organization of the United Nations.
+
+We made a number of steps to make the data easier to digest and present. For example, we sum together some detailed categories reported by the FAO only separately (e.g. "milled rice" and "broken rice" are shown together as a total for traded rice).
+
+Importantly, when digging into this data, we found that what exporting countries say they’ve exported to a given country doesn’t always match what the receiving country says they’ve imported. This is a common issue for all trade data, not just food. To keep things balanced, we had to make choices about how to align the data. Where only one country reports a trade flow, we take that figure and apply it to both parties. Where both an exporting and importing country report a flow but disagree about its quantity, we use the importer’s reported quantity. The FAO considers imports to typically be more reliable.
+
+Pablo Rosado, our data scientist behind this work, explains how we processed the original FAO data in more detail in our [technical documentation](https://docs.owid.io/projects/etl/analyses/food_trade/food_trade)."""
+
+# Fields the garden column carries that the viz does not show.
+FIELDS_NOT_SHOWN = ["descriptionShort", "unit", "shortUnit"]
+
 
 def _build_product_data(df: pd.DataFrame, product: str, entity_to_id: dict) -> dict:
     """Build the per-product JSON.
@@ -101,6 +115,9 @@ def run() -> None:
         columns={"Bilateral trade flow": tb["value"]},
         update_period_days=ds.metadata.update_period_days,
     )
+    for field in FIELDS_NOT_SHOWN:
+        feed_metadata.pop(field, None)
+    feed_metadata["descriptionKey"] = DESCRIPTION_KEY
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
