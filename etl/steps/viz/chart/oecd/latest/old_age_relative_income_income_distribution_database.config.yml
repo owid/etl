@@ -1,0 +1,99 @@
+grapher_schema: "011"
+slug: old-age-relative-income-income-distribution-database
+
+title:
+  title: Income of older people relative to the whole population
+  title_variant: ""
+topic_tags:
+  - Economic Inequality
+  - Poverty
+
+default_selection:
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Netherlands
+  - Denmark
+
+default_dimensions:
+  age: aged_66_and_older
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: auto
+        map:
+          colorScale:
+            baseColorScheme: BuGn
+
+dimensions:
+  - slug: age
+    name: Age
+    choices:
+      - slug: aged_66_and_older
+        name: 66 and older
+      - slug: aged_66_to_75
+        name: 66 to 75
+      - slug: aged_76_and_older
+        name: 76 and older
+      - slug: by_age
+        name: 66 to 75 vs. 76 and older
+        description: Compare older people of different ages
+
+views:
+  - dimensions:
+      age: aged_66_and_older
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#relative_disposable_income__age_over_65_years
+      color: regions#owid_region
+    config:
+      title: Average income of people aged 66 and older, relative to the whole population
+      subtitle: Average disposable income of people aged 66 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: aged_66_to_75
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#relative_disposable_income__age_66_to_75_years
+      color: regions#owid_region
+    config:
+      title: Average income of people aged 66 to 75, relative to the whole population
+      subtitle: Average disposable income of people aged 66 to 75, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: aged_76_and_older
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#relative_disposable_income__age_76_years_and_older
+      color: regions#owid_region
+    config:
+      title: Average income of people aged 76 and older, relative to the whole population
+      subtitle: Average disposable income of people aged 76 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+
+  # Comparison view: one line per group, one panel per country.
+  - dimensions:
+      age: by_age
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#relative_disposable_income__age_66_to_75_years
+          display:
+            name: 66 to 75
+        - catalogPath: income_distribution_database#relative_disposable_income__age_76_years_and_older
+          display:
+            name: 76 and older
+    config:
+      hasMapTab: false
+      tab: chart
+      chartTypes: ["LineChart", "DiscreteBar"]
+      selectedFacetStrategy: entity
+      title: Average income of people aged 66 to 75 and 76 and older, relative to the whole population
+      subtitle: Average disposable income of people aged 66 to 75 and of people aged 76 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.

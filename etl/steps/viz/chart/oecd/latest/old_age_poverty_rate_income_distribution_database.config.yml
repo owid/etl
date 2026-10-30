@@ -1,0 +1,103 @@
+grapher_schema: "011"
+slug: old-age-poverty-rate-income-distribution-database
+
+title:
+  title: Relative poverty among older people
+  title_variant: ""
+topic_tags:
+  - Poverty
+  - Economic Inequality
+
+default_selection:
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Netherlands
+  - Denmark
+
+default_dimensions:
+  age: aged_66_and_older
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: 0
+        map:
+          colorScale:
+            baseColorScheme: OrRd
+
+# NOTE: The OECD publishes the narrower age groups only at the 50% poverty line. If it adds them at 60%, consider a poverty line selector.
+dimensions:
+  - slug: age
+    name: Age
+    choices:
+      - slug: aged_66_and_older
+        name: 66 and older
+      - slug: aged_66_to_75
+        name: 66 to 75
+      - slug: aged_76_and_older
+        name: 76 and older
+      - slug: by_age
+        name: Older age groups vs. total population
+        description: Compare older people of different ages with the whole population
+
+views:
+  - dimensions:
+      age: aged_66_and_older
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_over_65_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 66 and older living in relative poverty
+      subtitle: Share of people aged 66 and older who live in households with an income below 50% of their country’s median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: aged_66_to_75
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_66_to_75_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 66 to 75 living in relative poverty
+      subtitle: Share of people aged 66 to 75 who live in households with an income below 50% of their country’s median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: aged_76_and_older
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_76_years_and_older
+      color: regions#owid_region
+    config:
+      title: Share of people aged 76 and older living in relative poverty
+      subtitle: Share of people aged 76 and older who live in households with an income below 50% of their country’s median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  # Comparison view: one line per group, one panel per country.
+  - dimensions:
+      age: by_age
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_66_to_75_years
+          display:
+            name: 66 to 75
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_76_years_and_older
+          display:
+            name: 76 and older
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_total
+          display:
+            name: Total population
+    config:
+      hasMapTab: false
+      tab: chart
+      chartTypes: ["LineChart", "DiscreteBar"]
+      selectedFacetStrategy: entity
+      title: Share of older people and of the whole population living in relative poverty
+      subtitle: Share of people aged 66 to 75 and 76 and older, and of the whole population, living in households with an income below 50% of their country’s median income. Income is measured after taxes and benefits and adjusted for household size.
