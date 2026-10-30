@@ -27,7 +27,9 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["DiscreteBar"]
+        chartTypes: ["DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
         map:
           hideTimeline: true
           colorScale:
@@ -65,6 +67,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#current_normal_retirement_age__sex_men
+      color: regions#owid_region
 
   - dimensions:
       timing: current
@@ -72,6 +75,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#current_normal_retirement_age__sex_women
+      color: regions#owid_region
 
   - dimensions:
       timing: future
@@ -79,6 +83,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#future_normal_retirement_age__sex_men
+      color: regions#owid_region
 
   - dimensions:
       timing: future
@@ -86,6 +91,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#future_normal_retirement_age__sex_women
+      color: regions#owid_region
 
   # Comparison views: one dot per series, joined by a line for each country.
   - dimensions:

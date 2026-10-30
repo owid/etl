@@ -29,7 +29,9 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["DiscreteBar"]
+        chartTypes: ["DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
         map:
           hideTimeline: true
           colorScale:

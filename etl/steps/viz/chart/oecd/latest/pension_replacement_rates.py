@@ -4,6 +4,9 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
+# Continent of each country, to color the Marimekkos.
+CONTINENT_PATH = "regions#owid_region"
+
 # For each selector: the slug of its comparison choice, and the legend label of each choice it compares.
 COMPARISONS = {
     "measure": ("gross_vs_net", {"gross": "Gross", "net": "Net"}),
@@ -18,8 +21,8 @@ COMPARISONS = {
     "sex": ("men_vs_women", {"men": "Men", "women": "Women"}),
 }
 
-# Two-way comparisons as dumbbells, sorted by the first choice, highest first. Neither choice comes before the other,
-# so a plain line joins them instead of an arrow.
+# Two-way comparisons as dumbbells, sorted by the first choice, highest first. Mandatory vs. voluntary schemes and men
+# vs. women have no order, so a plain line joins them instead of an arrow.
 DUMBBELL_CONFIG = {
     "hasMapTab": False,
     "tab": "chart",
@@ -28,6 +31,9 @@ DUMBBELL_CONFIG = {
     "sortBy": "startValue",
     "sortOrder": "desc",
 }
+
+# Gross and net are the rate before and after taxes, so an arrow points from the gross to the net rate.
+GROSS_VS_NET_CONFIG = {**DUMBBELL_CONFIG, "dumbbell": {"connectorStyle": "arrow"}}
 
 # Three earnings levels don't fit a dumbbell, so they go side by side, one panel per country. The custom sort keeps
 # the bars in the order of the indicators (half, average, twice), instead of sorting them by value in each panel.
@@ -39,6 +45,9 @@ EARNINGS_CONFIG = {
     "sortBy": "custom",
     "sortOrder": "asc",
 }
+
+# Chart settings of each comparison, other than the plain dumbbell.
+CONFIGS = {"measure": GROSS_VS_NET_CONFIG, "earnings": EARNINGS_CONFIG}
 
 # Wording of each choice in the titles and subtitles of the comparison views.
 MEASURE = {"gross": "Gross", "net": "Net", "gross_vs_net": "Gross and net"}
@@ -83,7 +92,7 @@ def run() -> None:
                 "choices": list(labels),
                 "choice_new_slug": slug,
                 "view_config": {
-                    **(EARNINGS_CONFIG if dimension == "earnings" else DUMBBELL_CONFIG),
+                    **CONFIGS.get(dimension, DUMBBELL_CONFIG),
                     "title": titles[dimension],
                     "subtitle": subtitle,
                     "note": note,
@@ -108,6 +117,12 @@ def run() -> None:
             if view.dimensions[dimension] == slug:
                 for indicator, label in zip(view.indicators.y, labels.values()):
                     indicator.update_display({"name": label})
+
+    # Color the Marimekkos of the single views by continent. Added after grouping, since group_views only merges views
+    # with y indicators alone.
+    for view in c.views:
+        if len(view.indicators.y) == 1:
+            view.indicators.set_indicator(color=CONTINENT_PATH)
 
     c.save()
 

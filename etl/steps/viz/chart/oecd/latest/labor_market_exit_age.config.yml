@@ -26,7 +26,9 @@ definitions:
         originUrl: ourworldindata.org/working-hours
         hasMapTab: true
         tab: chart
-        chartTypes: ["LineChart", "DiscreteBar"]
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
         yAxis:
           min: auto
     - dimensions:
@@ -80,6 +82,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#effective_labor_market_exit_age__sex_men
+      color: regions#owid_region
 
   - dimensions:
       metric: exit_age
@@ -87,6 +90,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#effective_labor_market_exit_age__sex_women
+      color: regions#owid_region
 
   - dimensions:
       metric: exit_age
@@ -106,6 +110,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
+      color: regions#owid_region
 
   - dimensions:
       metric: years_after_exit
@@ -113,6 +118,7 @@ views:
     indicators:
       y:
         - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
+      color: regions#owid_region
 
   - dimensions:
       metric: years_after_exit

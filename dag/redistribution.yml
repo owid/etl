@@ -48,10 +48,13 @@ steps:
   #
   viz://chart/oecd/latest/labor_market_exit_age:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
   viz://chart/oecd/latest/normal_retirement_age:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
   viz://chart/oecd/latest/pension_replacement_rates:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
 
   #
   # Social expenditure OMM
