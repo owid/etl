@@ -64,6 +64,8 @@ steps:
     - data://grapher/regions/2023-01-01/regions
   viz://chart/oecd/latest/income_sources_of_older_people:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+  viz://chart/oecd/latest/public_pension_spending_projections:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
 
   #
   # Social expenditure OMM
