@@ -1,0 +1,47 @@
+chart_config_id: 01a18dd8-7cb7-7e67-bd62-d7e3dc6354e2
+slug: pension-spending-public-and-mandatory-private
+grapher_schema: "011"
+topic_tags:
+  - Government Spending
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Cash benefits for old age and survivors from SOCX, the series Pensions at a Glance uses for public spending.
+      # Tolerance lets the bars of the latest year use 2021 or 2022 for countries without newer data.
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age_and_survivors__programme_type_total
+          display:
+            name: Public
+            color: "#6D87B5"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age_and_survivors__programme_type_total
+          display:
+            name: Mandatory private
+            color: "#A2557C"
+            tolerance: 2
+    config:
+      title: Spending on pensions, public and mandatory private
+      subtitle: Spending on pensions and other cash benefits for older people and survivors, as a share of [gross domestic product](#dod:gdp). Mandatory private spending comes from private schemes that people are required to join.
+      note: Voluntary private pensions aren’t included. In the Netherlands, for example, occupational pensions that cover almost all workers count as voluntary.
+      tab: chart
+      hasMapTab: false
+      chartTypes:
+        - StackedDiscreteBar
+        - StackedBar
+      stackMode: absolute
+      # The OECD average, large economies and the countries with the most mandatory private spending.
+      selectedEntityNames:
+        - OECD countries
+        - Italy
+        - France
+        - Germany
+        - Japan
+        - United Kingdom
+        - United States
+        - Switzerland
+        - Iceland
+        - Australia
+        - Denmark
+        - Chile
+      addCountryMode: add-country
