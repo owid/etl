@@ -315,6 +315,11 @@ definitions:
     Share of the gross income of people aged over 65 that comes from wages and self-employment.
   description_key_work_income_definition: |-
     Income from work includes earnings from employment and from self-employment.
+  # NOTE: Update the OECD average's total in 2020 (97.4%) and the effect of rescaling it (1.5 points, 55.8% to 57.3%), or drop those sentences if the source fixes it.
+  description_processing_income_sources: |-
+    {definitions.description_processing_repeated_surveys}
+
+    The four shares the OECD publishes (public transfers, occupational pensions, capital, and work) don’t always add up to exactly 100%. For countries, they add up to between 99.9% and 100.1%, because the OECD rounds each share to one decimal. For the OECD average in 2020, they add up to 97.4%. So we rescale them: we divide each share by the sum of the four and multiply it by 100. This changes country values by about 0.1 percentage points at most, and the OECD average for 2020 by up to 1.5 points: public transfers, for example, go from 55.8% to 57.3%.
 
   #
   # Text for the indicators in the pension_expenditure table.
@@ -850,7 +855,7 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
-        description_processing: "{definitions.description_processing_repeated_surveys}"
+        description_processing: "{definitions.description_processing_income_sources}"
         display:
           name: Public transfers
           numDecimalPlaces: 1
@@ -872,7 +877,7 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
-        description_processing: "{definitions.description_processing_repeated_surveys}"
+        description_processing: "{definitions.description_processing_income_sources}"
         display:
           name: Occupational pensions
           numDecimalPlaces: 1
@@ -892,7 +897,7 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
-        description_processing: "{definitions.description_processing_repeated_surveys}"
+        description_processing: "{definitions.description_processing_income_sources}"
         display:
           name: Capital
           numDecimalPlaces: 1
@@ -912,7 +917,7 @@ tables:
           {definitions.description_key_income_survey_years}
 
           {definitions.description_key_household_level}
-        description_processing: "{definitions.description_processing_repeated_surveys}"
+        description_processing: "{definitions.description_processing_income_sources}"
         display:
           name: Work
           numDecimalPlaces: 1

@@ -1,0 +1,57 @@
+chart_config_id: 01a18da2-cbd9-7e7d-b9de-7f9bb32c3a46
+slug: income-sources-of-older-people
+grapher_schema: "011"
+topic_tags:
+  - Poverty
+  - Economic Inequality
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Fixed colors, so each source looks the same in the area and bar charts.
+      y:
+        - catalogPath: income_sources_of_older_people#share_of_income_from_public_transfers
+          display:
+            name: Public pensions and benefits
+            color: "#6D87B5"
+        - catalogPath: income_sources_of_older_people#share_of_income_from_occupational_transfers
+          display:
+            name: Employer pensions
+            color: "#A2557C"
+        - catalogPath: income_sources_of_older_people#share_of_income_from_capital
+          display:
+            name: Personal pensions and savings
+            color: "#2C9C94"
+        - catalogPath: income_sources_of_older_people#share_of_income_from_work
+          display:
+            name: Work
+            color: "#C8A47E"
+    config:
+      title: Where older people’s income comes from
+      subtitle: Share of the gross income of people aged over 65 that comes from public pensions and other government benefits, from pensions provided through employers, from personal pensions and savings, and from work.
+      note: Incomes are measured for the whole household, so income from work can come from younger people living with older people. Only 14 countries report pensions provided through employers separately; in the others, they show as 0%.
+      tab: chart
+      hasMapTab: false
+      chartTypes:
+        - StackedArea
+        - StackedDiscreteBar
+      stackMode: absolute
+      hideRelativeToggle: true
+      # The sources add up to about 100%, so the total is left out of the bars.
+      hideTotalValueLabel: true
+      # Bars are sorted by the share from public pensions and benefits, highest first.
+      sortBy: column
+      sortColumnSlug: income_sources_of_older_people#share_of_income_from_public_transfers
+      sortOrder: desc
+      yAxis:
+        min: 0
+        max: 100
+      selectedFacetStrategy: entity
+      selectedEntityNames:
+        - OECD countries
+        - United States
+        - United Kingdom
+        - France
+        - Germany
+        - Japan
+      addCountryMode: add-country

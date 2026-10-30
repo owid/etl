@@ -62,6 +62,8 @@ steps:
   viz://chart/oecd/latest/old_age_relative_income:
     - data://grapher/oecd/2026-10-26/pensions_at_a_glance
     - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/income_sources_of_older_people:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
 
   #
   # Social expenditure OMM

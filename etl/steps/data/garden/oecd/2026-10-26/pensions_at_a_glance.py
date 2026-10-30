@@ -214,6 +214,9 @@ def run() -> None:
     # Create one wide table per group of indicators that share the same dimensions.
     tables = create_tables(tb=tb)
 
+    # Rescale the shares of income sources to add up to 100%, since the source's don't always.
+    tables["income_sources_of_older_people"] = rescale_income_shares(tb=tables["income_sources_of_older_people"])
+
     # Take the tax rate of workers from the data of Figure 4.3, since the source publishes it wrongly.
     tables["taxes_and_wages"] = add_tax_rate_of_workers(tb=tables["taxes_and_wages"], tb_taxes=tb_taxes)
 
@@ -430,15 +433,31 @@ def create_tables(tb: Table) -> dict[str, Table]:
     return tables
 
 
+def rescale_income_shares(tb: Table) -> Table:
+    """Rescale the shares of older people's income from each source so that they add up to 100%.
+
+    The source's shares add up to 99.9% to 100.1% because of rounding, except the OECD average in 2020 (97.4%).
+    """
+    columns = [column for column in tb.columns if column.startswith("share_of_income_from_")]
+    total = tb[columns].sum(axis=1)
+    # NOTE: Check whether the OECD average for 2020 still adds up to only 97.4%, and update the metadata if not.
+    assert ((total > 97) & (total < 101)).all(), (
+        f"Income shares far from 100%, check before rescaling:\n{tb[(total <= 97) | (total >= 101)]}"
+    )
+    for column in columns:
+        tb[column] = tb[column] / total * 100
+    return tb
+
+
 def sanity_check_outputs(tables: dict[str, Table]) -> None:
     for name, tb in tables.items():
         assert tb.columns[tb.isna().all()].empty, f"Table {name} has a fully empty column."
 
-    # Shares of income sources should add up to about 100%.
+    # Shares of income sources should add up to 100% after rescaling.
     tb_sources = tables["income_sources_of_older_people"]
     total = tb_sources.sum(axis=1)
-    assert ((total > 95) & (total < 101)).all(), (
-        f"Income shares don't add up to 100%:\n{total[(total <= 95) | (total >= 101)]}"
+    assert ((total - 100).abs() < 1e-3).all(), (
+        f"Income shares don't add up to 100%:\n{total[(total - 100).abs() >= 1e-3]}"
     )
 
     # Value bounds that a unit mistake or a parsing error would break.
