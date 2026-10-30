@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Aggregate replacement ratio for pensions (excluding other social benefits) by sex"
+    description: |-
+      The aggregate replacement ratio compares the pensions of people in their first years of retirement with the earnings from work of people in the years just before retirement. Eurostat calculates it as the median gross individual pension income of people aged 65 to 74, divided by the median gross individual earnings from work of an older working-age group. Pension income includes old-age benefits, survivor benefits, and pensions from individual private plans. Other social benefits, such as unemployment, family, sickness, or disability benefits, are left out.
+
+      The data comes from the EU Statistics on Income and Living Conditions (EU-SILC) survey. Eurostat publishes the ratio for everyone and for men and women separately, for EU countries, the EU and the euro area, and for several other European countries.
+    # NOTE: date_published is the "last data update" of ilc_pnp3 (the `updated` field of the JSON-stat API, https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_pnp3?format=JSON&lang=EN).
+    date_published: "2026-10-20"
+
+    # Citation
+    producer: "Eurostat"
+    # NOTE: Eurostat's copyright notice asks datasets to be cited as "Source: [DOI], [access date]"; the title is added for readability.
+    citation_full: |-
+      Eurostat (2026). Aggregate replacement ratio for pensions (excluding other social benefits) by sex – EU-SILC survey. https://doi.org/10.2908/ILC_PNP3, accessed on 30 October 2026.
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/ilc_pnp3/default/table?lang=en
+    # NOTE: Eurostat also publishes the same values in tables tespm100 (total only, from 2014) and tespn070 (by sex), and the gap between men and women in ilc_pnp11 — not snapshotted (2026-10-30). The age group of the earnings denominator differs between Eurostat's texts (50–59 in tespn070 and older documentation, 55–64 in tespm100 and the current glossary): re-check it on every update.
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_pnp3?format=TSV&compressed=true
+    date_accessed: 2026-10-30
+
+    # License
+    license:
+      name: "CC BY 4.0"
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: 510691133211594b6e087fe088fe16cc
+    size: 2656
+    path: aggregate_replacement_ratio.gz
