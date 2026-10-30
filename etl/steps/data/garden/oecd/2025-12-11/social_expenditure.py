@@ -37,11 +37,19 @@ EXPECTED_EXPENDITURE_SOURCES = {
     "Net total",
 }
 
-# Country-years where SOCX's shares of government spending imply an impossible total government spending, which
-# the .corrections.yml file removes: Japan 2004 (8.8% of GDP, against 34.9% in 2005), the United Kingdom 1989
-# (10.3%, against 38.9% in 1990), and Mexico 2020 (45.1%, against 29.3% in the OECD's national accounts).
-# NOTE: Check on every update whether SOCX still publishes these values.
-GOVERNMENT_SPENDING_ERRORS = {("Japan", 2004), ("Mexico", 2020), ("United Kingdom", 1989)}
+# Country-years where SOCX's shares of government spending imply a wrong total government spending (in % of GDP),
+# which the .corrections.yml file removes. Japan 2004 and the United Kingdom 1989 are far from the next year (34.9%
+# and 38.9%); Japan 2022 and Mexico 2020 and 2023 are far from the OECD's national accounts (43.3%, 29.3% and
+# 27.4%, as published in Government at a Glance). For the other country-years compared, the two agree within
+# about 3 points.
+# NOTE: Check on every update whether SOCX still publishes these values, and compare again with the national accounts.
+GOVERNMENT_SPENDING_ERRORS = {
+    ("Japan", 2004): 8.8,
+    ("Japan", 2022): 32.1,
+    ("Mexico", 2020): 45.1,
+    ("Mexico", 2023): 39.9,
+    ("United Kingdom", 1989): 10.3,
+}
 # Country-years with unusual but real government spending: Ireland 2010 (64.9% of GDP, the same in the OECD's
 # national accounts, because of the bank rescue).
 GOVERNMENT_SPENDING_UNUSUAL = {("Ireland", 2010)}
@@ -96,15 +104,14 @@ def run() -> None:
 
     sanity_check_inputs(tb)
 
-    # Check that the only years with an implausible share of government spending are the known source errors.
-    assert set(find_implausible_government_spending(tb)) == GOVERNMENT_SPENDING_ERRORS, (
-        f"Years with implausible total government spending changed: {find_implausible_government_spending(tb)}. "
-        "Update GOVERNMENT_SPENDING_ERRORS and the .corrections.yml file."
-    )
+    # Check that the known errors in the share of government spending are still there, and that there are no others.
+    check_government_spending_errors(tb)
 
     # Remove known errors in the source (see the .corrections.yml file).
     tb = paths.apply_corrections(tb)
     assert not find_implausible_government_spending(tb), "Implausible shares of government spending remain."
+    remaining = set(zip(implied_government_spending(tb)["country"], implied_government_spending(tb)["year"]))
+    assert not remaining & set(GOVERNMENT_SPENDING_ERRORS), "Known errors in the share of government spending remain."
 
     # Replace SOCX's mandatory private spending with public and mandatory private minus public spending.
     tb_corrected = tb.copy()
@@ -252,22 +259,42 @@ def check_oecd_average(tb_derived: Table) -> None:
     )
 
 
-def find_implausible_government_spending(tb: Table) -> list[tuple[str, int]]:
-    """Find the country-years whose share of government spending implies an implausible total government spending.
+def implied_government_spending(tb: Table) -> Table:
+    """Calculate total government spending as a share of GDP implied by SOCX, for each country and year.
 
     Dividing the share of GDP by the share of government spending gives total government spending as a share of
-    GDP. It should be the same for every row of a country and year, and close to the country's usual level. For
-    example, SOCX's values for Japan in 2004 imply government spending of 8.8% of GDP, against 34.9% in 2005.
+    GDP. It should be the same for every row of a country and year. For example, SOCX's values for Japan in 2004
+    imply government spending of 8.8% of GDP, against 34.9% in 2005.
     """
     tb_check = tb.dropna(subset=["share_gdp", "share_gov_expenditure"])
     tb_check = tb_check[(tb_check["share_gdp"] > 0.05) & (tb_check["share_gov_expenditure"] > 0.05)].copy()
     tb_check["government_spending"] = tb_check["share_gdp"] / tb_check["share_gov_expenditure"] * 100
-    tb_years = tb_check.groupby(["country", "year"], observed=True)["government_spending"].median().reset_index()
+    return tb_check.groupby(["country", "year"], observed=True)["government_spending"].median().reset_index()
+
+
+def find_implausible_government_spending(tb: Table) -> list[tuple[str, int]]:
+    """Find the country-years whose implied government spending is far from the country's usual level."""
+    tb_years = implied_government_spending(tb)
     usual = tb_years.groupby("country", observed=True)["government_spending"].transform("median")
     ratio = tb_years["government_spending"] / usual
     implausible = tb_years[(ratio < 0.6) | (ratio > 1.6)]
     found = zip(implausible["country"].astype(str), implausible["year"].astype(int))
     return sorted(set(found) - GOVERNMENT_SPENDING_UNUSUAL)
+
+
+def check_government_spending_errors(tb: Table) -> None:
+    """Assert that the known errors are still in the source, and that no other country-year looks implausible."""
+    tb_years = implied_government_spending(tb).set_index(["country", "year"])["government_spending"]
+    for (country, year), expected in GOVERNMENT_SPENDING_ERRORS.items():
+        assert (country, year) in tb_years.index and abs(tb_years[(country, year)] - expected) < 0.5, (
+            f"SOCX's share of government spending for {country} {year} changed: check whether it was fixed, and "
+            "update GOVERNMENT_SPENDING_ERRORS and the .corrections.yml file."
+        )
+    unexpected = set(find_implausible_government_spending(tb)) - set(GOVERNMENT_SPENDING_ERRORS)
+    assert not unexpected, (
+        f"New country-years with implausible total government spending: {sorted(unexpected)}. Check them and update "
+        "GOVERNMENT_SPENDING_ERRORS and the .corrections.yml file."
+    )
 
 
 def sanity_check_inputs(tb: Table) -> None:

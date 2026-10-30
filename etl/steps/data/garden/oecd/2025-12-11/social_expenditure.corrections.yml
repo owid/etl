@@ -149,3 +149,18 @@
   reason: >-
     The shares of government spending in this year imply total government spending of 45.1% of GDP, against
     27.1% in 2019 and 29.3% in the OECD's national accounts for 2020, so the denominator looks wrong.
+# Two more country-years, found by comparing the government spending implied by SOCX with the OECD's national
+# accounts (as published in Government at a Glance). For the other 642 country-years compared, they agree within
+# about 3 points of GDP; these two differ by 11 and 12 points.
+- <<: *government_spending
+  entity: Japan
+  years: [2022]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 32.1% of GDP, against
+    43.3% in the OECD's national accounts and 43.9% the year before, so the denominator looks wrong.
+- <<: *government_spending
+  entity: Mexico
+  years: [2023]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 39.9% of GDP, against
+    27.4% in the OECD's national accounts and 26.5% the year before, so the denominator looks wrong.
