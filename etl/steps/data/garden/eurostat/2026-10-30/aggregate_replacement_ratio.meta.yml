@@ -21,35 +21,22 @@ definitions:
     The aggregate replacement ratio is the median gross pension of {definitions.people_by_sex} aged 65 to 74, as a share of the median gross earnings from work of {definitions.people_by_sex} aged 55 to 64.
 
   description_key_definition: |-
-    The aggregate replacement ratio shows how pensions compare with earnings from work at the end of a working life. Eurostat calculates it by dividing the median pension of people aged 65 to 74 by the median earnings from work of people aged 55 to 64. A ratio of 60% means that the typical pension of people in their first years of retirement is 60% of the typical earnings of people in the decade before retirement.
-
-  description_key_who_counts: |-
-    Only people who receive a pension count toward the median pension, and only people who work count toward median earnings. Eurostat leaves out people whose pension or earnings are missing from the survey, and people living in institutions such as care homes.
-
-  description_key_gross_individual: |-
-    Pensions and earnings are measured before taxes and social contributions (gross), and for each person rather than for the household. The ratio doesn’t account for household size, or for the fact that many countries tax pensions less than earnings. So it can differ from how well-off retirees are once taxes and the people they live with are taken into account.
+    The aggregate replacement ratio compares the typical pension of people in their first years of retirement with the typical earnings of people in the decade before retirement. A ratio of 60% means that the median pension of people aged 65 to 74 is 60% of the median earnings from work of people aged 55 to 64.
 
   description_key_what_counts: |-
-    Pensions include old-age pensions, survivor pensions (paid after the death of a spouse or another family member), and pensions from individual private plans. “Excluding other social benefits” means that the ratio leaves out unemployment, family, sickness, disability, and education-related benefits, and any other social benefits people receive. Earnings from work include wages and salaries and income from self-employment. Other income, such as income from investments or money from other households, is not counted.
+    Pensions include old-age pensions, survivor pensions (paid after the death of a spouse or another family member), and pensions from individual private plans, but not other social benefits, such as unemployment, family, sickness, or disability benefits. Earnings from work include wages and income from self-employment. Only people who receive a pension count toward the median pension, and only people who work count toward median earnings.
+
+  description_key_gross_individual: |-
+    Pensions and earnings are measured before taxes and social contributions, for each person rather than for the household. So the ratio doesn’t show how well-off retirees are once taxes and the people they live with are taken into account.
 
   description_key_two_groups: |-
-    The ratio compares two different groups of people in the same year. It doesn’t follow the same people as they retire, so it is a rough measure of how much of their earnings people keep in retirement.
-
-  description_key_sex: |-
-    <% if sex == "both sexes" %>
-    Eurostat also publishes the ratio for men and women separately.
-    <%- else %>
-    This series compares the pensions of {definitions.people_by_sex} with the earnings of {definitions.people_by_sex}. Differences between men and women need careful reading: for example, a higher share of women work part-time, which lowers their median earnings and raises their ratio.
-    <%- endif %>
+    The ratio compares two different groups of people in the same year, rather than following the same people as they retire.<% if sex != "both sexes" %> A higher share of women work part-time, which lowers their median earnings and raises their ratio.<% endif %>
 
   description_key_survey: |-
-    The data comes from the EU Statistics on Income and Living Conditions (EU-SILC), a yearly household survey that national statistical offices run and Eurostat coordinates. The year shown is the survey year. In most countries, incomes refer to the previous calendar or tax year; in Ireland, to the 12 months before the interview; and in the United Kingdom, to the survey year.
-
-  description_key_age_groups_change: |-
-    Earlier Eurostat publications, and the European Commission’s 2024 Pension Adequacy Report, defined the ratio with the earnings of people aged 50 to 59 instead of 55 to 64. Eurostat has also revised past values, so figures quoted in older publications can differ from these.
+    The data comes from the EU Statistics on Income and Living Conditions (EU-SILC), a yearly household survey. The year shown is the survey year; in most countries, incomes refer to the year before.
 
   description_key_breaks: |-
-    Eurostat marks breaks in the series for some countries and years, for example when a country changes how it runs the survey. Values on either side of a break may not be fully comparable. Luxembourg, for example, has breaks in 2016, 2020, 2021, 2022, and 2025.
+    Eurostat marks breaks in the series for some countries and years, for example when a country changes how it runs the survey. Values on either side of a break may not be fully comparable.
 
   description_processing_percent: |-
     Eurostat publishes the aggregate replacement ratio as a ratio (for example, 0.60). We multiply it by 100 to show it as a percentage.
@@ -78,13 +65,10 @@ tables:
         description_short: "{definitions.definition_short}"
         description_key:
           - "{definitions.description_key_definition}"
-          - "{definitions.description_key_who_counts}"
-          - "{definitions.description_key_gross_individual}"
           - "{definitions.description_key_what_counts}"
+          - "{definitions.description_key_gross_individual}"
           - "{definitions.description_key_two_groups}"
-          - "{definitions.description_key_sex}"
           - "{definitions.description_key_survey}"
-          - "{definitions.description_key_age_groups_change}"
           - "{definitions.description_key_breaks}"
         description_from_producer: |-
           The aggregate replacement ratio is gross median individual pension income of the population aged 65–74 relative to gross median individual earnings from work of the population aged 55-64, excluding other social benefits.
