@@ -1,0 +1,276 @@
+grapher_schema: "011"
+slug: poverty-rate-by-age
+
+title:
+  title: Relative poverty by age
+  title_variant: ""
+topic_tags:
+  - Poverty
+  - Economic Inequality
+
+default_selection:
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Netherlands
+  - Denmark
+
+default_dimensions:
+  age: total
+  poverty_line: 50_median
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: 0
+        map:
+          colorScale:
+            baseColorScheme: OrRd
+
+# NOTE: The OECD publishes the narrower age groups only at the 50% poverty line. If it adds them at 60%, add those views.
+dimensions:
+  - slug: age
+    name: Age group
+    choices:
+      - slug: under_18
+        name: Under 18
+      - slug: "18_25"
+        name: 18–25 years
+      - slug: "26_40"
+        name: 26–40 years
+      - slug: "41_50"
+        name: 41–50 years
+      - slug: "51_65"
+        name: 51–65 years
+      - slug: "18_65"
+        name: 18–65 years
+        description: Working-age population
+      - slug: "66_75"
+        name: 66–75 years
+      - slug: 76_and_older
+        name: 76 years and older
+      - slug: over_65
+        name: Over 65 years
+      - slug: total
+        name: Total population
+      - slug: older_age_groups
+        name: Older age groups
+        description: Compare people aged 66–75 and 76 and older with the total population
+      - slug: all_age_groups
+        name: All age groups
+        description: Compare every age group, from under 18 to 76 and older
+  - slug: poverty_line
+    name: Poverty line
+    choices:
+      - slug: 50_median
+        name: 50% of median income
+      - slug: 60_median
+        name: 60% of median income
+        description: Only available for the total population, people aged 18–65 and people over 65
+
+views:
+  # Single age groups, 50% poverty line.
+  - dimensions:
+      age: under_18
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_under_18_years
+      color: regions#owid_region
+    config:
+      title: Share of children under 18 living in relative poverty
+      subtitle: Share of children under 18 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: "18_25"
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_18_to_25_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 18 to 25 living in relative poverty
+      subtitle: Share of people aged 18 to 25 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: "26_40"
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_26_to_40_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 26 to 40 living in relative poverty
+      subtitle: Share of people aged 26 to 40 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: "41_50"
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_41_to_50_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 41 to 50 living in relative poverty
+      subtitle: Share of people aged 41 to 50 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: "51_65"
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_51_to_65_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 51 to 65 living in relative poverty
+      subtitle: Share of people aged 51 to 65 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: "18_65"
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_working_population
+      color: regions#owid_region
+    config:
+      title: Share of working-age people living in relative poverty
+      subtitle: Share of people aged 18 to 65 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: "66_75"
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_66_to_75_years
+      color: regions#owid_region
+    config:
+      title: Share of people aged 66 to 75 living in relative poverty
+      subtitle: Share of people aged 66 to 75 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: 76_and_older
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_76_years_and_older
+      color: regions#owid_region
+    config:
+      title: Share of people aged 76 and older living in relative poverty
+      subtitle: Share of people aged 76 and older who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: over_65
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_over_65_years
+      color: regions#owid_region
+    config:
+      title: Share of people over 65 living in relative poverty
+      subtitle: Share of people over 65 who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: total
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_total
+      color: regions#owid_region
+    config:
+      title: Share of people living in relative poverty
+      subtitle: Share of people who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  # Single age groups, 60% poverty line.
+  - dimensions:
+      age: "18_65"
+      poverty_line: 60_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_60_median__age_working_population
+      color: regions#owid_region
+    config:
+      title: Share of working-age people living in relative poverty
+      subtitle: Share of people aged 18 to 65 who live in households with an income below 60% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: over_65
+      poverty_line: 60_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_60_median__age_over_65_years
+      color: regions#owid_region
+    config:
+      title: Share of people over 65 living in relative poverty
+      subtitle: Share of people over 65 who live in households with an income below 60% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: total
+      poverty_line: 60_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_60_median__age_total
+      color: regions#owid_region
+    config:
+      title: Share of people living in relative poverty
+      subtitle: Share of people who live in households with an income below 60% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  # Comparison views: one line per age group, one panel per country.
+  - dimensions:
+      age: older_age_groups
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_66_to_75_years
+          display:
+            name: 66–75 years
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_76_years_and_older
+          display:
+            name: 76 years and older
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_total
+          display:
+            name: Total population
+    config: &comparison
+      hasMapTab: false
+      tab: chart
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      title: Share of older people living in relative poverty, compared with the total population
+      subtitle: Share of people who live in households with an income below 50% of their country's median income. Income is measured after taxes and benefits and adjusted for household size.
+
+  - dimensions:
+      age: all_age_groups
+      poverty_line: 50_median
+    indicators:
+      y:
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_under_18_years
+          display:
+            name: Under 18
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_18_to_25_years
+          display:
+            name: 18–25 years
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_26_to_40_years
+          display:
+            name: 26–40 years
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_41_to_50_years
+          display:
+            name: 41–50 years
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_51_to_65_years
+          display:
+            name: 51–65 years
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_66_to_75_years
+          display:
+            name: 66–75 years
+        - catalogPath: income_distribution_database#headcount_ratio_disposable_50_median__age_76_years_and_older
+          display:
+            name: 76 years and older
+    config:
+      <<: *comparison
+      title: Share of people living in relative poverty, by age group

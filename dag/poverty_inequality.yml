@@ -115,6 +115,14 @@ steps:
     - data://garden/oecd/2026-04-23/income_distribution_database:
       - data://meadow/oecd/2026-04-23/income_distribution_database:
         - snapshot://oecd/2026-04-23/income_distribution_database.csv
+  # OECD Income Distribution Database
+  data://grapher/oecd/2026-10-30/income_distribution_database:
+    - data://garden/oecd/2026-10-30/income_distribution_database:
+      - data://meadow/oecd/2026-10-30/income_distribution_database:
+        - snapshot://oecd/2026-10-30/income_distribution_database.csv
+  viz://chart/oecd/latest/poverty_rate_by_age:
+    - data://grapher/oecd/2026-10-30/income_distribution_database
+    - data://grapher/regions/2023-01-01/regions
 
   # Historical poverty data - Moatsos (2021)
   data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
