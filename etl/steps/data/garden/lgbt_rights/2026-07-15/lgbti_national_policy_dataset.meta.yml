@@ -17,6 +17,9 @@ definitions:
   description_key_binding_instrument: |-
     The dataset counts policies established by binding legal instruments — statutes, constitutional provisions, decrees and regulations with the force of law, and binding court rulings. Where no law governs a policy, a written rule that does can count too, such as a health-authority guideline, a blood service's donor questionnaire or a religious ruling. Bills, ministerial statements and non-binding declarations are not counted.
 
+  description_key_constitutional_counting: |-
+    Only constitutions that name sexual orientation or gender identity are counted. For sexual orientation, there are two exceptions: Nepal, where courts have applied the open-ended equality grounds of the 2015 constitution to it, and Taiwan, where the top court ruled in 2017 that the constitution's equality clause covers it. Protections that courts have read into general equality clauses elsewhere, or that come from ordinary laws, are not counted.
+
   proportion_methodology: |-
     The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by population shares from one census per country, held constant so that changes over time reflect policy shifts rather than demographic change.
 
@@ -57,9 +60,9 @@ definitions:
     <% elif law == "civil_unions" %>
     Whether same-sex couples have access to a legally recognized partnership distinct from marriage (civil union, domestic partnership, or registered partnership).
     <% elif law == "constitutional_protections_gender_identity" %>
-    Whether gender identity is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
+    Whether the national constitution names gender identity as a protected characteristic.
     <% elif law == "constitutional_protections_sexual_orientation" %>
-    Whether sexual orientation is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
+    Whether the national constitution names sexual orientation as a protected characteristic. Top-court rulings that extend the constitution to cover it are also counted in Nepal and Taiwan.
     <% elif law == "conversion_therapies" %>
     Whether conversion therapy (practices that try to change a person's sexual orientation or gender identity) is banned, fully or in part, by law, executive order, or court ruling.
     <% elif law == "death_penalty" %>
@@ -472,10 +475,11 @@ tables:
       constitutional_protections_sexual_orientation:
         title: Constitutional protections based on sexual orientation
         description_short: |-
-          Whether sexual orientation is explicitly named in the constitution or established through binding constitutional court interpretation.
+          Whether the national constitution names sexual orientation as a protected characteristic. Top-court rulings that extend the constitution to cover it are also counted in Nepal and Taiwan.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Constitutionally protected_** (sexual orientation is named in the constitution or established as a protected characteristic through binding constitutional court interpretation) and **_Not protected_** (no national constitutional protection for sexual orientation).'
+          - 'The indicator is coded as follows: **_Constitutionally protected_** (the constitution names sexual orientation as a protected characteristic, or a top-court ruling has read it into the constitution) and **_Not protected_** (no national constitutional protection for sexual orientation).'
+          - "{definitions.description_key_constitutional_counting}"
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -492,10 +496,11 @@ tables:
       constitutional_protections_gender_identity:
         title: Constitutional protections based on gender identity
         description_short: |-
-          Whether gender identity is explicitly named in the constitution or established through binding constitutional court interpretation.
+          Whether the national constitution names gender identity as a protected characteristic.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Constitutionally protected_** (gender identity is named in the constitution or established as a protected characteristic through binding constitutional court interpretation) and **_Not protected_** (no national constitutional protection for gender identity).'
+          - 'The indicator is coded as follows: **_Constitutionally protected_** (the constitution names gender identity as a protected characteristic) and **_Not protected_** (no national constitutional protection for gender identity).'
+          - "{definitions.description_key_constitutional_counting}"
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -881,10 +886,11 @@ tables:
       constitutional_protections:
         title: Constitutional protections (sexual orientation and gender identity)
         description_short: |-
-          Whether the constitution explicitly or via binding court interpretation protects sexual orientation, gender identity, both, or neither.
+          Whether the national constitution protects sexual orientation, gender identity, both, or neither.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
+          - 'The indicator is coded as follows: **_Both protected_** (the constitution protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
+          - "{definitions.description_key_constitutional_counting}"
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
