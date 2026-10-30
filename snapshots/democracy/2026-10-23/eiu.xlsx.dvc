@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Democracy Index 2025: Democracy stabilizes after eight years of decline"
+    description: |-
+      The Democracy Index, produced by the Economist Intelligence Unit (EIU), measures the state of democracy in 167 countries and territories, covering almost the entire population of the world. Each country gets a score from 0 to 10, which is the average of five category scores: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. These category scores are built from 60 indicators, mostly assessed by EIU's country experts. Based on its overall score, each country is classified as one of four types of regime: "full democracy" (scores from 8 to 10), "flawed democracy" (6 to 7.99), "hybrid regime" (4 to 5.99) or "authoritarian regime" (below 4).
+
+      This edition covers 2025. EIU provided the overall score, the rank and the regime type of each country for every edition since 2006 as a spreadsheet. The index was not published for 2007 and 2009. The five category scores are only available through EIU's paid data services.
+    date_published: "2026-04-07"
+    # Citation
+    producer: Economist Intelligence Unit
+    citation_full: |-
+      Economist Intelligence Unit (2026). Democracy Index 2025: Democracy stabilizes after eight years of decline. London: Economist Intelligence Unit.
+
+    # Files
+    url_main: https://www.eiu.com/n/campaigns/democracy-index-2025/
+    date_accessed: "2026-10-23"
+
+    # License
+    license:
+      name: The Economist Intelligence Unit Limited
+      url: https://www.eiu.com/n/terms/
+outs:
+  - md5: 062fd637ebf6a9702e5376309549058a
+    size: 60750
+    path: eiu.xlsx
