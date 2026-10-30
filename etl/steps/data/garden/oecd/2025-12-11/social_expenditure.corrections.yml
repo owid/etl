@@ -114,3 +114,38 @@
   status: open
 - <<: *total_2022
   entity: Poland
+
+# Shares of government spending that imply an impossible total government spending. Dividing the share of GDP
+# by the share of government spending gives government spending as a share of GDP, which SOCX's values put at:
+#
+#   Japan 2004             8.8%   (2005: 34.9%)
+#   United Kingdom 1989   10.3%   (1990: 38.9%)
+#   Mexico 2020           45.1%   (2019: 27.1%, 2021: 26.7%; the OECD's national accounts give 29.3% for 2020)
+#
+# The shares of GDP and the US dollars per person for those years are consistent with the neighboring years,
+# so only the share of government spending is wrong. We drop it for every program in those years. The garden
+# step checks that these are the only years with an implausible share of government spending, so it fails
+# once SOCX fixes them (see GOVERNMENT_SPENDING_ERRORS).
+
+- &government_spending
+  indicator: share_gov_expenditure
+  entity: Japan
+  years: [2004]
+  action: drop
+  reason: >-
+    The shares of government spending in this year imply total government spending of 8.8% of GDP, against
+    34.9% the year after, so the denominator looks wrong.
+  producer: OECD
+  status: open
+- <<: *government_spending
+  entity: United Kingdom
+  years: [1989]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 10.3% of GDP, against
+    38.9% the year after, so the denominator looks wrong.
+- <<: *government_spending
+  entity: Mexico
+  years: [2020]
+  reason: >-
+    The shares of government spending in this year imply total government spending of 45.1% of GDP, against
+    27.1% in 2019 and 29.3% in the OECD's national accounts for 2020, so the denominator looks wrong.
