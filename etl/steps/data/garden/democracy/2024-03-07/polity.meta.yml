@@ -422,15 +422,6 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      experience_dem_polity:
-        title: Experience with democracy
-        unit: ""
-        description_short: |-
-          Number of total years in a democracy. It sums all periods of a democracy.
-        description_key:
-          - *other_sources
-          - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
-
       group_age_dem_polity:
         title: Democracy age group
         unit: ""

@@ -436,18 +436,11 @@ tables:
           numDecimalPlaces: 2
 
       # NEW
-      num_years_in_electdem: # electdem_exp_row_owid
-        title: Experience with electoral democracy
-        description_short: |-
-          Number of total years in electoral democracy. It sums all periods of electoral democracy.
-        description_key: &description_key_num_electdem
-          - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
-        unit: years
-
       num_years_in_electdem_consecutive: # electdem_age_row_owid
         title: Age of electoral democracy
         description_short: Number of consecutive years in electoral democracy.
-        description_key: *description_key_num_electdem
+        description_key: &description_key_num_electdem
+          - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         unit: years
         short_unit: years
         presentation:
@@ -465,18 +458,11 @@ tables:
         description_key: *description_key_num_electdem
         unit: ""
 
-      num_years_in_libdem: # libdem_exp_row_owid
-        title: Experience with liberal democracy
-        description_short: |-
-          Number of total years in liberal democracy. It sums all periods of liberal democracy.
-        description_key: &description_key_num_libdem
-          - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
-        unit: years
-
       num_years_in_libdem_consecutive: # libdem_age_row_owid
         title: Age of liberal democracy
         description_short: Number of consecutive years in electoral democracy.
-        description_key: *description_key_num_libdem
+        description_key: &description_key_num_libdem
+          - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         unit: years
         short_unit: years
         presentation:
