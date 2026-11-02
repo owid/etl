@@ -153,6 +153,8 @@ def add_population_in_dummies(
         interpolate_missing_population=True,
         expected_countries_without_population=expected_countries_without_population,
     )
+    # Fill population gaps only between known years, not before a country's first or after its last known value (as in the original Stata scripts)
+    tb = drop_extrapolated_population(tb, ds_population)
     tb = cast(Table, tb.dropna(subset="population"))
     # Add metadata (origins combined indicator+population)
     cols = [col for col in tb.columns if col not in ["year", "country", "population"]]
@@ -167,6 +169,19 @@ def add_population_in_dummies(
         metadata.origins += meta["population"].origins
         tb[col].metadata = meta[col]
 
+    return tb
+
+
+def drop_extrapolated_population(tb: Table, ds_population: Dataset) -> Table:
+    """Blank population for years outside each country's range in the population dataset.
+
+    `geo.add_population_to_table(..., interpolate_missing_population=True)` also copies a country's first and last known value outward (e.g. Ireland's 1950 population back to 1800).
+    """
+    tb_population = ds_population.read("population")
+    years = tb_population.dropna(subset="population").groupby("country", observed=True)["year"].agg(["min", "max"])
+    countries = tb["country"].astype(str)
+    outside_range = (tb["year"] < countries.map(years["min"])) | (tb["year"] > countries.map(years["max"]))
+    tb.loc[outside_range, "population"] = np.nan
     return tb
 
 
@@ -325,11 +340,7 @@ def add_count_years_in_regime(
     columns: list[tuple[str, str, int]],
     na_is_zero: bool = False,
 ) -> Table:
-    """Add years in a certain regime.
-
-    Two types of counters are generated:
-        - Age: Number of years consecutively with a certain regime type.
-        - Experience: Number of years with a certain regime type.
+    """Add the age of a regime: the number of consecutive years with a certain regime type.
 
     columns: List of tuples with 3 elements: (colname, col_newname, threshold).
     na_is_zero: NaN values (i.e. can't be classified based on the threshold) are classified into the negative class (i.e. 0).
@@ -349,12 +360,8 @@ def add_count_years_in_regime(
         # Add age of democracy
         tb[f"age_{col_new}"] = tb.groupby(["country", tb[col_th].fillna(0).eq(0).cumsum()])[col_th].cumsum().astype(int)
         tb[f"age_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
-        # Add experience with democracy
-        tb[f"experience_{col_new}"] = tb.groupby("country")[col_th].cumsum().astype(int)
-        tb[f"experience_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
         # Sanity check
         assert (tb.loc[tb[col_th] == 1, f"age_{col_new}"] != 0).all(), "Negative age found!"
-        assert (tb.loc[tb[col_th] == 1, f"experience_{col_new}"] != 0).all(), "Negative age found!"
         # Drop unused columns
         tb = tb.drop(columns=[col_th])
         return tb

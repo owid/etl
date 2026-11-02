@@ -102,6 +102,8 @@ def add_population_in_dummies(
         interpolate_missing_population=True,
         expected_countries_without_population=expected_countries_without_population,
     )
+    # Fill population gaps only between known years, not before a country's first or after its last known value (as in the original Stata scripts)
+    tb = drop_extrapolated_population(tb, ds_population)
     tb = cast(Table, tb.dropna(subset="population"))
     # Add metadata (origins combined indicator+population)
     cols = [col for col in tb.columns if col not in ["year", "country", "population"]]
@@ -116,4 +118,17 @@ def add_population_in_dummies(
         metadata.origins += meta["population"].origins
         tb[col].metadata = meta[col]
 
+    return tb
+
+
+def drop_extrapolated_population(tb: Table, ds_population: Dataset) -> Table:
+    """Blank population for years outside each country's range in the population dataset.
+
+    `geo.add_population_to_table(..., interpolate_missing_population=True)` also copies a country's first and last known value outward (e.g. Ireland's 1950 population back to 1800).
+    """
+    tb_population = ds_population.read("population")
+    years = tb_population.dropna(subset="population").groupby("country", observed=True)["year"].agg(["min", "max"])
+    countries = tb["country"].astype(str)
+    outside_range = (tb["year"] < countries.map(years["min"])) | (tb["year"] > countries.map(years["max"]))
+    tb.loc[outside_range, "population"] = np.nan
     return tb

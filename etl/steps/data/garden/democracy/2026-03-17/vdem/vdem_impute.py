@@ -108,7 +108,7 @@ def run(tb: Table) -> Table:
     # Fill NaNs with False
     tb["regime_imputed"] = tb["regime_imputed"].fillna(False).astype(bool)
 
-    # Check unique values
-    tb.format(underscore=False).reset_index()
+    # Check unique values, and sort by country and year (the imputed rows were appended at the top), since later steps count years in order
+    tb = tb.format(underscore=False).reset_index()
 
     return tb

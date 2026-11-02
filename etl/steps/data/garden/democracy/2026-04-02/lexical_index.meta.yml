@@ -397,13 +397,6 @@ tables:
           The variable distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies aged 1-18 years, 19-30 years, 31-60 years, 61-90 years, and 91+ years in electoral democracy.
         description_key: *key_electdem
 
-      experience_electdem_lied:
-        title: "Experience with electoral democracy"
-        unit: ""
-        description_short: |-
-          Number of total years in electoral democracy. It sums all periods of electoral democracy.
-        description_key: *key_electdem
-
       age_polyarchy_lied:
         title: "Age of full democracy"
         unit: "years"
@@ -449,12 +442,6 @@ tables:
           The variable distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies, full democracies aged 1-18 years, 19-30 years, 31-60 years, 61-90 years, and 91+ years in a full democracy.
         description_key: *key_poly
         description_processing: *polyarchy_fulldem_proc
-
-      experience_polyarchy_lied:
-        title: "Experience with full democracy"
-        unit: ""
-        description_short: Number of total years in a full democracy. It sums all periods of full democracy.
-        description_key: *key_poly
 
       turnover_event:
         title: Electoral turnover event
