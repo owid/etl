@@ -56,6 +56,7 @@ from etl.steps.data.garden.democracy.shared import (
     add_imputes,
     add_population_in_dummies,
     add_regions_and_global_aggregates,
+    codes_to_ordinal,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -70,6 +71,52 @@ PATH_IMPUTE = paths.directory / f"{paths.short_name}.countries_impute.yml"
 REGIME_LABELS = {
     0: "autocracy",
     1: "anocracy",
+}
+
+# Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
+LABELS = {
+    "regime_polity": {
+        0: "Autocracy",
+        1: "Anocracy",
+        2: "Democracy",
+    },
+    "exec_reccomp_polity": {
+        0: "Power seized",
+        1: "Elite selection",
+        2: "Dual or transitional",
+        3: "Election",
+    },
+    "exec_recopen_polity": {
+        0: "Power seized",
+        1: "Hereditary succession",
+        2: "Dual, chief minister designated",
+        3: "Dual, chief minister elected",
+        4: "Open",
+    },
+    "exec_constr_polity": {
+        1: "Unconstrained",
+        2: "Between unconstrained and slight to moderate",
+        3: "Slight to moderate",
+        4: "Between slight to moderate and substantial",
+        5: "Substantial",
+        6: "Between substantial and executive parity or subordination",
+        7: "Executive parity or subordination",
+    },
+    "polpart_reg_polity": {
+        1: "Highly unstable",
+        2: "Multiple identities",
+        3: "Sectarian",
+        4: "Restricted",
+        5: "Unrestricted and stable",
+    },
+    "polpart_comp_polity": {
+        0: "Unregulated",
+        1: "Repressed",
+        2: "Suppressed",
+        3: "Factional",
+        4: "Transitional",
+        5: "Competitive",
+    },
 }
 
 # Missing classifications of states
@@ -167,6 +214,11 @@ def run() -> None:
 
     # Remove columns
     tb = tb.drop(columns=[col_flag_imputed, "ccode"])
+
+    # Store categorical indicators as text. Done after the aggregates, which use the numeric codes. The numeric regime
+    # score is kept for the chart that compares the classifications of several sources.
+    tb["regime_polity_score"] = tb["regime_polity"].copy()
+    tb = codes_to_ordinal(tb, LABELS)
 
     # Format table
     tb = tb.format(["country", "year"])

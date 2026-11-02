@@ -8,6 +8,7 @@ from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_population_in_dummies,
     add_regions_and_global_aggregates,
+    codes_to_ordinal,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -35,6 +36,24 @@ REGIONS = {
     "South America": {},
     "Europe": {},
     "Oceania": {},
+}
+
+
+# Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
+LABELS = {
+    "regime_ert": {
+        0: "Hardening autocracy",
+        1: "Stable autocracy",
+        2: "Liberalizing autocracy",
+        3: "Eroding democracy",
+        4: "Stable democracy",
+        5: "Deepening democracy",
+    },
+    "regime_trich_ert": {
+        0: "Autocratizing",
+        1: "Neither autocratizing nor democratizing",
+        2: "Democratizing",
+    },
 }
 
 
@@ -83,6 +102,9 @@ def run() -> None:
 
     # Get regions table
     tb_regions = get_region_aggregates(tb, ds_regions, ds_population)
+
+    # Store categorical indicators as text. Done after the regional aggregates, which use the numeric codes.
+    tb = codes_to_ordinal(tb, LABELS)
 
     # Index
     tb = tb.format(["country", "year"])

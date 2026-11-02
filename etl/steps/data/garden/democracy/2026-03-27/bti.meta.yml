@@ -114,12 +114,11 @@ tables:
               tooltipUseCustomLabels: true
 
       regime_bti:
-        # `Main classification` view in PROD is line-only — the categorical 1–5 scale
-        # doesn't lend itself to the slope/discrete-bar/Marimekko toggles the other
-        # `bti` indicators expose. Override the table-level common chartTypes here.
+        # The categories are shown as a Swimlane, not with the slope/discrete-bar/Marimekko toggles the other `bti`
+        # indicators expose. Override the table-level common chartTypes here.
         title: "Political regime"
         description_short: |-
-          Identifies the political regime of a country. It distinguishes between hard-line autocracies (score 1), moderate autocracies (score 2), highly defective democracies (score 3), defective democracies (score 4), and consolidating democracies (score 5).
+          Identifies the political regime of a country. It distinguishes between hard-line autocracies, moderate autocracies, highly defective democracies, defective democracies, and consolidating democracies.
         description_key:
           - Consolidating democracies have comprehensive democratic features and minimum democratic characteristics (citizens can choose political leaders in free and fair elections and enjoy freedoms of association, expression and some further civil liberties, political power is separated, and leaders can effectively govern a state that fulfills basic functions).
           - Defective democracies have minimum democratic characteristics, but limited other democratic features.
@@ -133,35 +132,29 @@ tables:
             title: Democracy
             subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
             chartTypes:
-              - LineChart
-              - DiscreteBar
-            yAxis:
-              max: 5
-              min: 1
-            selectedFacetStrategy: entity
+              - Swimlane
             colorScale: &color_regime_bti
-              binningStrategy: manual
-              customNumericColorsActive: true
-              customNumericColors: *bti_palette_5
-              customNumericValues:
-                - 1
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-              customNumericLabels:
-                - Hard-line autocracy
-                - Moderate autocracy
-                - Highly defective democracy
-                - Defective democracy
-                - Consolidating democracy
+              customCategoryColors:
+                Hard-line autocracy: "#8a148c"
+                Moderate autocracy: "#d979d2"
+                Highly defective democracy: "#1ac6d9"
+                Defective democracy: "#0487d9"
+                Consolidating democracy: "#034c8c"
             map:
-              colorScale:
-                <<: *color_regime_bti
-                customCategoryLabels:
-                  No data: No data
-              tooltipUseCustomLabels: true
+              colorScale: *color_regime_bti
+        display:
+          numDecimalPlaces: 0
+
+      regime_bti_score:
+        title: Political regime (score)
+        unit: ""
+        description_short: |-
+          Political regime of a country as a score: 1 for hard-line autocracies, 2 for moderate autocracies, 3 for highly defective democracies, 4 for defective democracies, and 5 for consolidating democracies.
+        description_key:
+          - It is the same classification as our political regime indicator from the Bertelsmann Transformation Index, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+        presentation:
+          title_public: Political regime
+          title_variant: score
         display:
           numDecimalPlaces: 0
 

@@ -20,42 +20,27 @@ tables:
         title: Political regime
         unit: ""
         description_short: |-
-          Political regime of a country using the classification by the Episodes of Regime Transformation-project. It distinguishes between hardening autocracies (score 0), stable autocracies (score 1), liberalizing autocracies (score 2), eroding democracies (score 3), stable democracies (score 4), and deepening democracies (score 5).
+          Political regime of a country using the classification by the Episodes of Regime Transformation-project. It distinguishes between hardening autocracies, stable autocracies, liberalizing autocracies, eroding democracies, stable democracies, and deepening democracies.
         presentation:
           grapher_config:
             subtitle: |-
               Based on the [classification](#dod:regimes-episodes-regime-transformation-expanded) by Episodes of Regime Transformation and the estimates by [V-Dem](#dod:v-dem)'s experts.
-            note: |-
-              Numeric values range from 0 for hardening autocracies to 5 for deepening democracies.
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            selectedFacetStrategy: entity
             selectedEntityNames:
               - Argentina
               - Australia
               - Botswana
               - China
+            colorScale: &color_regime_ert
+              baseColorScheme: RdBu
+              customCategoryColors:
+                Hardening autocracy: "#d7191c"
+                Stable autocracy: "#bc8e5a"
             map:
-              colorScale:
-                binningStrategy: manual
-                baseColorScheme: RdBu
-                customNumericValues:
-                  - 0
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                customNumericLabels:
-                  - Hardening autocracy
-                  - Stable autocracy
-                  - Liberalizing autocracy
-                  - Eroding democracy
-                  - Stable democracy
-                  - Deepening democracy
-                customNumericColors:
-                  - "#d7191c"
-                  - "#bc8e5a"
+              colorScale: *color_regime_ert
       regime_dich_ert:
         title: Political regime (dichotomous)
         unit: ""

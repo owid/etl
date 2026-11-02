@@ -488,3 +488,21 @@ def add_imputes(
     if verify_integrity:
         tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
     return tb_
+
+
+def codes_to_ordinal(tb: Table, labels: dict[str, dict[int, str]]) -> Table:
+    """Replace the numeric codes of categorical indicators with their labels.
+
+    Grapher's Swimlane chart only shows indicators stored as text, so each column becomes an
+    ordinal indicator whose `sort` follows the order of `labels`, e.g.
+    `{"regime_row_owid": {0: "Closed autocracy", 1: "Electoral autocracy", ...}}`.
+    """
+    for column, column_labels in labels.items():
+        unknown = set(tb[column].dropna().unique()) - set(column_labels)
+        assert not unknown, f"Column `{column}` has codes without a label: {unknown}"
+        metadata = tb[column].metadata
+        tb[column] = tb[column].map(column_labels).astype("category")
+        tb[column].metadata = metadata
+        tb[column].metadata.type = "ordinal"
+        tb[column].metadata.sort = list(column_labels.values())
+    return tb

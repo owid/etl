@@ -70,26 +70,18 @@ definitions:
           baseColorScheme: Blues
           <<: *map_colorscale_1
 
-    # 0-1 (binary), RdYlBu
+    # No/Yes categories
     gconfig_b1: &gconfig_b1
-      <<: *gconfig_base
-      selectedFacetStrategy: entity
+      hasMapTab: true
+      tab: map
+      chartTypes:
+        - Swimlane
       colorScale: &color_b1
-        binningStrategy: manual
-        customNumericColorsActive: true
-        customNumericColors:
-          - "#ef8a62"
-          - "#2c7bb6"
-        customNumericLabels:
-          - "No"
-          - "Yes"
-        customNumericValues:
-          - 0
-          - 0
-          - 1
+        customCategoryColors:
+          "No": "#ef8a62"
+          "Yes": "#2c7bb6"
       map:
         colorScale: *color_b1
-        tooltipUseCustomLabels: true
 
     # -4 to 4, RdBu
     gconfig_c1: &gconfig_c1
@@ -804,7 +796,7 @@ tables:
         unit: ""
         description_key:
           - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
-          - The classification distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).
+          - The classification distinguishes between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
           - In _closed autocracies_, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
           - In _electoral autocracies_, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In _electoral democracies_, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
@@ -818,29 +810,32 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}."
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 0
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &colorscale_regime
               baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericLabels:
-                - Closed autocracy
-                - Electoral autocracy
-                - Electoral democracy
-                - Liberal democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
             map:
               colorScale: *colorscale_regime
-              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
+
+      regime_row_owid_score:
+        title: Political regime (score)
+        description_short: |-
+          Political regime of a country as a score: 0 for closed autocracies, 1 for electoral autocracies, 2 for electoral democracies, and 3 for liberal democracies.
+        unit: ""
+        description_key:
+          - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
+          - It is the same classification as our political regime indicator, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+        description_processing: |-
+          {definitions.aux.description_processing_row_no_legislative_elections}
+
+          {definitions.aux.description_processing_row}
+        presentation:
+          title_public: Political regime
+          title_variant: score
         display:
           numDecimalPlaces: 0
 
@@ -850,12 +845,12 @@ tables:
         description_short: |-
           Political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg, including ambiguous categories.
         description_key:
-          - It distinguishes between closed autocracies (score 0), electoral autocracies (score 3), electoral democracies (score 6), and liberal democracies (score 9) as the main types.
+          - It distinguishes between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies as the main types.
           - In closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
           - In electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
           - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislature and the courts.
-          - It further includes intermediate categories for closed autocracies that may be electoral autocracies (score 1), electoral autocracies that may be closed autocracies (score 2), electoral autocracies that may be electoral democracies (score 4), electoral democracies that may be electoral autocracies (score 5), electoral democracies that may be liberal democracies (score 7) and liberal democracies that may be electoral democracies (score 8).
+          - It further includes intermediate categories for closed autocracies that may be electoral autocracies, electoral autocracies that may be closed autocracies, electoral autocracies that may be electoral democracies, electoral democracies that may be electoral autocracies, electoral democracies that may be liberal democracies, and liberal democracies that may be electoral democracies.
         description_processing: |-
           {definitions.aux.description_processing_row_no_legislative_elections}
 
@@ -867,55 +862,23 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. The intermediate categories indicate that the country may belong in the next-higher or next-lower group."
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 9
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &colorscale_regime_amb
               baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#d7191c"
-                - "#e74731"
-                - "#f88e52"
-                -
-                - "#f0cda5"
-                - "#d0dcc1"
-                -
-                - "#8dc1dc"
-                - "#5496c5"
-                - "#2c7bb6"
-              customNumericLabels:
-                - Closed autocracy
-                - ""
-                - "2"
-                - Electoral autocracy
-                - ""
-                - "5"
-                - Electoral democracy
-                - ""
-                - "8"
-                - Liberal democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-                - 6
-                - 7
-                - 8
-                - 9
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Closed autocracy: "#d7191c"
+                Closed autocracy, may be electoral autocracy: "#e74731"
+                Electoral autocracy, may be closed autocracy: "#f88e52"
+                Electoral autocracy, may be electoral democracy: "#f0cda5"
+                Electoral democracy, may be electoral autocracy: "#d0dcc1"
+                Electoral democracy, may be liberal democracy: "#8dc1dc"
+                Liberal democracy, may be electoral democracy: "#5496c5"
+                Liberal democracy: "#2c7bb6"
             map:
               colorScale: *colorscale_regime_amb
-              tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
 
@@ -924,7 +887,7 @@ tables:
         description_short: |-
           Identifies the political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
         description_key:
-          - It distinguishes between closed autocracies (score 0), electoral autocracies (score 1), and electoral democracies (score 2, including liberal democracies).
+          - It distinguishes between closed autocracies, electoral autocracies, and electoral democracies (including liberal democracies).
           - In closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
           - In electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
@@ -940,30 +903,17 @@ tables:
           grapher_config:
             title: Electoral democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            selectedFacetStrategy: entity
-
             colorScale: &colorscale_regime_redux
-              baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#8d6e71"
-                - "#c6a1a5"
-                - "#abd9e9"
-              customNumericLabels:
-                - Closed autocracy
-                - Electoral autocracy
-                - Electoral democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 3
-              customNumericColorsActive: true
+              customCategoryColors:
+                Closed autocracy: "#8d6e71"
+                Electoral autocracy: "#c6a1a5"
+                Electoral democracy: "#abd9e9"
             map:
               colorScale: *colorscale_regime_redux
-              tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
 
@@ -2785,7 +2735,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2821,7 +2771,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2844,7 +2794,7 @@ tables:
             <<: *gconfig_b1
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2868,7 +2818,7 @@ tables:
         description_key:
           - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
           - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
-          - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
+          - We classify each election as free and fair ("Yes") or not ("No").
         description_from_producer: |-
           Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
 
@@ -2883,7 +2833,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2966,7 +2916,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into "No" and "Yes" categories.
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2989,7 +2939,7 @@ tables:
             <<: *gconfig_b1
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -3024,7 +2974,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2cltrnslw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2cltrnslw_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""

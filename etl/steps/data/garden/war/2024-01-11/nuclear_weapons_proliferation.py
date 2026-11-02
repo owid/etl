@@ -11,6 +11,14 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Labels of the nuclear weapons status, in order. It is stored as text, so the Swimlane chart can show it.
+STATUS_LABELS = {
+    0: "Does not consider",
+    1: "Considers",
+    2: "Pursues",
+    3: "Possesses",
+}
+
 # Latest year to be assumed for the content of the data, when intervals are open, e.g. "2000-", or "1980-".
 LATEST_YEAR = 2017
 
@@ -74,6 +82,15 @@ def run(dest_dir: str) -> None:
 
     # Rename table conveniently.
     tb_counts.metadata.short_name = "nuclear_weapons_proliferation_counts"
+
+    # Store the status as text. Done after the counts, which use the numeric codes.
+    unknown = set(tb["status"].dropna().unique()) - set(STATUS_LABELS)
+    assert not unknown, f"Status has codes without a label: {unknown}"
+    metadata = tb["status"].metadata
+    tb["status"] = tb["status"].map(STATUS_LABELS).astype("category")
+    tb["status"].metadata = metadata
+    tb["status"].metadata.type = "ordinal"
+    tb["status"].metadata.sort = list(STATUS_LABELS.values())
 
     #
     # Save outputs.

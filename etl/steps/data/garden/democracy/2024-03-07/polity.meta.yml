@@ -80,7 +80,7 @@ tables:
         title: Competitiveness of executive recruitment
         unit: ""
         description_short: |-
-          Indicates the extent to which executive recruitment is competitive. It ranges from executive power being seized (score of 0), over the executive being selected by elites (score of 1), and dual selection-election or transitional arrangements (score of 2), to the executive being elected (score of 4).
+          Indicates the extent to which executive recruitment is competitive. It ranges from executive power being seized, over the executive being selected by elites, and dual selection-election or transitional arrangements, to the executive being elected.
 
         description_from_producer: |-
           Indicator name: `xrcomp`
@@ -96,35 +96,15 @@ tables:
           grapher_config:
             title: Competitiveness of Executive Recruitment Score
             subtitle: "{definitions.subtitle_main}."
-            note: The Chart tab uses numeric values, ranging from 4 for an elected executive to 0 if executive power is seized.
-            chartTypes: ["LineChart"]
+            chartTypes: ["Swimlane"]
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 3
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_comp_exe
-              binningStrategy: manual
-              customNumericColors:
-                - "#b2182b"
-                - "#e74731"
-                - "#967282"
-                - "#5496c5"
-              customNumericLabels:
-                - Power seized
-                - Elite selection
-                - Dual or transitional
-                - Election
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Power seized: "#b2182b"
+                Elite selection: "#e74731"
+                Dual or transitional: "#967282"
+                Election: "#5496c5"
             map:
               colorScale: *color_comp_exe
               timeTolerance: 2
@@ -135,7 +115,7 @@ tables:
         title: Openness of executive recruitment
         unit: ""
         description_short: |-
-          Indicates the extent to which recruitment for the executive is open. It ranges from executive power being seized (score of 0), over hereditary succession (score of 1), dual hereditary-open arrangements with the chief minister designated (score of 2), and dual hereditary-open arrangements with the chief minister being elected (score of 3), to executive recruitment being open (score of 4).
+          Indicates the extent to which recruitment for the executive is open. It ranges from executive power being seized, over hereditary succession, dual hereditary-open arrangements with the chief minister designated, and dual hereditary-open arrangements with the chief minister being elected, to executive recruitment being open.
 
         description_from_producer: |-
           Indicator name: `xropen`
@@ -157,42 +137,19 @@ tables:
           grapher_config:
             title: Openness of Executive Recruitment Score
             subtitle: "{definitions.subtitle_main}."
-            chartTypes: ["LineChart"]
-            note: The Chart tab uses numeric values, ranging from 4 if recruitment is open to 0 if executive power is seized.
+            chartTypes: ["Swimlane"]
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 4
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_open
-              binningStrategy: manual
-              customNumericColors:
-                - "#b2182b"
-                - "#e74731"
-                - "#b66162"
-                - "#967282"
-                - "#0571b0"
-              customNumericLabels:
-                - Power seized
-                - Hereditary succession
-                - Dual, chief minister designated
-                - Dual, chief minister elected
-                - Open
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Power seized: "#b2182b"
+                Hereditary succession: "#e74731"
+                Dual, chief minister designated: "#b66162"
+                Dual, chief minister elected: "#967282"
+                Open: "#0571b0"
             map:
               colorScale: *color_open
               timeTolerance: 2
-              tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
 
@@ -200,7 +157,7 @@ tables:
         title: Constraints on the executive
         unit: ""
         description_short: |-
-          Indicates the extent to which the executive is constrained. It ranges from unconstrained executives (score of 1), over slight or moderate constraints (score of 3), and substantial constraints (score of 5), to an executive that is subordinated to or on par with other authorities (score of 7). The remaining categories are intermediate ones.
+          Indicates the extent to which the executive is constrained. It ranges from unconstrained executives, over slight or moderate constraints, and substantial constraints, to an executive that is subordinated to or on par with other authorities. The remaining categories are intermediate ones.
 
         description_from_producer: |-
           Indicator name: `xconst`
@@ -252,40 +209,17 @@ tables:
           grapher_config:
             title: Constraints on the Executive Score
             subtitle: "{definitions.subtitle_main}."
-            note: The Chart tab uses numeric values, ranging from 7 for an subordinated or on-par executive, to 1 if executive is unconstrained.
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 7
-              min: 1
-            selectedFacetStrategy: entity
+            chartTypes: ["Swimlane"]
+            colorScale: &color_constr
+              baseColorScheme: PuBu
+              customCategoryColors:
+                Unconstrained: "#e74731"
+                Between unconstrained and slight to moderate: "#b66162"
+                Slight to moderate: "#967282"
             map:
-              colorScale:
-                baseColorScheme: PuBu
-                binningStrategy: manual
-                customNumericColors:
-                  - "#e74731"
-                  - "#b66162"
-                  - "#967282"
-                customNumericLabels:
-                  - Unconstrained
-                  - "2"
-                  - Slight to moderate
-                  - "4"
-                  - Substantial
-                  - "6"
-                  - Executive parity or subordination
-                customNumericValues:
-                  - 1
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                customCategoryLabels:
-                  No data: No data
+              colorScale: *color_constr
               timeTolerance: 2
         display:
           numDecimalPlaces: 0
@@ -294,7 +228,7 @@ tables:
         title: Regulation of political participation
         unit: ""
         description_short: |-
-          Indicates the extent to which political participation is regulated, ranging from highly unstable political participation (score of 1), over political participation with multiple identities (score of 2), sectarian political participation (score of 3), and restricted political participation (score of 4), to unrestricted and stable political participation (score of 5).
+          Indicates the extent to which political participation is regulated, ranging from highly unstable political participation, over political participation with multiple identities, sectarian political participation, and restricted political participation, to unrestricted and stable political participation.
 
         description_from_producer: |-
           Indicator name: `parreg`
@@ -314,38 +248,16 @@ tables:
           grapher_config:
             title: Regulation of Political Participation Score
             subtitle: "{definitions.subtitle_main}."
-            note: The Chart tab uses numeric values, ranging from 5 for unrestricted, stable political participation to 0 for highly unstable participation.
-            chartTypes: ["LineChart"]
+            chartTypes: ["Swimlane"]
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 5
-              min: 1
-            selectedFacetStrategy: entity
             colorScale: &color_reg
               baseColorScheme: RdBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#b2182b"
-                - "#e74731"
-                - "#b66162"
-                - "#967282"
-              customNumericLabels:
-                - Highly unstable
-                - Multiple identities
-                - Sectarian
-                - Restricted
-                - Unrestricted and stable
-              customNumericValues:
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Highly unstable: "#b2182b"
+                Multiple identities: "#e74731"
+                Sectarian: "#b66162"
+                Restricted: "#967282"
             map:
               colorScale: *color_reg
               timeTolerance: 2
@@ -356,7 +268,7 @@ tables:
         title: Competitiveness of political participation
         unit: ""
         description_short: |-
-          Indicates the extent to which political participation is competitive. It ranges from unregulated political participation (score of 0), over repressed political participation (score of 1), suppressed political participation (score of 2), factional political participation (score of 3), and transitional arrangements (score of 4), to competitive political participation (score of 5).
+          Indicates the extent to which political participation is competitive. It ranges from unregulated political participation, over repressed political participation, suppressed political participation, factional political participation, and transitional arrangements, to competitive political participation.
 
         description_from_producer: |-
           Indicator name: `parcomp`
@@ -386,41 +298,17 @@ tables:
           grapher_config:
             title: Competitiveness of Political Participation Score
             subtitle: "{definitions.subtitle_main}."
-            chartTypes: ["LineChart"]
-            note: The Chart tab uses numeric values, ranging from 5 for competitive political participation to 0 for highly unstable political participation.
+            chartTypes: ["Swimlane"]
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 5
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_comp_pol
               baseColorScheme: RdBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#67001f"
-                - "#b2182b"
-                - "#e74731"
-                - "#b66162"
-                - "#967282"
-              customNumericLabels:
-                - Unregulated
-                - Repressed
-                - Suppressed
-                - Factional
-                - Transitional
-                - Competitive
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Unregulated: "#67001f"
+                Repressed: "#b2182b"
+                Suppressed: "#e74731"
+                Factional: "#b66162"
+                Transitional: "#967282"
             map:
               colorScale: *color_comp_pol
               timeTolerance: 2
@@ -431,7 +319,7 @@ tables:
         title: Political regime
         unit: ""
         description_short: |-
-          Identifies the political regime of a country using the Polity 5 data by the Center for Systemic Peace. It distinguishes between autocracies (score 0), anocracies (score 1), and democracies (score 2).
+          Identifies the political regime of a country using the Polity 5 data by the Center for Systemic Peace. It distinguishes between autocracies, anocracies, and democracies.
         description_key:
           - *other_sources
           - Democracies have mostly democratic characteristics, understood as open, multi-party, and competitive elections choosing a chief executive who faces comprehensive institutional constraints, and competitive political participation.
@@ -442,38 +330,33 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "{definitions.subtitle_main}."
-            note: The Chart tab uses numeric values, ranging from 2 for democracies to 0 for autocracies.
+            chartTypes: ["Swimlane"]
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 2
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_regime
               baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#e74731"
-                - "#967282"
-                - "#5496c5"
-              customNumericLabels:
-                - Autocracy
-                - Anocracy
-                - Democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Autocracy: "#e74731"
+                Anocracy: "#967282"
+                Democracy: "#5496c5"
             map:
               colorScale: *color_regime
               timeTolerance: 2
-              tooltipUseCustomLabels: true
         display:
           includeInTable: true
+          numDecimalPlaces: 0
+
+      regime_polity_score:
+        title: Political regime (score)
+        unit: ""
+        description_short: |-
+          Political regime of a country as a score: 0 for autocracies, 1 for anocracies, and 2 for democracies.
+        description_key:
+          - It is the same classification as our political regime indicator from Polity 5, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+        presentation:
+          title_public: Political regime
+          title_variant: score
+        display:
           numDecimalPlaces: 0
 
       democracy_recod_polity:

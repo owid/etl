@@ -10,6 +10,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Dummy indicators stored as No/Yes categories, so the Swimlane chart can show them.
+COLUMNS_NO_YES = ["statagency", "civreg", "popreg", "census_10_years", "register_based_census_10_years"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -48,6 +51,9 @@ def run(dest_dir: str) -> None:
 
     # Add regional aggregations
     tb = regional_aggregations(tb, tb_country_list)
+
+    # Store dummy indicators as No/Yes categories. Done after the regional aggregations, which sum the numeric values.
+    tb = dummies_to_no_yes(tb, COLUMNS_NO_YES)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -109,6 +115,20 @@ def add_new_indicators(tb: Table) -> Table:
     tb["census_10_years"] = tb["census_10_years"].apply(lambda x: 1 if x > 0 else 0)
     tb["register_based_census_10_years"] = tb["register_based_census_10_years"].apply(lambda x: 1 if x > 0 else 0)
 
+    return tb
+
+
+def dummies_to_no_yes(tb: Table, columns: list[str]) -> Table:
+    """Replace the 0/1 values of dummy indicators with "No"/"Yes", as an ordered category."""
+    labels = {0: "No", 1: "Yes"}
+    for column in columns:
+        unknown = set(tb[column].dropna().unique()) - set(labels)
+        assert not unknown, f"Column `{column}` has values other than 0 and 1: {unknown}"
+        metadata = tb[column].metadata
+        tb[column] = tb[column].map(labels).astype("category")
+        tb[column].metadata = metadata
+        tb[column].metadata.type = "ordinal"
+        tb[column].metadata.sort = list(labels.values())
     return tb
 
 

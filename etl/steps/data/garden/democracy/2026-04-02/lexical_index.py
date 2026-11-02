@@ -14,6 +14,7 @@ from etl.steps.data.garden.democracy.shared import (
     add_imputes,
     add_population_in_dummies,
     add_regions_and_global_aggregates,
+    codes_to_ordinal,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -36,6 +37,47 @@ REGIME_LABELS = {
     4: "exclusive democracy",
     5: "male democracy",
     6: "electoral democracy",
+}
+
+# Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
+LABELS_NO_YES = {0: "No", 1: "Yes"}
+LABELS = {
+    "regime_lied": {
+        0: "Non-electoral autocracy",
+        1: "One-party autocracy",
+        2: "Multi-party autocracy without elected executive",
+        3: "Multi-party autocracy",
+        4: "Exclusive democracy",
+        5: "Male democracy",
+        6: "Electoral democracy",
+        7: "Full democracy",
+    },
+    "suffrage_lied": {
+        0: "No universal right to vote",
+        1: "Men only",
+        2: "Men and women",
+    },
+    "suffrage_in_practice_trich_lied": {
+        0: "No broad voting rights",
+        1: "Broad voting rights for men",
+        2: "Universal voting rights",
+    },
+    **{
+        column: LABELS_NO_YES
+        for column in [
+            "exelec_lied",
+            "legelec_lied",
+            "exe_leg_elec_lied",
+            "opposition_lied",
+            "competition_lied",
+            "poliberties_lied",
+            "male_suffrage_lied",
+            "female_suffrage_lied",
+            "democracy_lied",
+            "is_full_democracy",
+            "recent_turnover_event_lied",
+        ]
+    },
 }
 
 REGIONS = {
@@ -166,6 +208,11 @@ def run() -> None:
 
     # Drop is imputed flag
     tb = tb.drop(columns=[col_flag_imputed])
+
+    # Store categorical indicators as text. Done after the regional aggregates, which count countries by numeric
+    # code. The numeric regime score is kept for the chart that compares the classifications of several sources.
+    tb["regime_lied_score"] = tb["regime_lied"].copy()
+    tb = codes_to_ordinal(tb, LABELS)
 
     # Format
     tb = tb.format(["country", "year"])
