@@ -357,7 +357,8 @@ def test_multidim_configs_pin_grapher_schema():
     catches a *malformed* pin (`grapher_schema:` with no value, an unquoted octal `011`) that a
     key-presence check would wave through.
     """
-    from etl.viz.chart.utils import default_grapher_schema_version, resolve_grapher_schema
+    from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION
+    from etl.viz.chart.utils import resolve_grapher_schema
 
     broken = []
     for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.y*ml")):
@@ -374,7 +375,7 @@ def test_multidim_configs_pin_grapher_schema():
     assert not broken, (
         "These multidim configs don't pin a valid `grapher_schema`. Add the current version as a "
         f'**quoted** string (an unquoted `011` is parsed as octal) — `grapher_schema: "'
-        f'{default_grapher_schema_version()}"`:\n  ' + "\n  ".join(broken)
+        f'{DEFAULT_GRAPHER_SCHEMA_VERSION}"`:\n  ' + "\n  ".join(broken)
     )
 
 
@@ -395,7 +396,7 @@ def test_no_newer_grapher_schema_version():
     assert latest_id == DEFAULT_GRAPHER_SCHEMA, (
         f"Upstream published a newer grapher schema: {latest_id} "
         f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
-        "Bump DEFAULT_GRAPHER_SCHEMA in etl/config.py once grapher renders the new version."
+        "Bump DEFAULT_GRAPHER_SCHEMA_VERSION in etl/config.py once grapher has deployed the new version."
     )
 
 

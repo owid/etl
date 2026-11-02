@@ -15,11 +15,11 @@ from typing_extensions import Self
 from apps.utils.files import generate_step, generate_step_to_channel
 from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
+from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION
 from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
 from etl.owners import resolve_owner
 from etl.paths import DAG_DIR, STEP_DIR
-from etl.viz.chart.utils import default_grapher_schema_version
 
 
 def _current_git_owner() -> str:
@@ -649,7 +649,7 @@ def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any
 
     # Chart configs must pin `grapher_schema`; scaffold it at the version we vendor today so
     # the generated config runs as-is instead of failing on the missing pin.
-    data = {**data, "grapher_schema": default_grapher_schema_version()}
+    data = {**data, "grapher_schema": DEFAULT_GRAPHER_SCHEMA_VERSION}
 
     target_dir = STEP_DIR / "viz" / "chart"
     generate_step(cookiecutter_path, data, target_dir)
