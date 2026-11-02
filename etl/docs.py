@@ -2,7 +2,6 @@ from typing import Any
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.files import read_json_schema
-from etl.http import session as http_session
 from etl.paths import SCHEMAS_DIR
 
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
@@ -299,17 +298,6 @@ def faqs_to_markdown(faqs: list[Any], extra_tab: int = 0) -> str:
 
     text = "\n\n".join(texts)
     return text
-
-
-def render_grapher_config() -> str:
-    """Render grapher config."""
-    grapher_config = http_session.get(DEFAULT_GRAPHER_SCHEMA, timeout=5).json()
-
-    grapher_config = f"""This is the JSON schema of field `variable.presentation.grapher_config`:
-
-    {grapher_config}
-    """
-    return grapher_config
 
 
 def render_chart(level: int = 1) -> str:

@@ -647,7 +647,7 @@ class ChartForm(StepForm):
 def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
 
-    # Chart configs must pin `grapher_schema`; scaffold it at the version we vendor today so
+    # Chart configs must pin `grapher_schema`; scaffold it at the current default version so
     # the generated config runs as-is instead of failing on the missing pin.
     data = {**data, "grapher_schema": DEFAULT_GRAPHER_SCHEMA_VERSION}
 
