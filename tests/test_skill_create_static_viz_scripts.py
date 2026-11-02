@@ -524,6 +524,15 @@ def test_finalize_accepts_a_sketch_with_the_older_promote_markers(tmp_path, sket
     assert "drop the `# PROMOTE` comments" in result.stdout
 
 
+def test_old_promote_script_path_still_finalizes(tmp_path, sketch):
+    # Older sketches' docstrings name `promote_sketch.py`; that path forwards to `finalize_sketch.py`.
+    repo = make_repo(tmp_path, "feature")
+    old = _locate(SCRIPTS / "promote_sketch.py")
+    result = run(old, sketch, "--step", STEP, "--dep", DEPS[0], "--dep", DEPS[1], "--repo-root", repo)
+    assert result.returncode == 0, result.stderr
+    assert (repo / "etl/steps/viz/static/demo/2026-09-17/demo.py").is_file()
+
+
 def mutated(sketch: Path, tmp_path: Path, old: str, new: str) -> Path:
     copy = tmp_path / "mutant"
     shutil.copytree(sketch, copy)
