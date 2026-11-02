@@ -1,4 +1,4 @@
-"""Promote a static-viz sketch into a real `viz://static` step.
+"""Finalize a static-viz sketch: turn it into a real `viz://static` step.
 
 Copies `<sketch-dir>/sketch.py` to `etl/steps/viz/static/<ns>/<version>/<short>.py`, swaps the
 `SketchPaths(__file__)` line for `PathFinder(__file__)`, fixes the imports, appends the DAG entry to
@@ -7,8 +7,8 @@ citation. Nothing else in the sketch is rewritten — its docstring, and the Fig
 it, travel with the file.
 
 Usage:
-    promote_sketch.py <sketch-dir> --step viz://static/<ns>/<version>/<short> --dep data://garden/... [--dep ...]
-                      [--comment "<dag comment>"] [--dry-run] [--force] [--repo-root <dir>]
+    finalize_sketch.py <sketch-dir> --step viz://static/<ns>/<version>/<short> --dep data://garden/... [--dep ...]
+                       [--comment "<dag comment>"] [--dry-run] [--force] [--repo-root <dir>]
 
 Run it INSIDE the `etl pr "<title>" data --worktree` checkout: it refuses to write on master, main or
 a detached HEAD. The sketch usually lives in the main checkout's gitignored `ai/`, so pass an absolute
@@ -32,7 +32,7 @@ STEPS_DIR = Path("etl/steps/viz/static")
 MAX_LINE = 120
 
 STEP_URI = re.compile(r"^viz://static/([a-z0-9_]+)/(\d{4}-\d{2}-\d{2}|latest)/([a-z0-9_]+)$")
-# The scaffold's line, with or without its trailing `# PROMOTE` comment.
+# The scaffold's line, with or without its trailing `# FINALIZE` comment (`# PROMOTE` in older sketches).
 PATHS_LINE = re.compile(r"^paths = SketchPaths\(__file__\)(?:\s*#.*)?$", re.MULTILINE)
 # Single-line or parenthesised (`[^)]` spans newlines), as ruff may have wrapped it.
 STATIC_IMPORT = re.compile(r"^from etl\.viz\.static import (\([^)]*\)|[^\n]+)$", re.MULTILINE)
@@ -43,7 +43,7 @@ TITLE_LINE = re.compile(r"""^TITLE = ("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')$""", 
 LAYOUTS_FIRST_KEY = re.compile(r'^LAYOUTS = \{\n\s+"([a-z0-9_]+)": \{', re.MULTILINE)
 
 
-class PromoteError(Exception):
+class FinalizeError(Exception):
     """A refusal: nothing has been written when this is raised."""
 
 
@@ -59,47 +59,47 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        return promote(args)
-    except PromoteError as e:
+        return finalize(args)
+    except FinalizeError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
 
 
-def promote(args: argparse.Namespace) -> int:
+def finalize(args: argparse.Namespace) -> int:
     repo_root = args.repo_root.resolve()
     sketch_dir = resolve_sketch_dir(args.sketch_dir, repo_root)
     sketch_path = sketch_dir / "sketch.py"
     if not sketch_path.is_file():
-        raise PromoteError(f"{sketch_dir} holds no sketch.py")
+        raise FinalizeError(f"{sketch_dir} holds no sketch.py")
 
     m = STEP_URI.match(args.step)
     if not m:
-        raise PromoteError(f"--step {args.step!r} must match {STEP_URI.pattern}")
+        raise FinalizeError(f"--step {args.step!r} must match {STEP_URI.pattern}")
     namespace, version, short_name = m.groups()
     target = repo_root / STEPS_DIR / namespace / version / f"{short_name}.py"
     dag_path = repo_root / DAG_FILE
     if not dag_path.is_file():
-        raise PromoteError(f"{dag_path} not found; is --repo-root an etl checkout?")
+        raise FinalizeError(f"{dag_path} not found; is --repo-root an etl checkout?")
 
     if not args.dry_run:
         branch = current_branch(repo_root)
         if branch in ("master", "main", ""):
-            raise PromoteError(
-                f"on {branch or 'a detached HEAD'!r}: promotion happens inside a PR branch. Run "
+            raise FinalizeError(
+                f"on {branch or 'a detached HEAD'!r}: finalizing happens inside a PR branch. Run "
                 '`.venv/bin/etl pr "<title>" data --worktree --share-data` first (WRITING-THE-STEP.md), '
-                "then promote from that checkout."
+                "then finalize from that checkout."
             )
     if target.exists() and not args.force:
-        raise PromoteError(f"{target} exists; pass --force to overwrite")
+        raise FinalizeError(f"{target} exists; pass --force to overwrite")
 
     dag_text = dag_path.read_text()
     steps = (yaml.safe_load(dag_text) or {}).get("steps") or {}
     if args.step in steps:
-        raise PromoteError(f"{args.step} is already in {DAG_FILE}")
+        raise FinalizeError(f"{args.step} is already in {DAG_FILE}")
 
     source = sketch_path.read_text()
     check_slug(source, short_name)
-    promoted, manual = rewrite_source(source)
+    finalized, manual = rewrite_source(source)
     comment = one_line(args.comment or sketch_title(source) or "") or short_name
     new_dag_text = dag_text.rstrip("\n") + "\n\n" + dag_block(args.step, args.deps, comment)
     new_steps = yaml.safe_load(new_dag_text)["steps"]
@@ -113,7 +113,7 @@ def promote(args: argparse.Namespace) -> int:
         print(dag_block(args.step, args.deps, comment))
     else:
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(promoted)
+        target.write_text(finalized)
         dag_path.write_text(new_dag_text)
         print(f"Wrote {rel_target} and appended {args.step} to {DAG_FILE}.")
 
@@ -153,9 +153,9 @@ def check_slug(source: str, short_name: str) -> None:
     the step and its Figma handoff under two identities."""
     m = LAYOUTS_FIRST_KEY.search(source)
     if not m:
-        raise PromoteError("cannot read the slug from the LAYOUTS registry — is this a new_sketch.py scaffold?")
+        raise FinalizeError("cannot read the slug from the LAYOUTS registry — is this a new_sketch.py scaffold?")
     if m.group(1) != short_name:
-        raise PromoteError(
+        raise FinalizeError(
             f"the sketch's slug is {m.group(1)!r} but --step names {short_name!r}: the slug becomes the step's "
             "short_name (its frames and LAYOUTS keys carry it). Use --step .../"
             f"{m.group(1)}, or re-scaffold under the new slug."
@@ -185,7 +185,7 @@ def rewrite_source(source: str) -> tuple[str, list[str]]:
     """
     paths_lines = PATHS_LINE.findall(source)
     if len(paths_lines) != 1:
-        raise PromoteError(
+        raise FinalizeError(
             f"expected exactly one `paths = SketchPaths(__file__)` line, found {len(paths_lines)} — "
             "is this a new_sketch.py scaffold?"
         )
@@ -193,10 +193,12 @@ def rewrite_source(source: str) -> tuple[str, list[str]]:
 
     imports = list(STATIC_IMPORT.finditer(source))
     if len(imports) != 1:
-        raise PromoteError(f"expected exactly one `from etl.viz.static import ...`, found {len(imports)}")
+        raise FinalizeError(f"expected exactly one `from etl.viz.static import ...`, found {len(imports)}")
     names = [n.strip() for n in imports[0].group(1).strip("()").replace("\n", ",").split(",") if n.strip()]
     if "SketchPaths" not in names:
-        raise PromoteError("the etl.viz.static import does not name SketchPaths — not a scaffold, or already promoted")
+        raise FinalizeError(
+            "the etl.viz.static import does not name SketchPaths — not a scaffold, or already finalized"
+        )
     names.remove("SketchPaths")
     static_import = format_import("etl.viz.static", names)
 
@@ -211,7 +213,7 @@ def rewrite_source(source: str) -> tuple[str, list[str]]:
     source = source[: imports[0].start()] + replacement + source[imports[0].end() :]
 
     if "SketchPaths" in source:
-        raise PromoteError(
+        raise FinalizeError(
             "SketchPaths is still referenced after the swap — the sketch uses it somewhere the scaffold does not"
         )
 
@@ -227,8 +229,9 @@ def rewrite_source(source: str) -> tuple[str, list[str]]:
             "inside `run()`, never at module level where `tb` does not exist yet — add `source_citation` to "
             "the etl.viz.static import, then delete the `SOURCE` constant"
         )
-    if "# PROMOTE" in source:
-        manual.append("drop the `# PROMOTE` comments once each edit is done")
+    markers = [m for m in ("# FINALIZE", "# PROMOTE") if m in source]
+    if markers:
+        manual.append(f"drop the `{markers[0]}` comments once each edit is done")
     return source, manual
 
 
