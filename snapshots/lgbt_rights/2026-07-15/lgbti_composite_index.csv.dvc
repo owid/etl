@@ -1,0 +1,31 @@
+meta:
+  origin:
+    producer: Velasco
+    title: LGBTI National Policy Dataset
+    title_snapshot: LGBTI National Policy Dataset - Composite index
+    description: |-
+      The LGBTI National Policy Dataset (Version 3.0) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 195 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
+
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 36 contain substantive data; the remaining 18 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
+    description_snapshot: |-
+      Pre-built country-year index panel published alongside the policy-level data, produced by the companion script Velasco_LGBTI_Index_Construction.R (codebook §5). Each of 35 policy-status combinations is scored in every country-year where it is in force, as the share of the population it covers times the average of its other indicators (scope, enforcement, and, where they apply, gender scope, penalty severity and ease of access). The Progressive Index sums the scores of the 23 progressive combinations, the Regressive Index those of the 12 regressive ones, and the Additive Index, the producer's preferred version, is the Progressive Index minus the Regressive Index. The National Index counts the progressive policies in force nationally minus the regressive ones, and the CFA Index is a variant that weights each policy's indicators by confirmatory factor analysis.
+    citation_full: |-
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 3.0." https://doi.org/10.17605/OSF.IO/WTA9P.
+    attribution_short: Velasco
+    version_producer: '3.0'
+    url_main: https://osf.io/wta9p/overview
+    # NOTE: Version 3.0 was ingested from the files the producer sent us directly
+    # (`etls lgbt_rights/2026-07-15/lgbti_composite_index --path-to-file LGBTI_Composite_Index.csv`), before it
+    # was posted on OSF. Once it is, add url_download back: the OSF link for LGBTI_Composite_Index.csv has been
+    # stable across revisions (https://osf.io/download/6v89b/). Re-run the snapshot from it and confirm the md5
+    # below is unchanged.
+    date_accessed: '2026-10-19'
+    # NOTE: Date of the files in the release the producer sent; its README dates Version 3.0 "October 2026".
+    date_published: '2026-10-16'
+    license:
+      name: CC BY 4.0
+      url: https://osf.io/wta9p/
+outs:
+  - md5: 39d4358de4412ab5e1407344b25bd204
+    size: 298193
+    path: lgbti_composite_index.csv

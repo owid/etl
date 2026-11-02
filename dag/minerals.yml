@@ -1,7 +1,5 @@
 steps:
-  #
   # Minerals - Minerals.
-  #
   # Compilation of minerals data from different origins.
   data://garden/minerals/2025-12-15/minerals:
     # BGS - World Mineral Statistics.
@@ -21,23 +19,19 @@ steps:
       - data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
         - snapshot://usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities.zip
     - data://garden/regions/2023-01-01/regions
-  #
+
   # Minerals - Minerals.
-  #
   data://grapher/minerals/2025-12-15/minerals:
     - data://garden/minerals/2025-12-15/minerals
-  #
+
   # Minerals - Minerals.
-  #
   data://grapher/minerals/2025-12-15/global_mine_production_by_mineral:
     - data://garden/minerals/2025-12-15/minerals
-  #
+
   # Minerals - Minerals explorer.
-  #
   viz://explorer/minerals/latest/minerals:
     - data://grapher/minerals/2025-12-15/minerals
-  #
+
   # Minerals - Minerals explorer (multidim).
-  #
   viz://chart/minerals/latest/minerals:
     - data://grapher/minerals/2025-12-15/minerals

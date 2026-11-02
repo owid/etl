@@ -473,8 +473,8 @@ def test_resolve_grapher_schema_rejects_missing_pin():
     """
     Test resolve_grapher_schema - `None` raises instead of falling back to a default.
 
-    A fallback would resolve an unpinned config to whatever version the repo vendors on the day the
-    step runs: it tells Grapher the config is already current (skipping migrations for a config
+    A fallback would resolve an unpinned config to whatever `DEFAULT_GRAPHER_SCHEMA` is on the day
+    the step runs: it tells Grapher the config is already current (skipping migrations for a config
     authored earlier), and it silently resolves to a different version after the next version bump.
     """
     from etl.config import DEFAULT_GRAPHER_SCHEMA
@@ -483,7 +483,7 @@ def test_resolve_grapher_schema_rejects_missing_pin():
     with pytest.raises(ValueError, match="No `grapher_schema` pinned"):
         resolve_grapher_schema(None)
 
-    # The version suggested in the error is the one this repo vendors, in short quoted form.
+    # The version suggested in the error is `DEFAULT_GRAPHER_SCHEMA`, in short quoted form.
     assert DEFAULT_GRAPHER_SCHEMA.endswith(f"grapher-schema.{default_grapher_schema_version()}.json")
 
 

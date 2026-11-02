@@ -3,9 +3,7 @@
 # with a deprecation banner) still depend on them. Do NOT point new
 # work here; migrate consumers to the 2026-06-30 steps, then retire these.
 steps:
-  #
   # Energy Institute - Statistical Review of World Energy.
-  #
   data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2026-07-01/income_groups
@@ -14,24 +12,21 @@ steps:
       - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
+
   # Energy - Energy mix.
-  #
   data://garden/energy/2025-06-27/energy_mix:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/wb/2026-07-01/income_groups
   data://grapher/energy/2025-06-27/energy_mix:
     - data://garden/energy/2025-06-27/energy_mix
-  #
+
   # Energy - Fossil fuel reserves/production ratio.
-  #
   data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
       - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
+
   # Energy - Fossil Fuel Production.
-  #
   data://garden/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     # Shift - Energy production from fossil fuels.
@@ -49,9 +44,8 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy/2025-06-27/fossil_fuel_production
-  #
+
   # Energy - Global primary energy.
-  #
   data://grapher/energy/2025-06-27/global_primary_energy:
     - data://garden/energy/2025-06-27/global_primary_energy:
       # Smil - Global primary energy (2017).
@@ -59,30 +53,27 @@ steps:
         - data://meadow/papers/2023-12-12/smil_2017:
           - snapshot://papers/2023-12-12/smil_2017.csv
       - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
+
   # Energy - Electricity mix (EI & Ember).
-  #
   data://garden/energy/2026-04-24/electricity_mix:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/ember/2026-04-24/yearly_electricity
     - data://garden/demography/2024-07-15/population
   data://grapher/energy/2026-04-24/electricity_mix:
     - data://garden/energy/2026-04-24/electricity_mix
-  #
+
   # IEA - Energy and AI.
-  #
   data://grapher/energy/2026-04-27/energy_ai:
     - data://garden/energy/2026-04-27/energy_ai:
       - data://garden/regions/2023-01-01/regions
       - data://meadow/energy/2025-11-07/energy_ai
       - data://meadow/energy/2026-04-27/energy_ai
       - data://garden/energy/2026-04-24/electricity_mix
-  #
+
   # Energy - Primary energy consumption.
   # NOTE: Substitution-method (pre-TES) step. The emissions pipeline still consumes it: owid_co2
   # embeds its energy-per-capita / energy-per-gdp columns, and the Global Carbon Budget uses it for
   # carbon intensity. Adapt those to Total Energy Supply (separate PR), then this can be retired.
-  #
   data://garden/energy/2026-05-05/primary_energy_consumption:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population

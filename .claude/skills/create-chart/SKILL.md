@@ -192,9 +192,7 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 
 ## Step 6: Run and verify
 
-**Always run the step after creating it** — schema validation only happens at runtime, so errors (like
-invalid fields in `config`, or a missing `chart_config_id`) won't surface until the step is executed. CI
-will catch these, but fix them locally first.
+**Always run the step after creating it, with `--grapher`** — ETL checks only its own structure (dimensions, views, a missing `chart_config_id`); the view `config` blocks are validated by the grapher admin API on upsert. A run without `--grapher` therefore passes a misspelled or invalid `config` field, and the upsert is where it fails, with a 400 naming the path (e.g. `/titel: must NOT have additional properties`). Valid fields and values are in the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
 ```bash
 # Chart steps write to the grapher DB, so they need the --grapher flag
@@ -434,13 +432,16 @@ Inheritance is from `grapher_config` only — there is no fallback to the indica
 template), rebuild the grapher step, and leave the view configs thin. To verify what will actually render,
 read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
+Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): show the user its links before you write, check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
+
 ## Chart config options
 
 Key fields for `config` in views or `common_views`:
 
 | What | Field | Notes |
 |---|---|---|
-| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko` |
+| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko`, `Dumbbell` |
+| Dumbbell connector | `dumbbell: { connectorStyle: line }` | The default arrow reads as a change from the first series to the second, so keep it only for a before and after (two dates, before vs. after tax). Use `line` for categories with no order, such as men vs. women |
 | Default tab | `tab: "chart"` | `chart`, `map`, `table`, `line`, `slope`, `discrete-bar`, `marimekko` |
 | Map tab visible? | `hasMapTab: true` | Set with `tab: "map"` for map-by-default charts; avoid with multi-indicator views |
 | Facet strategy | `selectedFacetStrategy: entity` | `entity`, `metric`, `none` — how to facet multi-indicator charts |
