@@ -25,10 +25,10 @@ full flow. **Any other ask gets one question first** (the spine's Sketch mode se
 with a recommendation:
 
 > *"Sketch first, or the full flow? A sketch renders the chart in a scratch folder and puts it into the
-> Figma template quickly, with no ETL steps and no checks, so we can iterate on the design; when it
-> settles, say **finalize** and I create the ETL steps and run every check. The full flow creates the
-> ETL step in a pull request now and runs the checks before the chart reaches Figma. Since the design
-> isn't settled yet, I'd sketch."*
+> Figma template quickly, with no ETL steps and only a quick check that the file imports cleanly, so we
+> can iterate on the design; when it settles, say **finalize** and I create the ETL steps and run every
+> check. The full flow creates the ETL step in a pull request now and runs the checks before the chart
+> reaches Figma. Since the design isn't settled yet, I'd sketch."*
 
 Once it is a sketch, say so in one line, with what it skips:
 
