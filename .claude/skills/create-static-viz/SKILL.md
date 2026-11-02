@@ -187,12 +187,14 @@ to work like (`/owid-staff:create-figma-chart` has a whole mode for that).
 ## Sketch mode — a data file in, no ETL until the visuals settle
 
 **Settle the mode first, from the words, before Step 1 and before any branch:** "sketch / draft /
-brainstorm / prototype" is a sketch; "full flow" or "full build" is the full flow (Steps 1–9). Any other
-ask — an old viz, an indicator, a chart, a bare data file — gets **one question**: sketch first (a
-scratch folder, no ETL and no checks while the visuals settle; you finalize when they do) or the full
-flow now (an ETL step in a PR, and every check before Figma). Recommend the sketch for a new viz or a
-refresh that changes the design, the full flow for a refresh that only needs the new data. A full flow
-from a data file starts with `/create-dataset` (Step 2). **For a sketch, read
+brainstorm / prototype" is a sketch; "full flow" or "full build" is the full flow (Steps 1–9);
+"finalize" on a sketch that already exists skips the question and goes straight to §7 of
+[reference/SKETCHING.md](reference/SKETCHING.md). Any other ask — an old viz, an indicator, a chart, a
+bare data file — gets **one question**: sketch first (a scratch folder, no ETL and no checks while the
+visuals settle; you finalize when they do) or the full flow now (an ETL step in a PR, and every check
+before Figma). Recommend the sketch for a new viz or a refresh that changes the design, the full flow
+for a refresh that only needs the new data. A full flow from a data file starts with `/create-dataset`
+(Step 2). **For a sketch, read
 [reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of Steps 1–4.** A Data Insight
 image is not a static-viz sketch — it is sketched in that skill directly, from the grapher chart.
 
