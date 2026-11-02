@@ -10,8 +10,12 @@ session cannot reach it: prepare the files and the texts, and the user enters th
 
 - **Export each frame at its family's scale** (`/owid-staff:create-figma-chart` →
   `reference/NODE-MAP.md` → *Export scale per family*: 2× for the 850-wide desktop frames, 3× for
-  the 540-wide mobile ones). From a session, clone the frame, `rescale` the clone, `get_screenshot` it
-  at its natural size, and delete the clone. Save the files under the user's `ai/` folder.
+  the 540-wide mobile ones). From a session, render each frame inline in one read-only `use_figma`,
+  `await frame.screenshot({ scale })` per frame; Claude Code saves each image as a PNG at that scale and
+  names its path in the result, so nothing is written to the shared file. It has not yet been compared
+  with Figma's own export, so the first time it ships, check it against one. Where inline images are not
+  saved, clone the frame, `rescale` the clone, `get_screenshot` it at its natural size, and delete the
+  clone. Save the files under the user's `ai/` folder.
 - **Upload them in Admin → Images under a filename the library does not hold yet**: each frame's name
   plus `.png` the first time, and the frame's name plus the refresh's date
   (`<frame name>-2027-03-14.png`) when a later refresh finds that taken; if that is taken too, add

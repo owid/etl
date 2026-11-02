@@ -104,8 +104,11 @@ turn 80% of the cost rather than 46%.
 Reads always; writes only when they target different pages. If the Figma tools arrive deferred —
 a harness setting, not an environment — load the ones you need in a single `ToolSearch`, taking the
 prefix from your own session's tool list rather than assuming one; skip that where
-they are already loaded. `/owid-staff:create-figma-chart` → **Round-trip budget** has the full
-rule and the list of what is genuinely serial.
+they are already loaded. Before the first file call, `create_session` (its UUID goes as `sessionId`
+on every later call) and load Figma's current `figma-use` with `get_figma_skill`, both in one message;
+a render you need right after a write goes inside that write as `node.screenshot()`.
+`/owid-staff:create-figma-chart` → **Round-trip budget** has the full rule and the list of what is
+genuinely serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
