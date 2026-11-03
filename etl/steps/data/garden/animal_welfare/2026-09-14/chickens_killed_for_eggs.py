@@ -28,13 +28,13 @@ FAOSTAT_ELEMENT_CODE_EGGS_PRODUCED = "005513"
 
 # Average number of weeks a hen spends in the laying flock before being replaced. A compromise between the commercial
 # flocks of the United States (where USDA's figures imply 64 to 75 weeks in recent years) and of China (54 to 59 weeks,
-# according to industry reports), as explained in the notebook docs/analyses/animals_killed_for_eggs. Unlike the model
-# of Faunalytics (https://faunalytics.org/global-chick-culling-2019-2024/), we ignore mortality before and during the
-# laying period (a few percent), as we do for animals slaughtered for meat.
+# according to industry reports), as explained in the notebook docs/analyses/chickens_killed_in_egg_production. Unlike
+# the model of Faunalytics (https://faunalytics.org/global-chick-culling-2019-2024/), we ignore mortality before and
+# during the laying period (a few percent), as we do for animals slaughtered for meat.
 WEEKS_IN_LAY = 65
 
 # First year of our estimates. Until the late 1980s, a large share of the world's hens were in backyard flocks, which are
-# kept for much longer than WEEKS_IN_LAY, as explained in the notebook docs/analyses/animals_killed_for_eggs.
+# kept for much longer than WEEKS_IN_LAY, as explained in the notebook docs/analyses/chickens_killed_in_egg_production.
 FIRST_YEAR = 1990
 
 # Name of the EU aggregate in the FAOSTAT data.
