@@ -19,6 +19,8 @@ definitions:
     Nitrous oxide emissions in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273. This factor is taken from the 6th Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC).
   processing_greenhouse_gases: &processing-greenhouse-gases |-
     Emissions given in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources. These factors are taken from the 6th Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC).
+  processing_per_capita: &processing-per-capita |-
+    We calculate per capita emissions by dividing emissions by population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
   common:
     processing_level: major
     presentation:
@@ -603,6 +605,7 @@ tables:
         unit: tonnes per person
         short_unit: t/person
         description_short: *measured-in-tonnes-per-person
+        description_processing: *processing-per-capita
         presentation:
           title_public: Per capita CO₂ emissions including land use
       annual_emissions_co2_fossil_per_capita:
@@ -610,6 +613,7 @@ tables:
         unit: tonnes per person
         short_unit: t/person
         description_short: *measured-in-tonnes-per-person
+        description_processing: *processing-per-capita
         presentation:
           title_public: Per capita CO₂ emissions from fossil fuels and industry
       annual_emissions_ch4_total_co2eq_per_capita:
@@ -617,7 +621,10 @@ tables:
         unit: tonnes of CO₂ equivalents per person
         short_unit: t/person
         description_short: *measured-in-co2-eq-per-person
-        description_processing: *processing-methane
+        description_processing: |-
+          {definitions.processing_methane}
+
+          {definitions.processing_per_capita}
         presentation:
           title_public: Per capita methane emissions including land use
           grapher_config:
@@ -644,7 +651,10 @@ tables:
         unit: tonnes of CO₂ equivalents per person
         short_unit: t/person
         description_short: *measured-in-co2-eq-per-person
-        description_processing: *processing-nitrous-oxide
+        description_processing: |-
+          {definitions.processing_nitrous_oxide}
+
+          {definitions.processing_per_capita}
         presentation:
           title_public: Per capita nitrous oxide emissions including land use
           grapher_config:
@@ -669,7 +679,10 @@ tables:
         unit: tonnes of CO₂ equivalents per person
         short_unit: t/person
         description_short: *ghg-emissions-per-person
-        description_processing: *processing-greenhouse-gases
+        description_processing: |-
+          {definitions.processing_greenhouse_gases}
+
+          {definitions.processing_per_capita}
         presentation:
           title_public: Per capita greenhouse gas emissions including land use
           grapher_config:
@@ -695,6 +708,9 @@ tables:
         unit: tonnes of CO₂ equivalents per person
         short_unit: t/person
         description_short: *ghg-emissions-per-person
-        description_processing: *processing-greenhouse-gases
+        description_processing: |-
+          {definitions.processing_greenhouse_gases}
+
+          {definitions.processing_per_capita}
         presentation:
           title_public: Per capita greenhouse gas emissions from fossil fuels and industry

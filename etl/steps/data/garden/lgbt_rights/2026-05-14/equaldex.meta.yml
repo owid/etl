@@ -358,6 +358,9 @@ tables:
           {definitions.description_from_producer_legal_index}
 
           {definitions.description_from_producer_public_opinion_index}
+        description_processing: &description_processing_weighted |-
+          {definitions.common.description_processing}
+          - We calculate regional values as population-weighted averages of the country values. These population-weighted averages use our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         display:
           name: Equality index
           numDecimalPlaces: 0
@@ -372,6 +375,7 @@ tables:
           - "The legal equality index summarizes the current legal status of 16 LGBT+ policies — from the legality of same-sex sexual activity and marriage to hate-crime protections and the right to change legal gender — each weighted by how heavily it counts toward the overall ranking. For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_legal_index}
+        description_processing: *description_processing_weighted
         display:
           name: Legal equality index
           numDecimalPlaces: 0
@@ -386,6 +390,7 @@ tables:
           - "The public opinion equality index averages results from reputable surveys and polls on LGBT+ attitudes by region, weighted so that more recent surveys carry more influence. For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_public_opinion_index}
+        description_processing: *description_processing_weighted
         display:
           name: Public opinion equality index
           numDecimalPlaces: 0

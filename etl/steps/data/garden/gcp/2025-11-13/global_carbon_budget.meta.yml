@@ -14,7 +14,7 @@ definitions:
   per_capita_description_key: &per_capita_description_key
     - "CO₂ emissions per capita are calculated by dividing emissions by population. They represent the average emissions per person in a country or region. To learn more about how different metrics capture the distribution of CO₂ emissions, read our article: [Per capita, national, historical: how do countries compare on CO2 metrics?](https://ourworldindata.org/co2-emissions-metrics)"
   per_capita_description_processing: |-
-    - To calculate CO₂ emissions per capita, we divide the original data by a country's estimated population. These estimates come from our population dataset based on [multiple sources](https://ourworldindata.org/population-sources).
+    - To calculate CO₂ emissions per capita, we divide the original data by a country's estimated population. These estimates come from our population dataset based on [multiple sources](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
   # Map colour for the first (net-negative / carbon-sink) bin on land-use-inclusive maps, where values can fall below zero.
   color_carbon_sink: &color_carbon_sink "#74c0bd"
   # Common fields to be used in all indicators (unless overridden for specific indicators below).
@@ -87,7 +87,8 @@ tables:
           - *per_capita_description_key
           - *international_aviation_description_key
         description_processing: |-
-          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         unit: tonnes per person
         short_unit: t/person
         display:
@@ -165,7 +166,8 @@ tables:
           - The data comes from the Global Carbon Budget. Fossil CO₂ emissions are estimated using national statistics on energy use — such as coal, oil, and gas consumption — and industrial production, particularly cement. These figures are converted into CO₂ emissions using standardized emission factors. For more details, read [the Global Carbon Budget paper](https://doi.org/10.5194/essd-15-5301-2023).
           - *per_capita_description_key
         description_processing: |-
-          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           title_public: CO₂ emissions per capita
           ##################################################################################################################
@@ -646,6 +648,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from cement, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -701,6 +706,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from coal, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -755,6 +763,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from flaring, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -810,6 +821,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from gas, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -893,6 +907,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -949,6 +966,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from oil, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -987,6 +1007,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from other industry sources, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -1100,6 +1123,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -1255,6 +1281,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Population, measured as a percentage of global total population in the same year."
+        description_processing: |-
+          - We calculate each country's share of the global population using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
       primary_energy_consumption:
         title: "Primary energy consumption"
         unit: "terawatt-hours"
@@ -1275,6 +1303,9 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *traded_emissions_description_key
