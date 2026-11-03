@@ -1,0 +1,33 @@
+chart_config_id: 01a1a144-4901-7b77-9025-9541b604f567
+slug: share-of-people-above-retirement-age-receiving-a-pension
+grapher_schema: "011"
+topic_tags:
+  - Government Spending
+  - Poverty
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Title, subtitle and the map tab come from the indicator's metadata in the UN SDG step.
+      y:
+        - catalogPath: _1_3_1__si_cov_pensn__both_sexes#_1_3_1__si_cov_pensn__both_sexes
+    config:
+      chartTypes:
+        - LineChart
+        - DiscreteBar
+      yAxis:
+        min: 0
+        max: 100
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [20, 40, 60, 80, 100]
+      selectedEntityNames:
+        - World
+        - Sub-Saharan Africa (UN SDG)
+        - India
+        - Brazil
+        - Chile
+        - Nigeria
+      addCountryMode: add-country
