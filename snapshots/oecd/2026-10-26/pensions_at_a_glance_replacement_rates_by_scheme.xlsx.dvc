@@ -1,0 +1,41 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "OECD Pensions at a Glance"
+    description: |-
+      The OECD Pensions at a Glance database provides internationally comparable indicators on pension policies and their outcomes for OECD countries and, where possible, for other members of the G20 and the European Union. It accompanies the OECD report of the same name, published every two years, and this release matches the 2025 edition.
+
+      The indicators cover:
+
+      - The design of pension systems: the current and future normal retirement ages for a person who enters the labor market at age 22.
+      - Pension entitlements, modeled for a worker who enters the labor market at age 22 in 2024 and works a full career under the rules legislated in each country: gross and net replacement rates and gross and net pension wealth, for workers earning half, one and two times the average wage, and the average tax rates paid by workers and pensioners.
+      - The demographic and economic context: fertility rates, life expectancy, the old-age to working-age ratio, employment rates of older workers, average wages, the effective age of labor market exit and the expected number of years spent after it.
+      - The incomes and poverty of older people: their disposable income relative to the total population, their income poverty rate and the sources of their income.
+      - The finances of retirement-income systems: public spending on pensions and its projected path to 2060.
+    date_published: "2025-11-27"
+    version_producer: "2025"
+    title_snapshot: "Pensions at a Glance – Gross replacement rates by type of pension scheme"
+    description_snapshot: |-
+      Data behind Table 4.2 of Pensions at a Glance 2025, "Gross pension replacement rates from mandatory public, mandatory private and voluntary private pension schemes, full career workers". For a man who starts working at age 22 in 2024 and earns half, one or two times the average wage, it gives his gross pension as a share of his earnings, from mandatory public schemes, mandatory private schemes, all mandatory schemes, voluntary private schemes, and all schemes including voluntary ones. Voluntary schemes are shown for the ten countries where many workers have them. This split is not published in the OECD Data Explorer.
+
+    # Citation
+    producer: "OECD"
+    citation_full: |-
+      OECD (2025), Pensions at a Glance 2025: OECD and G20 Indicators, OECD Publishing, Paris, https://doi.org/10.1787/e40274c1-en. Data from Table 4.2, https://stat.link/pru4oj.
+    attribution_short: "OECD"
+
+    # Files
+    url_main: https://stat.link/pru4oj
+    url_download: https://stat.link/files/e40274c1-en/pru4oj.xlsx
+    date_accessed: 2026-11-03
+
+    # License
+    license:
+      name: "CC BY 4.0"
+      url: https://doi.org/10.1787/e40274c1-en
+outs:
+  - md5: 446353f3a459124ca07b95d7a1bcb00f
+    size: 34768
+    path: pensions_at_a_glance_replacement_rates_by_scheme.xlsx

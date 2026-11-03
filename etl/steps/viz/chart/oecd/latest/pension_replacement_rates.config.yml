@@ -66,15 +66,24 @@ dimensions:
   - slug: schemes
     name: Pension schemes
     choices:
+      - slug: public
+        name: Public
+        description: Only pensions paid by the government or social security; only available for gross rates for men
+      - slug: public_and_quasi_mandatory
+        name: Public and quasi-mandatory private
+        description: Public pensions, and private pensions that cover nearly all workers without being required by law; only available for gross rates for men
       - slug: mandatory
         name: Mandatory
         description: Mandatory schemes, and schemes that cover nearly all workers
+      - slug: mandatory_by_scheme
+        name: Mandatory, by type of scheme
+        description: Public, quasi-mandatory private, and other mandatory private pensions; only available for gross rates for men
       - slug: mandatory_and_voluntary
         name: Mandatory and voluntary
-        description: Also includes voluntary private schemes where many workers have them; only available for net rates for men
+        description: Also includes voluntary private schemes where many workers have them; only available for men
       - slug: mandatory_vs_voluntary
         name: Mandatory vs. mandatory and voluntary
-        description: Compare mandatory schemes alone with mandatory and voluntary schemes; only available for net rates for men
+        description: Compare mandatory schemes alone with mandatory and voluntary schemes; only available for men
   - slug: sex
     name: Sex
     choices:
@@ -258,3 +267,63 @@ views:
     indicators:
       y:
         - catalogPath: replacement_rates#gross_replacement_rate_at_age_80__sex_men__earnings_average_wage__pension_schemes_mandatory
+
+  - dimensions:
+      measure: gross
+      earnings: half
+      schemes: public
+      sex: men
+      age: at_retirement
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_public
+
+  - dimensions:
+      measure: gross
+      earnings: average
+      schemes: public
+      sex: men
+      age: at_retirement
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_average_wage__pension_schemes_public
+
+  - dimensions:
+      measure: gross
+      earnings: twice
+      schemes: public
+      sex: men
+      age: at_retirement
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_public
+
+  - dimensions:
+      measure: gross
+      earnings: half
+      schemes: mandatory_and_voluntary
+      sex: men
+      age: at_retirement
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_50pct_of_average_wage__pension_schemes_mandatory_and_voluntary
+
+  - dimensions:
+      measure: gross
+      earnings: average
+      schemes: mandatory_and_voluntary
+      sex: men
+      age: at_retirement
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_average_wage__pension_schemes_mandatory_and_voluntary
+
+  - dimensions:
+      measure: gross
+      earnings: twice
+      schemes: mandatory_and_voluntary
+      sex: men
+      age: at_retirement
+    indicators:
+      y:
+        - catalogPath: replacement_rates#gross_replacement_rate__sex_men__earnings_200pct_of_average_wage__pension_schemes_mandatory_and_voluntary

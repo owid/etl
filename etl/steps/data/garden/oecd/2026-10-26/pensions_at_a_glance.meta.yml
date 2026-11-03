@@ -41,8 +41,23 @@ definitions:
   schemes_phrase: |-
     <% if pension_schemes == "Mandatory and voluntary" %>
     mandatory and voluntary pension schemes
+    <%- elif pension_schemes == "Public" %>
+    public pension schemes
+    <%- elif pension_schemes == "Quasi-mandatory private" %>
+    quasi-mandatory private pension schemes
+    <%- elif pension_schemes == "Other mandatory private" %>
+    other mandatory private pension schemes
     <%- else %>
     mandatory pension schemes
+    <%- endif %>
+  # Added to the title of the indicators of one type of mandatory scheme, so they can be told apart from the total.
+  title_schemes_suffix: |-
+    <% if pension_schemes == "Public" %>
+    , from public schemes
+    <%- elif pension_schemes == "Quasi-mandatory private" %>
+    , from quasi-mandatory private schemes
+    <%- elif pension_schemes == "Other mandatory private" %>
+    , from other mandatory private schemes
     <%- endif %>
   # NOTE: Update the year people start working (2024) to the new edition's.
   note_modeled_pensions: The OECD models these values for a person who starts working at age 22 in 2024 and works without interruption until the normal retirement age, under the pension rules each country has already legislated. They are not the pensions that today’s retirees receive.
@@ -69,13 +84,35 @@ definitions:
     <%- elif sex == "Men" %>
     The OECD models men and women with the same career and earnings, so replacement rates only differ by sex where pension rules do, for example where women can retire earlier.
     <%- endif +%>
+  # NOTE: Check the countries with broad voluntary private pensions in the new edition (Table 4.2).
   description_key_voluntary_schemes: |-
-    It also includes voluntary private schemes in the countries where many workers have them: Belgium, Canada, Estonia, Germany, Ireland, Lithuania, New Zealand, the United States, and South Africa. It assumes the worker pays into them for their whole career. For other countries, it is the same as for mandatory schemes only.
+    It also includes voluntary private schemes in the countries where many workers have them: Belgium, Canada, Estonia, Germany, Ireland, Israel, Lithuania, Mexico, New Zealand, the United States, and South Africa. It assumes the worker pays into them for their whole career. For other countries, it is the same as for mandatory schemes only. In Estonia, Germany, Mexico, and South Africa, voluntary pensions add less than their full amount, because they reduce some public benefits, such as means-tested ones.
+  description_key_public_schemes: |-
+    This only includes public schemes: pensions paid by the government or by social security institutions. It leaves out mandatory and quasi-mandatory private pensions, which the OECD also counts in its replacement rates from mandatory schemes.
+  # NOTE: Check the countries with quasi-mandatory schemes in the new edition (pp. 164 and 170, printed numbering).
+  description_key_quasi_mandatory_schemes: |-
+    This only includes quasi-mandatory private schemes: private pensions that the law doesn't require, but that cover nearly all workers, for example through collective agreements between employers and unions. The OECD counts them in Denmark, the Netherlands, Sweden, and the United Kingdom. In other countries, this value is 0%.
+  description_key_other_mandatory_schemes: |-
+    This only includes mandatory private schemes other than quasi-mandatory ones: private pensions that the law requires workers to join, mostly funded schemes in which each worker's contributions build up their own savings. They exist in Australia, Chile, Colombia (only for high earners), Costa Rica, Iceland, Israel, Mexico, Norway, and Switzerland, and in India and Indonesia. In other countries, this value is 0%.
+  description_processing_gross_replacement_rate: |-
+    <% if pension_schemes == "Mandatory and voluntary" %>
+    The OECD Data Explorer gives the same values for mandatory and voluntary schemes as for mandatory schemes alone, so we take the gross rates with voluntary schemes from Table 4.2 of the report.
+    <%- elif pension_schemes in ["Public", "Quasi-mandatory private", "Other mandatory private"] %>
+    We take the split by type of scheme from Table 4.2 of the report, which the OECD Data Explorer doesn't publish. {definitions.description_processing_schemes_oecd_average}
+    <%- endif %>
+  description_processing_schemes_oecd_average: |-
+    Pensions at a Glance doesn't give the OECD average of each type of private scheme, so we calculate it as the average of the 38 OECD members. The same calculation reproduces the report's OECD averages for public schemes and for all mandatory schemes. We split the OECD's mandatory private schemes into quasi-mandatory and other ones, following the report's list of countries with quasi-mandatory schemes.
   description_key_schemes_covered_mandatory_or_voluntary: |-
     <% if pension_schemes == "Mandatory" %>
     {definitions.description_key_schemes_covered}
     <%- elif pension_schemes == "Mandatory and voluntary" %>
     {definitions.description_key_schemes_covered} {definitions.description_key_voluntary_schemes}
+    <%- elif pension_schemes == "Public" %>
+    {definitions.description_key_public_schemes}
+    <%- elif pension_schemes == "Quasi-mandatory private" %>
+    {definitions.description_key_quasi_mandatory_schemes}
+    <%- elif pension_schemes == "Other mandatory private" %>
+    {definitions.description_key_other_mandatory_schemes}
     <%- endif +%>
   description_key_above_100: |-
     Values above 100% mean that the pension is higher than what the person earned while working. This mostly happens for low earners in countries with generous minimum pensions, such as Denmark and Mexico.
@@ -489,6 +526,8 @@ tables:
           {definitions.description_key_sex_replacement_rates}
 
           {definitions.description_key_above_100}
+        description_processing: |-
+          {definitions.description_processing_gross_replacement_rate}
         display:
           name: <<sex>>, <<earnings.lower()>>, <<pension_schemes.lower()>>
           numDecimalPlaces: 1
@@ -496,7 +535,7 @@ tables:
         presentation:
           title_public: Gross pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
           grapher_config:
-            title: Gross pension replacement rate for <<sex.lower()>> earning {definitions.earnings_phrase}
+            title: Gross pension replacement rate for <<sex.lower()>> earning {definitions.earnings_phrase}{definitions.title_schemes_suffix}
             subtitle: '{definitions.subtitle_gross_replacement_rate}'
             note: "{definitions.note_modeled_pensions}"
 

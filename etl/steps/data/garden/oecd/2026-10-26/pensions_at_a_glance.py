@@ -90,6 +90,24 @@ TABLE_DIMENSIONS = {
     "pension_expenditure": [],
 }
 
+# Earnings levels of Table 4.2 (multiples of the average wage) and their labels in the replacement rates table.
+EARNINGS_LEVELS = {0.5: "50% of average wage", 1.0: "Average wage", 2.0: "200% of average wage"}
+
+# Countries whose mandatory private pensions the report calls "quasi-mandatory": not required by law, but covering
+# nearly all workers (Pensions at a Glance 2025, pp. 164 and 170, printed numbering).
+# NOTE: The report's methodology (p. 160) also lists Iceland, where these pensions are mandatory by law; check again in
+# the new edition.
+QUASI_MANDATORY_COUNTRIES = {"Denmark", "Netherlands", "Sweden", "United Kingdom"}
+
+# Countries in Table 4.2 that are not OECD members, so they don't count in the OECD average.
+TABLE_4_2_NON_OECD = {"Argentina", "Brazil", "China", "India", "Indonesia", "Saudi Arabia", "South Africa"}
+
+# Countries where Table 4.2's total with voluntary schemes is less than the total of mandatory schemes plus the
+# voluntary pension, because the voluntary pension reduces public benefits (e.g. means-tested ones). In South Africa
+# the total equals the voluntary pension alone, and in Mexico it equals the mandatory total for low and average earners.
+# NOTE: Check the list in the new edition.
+TABLE_4_2_INTERACTING_VOLUNTARY = {"Estonia", "Germany", "Mexico", "South Africa"}
+
 # Labels for the dimension codes. "_Z" (not applicable) and "_T" (total) both mean "both sexes" or "all ages" here.
 SEX = {"F": "Women", "M": "Men", "_T": "Both sexes", "_Z": "Both sexes"}
 AGE = {
@@ -172,6 +190,7 @@ def run() -> None:
     tb = ds_meadow.read("pensions_at_a_glance")
     tb_taxes = ds_meadow.read("tax_rates")
     tb_age_80 = ds_meadow.read("replacement_rates_at_age_80")
+    tb_by_scheme = ds_meadow.read("replacement_rates_by_scheme")
 
     # Check that the source has the expected measures and dimensions.
     sanity_check_inputs(tb=tb)
@@ -195,6 +214,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb)
     tb_taxes = paths.regions.harmonize_names(tb_taxes)
     tb_age_80 = paths.regions.harmonize_names(tb_age_80)
+    tb_by_scheme = paths.regions.harmonize_names(tb_by_scheme)
 
     # Drop known errors in the source data (missing values published as zeros).
     tb = paths.apply_corrections(tb)
@@ -223,6 +243,12 @@ def run() -> None:
     # Add the gross replacement rate at age 80 from the data of Figure 4.2, which the source doesn't publish.
     tables["replacement_rates"] = add_replacement_rate_at_age_80(
         tb=tables["replacement_rates"], tb_age_80=tb_age_80, tb_retirement=tables["retirement"]
+    )
+
+    # Add gross replacement rates by type of scheme from Table 4.2, and the gross rates with voluntary schemes, which
+    # the source doesn't publish correctly.
+    tables["replacement_rates"] = add_replacement_rates_by_scheme(
+        tb=tables["replacement_rates"], tb_by_scheme=tb_by_scheme
     )
 
     # Improve table formats.
@@ -382,6 +408,105 @@ def add_replacement_rate_at_age_80(tb: Table, tb_age_80: Table, tb_retirement: T
     tb_age_80["earnings"] = "Average wage"
     tb_age_80["pension_schemes"] = "Mandatory"
     tb = pr.merge(tb, tb_age_80, on=["country", "year", "sex", "earnings", "pension_schemes"], how="left")
+
+    return tb
+
+
+def add_replacement_rates_by_scheme(tb: Table, tb_by_scheme: Table) -> Table:
+    """Add the gross replacement rates of men by type of mandatory scheme from Table 4.2, and their gross rates with
+    voluntary schemes.
+
+    Table 4.2 splits the gross rate of men in mandatory schemes into public and mandatory private schemes. We split
+    mandatory private schemes into quasi-mandatory ones (covering nearly all workers without being required by law)
+    and other mandatory ones, and give 0 to countries without a scheme of a type, so the types add up to the total.
+    The table leaves the private types empty for the OECD average, so we calculate them as the average of the 38
+    members, which reproduces the table's public and total averages. Voluntary pensions are not split out, because in
+    some countries they reduce public benefits, so they don't simply add to the mandatory ones.
+    """
+    tb_scheme = tb_by_scheme.copy()
+    tb_scheme["earnings"] = tb_scheme["earnings"].map(EARNINGS_LEVELS)
+    is_aggregate = tb_scheme["country"].isin(["OECD countries", "European Union (27)"])
+
+    # The total of mandatory schemes must match the gross rate of men in mandatory schemes from the dataflow.
+    tb_mandatory = tb[(tb["sex"] == "Men") & (tb["pension_schemes"] == "Mandatory")]
+    tb_check = pr.merge(tb_scheme, tb_mandatory, on=["country", "year", "earnings"], how="left")
+    tb_check = tb_check[tb_check["country"] != "European Union (27)"]
+    assert tb_check["gross_replacement_rate"].notna().all(), "Countries of Table 4.2 are missing from the source."
+    difference = (tb_check["total_mandatory"] - tb_check["gross_replacement_rate"]).abs()
+    assert (difference < 0.1).all(), "Table 4.2's total of mandatory schemes differs from the source's gross rates."
+
+    # The types of mandatory schemes must add up to their total. The total with voluntary schemes adds the voluntary
+    # pension to the mandatory total, except where it reduces public benefits; there it's lower, but never below the
+    # voluntary pension alone.
+    tb_countries = tb_scheme[~is_aggregate]
+    total = tb_countries["public"] + tb_countries["mandatory_private"].fillna(0)
+    assert ((total - tb_countries["total_mandatory"]).abs() < 0.01).all(), "Table 4.2's mandatory schemes don't add up."
+    tb_voluntary = tb_countries.dropna(subset=["voluntary"])
+    gap = tb_voluntary["total_mandatory"] + tb_voluntary["voluntary"] - tb_voluntary["total_with_voluntary"]
+    assert set(tb_voluntary.loc[gap.abs() > 0.01, "country"]) == TABLE_4_2_INTERACTING_VOLUNTARY, (
+        f"Countries whose voluntary pensions don't add to the mandatory ones changed: "
+        f"{sorted(set(tb_voluntary.loc[gap.abs() > 0.01, 'country']))}"
+    )
+    assert (gap > -0.01).all() and (tb_voluntary["total_with_voluntary"] >= tb_voluntary["voluntary"] - 0.01).all(), (
+        "Table 4.2's totals with voluntary schemes are out of range."
+    )
+
+    # Split mandatory private schemes into quasi-mandatory and other ones, and give 0 to schemes a country doesn't have.
+    is_quasi = tb_scheme["country"].isin(QUASI_MANDATORY_COUNTRIES)
+    tb_scheme["quasi_mandatory_private"] = tb_scheme["mandatory_private"].fillna(0)
+    tb_scheme.loc[~is_quasi, "quasi_mandatory_private"] = 0
+    tb_scheme["other_mandatory_private"] = tb_scheme["mandatory_private"].fillna(0)
+    tb_scheme.loc[is_quasi, "other_mandatory_private"] = 0
+
+    # Calculate the OECD average of each private type as the average of its members, after checking that this
+    # reproduces the table's own OECD averages.
+    tb_members = tb_scheme[~is_aggregate & ~tb_scheme["country"].isin(TABLE_4_2_NON_OECD)]
+    assert tb_members["country"].nunique() == 38, "Table 4.2 doesn't have 38 OECD members."
+    tb_members = tb_members.assign(
+        total_with_voluntary=tb_members["total_with_voluntary"].fillna(tb_members["total_mandatory"])
+    )
+    published_columns = ["public", "total_mandatory", "total_with_voluntary"]
+    types = ["quasi_mandatory_private", "other_mandatory_private"]
+    tb_means = tb_members.groupby("earnings", observed=True)[published_columns + types].mean()
+    is_oecd = tb_scheme["country"] == "OECD countries"
+    for column in published_columns:
+        published = dict(zip(tb_scheme.loc[is_oecd, "earnings"], tb_scheme.loc[is_oecd, column]))
+        assert all(abs(tb_means.loc[level, column] - value) < 0.01 for level, value in published.items()), (
+            f"The OECD average of {column} differs from the average of its members."
+        )
+    for column in types:
+        tb_scheme.loc[is_oecd, column] = tb_scheme.loc[is_oecd, "earnings"].map(tb_means[column]).values
+
+    # Gross rate with voluntary schemes: the table's total where the country has voluntary schemes, and the total of
+    # mandatory schemes where it doesn't, as in the source's net rates.
+    tb_scheme["gross_with_voluntary"] = tb_scheme["total_with_voluntary"].fillna(tb_scheme["total_mandatory"])
+
+    # Add each type of mandatory scheme as a value of the pension schemes dimension (not for the EU, whose private types
+    # the table leaves empty).
+    tables = []
+    for column, label in {
+        "public": "Public",
+        "quasi_mandatory_private": "Quasi-mandatory private",
+        "other_mandatory_private": "Other mandatory private",
+    }.items():
+        tb_type = tb_scheme[tb_scheme["country"] != "European Union (27)"][["country", "year", "earnings", column]]
+        tb_type = tb_type.rename(columns={column: "gross_replacement_rate"})
+        tb_type["sex"] = "Men"
+        tb_type["pension_schemes"] = label
+        tables.append(tb_type)
+    tb = pr.concat([tb] + tables, ignore_index=True)
+
+    # Fill the gross rate with voluntary schemes, which the source leaves empty (see drop_wrong_series).
+    tb_with_voluntary = tb_scheme[["country", "year", "earnings", "gross_with_voluntary"]].assign(
+        sex="Men", pension_schemes="Mandatory and voluntary"
+    )
+    tb = pr.merge(tb, tb_with_voluntary, on=["country", "year", "sex", "earnings", "pension_schemes"], how="left")
+    assert tb.loc[tb["gross_with_voluntary"].notna(), "gross_replacement_rate"].isna().all(), (
+        "The source now publishes gross rates with voluntary schemes: check them against Table 4.2."
+    )
+    is_voluntary = tb["gross_with_voluntary"].notna()
+    tb.loc[is_voluntary, "gross_replacement_rate"] = tb.loc[is_voluntary, "gross_with_voluntary"]
+    tb = tb.drop(columns=["gross_with_voluntary"])
 
     return tb
 

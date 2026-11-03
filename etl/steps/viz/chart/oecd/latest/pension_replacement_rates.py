@@ -1,6 +1,7 @@
 """Pension replacement rate MDim: the single views from the config, plus a comparison view for each selector."""
 
 from etl.helpers import PathFinder
+from etl.viz.chart.model.view import View
 
 paths = PathFinder(__file__)
 
@@ -76,11 +77,53 @@ EARNINGS = {
     "all_earnings": "half the average wage, the average wage, or twice the average wage",
 }
 SCHEMES = {
+    "public": "public pension schemes",
+    "public_and_quasi_mandatory": "public and quasi-mandatory private pension schemes",
     "mandatory": "mandatory pension schemes",
+    "mandatory_by_scheme": "mandatory pension schemes",
     "mandatory_and_voluntary": "mandatory and voluntary pension schemes",
     "mandatory_vs_voluntary": "mandatory pension schemes alone, and together with voluntary schemes",
 }
 SEX = {"men": "men", "women": "women", "men_vs_women": "men and women"}
+
+# Stacked views of the gross rate of men by type of mandatory scheme: for each choice, the types it stacks (pension
+# schemes code in the indicator name, legend label and color), bottom first.
+STACKED_SCHEMES = {
+    "public_and_quasi_mandatory": [
+        ("public", "Public", "#4C6A9C"),
+        ("quasi_mandatory_private", "Quasi-mandatory private", "#E56E5A"),
+    ],
+    "mandatory_by_scheme": [
+        ("public", "Public", "#4C6A9C"),
+        ("quasi_mandatory_private", "Quasi-mandatory private", "#E56E5A"),
+        ("other_mandatory_private", "Other mandatory private", "#A2B4DA"),
+    ],
+}
+STACKED_TITLES = {
+    "public_and_quasi_mandatory": "Gross pension replacement rates for men earning {earnings}, from public and quasi-mandatory private schemes",
+    "mandatory_by_scheme": "Gross pension replacement rates for men earning {earnings}, by type of mandatory scheme",
+}
+STACKED_SUBTITLES = {
+    "public_and_quasi_mandatory": "Pension that men earning {earnings} can expect to receive when they retire, as a share of what they earned while working, from public schemes and from quasi-mandatory private schemes, which cover nearly all workers without being required by law. Both are measured before income taxes and social security contributions.",
+    "mandatory_by_scheme": "Pension that men earning {earnings} can expect to receive when they retire, as a share of what they earned while working, from public schemes, quasi-mandatory private schemes (which cover nearly all workers without being required by law), and other mandatory private schemes. Both are measured before income taxes and social security contributions.",
+}
+EARNINGS_CODES = {"half": "50pct_of_average_wage", "average": "average_wage", "twice": "200pct_of_average_wage"}
+# The stacked views open on more countries than the rest, including those with each type of private scheme.
+STACKED_SELECTION = [
+    "OECD countries",
+    "United Kingdom",
+    "Netherlands",
+    "Denmark",
+    "Sweden",
+    "Switzerland",
+    "Australia",
+    "Iceland",
+    "Chile",
+    "United States",
+    "Germany",
+    "France",
+    "Japan",
+]
 
 
 def run() -> None:
@@ -98,7 +141,7 @@ def run() -> None:
     titles = {
         "measure": "Gross and net pension replacement rates for {sex} earning {earnings}",
         "earnings": "{measure} pension replacement rates for {sex}, by earnings",
-        "schemes": "Net pension replacement rates for {sex} earning {earnings}, with and without voluntary schemes",
+        "schemes": "{measure} pension replacement rates for {sex} earning {earnings}, with and without voluntary schemes",
         "sex": "{measure} pension replacement rates for men and women earning {earnings}",
         "age": "{measure} pension replacement rate for {sex} earning {earnings}, at retirement and at age 80",
     }
@@ -141,15 +184,58 @@ def run() -> None:
         if len(view.indicators.y) == 1:
             view.indicators.set_indicator(color=CONTINENT_PATH)
 
+    # Add the stacked views by type of mandatory scheme (after grouping, since group_views can't merge them).
+    dataset_uri = tb.m.dataset.uri
+    c.views.extend(create_stacked_scheme_views(dataset_uri=dataset_uri, note=note))
+
     c.save()
+
+
+def create_stacked_scheme_views(dataset_uri: str, note: str) -> list[View]:
+    """Create the stacked bar views of the gross rate of men by type of mandatory scheme, one per earnings level."""
+    views = []
+    for schemes, types in STACKED_SCHEMES.items():
+        for earnings, earnings_code in EARNINGS_CODES.items():
+            indicators = [
+                {
+                    "catalogPath": f"{dataset_uri}/replacement_rates#gross_replacement_rate__sex_men__earnings_{earnings_code}__pension_schemes_{code}",
+                    "display": {"name": label, "color": color},
+                }
+                for code, label, color in types
+            ]
+            views.append(
+                View.from_dict(
+                    {
+                        "dimensions": {
+                            "measure": "gross",
+                            "earnings": earnings,
+                            "schemes": schemes,
+                            "sex": "men",
+                            "age": "at_retirement",
+                        },
+                        "indicators": {"y": indicators},
+                        "config": {
+                            "hasMapTab": False,
+                            "tab": "chart",
+                            "chartTypes": ["StackedDiscreteBar"],
+                            "stackMode": "absolute",
+                            "selectedEntityNames": STACKED_SELECTION,
+                            "title": STACKED_TITLES[schemes].format(earnings=EARNINGS[earnings]),
+                            "subtitle": STACKED_SUBTITLES[schemes].format(earnings=EARNINGS[earnings]),
+                            "note": note,
+                        },
+                    }
+                )
+            )
+    return views
 
 
 def keep_view(view) -> bool:
     """Keep a comparison view only if it has an indicator for each choice it compares.
 
-    Mandatory and voluntary schemes are only published for net rates for men, so the comparisons of gross and net, or
-    of men and women, have only one side for those schemes, and so has the comparison of schemes for women or for
-    gross rates. Likewise, rates at age 80 are only published for gross rates for men earning the average wage in
+    Mandatory and voluntary schemes are only published for men, so the comparison of men and women has only one side
+    for those schemes, and so has the comparison of schemes for women. Public schemes are only published for gross
+    rates for men. Likewise, rates at age 80 are only published for gross rates for men earning the average wage in
     mandatory schemes.
     """
     for dimension, (slug, labels) in COMPARISONS.items():
