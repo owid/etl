@@ -492,6 +492,15 @@ def test_finalize_writes_step_and_dag_entry(tmp_path, sketch):
 
     for word in ("load_data", "SOURCE", "source_citation", "finalize"):
         assert word in result.stdout, f"the manual checklist must name {word}"
+    assert "finalize mode on the sketch frame" in result.stdout, "both halves: the checklist ends in the Figma checks"
+
+
+def test_finalize_etl_only_leaves_the_figma_checks_out(tmp_path, sketch):
+    repo = make_repo(tmp_path, "feature")
+    result = finalize(sketch, repo, "--etl-only")
+    assert result.returncode == 0, result.stderr
+    assert "finalize mode on the sketch frame" not in result.stdout, "the person opted out of the Figma half"
+    assert "without the Figma checks" in result.stdout and "still to run" in result.stdout
 
 
 def test_finalize_refuses_master(tmp_path, sketch):

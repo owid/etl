@@ -8,7 +8,10 @@ it, travel with the file.
 
 Usage:
     finalize_sketch.py <sketch-dir> --step viz://static/<ns>/<version>/<short> --dep data://garden/... [--dep ...]
-                       [--comment "<dag comment>"] [--dry-run] [--force] [--repo-root <dir>]
+                       [--comment "<dag comment>"] [--etl-only] [--dry-run] [--force] [--repo-root <dir>]
+
+`--etl-only` is the finalize choice "the ETL steps only": the closing checklist then leaves the Figma
+checks out, and says how to run them later.
 
 Run it INSIDE the `etl pr "<title>" data --worktree` checkout: it refuses to write on master, main or
 a detached HEAD. The sketch usually lives in the main checkout's gitignored `ai/`, so pass an absolute
@@ -53,6 +56,11 @@ def main() -> int:
     parser.add_argument("--step", required=True, help="viz://static/<namespace>/<version>/<short_name>")
     parser.add_argument("--dep", action="append", required=True, dest="deps", help="a data:// dependency; repeatable")
     parser.add_argument("--comment", help="the one-line DAG comment; defaults to the sketch's TITLE")
+    parser.add_argument(
+        "--etl-only",
+        action="store_true",
+        help="the ETL steps only: leave the Figma checks out of the checklist; they run later, on request",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print the plan and write nothing")
     parser.add_argument("--force", action="store_true", help="overwrite an existing step file")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT, help="checkout to write into (default: this one)")
@@ -118,14 +126,21 @@ def finalize(args: argparse.Namespace) -> int:
         print(f"Wrote {rel_target} and appended {args.step} to {DAG_FILE}.")
 
     dep_short = args.deps[0].rsplit("/", 1)[-1]
+    normal_flow = "now run the normal flow: Steps 1-2 (resolve the dependency, check for newer data) and 5-9"
+    if args.etl_only:
+        normal_flow += (
+            " — without the Figma checks (the ETL steps only): the frame keeps its sketch names; say the checks are "
+            "still to run, and that saying finalize on the frame in /owid-staff:create-figma-chart runs them"
+        )
+    else:
+        normal_flow += ", plus /owid-staff:create-figma-chart's finalize mode on the sketch frame"
     print("\nLeft for you, in this order:")
     for i, item in enumerate(
         manual
         + [
             f"run `.venv/bin/etlr {args.step}`, then `verify_static_viz.py {rel_target.parent} --template <name> --expect-gid <data layer>`"
             " (the commit hook runs `make check`; do not run it separately)",
-            "now run the normal flow: Steps 1-2 (resolve the dependency, check for newer data) and 5-9, plus "
-            "/owid-staff:create-figma-chart's finalize mode on the sketch frame",
+            normal_flow,
             "do not commit the sketch's own PNG/SVG: the step re-renders its pair next to the .py",
         ],
         start=1,

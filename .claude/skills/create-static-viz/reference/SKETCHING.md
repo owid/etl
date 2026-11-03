@@ -27,13 +27,13 @@ with a recommendation:
 > *"Sketch first, or the full flow? A sketch renders the chart in a scratch folder and puts it into the
 > Figma template quickly, with no ETL steps and only a quick check that the file imports cleanly, so we
 > can iterate on the design; when it settles, say **finalize** and I create the ETL steps and run every
-> check. The full flow creates the ETL step in a pull request now and runs the checks before the chart
+> check — or only one of those two halves, if you'd rather; I'll ask then. The full flow creates the ETL step in a pull request now and runs the checks before the chart
 > reaches Figma. Since the design isn't settled yet, I'd sketch."*
 
 Once it is a sketch, say so in one line, with what it skips:
 
 > *"Sketching this from `<file>` in `ai/static-viz-sketches/<slug>/` — no branch, PR, DAG entry or
-> newer-data check until the visuals settle; finalizing runs all of them."*
+> newer-data check until the visuals settle; finalizing's ETL half runs all of them."*
 
 A full-flow answer means the spine's Steps 1–9: data not in ETL goes to `/create-dataset` first, as
 Step 2 says.
@@ -184,7 +184,8 @@ carries the choice):
 > usual choice, because checking first means checking again if the steps redraw the chart."*
 
 - **Both:** this section, then §8 in full, ending with the Figma handoff.
-- **ETL steps only:** this section and §8 without the Figma handoff. The frame keeps its sketch
+- **ETL steps only:** this section and §8 without the Figma handoff; pass `--etl-only` to
+  `finalize_sketch.py` below, so its closing checklist leaves the Figma checks out. The frame keeps its sketch
   names. Close by saying the checks are still to run, and that saying **finalize** on the frame in
   `/owid-staff:create-figma-chart` runs them.
 - **Figma checks only:** skip this section and §8. Hand the sketch frame's link to
@@ -203,7 +204,7 @@ If the data is not in ETL, `/create-dataset` first (Step 2's routing table), so 
 
 ```bash
 .venv/bin/python .claude/skills/create-static-viz/scripts/finalize_sketch.py <sketch dir> \
-    --step viz://static/<namespace>/<version>/<short_name> --dep data://garden/<ns>/<version>/<short> [--dep ...]
+    --step viz://static/<namespace>/<version>/<short_name> --dep data://garden/<ns>/<version>/<short> [--dep ...] [--etl-only]
 ```
 
 It refuses to write on `master`/`main`, copies `sketch.py` to `etl/steps/viz/static/<ns>/<version>/<short>.py`,
