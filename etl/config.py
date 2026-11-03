@@ -345,8 +345,11 @@ GRAPHER_SCHEMA_LATEST_URL = "https://files.ourworldindata.org/schemas/grapher-sc
 # indicator-level `presentation.grapher_config`, and the version a new chart config should pin.
 # Grapher keys its config migrations on this, so it must name a version grapher renders; stamping
 # an older one is safe (grapher migrates the config forward), a newer one is rejected.
-# `test_no_newer_grapher_schema_version` watches for a new version upstream.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
+# `test_no_newer_grapher_schema_version` watches for a new version upstream. Bump the version only
+# once grapher has deployed it; everything else (URL, scaffolds, error hints) derives from it.
+GRAPHER_SCHEMA_URL_TEMPLATE = "https://files.ourworldindata.org/schemas/grapher-schema.{version}.json"
+DEFAULT_GRAPHER_SCHEMA_VERSION = "012"
+DEFAULT_GRAPHER_SCHEMA = GRAPHER_SCHEMA_URL_TEMPLATE.format(version=DEFAULT_GRAPHER_SCHEMA_VERSION)
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")

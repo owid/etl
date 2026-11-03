@@ -3,7 +3,7 @@
 A sketch is how a NEW static viz is prototyped before any ETL step exists — from a CSV, Excel or
 parquet file, in a gitignored `ai/static-viz-sketches/<slug>/` directory, with no branch, PR, DAG
 entry or newer-data check. The scaffold is written in the exact shape of a step (constants on top,
-`run()`, helpers below it, a `LAYOUTS` registry, `export_frame` per frame) so `promote_sketch.py` can
+`run()`, helpers below it, a `LAYOUTS` registry, `export_frame` per frame) so `finalize_sketch.py` can
 turn it into one with a two-line edit. It renders as-is: a placeholder figure at the template's
 proportions, so the round trip — render, verify, import into Figma — is proven before any chart code
 is written.
@@ -71,11 +71,11 @@ SCAFFOLD = string.Template(
     r'''"""$TITLE — a static-viz sketch.
 
 A sketch in the shape of a `viz://static` step, rendered from a local data file with no ETL behind it.
-Promote it with `.claude/skills/create-static-viz/scripts/promote_sketch.py` once the visuals settle;
+Finalize it with `.claude/skills/create-static-viz/scripts/finalize_sketch.py` once the visuals settle;
 `.claude/skills/create-static-viz/reference/SKETCHING.md` has the whole loop.
 
 Data: `$DATA_FILE`. Provenance: FILL IN where the file came from (a URL, a grapher slug, a
-catalogPath), so promotion knows which dataset to point the step at.
+catalogPath), so finalizing knows which dataset to point the step at.
 
 Render:  .venv/bin/python $SKETCH_PATH
 Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py $SKETCH_STEM \
@@ -86,8 +86,8 @@ Then read the PNG.
 
 Figma handoff
 -------------
-Filled in by /owid-staff:create-figma-chart's sketch mode when the SVG is imported. The promoted step's
-docstring inherits it, so record names, not just ids:
+Filled in by /owid-staff:create-figma-chart's sketch mode when the SVG is imported. The step it becomes
+inherits it in its docstring, so record names, not just ids:
 - File: Charts (YYYY), key <fileKey>
 - Page: <YYYYMMDD Title (Creator) [sketch]>
 - Frames: <frame name> -> <node id>, cloned from <template name> <template node id>
@@ -112,16 +112,16 @@ from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, SketchPaths, apply_svg_rc
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()
 
-paths = SketchPaths(__file__)  # PROMOTE: becomes PathFinder(__file__)
+paths = SketchPaths(__file__)  # FINALIZE: becomes PathFinder(__file__)
 
 # The file this sketch draws from, copied next to it by new_sketch.py.
-DATA_FILE = Path(__file__).with_name($DATA_FILE_LITERAL)  # PROMOTE: delete; the step loads from the catalog
+DATA_FILE = Path(__file__).with_name($DATA_FILE_LITERAL)  # FINALIZE: delete; the step loads from the catalog
 
 TITLE = $TITLE_LITERAL
 SUBTITLE = "What the chart shows, in one sentence."
 NOTE = ""  # desktop templates only; mobile has no Note slot (TEMPLATES.md)
 # The Data source string: a CSV carries no origins, a garden table does. run() reads it once.
-# PROMOTE: delete, once run() derives the citation with source_citation.
+# FINALIZE: delete, once run() derives the citation with source_citation.
 SOURCE = $SOURCE_LITERAL
 AUTHOR = $AUTHOR_LITERAL
 
@@ -192,7 +192,7 @@ X_TICK_ROW = 22
 
 # One entry per frame this sketch emits, keyed by the output filename. Slot positions are template px
 # from the top edge, transcribed from TEMPLATES.md for the templates' placeholder two-line subtitle: a
-# one-line subtitle gains 19 px of band, so re-verify against the live template at promotion
+# one-line subtitle gains 19 px of band, so re-verify against the live template when finalizing
 # (TEMPLATES.md's own rule). The verifier picks each frame's template from the filename suffix.
 $LAYOUTS_BLOCK
 
@@ -201,7 +201,7 @@ def run() -> None:
     tb = load_data()
     paths.log.info(f"Loaded {len(tb)} rows; columns: {list(tb.columns)}")
     sanity_check_inputs(tb)
-    # PROMOTE: source = source_citation(tb["<column>"]) — here, after load_data(), where `tb` exists.
+    # FINALIZE: source = source_citation(tb["<column>"]) — here, after load_data(), where `tb` exists.
     source = SOURCE
     for name, layout in LAYOUTS.items():
         fig = build(tb, layout, source)
@@ -212,7 +212,7 @@ def run() -> None:
 def load_data() -> Table:
     """Read the data file next to this sketch, with garden-style snake_case column names.
 
-    PROMOTE: return paths.load_dataset("<short_name>").read("<table>") instead, and delete DATA_FILE.
+    FINALIZE: return paths.load_dataset("<short_name>").read("<table>") instead, and delete DATA_FILE.
     """
     suffix = DATA_FILE.suffix.lower()
     if suffix == ".csv":
@@ -473,7 +473,7 @@ def main() -> int:
     )
     print(
         "Skipped, by design — say so when reporting: branch, worktree, PR, DAG entry, the Step 2 newer-data "
-        "check, the tracker question. Promotion runs all of them."
+        "check, the tracker question. Finalizing runs all of them."
     )
     print("Next:")
     print(f"  .venv/bin/python {display_path(sketch_path)}")

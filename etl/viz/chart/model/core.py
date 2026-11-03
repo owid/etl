@@ -21,7 +21,7 @@ from typing_extensions import Self
 
 import etl.config as etl_config
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import SCHEMAS_DIR, VIZ_DIR
 from etl.viz.chart.exceptions import DuplicateChartViews, DuplicateValuesError
@@ -30,7 +30,6 @@ from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.params import GroupViewsConfig
 from etl.viz.chart.model.view import CommonView, View, ViewIndicators
 from etl.viz.chart.utils import (
-    default_grapher_schema_version,
     fill_placeholders,
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
@@ -965,8 +964,8 @@ class Chart(MDIMBase):
             raise ValueError(
                 f"Chart '{self.catalog_path}' pins no `grapher_schema`. Add a top-level "
                 "`grapher_schema` to the config YAML recording the version its view configs were "
-                f'authored against — `grapher_schema: "{default_grapher_schema_version()}"` for a '
-                "config written today (quoted: an unquoted `011` is YAML octal)."
+                f'authored against — `grapher_schema: "{DEFAULT_GRAPHER_SCHEMA_VERSION}"` for a '
+                f"config written today (quoted: an unquoted `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is YAML octal)."
             )
 
     def validate_description_keys(self):
