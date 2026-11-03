@@ -160,20 +160,37 @@ because the person may not know either exists — and **the first time, say what
 
 > *"This is still a sketch: the chart lives in a scratch folder, nothing has been checked, and the
 > data is not in ETL — so nobody else can rebuild this chart and it will not follow the data when the
-> source updates. When the visuals are settled, say **finalize** and I'll **create the ETL steps for
-> it**: the data gets steps of its own, so the chart re-renders whenever the data updates and anyone
-> can see where its numbers came from. Then I check whether the source has published anything newer,
-> verify the numbers, the source line and every piece of text against the data and our style guide,
-> and run the Figma checks on the frame — type, layout, colours, lines and annotations, and that the
-> frame still matches its template — before it is renamed for the website."*
+> source updates. When the visuals are settled, say **finalize**. Finalizing has two halves, and I'll
+> ask whether you want both or one. **The ETL steps:** the data gets steps of its own, so the chart
+> re-renders whenever the data updates and anyone can see where its numbers came from; I also check
+> whether the source has published anything newer, and verify the numbers, the source line and every
+> piece of text against the data and our style guide. **The Figma checks:** type, layout, colours,
+> lines and annotations, and that the frame still matches its template. With both done, the frame is
+> renamed for the website."*
 
 After that, one line is enough — *"Still a sketch and not in ETL: say finalize when you're happy with
-it and I'll create the ETL steps."* — but never none. **When they sound done** ("looks good", "that's
-it", "ship it"), don't wait to be asked: propose creating the ETL steps now, and start on a yes. If
-the data is not in ETL at all, say that finalizing begins by adding the dataset (§7). The loop ends
-when they say yes.
+it."* — but never none. **When they sound done** ("looks good", "that's it", "ship it"), don't wait
+to be asked: propose finalizing now, and on a yes ask §7's question. If the data is not in ETL at
+all, say that the ETL half begins by adding the dataset (§7). The loop ends when they say yes.
 
-## 7 — Finalize: create the ETL step
+## 7 — Finalize: ask which halves, then create the ETL step
+
+**Ask first, unless the request already says** (a handoff from `/owid-staff:create-figma-chart`
+carries the choice):
+
+> *"Finalizing has two halves. I can do both: create the ETL steps, then run the Figma checks once,
+> on the chart the steps draw. Or only the ETL steps: the frame stays a sketch, and the checks
+> wait until you ask for them. Or only the Figma checks now, with the ETL steps later. Both is the
+> usual choice, because checking first means checking again if the steps redraw the chart."*
+
+- **Both:** this section, then §8 in full, ending with the Figma handoff.
+- **ETL steps only:** this section and §8 without the Figma handoff. The frame keeps its sketch
+  names. Close by saying the checks are still to run, and that saying **finalize** on the frame in
+  `/owid-staff:create-figma-chart` runs them.
+- **Figma checks only:** skip this section and §8. Hand the sketch frame's link to
+  `/owid-staff:create-figma-chart` with **finalize** and *Figma checks only*: its F1 runs the checks
+  on the sketch as it is, keeps the sketch names, and records the result in `sketch.py`'s `Figma
+  handoff` docstring. The ETL half comes later, from §7 again.
 
 Now the ETL work, in a PR branch, per the spine's Step 4 preamble:
 
@@ -203,7 +220,10 @@ The step exists; everything the sketch skipped now runs, in the spine's order: *
 the dependency; check for newer data on both sides — the CSV's provenance finally gets its real
 answer), **Step 5** (`etlr`, the verifier with the real `--expect-gid`s, the PNG), **Step 8** (the
 docstring already carries the Figma handoff — complete it with what the finalize pass changes), and
-**Step 9** (the PR and the review chain). On the Figma side, hand the sketch frame's link to
+**Step 9** (the PR and the review chain). On the Figma side, unless the person chose the ETL steps
+only, hand the sketch frame's link to
 `/owid-staff:create-figma-chart` and say **finalize**: it reads the person's Figma edits as decisions,
 proposes labels and annotations, runs the full verification gate, and renames the frame to the bare
-slug. If the new step's SVG differs from the sketch's, that mode decides whether to re-import.
+slug. If the new step's SVG differs from the sketch's, that mode decides whether to re-import. If a
+Figma-checks-only pass ran earlier, say so in the handoff: that mode decides whether its result still
+stands or the checks run again.

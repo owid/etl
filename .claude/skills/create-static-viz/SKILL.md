@@ -46,6 +46,7 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, local-SVG route |
 > | The sketch marker — page `… [sketch]`, frame `<slug>--sketch`; no sketch carries the bare website slug | that skill | this skill reports it |
 > | Finalize mode as the re-entry point once a sketch has its `viz://static` step | that skill | this skill's Sketch mode, §8 (its own finalize hands off to it) |
+> | The finalize split for a sketch with no step: both halves, the ETL steps only, or the Figma checks only, asked by whichever skill the finalize starts in | the Figma-checks-only rules: that skill (`SKETCH-AND-FINALIZE.md` F1); the ETL half: this skill ([reference/SKETCHING.md](reference/SKETCHING.md) §7) | both |
 >
 > The asymmetry worth remembering: **this skill owns the data, the geometry and the proportions; that
 > one owns the type and the palette.** A change that crosses that line belongs in both files. In
@@ -108,7 +109,8 @@ they are already loaded. Before the first file call, `create_session` (its UUID 
 on every later call) and load Figma's current `figma-use` with `get_figma_skill`, both in one message;
 a render you need right after a write goes inside that write as `node.screenshot()`.
 `/owid-staff:create-figma-chart` → **Round-trip budget** has the full rule and the list of what is
-genuinely serial.
+genuinely serial. It also says when to use subagents instead: when the time goes into the model's
+own writing or research rather than into waiting for Figma, as in Step 2's two sides.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
@@ -189,7 +191,8 @@ to work like (`/owid-staff:create-figma-chart` has a whole mode for that).
 **Settle the mode first, from the words, before Step 1 and before any branch:** "sketch / draft /
 brainstorm / prototype" is a sketch; "full flow" or "full build" is the full flow (Steps 1–9);
 "finalize" on a sketch that already exists skips the question and goes straight to §7 of
-[reference/SKETCHING.md](reference/SKETCHING.md). Any other ask — an old viz, an indicator, a chart, a
+[reference/SKETCHING.md](reference/SKETCHING.md), which asks its own: both halves of finalizing,
+the ETL steps only, or the Figma checks only. Any other ask — an old viz, an indicator, a chart, a
 bare data file — gets **one question**: sketch first (a scratch folder, no ETL and none of the full
 flow's gates while the visuals settle, only the emitted-file verifier and a look at the PNG; you
 finalize when they do) or the full flow now (an ETL step in a PR, and every check before Figma).
@@ -259,7 +262,10 @@ Then report what you found: which dataset, which version, and how many charts us
 ## Step 2 — Check for newer data. Always, even when it is already in ETL
 
 Two sides, and both are needed. The ETL side tells you whether a newer *version in our catalog*
-exists; only the producer side tells you whether newer *data* exists at all.
+exists; only the producer side tells you whether newer *data* exists at all. **Run them as two
+subagents, launched in one message**, on the session's model: they need nothing from each other,
+and the producer side's web research is the slow half. Each one's brief is its paragraph below;
+read both reports before routing.
 
 **ETL side.**
 
