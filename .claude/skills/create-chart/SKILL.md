@@ -192,9 +192,7 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 
 ## Step 6: Run and verify
 
-**Always run the step after creating it** — schema validation only happens at runtime, so errors (like
-invalid fields in `config`, or a missing `chart_config_id`) won't surface until the step is executed. CI
-will catch these, but fix them locally first.
+**Always run the step after creating it, with `--grapher`** — ETL checks only its own structure (dimensions, views, a missing `chart_config_id`); the view `config` blocks are validated by the grapher admin API on upsert. A run without `--grapher` therefore passes a misspelled or invalid `config` field, and the upsert is where it fails, with a 400 naming the path (e.g. `/titel: must NOT have additional properties`). Valid fields and values are in the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
 ```bash
 # Chart steps write to the grapher DB, so they need the --grapher flag
@@ -246,7 +244,7 @@ Key fields:
 
 - `grapher_schema` — **required**, and there is no fallback: the grapher chart-config schema version this
   config is written against, which becomes the chart's `$schema` and is what lets grapher migrate the
-  config after a breaking schema change. Use the version in `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`) when
+  config after a breaking schema change. Use `DEFAULT_GRAPHER_SCHEMA_VERSION` (`etl/config.py`) when
   authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required** for single charts, the chart's identity in grapher (`charts.configId`).
   See Step 4.
@@ -286,7 +284,7 @@ Key fields:
 ```yaml
 # REQUIRED — grapher chart-config schema the view configs below are written against, as a
 # QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
-# current DEFAULT_GRAPHER_SCHEMA version (etl/config.py) when authoring a new chart, then leave it
+# current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
 grapher_schema: "011"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
@@ -434,13 +432,16 @@ Inheritance is from `grapher_config` only — there is no fallback to the indica
 template), rebuild the grapher step, and leave the view configs thin. To verify what will actually render,
 read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
+Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): show the user its links before you write, check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
+
 ## Chart config options
 
 Key fields for `config` in views or `common_views`:
 
 | What | Field | Notes |
 |---|---|---|
-| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko` |
+| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko`, `Dumbbell` |
+| Dumbbell connector | `dumbbell: { connectorStyle: line }` | The default arrow reads as a change from the first series to the second, so keep it only for a before and after (two dates, before vs. after tax). Use `line` for categories with no order, such as men vs. women |
 | Default tab | `tab: "chart"` | `chart`, `map`, `table`, `line`, `slope`, `discrete-bar`, `marimekko` |
 | Map tab visible? | `hasMapTab: true` | Set with `tab: "map"` for map-by-default charts; avoid with multi-indicator views |
 | Facet strategy | `selectedFacetStrategy: entity` | `entity`, `metric`, `none` — how to facet multi-indicator charts |

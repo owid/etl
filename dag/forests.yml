@@ -21,9 +21,7 @@ steps:
       - snapshot://papers/2025-05-23/he_2025.csv
       - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
       - snapshot://usda_fs/2025-05-07/forest_share.csv
-      #
       # FAO Forest Resources Assessment (FRA) data
-      #
       - data://garden/fao/2025-05-09/fra_forest_extent:
         - data://meadow/fao/2025-05-09/fra_forest_extent:
           - snapshot://fao/2025-05-09/fra_forest_extent.xlsx
@@ -52,9 +50,7 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
-  #
   # FAO Forest Resources Assessment (FRA) full dataset
-  #
   data://garden/fao/2025-12-05/fra:
     - data://meadow/fao/2025-12-05/fra:
       - snapshot://fao/2025-12-05/fra.zip
@@ -87,6 +83,7 @@ steps:
     - snapshot://forests/2026-09-29/deforestation_commodity_lookup.xlsx
   data://garden/forests/2026-09-29/deforestation_embedded_in_trade:
     - data://meadow/forests/2026-09-29/deforestation_embedded_in_trade
+
   # Files read by the bespoke viz: a metadata JSON plus one JSON per country, synced to the environment's v1/bespoke path.
   viz://bespoke/forests/latest/deforestation_trade:
     - data://garden/forests/2026-09-29/deforestation_embedded_in_trade

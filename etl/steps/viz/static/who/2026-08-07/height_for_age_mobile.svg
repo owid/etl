@@ -4362,38 +4362,36 @@ L 205.331645 171.009416
     <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #4c72b0" x="200.291645" y="165.962278" transform="rotate(-0 200.291645 165.962278)">Median</text>
    </g>
    <g id="leader__within-2-sd">
-    <path d="M 120.762195 212.487466 
-Q 138.52686 220.607849 137.895308 239.835997 
+    <path d="M 118.253363 212.47347 
+Q 137.297337 219.76279 137.840836 239.83584 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.72; stroke-linecap: round"/>
-    <path d="M 140.58436 234.121191 
-L 137.895308 239.835997 
-L 135.587055 233.957054 
+    <path d="M 140.182937 233.970299 
+L 137.840836 239.83584 
+L 135.184768 234.10563 
 z
 " style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.72; stroke-linecap: round"/>
    </g>
    <g id="label__within-2-sd">
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 156.154014)">95.4% of children in</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 167.969916)">the reference</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 179.785818)">population are</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 191.768796)">expected to fall</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 203.584698)">within the</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 215.4006)">shaded area.</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 179.952894)">95% of children</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 191.768796)">are expected to</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 203.584698)">fall within the</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 215.4006)">shaded area</text>
    </g>
    <g id="leader__stunting-cutoff">
-    <path d="M 136.056742 338.962872 
-Q 124.010577 334.14279 120.250875 321.882671 
+    <path d="M 111.293629 373.029307 
+Q 100.754887 368.476225 96.692561 357.566541 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.72; stroke-linecap: round"/>
-    <path d="M 119.56121 328.160757 
-L 120.250875 321.882671 
-L 124.341488 326.694831 
+    <path d="M 96.373639 363.874337 
+L 96.692561 357.566541 
+L 101.05934 362.129571 
 z
 " style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.72; stroke-linecap: round"/>
    </g>
    <g id="label__stunting-cutoff">
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(143.200225 342.836325)">Stunting cutoff:</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(133.504525 354.770352)">a child below this</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.910125 366.586254)">line is too short for</text>
-    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(168.238 378.402156)">their age.</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(121.36915 377.363925)">Cutoff for “stunting”:</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(115.014025 389.297952)">a child below this line</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(108.8542 401.113854)">is considered too short</text>
+    <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(156.4759 413.096832)">for their age</text>
    </g>
    <g id="boys__label">
     <text style="font-weight: 700; font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="60.534959" y="131.7258" transform="rotate(-0 60.534959 131.7258)">Boys</text>
@@ -8703,9 +8701,9 @@ L 377.28 204.506193
    <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #111111" transform="translate(11.52 40.317)">for boys and girls</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 64.784225)">Height by age, according to the World Health Organization.</text>
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 75.56384)">Children more than 2 standard deviations below the median</text>
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 86.37275)">height for their age are considered stunted.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 64.777925)">Reference standards for height by age, as defined by the World Health</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 75.71252)">Organization. A child is considered “stunted” if their height is more than</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 86.639555)">2 standard deviations below the median for children of the same age.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="560.775195" transform="rotate(-0 11.52 560.775195)">Data source: World Health Organization (2006; 2007)</text>

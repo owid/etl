@@ -3,8 +3,8 @@
 Nothing under `.claude/` is covered by CI (the pre-commit hook does not lint it and no other test
 collects it), so these run the two scripts the way a session does. `new_sketch.py` scaffolds into a
 temp dir from a three-row CSV and the sketch is rendered as a subprocess with this interpreter;
-`promote_sketch.py` runs against a temp git checkout seeded with a DAG file. The mutation cases pin the
-refusals: a sketch whose markers are gone must not be promoted quietly.
+`finalize_sketch.py` runs against a temp git checkout seeded with a DAG file. The mutation cases pin the
+refusals: a sketch whose markers are gone must not be finalized quietly.
 """
 
 import ast
@@ -31,7 +31,7 @@ def _locate(relative: Path) -> Path:
 
 
 NEW_SKETCH = _locate(SCRIPTS / "new_sketch.py")
-PROMOTE = _locate(SCRIPTS / "promote_sketch.py")
+FINALIZE = _locate(SCRIPTS / "finalize_sketch.py")
 VERIFY = _locate(SCRIPTS / "verify_static_viz.py")
 RUFF = Path(sys.executable).with_name("ruff")
 
@@ -72,8 +72,8 @@ def make_repo(tmp_path: Path, branch: str) -> Path:
     return root
 
 
-def promote(sketch_dir: Path, repo: Path, *extra: str):
-    return run(PROMOTE, sketch_dir, "--step", STEP, "--dep", DEPS[0], "--dep", DEPS[1], "--repo-root", repo, *extra)
+def finalize(sketch_dir: Path, repo: Path, *extra: str):
+    return run(FINALIZE, sketch_dir, "--step", STEP, "--dep", DEPS[0], "--dep", DEPS[1], "--repo-root", repo, *extra)
 
 
 # --- new_sketch.py ---------------------------------------------------------------------------------
@@ -94,14 +94,14 @@ def test_scaffold_renders_and_passes_the_verifier(sketch):
 
 @pytest.mark.skipif(not RUFF.exists(), reason="ruff not installed next to the interpreter")
 def test_scaffold_is_ruff_clean(sketch):
-    # It lands under etl/steps on promotion, where `make check` lints it.
+    # It lands under etl/steps when finalized, where `make check` lints it.
     for args in (["check"], ["format", "--check"]):
         result = subprocess.run([str(RUFF), *args, str(sketch / "sketch.py")], capture_output=True, text=True)
         assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_scaffold_names_every_mark(sketch):
-    # A promoted sketch is a new step, and the skill asks new steps to pass the strict naming check.
+    # A finalized sketch is a new step, and the skill asks new steps to pass the strict naming check.
     verify = run(VERIFY, sketch, "--template", "horizontal", "--require-named-marks")
     assert verify.returncode == 0, verify.stdout + verify.stderr
 
@@ -221,7 +221,7 @@ def test_a_size_for_a_missing_output_is_refused(tmp_path):
     assert stem.with_suffix(".svg").exists()
 
 
-def test_scaffold_carries_the_promotion_markers(sketch):
+def test_scaffold_carries_the_finalize_markers(sketch):
     source = (sketch / "sketch.py").read_text()
     assert source.count("paths = SketchPaths(__file__)") == 1
     assert 'SOURCE = "Demo (2026)"' in source and "source_citation" in source
@@ -295,7 +295,7 @@ def test_quoted_arguments_become_valid_literals(tmp_path):
     assert rendered.returncode == 0, rendered.stderr  # DATA_FILE resolved to the quoted filename
 
     repo = make_repo(tmp_path, "feature")
-    result = promote(sketch_dir, repo)
+    result = finalize(sketch_dir, repo)
     assert result.returncode == 0, result.stderr
     assert f"# {title}" in (repo / "dag/static_viz.yml").read_text(), "the DAG comment is the title, unescaped"
 
@@ -467,12 +467,12 @@ def test_data_already_in_the_sketch_dir_is_left_in_place(tmp_path):
     )
 
 
-# --- promote_sketch.py -----------------------------------------------------------------------------
+# --- finalize_sketch.py ----------------------------------------------------------------------------
 
 
-def test_promote_writes_step_and_dag_entry(tmp_path, sketch):
+def test_finalize_writes_step_and_dag_entry(tmp_path, sketch):
     repo = make_repo(tmp_path, "feature")
-    result = promote(sketch, repo)
+    result = finalize(sketch, repo)
     assert result.returncode == 0, result.stderr
 
     step = repo / "etl/steps/viz/static/demo/2026-09-17/demo.py"
@@ -494,9 +494,9 @@ def test_promote_writes_step_and_dag_entry(tmp_path, sketch):
         assert word in result.stdout, f"the manual checklist must name {word}"
 
 
-def test_promote_refuses_master(tmp_path, sketch):
+def test_finalize_refuses_master(tmp_path, sketch):
     repo = make_repo(tmp_path, "master")
-    result = promote(sketch, repo)
+    result = finalize(sketch, repo)
     assert result.returncode == 2 and "master" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
     assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG
@@ -504,11 +504,33 @@ def test_promote_refuses_master(tmp_path, sketch):
 
 def test_dry_run_writes_nothing(tmp_path, sketch):
     repo = make_repo(tmp_path, "master")  # the guard is bypassed too: a dry run is safe anywhere
-    result = promote(sketch, repo, "--dry-run")
+    result = finalize(sketch, repo, "--dry-run")
     assert result.returncode == 0, result.stderr
     assert "DRY RUN" in result.stdout and STEP in result.stdout
     assert not (repo / "etl/steps/viz/static/demo").exists()
     assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG
+
+
+def test_finalize_accepts_a_sketch_with_the_older_promote_markers(tmp_path, sketch):
+    # Sketches scaffolded before the mode was renamed carry `# PROMOTE` comments instead of `# FINALIZE`.
+    repo = make_repo(tmp_path, "feature")
+    copy = tmp_path / "older"
+    shutil.copytree(sketch, copy)
+    source = (copy / "sketch.py").read_text()
+    assert "# FINALIZE" in source
+    (copy / "sketch.py").write_text(source.replace("# FINALIZE", "# PROMOTE"))
+    result = finalize(copy, repo)
+    assert result.returncode == 0, result.stderr
+    assert "drop the `# PROMOTE` comments" in result.stdout
+
+
+def test_old_promote_script_path_still_finalizes(tmp_path, sketch):
+    # Older sketches' docstrings name `promote_sketch.py`; that path forwards to `finalize_sketch.py`.
+    repo = make_repo(tmp_path, "feature")
+    old = _locate(SCRIPTS / "promote_sketch.py")
+    result = run(old, sketch, "--step", STEP, "--dep", DEPS[0], "--dep", DEPS[1], "--repo-root", repo)
+    assert result.returncode == 0, result.stderr
+    assert (repo / "etl/steps/viz/static/demo/2026-09-17/demo.py").is_file()
 
 
 def mutated(sketch: Path, tmp_path: Path, old: str, new: str) -> Path:
@@ -520,27 +542,27 @@ def mutated(sketch: Path, tmp_path: Path, old: str, new: str) -> Path:
     return copy
 
 
-def test_promote_refuses_a_rewritten_paths_line(tmp_path, sketch):
+def test_finalize_refuses_a_rewritten_paths_line(tmp_path, sketch):
     repo = make_repo(tmp_path, "feature")
     mutant = mutated(sketch, tmp_path, "paths = SketchPaths(__file__)", "paths = SketchPaths(Path(__file__))")
-    result = promote(mutant, repo)
+    result = finalize(mutant, repo)
     assert result.returncode == 2 and "exactly one" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
     assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG
 
 
-def test_promote_refuses_an_import_without_sketchpaths(tmp_path, sketch):
+def test_finalize_refuses_an_import_without_sketchpaths(tmp_path, sketch):
     repo = make_repo(tmp_path, "feature")
     mutant = mutated(sketch, tmp_path, "TEMPLATES, SketchPaths, apply_svg_rcparams", "TEMPLATES, apply_svg_rcparams")
-    result = promote(mutant, repo)
+    result = finalize(mutant, repo)
     assert result.returncode == 2 and "not a scaffold" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
 
 
-def test_promote_refuses_a_step_already_in_the_dag(tmp_path, sketch):
+def test_finalize_refuses_a_step_already_in_the_dag(tmp_path, sketch):
     repo = make_repo(tmp_path, "feature")
     (repo / "dag/static_viz.yml").write_text(SEED_DAG + f"\n  # Taken\n  {STEP}:\n    - {DEPS[0]}\n")
-    result = promote(sketch, repo)
+    result = finalize(sketch, repo)
     assert result.returncode == 2 and "already in" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
 
@@ -563,7 +585,7 @@ def test_a_multiline_comment_cannot_write_into_the_dag(tmp_path, via):
 
     repo = make_repo(tmp_path, "feature")
     extra = ("--comment", multiline) if via == "comment" else ()
-    result = promote(out_root / "demo", repo, *extra)
+    result = finalize(out_root / "demo", repo, *extra)
     assert result.returncode == 0, result.stderr
 
     dag_text = (repo / "dag/static_viz.yml").read_text()
@@ -575,11 +597,11 @@ def test_a_multiline_comment_cannot_write_into_the_dag(tmp_path, via):
     )
 
 
-def test_promote_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sketch):
+def test_finalize_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sketch):
     """The frames and LAYOUTS keys carry the slug; only the file would be renamed, leaving two identities."""
     repo = make_repo(tmp_path, "feature")
     step = "viz://static/demo/2026-09-17/other"
-    result = run(PROMOTE, sketch, "--step", step, "--dep", DEPS[0], "--repo-root", repo)
+    result = run(FINALIZE, sketch, "--step", step, "--dep", DEPS[0], "--repo-root", repo)
     assert result.returncode == 2 and "slug is 'demo'" in result.stderr and "'other'" in result.stderr
     assert not list((repo / "etl/steps/viz/static").iterdir()), "nothing may be written on a refusal"
     assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG

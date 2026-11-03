@@ -34,6 +34,7 @@ definitions:
   description_returned_statistics: The UNHCR only includes refugees who returned during this calendar year in their statistics, although in practice, operations may assist returnees for longer periods.
   description_stateless: Stateless persons are people who are not considered a citizen of any country. A person can be stateless for many reasons, including (among others) unknown parentage, discrimination or complex nationality laws. You can read more about this on the [UNHCR's website](https://www.unhcr.org/about-unhcr/who-we-protect/stateless-people).
   description_stateless_problems: Stateless persons often struggle to obtain documentation and proof of their legal identities. Because of this, they face difficulties accessing basic rights and services, such as education, healthcare, employment, and freedom of movement. They may also be at risk of detention or deportation.
+  description_key_china_indochinese: A large group of refugees from current-day Vietnam settled in China after the Vietnam War in the late 1970s and early 1980s. These refugees and their descendants are [de facto integrated into Chinese society](https://www.unhcr.org/asia/where-we-work/countries/china), have full access to public services, and enjoy the same rights as Chinese nationals. UNHCR therefore stopped counting them in the refugee population in 2022.
   description_key_child_refugee: This only includes refugees who are children, under the age of 18.
   description_unicef_source: The data on child refugees (under 18) is published by UNICEF, and is based on UNHCR's Refugee Statistics data.
 
@@ -110,6 +111,7 @@ views:
       description_key:
         - "{definitions.description_key_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_key_china_indochinese}"
 
   - dimensions:
       metric: refugees
@@ -132,6 +134,7 @@ views:
       description_key:
         - "{definitions.description_key_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_key_china_indochinese}"
 
   - dimensions:
       metric: refugees
@@ -151,6 +154,7 @@ views:
       description_key:
         - "{definitions.description_key_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_key_china_indochinese}"
 
   - dimensions:
       metric: refugees
@@ -173,6 +177,7 @@ views:
       description_key:
         - "{definitions.description_key_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_key_china_indochinese}"
 
   # Asylum seekers
   - dimensions:
@@ -361,6 +366,7 @@ views:
         - "{definitions.description_key_child_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
         - "{definitions.description_unicef_source}"
+        - "{definitions.description_key_china_indochinese}"
 
   - dimensions:
       metric: refugees
@@ -384,6 +390,7 @@ views:
         - "{definitions.description_key_child_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
         - "{definitions.description_unicef_source}"
+        - "{definitions.description_key_china_indochinese}"
 
   - dimensions:
       metric: refugees
@@ -405,6 +412,7 @@ views:
         - "{definitions.description_key_child_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
         - "{definitions.description_unicef_source}"
+        - "{definitions.description_key_china_indochinese}"
 
   - dimensions:
       metric: refugees
@@ -428,4 +436,5 @@ views:
         - "{definitions.description_key_child_refugee}"
         - "{definitions.description_diff_refugee_asylum}"
         - "{definitions.description_unicef_source}"
+        - "{definitions.description_key_china_indochinese}"
 

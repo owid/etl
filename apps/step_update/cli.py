@@ -257,8 +257,10 @@ class StepUpdater:
                     # Create new file.
                     step_file_new.write_bytes(step_file.read_bytes())
 
-            # Add new step and its dependencies to the dag.
-            write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
+            # Add new step and its dependencies to the dag, with a blank line above each new block.
+            write_to_dag_file(
+                dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header}, separate_new_blocks=True
+            )
 
             # Reload steps dataframe.
             self._load_version_tracker()

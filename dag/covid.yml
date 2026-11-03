@@ -152,6 +152,7 @@ steps:
     - data://garden/covid/latest/sweden_covid:
       - data://meadow/covid/latest/sweden_covid:
         - snapshot://covid/latest/sweden_covid.csv
+
   # UK
   data://grapher/covid/latest/uk_covid:
     - data://garden/covid/latest/uk_covid:
@@ -245,8 +246,10 @@ steps:
         - snapshot://covid/2024-11-05/github_stats_commits.csv
         - snapshot://covid/2024-11-05/github_stats_commits_users.csv
 
-  ######################################
+  ##########
   # MULTIDIM
+  ##########
+
   viz://chart/covid/latest/covid:
     - data://grapher/covid/latest/hospital
     - data://grapher/covid/latest/vaccinations_global
