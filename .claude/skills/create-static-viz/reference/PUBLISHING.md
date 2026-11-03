@@ -17,7 +17,8 @@ session cannot reach it: prepare the files and the texts, and the user enters th
   they match, replace `never` with the date, and if they differ, use the fallback below and say so.
   *Inline render last verified against Figma's export: never.* Where inline images are not
   saved, clone the frame, `rescale` the clone, `get_screenshot` it at its natural size, and delete the
-  clone. Save the files under the user's `ai/` folder.
+  clone; with several frames, one write clones and rescales them all, the `get_screenshot`s go in one
+  message, and one write deletes the clones. Save the files under the user's `ai/` folder.
 - **Upload them in Admin → Images under a filename the library does not hold yet**: each frame's name
   plus `.png` the first time, and the frame's name plus the refresh's date
   (`<frame name>-2027-03-14.png`) when a later refresh finds that taken; if that is taken too, add

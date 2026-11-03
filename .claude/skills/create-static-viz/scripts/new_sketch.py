@@ -473,7 +473,8 @@ def main() -> int:
     )
     print(
         "Skipped, by design — say so when reporting: branch, worktree, PR, DAG entry, the Step 2 newer-data "
-        "check, the tracker question. Finalizing runs all of them."
+        "check, the tracker question. Finalizing's ETL half runs all of them (finalize asks whether to do both "
+        "halves, the ETL steps only, or the Figma checks only)."
     )
     print("Next:")
     print(f"  .venv/bin/python {display_path(sketch_path)}")
