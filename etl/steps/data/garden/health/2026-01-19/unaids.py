@@ -110,7 +110,7 @@ TODO:
 - Review NCPI: there are too few data points
 - Normalize names for GAM
 - Explore potential useful indicators in KPA/NCPI (check for year-country coverage)
-    tb_kpa["country_year"] = tb_kpa["country"] + (tb_kpa["year"]).astype("string")
+    tb_kpa["country_year"] = tb_kpa["country"] + (tb_kpa["year"]).astype("str")
     results = tb_kpa.groupby("indicator").agg({
         "year": "nunique",
         "country": "nunique",
@@ -275,9 +275,9 @@ def run() -> None:
 
     tb = tb.astype(
         {
-            "indicator": "string",
-            "dimension_0": "string",
-            "country": "string",
+            "indicator": "str",
+            "dimension_0": "str",
+            "country": "str",
         }
     )
 
@@ -571,8 +571,7 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
 
     ### Set to "other"
     tb.loc[
-        (tb["group"].astype("string").str.contains("trans"))
-        | (tb["dimension_0"].astype("string").str.contains("trans")),
+        (tb["group"].astype("str").str.contains("trans")) | (tb["dimension_0"].astype("str").str.contains("trans")),
         "sex",
     ] = "other"
 
@@ -609,7 +608,7 @@ def extract_hepatitis_table_gam(tb):
     assert set(tb_hepatitis["sex"].unique()) == {"female", "male", "other", "total"}
     assert set(tb_hepatitis["age"].unique()) == {"0-25", "25+", "total"}
     assert set(tb_hepatitis["hepatitis"].unique()) == {"B", "C"}
-    assert set(tb_hepatitis["group"].unique()) == {pd.NA, "prisoners", "transgender"}
+    assert set(tb_hepatitis["group"].dropna().unique()) == {"prisoners", "transgender"}
     assert (num_notna := tb_hepatitis["group"].notna().sum()) == 181, f"Unexpected not-NAs, found {num_notna}"
 
     # Drop columns
@@ -654,8 +653,8 @@ def extract_estimate_table_gam(tb):
     tb_estimate = tb.loc[mask_estimate]
 
     # Checks
-    assert set(tb_estimate["sex"].unique()) == {pd.NA, "total"}
-    assert set(tb_estimate["age"].unique()) == {pd.NA, "total"}
+    assert set(tb_estimate["sex"].dropna().unique()) == {"total"}
+    assert set(tb_estimate["age"].dropna().unique()) == {"total"}
     assert tb_estimate["group"].isna().all()
     assert tb_estimate["dimension_0"].isna().all()
     assert tb_estimate["estimate"].notna().all()
@@ -693,8 +692,8 @@ def extract_group_table_gam(tb):
     tb_new.loc[mask, "dimension_0"] = None
 
     # Checks
-    assert set(tb_new["sex"].unique()) == {pd.NA, "other", "total"}
-    assert set(tb_new["age"].unique()) == {pd.NA, "total"}
+    assert set(tb_new["sex"].dropna().unique()) == {"other", "total"}
+    assert set(tb_new["age"].dropna().unique()) == {"total"}
     assert tb_new["hepatitis"].isna().all()
     assert tb_new["estimate"].isna().all()
     assert tb_new["group"].notna().all()
@@ -778,7 +777,7 @@ def extract_age_sex_table_gam(tb):
         value="total",
     )
     # Checks
-    assert set(tb_new["group"].unique()) == {pd.NA, "total"}
+    assert set(tb_new["group"].dropna().unique()) == {"total"}
     assert tb_new["hepatitis"].isna().all()
     assert tb_new["estimate"].isna().all()
     assert tb_new["age"].notna().all()
@@ -821,7 +820,7 @@ def extract_age_group_table_gam(tb):
     assert tb_new["estimate"].isna().all()
     assert tb_new["group"].notna().all()
     assert tb_new["age"].notna().all()
-    assert set(tb_new["sex"].unique()) == {pd.NA, "total"}
+    assert set(tb_new["sex"].dropna().unique()) == {"total"}
     assert tb_new["dimension_0"].isna().all()
     # Drop columns
     tb_new = tb_new.drop(columns=["sex", "hepatitis", "estimate"])
@@ -1112,11 +1111,6 @@ def pivot_and_format(tb, columns, short_name, regions_agg=True):
     tb = tb.pivot(index=columns, columns="indicator", values="value").reset_index()
     tb = tb.underscore()
 
-    # Convert StringDtype columns to object dtype to avoid issues with dropna
-    for col in tb.columns:
-        if hasattr(tb[col].dtype, "name") and "string" in str(tb[col].dtype):
-            tb[col] = tb[col].astype(object)
-
     tb = tb.dropna(how="all")
 
     # 3/ Remove anomalies
@@ -1385,7 +1379,7 @@ def clean_indicator_names(tb, short_name, drop: bool = True):
     tb = tb.loc[~tb[column_indicator_id].isin(indicators_drop)].reset_index(drop=True)
 
     # Rename indicators
-    tb[column_indicator] = tb[column_indicator_id].map(INDICATOR_SHORT_NAME_MAPPING[short_name]).astype("string")
+    tb[column_indicator] = tb[column_indicator_id].map(INDICATOR_SHORT_NAME_MAPPING[short_name]).astype("str")
     assert tb[column_indicator].isna().sum() == 0, "NaNs found in indicator after renaming."
 
     # Drop unnecessary indicator ID column
@@ -1497,7 +1491,7 @@ def expand_raw_dimension(tb, dimensions, dimension_names=None, drop=True, check_
     # Add new dimension columns
     dim_values = {dim: {k: v.get(dim) for k, v in dimensions.items()} for dim in dimension_names}
     for dim in dimension_names:
-        tb[dim] = tb[column_dimension_id].map(dim_values[dim]).astype("string")
+        tb[dim] = tb[column_dimension_id].map(dim_values[dim]).astype("str")
         if check_na:
             assert tb[dim].isna().sum() == 0, f"NaNs found in dimension {dim} after expansion."
 

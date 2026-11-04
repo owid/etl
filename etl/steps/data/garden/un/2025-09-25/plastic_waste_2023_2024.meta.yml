@@ -30,7 +30,7 @@ tables:
         title: Plastic waste imports
         unit: tonnes
         short_unit: t
-        description_short: The amount of plastic waste a country imports from other countries, measured in tonnes per year.
+        description_short: Amount of plastic waste a country imports from other countries, measured in tonnes per year.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -50,7 +50,7 @@ tables:
         title: Plastic waste exports
         unit: tonnes
         short_unit: t
-        description_short: The amount of plastic waste a country exports to other countries, measured in tonnes per year.
+        description_short: Amount of plastic waste a country exports to other countries, measured in tonnes per year.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -70,7 +70,7 @@ tables:
         title: Plastic waste imports by air
         unit: tonnes
         short_unit: t
-        description_short: The amount of plastic waste a country imports by air freight, measured in tonnes per year.
+        description_short: Amount of plastic waste a country imports by air freight, measured in tonnes per year.
         description_key:
           - *hs_classification
           - Data includes only plastic waste transported by air.
@@ -81,7 +81,7 @@ tables:
         title: Plastic waste exports by air
         unit: tonnes
         short_unit: t
-        description_short: The amount of plastic waste a country exports by air freight, measured in tonnes per year.
+        description_short: Amount of plastic waste a country exports by air freight, measured in tonnes per year.
         description_key:
           - *hs_classification
           - Data includes only plastic waste transported by air.
@@ -93,7 +93,7 @@ tables:
         unit: kilograms
         short_unit: kg
         processing_level: major
-        description_short: The amount of plastic waste imported per person, measured in kilograms per person per year.
+        description_short: Amount of plastic waste imported per person, measured in kilograms per person per year.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -115,7 +115,7 @@ tables:
         unit: kilograms
         short_unit: kg
         processing_level: major
-        description_short: The amount of plastic waste exported per person, measured in kilograms per person per year.
+        description_short: Amount of plastic waste exported per person, measured in kilograms per person per year.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -160,7 +160,7 @@ tables:
         unit: '%'
         short_unit: '%'
         processing_level: major
-        description_short: The percentage of global plastic waste imports that a country accounts for.
+        description_short: Percentage of global plastic waste imports that a country accounts for.
         description_key:
           - *hs_classification
           - *all_transport_modes
@@ -176,7 +176,7 @@ tables:
         unit: '%'
         short_unit: '%'
         processing_level: major
-        description_short: The percentage of global plastic waste exports that a country accounts for.
+        description_short: Percentage of global plastic waste exports that a country accounts for.
         description_key:
           - *hs_classification
           - *all_transport_modes

@@ -11,5 +11,26 @@
   # telling us to remove the entry. 1,000,000 sits safely between the buggy and fixed magnitudes.
   expect: {gt: 1000000}
   reason: UNWTO reports Taiwan's domestic short-term hotel guests in units while every other country reports in thousands, making the value ~1000× too large after the garden ×1000 conversion.
-  provider: UNWTO
+  producer: UNWTO
+  status: open
+
+# Pakistan reports arrivals by region of origin (2020 onward) about 1000x too large: 117 million arrivals in 2024,
+# more than any other destination reports, and 58 million from South Asia alone. The true scale is unclear (dividing by
+# 1000 gives an implausibly low ~117 thousand), so we blank the values rather than rescale them.
+# Guard: every raw value is at least 48 (thousand), while a fixed source (divided by 1000) would report at most ~75,
+# mostly far below 40, so `gt: 40` trips once UN Tourism corrects it.
+- indicator:
+    - inbound_tourism_regions_inbound__trips__region__overnight_visitors__tourists__africa__unwto_total
+    - inbound_tourism_regions_inbound__trips__region__overnight_visitors__tourists__americas__unwto_total
+    - inbound_tourism_regions_inbound__trips__region__overnight_visitors__tourists__east_asia_and_the_pacific__unwto_total
+    - inbound_tourism_regions_inbound__trips__region__overnight_visitors__tourists__europe__unwto_total
+    - inbound_tourism_regions_inbound__trips__region__overnight_visitors__tourists__middle_east__unwto_total
+    - inbound_tourism_regions_inbound__trips__region__overnight_visitors__tourists__south_asia__unwto_total
+  entity: Pakistan
+  years: {from: 2020}
+  action: override
+  value: null
+  expect: {gt: 40}
+  reason: UN Tourism reports implausibly large arrivals by region of origin for Pakistan (117 million in total in 2024, more than any other country), likely a units-vs-thousands mismatch; the correct scale is unclear, so the values are removed.
+  producer: UN Tourism
   status: open

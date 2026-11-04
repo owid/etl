@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: "WHO Child Growth Standards: Length/height-for-age"
+    description: |-
+      The WHO Child Growth Standards describe how children grow under conditions recognized as optimal: breastfeeding, a healthy diet, and an environment without significant constraints on growth such as infection or smoking. They were derived from the WHO Multicentre Growth Reference Study, which between 1997 and 2003 followed 8,440 healthy children from Brazil, Ghana, India, Norway, Oman, and the United States. Because children from these six sites grew very similarly, the standards are treated as applicable to all children everywhere.
+
+      The length/height-for-age standards cover birth to 60 completed months, tabulated by day of age. Length is measured lying down up to age 2, and standing height from age 2 onwards. Standing height is on average around 0.7 cm less than recumbent length, so the tabulated curves step down between day 730 and day 731.
+
+      These are the expanded tables, which WHO publishes so that countries can reproduce the growth charts on national health cards. They give the L, M, and S parameters of the fitted distribution alongside percentiles and z-scores at three-decimal precision.
+    citation_full: |-
+      WHO Multicentre Growth Reference Study Group. WHO Child Growth Standards: Length/height-for-age, weight-for-age, weight-for-length, weight-for-height and body mass index-for-age: Methods and development. Geneva: World Health Organization; 2006.
+    attribution_short: WHO
+    url_main: https://www.who.int/tools/child-growth-standards/standards/length-height-for-age
+    url_download: https://cdn.who.int/media/docs/default-source/child-growth/child-growth-standards/indicators/length-height-for-age/expandable-tables/lhfa-girls-zscore-expanded-tables.xlsx
+    date_accessed: '2026-08-07'
+    date_published: '2006-04-27'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 88df6e6e2f5f5da9a2bb93c64698e97b
+    size: 199890
+    path: height_for_age_zscores_girls_under_5.xlsx

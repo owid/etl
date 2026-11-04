@@ -8,7 +8,7 @@ tables:
       wages_relative_to_price_of_energy:
         title: Wages relative to price of energy
         unit: ''
-        description: Labourer's daily wage relative to the price of 1 million British Thermal Units (BTUs), early 1700s
+        description: Laborer's daily wage relative to the price of 1 million British Thermal Units (BTUs), early 1700s
     dimensions:
       - name: year
         slug: year

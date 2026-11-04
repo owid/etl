@@ -22,7 +22,7 @@ def run() -> None:
     #
     # There is a new category, "NO DATA".
     # For better visualization, we will replace them with nan.
-    tb = tb.astype({"fur_farming_status": "string", "fur_trading_status": "string", "fur_farms_active": "string"})
+    tb = tb.astype({"fur_farming_status": "str", "fur_trading_status": "str", "fur_farms_active": "str"})
     for column in ["fur_farming_status", "fur_trading_status", "fur_farms_active"]:
         tb.loc[tb[column] == "NO DATA", column] = None
 

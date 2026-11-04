@@ -2,7 +2,7 @@ meta:
   origin:
     producer: OECD
     title: OECD Labor Force Statistics
-    title_snapshot: OECD Labor Force Statistics - Female weekly hours worked
+    title_snapshot: OECD Labor Force Statistics – Female weekly hours worked
     description_snapshot: |-
       Original source notes:
       Part-time employment is defined according to a common definition of less than 30-weekly-usual hours worked in the main job.

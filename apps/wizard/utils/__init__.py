@@ -20,16 +20,16 @@ from collections.abc import Callable, Mapping
 from datetime import date
 from functools import cache, wraps
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Generic, TypeVar, cast
 
 import numpy as np
+import pandas as pd
 import streamlit as st
 from owid.catalog import Dataset
 from sentry_sdk import capture_exception
 from sqlalchemy.orm import Session
 from streamlit.runtime.runtime import Runtime
 from structlog import get_logger
-from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
@@ -134,17 +134,23 @@ def get_namespaces(step_type: str) -> list[str]:
     return namespaces
 
 
-class classproperty(property):
-    """Decorator."""
+T = TypeVar("T")
 
-    def __get__(self, owner_self: Self, owner_cls: Self):  # ty: ignore[invalid-method-override]
-        return self.fget(owner_cls)  # ty: ignore
+
+class classproperty(Generic[T]):
+    """Like `property`, but read on the class."""
+
+    def __init__(self, fget: Callable[[Any], T]) -> None:
+        self.fget = fget
+
+    def __get__(self, instance: object, owner: type | None = None) -> T:
+        return self.fget(owner)
 
 
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
+    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "chart"]
     dataset_edit: dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
@@ -152,7 +158,7 @@ class AppState:
         "grapher": None,
         "express": None,
         "data": None,
-        "collection": None,
+        "chart": None,
     }
     _previous_step: str | None = None
 
@@ -545,16 +551,6 @@ def as_valid_json(s):
             return s
 
 
-def as_list(s):
-    """Return `s` as a list if applicable."""
-    if isinstance(s, str):
-        try:
-            return ast.literal_eval(s)
-        except (ValueError, SyntaxError):
-            return s
-    return s
-
-
 @cache
 def is_running_in_streamlit():
     """Check if running in Streamlit."""
@@ -577,6 +573,16 @@ def _canon(x):
     if isinstance(x, np.ndarray):
         # stable, hashable representation for numpy arrays
         return ("__np__", x.dtype.str, x.shape, x.tobytes())
+    if isinstance(x, (pd.DataFrame, pd.Series, pd.Index)):
+        # Content-based key. Falling through to the __dict__ branch below would build a key out of
+        # the internal BlockManager, whose repr contains the object's memory address - so the key
+        # would differ on every call, never hit the cache, and grow the cache without bound.
+        return (
+            "__pandas__",
+            x.__class__.__qualname__,
+            tuple(map(str, getattr(x, "columns", ()))),
+            _canon(pd.util.hash_pandas_object(x, index=True).to_numpy()),
+        )
     # Fallback: try dataclasses/objects with __dict__
     if hasattr(x, "__dict__"):
         return ("__obj__", x.__class__.__qualname__, _canon(vars(x)))
@@ -585,12 +591,12 @@ def _canon(x):
 
 
 def cache_all(f):
-    """A caching decorator that works for unhashable types (lists, dicts)."""
+    """A caching decorator that works for unhashable types (lists, dicts).
 
-    @cache
-    def _cached(key):
-        args_c, kwargs_c = key
-        return f(*args_c, **dict(kwargs_c))
+    The canonical form of the arguments is used as the cache key only; the wrapped function is
+    always called with the original arguments.
+    """
+    results = {}
 
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -598,7 +604,9 @@ def cache_all(f):
             tuple(_canon(a) for a in args),
             tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
         )
-        return _cached(key)
+        if key not in results:
+            results[key] = f(*args, **kwargs)
+        return results[key]
 
     return wrapper
 

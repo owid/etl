@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Homelessness - Better Data Project
+    title: Homelessness – Better Data Project
     description: |-
       Mapping and measuring homelessness as a global phenomenon has never been done, due in part to differing definitions of homelessness and varying methods for data collection which render side-by-side comparisons impossible. In order to showcase the difference between definitions and methodologies and to spotlight gaps in the data, the Ruff Institute of Global Homelessness's Better Data Project reviewed publicly available information from government sources, nongovernmental organizations, intergovernmental organizations, and news media reports. We found that the data varied widely from country to country, with vast differences in the quality, transparency, accuracy, and reliability of the enumeration.
 

@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Centers for Disease Prevention and Control
-    title: CDC Summary of Notifiable Infectious Diseases - Measles
+    title: CDC Summary of Notifiable Infectious Diseases – Measles
     description: |-
       Reported cases of measles by state, for the United States. The cases are split by those that are indigenous (those that were infected in the United States) and imported (those that were infected outside of the United States).
     citation_full: |-

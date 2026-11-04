@@ -263,8 +263,8 @@ def fix_units_millions_to_dollars(df: pd.DataFrame) -> pd.DataFrame:
 
     # Update units
     # Convert to string to avoid categorical error if new unit is not in categories
-    df["long_unit"] = df["long_unit"].astype("string")
-    df["short_unit"] = df["short_unit"].astype("string")
+    df["long_unit"] = df["long_unit"].astype("str")
+    df["short_unit"] = df["short_unit"].astype("str")
 
     df.loc[mask, "long_unit"] = "current United States dollars"
     df.loc[mask, "short_unit"] = "$"

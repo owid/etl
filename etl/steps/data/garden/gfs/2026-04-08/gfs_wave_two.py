@@ -313,8 +313,11 @@ def run() -> None:
     tb_scored_97 = average_scored(tb, groups=GROUPS, cols=["cigarettes", "drinks"])
 
     # Merge all tables and remove duplicate columns (na shares are calculated twice for some variables)
+    # The stray "index" column (from reset_index in average_scored) would be suffixed twice, which pandas 3 rejects as duplicate columns.
+    tbs_to_merge = [tb_scored_10, tb_share_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97]
+    tbs_to_merge = tbs_to_merge[:1] + [t.drop(columns=["index"], errors="ignore") for t in tbs_to_merge[1:]]
     tbs_full = pr.multi_merge(
-        [tb_scored_10, tb_share_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97],
+        tbs_to_merge,
         on=GROUPS,
         suffixes=["", "_DROP_COLUMN"],
     ).copy()

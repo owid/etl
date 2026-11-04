@@ -47,3 +47,31 @@ steps:
     - data://grapher/worldbank_wdi/2026-07-27/wdi
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
+  # archived; last active in 713c5842dbb3 on 2026-10-13
+  data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
+    - data://garden/tourism/2026-01-21/unwto
+    - data://garden/un/2025-05-07/undp_hdr
+    - data://garden/ggdc/2025-10-09/penn_world_table
+    - data://garden/demography/2024-07-15/population
+    - data://garden/worldbank_wdi/2026-07-27/wdi
+    - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/unesco/2026-05-12/education_sdgs
+    - data://garden/wash/2025-12-08/household
+    - data://garden/happiness/2026-03-16/happiness
+    - data://garden/education/2025-08-20/harmonized_scores
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2026-06-09/igme
+    - data://garden/wb/2026-09-22/world_bank_pip
+    - data://grapher/wb/2025-09-08/gender_statistics
+    - data://garden/who/2026-05-22/gho
+    - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://garden/imf/2026-04-22/world_economic_outlook:
+    - data://meadow/imf/2026-04-22/world_economic_outlook
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://grapher/imf/2026-04-22/world_economic_outlook:
+    - data://garden/imf/2026-04-22/world_economic_outlook
+  # archived; last active in 1eef5299f04d on 2026-10-20
+  data://meadow/imf/2026-04-22/world_economic_outlook:
+    - snapshot://imf/2026-04-22/world_economic_outlook.csv

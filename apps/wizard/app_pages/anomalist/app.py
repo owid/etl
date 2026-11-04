@@ -25,7 +25,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection, load_detector, pretty_print_number
-from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
+from apps.utils.llms import claude
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
     create_tables,
@@ -37,9 +37,7 @@ from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import (
     Pagination,
     grapher_chart,
-    st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
     tag_in_md,
     url_persist,
 )
@@ -81,8 +79,8 @@ ANOMALY_TYPES = {
 ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
-# GPT
-MODEL_DEFAULT = "gpt-5"
+# Model for the AI summary of anomalies
+MODEL_DEFAULT = "claude-sonnet-5-5"
 
 # Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
@@ -167,7 +165,7 @@ def llm_ask(df: pd.DataFrame):
         "AI Summary",
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
-        help=f"Ask GPT {MODEL_DEFAULT} to summarize the anomalies. This is experimental.",
+        help=f"Ask {MODEL_DEFAULT} to summarize the anomalies. This is experimental.",
     )
 
 
@@ -227,17 +225,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
         df_str += text
 
     # Ask LLM for summary
-    client = OpenAIWrapper()
-
-    # Prepare messages for the LLM
-    messages = [
-        {
-            "role": "system",
-            "content": [
-                {
-                    "type": "text",
-                    "text": (
-                        f"""
+    system = f"""
                         The user has obtained anomalies for a list of indicators. This list comes in the format of a dataframe with columns:
                             - 'entity_name': Typically a country name.
                             - 'year': The year in which the anomaly was detected.
@@ -261,42 +249,17 @@ def ask_llm_for_summary(df: pd.DataFrame):
 
                         {metadata_summary}
                         """
-                    ),
-                },
-            ],
-        },
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": df_str,
-                },
-            ],
-        },
-    ]
+    if not claude.has_api_key():
+        st.info("Set `ANTHROPIC_API_KEY` in your `.env` to get an AI summary of the anomalies.")
+        return
+    stream = claude.TextStream(MODEL_DEFAULT, system, df_str, effort="low")
+    try:
+        st.write_stream(stream)
+    except claude.APIError as e:
+        st.error(f"AI summary failed: {e}")
+        return
 
-    text_in = "\n".join([m["content"][0]["text"] for m in messages])
-    num_tokens = get_number_tokens(text_in, MODEL_DEFAULT)
-
-    # Check if the number of tokens is within limits
-    if num_tokens > 128_000:
-        st.warning(
-            f"There are too many tokens in the GPT query to model {MODEL_DEFAULT}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
-        )
-    else:
-        # Ask GPT (stream)
-        stream = client.chat.completions.create(
-            model=MODEL_DEFAULT,
-            messages=messages,  # ty: ignore
-            max_completion_tokens=3000,
-            stream=True,
-        )
-        response = cast(str, st.write_stream(stream))
-
-        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_DEFAULT))
-        cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
-        st.info(cost_msg)
+    st.info(stream.summary)
 
 
 # Functions to filter the results
@@ -586,10 +549,7 @@ create_tables()
 
 # 1/ PAGE TITLE
 # Show title
-st_title_with_expert(
-    "Anomalist",
-    icon=":material/planner_review:",
-)
+st.title(":material/planner_review: Anomalist")
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).
@@ -827,7 +787,7 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_filter_anomaly_types",
                 )
         with col2:
-            with st_horizontal():
+            with st.container(horizontal=True, vertical_alignment="bottom"):
                 url_persist(st.number_input)(
                     "Min year",
                     value=YEAR_MIN,
@@ -876,7 +836,7 @@ if st.session_state.anomalist_df is not None:
     # Show anomalies with time and version changes
     if not df.empty:
         # Top option buttons
-        with st_horizontal():
+        with st.container(horizontal=True):
             # LLM summary option
             llm_ask(df)
             download_anomalies(df)

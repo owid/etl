@@ -3,6 +3,7 @@ name: fix-dependabot
 description: Resolve Dependabot security alerts on owid/etl by upgrading vulnerable dependencies. Use when the user mentions "dependabot", "security alerts", "vulnerability", "CVE", "security fixes", "dependabot alerts", or wants to fix vulnerable packages. Also trigger when the user pastes a GitHub Dependabot URL or asks about outdated/insecure dependencies.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Fix Dependabot Alerts
@@ -51,8 +52,7 @@ For each open PR:
    gh pr close <number> --repo owid/etl --comment \
      "Closing as obsolete: the current default branch already has this dependency at the requested version or newer, so this stale Dependabot PR is no longer relevant."
    ```
-4. If you create a replacement PR that batches or supersedes Dependabot PRs, close the superseded PRs and reference the replacement PR in the close comment.
-5. Re-run the PR list and confirm there are no open irrelevant Dependabot PRs before reporting completion.
+4. If you create a replacement PR that batches or supersedes Dependabot PRs, close the superseded PRs and re-run this list in Step 6.
 
 **Map each open PR to an alert (or not).** Cross-reference this PR list against the alert list from Step 1. A PR whose package/manifest matches an open alert is a *security* PR — handled by Steps 2–4. A PR with **no** matching open alert is a routine *version-update* PR — handled by Step 4c. Both kinds should be gone by the end.
 
@@ -110,7 +110,7 @@ If the package is only in `uv.lock` (not a direct dependency):
 
 ### After removing a dependency
 
-When removing a package, check if it's imported anywhere in the codebase. If it is, replace its usage with an alternative approach. For example, when we removed `moviepy`, we replaced its `ImageSequenceClip` usage with a direct `ffmpeg` subprocess call.
+When removing a package, check if it's imported anywhere in the codebase. If it is, replace its usage with an alternative approach. For example, `moviepy`'s `ImageSequenceClip` usage can be replaced with a direct `ffmpeg` subprocess call.
 
 Always search broadly:
 ```bash
@@ -151,7 +151,7 @@ After the security alerts are handled, fold every *remaining* open Dependabot PR
 For each remaining PR, apply its bump locally rather than merging the Dependabot branch (keeps everything in one PR with one CI run):
 
 1. Read the target package + version from the PR title (`Bump <pkg> from <old> to <new> in /<path>`).
-2. `cd` into the manifest's directory and apply it the same way as Step 4 (direct bump if imported in `src/`, `overrides` if a dev-tooling transitive — see above). For a pure devDependency like esbuild, bump it in `devDependencies`: `npm install -D <pkg>@^<new>`.
+2. `cd` into the manifest's directory and apply it the same way as Step 4 (see "npm transitive vs. direct deps"). For a pure devDependency like esbuild, bump it in `devDependencies`: `npm install -D <pkg>@^<new>`.
 3. Verify it resolved: `npm ls <pkg>`.
 
 After applying all of them, **compile each touched extension** so a bad bump fails locally, not in CI:
@@ -203,7 +203,7 @@ Then close **every** open Dependabot PR this batch covers — both the security 
 
 ## Important notes
 
-- `lib/` contains subdirectories (`catalog`, `datautils`, `repack`, `walden`) with their own `pyproject.toml` files — check these too
+- `lib/` contains subdirectories (`catalog`, `datautils`, `owl`, `repack`) with their own `pyproject.toml` files — check these too
 - Multiple alerts may reference the same package (e.g. 4 alerts for pytest) — one upgrade fixes them all
 - The `uv.lock` file may also be affected by `[tool.uv] exclude-newer` settings in pyproject.toml — if a patched version exists on PyPI but uv won't resolve it, check this setting
 - Some alerts may be auto-dismissed by Dependabot (state `auto_dismissed`) — skip those

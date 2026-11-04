@@ -6,9 +6,8 @@ If you want to learn more about it, start from its `show` method.
 
 import difflib
 import json
-import os
 from functools import cached_property
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 import streamlit as st
@@ -21,19 +20,23 @@ from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
 from apps.chart_sync.admin_api import AdminAPI
-from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
+from apps.utils.llms import claude
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.citations import st_show_citations
-from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
+from apps.wizard.app_pages.chart_diff.conflict_resolver import (
+    PRODUCTION,
+    STAGING,
+    ChartDiffConflictResolver,
+)
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.io import variable_metadata_df_from_s3
 
 log = get_logger()
 
-# GPT model default
-MODEL_DEFAULT = "gpt-5"
+# Model for the AI summary of metadata changes
+MODEL_DEFAULT = "claude-sonnet-5-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -91,12 +94,6 @@ class ChartDiffShow:
         self.target_session = target_session
         self.expander = expander
         self.show_link = show_link
-
-        # OpenAI
-        if "OPENAI_API_KEY" in os.environ:
-            self.openai_api = OpenAIWrapper()
-        else:
-            self.openai_api = None
 
     @property
     def box_icon(self) -> str:
@@ -255,40 +252,82 @@ class ChartDiffShow:
             resolver.resolve_conflicts(rerun=False)
             self._refresh_chart_diff()
 
-        resolver = ChartDiffConflictResolver(self.diff, self.source_session)
-        col1, col2 = st.columns(2)
-        with col1:
-            st.warning("This is under development! Find below a form with the different fields that present conflicts.")
-        with col2:
-            st.button(
-                key=f"resolve-conflicts-{self.diff.chart_id}",
-                label="⚠️ Mark as resolved: Accept all changes from staging",
-                help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useful if you're happy with the changes in staging as they are.",
-                on_click=_mark_as_resolved,
-            )
+        resolver = ChartDiffConflictResolver(self.diff, self.source_session, self.target_session)
 
         # If things to compare...
         if resolver.config_compare:
+            # What production actually did, before asking which side to keep.
+            resolver.show_production_edits()
             st.markdown(
                 "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
+            )
+
+            # Shortcuts to decide every field at once (nothing is preselected otherwise)
+            col1, col2 = st.columns(2)
+            col1.button(
+                "Use staging for all",
+                help="Choose the staging value for every field below. You can still change individual fields afterwards.",
+                key=f"conflict-all-staging-{self.diff.chart_id}",
+                on_click=resolver.choose_env_for_all,
+                args=(STAGING,),
+                width="stretch",
+            )
+            col2.button(
+                "Use production for all",
+                help="Choose the production value for every field below. You can still change individual fields afterwards.",
+                key=f"conflict-all-production-{self.diff.chart_id}",
+                on_click=resolver.choose_env_for_all,
+                args=(PRODUCTION,),
+                width="stretch",
             )
 
             # Show conflict resolver per field
             ## Provide tools to merge the content of each field
             for field in resolver.config_compare:
-                resolver._show_field_conflict_resolver(field)
+                resolver.show_field_resolver(field)
 
-            # Button to resolve all conflicts
+            # Button to resolve all conflicts. Undecided fields block it: writing an unconfirmed
+            # default is exactly how staging edits used to get silently reverted.
+            undecided = resolver.fields_undecided
             st.button(
                 "Resolve conflicts",
                 help="Click to resolve the conflicts and update the chart config.",
                 key=f"resolve-conflicts-btn-{self.diff.chart_id}",
                 type="primary",
+                disabled=bool(undecided),
                 on_click=lambda r=resolver: _resolve_conflicts(r),
             )
+            if undecided:
+                st.caption("Choose an environment for: " + ", ".join(f"`{field}`" for field in undecided) + ".")
+
+            # Why the last attempt wrote nothing, if it wrote nothing.
+            resolver.show_error()
+
+            # Recovery path for a failed write: the error message points at this button.
+            if st.session_state.get(f"conflict-write-failed-{self.diff.chart_id}"):
+                st.button(
+                    "Mark as resolved",
+                    key=f"resolve-conflicts-{self.diff.chart_id}",
+                    help="Clear the conflict without writing anything, for when you have already integrated the changes by hand.",
+                    on_click=_mark_as_resolved,
+                )
+
+            st.caption(
+                "This is under development. A field marked *Not present* is missing from that "
+                "environment's config; charts inherit those fields from the indicator's metadata, so "
+                "choosing that side removes the field rather than blanking it."
+            )
         else:
-            st.success(
-                "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
+            st.info(
+                "Production was edited after this staging server was created, but no config field "
+                "differs between the two. Mark the conflict as resolved to carry on."
+            )
+            st.button(
+                "Mark as resolved",
+                key=f"resolve-conflicts-{self.diff.chart_id}",
+                type="primary",
+                help="Clear the conflict. Neither chart is changed.",
+                on_click=_mark_as_resolved,
             )
 
     def _show_chart_diff_header(self):
@@ -438,7 +477,7 @@ class ChartDiffShow:
             st.success("No differences found in the metadata fields relevant for comparison.")
             return
 
-        # Placeholder for GPT summary (filled after the diffs render, so the user isn't blocked on the LLM)
+        # Placeholder for the AI summary (filled after the diffs render, so the user isn't blocked on the LLM)
         container = st.container()
 
         # Show diffs
@@ -450,19 +489,19 @@ class ChartDiffShow:
                 st_show_diff(meta_diff)
 
         with container:
-            self._show_metadata_diff_gpt_summary(meta_diffs)
+            self._show_metadata_diff_ai_summary(meta_diffs)
 
-    def _show_metadata_diff_gpt_summary(self, meta_diffs: dict[int, str]) -> None:
-        """Summarise differences in metadata using GPT."""
-        if self.openai_api is None:
-            st.info("Set `OPENAI_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
+    def _show_metadata_diff_ai_summary(self, meta_diffs: dict[int, str]) -> None:
+        """Summarise differences in metadata with an LLM."""
+        if not claude.has_api_key():
+            st.info("Set `ANTHROPIC_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
             return
 
         # Cache the summary in session state, keyed by the diff content, so re-opening the dialog
         # doesn't re-query the API but a changed diff does.
         # NOTE: Don't use `st.cache_data` here — caching a function that *renders* UI (and returns
         # None) makes the summary render once and then vanish on subsequent calls.
-        cache_key = f"gpt-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
+        cache_key = f"ai-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
         cached = st.session_state.get(cache_key)
 
         with st.chat_message("assistant"):
@@ -470,34 +509,16 @@ class ChartDiffShow:
                 response, cost_msg = cached
                 st.markdown(response)
             else:
-                messages = [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You will be presented with the metadata diffs of various indicators, as a dictionary "
-                            "mapping indicator ID to a unified diff (production → staging). Summarise the main "
-                            "changes at a high level, in a few short bullet points. Group similar changes across "
-                            "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": str(meta_diffs),
-                    },
-                ]
+                system = (
+                    "You will be presented with the metadata diffs of various indicators, as a dictionary "
+                    "mapping indicator ID to a unified diff (production → staging). Summarise the main "
+                    "changes at a high level, in a few short bullet points. Group similar changes across "
+                    "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
+                )
+                stream = claude.TextStream(MODEL_DEFAULT, system, str(meta_diffs), effort="low")
                 try:
-                    stream = self.openai_api.chat.completions.create(
-                        model=MODEL_DEFAULT,
-                        messages=messages,  # ty: ignore
-                        # NOTE: gpt-5 is a reasoning model and reasoning tokens count towards this
-                        # limit; keep it well above the expected summary length or the visible
-                        # output may be empty.
-                        max_completion_tokens=4000,
-                        reasoning_effort="low",
-                        stream=True,
-                    )
                     response = cast(str, st.write_stream(stream))
-                except Exception as e:
+                except claude.APIError as e:
                     st.error(f"AI summary failed: {e}")
                     return
 
@@ -505,12 +526,38 @@ class ChartDiffShow:
                     st.warning("The model returned an empty summary.")
                     return
 
-                # Cost information (estimated with tiktoken, hence lower bounds)
-                text_in = "\n".join([m["content"] for m in messages])
-                cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
-                cost_msg = f"Cost: ≥{cost} USD. Tokens: ≥{num_tokens}."
+                cost_msg = stream.summary
                 st.session_state[cache_key] = (response, cost_msg)
         st.caption(cost_msg)
+
+    def _chart_header_row(self, height: int | Literal["content"] = "content"):
+        """Row for a chart's header: title on the left, admin link pushed to the right.
+
+        A fixed `height` keeps both columns' headers the same size when one of them
+        shows the taller revision selectbox.
+        """
+        return st.container(
+            border=False,
+            height=height,
+            horizontal=True,
+            horizontal_alignment="distribute",
+            vertical_alignment="center",
+        )
+
+    def _show_edit_link(self, owid_env: OWIDEnv, chart_id: int | None) -> None:
+        """Link to a chart's edit page in the admin of the given environment.
+
+        `chart_id` must be the id the chart has *in that environment*: a chart created on
+        staging gets a fresh numeric id when it is synced to production, so the production
+        twin's id and `diff.chart_id` (always the source chart's) can differ.
+
+        Grapher's own "Edit" entry in the share menu never shows up here: we mount the
+        chart with the npm package inside a srcdoc iframe, where none of the signals it
+        uses to detect an internal user (admin cookie, host name) can apply.
+        """
+        if not chart_id:
+            return
+        st.markdown(f"[:material/edit: Edit]({owid_env.admin_site}/charts/{chart_id}/edit)")
 
     def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
@@ -518,7 +565,7 @@ class ChartDiffShow:
         def _show_chart_old():
             last_approved_revision = self.last_approved_revision
             if (last_approved_revision is not None) and (not self.diff.in_conflict):
-                with st.container(height=40, border=False):
+                with self._chart_header_row(height=40):
                     options = {
                         "prod": self._header_production_chart_plain,
                         "last": f"Last approved on staging ({prettify_date(last_approved_revision)} - REV {last_approved_revision.id})",
@@ -530,6 +577,11 @@ class ChartDiffShow:
                         key=f"prod-review-{self.diff.chart_id}",
                         label_visibility="collapsed",
                     )
+                    if option == "prod":
+                        assert self.diff.target_chart is not None
+                        self._show_edit_link(TARGET, self.diff.target_chart.id)
+                    else:
+                        self._show_edit_link(SOURCE, self.diff.chart_id)
 
                 if option == "prod":
                     self._show_tags_if_changed(self.diff.target_chart, self.target_session)
@@ -539,10 +591,13 @@ class ChartDiffShow:
                     grapher_chart(chart_config=last_approved_revision.config, owid_env=SOURCE)
                     return last_approved_revision.config, False
             else:
-                if self.diff.in_conflict:
-                    st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
-                else:
-                    st.markdown(self._header_production_chart)
+                with self._chart_header_row():
+                    if self.diff.in_conflict:
+                        st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
+                    else:
+                        st.markdown(self._header_production_chart)
+                    assert self.diff.target_chart is not None
+                    self._show_edit_link(TARGET, self.diff.target_chart.id)
 
                 self._show_tags_if_changed(self.diff.target_chart, self.target_session)
 
@@ -553,11 +608,12 @@ class ChartDiffShow:
             return self.diff.target_chart.config, True
 
         def _show_chart_new():
-            if self.last_approved_revision is None:
+            # Match the production column's fixed header height when it shows the
+            # revision selectbox, so both charts start at the same offset.
+            height = "content" if self.last_approved_revision is None else 40
+            with self._chart_header_row(height=height):
                 st.markdown(self._header_staging_chart)
-            else:
-                with st.container(height=40, border=False):
-                    st.markdown(self._header_staging_chart)
+                self._show_edit_link(SOURCE, self.diff.chart_id)
 
             self._show_tags_if_changed(self.diff.source_chart, self.source_session)
 
@@ -587,7 +643,9 @@ class ChartDiffShow:
         # Only one chart: new chart
         is_prod = True
         if self.diff.target_chart is None:
-            st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
+            with self._chart_header_row():
+                st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
+                self._show_edit_link(SOURCE, self.diff.chart_id)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
             config_ref = self.diff.source_chart.config
         # Two charts, actual diff
@@ -731,7 +789,13 @@ class ChartDiffShow:
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
         if self.diff.in_conflict:
-            with st.popover("⚠️ Resolve conflict"):
+            # A popover rather than a dialog on purpose: its content is rendered eagerly, so a
+            # half-made decision survives an accidental click outside, and interacting with a widget
+            # cannot close it. `st.dialog` needs a session-state flag to survive widget interaction at
+            # all, and, with no dismissal callback in Streamlit, a dismissed dialog would reopen on the
+            # next fragment rerun. `width="stretch"` gives the panel the width the side-by-side value
+            # comparison needs, which was the one real advantage a modal had.
+            with st.popover("⚠️ Resolve conflict", width="stretch"):
                 self._show_conflict_resolver()
 
         if self.diff.error:
@@ -790,9 +854,24 @@ class ChartDiffShow:
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
 
+    def _show_conflict_resolver_toast(self) -> None:
+        """Show the outcome of a conflict resolution.
+
+        As a toast: it floats, so it pushes no content down, and the outcome of a resolve is not
+        something to keep on screen. `resolve_conflicts` runs as a callback, and the popover it lives
+        in is gone by the time the conflict is resolved, so the message is deferred to session state
+        and drawn here instead (drawing it from the callback duplicates it).
+        """
+        message = st.session_state.pop(f"conflict-toast-{self.diff.chart_id}", None)
+        if message is not None:
+            st.toast(message, icon=":material/merge:")
+
     @st.fragment
     def show(self):
         """Show chart diff."""
+        # Outcome of a conflict resolution (shown even if the diff itself is gone afterwards)
+        self._show_conflict_resolver_toast()
+
         # Chart diff no longer exists (e.g. after a refresh found no differences)
         if st.session_state.pop(f"chart-diff-gone-{self.diff.chart_id}", False):
             st.info(

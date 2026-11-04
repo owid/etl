@@ -225,7 +225,7 @@ def mk_omms(table: Table) -> Table:
     omm_origin = table["sp_pop_totl"].metadata.origins[0].copy()
 
     # rewrite "World Development Indicators" to "Our World in Data based on World Bank"
-    omm_origin.citation_full = f"{omm_origin.producer} - {omm_origin.citation_full}"
+    omm_origin.citation_full = f"{omm_origin.producer} – {omm_origin.citation_full}"
 
     published_by = omm_origin.producer
 
@@ -587,7 +587,7 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
         origin.producer = clean_source["name"]
         origin.title = "World Development Indicators"
         origin.url_main = f"https://data.worldbank.org/indicator/{var['indicator_code_original']}"
-        origin.citation_full = f"{source_raw_name.rstrip('.')}. Indicator {var['indicator_code_original']} ({origin.url_main}). World Development Indicators - World Bank ({origin.date_published.split('-')[0]}). Accessed on {origin.date_accessed}."
+        origin.citation_full = f"{source_raw_name.rstrip('.')}. Indicator {var['indicator_code_original']} ({origin.url_main}). World Development Indicators – World Bank ({origin.date_published.split('-')[0]}). Accessed on {origin.date_accessed}."
 
         # set description_from_producer
         tb[var_code].m.description_from_producer = create_description_from_producer(var)

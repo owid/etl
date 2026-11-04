@@ -5,7 +5,7 @@ meta:
     description: |-
       This dataset provides information on the number of nuclear warheads owned by the nuclear powers, as well as their status (e.g. whether or not they are deployed, nondeployed, or retired).
     citation_full: |-
-      Hans M. Kristensen, Matt Korda, Eliana Johns, Mackenzie Knight-Boyle, and Kate Kohn, Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
+      Hans M. Kristensen, Matt Korda, Eliana Johns, Mackenzie Knight-Boyle, and Kate Kohn, Federation of American Scientists – Estimated Global Nuclear Warhead Inventories.
     attribution_short: FAS
     url_main: https://fas.org/initiative/status-world-nuclear-forces/
     date_accessed: '2026-05-13'

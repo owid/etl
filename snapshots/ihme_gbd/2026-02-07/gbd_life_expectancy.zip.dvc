@@ -4,7 +4,7 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Life expectancy
+    title: Global Burden of Disease – Life expectancy
     description: |-
       The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends.'
     date_published: "2025-10-20"

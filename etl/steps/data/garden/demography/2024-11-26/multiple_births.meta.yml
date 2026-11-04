@@ -89,7 +89,7 @@ tables:
         title: Total deliveries
         unit: "deliveries"
         description_short: |-
-          Total number of deliveries (i.e., single and multiple deliveries combined)
+          Total number of deliveries (i.e., single and multiple deliveries combined).
 
       # Absolute (children)
       multiple_children:
@@ -127,33 +127,33 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The number of deliveries that are single deliveries per 100 deliveries.
+          Number of deliveries that are single deliveries per 100 deliveries.
       multiple_share:
         title: Multiple delivery share
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The number of deliveries that are multiple deliveries (2 or more) per 100 deliveries.
+          Number of deliveries that are multiple deliveries (2 or more) per 100 deliveries.
       twinning_share:
         title: Twinning delivery share
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The number of twin deliveries per 100 deliveries.
+          Number of twin deliveries per 100 deliveries.
         description_key: *twins
       triplets_plus_share:
         title: Triplets+ delivery share
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The number of deliveries of triplets or more children per 100 deliveries.
+          Number of deliveries of triplets or more children per 100 deliveries.
 
       # Ratios
       children_delivery_ratio:
         title: "Children per delivery"
         unit: "children per 1,000 deliveries"
         description_short: |-
-          The average number of children born per delivery. This is estimated by dividing the number of children born by the total number deliveries, per 1,000 people.
+          Average number of children born per delivery. This is estimated by dividing the number of children born by the total number deliveries, per 1,000 people.
       children_multiple_delivery_ratio:
         title: "Children per multiple delivery"
         unit: "children per 1,000 multiple deliveries"

@@ -1,0 +1,122 @@
+grapher_schema: "011"
+
+definitions:
+  confirmed_infections: &confirmed_infections
+    catalogPath: cases_deaths#new_cases_7_day_avg_right
+    display:
+      name: Confirmed cases, 7-day average
+      color: "#000000"
+  common_views:
+    - config:
+      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+      originUrl: ourworldindata.org/covid-models
+      hideAnnotationFieldsInTitle:
+        time: true
+
+title:
+  title: Daily new estimated COVID-19 infections
+  title_variant: "by model"
+default_selection:
+  - United States
+topic_tags:
+  - COVID-19
+
+dimensions:
+  - slug: model
+    name: Statistical model
+    choices:
+      - slug: icl
+        name: ICL
+        description: Imperial College London
+      - slug: ihme
+        name: IHME
+        description: Institute for Health and Metrics Evaluation
+      - slug: lshtm
+        name: LSHTM
+        description: London School of Hygiene and Tropical Medicine
+      - slug: yyg
+        name: YYG
+        description: Youyang Gu (2020)
+
+views:
+  # ICL
+  - dimensions:
+      model: icl
+    indicators:
+      y:
+        - catalogPath: infections_model#icl_infections__estimate_mean
+          display:
+            color: "#4C6A9C"
+        - catalogPath: infections_model#icl_infections__estimate_low
+          display:
+            color: "#B6C7DE"
+        - catalogPath: infections_model#icl_infections__estimate_upper
+          display:
+            color: "#B6C7DE"
+        - *confirmed_infections
+
+    config:
+      title: "Daily new estimated COVID-19 infections from the ICL model"
+      note: This chart shows the model estimates dated 25 December 2022.
+
+  # IHME
+  - dimensions:
+      model: ihme
+    indicators:
+      y:
+        - catalogPath: infections_model#ihme_infections__estimate_mean
+          display:
+            color: "#2C8465"
+        - catalogPath: infections_model#ihme_infections__estimate_low
+          display:
+            # plotMarkersOnlyInLineChart: true
+            color: "#A4C5B8"
+        - catalogPath: infections_model#ihme_infections__estimate_upper
+          display:
+            # plotMarkersOnlyInLineChart: true
+            color: "#A4C5B8"
+        - *confirmed_infections
+
+    config:
+      title: "Daily new estimated COVID-19 infections from the IHME model"
+      note: This chart shows the model estimates dated 16 December 2022.
+
+  # LSHTM
+  - dimensions:
+      model: lshtm
+    indicators:
+      y:
+        - catalogPath: infections_model#lshtm_infections__estimate_median
+          display:
+            color: "#B13507"
+        - catalogPath: infections_model#lshtm_infections__estimate_low
+          display:
+            color: "#DCAC9B"
+        - catalogPath: infections_model#lshtm_infections__estimate_upper
+          display:
+            color: "#DCAC9B"
+        - *confirmed_infections
+
+    config:
+      title: "Daily new estimated COVID-19 infections from the LSHTM model"
+      note: This chart shows the model estimates dated 25 August 2020.
+
+  # YYG
+  - dimensions:
+      model: yyg
+    indicators:
+      y:
+        - catalogPath: infections_model#yyg_infections__estimate_mean
+          display:
+            color: "#996D39"
+        - catalogPath: infections_model#yyg_infections__estimate_low
+          display:
+            color: "#CFBFAF"
+        - catalogPath: infections_model#yyg_infections__estimate_upper
+          display:
+            color: "#CFBFAF"
+        - *confirmed_infections
+
+    config:
+      title: "Daily new estimated COVID-19 infections from the YYG model"
+      note: This chart shows the model estimates dated 4 October 2020. YYG announced that this is the final model update.

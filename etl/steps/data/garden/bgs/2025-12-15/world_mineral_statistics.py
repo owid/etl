@@ -749,7 +749,8 @@ ACCEPTED_OVERLAPS = [
 
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
-    tb = tb.astype({"commodity": str, "sub_commodity": str}).copy()
+    # Missing names stay NaN under the pandas str dtype; spell them "nan" so COMMODITY_MAPPING keys can match them.
+    tb = tb.astype({"commodity": str, "sub_commodity": str}).fillna({"commodity": "nan", "sub_commodity": "nan"}).copy()
     missing_mappings = set(
         [tuple(pair) for pair in tb[["commodity", "sub_commodity"]].drop_duplicates().values.tolist()]
     ) - set(COMMODITY_MAPPING)
@@ -780,7 +781,7 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
 
 
 def harmonize_units(tb: Table) -> Table:
-    tb = tb.astype({"value": "Float64", "unit": "string"}).copy()
+    tb = tb.astype({"value": "Float64", "unit": "str"}).copy()
 
     # In some cases, units given in "tonnes *" can safely be converted to simply "tonnes".
     # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.

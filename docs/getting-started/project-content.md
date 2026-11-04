@@ -20,6 +20,7 @@ You don't need to understand all of them to get started, but as you work more wi
 | `docs/`, `.readthedocs.yaml`    | Project documentation config files and directory. |
 | `etl/`       | This is home to our ETL library. This is where all the recipes to generate our datasets live. |
 | `export/`    | Similar to `data/` but for `export` steps. |
+| `viz/`    | Similar to `data/` but for `viz` steps (charts, explorers, static images, bespoke visualizations). |
 | `lib/`    | Other OWID sub-packages. |
 | `owid_mcp/`    | OWID's MCP server code. |
 | `schemas/`    | Metadata schemas for ETL datasets. |

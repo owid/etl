@@ -298,7 +298,7 @@ def _check_nas(tb, missing_row_max, missing_countries_max):
 
 
 def _clean_population_type(tb):
-    """Data provider notes the following:
+    """Data producer notes the following:
 
     For populations with territorial changes, two sets of population estimates are given for years in which a territorial change occurred. The first set of estimates (identified as year "19xx-") refers to the population just before the territorial change, whereas the second set (identified as year "19xx+") refers to the population just after the change. For example, in France, the data for "1914-" cover the previous territory (i.e., as of December 31, 1913), whereas the data for "1914+" reflect the territorial boundaries as of January 1, 1914.
 
@@ -306,7 +306,7 @@ def _clean_population_type(tb):
     """
     # Create new column with the year.
     regex = r"\b\d{4}\b"
-    tb["year"] = tb["Year"].astype("string").str.extract(f"({regex})", expand=False)
+    tb["year"] = tb["Year"].astype("str").str.extract(f"({regex})", expand=False)
     assert tb["year"].notna().all(), "Year extraction failed - found null values"
     tb["year"] = tb["year"].astype(int)
 
@@ -316,7 +316,7 @@ def _clean_population_type(tb):
     )
 
     # Drop duplicate years, keeping YYYY+.
-    tb["Year"] = tb["Year"].astype("string")
+    tb["Year"] = tb["Year"].astype("str")
     tb = tb.sort_values("Year")
     tb = tb.drop_duplicates(subset=["year", "Age", "sex", "PopName", "format"], keep="first").drop(columns="Year")
 
@@ -330,7 +330,7 @@ def _clean_population_type(tb):
 
 def _clean_year(tb):
     # Remove year ranges, and convert to int
-    flag = tb["Year"].astype("string").str.contains("-")
+    flag = tb["Year"].astype("str").str.contains("-")
     tb = tb.loc[~flag]
     tb.loc[:, "Year"] = tb.loc[:, "Year"].astype("int")
     return tb

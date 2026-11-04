@@ -37,10 +37,10 @@ The simplest way to access an older dataset is by checking out the commit where 
       from etl.dataset import Dataset
 
       # Load current dataset
-      tb_current = Dataset("~/projects/etl/data/garden/climate/latest/weekly_wildfires").read_table('wildfires')
+      tb_current = Dataset("~/projects/etl/data/garden/climate/latest/weekly_wildfires").read_table("wildfires")
 
       # Load dataset from a previous commit
-      tb_old = Dataset("~/projects/etl2/data/garden/climate/latest/weekly_wildfires").read_table('wildfires')
+      tb_old = Dataset("~/projects/etl2/data/garden/climate/latest/weekly_wildfires").read_table("wildfires")
       ```
 
 ---

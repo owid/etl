@@ -1,0 +1,105 @@
+grapher_schema: "011"
+chart_config_id: 0193d6ce-50c0-7481-84b5-0be36e732ab3
+slug: cohort-fertility-rate-by-age
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_2010
+          display:
+            name: '2010'
+            unit: births per woman at a specific age
+            color: '#c4eacf'
+            shortUnit: ''
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_2005
+          display:
+            name: '2005'
+            color: '#a6e1bc'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_2000
+          display:
+            name: '2000'
+            color: '#7fd7af'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1995
+          display:
+            name: '1995'
+            color: '#5bcdad'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1990
+          display:
+            name: '1990'
+            color: '#46bead'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1985
+          display:
+            name: '1985'
+            color: '#3bafad'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1980
+          display:
+            name: '1980'
+            color: '#35a0ab'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1975
+          display:
+            name: '1975'
+            color: '#3491a8'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1970
+          display:
+            name: '1970'
+            color: '#3482a4'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1965
+          display:
+            name: '1965'
+            color: '#3573a1'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1960
+          display:
+            name: '1960'
+            color: '#38639d'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1955
+          display:
+            name: '1955'
+            color: '#3c5397'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1950
+          display:
+            name: '1950'
+            color: '#414387'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1945
+          display:
+            name: '1945'
+            color: '#3f3770'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1940
+          display:
+            name: '1940'
+            color: '#3a2c58'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1935
+          display:
+            name: '1935'
+            color: '#312142'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1930
+          display:
+            name: '1930'
+            color: '#26172b'
+        - catalogPath: cohort_ages_years#asfr_cohort__cohort_1925
+          display:
+            name: '1925'
+            color: '#190e18'
+    config:
+      title: Age of mothers at childbirth by mother's birth year
+      subtitle: Each line denotes women born in a particular year, and shows their timing of childbearing. The vertical axis shows the [age-specific fertility rate](#dod:age-specific-fertility-rate) per woman.
+      variantName: Age distribution
+      originUrl: /fertility-rate
+      chartTypes:
+        - LineChart
+      facettingLabelByYVariables: women's birth year
+      hideAnnotationFieldsInTitle:
+        time: true
+      hideTimeline: true
+      selectedEntityNames:
+        - Spain
+        - United Kingdom
+        - Japan
+        - United States
+      selectedFacetStrategy: entity
+      xAxis:
+        label: Age of women
+      yAxis:
+        min: 0

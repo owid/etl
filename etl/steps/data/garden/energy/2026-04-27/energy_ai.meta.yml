@@ -70,7 +70,7 @@ tables:
         title: Projected total installed capacity for data centers
         unit: gigawatts
         short_unit: GW
-        description_short: Projected total installed power capacity of data centers in 2030 under the IEA's base scenario, measured in [gigawatts](#dod:watt).
+        description_short: Projected total installed power capacity of data centers in 2030 under the IEA's base scenario, measured in gigawatts.
         description_key:
           - *data_centers_description
           - *eurasia_note

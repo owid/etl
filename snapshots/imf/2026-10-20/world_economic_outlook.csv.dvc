@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: International Monetary Fund
+    title: World Economic Outlook (WEO)
+    description: |-
+      The World Economic Outlook (WEO) database is published twice a year, in April and in September or October, together with the World Economic Outlook report. It contains selected data from the report’s statistical appendix, which presents the IMF staff’s analysis and projections for the world economy, for major country groups, and for many individual countries. The database includes data on national accounts, inflation, unemployment rates, balance of payments, fiscal indicators, trade, and commodity prices. Data is available from 1980 to the present. Projections for most data series are given for the next five years. For some countries, country groups, and indicators, data is incomplete or unavailable for certain years.
+    citation_full: International Monetary Fund. World Economic Outlook (WEO), https://data.imf.org/en/datasets/IMF.RES:WEO.
+    attribution_short: IMF
+    version_producer: October 2026
+    url_main: https://data.imf.org/en/datasets/IMF.RES:WEO
+    date_accessed: '2026-10-20'
+    date_published: '2026-10-13'
+    license:
+      name: © IMF
+      url: https://www.imf.org/en/about/copyright-and-terms
+outs:
+  - md5: 732b964ebac7455a2c8cffaa9a7eba29
+    size: 2150716
+    path: world_economic_outlook.csv

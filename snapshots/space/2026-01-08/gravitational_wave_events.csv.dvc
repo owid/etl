@@ -5,7 +5,7 @@ meta:
     description: |-
       Gravitational wave event list, accessed via the Gravitational Wave Open Science Center (GWOSC).
     citation_full: |-
-      Gravitational Wave Open Science Center - Event List (2025).
+      Gravitational Wave Open Science Center – Event List (2025).
 
       - The LIGO Scientific Collaboration, the Virgo Collaboration, the KAGRA Collaboration, "Open Data from LIGO, Virgo, and KAGRA through the First Part of the Fourth Observing Run", [arXiv:2508.18079](https://arxiv.org/abs/2508.18079) -- [INSPIRE](https://inspirehep.net/literature/2963692)
       - R. Abbott et al. (LIGO Scientific Collaboration, Virgo Collaboration and KAGRA Collaboration), "Open data from the third observing run of LIGO, Virgo, KAGRA and GEO", [ApJS 267 29 (2023)](https://doi.org/10.3847/1538-4365/acdc9f) -- [INSPIRE](https://inspirehep.net/literature/2630216)

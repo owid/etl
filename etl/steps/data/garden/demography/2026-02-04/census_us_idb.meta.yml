@@ -37,7 +37,7 @@ tables:
       tfr:
         title: Total fertility rate
         description_short: |-
-          The average number of children a woman would have by age 49 if current age-specific fertility rates remained constant.
+          Average number of children a woman would have by age 49 if current age-specific fertility rates remained constant.
         description_key:
           - The TFR assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
@@ -58,7 +58,7 @@ tables:
 
       e0:
         title: Life expectancy at birth
-        description_short: The average number of years a newborn would live if current age-specific mortality rates remained constant throughout their lifetime.
+        description_short: Average number of years a newborn would live if current age-specific mortality rates remained constant throughout their lifetime.
         description_key:
           - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
           - For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
@@ -72,7 +72,7 @@ tables:
 
       nim:
         title: Net international migration
-        description_short: The net number of international migrants (immigrants minus emigrants) in a given year.
+        description_short: Net number of international migrants (immigrants minus emigrants) in a given year.
         description_key:
           - Net international migration is the difference between the number of people entering a country (immigrants) and the number of people leaving (emigrants) during the year.
           - Positive values indicate net immigration (more people entering than leaving), while negative values indicate net emigration.

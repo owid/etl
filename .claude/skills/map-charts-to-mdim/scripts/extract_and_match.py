@@ -131,7 +131,7 @@ def path_tail(catalog_path: str | None) -> str:
 
 CHART_SELECT = """
 SELECT DISTINCT c.id AS chart_id, cc.slug AS chart_slug, cc.chartType AS chart_type,
-       cc.full->>'$.title' AS title, c.publishedAt AS published_at, cc.fullMd5 AS config_md5
+       cc.config->>'$.title' AS title, c.publishedAt AS published_at, cc.configMd5 AS config_md5
 FROM charts c
 JOIN chart_configs cc ON cc.id = c.configId
 """
@@ -141,7 +141,7 @@ JOIN chart_configs cc ON cc.id = c.configId
 # put charts an editor has already retired into the migration CSV, and applying that CSV
 # would make their dead URLs resolve again. The live state is `isPublished` in the config,
 # the same test `preflight.py:unpublished_sources` uses.
-LIVE_PUBLISHED = "COALESCE(cc.full->>'$.isPublished', 'false') = 'true'"
+LIVE_PUBLISHED = "COALESCE(cc.config->>'$.isPublished', 'false') = 'true'"
 
 
 def resolve_charts(args) -> tuple[list[dict], dict]:
@@ -396,7 +396,7 @@ def attach_view_config_facts(views: list[dict], mdim_ids: list[int]) -> None:
     changes together with the view id, which is already tracked.
     """
     df = OWID_ENV.read_sql(
-        "SELECT mx.chartConfigId AS cc_id, cc.chartType AS chart_type, cc.fullMd5 AS config_md5 "
+        "SELECT mx.chartConfigId AS cc_id, cc.chartType AS chart_type, cc.configMd5 AS config_md5 "
         "FROM multi_dim_x_chart_configs mx JOIN chart_configs cc ON cc.id = mx.chartConfigId "
         "WHERE mx.multiDimId IN %(ids)s",
         params={"ids": tuple(mdim_ids)},
@@ -1256,34 +1256,32 @@ def write_unmatched_md(out: Path, charts: list[dict], id_to_path: dict[int, str]
             lines.append(f"    - {c['conflict']}")
         lines.append("")
 
-    # This whole report is unfinished work, so it says which kind each row is rather than
-    # leaving a reader to infer it: a pick someone can make now, versus a chart nobody has
-    # judged yet. Mirrors the closing block of audit_references.py's references.md.
+    # Every row here is unfinished work, so the report closes by separating a pick someone can
+    # make now from a chart nobody has judged yet, and states what "no match" does and doesn't
+    # mean — a reader can count the rows above, but cannot infer that caveat from them.
     by_quality = Counter(c["quality"] for c in charts)
     decidable = by_quality["ambiguous"] + len(conflicted)
     unjudged = by_quality["near_miss"] + by_quality["none"]
+    lines += ["## What's still open", ""]
+    if decidable:
+        lines += [
+            f"{decidable} chart(s) can be decided right now: {by_quality['ambiguous']} ambiguous row(s) need one "
+            f"candidate picked in overrides.csv, and {len(conflicted)} matched row(s) are blocked by an existing "
+            "redirect that has to be resolved or the chart skipped.",
+            "",
+        ]
+    if unjudged:
+        lines += [
+            f"{unjudged} chart(s) nobody has judged: {by_quality['near_miss']} near miss(es) and "
+            f"{by_quality['none']} with no match at all.",
+            "",
+        ]
+    if not decidable and not unjudged:
+        lines += ["Every chart either matched or was skipped deliberately.", ""]
     lines += [
-        "## What's still open",
-        "",
-        "**Handed off** — nothing. This report assigns no owners; every row above is still "
-        "waiting on whoever runs the migration.",
-        "",
-        (
-            f"**Proposed** — {decidable} chart(s) can be decided right now: {by_quality['ambiguous']} ambiguous "
-            f"row(s) need one candidate picked in overrides.csv, and {len(conflicted)} matched row(s) are blocked "
-            "by an existing redirect that has to be resolved or the chart skipped."
-            if decidable
-            else "**Proposed** — nothing. No chart is waiting on a pick or on an existing redirect being resolved."
-        ),
-        "",
-        (
-            f"**Unverified** — {unjudged} chart(s) nobody has judged: {by_quality['near_miss']} near miss(es) and "
-            f"{by_quality['none']} with no match at all. Matching is by indicator set, so 'no match' means no "
-            "published MDIM view carries the same indicators — not that no suitable replacement exists. "
-            f"{by_quality['skipped']} chart(s) were skipped deliberately via overrides.csv and are not in scope."
-            if unjudged
-            else "**Unverified** — nothing. Every chart either matched or was skipped deliberately."
-        ),
+        "Matching is by indicator set, so 'no match' means no published MDIM view carries the same indicators "
+        f"— not that no suitable replacement exists. {by_quality['skipped']} chart(s) were skipped deliberately "
+        "via overrides.csv and are not in scope.",
         "",
     ]
     (out / "unmatched.md").write_text("\n".join(lines))

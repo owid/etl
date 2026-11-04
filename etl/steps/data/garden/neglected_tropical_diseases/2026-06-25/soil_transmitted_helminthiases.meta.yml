@@ -30,8 +30,8 @@ tables:
         display:
           numDecimalPlaces: 0
       programme_coverage__pct:
-        title: Programme coverage of pre-school age children
-        description_short: "Programme coverage of pre-school age children for [preventive chemotherapy](#dod:preventive-chemotherapy) for soil-transmitted helminthiases."
+        title: Program coverage of pre-school age children
+        description_short: "Program coverage of pre-school age children for [preventive chemotherapy](#dod:preventive-chemotherapy) for soil-transmitted helminthiases."
         unit: "%"
         short_unit: "%"
         display:
@@ -74,8 +74,8 @@ tables:
         display:
           numDecimalPlaces: 0
       programme_coverage__pct:
-        title: Programme coverage of school-age children
-        description_short: "Programme coverage of school-age children for [preventive chemotherapy](#dod:preventive-chemotherapy) for soil-transmitted helminthiases."
+        title: Program coverage of school-age children
+        description_short: "Program coverage of school-age children for [preventive chemotherapy](#dod:preventive-chemotherapy) for soil-transmitted helminthiases."
         unit: "%"
         short_unit: "%"
         display:

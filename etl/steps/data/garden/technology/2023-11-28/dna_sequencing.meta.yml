@@ -17,13 +17,13 @@ tables:
         title: Cost of sequencing a full human genome
         unit: "current US$"
         short_unit: "$"
-        description_short: "The cost of sequencing the full genetic information of a human, measured in US$. This data is not adjusted for inflation."
+        description_short: "Cost of sequencing the full genetic information of a human, measured in US$. This data is not adjusted for inflation."
         display:
           numDecimalPlaces: 0
       cost_per_gb:
         title: Cost per billion pairs of DNA sequencing
         unit: "current US$"
         short_unit: "$"
-        description_short: "The cost of sequencing one billion base pairs of DNA, measured in US$. This data is not adjusted for inflation."
+        description_short: "Cost of sequencing one billion base pairs of DNA, measured in US$. This data is not adjusted for inflation."
         display:
           numDecimalPlaces: 2

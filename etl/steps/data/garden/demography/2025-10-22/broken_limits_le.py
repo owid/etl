@@ -49,7 +49,7 @@ def run() -> None:
 
     # Organise columns
     tb["country_with_max_le"] = tb["country"]
-    tb["country"] = tb["country"] + " " + tb["year"].astype("string")
+    tb["country"] = tb["country"] + " " + tb["year"].astype("str")
 
     # First year
     tb = tb[tb["year"] >= YEAR_FIRST]

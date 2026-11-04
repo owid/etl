@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical measless deaths in the United States - Public Health Reports
+    title: Historical measless deaths in the United States – Public Health Reports
     description: |-
       Data on historical measles deaths in the United States, compiled from a selection of sources.
 
@@ -36,15 +36,15 @@ meta:
 
       Public Health Reports Vol. 40, No. 51. The Notifiable Diseases: Prevalence during 1924 in States.
 
-      Public Health Reports, Vol. 42, No. 1 - The Notifiable Diseases: Prevalence during 1925 in States.
+      Public Health Reports, Vol. 42, No. 1 – The Notifiable Diseases: Prevalence during 1925 in States.
 
-      Public Health Reports, Vol. 53, No. 44 - Health Conditions in the United States as Indicated by Mortality Rates, 1929-38.
+      Public Health Reports, Vol. 53, No. 44 – Health Conditions in the United States as Indicated by Mortality Rates, 1929-38.
 
-      Public Health Reports, Vol. 55, No. 10 - Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
+      Public Health Reports, Vol. 55, No. 10 – Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
 
-      Public Health Reports, Vol. 56, No. 7 - Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
+      Public Health Reports, Vol. 56, No. 7 – Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
 
-      Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
+      Public Health Reports, Vol. 57, No. 7 – Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
 
     # Files
     url_main: https://www.jstor.org/stable/4584013

@@ -5,7 +5,7 @@ File lives in GD: https://docs.google.com/spreadsheets/d/1SY7K_hyMtJUhyXDtQQwXAH
 Example execution:
 
     etls owid/latest/ig_countries --path-to-file snapshots/owid/latest/countries.csv
-    etlr ig_countries --private
+    etlr ig_countries
 """
 
 from pathlib import Path

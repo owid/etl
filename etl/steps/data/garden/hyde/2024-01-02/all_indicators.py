@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     # columns_exclude = ["popd_c"]
     tb_with_regions = tb.merge(tb_regions, on="country", how="left").copy()
     ## Set region column as string
-    tb_with_regions["region"] = tb_with_regions["region"].astype("string")
+    tb_with_regions["region"] = tb_with_regions["region"].astype("str")
     ## Add missing mapping for Serbia and Montenegro
     tb_with_regions.loc[tb_with_regions["country"] == "Serbia and Montenegro", "region"] = "Europe"
     ## Remove World

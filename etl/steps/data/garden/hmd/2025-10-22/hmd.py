@@ -81,7 +81,10 @@ def run() -> None:
     # 7/ Death aggregates (absolute and rate)
     ## Aggregate deaths (only use single-year age groups, and not ranges, to avoid double-counting)
     tb_mort_all = tb_mort.loc[tb_mort["age"].str.contains("-")]
-    tb_mort_all = tb_mort_all.groupby(["country", "year", "sex"], as_index=False)["deaths"].sum()
+    # NOTE: skipna=False keeps a total missing when any age is missing (e.g. Belgium 1914–1918, which HMD doesn't
+    # publish), instead of summing the missing ages as zero.
+    tb_mort_all = tb_mort_all.groupby(["country", "year", "sex"], as_index=False)["deaths"].sum(skipna=False)
+    assert (tb_mort_all["deaths"].dropna() > 0).all(), "Some total deaths are zero or negative."
     ## Population table already provides total population
     tb_pop_all = tb_pop.loc[tb_pop["age"] == "total"]
     ## Merge & estimate rate
@@ -179,7 +182,9 @@ def standardize_sex_cat_names(tb, sex_expected):
 def add_total_population(tb_pop):
     flag = tb_pop["age"].str.match(r"^(\d{1,3}|\d{3}\+)$")
     tb_pop_total = tb_pop[flag]
-    tb_pop_total = tb_pop_total.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+    # Keep the total missing when any age is missing, instead of summing the missing ages as zero.
+    tb_pop_total = tb_pop_total.groupby(["country", "year", "sex"], as_index=False)["population"].sum(skipna=False)
+    assert (tb_pop_total["population"].dropna() > 0).all(), "Some total populations are zero or negative."
     tb_pop_total["age"] = "total"
     tb_pop = pr.concat([tb_pop, tb_pop_total], ignore_index=True)
     return tb_pop

@@ -3,8 +3,8 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Changes in food consumption in Iceland, 1770-1940
-    title_snapshot: Changes in food consumption in Iceland, 1770-1940 - Daily calories in Iceland
+    title: Changes in food consumption in Iceland, 1770–1940
+    title_snapshot: Changes in food consumption in Iceland, 1770–1940 – Daily calories in Iceland
     description: |-
       This dataset contains daily energy from Table 5 of Jonsson (1998) paper: "Changes in food consumption in Iceland, 1770-1940".
     date_published: "1998-01-01"

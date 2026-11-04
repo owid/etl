@@ -1,16 +1,22 @@
 steps:
-  ###########  UPDATED MONTHLY #############################################################################
+  ##########
+  # UPDATED MONTHLY
+  ##########
+
   # FrontierMath Benchmark (EPOCH)
-  data://grapher/artificial_intelligence/2026-01-30/frontiermath:
-    - data://garden/artificial_intelligence/2026-01-30/frontiermath:
-      - data://meadow/artificial_intelligence/2026-01-30/frontiermath:
+  data://grapher/artificial_intelligence/2026-09-07/frontiermath:
+    - data://garden/artificial_intelligence/2026-09-07/frontiermath:
+      - data://meadow/artificial_intelligence/2026-09-07/frontiermath:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
 
   # Stack Overflow Developer Survey – AI tool usage
-  data://grapher/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
-    - data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
-      - data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
-        - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
+  data://grapher/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+    - data://garden/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+      - data://meadow/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2023.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2024.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2025.csv
+        - snapshot://artificial_intelligence/2026-10-19/stackoverflow_developer_survey_2026.csv
 
   # Main EPOCH dataset
   data://meadow/artificial_intelligence/2025-03-12/epoch:
@@ -36,14 +42,14 @@ steps:
   data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive:
     - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
-
   # EPOCH dataset on Compute Intensive AI, aggregates by country
   data://grapher/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
     - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
       - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
-  ############### OTHERS #####################################################################################
-
+  ##########
+  # OTHERS
+  ##########
 
   # Dataset on AI performance across different benchmarks from Dynabench
   data://grapher/artificial_intelligence/2024-04-02/dynabench:
@@ -51,14 +57,12 @@ steps:
       - data://meadow/artificial_intelligence/2024-04-02/dynabench:
         - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx
 
-
   # Chess dataset (ELO ratings)
   data://grapher/artificial_intelligence/2024-02-05/chess:
     - data://garden/artificial_intelligence/2024-02-05/chess:
       - snapshot://artificial_intelligence/2024-02-05/chess.csv
-  #
+
   # AI polls
-  #
 
   # YouGov AI surveys
   data://grapher/artificial_intelligence/2026-03-23/yougov_robots:
@@ -70,14 +74,12 @@ steps:
       - data://meadow/artificial_intelligence/2026-03-23/yougov_job_automation:
         - snapshot://artificial_intelligence/2026-03-23/yougov_job_automation.xlsx
 
-
-
   # Datacenter construction spending (U.S. Census Bureau)
-  data://grapher/us_census_bureau/2026-07-20/datacenter_construction:
-    - data://garden/us_census_bureau/2026-07-20/datacenter_construction:
-      - data://garden/bls/2026-07-20/us_ppi_construction
-      - data://meadow/us_census_bureau/2026-07-20/datacenter_construction:
-        - snapshot://us_census_bureau/2026-07-20/datacenter_construction.xlsx
+  data://grapher/us_census_bureau/2026-10-02/datacenter_construction:
+    - data://garden/us_census_bureau/2026-10-02/datacenter_construction:
+      - data://garden/bls/2026-10-02/us_ppi_construction
+      - data://meadow/us_census_bureau/2026-10-02/datacenter_construction:
+        - snapshot://us_census_bureau/2026-10-02/datacenter_construction.xlsx
 
   # TSMC operating data
   data://grapher/tsmc/2025-11-10/operating_data:
@@ -106,16 +108,16 @@ steps:
           - snapshot://ifr/2026-01-14/robot_density.xlsx
 
   # Robotaxis dataset
-  data://grapher/artificial_intelligence/2026-07-15/robotaxis:
-    - data://garden/artificial_intelligence/2026-07-15/robotaxis:
-      - data://meadow/artificial_intelligence/2026-07-15/robotaxis:
-        - snapshot://artificial_intelligence/2026-07-15/robotaxis.csv
+  data://grapher/artificial_intelligence/2026-08-20/robotaxis:
+    - data://garden/artificial_intelligence/2026-08-20/robotaxis:
+      - data://meadow/artificial_intelligence/2026-08-20/robotaxis:
+        - snapshot://artificial_intelligence/2026-08-20/robotaxis.csv
 
   # NVIDIA quarterly revenue dataset
-  data://grapher/artificial_intelligence/2026-06-08/nvidia_revenue:
-    - data://garden/artificial_intelligence/2026-06-08/nvidia_revenue:
-      - data://meadow/artificial_intelligence/2026-06-08/nvidia_revenue:
-        - snapshot://artificial_intelligence/2026-06-08/nvidia_revenue.csv
+  data://grapher/artificial_intelligence/2026-09-02/nvidia_revenue:
+    - data://garden/artificial_intelligence/2026-09-02/nvidia_revenue:
+      - data://meadow/artificial_intelligence/2026-09-02/nvidia_revenue:
+        - snapshot://artificial_intelligence/2026-09-02/nvidia_revenue.csv
 
   # Microsoft AI Diffusion — Global AI adoption estimates
   data://grapher/artificial_intelligence/2026-06-12/ai_diffusion_msft:
@@ -130,13 +132,15 @@ steps:
         - snapshot://eurostat/2026-04-07/generative_ai_use.gz
 
   # Gallup - Artificial Intelligence indicator
-  data://grapher/gallup/2026-07-15/ai_indicator:
-    - data://garden/gallup/2026-07-15/ai_indicator:
-      - data://meadow/gallup/2026-07-15/ai_indicator:
-        - snapshot://gallup/2026-07-15/ai_indicator.csv
-  ########################
+  data://grapher/gallup/2026-10-20/ai_indicator:
+    - data://garden/gallup/2026-10-20/ai_indicator:
+      - data://meadow/gallup/2026-10-20/ai_indicator:
+        - snapshot://gallup/2026-10-20/ai_indicator.csv
+
+  ##########
   # AI Index Report 2026
-  ############################
+  ##########
+
   data://grapher/artificial_intelligence/2026-04-20/ai_index:
     - data://garden/artificial_intelligence/2026-04-20/ai_index_report:
       - data://meadow/artificial_intelligence/2026-04-20/ai_index_report:
@@ -146,9 +150,8 @@ steps:
         - snapshot://artificial_intelligence/2025-04-08/ai_adoption.csv
         - snapshot://artificial_intelligence/2024-06-28/ai_adoption_2023.csv
       - data://garden/bls/2026-03-20/us_consumer_prices
-  #
+
   # CSET datasets
-  #
   # CSET data on articles, patents and investment
   data://grapher/artificial_intelligence/2026-04-27/cset:
     - data://garden/artificial_intelligence/2026-04-27/cset:

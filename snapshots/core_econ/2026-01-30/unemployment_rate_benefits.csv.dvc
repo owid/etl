@@ -5,7 +5,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "CORE Econ - Unemployment rate and unemployment benefit replacement rates from OECD"
+    title: "CORE Econ – Unemployment rate and unemployment benefit replacement rates from OECD"
     description: |-
       Unemployment rate and unemployment benefit replacement rates processed by CORE Econ, from OECD data.
 

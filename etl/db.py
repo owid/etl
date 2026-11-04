@@ -72,9 +72,9 @@ def get_session(**kwargs) -> Session:
 
 
 @functools.cache
-def _get_engine_cached(cf: Any, pid: int) -> Engine:
+def _get_engine_cached(user: str, password: str, host: str, port: str, db_name: str, pid: int) -> Engine:
     return create_engine(
-        f"mysql+pymysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
+        f"mysql+pymysql://{user}:{quote(password)}@{host}:{port}/{db_name}",
         pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
         max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
     )
@@ -82,9 +82,11 @@ def _get_engine_cached(cf: Any, pid: int) -> Engine:
 
 def get_engine(conf: dict[str, Any] | None = None) -> Engine:
     cf: Any = dict_to_object(d=conf) if conf else config
+    # Memoize on the connection parameters, not on `cf`: `dict_to_object` returns a new object on every call, so
+    # keying on it created (and kept alive forever) a new Engine, with its own pool of open connections, per call.
     # pid in memoization makes sure every process gets its own Engine
     pid = os.getpid()
-    return _get_engine_cached(cf, pid)
+    return _get_engine_cached(cf.DB_USER, cf.DB_PASS, cf.DB_HOST, str(cf.DB_PORT), cf.DB_NAME, pid)
 
 
 def dict_to_object(d):
@@ -94,7 +96,18 @@ def dict_to_object(d):
 def read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
+
+    Text columns come back as object with None for NULL, as in pandas 2. pandas 3 reads them as `str` with
+    NaN, which is truthy, so `row.get("title") or ""` and `if row["title"]` would treat NULL as text.
     """
+    df = _read_sql(sql, engine, *args, **kwargs)
+    if isinstance(df, pd.DataFrame):
+        for col in df.columns[df.dtypes == "str"]:
+            df[col] = df[col].astype(object).where(df[col].notna(), None)
+    return df
+
+
+def _read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
@@ -141,12 +154,17 @@ def to_sql(df: pd.DataFrame, name: str, engine: Engine | Session | None = None, 
             _handle_connection_error(e)
 
 
-def production_or_master_engine() -> Engine:
-    """Return the production engine if available, otherwise connect to staging-site-master."""
+def production_or_master_env() -> config.OWIDEnv:
+    """Return the production environment if available, otherwise staging-site-master."""
     if config.OWID_ENV.env_remote == "production":
-        return config.OWID_ENV.get_engine()
+        return config.OWID_ENV
     elif config.ENV_FILE_PROD:
-        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD).get_engine()
+        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD)
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
-        return config.OWIDEnv.from_staging("master").get_engine()
+        return config.OWIDEnv.from_staging("master")
+
+
+def production_or_master_engine() -> Engine:
+    """Return the production engine if available, otherwise connect to staging-site-master."""
+    return production_or_master_env().get_engine()

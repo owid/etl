@@ -661,3 +661,13 @@ steps:
     - data://garden/emissions/2023-10-10/net_zero_tracker:
       - data://meadow/emissions/2023-10-10/net_zero_tracker:
         - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/emissions/latest/co2:
+    - data://grapher/gcp/2025-11-13/global_carbon_budget
+    - data://grapher/emissions/2025-12-04/national_contributions
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants

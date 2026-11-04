@@ -192,6 +192,40 @@ tables:
           { additional_info }
 ```
 
+### Recommended layout: text in definitions, structure in the indicator
+
+When a dataset has several indicators that share text, keep its prose in `definitions:` (`description_short`, each `description_key` paragraph, `description_processing`, and chart subtitles and notes), and let each indicator list the pieces it uses. Split `description_key` into paragraph-sized pieces named after what they say, so indicators that share a paragraph reference the same piece. This keeps the dataset's important text in one place you can read end to end. Titles and display names stay with the indicator.
+
+```yaml
+definitions:
+  description_key_normal_retirement_age_definition: |-
+    The normal retirement age is the earliest age at which a person can receive their full pension in all schemes.
+  description_key_normal_retirement_age_current_year: |-
+    The current normal retirement age applies to people retiring in 2024.
+  description_key_normal_retirement_age_future_year: |-
+    This indicator is for a person who enters the labor market at age 22 in 2024.
+
+tables:
+  retirement:
+    variables:
+      current_normal_retirement_age:
+        title: Current normal retirement age
+        description_key: |-
+          {definitions.description_key_normal_retirement_age_definition}
+
+          {definitions.description_key_normal_retirement_age_current_year}
+      future_normal_retirement_age:
+        title: Future normal retirement age
+        description_key: |-
+          {definitions.description_key_normal_retirement_age_definition}
+
+          {definitions.description_key_normal_retirement_age_future_year}
+```
+
+Here `description_key` is one Markdown string with a reference per paragraph, the current format. In a file that still writes `description_key` as a YAML list (rendered as bullets), use one `- "{definitions.…}"` entry per piece instead.
+
+A simple dataset, with a few indicators that share no text, can keep its text directly under each indicator. Large files that already write their text inline throughout don't need to be reorganized.
+
 ## Using Jinja Templates for Advanced Cases
 
 Even more complex metadata can be generated with [:octicons-link-external-16:  Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
@@ -287,6 +321,7 @@ The most straightforward way to check your metadata is in Admin, although that m
 
 ```python
 import etl.grapher.helpers as gh
+
 dim_dict = {"age_group": "YEARS0-4", "sex": "Male", "cause": "Drug use disorders"}
 d = gh.render_yaml_file("ghe.meta.yml", dim_dict=dim_dict)
 d["tables"]["ghe"]["variables"]["death_count"]
@@ -299,8 +334,8 @@ from owid.catalog import Dataset
 from etl import paths
 
 ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
-tb = ds['ceds_air_pollutants']
-tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
+tb = ds["ceds_air_pollutants"]
+tb.emissions.m.render({"pollutant": "CO", "sector": "Transport"})
 ```
 
 ### Jinja Macros
@@ -376,9 +411,7 @@ In some cases, you may need to programmatically modify metadata after creating a
 
 ```python
 # Create a new grapher dataset
-ds_grapher = create_dataset(
-    dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-)
+ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
 # Retrieve the table from the created dataset for metadata modification
 tb = ds_grapher["my_table"]

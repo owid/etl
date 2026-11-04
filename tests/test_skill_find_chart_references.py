@@ -229,3 +229,156 @@ def test_mdim_raw_url_branch_emits_a_reference(mod, monkeypatch):
     # the fragment is not a parameter and must not leak into the query string.
     assert ref["query_string"] == "tab=map"
     assert ref["where_path"] == "/an-article"
+
+
+def test_link_only_data_insight_gets_its_data_insights_path(mod, monkeypatch):
+    """A data insight reached through posts_gdocs_links must point at /data-insights/<slug>.
+
+    Only insights holding the chart in front matter went through the data-insight sweep, so one
+    that merely linked the chart came back with `/<slug>`, which 404s on the live site.
+    """
+
+    def fake_read_sql(sql, params=None):
+        return pd.DataFrame(
+            [
+                {
+                    "gdoc_id": "g1",
+                    "post_slug": "an-insight",
+                    "post_type": "data-insight",
+                    "published": 1,
+                    "target": "a-chart",
+                    "queryString": "",
+                    "componentType": "span-link",
+                    "text": "this chart",
+                },
+                {
+                    "gdoc_id": "g2",
+                    "post_slug": "an-article",
+                    "post_type": "article",
+                    "published": 1,
+                    "target": "a-chart",
+                    "queryString": "",
+                    "componentType": "chart",
+                    "text": "",
+                },
+            ]
+        )
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    refs = mod.sweep_gdoc_links({"a-chart": {"id": 1}})
+    paths = {r["where"]: r["where_path"] for r in refs}
+    assert paths == {"an-insight": "/data-insights/an-insight", "an-article": "/an-article"}
+
+
+def test_data_insight_placing_narrative_chart_in_front_matter_is_found(mod, monkeypatch):
+    """A data insight naming a narrative chart in its front matter writes no posts_gdocs_links
+    row, so the placement hop must read the front-matter key as well — once per placement.
+    """
+
+    def fake_read_sql(sql, params=None):
+        if "posts_gdocs_links" in sql:
+            return pd.DataFrame(
+                [
+                    {
+                        "target": "nc-a",
+                        "gdoc_id": "article-1",
+                        "post_slug": "an-article",
+                        "post_type": "article",
+                        "published": 1,
+                        "componentType": "narrative-chart",
+                        "text": "",
+                        "queryString": "",
+                    }
+                ]
+            )
+        return pd.DataFrame(
+            [
+                {"target": "nc-a", "gdoc_id": "di-1", "post_slug": "an-insight", "post_type": "data-insight", "published": 1, "queryString": ""},
+                # Also linked through the table: must not be reported twice.
+                {"target": "nc-a", "gdoc_id": "article-1", "post_slug": "an-article", "post_type": "article", "published": 1, "queryString": ""},
+            ]
+        )  # fmt: skip
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    findings = [mod.rec("chart", "a-chart", 1, "narrative chart", mod.LINK, "nc-a", surface_id=348)]
+    refs = mod.sweep_articles_placing_narrative_charts(findings)
+    paths = sorted((r["where"], r["where_path"]) for r in refs)
+    assert paths == [("an-article", "/an-article"), ("an-insight", "/data-insights/an-insight")]
+    assert all(r["surface"] == "gdoc (narrative chart)" and r["subject"] == "nc-a" for r in refs)
+
+
+def test_image_subject_reports_pages_fragments_and_their_data_pages(mod, monkeypatch):
+    """An image is found in the gdocs that place it. A fragment has no page of its own, so the data
+    pages showing its FAQ are listed instead, and a fragment that no FAQ uses says so.
+    """
+
+    def fake_read_sql(sql, params=None):
+        params = params or {}
+        if "posts_gdocs_x_images" in sql:
+            return pd.DataFrame(
+                [
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "topic", "post_slug": "human-height", "post_type": "linear-topic-page", "published": 1, "featured": None, "body": '[{"type": "image", "filename": "old.png"}]'},
+                    # Both the page's featured image and a body block: two placements, two edits.
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "art", "post_slug": "an-article", "post_type": "article", "published": 1, "featured": "old.png", "body": '[{"type": "image", "filename": "old.png"}]'},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "faqs", "post_slug": "gcp-faqs", "post_type": "fragment", "published": 1, "featured": None, "body": "[]"},
+                    {"image_id": 7, "filename": "old.png", "gdoc_id": "texts", "post_slug": "data-pages-texts", "post_type": "fragment", "published": 1, "featured": None, "body": '[{"type": "image", "filename": "old.png"}]'},
+                ]
+            )  # fmt: skip
+        if "posts_gdocs_links" in sql:
+            # A {.static-viz} block writes no image row, only a link to the static viz by name.
+            assert params["n"] == ("a-static-viz",)
+            return pd.DataFrame(
+                [
+                    {"name": "a-static-viz", "gdoc_id": "di", "post_slug": "a-data-insight", "post_type": "data-insight", "published": 1},
+                    {"name": "a-static-viz", "gdoc_id": "vizfaqs", "post_slug": "viz-faqs", "post_type": "fragment", "published": 1},
+                ]
+            )  # fmt: skip
+        if "static_viz" in sql:
+            return pd.DataFrame([{"id": 3, "name": "a-static-viz", "filename": "old.png"}])
+        if "parsedFaqs" in sql:
+            # "other" holds a file whose name merely contains the subject's: it must not match.
+            faqs = (
+                '{"stunting": {"content": [{"type": "image", "filename": "new.png", "smallFilename": "old.png"}]},'
+                ' "other": {"content": [{"type": "image", "filename": "world-old.png"}]}}'
+                if params["g"] == "faqs"
+                # A FAQ showing the static viz names the viz, never its image file.
+                else '{"measurement": {"content": [{"type": "static-viz", "name": "a-static-viz"}]}}'
+                if params["g"] == "vizfaqs"
+                else "{}"
+            )
+            return pd.DataFrame([{"faqs": faqs}])
+        if "posts_gdocs_variables_faqs" in sql:
+            # Live state: publishedAt survives an unpublish.
+            assert "isPublished" in sql and "publishedAt" not in sql
+            if params["fr"] == ("measurement",):
+                return pd.DataFrame([{"fragmentId": "measurement", "slug": "height-measured", "chart_id": 43}])
+            assert params["fr"] == ("stunting",)
+            return pd.DataFrame([{"fragmentId": "stunting", "slug": "share-stunted", "chart_id": 42}])
+        raise AssertionError(sql)
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    rows = mod.sweep_images(["old.png"])
+    hops = mod.sweep_fragment_data_pages(rows)
+    by_where = {r["where"]: r for r in rows + hops}
+    assert by_where["human-height"]["where_path"] == "/human-height"
+    assert by_where["gcp-faqs"]["surface"] == "gdoc fragment" and by_where["gcp-faqs"]["where_path"] == ""
+    assert "FAQ stunting" in by_where["gcp-faqs"]["context"]
+    assert "in no FAQ entry" in by_where["data-pages-texts"]["context"]
+    assert by_where["data-pages-texts"]["context"].endswith("(fragment)")
+    assert by_where["share-stunted"]["surface"] == "data page FAQ"
+    assert by_where["share-stunted"]["where_path"] == "/grapher/share-stunted"
+    assert by_where["a-static-viz"]["where_path"] == "/admin/static-viz/3/edit"
+    assert by_where["a-data-insight"]["where_path"] == "/data-insights/a-data-insight"
+    assert by_where["a-data-insight"]["context"] == "static-viz block a-static-viz (data-insight)"
+    assert "FAQ measurement" in by_where["viz-faqs"]["context"]
+    assert by_where["height-measured"]["surface"] == "data page FAQ"
+    article = sorted(r["context"] for r in rows if r["where"] == "an-article")
+    assert article == ["featured image (article)", "image block (article)"]
+
+
+def test_unresolved_image_filename_is_a_coverage_gap(mod, monkeypatch):
+    """A filename absent from the library must be reported as unswept, not as an unused image."""
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", lambda sql, params=None: pd.DataFrame({"filename": ["real.png"]}))
+    monkeypatch.setattr(mod, "COVERAGE_GAPS", [])
+    assert mod.resolve_image_filenames(["real.png", "typo.png"]) == ["real.png"]
+    assert len(mod.COVERAGE_GAPS) == 1 and "typo.png" in mod.COVERAGE_GAPS[0]

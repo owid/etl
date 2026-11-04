@@ -6,10 +6,8 @@ summary to the PR: only changed datasets with a few sample rows, everything deep
 the linked report.
 """
 
-import os
 import re
 import shlex
-import subprocess
 import tempfile
 import time
 from pathlib import Path
@@ -206,28 +204,19 @@ def _truncate_diff(diff: str) -> str:
     return diff[:cut] + "\n\n... diff too long, truncated — see the full report ..."
 
 
-def _tail_output(output: str, max_lines: int = 80) -> str:
-    """Return the last non-empty lines from command output for error messages."""
-    lines = output.strip().splitlines()
-    if len(lines) > max_lines:
-        lines = [f"... ({len(lines) - max_lines} lines omitted)", *lines[-max_lines:]]
-    return "\n".join(lines)
-
-
 def call_etl_diff(include: str, output_json: Path, output_html: Path) -> None:
-    cmd = [
-        "uv",
-        "run",
-        "etl",
-        "diff",
+    """Run `etl diff` in this process rather than as `uv run etl diff`: owidbot has already
+    imported most of what it needs, while a fresh `etl` process spends ~6 s on imports alone."""
+    from etl import datadiff
+
+    args = [
         "REMOTE",
-        "data/",
+        str(BASE_DIR / "data"),
         "--changed",
         "--include",
         include,
         "--exclude",
         EXCLUDE_DATASETS,
-        "--verbose",
         "--workers",
         "3",
         "--output-json",
@@ -235,33 +224,14 @@ def call_etl_diff(include: str, output_json: Path, output_html: Path) -> None:
         "--output-html",
         str(output_html),
     ]
+    log.info("Running etl diff", args=shlex.join(args))
 
-    cmd_str = shlex.join(cmd)
-    print(cmd_str)
-
-    env = os.environ.copy()
-    env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
-
-    result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, text=True)
-    stdout, stderr = result.communicate()
-
-    # Remove all warnings from stderr
-    stderr = re.sub(r"^.*WARNING.*", "", stderr, flags=re.MULTILINE).strip()
-
-    # `etl diff` exits 1 for any completed run with findings; when a dataset fails to compare,
-    # the summary line is "⚠ Found errors, create an issue please" *instead of* "Found
-    # differences". The JSON/HTML reports are fully written before it exits either way (error
-    # datasets are included with an ⚠ icon), so both outcomes must be posted, not raised.
-    if result.returncode == 1 and ("Found differences" in stdout or "Found errors" in stdout):
-        log.info("etl diff found differences or errors", returncode=result.returncode)
-    elif result.returncode != 0:
-        details = [f"etl diff failed (exit {result.returncode})", f"Command: {cmd_str}"]
-        if stderr:
-            details.append(f"stderr (tail):\n{_tail_output(stderr)}")
-        if stdout:
-            details.append(f"stdout (tail):\n{_tail_output(stdout)}")
-        if not stdout and not stderr:
-            details.append("No stdout or stderr was captured.")
-        raise RuntimeError("\n\n".join(details))
-    if stderr:
-        log.warning("etl diff produced stderr output", stderr=stderr)
+    # `etl diff` always ends with exit(): 0 when nothing differs, 1 for any completed run with
+    # differences or with datasets that failed to compare. The JSON/HTML reports are fully
+    # written before it exits either way, so both must be posted, not raised. A crash raises
+    # instead of exiting, and propagates.
+    try:
+        datadiff.cli.main(args, standalone_mode=False)
+    except SystemExit as e:
+        if e.code not in (None, 0, 1):
+            raise RuntimeError(f"etl diff failed (exit {e.code}): {shlex.join(args)}") from e

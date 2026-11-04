@@ -1,0 +1,83 @@
+grapher_schema: "011"
+chart_config_id: 019417b5-7b12-78a4-8902-8ac569123018
+slug: age-of-mothers-at-childbirth-by-year
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1900
+          display:
+            name: '1900'
+            color: '#1d111d'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1910
+          display:
+            name: '1910'
+            color: '#2d1d38'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1920
+          display:
+            name: '1920'
+            color: '#382a54'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1930
+          display:
+            name: '1930'
+            color: '#403872'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1940
+          display:
+            name: '1940'
+            color: '#40498e'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1950
+          display:
+            name: '1950'
+            color: '#395d9c'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1960
+          display:
+            name: '1960'
+            color: '#3671a0'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1970
+          display:
+            name: '1970'
+            color: '#3484a5'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1980
+          display:
+            name: '1980'
+            color: '#3497a9'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_1990
+          display:
+            name: '1990'
+            color: '#38aaac'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_2000
+          display:
+            name: '2000'
+            color: '#45bdad'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_2010
+          display:
+            name: '2010'
+            color: '#60ceac'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_2020
+          display:
+            name: '2020'
+            color: '#91dbb4'
+        - catalogPath: fertility_rate_by_age#asfr__year_as_dimension_2023
+          display:
+            name: '2023'
+            color: '#bbe7c8'
+    config:
+      title: Age distribution of mothers at childbirth by year
+      subtitle: 'Each line shows the [fertility rate by age](#dod:age-specific-fertility-rate) in a given year: how many children were born per woman, at each age.'
+      variantName: Age distribution
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      chartTypes:
+        - LineChart
+      hideAnnotationFieldsInTitle:
+        time: true
+      hideTimeline: true
+      selectedEntityNames:
+        - United States
+      xAxis:
+        label: Age of women
+      yAxis:
+        min: 0

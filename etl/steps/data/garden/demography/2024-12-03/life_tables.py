@@ -98,7 +98,7 @@ def run(dest_dir: str) -> None:
 
     # Set DTypes
     dtypes = {
-        "type": "string",
+        "type": "str",
     }
     tb = tb.astype(dtypes)
     tb_rel = tb_rel.astype(dtypes)

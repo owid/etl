@@ -10,7 +10,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "Public trust in US government - Pew Research Center"
+    title: "Public trust in US government – Pew Research Center"
     description: |-
       % who say they trust the government in Washington to do what is right just about always/most of the time. Data from Pew Research Center, National Election Studies, Gallup, ABC/Washington Post, CBS/New York Times, and CNN surveys.
     date_published: "2025-12-04"

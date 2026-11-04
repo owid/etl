@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Maternal and Neonatal Tetanus (MNT) Elimination"
+    description: |-
+      For each of the 59 countries originally classified as at risk of maternal and neonatal tetanus (MNT) in 1999, this tracks whether elimination of MNT has since been validated, and in which year.
+
+      The core of this compilation is WHO's Weekly Epidemiological Record report "Progress towards achieving and sustaining maternal and neonatal tetanus elimination – worldwide, 2000–2022", which gives per-country validation years through the end of 2022. Countries validated afterwards (reported 2023 onwards) are added from subsequent WHO/UNICEF announcements; each row's specific source is recorded alongside it.
+    date_published: "2024-07-19"
+
+    # Citation
+    producer: "World Health Organization"
+    citation_full: |-
+      World Health Organization. Progress towards achieving and sustaining maternal and neonatal tetanus elimination – worldwide, 2000–2022. Weekly Epidemiological Record. 2024;99(29):381–393.
+    attribution_short: "WHO"
+
+    # Files
+    url_main: https://iris.who.int/handle/10665/378241
+    date_accessed: 2026-10-05
+
+    # License
+    license:
+      name: "CC BY-NC-SA 3.0 IGO"
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: b6994b289615df6adef8c2b04e1b67c1
+    size: 356563
+    path: maternal_tetanus.pdf

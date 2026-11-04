@@ -1,0 +1,40 @@
+grapher_schema: "011"
+chart_config_id: 01935484-6f8e-7b0f-a04d-2a9379fde0e9
+slug: age-adjusted-total-fertility-rate-after-a-given-number-of-births
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#patfr__birth_order_total
+          display:
+            name: Age-adjusted total fertility rate (total)
+        - catalogPath: period#patfr__birth_order_1
+          display:
+            name: After first birth
+        - catalogPath: period#patfr__birth_order_2
+          display:
+            name: After second birth
+        - catalogPath: period#patfr__birth_order_3
+          display:
+            name: After third birth
+        - catalogPath: period#patfr__birth_order_4
+          display:
+            name: After fourth birth
+        - catalogPath: period#patfr__birth_order_5p
+          display:
+            name: After fifth birth or more
+    config:
+      title: Age-adjusted total fertility rate, after a given number of births
+      note: ''
+      originUrl: /fertility-rate
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - Spain
+      selectedFacetStrategy: metric
+      yAxis:
+        min: 0
+        facetDomain: independent

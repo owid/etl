@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Cancer over time - Cervical cancer
+    title: Cancer over time – Cervical cancer
     description: |-
       Cancer Over Time presents international trends in cancer-specific incidence and mortality rates. The incidence data are based on high-quality cancer incidence data, as recorded by one or more subnational or national population-based cancer registries that are included in the Cancer Incidence in Five Continents (CI5) CI5plus database. National cancer mortality data were extracted from the World Health Organization (WHO) Mortality Database.
 

@@ -1,8 +1,14 @@
 ---
 name: create-dataset
-description: Create a brand-new OWID dataset in ETL from a data file the user provides — a local CSV/Excel, a downloaded file, or a web link to data (snapshot → meadow → garden → grapher → PR → staging server). Use when someone has data they want in ETL so they can build charts. Designed for non-technical "Cloud co-work" users: infer aggressively, build a working dataset first, then ask the person to review and correct.
+description: >-
+  Create a brand-new OWID dataset in ETL from a data file the user provides — a local
+  CSV/Excel, a downloaded file, or a web link to data (snapshot → meadow → garden →
+  grapher → PR → staging server). Use when someone has data they want in ETL so they can
+  build charts. Designed for non-technical "Cloud co-work" users: infer aggressively,
+  build a working dataset first, then ask the person to review and correct.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Create a dataset
@@ -29,7 +35,7 @@ Required (one of):
 - A **web link** — a URL pointing at a data file (CSV/Excel/JSON) or a page that links to one.
 
 Optional:
-- `metadata_url` — a link to the source page / documentation (if different from a data link). If given, fetch it for metadata (producer, citation, license, definitions).
+- `metadata_url` — a link to the source page / documentation (if different from a data link).
 - Anything the user volunteers (units, column meanings, namespace, title…).
 
 ---
@@ -48,7 +54,7 @@ If they have uncommitted local changes or a detached HEAD that blocks this, surf
 
 ### Step 1 — Get the data into reach and inspect it (no questions yet)
 
-If the input is a **web link**, first obtain the actual data file: download a direct CSV/Excel/JSON URL (use `etl.http`'s session for OWID hosts; plain download otherwise), or if it's a landing page, WebFetch it to find the download link. Save it locally so the snapshot can ingest it. If the input is already a **local file**, use it directly.
+If the input is a **web link**, first obtain the actual data file: download a direct CSV/Excel/JSON URL (use `etl.http`'s session for OWID hosts; plain download otherwise), or if it's a landing page, WebFetch it to find the download link (if the page blocks WebFetch or needs JavaScript, offer to open it in the user's Chrome through the Claude in Chrome extension). Save it locally so the snapshot can ingest it. If the input is already a **local file**, use it directly.
 
 Then read the file and figure out its shape. Do **not** ask the user anything in this step.
 
@@ -70,6 +76,7 @@ Then read the file and figure out its shape. Do **not** ask the user anything in
    - `short_name` — snake_case of the core title (`electric_car_sales`).
    - `namespace` — the producer's slug if one already exists under `snapshots/` (check `ls snapshots/`), else a sensible new one.
    - `version` — today's date (`date -u +"%Y-%m-%d"`).
+8. **Look for the producer's latest documentation**: the dataset page, methodology, indicator definitions, codebook, main report and what's new, from the link, the file, or a web search, per `.claude/rules/producer-documentation.md`. It fills the metadata later on. Don't ask about it yet: anything missing, insufficient or inaccessible goes into Step 2's question.
 
 Write a one-paragraph internal summary of what you found before moving on.
 
@@ -78,7 +85,7 @@ Write a one-paragraph internal summary of what you found before moving on.
 Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Before listing the specifics, set expectations in one plain sentence so the end isn't a surprise — e.g. *"I'll build the dataset and put it on a staging server for you to review; once you're happy you merge the PR and it goes live."* Then keep the questions to the few things that genuinely can't be guessed or that would be expensive to get wrong:
 
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
-- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). If they give one, fetch it now for citation, license, and column definitions.
+- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). List the documentation you found in Step 1 as links, one line per source (dataset page, methodology, indicator definitions with where each indicator is explained, codebook, main report, what's new), saying when one wasn't found, and ask for anything missing, insufficient or inaccessible that the metadata depends on (a methodology to define the indicators, a codebook for unclear columns).
 - **License** — show your best guess (default `CC BY 4.0` for academic/IGO sources if unknown) and let them correct.
 - **Other data files the source ships** — when the landing page or repository carries several data files (a companion index, summary tables), list them with a default of "not ingesting these" so the user can opt in with one word. Persist the skips as the companion-files `# NOTE:` in the snapshot `.dvc` (Step 4 follows `/create-snapshot`'s convention) — that NOTE, not the PR body, is the baseline the update and review workflows diff against; mention them in the PR body as well for the reviewer.
 - **Any column meanings you couldn't infer** — only ask about the genuinely ambiguous ones (e.g. "is `ev_sales_share` a percentage 0–100 or a fraction 0–1?"). Don't ask about columns you're confident on.
@@ -104,26 +111,11 @@ This creates the branch + a draft PR and does **not** commit. (If the user is on
 This is a **manual-import** snapshot (you hand the snapshot a local file rather than relying on a stable download URL — even for web inputs, you've already saved the file locally in Step 1). Use the file's real extension in the `.dvc` name (`.csv`, `.xlsx`, …). Follow `/create-snapshot` conventions, with these specifics:
 
 - `snapshots/<namespace>/<version>/<short_name>.<ext>.dvc` — fill `origin` from Step 2 (title, producer, citation_full, attribution_short, date_published, url_main, license). `description` must describe the data product factually — use the producer's own text when it is factual (page prose or paper abstract), but rewrite promotional or first-person copy from OWID's point of view (see `/create-snapshot`) — and `citation_full` the producer's recommended citation verbatim when one exists (slight modifications only to fix typos or spacing in the source); for the license, check the documentation too and warn the user if none is stated anywhere (fall back to `© <producer> (<year>)`); if the file is one table/extract of a broader product, use `title_snapshot` + `description_snapshot` for the file specifics and any OWID-side notes (see `/create-snapshot`). Set `date_accessed: <version>`. Omit fields you don't have rather than leaving them blank; use `TBD` placeholders only where the review needs to flag them.
-- `snapshots/<namespace>/<version>/<short_name>.py` — modern manual-import script. **No `click` decorators and no `if __name__ == "__main__"` block** — `etls` wraps a plain `run(upload, path_to_file)` and supplies the CLI itself:
+- `snapshots/<namespace>/<version>/<short_name>.py` — the manual-import script.
 
-```python
-"""Script to create a snapshot of dataset.
+**Generate both files with the command in `/create-snapshot` step 3**, passing `dataset_manual_import: True` and `dvc_only: False`. It runs the wizard's snapshot cookiecutter, which emits the `path_to_file` variant of `run()` and — the part that is easy to get wrong by hand — nests `license` inside `origin` rather than at the top level. Don't hand-write either file, and don't copy a template into this skill: the cookiecutter is the single source of truth, and copies drift.
 
-The data file is provided manually. Run with:
-  etls <namespace>/<version>/<short_name> --path-to-file <path>
-"""
-
-from etl.helpers import PathFinder
-
-paths = PathFinder(__file__)
-
-
-def run(upload: bool = True, path_to_file: str | None = None) -> None:
-    snap = paths.init_snapshot()
-    snap.create_snapshot(filename=path_to_file, upload=upload)
-```
-
-Run it against the user's file:
+Then run it against the user's file:
 
 ```bash
 .venv/bin/etls <namespace>/<version>/<short_name> --path-to-file "<path_to_file>"
@@ -133,17 +125,25 @@ Run it against the user's file:
 
 Scaffold the three steps with `/create-etl-steps` (DAG file = the topic that best fits, e.g. `energy`, `health`; ask in Step 2 if unclear). Then adapt:
 
-- **Meadow** — load the snapshot, rename the entity column to `country` if needed, cast low-cardinality string columns (`country`, dims) to `category`, `tb.format(["country", "year"])` (or `["country", "date"]`, plus any dims). Keep it light.
-- **Garden** — `paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)`, then `tb.format(...)`. Add `sanity_check_inputs` / `sanity_check_outputs` if the step does more than load-and-format (see CLAUDE.md "Sanity checks"); ground every threshold in the built data and pick value bounds from the by-indicator-type table in `/update-dataset` §5b-bis, then negative-test the checks. Don't strip origins — follow the metadata-preserving patterns in CLAUDE.md (`pr.concat`, no `np.where`, etc.).
+- **Meadow** — load the snapshot, rename the entity column to `country` if needed, cast low-cardinality string columns (`country`, dims) to `category`, `tb.format(["country", "year"])` (or `["country", "date"]`, plus any dims). Keep it light. If you parse rows yourself (XML, HTML, a PDF, nested JSON), build the table with `snap.read_from_records(rows)`, which attaches the snapshot's metadata and origin to every column, never `Table(pd.DataFrame(...))` patched with `.copy_metadata(...)`.
+- **Garden** — `paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)`, then `tb.format(...)`. Add `sanity_check_inputs` / `sanity_check_outputs` if the step does more than load-and-format (see CLAUDE.md "Sanity checks"); ground every threshold in the built data and pick value bounds from the by-indicator-type table in `/update-dataset` §5b-bis, then negative-test the checks. Don't strip origins — follow the metadata-preserving patterns in CLAUDE.md (`pr.concat`, no `np.where`, etc.). Use `pr.*` over `pd.*` wherever it has an equivalent, also in sanity checks; a helper table built here (a mapping, a lookup) is `pr.read_from_records(rows, columns=[...])`, never `Table(pd.DataFrame(...))`. If the harmonizer excluded nothing, delete the empty `.excluded_countries.json`.
 - **Grapher** — pass the garden table through unchanged.
-- **Metadata** (`<short_name>.meta.yml` in garden) — generate it with `/owid-metadata-generation`, then verify it against the mandatory-fields checklist in `/update-dataset` §6c. Fill `title`, `unit`, `short_unit`, `description_short`, `description_key` (free-form markdown prose; non-empty), `display.name`, `display.numDecimalPlaces`, `display.tolerance` per indicator; `topic_tags` and `processing_level` in `definitions.common`; `presentation.attribution_short` explicitly under `definitions.common.presentation` — it does **not** inherit from the origin's `attribution_short`. In the `dataset` block, set `update_period_days` plus `owners`: the user is the new dataset's first owner — resolve their canonical OWID name from `git config user.name` via `etl.owners.resolve_owner` (must match the `schemas/dataset-schema.json` enum; add the mapping in `etl/owners.py` + an enum row if missing), mirroring `/update-dataset` step 1a-bis. Use the units you inferred in Step 1; mark anything uncertain so it shows up in the review.
-- **Outdated-practices check** — run `/check-outdated-practices` on every new step file (including any helper modules) and fix findings before the first run, per `/update-dataset` step 1b — run the skill, don't eyeball the patterns.
+- **Metadata** (`<short_name>.meta.yml` in garden) — generate it with `/generate-metadata`, then verify it against the mandatory-fields checklist in `/update-dataset` §6c. Fill `title`, `unit`, `short_unit`, `description_short`, `description_key` (free-form markdown prose; non-empty), `display.name` (a short legend label also needs `presentation.title_public`; see §6c), `display.numDecimalPlaces`, `display.tolerance` per indicator; `topic_tags` and `processing_level` in `definitions.common`; `presentation.attribution_short` explicitly under `definitions.common.presentation` — it does **not** inherit from the origin's `attribution_short`. In the `dataset` block, set `update_period_days` plus `owners`: the user is the new dataset's first owner — resolve their canonical OWID name from `git config user.name` via `etl.owners.resolve_owner` (must match the `schemas/dataset-schema.json` enum; add the mapping in `etl/owners.py` + an enum row if missing), mirroring `/update-dataset` step 1a-bis. Use the units you inferred in Step 1; mark anything uncertain so it shows up in the review.
+- **Label each step of `run()` with a short comment** (e.g. `# Add regional aggregates.`, with no `Step N:` numbering), plus the *why* where the code doesn't show it. Keep them to a line or two, not paragraphs (CLAUDE.md, "Comments in steps").
+- **Instructions for future updates go in `# NOTE:` comments** — anything the next maintainer must check or change when the data is refreshed (a version or base year to bump, a source quirk to re-check, an assumption that holds only for the current data). `/update-dataset` step 1c collects exactly the comments that start with `NOTE:` / `TODO:` (in the step files, `.meta.yml` and `.dvc`) and re-checks them against the new data; a plain comment is invisible to it. Put the tag on the first line of the comment, and keep descriptive comments (what a constant means) untagged, e.g.:
+
+  ```python
+  # Base year of the source's constant-price series.
+  # NOTE: The source changes it at every release, so bump it at each update.
+  BASE_YEAR = 2024
+  ```
+- **Outdated-practices check** — run `/check-outdated-practices` on every new step file (including any helper modules, and the Step 4 snapshot `.py` if one was written) and fix findings before the first run, per `/update-dataset` step 1b — run the skill, don't eyeball the patterns.
 - **DAG form** — write the new chain in the nested (compact) DAG form (grapher → garden → meadow → snapshot declared inline; example in `/update-dataset` "Removing the old version & reordering the DAG", step 4) and verify it parses: `.venv/bin/python -c "from etl.dag_helpers import load_dag; load_dag()"`.
 
 ### Step 6 — Run the chain and harmonize countries
 
 ```bash
-.venv/bin/etlr <namespace>/<version>/<short_name> --private
+.venv/bin/etlr <namespace>/<version>/<short_name>
 ```
 
 Fix whatever breaks (trace upstream, never mask). The most common task is **country harmonization**: the garden run logs unmatched country names that need mapping into `<short_name>.countries.json`.
@@ -157,7 +157,7 @@ from owid.catalog import Dataset
 import pandas as pd
 
 # Needs the regions dataset built locally:
-#   .venv/bin/etlr data://garden/regions/2023-01-01/regions --private
+#   .venv/bin/etlr data://garden/regions/2023-01-01/regions
 tb_regions = Dataset(str(sorted(Path("data/garden/regions").glob("*/regions"))[-1]))["regions"]
 canonical = set(tb_regions["name"].dropna().astype(str))
 alias_map = {}
@@ -173,27 +173,27 @@ for e in entities:
     else: unmatched.append(e)  # decide these by hand: typo, alias, custom aggregate, or exclude
 ```
 
-Resolve `unmatched` by hand against canonical regions; follow the harmonization-audit guidance in `/update-dataset` (Step 5c). Residual aggregates the producer defines (e.g. `Rest of World`, `European Union (27)`) can be kept as custom entities (map to themselves) — they won't join with population/region data, so note that in the review. Don't silently drop countries — if you exclude any, list them.
+Resolve `unmatched` by hand against canonical regions; follow the harmonization-audit guidance in `/update-dataset` (Step 5c). Residual aggregates the producer defines (e.g. `Rest of World`, `European Union (27)`) can be kept as custom entities — they won't join with population/region data, so note that in the review. Name them as the producer's other datasets already name the same aggregate, rather than inventing a name (an OECD-wide aggregate is `OECD countries`, but a second OECD-wide row with a different definition, such as an "average country" benchmark next to a group total, keeps its own name; see `/update-dataset` §5c). Don't silently drop countries — if you exclude any, list them.
 
 After the garden step builds, also run the **garden-output entity check** from `/update-dataset` §5c (Python check #5): load the built garden tables and confirm every `country` value is canonical (regions + latest income groups). It catches what the mapping file can't see — inline `tb["country"] = ...` assignments and post-harmonization mutations. List any non-canonical entity (including the custom aggregates you kept) in the Step 7 review and the PR body as living outside the canonical system.
 
 Then build and upload the grapher step to staging — target the `grapher/...` path (no `--only`, so the `grapher://` MySQL upsert step actually runs):
 
 ```bash
-STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher --private
+STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher
 ```
 
 Confirm the upsert actually succeeded before moving on: it should print the dataset's admin URL / id (`…/admin/datasets/<id>`). **Capture that `<id>`** — you'll hand it to the user in Step 7. If the upsert errored or printed no dataset, fix it now rather than handing over a link that won't resolve.
 
-### Step 6b — Adversarial fact-check of data and metadata (optional — offer it in the handoff)
+### Step 6b — Adversarial fact-check of data and metadata (mandatory — run it in the background)
 
-Optionally run [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) on `garden/<namespace>/<version>/<short_name>`. It's not part of the default build because it can consume many tokens (~12–20 web calls even for a small dataset) — mention it as an offer in the Step 7 handoff ("I can also fact-check the data and metadata against the source's documentation and independent sources — say the word") and run it when the user opts in, or proactively when the build surfaced red flags (values that look implausible, a source page contradicting the file).
+Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>` as a background agent once the garden step is built. Skip it only on the user's explicit request, and say so in the PR body. Scale the effort: the main indicators with a few value cross-checks each, more where the build raised red flags. The empty-entity audit doesn't apply yet (no charts).
 
-When it runs: since the dataset is brand-new (no charts yet, few indicators), review **all** indicators. This catches the two things the Step 7 review table can't: metadata you inferred that the source's own documentation contradicts (units, definitions, scope), and values the *source itself* got wrong (unit slips, wrong-year rows) — verified against independent sources online. Fold the findings into the handoff in plain language ("I double-checked the numbers against <independent source> — X and Y match; Z looks off, here's why"), and route confirmed source errors to `<short_name>.corrections.yml` per that skill's routing table rather than editing the data inline.
+Review all indicators when there are few. This catches the two things the Step 7 review table can't: metadata you inferred that the source's own documentation contradicts (units, definitions, scope), and values the *source itself* got wrong (unit slips, wrong-year rows) — verified against independent sources online. Fold the findings into the handoff in plain language ("I double-checked the numbers against <independent source> — X and Y match; Z looks off, here's why"), and route confirmed source errors to `<short_name>.corrections.yml` per that skill's routing table rather than editing the data inline.
 
 ### Step 7 — Commit, push, and hand off for review
 
-1. **Quality pass before handoff.** Run `/check-metadata-typos`, `/check-metadata-spacing`, and `/check-metadata-style` on the new garden + grapher `.meta.yml` files, and walk the general-audience clarity checklist — full procedure in `/update-dataset` §6b. Then run the link-verification loop from `/update-dataset` §6c on every URL in the new `.dvc` and `.meta.yml` files, including its anchor-fragment pass for URLs with `#…` (a curl non-2xx is a *signal*, not proof — escalate WebFetch → Wayback availability API, and per §6c no automated signal is decisive: a link failing every automated check goes to the user for a browser confirmation, never auto-marked broken or replaced). After any `.meta.yml` edit, re-run the affected step (`--grapher` for grapher) so the built catalog and staging reflect it.
+1. **Quality pass before handoff.** Run **all four checks** from `/update-dataset` §6b on the new garden + grapher `.meta.yml` files — `/check-metadata-typos`, `/check-metadata-style` (its first pass covers Jinja spacing), the general-audience clarity checklist, and the **dimension sweep**. Include the Step 4 `.dvc` in the `/check-metadata-typos` scope: its `description` / `title` / `citation_full` are user-facing too, and no other check spell-checks them (`/create-snapshot` step 5 makes the same pass for a standalone snapshot — keep the two consistent). Leave `citation_full` alone unless the producer's own page has the word right; it is verbatim producer text whenever a piece of user-facing text is shared across sibling variants — Jinja over a dimension (the long-format case Step 1 item 5 detects) *or* a `definitions:` key that several indicator blocks reuse, which a wide-format file with one column per subgroup produces without any extra-dimension column to detect. A sentence written for one variant renders on all its siblings, where what each view already restricts can make it false; render the text per variant and read each output as a reader of that chart. A brand-new dataset is exactly where such shared text gets written for the first time, so it needs the sweep as much as an update does. Then run the link-verification loop from `/update-dataset` §6c on every URL in the new `.dvc` and `.meta.yml` files, including its anchor-fragment pass for URLs with `#…` (a curl non-2xx is a *signal*, not proof — escalate WebFetch → Wayback availability API, and per §6c no automated signal is decisive: a link failing every automated check goes to the user for a browser confirmation, never auto-marked broken or replaced). After any `.meta.yml` edit, re-run the affected step (`--grapher` for grapher) so the built catalog and staging reflect it.
 2. Run `make check`, confirm you're still on the work branch (`git branch --show-current` — a branch switch in the user's IDE silently moves your shell too), then commit and push:
    ```bash
    git add .
@@ -203,8 +203,10 @@ When it runs: since the dataset is brand-new (no charts yet, few indicators), re
 3. Update the PR description (attribution blockquote per CLAUDE.md "Team"; what the dataset is, source, coverage, indicator count). Then post `@codex review` as a separate PR comment; while the user reviews, address any valid findings and resolve the threads per `/update-dataset` step 10 — don't block the handoff on the review round.
 4. **Hand the user a review** — this is the second and final checkpoint. Present a compact table they can scan and correct:
 
-   | Indicator (column) | Title | Unit | Decimals | Inferred? |
+   | Indicator (column) | Title | Unit | Decimals | Based on |
    |---|---|---|---|---|
+
+   In **Based on**, name the documentation each indicator's metadata comes from and where in it (e.g. "report, 'Definition and measurement' box, p. 164"), or say "inferred from the data" (`.claude/rules/producer-documentation.md`, "Say what the metadata rests on"). Add the same per-indicator sources to the PR description, so the reviewer sees them too.
 
    Plus a short list of:
    - **Things I guessed** (units, descriptions, license, topic tags) — "tell me if any are wrong."
@@ -253,7 +255,5 @@ The dataset and any charts they build live on the **staging server**, not on our
 ## Notes & gotchas
 
 - **Snapshot is raw passthrough.** Don't sum, dedupe, relabel, or convert period labels in the snapshot — that's garden's job (see CLAUDE.md "Snapshot is raw passthrough only").
-- **`Entity` → `country`.** OWID-exported files name the country column `Entity`; rename it in meadow.
 - **Shares: 0–1 vs 0–100.** The single most common unit mistake. If a "share"/"%" column tops out near 1, it's a fraction (multiply by 100 in garden, or set the unit to fraction); if it tops out near 100, it's already a percentage. When unsure, this is worth one of your Step 2 questions.
-- **Start on fresh `master` (Step 0).** Saves you from basing the branch/PR on a stale checkout — common with non-git-savvy users. `etl pr` and staging also need a real branch (not a detached HEAD).
 - **Keep the user oriented.** They're not ETL experts. When you report progress, say what you did in plain language and what they can do next (review the table, build charts on staging) — not a wall of pipeline jargon.

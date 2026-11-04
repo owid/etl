@@ -45,7 +45,7 @@ tables:
           title_public: Wealth share of the richest 10%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total wealth held by the richest 10% of tax units (a married couple counts as one unit).
+        description_short: Share of total wealth held by the richest 10% of tax units (a married couple counts as one unit).
         description_key: *desc_key_tax_units
         display:
           name: Top 10% (tax units)
@@ -58,7 +58,7 @@ tables:
           title_public: Wealth share of the richest 1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total wealth held by the richest 1% of tax units (a married couple counts as one unit).
+        description_short: Share of total wealth held by the richest 1% of tax units (a married couple counts as one unit).
         description_key: *desc_key_tax_units
         display:
           name: Top 1% (tax units)
@@ -71,7 +71,7 @@ tables:
           title_public: Wealth share of the richest 0.1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total wealth held by the richest 0.1% of tax units (a married couple counts as one unit).
+        description_short: Share of total wealth held by the richest 0.1% of tax units (a married couple counts as one unit).
         description_key: *desc_key_tax_units
         display:
           name: Top 0.1% (tax units)
@@ -84,7 +84,7 @@ tables:
           title_public: Wealth share of the richest 10%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total wealth held by the richest 10% of adults, with each household's wealth split equally between its adults.
+        description_short: Share of total wealth held by the richest 10% of adults, with each household's wealth split equally between its adults.
         description_key: *desc_key_equal_split
         display:
           name: Top 10% (equal-split adults)
@@ -97,7 +97,7 @@ tables:
           title_public: Wealth share of the richest 1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total wealth held by the richest 1% of adults, with each household's wealth split equally between its adults.
+        description_short: Share of total wealth held by the richest 1% of adults, with each household's wealth split equally between its adults.
         description_key: *desc_key_equal_split
         display:
           name: Top 1% (equal-split adults)
@@ -110,7 +110,7 @@ tables:
           title_public: Wealth share of the richest 0.1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total wealth held by the richest 0.1% of adults, with each household's wealth split equally between its adults.
+        description_short: Share of total wealth held by the richest 0.1% of adults, with each household's wealth split equally between its adults.
         description_key: *desc_key_equal_split
         display:
           name: Top 0.1% (equal-split adults)

@@ -31,7 +31,7 @@ tables:
           title_public: Wealth share of the richest 10%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 10% of adults.
+        description_short: Share of total personal wealth held by the wealthiest 10% of adults.
         display:
           name: Top 10%
           numDecimalPlaces: 1
@@ -43,7 +43,7 @@ tables:
           title_public: Wealth share of the richest 1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 1% of adults.
+        description_short: Share of total personal wealth held by the wealthiest 1% of adults.
         display:
           name: Top 1%
           numDecimalPlaces: 1
@@ -55,7 +55,7 @@ tables:
           title_public: Wealth share of the poorest 50%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the least wealthy 50% of adults.
+        description_short: Share of total personal wealth held by the least wealthy 50% of adults.
         display:
           name: Bottom 50%
           numDecimalPlaces: 1

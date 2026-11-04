@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Global EV Outlook - Electric vehicle charging points
+    title: Global EV Outlook – Electric vehicle charging points
     description: |-
       Number of publicly available electric vehicle charging points, broken down by fast and slow chargers, along with the share of fast chargers and the number of electric cars per public charging point.
 
@@ -13,7 +13,7 @@ meta:
     # Citation
     producer: International Energy Agency
     citation_full: |-
-      International Energy Agency - Global EV Outlook 2026.
+      International Energy Agency – Global EV Outlook 2026.
     attribution_short: IEA
 
     # Files

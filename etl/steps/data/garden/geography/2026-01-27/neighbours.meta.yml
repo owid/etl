@@ -40,7 +40,7 @@ tables:
       score_neighbour_border:
         title: Border share score
         unit: ""
-        description_short: The proportion of a country's total land border that is shared with another country.
+        description_short: Proportion of a country's total land border that is shared with another country.
         description_key:
           - Only non-zero for countries that share a land border.
           - Calculated as shared border length divided by total border length.
@@ -54,7 +54,7 @@ tables:
       score_neighbour_population:
         title: Neighbor population score
         unit: ""
-        description_short: The share of total neighboring population represented by each neighbor.
+        description_short: Share of total neighboring population represented by each neighbor.
         description_key:
           - Only non-zero for countries that share a land border.
           - Calculated as neighbor's population divided by total population of all neighbors.

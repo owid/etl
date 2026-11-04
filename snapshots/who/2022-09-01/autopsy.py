@@ -6,7 +6,6 @@ from pathlib import Path
 import click
 import pandas as pd
 import requests
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -31,10 +30,8 @@ def main(upload: bool) -> None:
     df = pd.read_csv(url, skiprows=25)
     # assert column names are as expected
     assert df.columns.to_list() == ["COUNTRY", "COUNTRY_GRP", "SEX", "YEAR", "VALUE"]
-    # Download data from source.
-    df_to_file(df, file_path=snap.path)
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Save data, add file to DVC and upload to S3.
+    snap.create_snapshot(data=df, upload=upload)
 
 
 if __name__ == "__main__":

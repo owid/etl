@@ -49,19 +49,19 @@ tables:
           shortUnit: gP-eq
           numDecimalPlaces: 0
       ionising_radiation:
-        title: Ionising radiation per unit of electricity
+        title: Ionizing radiation per unit of electricity
         unit: kilograms of U-235-equivalents per megawatt-hour
         short_unit: kg U-235eq/MWh
-        description_short: Ionising radiation impacts per unit of electricity produced, expressed in U-235 equivalents.
+        description_short: Ionizing radiation impacts per unit of electricity produced, expressed in U-235 equivalents.
         description_key:
           - *description-key-common
         display:
-          name: Ionising radiation
+          name: Ionizing radiation
           shortUnit: kg U-235eq
           numDecimalPlaces: 1
       water_use:
         title: Dissipated water use per unit of electricity
-        unit: cubic metres per megawatt-hour
+        unit: cubic meters per megawatt-hour
         short_unit: m³/MWh
         description_short: Dissipated water includes all uses that immediately deprive the local environment of using water. This therefore gives some indication of local scarcity of a water resource. For example, water immediately returned to the environment (in river, ocean, or groundwater) is not counted, while water used as an ingredient for a chemical product, or evaporated, is counted.
         description_key:
@@ -104,7 +104,7 @@ tables:
           numDecimalPlaces: 1
       land_use_energy:
         title: Land use per unit of electricity
-        unit: square metres per megawatt-hour
+        unit: square meters per megawatt-hour
         short_unit: m²/MWh
         description_short: Total land used per unit of electricity production, including direct land use (e.g. the area of a power plant or solar farm) and indirect land use from mining of fuels and materials.
         description_key: *description-key-land-use

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Common farmland bird index by EU Member State
+    description: |-
+      This data provides an overview of farmland bird populations of all EU member states. Up to reference year 2014, the unsmoothed national farmland bird indices were provided to Eurostat by the national BirdLife organisations based on an agreed national list of species (see the annexed "National lists of farmland bird species lists as of 2014"). Note that only one species, the skylark Alauda arvensis, is common to all the national lists of farmland birds.
+
+      Starting from reference year 2015, these indices are collected from the EU Member States by the OECD, whether or not they are members of OECD.
+    date_published: "2026-02-24"
+
+    # Citation
+    producer: BirdLife International
+    citation_full: |-
+      BirdLife International - Common farmland bird index by EU Member State, via Eurostat (2026), https://ec.europa.eu/eurostat/web/environment/information-data/protected-areas-birds (accessed on 29 July 2026)
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/web/environment/information-data/protected-areas-birds
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/env_bio2?format=TSV&compressed=true
+    date_accessed: '2026-07-29'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: 64aadc1dd200185f10cc1cab38e93d19
+    size: 2203
+    path: farmland_bird_index.gz

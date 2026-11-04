@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Eurobarometer
-    title: Life satisfaction - Eurobarometer
+    title: Life satisfaction – Eurobarometer
     description: |-
       The Eurobarometer provides estimates for dated surveys. In some years, there are some countries with multiple surveys. In those cases, we provide yearly averages.
     citation_full: Eurobarometer Interactive (2017).

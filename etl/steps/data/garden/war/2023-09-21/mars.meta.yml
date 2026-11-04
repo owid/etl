@@ -48,11 +48,11 @@ definitions:
     description_short: |-
       <% set per_capita = "" %>
       <%- if conflict_type == "all" %>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in all ongoing conventional wars that year
+      << estimate | capitalize >> estimate of the number of deaths<< per_capita >> in all ongoing conventional wars that year.
       <%- elif conflict_type == "others (non-civil)" %>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional interstate wars that year
+      << estimate | capitalize >> estimate of the number of deaths<< per_capita >> in ongoing conventional interstate wars that year.
       <%- elif conflict_type == "civil war" %>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year
+      << estimate | capitalize >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year.
       <%- endif %>
     description_short_per_capita: <% set per_capita = " per 100,000 people" %> {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
@@ -203,7 +203,7 @@ tables:
         title: Number of ongoing wars per state
         unit: wars per state
         description_short: |-
-          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          Number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
@@ -212,7 +212,7 @@ tables:
         title: Number of ongoing wars per state-pair
         unit: wars per state-pair
         description_short: |-
-          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          Number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5

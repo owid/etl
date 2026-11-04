@@ -49,12 +49,12 @@ In the following sections we try to give a brief overview of each of the section
 
 <figure markdown="span">
   ![Wizard](../assets/wizard.png)
-  <figcaption>Wizard as of November 2025.</figcaption>
+  <figcaption>Wizard as of September 2026.</figcaption>
 </figure>
 
 ### Create ETL steps
 
-Create new ETL steps from Wizard, including **Snapshot**, **Data** (Meadow, Garden, Grapher) and also **Collection** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
+Create new ETL steps from Wizard, including **Snapshot**, **Data** (Meadow, Garden, Grapher) and also **Chart** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
 
 
 In each step creation, a form is presented to the user so that they can fill in the necessary metadata fields. Based on the input, new files (e.g. python scripts, metadata YAML files, etc.) are created and modifications to existing ones (e.g. the DAG) are done.
@@ -75,45 +75,30 @@ After submitting each of the forms, a short guideline is shown so that the user 
 
     Data step creation
 
-- ![Collection step](../assets/step-collection.png){ width="100%" }
+- ![Chart step](../assets/step-chart.png){ width="100%" }
 
     ---
 
-    Collection step creation
+    Chart step creation
 
 </div>
 
-### Expert
+### Data tools
 
-GPT-based assistant to help resolve doubts. Doubts can include anything ETL-related (metadata structure, environment setup, etc.). This documentation is fed to the Expert, so it should be able to answer most of the questions concerning this documentation.
-
-Additionally, Expert can also help out create Datasette queries!
-
-<figure markdown="span">
-  ![Expert](../assets/expert.png)
-  <figcaption>Asking the Expert a data question.</figcaption>
-</figure>
-
-### Update tools
-
-Pages to help us improve our charts (e.g. keeping them up to date). The current pages are:
+Pages to keep our steps and charts up to date. The current pages are:
 
 - **Step upgrader**: Monitor datasets and update them quickly!
 - [**Indicator Upgrader**](data-work/update-charts/#indicator-upgrader){ data-preview }: Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
-- [**Chart diff**](data-work/update-charts/#using-chart-diff){ data-preview }: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production. Additionally, we provide MDIM and Explorer diff (experimental).
+- [**Harmonizer**](harmonize-countries/){ data-preview }: Harmonize the entity names of a table.
 
 !!! info "Learn more about [updating charts](data-work/update-charts.md) section"
 
-### Data tools
+### QA
 
+- [**Chart diff**](data-work/update-charts/#using-chart-diff){ data-preview }: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production. Additionally, we provide MDIM and Explorer diff (experimental).
 - **Anomalist**: Presents all anomalies detected in a given selected dataset. By default, it attempts to load anomalies from the newly added datasets (and, if applicable, it also compares the new indicators with the old counterparts).
-- [**Harmonizer**](harmonize-countries/){ data-preview }: Harmonize the entity names of a table.
 <!--
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it. -->
-
-### Assistant
-
-- **Chart animation**: Animate a chart over time and export it as a GIF.
 
 ### Search (experimental)
 
@@ -121,9 +106,12 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 - **Related charts**: Given a chart, find related charts based on semantic similarity.
 
 
-### Misc
+### Engineering/Analytics
 
 - **Servers dashboard**: Track the status of all our servers.
+- **Producer analytics**: Share chart analytics with data producers.
+- **Metabase**: OWID's analytics dashboards (external).
+
 <!--
 ### Metadata
 

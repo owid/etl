@@ -156,7 +156,7 @@ def _combine_data(country_all: Table, world_all: Table) -> Table:
     combined_data = pr.concat([country_all, world_all], ignore_index=True)
 
     # these should be replaced with FALSE values
-    combined_data["known_excess_deaths"].fillna(False, inplace=True)
+    combined_data["known_excess_deaths"] = combined_data["known_excess_deaths"].fillna(False)
 
     # if reported data exists (TRUE), collapse uncertainty interval to central estimate
     # if reported data does not exist (FALSE), keep uncertainty interval as is

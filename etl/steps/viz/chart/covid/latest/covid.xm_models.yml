@@ -1,0 +1,196 @@
+grapher_schema: "011"
+
+definitions:
+  common_indicators:
+    confirmed: &confirmed
+      catalogPath: "cases_deaths#total_deaths"
+      display:
+        name: "Confirmed deaths"
+        color: "#000000"
+  common_views:
+    - config:
+        title: "Estimated cumulative excess deaths during COVID-19"
+        subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          time: true
+title:
+  title: Estimated cumulative excess deaths during COVID-19
+  title_variant: "by model"
+default_selection:
+  - World
+topic_tags:
+  - COVID-19
+
+dimensions:
+  - slug: model
+    name: Model
+    choices:
+      - slug: all
+        name: All
+        description: Show estimates by the WHO and The Economist together
+      - slug: econ
+        name: The Economist
+        description: null
+      - slug: who
+        name: WHO
+        description: null
+  - slug: normalize
+    name: Normalization
+    choices:
+      - slug: total
+        name: Absolute number
+        description: null
+      - slug: per_100k
+        name: Per 100,000 people
+        description: Normalize by 100,000 people living in the country or region
+
+views:
+  # The Economist + WHO
+  - dimensions:
+      model: all
+      normalize: total
+    indicators:
+      y:
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
+          display:
+            name: "The Economist (central)"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
+          display:
+            name: "The Economist (high)"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+          display:
+            name: "The Economist (low)"
+            color: "#DAAE9E"
+        - catalogPath: "xm_who#cumul_excess_mean"
+          display:
+            name: "WHO (mean)"
+            color: "#4C6A9C"
+        - catalogPath: "xm_who#cumul_excess_high"
+          display:
+            name: "WHO (high)"
+            color: "#AABBDA"
+        - catalogPath: "xm_who#cumul_excess_low"
+          display:
+            name: "WHO (low)"
+            color: "#AABBDA"
+        - *confirmed
+
+  # The Economist
+  - dimensions:
+      model: econ
+      normalize: total
+    indicators:
+      y:
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
+          display:
+            name: "Central estimate"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
+          display:
+            name: "95% CI top"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+          display:
+            name: "95% CI bottom"
+            color: "#DAAE9E"
+        - *confirmed
+
+  # The Economist (100k)
+  - dimensions:
+      model: econ
+      normalize: per_100k
+    indicators:
+      y:
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k"
+          display:
+            name: "Central estimate"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k"
+          display:
+            name: "95% CI top"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k"
+          display:
+            name: "95% CI bottom"
+            color: "#DAAE9E"
+        - catalogPath: "cases_deaths#total_deaths_per_100k"
+          display:
+            name: "Confirmed deaths"
+            color: "#000000"
+
+  # WHO
+  - dimensions:
+      model: who
+      normalize: total
+    indicators:
+      y:
+        - catalogPath: "xm_who#cumul_excess_mean"
+          display:
+            name: "Mean estimate"
+            color: "#4C6A9C"
+        - catalogPath: "xm_who#cumul_excess_high"
+          display:
+            name: "High estimate"
+            color: "#AABBDA"
+        - catalogPath: "xm_who#cumul_excess_low"
+          display:
+            name: "Low estimate"
+            color: "#AABBDA"
+        - *confirmed
+
+  # # IHME
+  # - dimensions:
+  #     model: ihme
+  #   indicators:
+  #     y:
+  #       - "{definitions.table}#ihme_infections__estimate_mean"
+  #       - "{definitions.table}#ihme_infections__estimate_low"
+  #       - "{definitions.table}#ihme_infections__estimate_upper"
+  #       - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+  #   config:
+  #     title: "Daily new estimated COVID-19 infections from the IHME model"
+  #     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+  #     note: This chart shows the model estimates dated 16 December 2022.
+  #     originUrl: ourworldindata.org/covid-models
+  #     hideAnnotationFieldsInTitle:
+  #       time: true
+
+  # # LSHTM
+  # - dimensions:
+  #     model: lshtm
+  #   indicators:
+  #     y:
+  #       - "{definitions.table}#lshtm_infections__estimate_median"
+  #       - "{definitions.table}#lshtm_infections__estimate_low"
+  #       - "{definitions.table}#lshtm_infections__estimate_upper"
+  #       - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+  #   config:
+  #     title: "Daily new estimated COVID-19 infections from the LSHTM model"
+  #     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+  #     note: This chart shows the model estimates dated 25 August 2020.
+  #     originUrl: ourworldindata.org/covid-models
+  #     hideAnnotationFieldsInTitle:
+  #       time: true
+
+  # # YYG
+  # - dimensions:
+  #     model: yyg
+  #   indicators:
+  #     y:
+  #       - "{definitions.table}#yyg_infections__estimate_mean"
+  #       - "{definitions.table}#yyg_infections__estimate_low"
+  #       - "{definitions.table}#yyg_infections__estimate_upper"
+  #       - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+  #   config:
+  #     title: "Daily new estimated COVID-19 infections from the YYG model"
+  #     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+  #     note: This chart shows the model estimates dated 4 October 2020. YYG announced that this is the final model update.
+  #     originUrl: ourworldindata.org/covid-models
+  #     hideAnnotationFieldsInTitle:
+  #       time: true

@@ -66,7 +66,7 @@ tables:
       behavioral:
         title: Number of clinical trials with behavioral interventions
         description_short: |
-          Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments
+          Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments.
         unit: trials
         short_unit: ""
         description_key:

@@ -115,7 +115,7 @@ def get_code_to_country(tb_gw):
     assert codes == {260, 580}, "Unexpected duplicate country codes!"
 
     # Make country string
-    tb_gw["country"] = tb_gw["country"].astype("string")
+    tb_gw["country"] = tb_gw["country"].astype("str")
 
     # Fix: Although there were different namings in the past for countries with codes 260 and 580, we want these to have the modern name.
     tb_gw["country"] = tb_gw["country"].replace(

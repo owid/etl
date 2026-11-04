@@ -8,6 +8,10 @@ definitions:
 
 dataset:
   title: Most populous age groups (UN WPP)
+  # Pinned rather than inherited from un_wpp: inheriting its period would apply it to this step's
+  # own (earlier) version date and land on March 2027, before the next WPP revision even exists.
+  # 2024-03-14 + 1215 days -> 2027-07-12.
+  update_period_days: 1215
 
   owners:
     - Fiona Spooner

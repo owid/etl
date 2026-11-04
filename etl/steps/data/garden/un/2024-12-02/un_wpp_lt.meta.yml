@@ -31,7 +31,7 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - |-
             The death rate is measured using the number of person-years lived during the interval.
@@ -47,7 +47,7 @@ tables:
         title: Probability of death
         unit: "%"
         description_short: |-
-          The probability of dying in a given interval, among people who survived to the start of that interval.
+          Probability of dying in a given interval, among people who survived to the start of that interval.
         description_key:
           - |-
             For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
@@ -57,7 +57,7 @@ tables:
       probability_of_survival:
         title: Probability of survival
         unit: "%"
-        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
+        description_short: Probability that a person who survived until the start of a given interval will have died by the end of the interval.
         processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
@@ -82,7 +82,7 @@ tables:
       survivorship_ratio:
         title: Survivorship ratio
         unit: ""
-        description_short: Survival ratio (nSx) corresponding to proportion of the life table population in age group (x, x+n) who are alive n year later
+        description_short: Survival ratio (nSx) corresponding to proportion of the life table population in age group (x, x+n) who are alive n year later.
       number_person_years_remaining:
         title: Number of person-years remaining
         unit: person-years
@@ -93,9 +93,9 @@ tables:
         unit: years
         description_short: |-
           <%- if type == "period" -%>
-          The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+          Average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
           <%- elif type == "cohort" -%>
-          The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+          Average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
           <%- endif -%>
         description_key:
           - |-

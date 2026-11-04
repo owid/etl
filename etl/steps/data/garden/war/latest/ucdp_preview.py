@@ -53,9 +53,9 @@ LAST_YEAR = 2025
 LAST_YEAR_PREVIEW = 2026
 
 # Number of events with no location assigned (see function estimate_metrics_locations).
-# With stable GED 26.1 (data through 2025) + CED 2026-Q1, there are 1303 events without
-# an exact polygon coordinate match (up from 1255 with the previous stable release).
-NUM_MISSING_LOCATIONS = 1303
+# With stable GED 26.1 (data through 2025) + CED 2026-Q2, there are 1314 events without
+# an exact polygon coordinate match (up from 1303 with CED 2026-Q1).
+NUM_MISSING_LOCATIONS = 1314
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
 VERSION_UCDP_STABLE = "2026-06-10"
@@ -120,6 +120,8 @@ def run() -> None:
         short_name=paths.short_name,
         tolerance_unk_ctype=0.01,
     )
+    # Cumulative deaths since 1989 are only published with the stable release (table `ucdp_cumulative` in `ucdp`)
+    tables = [tb for tb in tables if tb.m.short_name != f"{paths.short_name}_cumulative"]
 
     #
     # Save outputs.

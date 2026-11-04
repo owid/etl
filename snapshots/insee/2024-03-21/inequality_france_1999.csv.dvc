@@ -8,7 +8,7 @@ meta:
       Public statistics in France about household income and wealth.
     date_published: "1999-09-01"
     version_producer: 1999 edition
-    title_snapshot: Household income and wealth - Gini coefficient
+    title_snapshot: Household income and wealth – Gini coefficient
     description_snapshot: |-
       Gini coefficient estimates for equivalized disposable household income in France between 1970 and 1996.
 

@@ -93,7 +93,7 @@ class IndicatorResult(BaseModel):
         indicator_id: Unique indicator ID.
         path: Path in the catalog (e.g., "grapher/un/2024-07-12/un_wpp/population#population").
         channel: Data channel (parsed from path).
-        namespace: Data provider namespace (parsed from path).
+        namespace: Data producer namespace (parsed from path).
         version: Version string (parsed from path).
         dataset: Dataset name (parsed from path).
         column_name: Column name in the table.

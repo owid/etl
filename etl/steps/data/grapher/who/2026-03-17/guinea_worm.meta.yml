@@ -100,7 +100,7 @@ tables:
         title: Certification status over time
         unit: ""
         description_short:
-          The current and historical values for the status of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) as certified by the WHO.
+          Current and historical values for the status of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) as certified by the WHO.
           To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
         description_from_producer: *desc_elimination_who
         description_processing: *certification_source

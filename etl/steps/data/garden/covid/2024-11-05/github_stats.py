@@ -125,8 +125,8 @@ def make_table_issues(tb_issues):
     ## Dtypes
     tb_issues = tb_issues.astype(
         {
-            "author_name": "string",
-            "author_login": "string",
+            "author_name": "str",
+            "author_login": "str",
             "date_created": "datetime64[ns]",
             "is_pr": "bool",
         }

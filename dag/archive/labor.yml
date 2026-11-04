@@ -46,3 +46,15 @@ steps:
   # archived; last active in f9999c6a2e61 on 2025-12-16
   export://multidim/worldbank_wdi/latest/wdi:
     - data://grapher/worldbank_wdi/2025-09-08/wdi
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/un/latest/child_labor:
+    - data://grapher/un/2026-04-08/child_labor_report
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/un/latest/hazardous_work:
+    - data://grapher/un/2026-04-08/child_labor_report
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/worldbank_wdi/latest/labor_force_participation_rate:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/worldbank_wdi/latest/ilostat_comparison:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi

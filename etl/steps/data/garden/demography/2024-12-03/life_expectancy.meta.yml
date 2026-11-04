@@ -38,15 +38,15 @@ definitions:
     description_short: |-
       <%- if age == 0 -%>
         <%- if sex == 'total' -%>
-        The period life expectancy at birth, in a given year.
+        Period life expectancy at birth, in a given year.
         <%- else -%>
-        The period life expectancy at birth among << sex + 's' >>, in a given year.
+        Period life expectancy at birth among << sex + 's' >>, in a given year.
         <%- endif -%>
       <%- else -%>
         <%- if sex == 'total' -%>
-        The total period life expectancy at age << age >>, in a given year.
+        Total period life expectancy at age << age >>, in a given year.
         <%- else -%>
-        The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
+        Total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
         <%- endif -%>
       <%- endif -%>
     description_key:
@@ -135,7 +135,7 @@ tables:
       source:
         title: Source of life expectancy at birth data
         description_short: |-
-          The source of the life expectancy at birth data.
+          Source of the life expectancy at birth data.
         description_key:
           - |-
             The source of the life expectancy at birth data used for each country and year.
@@ -149,7 +149,7 @@ tables:
       source_url:
         title: Source URL of life expectancy at birth data
         description_short: |-
-          The source URL of the life expectancy at birth data.
+          Source URL of the life expectancy at birth data.
         description_key:
           - |-
             The source URL of the life expectancy at birth data used for each country and year.

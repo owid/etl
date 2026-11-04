@@ -14,7 +14,6 @@ from etl import config
 from etl.config import OWID_ENV
 from etl.db import get_engine
 from etl.grapher import helpers as gh
-from etl.grapher import model as gm
 from etl.grapher import to_db as db
 from owid import catalog
 from sqlalchemy.orm import Session
@@ -94,10 +93,10 @@ def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
 
         [future.result() for future in as_completed(futures)]
 
-    with Session(engine) as session:
-        upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
+    upserted = set(catalog_paths)
+    ghost_variable_ids = [row["id"] for path, row in preloaded_checksums.items() if path not in upserted]
 
-    cleanup_ok = db.cleanup_ghost_variables(engine, dataset_upsert_result.dataset_id, upserted_variable_ids)
+    cleanup_ok = db.delete_ghost_variables(admin_api, ghost_variable_ids)
     db.set_dataset_checksum_and_editedAt(
         dataset_upsert_result.dataset_id, ds.checksum() if cleanup_ok else "to_be_rerun"
     )

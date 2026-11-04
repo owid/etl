@@ -117,7 +117,7 @@ tables:
       daily_vaccinations_smoothed:
         title: COVID-19 doses (daily, 7-day average)
         description_short: |-
-          New COVID-19 vaccination doses administered (7-day smoothed). For countries that don't report vaccination data on a daily basis, we assume that vaccination changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window
+          New COVID-19 vaccination doses administered (7-day smoothed). For countries that don't report vaccination data on a daily basis, we assume that vaccination changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window.
         unit: "people"
         display:
           numDecimalPlaces: 2
@@ -137,7 +137,7 @@ tables:
       # 7-day average, per-capita
       daily_vaccinations_smoothed_per_million:
         title: COVID-19 doses (daily, 7-day average, per million people)
-        description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population
+        description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population.
         unit: "doses per million people"
         description_processing: *per_capita
         display:
@@ -352,7 +352,7 @@ tables:
         presentation:
           grapher_config:
             title: Daily number of people receiving a first COVID-19 vaccine dose
-            subtitle: 7-day rolling average
+            subtitle: 7-day rolling average.
             hasMapTab: true
             map:
               colorScale:
@@ -373,7 +373,7 @@ tables:
         presentation:
           grapher_config:
             title: Daily share of the population receiving a first COVID-19 vaccine dose
-            subtitle: 7-day rolling average
+            subtitle: 7-day rolling average.
             hasMapTab: true
             map:
               colorScale:

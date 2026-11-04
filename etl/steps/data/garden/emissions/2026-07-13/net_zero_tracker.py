@@ -79,7 +79,7 @@ def run() -> None:
     tb["year"] = tb["year"].astype(int)
 
     # The source status is categorical, so cast to string to be able to label "no target" countries.
-    tb["net_zero_status"] = tb["net_zero_status"].astype("string")
+    tb["net_zero_status"] = tb["net_zero_status"].astype("str")
     tb.loc[no_target, "net_zero_status"] = NO_TARGET_LABEL
 
     tb = tb.drop(columns=["end_target"])

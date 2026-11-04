@@ -1,0 +1,45 @@
+grapher_schema: "011"
+chart_config_id: 019412ae-2abc-7f97-a8cf-d59076b3005b
+slug: period-average-age-of-mothers
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: mean_age_childbearing#mean_age_childbearing_hist
+    config:
+      title: Average age of mothers at childbirth
+      subtitle: Estimated average age of women who have given birth in each year. This includes all births that year, not just women's first childbirth.
+      originUrl: /fertility-rate
+      hasMapTab: true
+      map:
+        colorScale:
+          baseColorScheme: BuPu
+          binningStrategy: manual
+          customNumericColors:
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 100
+            - 26
+            - 27
+            - 28
+            - 29
+            - 30
+            - 31
+            - 32
+            - 33
+            - 1
+        columnSlug: mean_age_childbearing#mean_age_childbearing_hist
+      selectedEntityNames:
+        - United States
+        - Thailand
+        - France
+        - South Africa
+        - India
+        - China
+        - Brazil
+      tab: map

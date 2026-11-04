@@ -84,3 +84,6 @@ steps:
   # archived; last active in a9b8eb4f4d3b on 2026-06-11
   data://grapher/un/2024-01-17/urban_agglomerations_capitals:
     - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/urbanization/latest/cities_towns_rural_areas:
+    - data://grapher/urbanization/2025-12-10/ghsl_countries

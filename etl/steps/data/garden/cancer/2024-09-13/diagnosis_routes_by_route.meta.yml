@@ -7,7 +7,7 @@ definitions:
 
   diag_route: &diag_route |-
     <% if route == "Screening" %>
-    Screening is flagged by the cancer registry as detected via the breast, bowel, or cervical screening programmes.
+    Screening is flagged by the cancer registry as detected via the breast, bowel, or cervical screening programs.
     <% elif route == "USC" %>
     USC (Urgent Suspected Cancer) refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
     <% elif route == "GP referral" %>

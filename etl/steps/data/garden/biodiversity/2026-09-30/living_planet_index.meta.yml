@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: (1970 = 1)
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 2
+    presentation:
+      attribution_short: WWF & ZSL
+      topic_tags:
+        - Biodiversity
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 730
+
+
+  owners:
+    - Fiona Spooner
+    - Hannah Ritchie
+tables:
+  living_planet_index:
+    variables:
+      lpi_final:
+        title: Living Planet Index
+        description_short: The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population trends of vertebrate species from around the world. The index value is measured relative to species' populations in 1970 (i.e. 1970 = 1).
+      ci_low:
+        title: Lower confidence interval of Living Planet Index
+        description_short: Lower bound of the 95% confidence interval of the Living Planet Index, measured relative to species' populations in 1970 (i.e. 1970 = 1).
+      ci_high:
+        title: Upper confidence interval of Living Planet Index
+        description_short: Upper bound of the 95% confidence interval of the Living Planet Index, measured relative to species' populations in 1970 (i.e. 1970 = 1).

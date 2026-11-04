@@ -127,3 +127,6 @@ steps:
   # archived; last active in e80dbf7b9f13 on 2023-07-20
   data://garden/papers/2023-01-04/nemet_2009:
     - data://meadow/papers/2023-01-04/nemet_2009
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/plastic_waste/latest/plastic_emissions_oceans:
+    - data://grapher/papers/2026-01-27/meijer_2021

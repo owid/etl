@@ -16,7 +16,7 @@ meta:
       3) IPUMS-International;
       4) Labor Force Surveys (LFS) of the European Union, Eurostat.
 
-      Where a country time series was composed of multiple sources, we favoured the source covering the most years. In cases where there was a tie between sources, we favoured the DYB, then IPUMS, DHS, and lastly LFS estimates. The DYB covered the largest number of countries and the LFS the least.
+      Where a country time series was composed of multiple sources, we favored the source covering the most years. In cases where there was a tie between sources, we favored the DYB, then IPUMS, DHS, and lastly LFS estimates. The DYB covered the largest number of countries and the LFS the least.
 
       - Data from the [OECD](http://www.oecd.org/els/family/database.htm#structure) was used to supplement the dataset for 2011, for countries where data from other sources were unavailable.
       - The time series for Germany was supplemented using the [Deutschland in Daten](https://figshare.com/articles/German_Time_Series_Dataset_1834_2012/1450809/1) dataset where West Germany refers to the German Federal Republic series and East Germany to the German Democratic Republic.
@@ -25,7 +25,7 @@ meta:
       (*NB. The source for each observation can be found in the metadata spreadsheet [here](https://owid.cloud/app/uploads/2019/12/living-alone-metadata-final_country_stan.csv)*)
 
       Notes:
-      The UN data included two observations for Tanzania in 2004 and two for Senegal in 2013. We favoured the observation produced later in the year to avoid under- or over-estimating the share of one-person households. The figures produced later in the year are a more sensible fit for their respective country series.
+      The UN data included two observations for Tanzania in 2004 and two for Senegal in 2013. We favored the observation produced later in the year to avoid under- or over-estimating the share of one-person households. The figures produced later in the year are a more sensible fit for their respective country series.
 
       New Zealand in 1991 and 1996 uses the total number of households as the denominator. All other years use the total number of stated households. Stated households exclude cases where the household composition is unidentifiable and is used where possible.
 

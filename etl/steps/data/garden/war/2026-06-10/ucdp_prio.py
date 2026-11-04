@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from shared import add_indicators_extra
+from shared import add_indicators_extra, add_suffix_to_regions
 
 from etl.helpers import PathFinder
 
@@ -96,6 +96,9 @@ def run() -> None:
     )
 
     # tb_country = make_tb_country(tb_ucdp_countries, tb_prio_countries)
+
+    # Add suffix (UCDP) to region names, e.g. "Africa" -> "Africa (UCDP)". PRIO uses the same region definitions.
+    tb = add_suffix_to_regions(tb, "region")
 
     # Set index
     tb = tb.format(COLUMNS_INDEX)

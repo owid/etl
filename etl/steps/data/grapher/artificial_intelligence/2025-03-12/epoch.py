@@ -71,7 +71,9 @@ def find_max_label_and_concat(tb, column, label):
     - Preserves original data and model names.
     - Adds new summary rows with "model" set to f"Maximum {label}".
     """
-    tb = tb.sort_values(by=["year"])  # Ensure the DataFrame is sorted by year
+    # Stable sort: many models share a year, and an unstable sort breaks those ties differently per CPU,
+    # which changes which model counts as the record.
+    tb = tb.sort_values(by=["year"], kind="stable")
     max_value = -float("inf")
     rows_to_keep = []
 

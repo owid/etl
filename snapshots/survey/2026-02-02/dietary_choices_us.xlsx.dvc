@@ -10,7 +10,7 @@ meta:
       - Vegetarian: do not eat any meat, poultry, game, fish, or shellfish.
       - Plant-based / Vegan: do not eat dairy products, eggs, or any other animal product.
       - None of these.
-    citation_full: YouGov (2026) - Dietary choices of Americans (e.g. vegetarian, flexitarian, meat-eater etc)?
+    citation_full: YouGov (2026) – Dietary choices of Americans (e.g. vegetarian, flexitarian, meat-eater etc)?
     attribution_short: YouGov
     url_main: https://today.yougov.com/topics/consumer/trackers/dietary-choices-of-americans
     url_download: https://today.yougov.com/_pubapis/v5/us/trackers/dietary-choices-of-americans/download/

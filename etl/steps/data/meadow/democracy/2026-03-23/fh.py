@@ -115,7 +115,7 @@ def reshape_scores(tb_0305, tb_0624, tb_1325):
     tb = pr.concat([tb_0305, tb_0624, tb_1325], ignore_index=True)
 
     # Set dtypes
-    tb = tb.astype({"country": "string"})
+    tb = tb.astype({"country": "str"})
     return tb
 
 
@@ -152,11 +152,11 @@ def reshape_ratings_from_scores_file(tb: Table, min_year: int) -> Table:
     tb["country_flag"] = tb["country_flag"].replace({"c": 1, "t": 0})
 
     # Apply same dtype conversions as _set_dtypes_indicators_ratings
-    tb["civlibs"] = tb["civlibs"].astype("string").astype("Int64")
-    tb["polrights"] = tb["polrights"].astype("string").astype("Int64")
-    tb["regime"] = tb["regime"].astype("string").replace({"NF": "0", "PF": "1", "F": "2"}).astype("Int64")
+    tb["civlibs"] = tb["civlibs"].astype("str").astype("Int64")
+    tb["polrights"] = tb["polrights"].astype("str").astype("Int64")
+    tb["regime"] = tb["regime"].astype("str").replace({"NF": "0", "PF": "1", "F": "2"}).astype("Int64")
     tb["country_flag"] = tb["country_flag"].astype("Int64")
-    tb["country"] = tb["country"].astype("string")
+    tb["country"] = tb["country"].astype("str")
     tb["year"] = tb["year"].astype(int)
 
     assert set(tb["civlibs"].dropna()) == set(range(1, 8)), "Values for civlibs (from scores file) are not correct!"
@@ -261,11 +261,11 @@ def _reshape_rating(tb: Table) -> Table:
 
 
 def _set_dtypes_indicators_ratings(tb: Table) -> Table:
-    tb["civlibs"] = tb["civlibs"].astype("string").astype("Int64")
-    tb["polrights"] = tb["polrights"].astype("string").astype("Int64")
+    tb["civlibs"] = tb["civlibs"].astype("str").astype("Int64")
+    tb["polrights"] = tb["polrights"].astype("str").astype("Int64")
     tb["regime"] = (
         tb["regime"]
-        .astype("string")
+        .astype("str")
         .replace(
             {
                 "NF": "0",

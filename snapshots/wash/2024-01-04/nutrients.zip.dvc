@@ -11,12 +11,12 @@ meta:
     description: |-
       The WISE Statistics are aggregated data products for creation of the Freshwater indicators "Oxygen consuming substances in European rivers" and "Nutrients in Freshwater in Europe", which are published at the EEA website.
     date_published: 2023-07-14
-    title_snapshot: WISE statistics - Nutrients
+    title_snapshot: WISE statistics – Nutrients
 
     # Citation
     producer: European Environment Agency
     citation_full: |-
-      European Environment Agency (2023). WISE statistics - nutrients (1990-2021), 2023.
+      European Environment Agency (2023). WISE statistics – nutrients (1990-2021), 2023.
     attribution_short: EEA
     # Files
     url_main: https://sdi.eea.europa.eu/catalogue/srv/eng/catalog.search#/metadata/271f545b-cdc7-4b18-89fb-1adda5a3f4ef

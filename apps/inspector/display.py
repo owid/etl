@@ -5,7 +5,7 @@ from rich import print as rprint
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeRemainingColumn
 
-from apps.inspector.config import CLAUDE_MODEL, GROUPING_MODEL, MODEL_PRICING
+from apps.inspector.config import CLAUDE_MODEL, GROUPING_MODEL
 from apps.inspector.detectors import calculate_cost
 from apps.inspector.utils import estimate_tokens
 
@@ -252,10 +252,7 @@ def display_results(
             # Assume roughly 50/50 split between input and output tokens
             grouping_input = grouping_tokens // 2
             grouping_output = grouping_tokens - grouping_input
-            grouping_pricing = MODEL_PRICING.get(GROUPING_MODEL, MODEL_PRICING[CLAUDE_MODEL])
-            grouping_cost = (grouping_input / 1_000_000) * grouping_pricing["input"] + (
-                grouping_output / 1_000_000
-            ) * grouping_pricing["output"]
+            grouping_cost = calculate_cost(grouping_input, grouping_output, model=GROUPING_MODEL)
 
         total_cost = detection_cost + grouping_cost
 
@@ -301,32 +298,16 @@ def display_cost_estimate(
         # Calculate cost WITH prompt caching
         # Instructions are ~250 tokens and are cached after first request
         instruction_tokens = 250
-        if num_views > 0 and detection_model in MODEL_PRICING:
-            # Get pricing for the current model
-            pricing = MODEL_PRICING[detection_model]
-            input_price = pricing["input"]
-            output_price = pricing["output"]
-
-            # Calculate cache pricing (cache write = base + 25%, cache read = 10% of base)
-            cache_write_price = input_price * 1.25  # 25% premium over regular input
-            cache_read_price = input_price * 0.01  # 90% discount (10% of regular price)
-
-            # Calculate instruction token costs with caching
-            # First request: cache write
-            cache_write_cost = instruction_tokens * cache_write_price / 1_000_000
-
-            # Remaining requests: cache reads
-            cache_read_cost = instruction_tokens * (num_views - 1) * cache_read_price / 1_000_000
-
-            # Data tokens (non-instruction) still cost regular input price
+        if num_views > 0:
+            # First request writes the instructions to the cache, the remaining ones read them.
             # total_input_tokens includes instruction tokens, so subtract them to get data tokens
-            data_tokens = total_input_tokens - (instruction_tokens * num_views)
-            regular_input_cost = data_tokens * input_price / 1_000_000
-
-            # Output tokens always cost regular output price
-            output_cost = total_output_tokens * output_price / 1_000_000
-
-            estimated_cost_with_cache = cache_write_cost + cache_read_cost + regular_input_cost + output_cost
+            estimated_cost_with_cache = calculate_cost(
+                total_input_tokens - (instruction_tokens * num_views),
+                total_output_tokens,
+                cache_creation_tokens=instruction_tokens,
+                cache_read_tokens=instruction_tokens * (num_views - 1),
+                model=detection_model,
+            )
         else:
             estimated_cost_with_cache = estimated_cost_no_cache
 
@@ -394,21 +375,22 @@ def estimate_check_costs(
     views: list[dict[str, Any]],
     skip_typos: bool,
     skip_issues: bool,
-) -> tuple[int, int]:
+) -> tuple[int, int, int]:
     """Estimate token costs for checks without running them.
 
     Returns:
-        Tuple of (input_tokens, output_tokens)
+        Tuple of (input_tokens, output_tokens, views_to_check), where views_to_check counts only the
+        views with at least one field to send (the others make no API call).
     """
     from apps.inspector.db import parse_chart_config
 
     total_input_tokens = 0
     total_output_tokens = 0
+    views_to_check = 0
 
     if not skip_issues:
         rprint("[yellow]Estimating issue check costs (dry run)...[/yellow]")
         # Estimate costs by simulating what would be checked
-        views_to_check = 0
 
         for view in views:
             # Build field list (same logic as check_view_async)
@@ -457,4 +439,4 @@ def estimate_check_costs(
 
         rprint(f"[yellow]Would check {views_to_check}/{len(views)} views[/yellow]")
 
-    return total_input_tokens, total_output_tokens
+    return total_input_tokens, total_output_tokens, views_to_check

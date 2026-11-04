@@ -118,7 +118,9 @@ locally. There is no published image to run.
 !!! note
 
     Cloud sessions get the repository's `CLAUDE.md`, `.claude/` skills and
-    agents, and the `SessionStart` hook, but **not** your personal
+    agents, the `SessionStart` hook, and the plugins declared in
+    `.claude/settings.json` (installed at session start; currently the
+    `owid-staff` plugin from `owid/skills-private`), but **not** your personal
     `~/.claude/CLAUDE.md`. Anything a cloud session needs to know has to live
     in the repo — see [`.claude/docs/cloud-sandbox.md`](https://github.com/owid/etl/blob/master/.claude/docs/cloud-sandbox.md).
 

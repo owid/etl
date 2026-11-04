@@ -131,7 +131,7 @@ tables:
       # Land use for different crops (rainfed / irrigated)
       tot_rice_c:
         title: "Land use: Rice"
-        description_short: Total rice area for each country over time
+        description_short: Total rice area for each country over time.
         description_key:
           - "{definitions.land_use_allocation}"
         unit: "hectares"
@@ -140,7 +140,7 @@ tables:
         title: "Land use: Rainfed"
         description_key:
           - "{definitions.land_use_allocation}"
-        description_short: Total rainfed area for each country over time
+        description_short: Total rainfed area for each country over time.
         unit: "hectares"
         short_unit: "ha"
       rf_rice_c:

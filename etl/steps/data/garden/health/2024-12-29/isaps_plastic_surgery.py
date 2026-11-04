@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     tb = concat([tb, tb_all_0, tb_all_1, tb_all_2])
 
     columns = ["category_1", "category_2", "procedure_name"]
-    tb[columns] = tb[columns].astype("string").fillna("all")
+    tb[columns] = tb[columns].astype("str").fillna("all")
 
     # Add per-capita
     tb_pop = prepare_population(tb=tb_pop)

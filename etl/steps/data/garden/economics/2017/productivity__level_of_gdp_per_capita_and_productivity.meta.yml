@@ -24,7 +24,7 @@ tables:
         title: Subject:Gap in GDP per hour worked with respect to the USA - PDB_LV
         unit: Percentage
       subject__gap_in_labour_utilisation_with_respect_to_the_usa__pdb_lv:
-        title: Subject:Gap in labour utilisation with respect to the USA - PDB_LV
+        title: Subject:Gap in labor utilization with respect to the USA - PDB_LV
         unit: Percentage
       subject__gross_domestic_product__gdp__millions__pdb_lv:
         title: Subject:Gross Domestic Product (GDP); millions - PDB_LV
@@ -33,7 +33,7 @@ tables:
         title: Subject:Hours worked for total employment; millions - PDB_LV
         unit: Hours
       subject__labour_utilisation__hours_worked_per_head_of_population__pdb_lv:
-        title: Subject:Labour utilisation (hours worked per head of population) - PDB_LV
+        title: Subject:Labor utilization (hours worked per head of population) - PDB_LV
         unit: Percentage
       subject__total_employment__number_of_persons_employed__thousands__pdb_lv:
         title: Subject:Total employment (number of persons employed); thousands - PDB_LV

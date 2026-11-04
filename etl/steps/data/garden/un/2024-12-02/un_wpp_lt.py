@@ -65,7 +65,7 @@ def run(dest_dir: str) -> None:
     # DTypes
     tb = tb.astype(
         {
-            "age": "string",
+            "age": "str",
         }
     )
 

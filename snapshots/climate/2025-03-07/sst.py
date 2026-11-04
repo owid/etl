@@ -6,7 +6,6 @@ from pathlib import Path
 import click
 import pandas as pd
 import requests
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -83,8 +82,7 @@ def main(upload: bool) -> None:
 
         dfs.append(df)
     df = pd.merge(dfs[0], dfs[1], on=["year", "month"], how="outer")
-    df_to_file(df, file_path=snap.path)
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(data=df, upload=upload)
 
 
 if __name__ == "__main__":

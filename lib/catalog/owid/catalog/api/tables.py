@@ -44,6 +44,11 @@ if TYPE_CHECKING:
 # =============================================================================
 
 
+def _is_missing_scalar(value: object) -> bool:
+    """True for scalar missing values (None, NaN, NA); False for lists and arrays."""
+    return not isinstance(value, (list, tuple, np.ndarray)) and bool(pd.isna(value))
+
+
 def _download_private_file_s3(uri: str, tmpdir: str) -> str:
     """Download private files from S3 to temporary directory.
 
@@ -297,7 +302,7 @@ class TableResult(BaseModel):
         table: Table name.
         path: Full path to the table.
         channel: Data channel (garden, meadow, etc.).
-        namespace: Data provider namespace.
+        namespace: Data producer namespace.
         version: Version string.
         dataset: Dataset name.
         dimensions: List of dimension columns.
@@ -592,6 +597,8 @@ class TablesAPI:
 
         # Use to_dict("records") for better performance than iterrows
         for row in matches.to_dict("records"):
+            # Missing strings are NaN under the pandas str dtype; the result model expects None.
+            row = {k: None if _is_missing_scalar(v) else v for k, v in row.items()}
             # Handle dimensions - could be list or JSON string
             dimensions = row.get("dimensions", [])
             if isinstance(dimensions, str):

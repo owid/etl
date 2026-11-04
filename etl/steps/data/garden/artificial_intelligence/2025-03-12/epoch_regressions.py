@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from datetime import datetime
+from datetime import date
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -12,11 +12,11 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Constants for defining the time periods
-DL_ERA_START = 2010
-START_DATE = 1950
-_now = datetime.now()
-END_DATE = _now.year + (_now.month - 1) / 12 + (_now.day - 1) / 365
+# Constants for defining the time periods.
+REFERENCE_DATE = pd.Timestamp("1949-01-01")
+START_DATE = pd.Timestamp("1950-01-01")
+DL_ERA_START_DATE = pd.Timestamp("2010-01-01")
+END_DATE = pd.Timestamp(date.today())
 
 
 def run() -> None:
@@ -54,7 +54,7 @@ def run() -> None:
 def fit_exponential(models, metric):
     """Fit an exponential model to the given metric data. Code provided by Epoch AI team."""
     x = models["frac_year"].values.reshape(-1, 1)
-    y = pd.to_numeric(models[metric], errors="coerce")
+    y = pr.to_numeric(models[metric], errors="coerce").to_numpy(dtype=float, na_value=np.nan)
 
     # Filter out non-positive values
     positive_mask = y > 0
@@ -69,8 +69,12 @@ def fit_exponential(models, metric):
     x = x[finite_mask]
     y = y[finite_mask]
 
+    assert len(y) >= 2, f"At least two valid observations are required to fit {metric}."
+    assert len(np.unique(x)) >= 2, f"At least two distinct dates are required to fit {metric}."
+
     # Fit linear regression model
     reg = LinearRegression().fit(x, y)
+    assert np.isfinite(reg.intercept_) and np.isfinite(reg.coef_[0]), f"Non-finite regression fit for {metric}."
     return reg.intercept_, reg.coef_[0]
 
 
@@ -78,33 +82,30 @@ def run_regression(tb):
     """Run regression analysis on the given table and return the updated table."""
     # Add fractional year for sorting and processing
     publication_dates = tb["publication_date"]
-    tb.loc[:, "frac_year"] = (
-        publication_dates.dt.year + (publication_dates.dt.month - 1) / 12 + (publication_dates.dt.day - 1) / 365
-    )
+    tb.loc[:, "frac_year"] = to_fractional_year(publication_dates)
     tb = tb.sort_values(by="frac_year")
 
-    # Define periods dynamically
-    periods = {
-        f"{START_DATE}–{DL_ERA_START}": (tb["frac_year"] < DL_ERA_START),
-        f"{DL_ERA_START}–{int(END_DATE)}": ((tb["frac_year"] >= DL_ERA_START) & (tb["frac_year"] < END_DATE)),
-    }
-    # Define year grids dynamically
-    year_grids = {
-        f"{START_DATE}–{DL_ERA_START}": np.array([START_DATE, DL_ERA_START]),
-        f"{DL_ERA_START}–{int(END_DATE)}": np.array([DL_ERA_START, END_DATE]),
-    }
+    # Define the two eras using exact dates. The same dates are used both to
+    # calculate and to plot each fitted line, so its displayed slope matches its label.
+    periods = [
+        (START_DATE, DL_ERA_START_DATE, False),
+        (DL_ERA_START_DATE, END_DATE, True),
+    ]
 
     metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__total"]
-    new_tables = []
+    trend_rows = {}
 
     for metric in metrics:
-        # Filter out models without the metric information
-        tb_metric = tb[pd.notnull(tb[metric])]
-        dfs = []
+        for period_start, period_end, include_end in periods:
+            period_dates = pd.Series([period_start, period_end])
+            period_years = to_fractional_year(period_dates).to_numpy()
+            period_name = f"{period_start.year}–{period_end.year}"
+            condition = tb["frac_year"].between(
+                period_years[0], period_years[1], inclusive="both" if include_end else "left"
+            )
 
-        for period_name, condition in periods.items():
             # Subset data for the current period
-            period_data = tb_metric[condition]
+            period_data = tb[condition]
 
             # Fit exponential model
             fit = fit_exponential(period_data, metric)
@@ -114,31 +115,23 @@ def run_regression(tb):
             # Log the results
             paths.log.info(f"{period_name} ({metric}): {info}")
 
-            # Calculate the regression line for the current period
-            year_grid = year_grids[period_name]
-            line = 10 ** (fit[0] + year_grid * fit[1])
+            # Calculate and store the fitted values at those same boundary dates.
+            line = 10 ** (fit[0] + period_years * fit[1])
+            assert np.isfinite(line).all() and (line > 0).all(), f"Invalid regression predictions for {metric}."
 
-            # Create DataFrame for the current period
-            df = pd.DataFrame(
-                {
-                    "days_since_1949": [
-                        period_data["days_since_1949"].min(),
-                        period_data["days_since_1949"].max(),
-                    ],
-                    f"{metric}": [line[0], line[-1]],
-                    "model": [f"{info} between {period_name}"] * 2,
-                }
-            )
-            dfs.append(df)
+            days_since_1949 = (period_dates - REFERENCE_DATE).dt.days
+            model = f"{info} between {period_name}"
+            for day, value in zip(days_since_1949, line):
+                key = (int(day), model)
+                trend_rows.setdefault(key, {"days_since_1949": int(day), "model": model})[metric] = value
 
-        # Combine the DataFrames for all periods for the current metric
-        df_combined = pd.concat(dfs, ignore_index=True)
-        new_tables.append(df_combined)
-
-    # Merge all the new DataFrames
-    tb_new = new_tables[0]
-    for tb_m in new_tables[1:]:
-        tb_new = pd.merge(tb_new, tb_m, on=["model", "days_since_1949"], how="outer")
+    # Metrics can occasionally have the same rounded trend label. Coalesce their
+    # values onto the same two rows so the output index remains unique.
+    tb_new = pd.DataFrame(trend_rows.values())
+    assert not tb_new.duplicated(subset=["days_since_1949", "model"]).any(), "Duplicate regression points found."
+    assert (tb_new.groupby("model")["days_since_1949"].nunique() == 2).all(), (
+        "Each regression trend must have two endpoints."
+    )
 
     # Convert to OWID Table and add metadata
     tb_new = Table(tb_new, short_name=paths.short_name)
@@ -146,3 +139,8 @@ def run_regression(tb):
         tb_new[column].metadata.origins = tb["publication_date"].metadata.origins
 
     return tb_new
+
+
+def to_fractional_year(dates):
+    """Convert dates to the decimal-year convention used by the Epoch regressions."""
+    return dates.dt.year + (dates.dt.month - 1) / 12 + (dates.dt.day - 1) / 365
