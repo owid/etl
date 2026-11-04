@@ -51,9 +51,9 @@ definitions:
   description_short_area: |-
     <% if area == "Urban" %>
      This indicator is calculated for urban areas.
-    <% elif area == "Rural" %>
+    <%- elif area == "Rural" %>
      This indicator is calculated for rural areas.
-    <% elif area == "Camp" %>
+    <%- elif area == "Camp" %>
      This indicator is calculated for populations within refugee camps (available only for Palestine).
     <%- endif -%>
 
@@ -123,6 +123,21 @@ definitions:
   description_key_indicator: |-
     {definitions.description_key_indicator_start} {definitions.description_key_indicator_end}
 
+  # For grapher_config (chart subtitle and footnote, inherited by charts with one indicator)
+  subtitle_mpi: The MPI is a measure that combines the prevalence and the intensity of multidimensional poverty on a scale from 0 to 1. Higher values indicate higher poverty.
+  subtitle_intensity: The intensity is the share of weighted indicators in which people in multidimensional poverty are deprived on average.
+  subtitle_vulnerable: This is the share of the population that is close to the multidimensional poverty threshold.
+  subtitle_flavor: |-
+    <% if flavor == "Current margin estimate" %>
+     Estimates based on the most recent household survey data.
+    <%- endif -%>
+  note_flavor: |-
+    <% if flavor == "Current margin estimate" and area == "National" %>
+    A [separate dataset](<<hot_link>>) is produced to monitor trends over time.
+    <% elif flavor == "Harmonized over time" and area == "National" %>
+    This data aims to provide estimates that are comparable over time within individual countries. A [separate dataset](<<cme_link>>) provides more complete data of the latest estimates for international comparisons.
+    <%- endif -%>
+
   # For title_variant
   title_variant_area: |-
     <%- if area == "Urban" -%>
@@ -172,6 +187,10 @@ tables:
         presentation:
           title_public: Multidimensional Poverty Index (MPI)
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+          grapher_config:
+            title: Multidimensional Poverty Index (MPI)
+            subtitle: "{definitions.description_short_multidimensional_poverty} {definitions.subtitle_mpi}{definitions.description_short_area}{definitions.subtitle_flavor}"
+            note: <%- set cme_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi" -%><%- set hot_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi-hot" -%>{definitions.note_flavor}
         display:
           name: Multidimensional Poverty Index (MPI)
           numDecimalPlaces: 3
@@ -190,6 +209,10 @@ tables:
         presentation:
           title_public: Share of population living in multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+          grapher_config:
+            title: Share of population living in multidimensional poverty
+            subtitle: "{definitions.description_short_multidimensional_poverty}{definitions.description_short_area}{definitions.subtitle_flavor}"
+            note: <%- set cme_link = "https://ourworldindata.org/grapher/share-multi-poverty" -%><%- set hot_link = "https://ourworldindata.org/grapher/share-of-population-multidimensionally-poor-hot" -%>{definitions.note_flavor}
         display:
           name: Share of population living in multidimensional poverty
           numDecimalPlaces: 1
@@ -209,6 +232,10 @@ tables:
         presentation:
           title_public: Intensity of multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+          grapher_config:
+            title: Intensity of multidimensional poverty
+            subtitle: "{definitions.description_short_multidimensional_poverty} {definitions.subtitle_intensity}{definitions.description_short_area}{definitions.subtitle_flavor}"
+            note: <%- set cme_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty" -%><%- set hot_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-hot" -%>{definitions.note_flavor}
         display:
           name: Intensity of multidimensional poverty
           numDecimalPlaces: 1
@@ -227,6 +254,9 @@ tables:
         presentation:
           title_public: Share of population vulnerable to multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+          grapher_config:
+            title: Share of population vulnerable to multidimensional poverty
+            subtitle: "{definitions.description_short_multidimensional_poverty} {definitions.subtitle_vulnerable}{definitions.description_short_area}{definitions.subtitle_flavor}"
         display:
           name: Share of population vulnerable to multidimensional poverty
           numDecimalPlaces: 1
@@ -245,6 +275,9 @@ tables:
         presentation:
           title_public: Share of population living in severe multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
+          grapher_config:
+            title: Share of population living in severe multidimensional poverty
+            subtitle: "Severe multidimensional poverty is defined as being highly deprived in a range of health, education and living standards indicators.{definitions.description_short_area}{definitions.subtitle_flavor}"
         display:
           name: Share of population living in severe multidimensional poverty
           numDecimalPlaces: 1
