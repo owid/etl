@@ -19,7 +19,7 @@ views:
     config:
       title: "People migrating to and from the United Kingdom"
       subtitle: "Number of people moving to the United Kingdom each year (above zero) and leaving it (below zero)."
-      note: "There is no data for 1939 to 1946."
+      note: "Migration was not recorded between 1939 and 1946, during and just after the Second World War."
       originUrl: "/migration"
       tab: "chart"
       chartTypes:
