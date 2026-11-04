@@ -1,0 +1,443 @@
+<title>Total fertility rates: national statistics vs. UN estimates</title>
+<style>
+ /* Light only, on a warm off-white rather than pure white. Greys are named for the job they do, not
+    for how light they are: a gridline, a hairline rule, an axis and a data mark all need different
+    contrast, and one shared grey cannot serve them. --edge in particular has to stay visible against
+    the page, because the middle of the diverging map scale is nearly the same colour as the page. */
+ :root { --bg:#f7f6f2; --panel:#fffdf9; --fg:#1c1c19; --mut:#6a6862;
+         --line:#e3e0d8;      /* hairline rules: table borders, the sticky bar, the tooltip */
+         --grid:#ebe8e1;      /* chart gridlines, fainter than a rule */
+         --axis-c:#cdc9be;    /* axis lines, stronger than a gridline */
+         --mark:#d6d2c6;      /* the connector in the dumbbell charts — a data mark, not a rule */
+         --nodata:#e0ddd4;    /* map fill where there is no national figure */
+         --edge:#b6b1a4;      /* outlines that must read against the page: country borders, ticks */
+         --chip:#eae7df;      /* filled chip behind a badge */
+         --nso:#bf3c2c; --wpp:#2e6da4; }
+ body { background:var(--bg); color:var(--fg); margin:0; padding:34px 24px 76px;
+        font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+ .wrap { max-width:1200px; margin:0 auto; }
+ h1 { font-size:27px; margin:0 0 8px; letter-spacing:-.01em; }
+ h2 { font-size:19px; margin:0 0 2px; }
+ h3 { font-size:14.5px; font-weight:600; margin:20px 0 4px; }
+ .lede { color:var(--mut); margin:0 0 20px; max-width:76ch; }
+ .bar-top { position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 26px;
+            padding:12px 24px 10px; border-bottom:1px solid var(--line); }
+ .key { display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--mut);
+        margin:0 0 10px; }
+ .key i { display:inline-block; width:11px; height:11px; border-radius:50%; background:currentColor;
+          vertical-align:middle; margin-right:7px; }
+ .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
+ select { font:inherit; font-size:13px; color:var(--fg); background:var(--panel); border:1px solid var(--line);
+          border-radius:6px; padding:4px 8px; margin-left:auto; }
+ .head { display:flex; align-items:flex-start; gap:20px; margin:0 0 10px; }
+ .head h1 { margin:0; flex:1; }
+ .tabs { display:flex; gap:6px; align-items:center; margin:0; flex:none; }
+ button.tab { font:inherit; font-size:13px; color:var(--mut); background:none; cursor:pointer;
+              border:1px solid var(--line); border-radius:99px; padding:4px 14px; }
+ button.tab.on { color:var(--panel); background:var(--fg); border-color:var(--fg); }
+ [hidden] { display:none !important; }
+ .filters { margin:0; font-size:13px; color:var(--mut); display:flex; gap:10px; flex-wrap:wrap; }
+ .filters fieldset { border:1px solid var(--line); border-radius:8px; margin:0; padding:6px 12px 7px; }
+ .filters legend { font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:0 4px; }
+ .filters label { display:inline-flex; align-items:center; gap:6px; margin-right:16px; cursor:pointer;
+                  white-space:nowrap; }
+ .filters input { accent-color:var(--wpp); }
+ .swatch { display:inline-block; width:9px; height:9px; border-radius:2px; background:currentColor; }
+ section { margin:0 0 36px; }
+ section[hidden] { display:none; }
+ #overview.hide, #unplotted.hide { display:none; }
+ .src { color:var(--mut); font-size:13px; margin:0 0 6px; }
+ .detail { margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }
+ .na { color:var(--mut); font-size:13.5px; max-width:70ch; }
+ .note { color:var(--mut); font-size:12.5px; margin:10px 0 0; max-width:82ch; }
+ dl.docs { margin:16px 0 0; font-size:13px; max-width:96ch; }
+ dl.docs dt { color:var(--fg); font-weight:600; font-size:11px; text-transform:uppercase;
+              letter-spacing:.06em; margin:12px 0 2px; }
+ dl.docs dd { color:var(--mut); margin:0; }
+ dl.docs a { color:var(--wpp); }
+ .badge { display:inline-block; font-size:11px; font-weight:600; border-radius:99px; padding:2px 9px;
+          margin-left:8px; vertical-align:2px; }
+ .badge.rc { background:var(--chip); color:#575349; }
+ svg { width:100%; height:auto; display:block; overflow:visible; }
+ .grid { stroke:var(--grid); stroke-width:1; }
+ .axis { stroke:var(--axis-c); stroke-width:1.4; }
+ .ylab { fill:var(--mut); font-size:11px; text-anchor:end; }
+ .xlab { fill:var(--mut); font-size:11px; text-anchor:middle; }
+ .ln { fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+ .proj { stroke-dasharray:5 3; }
+ .blab { fill:var(--mut); font-size:11.5px; text-anchor:end; }
+ .bar { stroke:var(--mark); stroke-width:4; stroke-linecap:round; }
+ .pn { fill:var(--nso); }
+ .pw { fill:var(--wpp); }
+ .vn { fill:var(--nso); font-size:11.5px; font-weight:600; }
+ .vw { fill:var(--wpp); font-size:11.5px; font-weight:600; }
+ /* haloed in the page colour so a mark still reads where it lands on a gridline */
+ .tdot { r:4; stroke:var(--bg); stroke-width:1.5; }
+ /* a year with no neighbouring year is drawn as a dot — most countries report every few years */
+ .dot { stroke:var(--bg); stroke-width:1.4; }
+ table.list { border-collapse:collapse; font-size:13.5px; width:100%; }
+ table.list td { padding:6px 12px 6px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+ table.list td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; white-space:nowrap; }
+ table.ov { border-collapse:collapse; width:100%; font-size:13.5px; table-layout:auto; }
+ table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
+ /* name and metadata hug their text so the chart column takes whatever is left */
+ table.ov td.cn { width:1%; text-align:right; padding-right:12px; }
+ table.ov td.cn a { color:inherit; text-decoration:none; cursor:pointer; }
+ table.ov td.cn a:hover { text-decoration:underline; }
+ table.ov td.cc { width:99%; padding-right:10px; }
+ table.ov td.n, table.ov td.meta { width:1%; }
+ table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
+ table.ov td.meta { color:var(--mut); font-size:12.5px; }
+ table.ov tr.ticks td { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+                        padding-bottom:2px; }
+ svg.rowchart { display:block; width:100%; height:28px; }
+ tr.ticks svg.rowchart { height:14px; }
+ #mapwrap { position:relative; }
+ svg#map { width:100%; height:auto; overflow:visible; }
+ /* a real outline, not a gap in the page colour: the middle bins of the scale are near-white, and on an
+    off-white page a background-coloured stroke would let those countries dissolve into it */
+ svg#map path { stroke:var(--edge); stroke-width:0.5; vector-effect:non-scaling-stroke; }
+ svg#map path.nodata { fill:var(--nodata); }
+ svg#map path.has { cursor:pointer; }
+ svg#map path.has:hover { stroke:var(--fg); stroke-width:1.4; }
+ #tip { position:absolute; z-index:20; pointer-events:none; min-width:210px; max-width:290px;
+        background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:9px 11px;
+        box-shadow:0 2px 10px rgba(58,54,44,.10); font-size:12.5px; line-height:1.45; }
+ #tip .tc { font-weight:600; font-size:13.5px; margin-bottom:4px; }
+ #tip .tr { display:flex; justify-content:space-between; gap:14px; color:var(--mut); }
+ #tip .tr b { font-weight:600; font-variant-numeric:tabular-nums; }
+ #tip .tn { color:var(--nso); } #tip .tw { color:var(--wpp); }
+ #tip .tm { margin-top:5px; padding-top:5px; border-top:1px solid var(--line); color:var(--mut);
+            font-size:12px; }
+ #maplegend { display:flex; align-items:center; gap:9px; margin:10px 0 22px; font-size:12px;
+              color:var(--mut); }
+ #maplegend .bins { position:relative; flex:0 1 320px; height:10px; display:flex; }
+ /* the middle bin is near-white, so every chip carries a faint ring or that one looks like a gap */
+ #maplegend .bins i { flex:1 1 0; height:10px; box-shadow:inset 0 0 0 1px rgba(50,46,38,.10); }
+ #maplegend .bins i:first-child { border-radius:2px 0 0 2px; }
+ #maplegend .bins i:last-child { border-radius:0 2px 2px 0; }
+ #maplegend .tick { position:absolute; top:13px; transform:translateX(-50%); white-space:nowrap;
+                    font-size:11px; }
+ #maplegend .tick::before { content:''; position:absolute; left:50%; top:-4px; width:1px; height:3px;
+                            background:var(--edge); }
+</style>
+<div class="wrap">
+<div class="head">
+ <h1>Total fertility rates: national statistics vs. UN estimates</h1>
+ <div class="tabs">
+  <button class="tab on" data-tab="summary">Summary</button>
+  <button class="tab" data-tab="country">Country by country</button>
+ </div>
+</div>
+
+<div class="bar-top">
+ <div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
+ <div class="filters" id="filters">
+  <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
+  <fieldset><legend>Validation level</legend>
+   <label><input type="checkbox" class="rc" value="1" checked> Recalculated from births &amp; women</label>
+   <label><input type="checkbox" class="rc" value="0" checked> Rate copied from source</label>
+  </fieldset>
+ </div>
+</div>
+
+<div id="tab-summary">
+ <section id="overview">
+ <h2>Total fertility rate, latest national year</h2>
+ <p class="src">Each country's own figure against the UN WPP estimate or medium projection for the same year,
+ ordered by how far above the national figure the UN sits.</p>
+ <div id="ov"></div>
+ </section>
+
+ <section id="unplotted">
+ <h2>Countries with no national figure to plot</h2>
+ <p class="src">No official total fertility rate we could source, so only the UN estimate exists.</p>
+ <div id="unp"></div>
+ </section>
+
+ <section id="mapsec">
+ <h2>Where the two disagree</h2>
+ <p class="src">How far the UN estimate sits above or below the country's own figure, for its latest
+ year. Countries not investigated or with no national figure are in gray. Click a country to open its
+ page.</p>
+ <div id="mapwrap">
+  <svg id="map" viewBox="{{MAPBOX}}" role="img" aria-label="World map of the gap between national and UN figures"></svg>
+  <div id="tip" hidden></div>
+ </div>
+ <div id="maplegend"></div>
+ </section>
+</div>
+
+<div id="tab-country" hidden>
+{{SECTIONS}}
+</div>
+
+<script>
+const ROWS = {{ROWS}};
+const TIERS = {{TIERSJSON}};
+const UNPLOTTED = {{UNPLOTTED}};
+const SHAPES = {{SHAPES}};
+
+(function () {
+  const W = 940, LW = 186, R = 24, T = 16, B = 32, ROW = 30, PAD = 46;
+  const svgns = 'http://www.w3.org/2000/svg';
+
+  function el(name, attrs, text) {
+    const n = document.createElementNS(svgns, name);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  // fertility rates are small numbers — just round up to the next whole child per woman
+  function axisTop(top) {
+    return Math.max(1, Math.ceil(top));
+  }
+
+  // One table row per country: name, its own dumbbell on a shared scale, then the metadata.
+  // The chart column takes whatever width is left over, so the SVG is drawn only after the
+  // table is in the document and that width can be measured — a viewBox matching the real
+  // pixel width keeps the dots circular instead of stretching them into ellipses.
+  const CH = 28, LPAD = 40, RPAD = 38;
+
+  const ticks = (top) => Array.from({ length: top + 1 }, (_, i) => i);
+
+  function rowSvg(r, top, cw) {
+    const dx = (v) => LPAD + (v / top) * (cw - LPAD - RPAD);
+    const y = CH / 2;
+    const svg = el('svg', { viewBox: `0 0 ${cw} ${CH}`, class: 'rowchart' });
+    for (const v of ticks(top)) {
+      svg.appendChild(el('line', { class: 'grid', x1: dx(v), y1: 0, x2: dx(v), y2: CH }));
+    }
+    svg.appendChild(el('line', {
+      class: 'bar', x1: dx(Math.min(r.nso, r.wpp)), y1: y, x2: dx(Math.max(r.nso, r.wpp)), y2: y,
+    }));
+    svg.appendChild(el('circle', { class: 'pw', cx: dx(r.wpp), cy: y, r: 5 }));
+    svg.appendChild(el('circle', { class: 'pn', cx: dx(r.nso), cy: y, r: 5 }));
+    [[r.nso, 'vn'], [r.wpp, 'vw']].forEach(([v, cls]) => {
+      const low = v === Math.min(r.nso, r.wpp);
+      svg.appendChild(el('text', {
+        class: cls, x: dx(v) + (low ? -9 : 9), y: y + 4, 'text-anchor': low ? 'end' : 'start',
+      }, v.toFixed(2)));
+    });
+    return svg;
+  }
+
+  function draw(rows) {
+    const host = document.getElementById('ov');
+    host.textContent = '';
+    if (!rows.length) {
+      host.innerHTML = '<p class="na">No countries match these filters.</p>';
+      return;
+    }
+    const top = axisTop(Math.max(...rows.flatMap((r) => [r.nso, r.wpp])));
+    const table = document.createElement('table');
+    table.className = 'ov';
+
+    const head = document.createElement('tr');
+    head.className = 'ticks';
+    head.innerHTML =
+      '<td></td><td class="cc"></td>' +
+      '<td>Built from</td><td>Validation level</td><td>Year</td>';
+    table.appendChild(head);
+
+    rows.forEach((r) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        `<td class="cn"><a data-go="${r.country}">${r.short}</a></td><td class="cc"></td>` +
+        `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
+        `<td class="meta">${r.recalc ? 'Recalculated' : 'Copied from source'}</td>` +
+        `<td class="n">${r.year}</td>`;
+      table.appendChild(tr);
+    });
+    host.appendChild(table);
+
+    // now the column has a real width, so draw to it
+    const cells = table.querySelectorAll('td.cc');
+    const cw = Math.max(240, Math.round(cells[1].getBoundingClientRect().width));
+    const axis = el('svg', { viewBox: `0 0 ${cw} 14`, class: 'rowchart' });
+    for (const v of ticks(top)) {
+      axis.appendChild(el('text', {
+        class: 'xlab', x: LPAD + (v / top) * (cw - LPAD - RPAD), y: 11,
+      }, String(v)));
+    }
+    cells[0].appendChild(axis);
+    rows.forEach((r, i) => cells[i + 1].appendChild(rowSvg(r, top, cw)));
+  }
+
+  // ---------------------------------------------------------------- world map
+  // ColorBrewer RdBu, nine classes. Blue is where the UN sits below the country's own figure,
+  // red where it sits above. The bins are fixed at two tenths of a child rather than stretched to
+  // fit the data, so a shade means the same thing however the reader filters, and the two outer
+  // bins are open ended.
+  const BREAKS = [-0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7];
+  const FILLS = ['#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#f7f7f7',
+                 '#fddbc7', '#f4a582', '#d6604d', '#b2182b'];
+
+  const gapOf = (r) => r.wpp - r.nso;
+
+  // nine bins, each two tenths wide and running [lower, upper), with the middle one straddling
+  // zero from -0.1 to +0.1 and the outer two open ended beyond seven tenths
+  function fillOf(gap) {
+    let i = 0;
+    while (i < BREAKS.length && gap >= BREAKS[i]) i++;
+    return FILLS[i];
+  }
+
+  function drawMap(rows) {
+    const svg = document.getElementById('map');
+    const byIso = {};
+    rows.forEach((r) => { if (r.iso) byIso[r.iso] = r; });
+
+    svg.textContent = '';
+    for (const iso in SHAPES) {
+      const r = byIso[iso];
+      const p = el('path', { d: SHAPES[iso] });
+      if (r) {
+        p.setAttribute('class', 'has');
+        p.setAttribute('fill', fillOf(gapOf(r)));
+        p.dataset.iso = iso;
+      } else {
+        p.setAttribute('class', 'nodata');
+      }
+      svg.appendChild(p);
+    }
+  }
+
+  // the legend is fixed, so it is drawn once. The eleven swatches are the ten bins with the
+  // exact-agreement colour inserted in the middle; ticks mark every other boundary.
+  function drawLegend() {
+    const ticks = [[1, '−0.7'], [3, '−0.3'], [4.5, '±0.1'], [6, '+0.3'], [8, '+0.7']];
+    document.getElementById('maplegend').innerHTML =
+      '<span>UN below</span>' +
+      `<span class="bins">${FILLS.map((c) => `<i style="background:${c}"></i>`).join('')}` +
+      ticks.map(([at, label]) =>
+        `<span class="tick" style="left:${(at / FILLS.length * 100).toFixed(2)}%">${label}</span>`
+      ).join('') +
+      '</span><span>UN above</span>';
+  }
+
+  // the tooltip carries the same facts as the overview table
+  const tip = document.getElementById('tip');
+
+  function showTip(r, ev) {
+    const wrap = document.getElementById('mapwrap');
+    const box = wrap.getBoundingClientRect();
+    const gap = gapOf(r);
+    tip.innerHTML =
+      `<div class="tc">${r.short}</div>` +
+      `<div class="tr"><span class="tn">National</span><b class="tn">${r.nso.toFixed(2)}</b></div>` +
+      `<div class="tr"><span class="tw">UN WPP</span><b class="tw">${r.wpp.toFixed(2)}</b></div>` +
+      `<div class="tr"><span>Difference</span><b>${gap >= 0 ? '+' : ''}${gap.toFixed(2)}</b></div>` +
+      `<div class="tm"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ` +
+      `${TIERS[r.tier][0]}<br>${r.recalc ? 'Recalculated' : 'Copied from source'} · ${r.year}</div>`;
+    tip.hidden = false;
+    // keep the tooltip inside the map, flipping it left or up near the edges
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = ev.clientX - box.left + 14, y = ev.clientY - box.top + 14;
+    if (x + w > box.width) x = ev.clientX - box.left - w - 14;
+    if (y + h > box.height) y = Math.max(0, ev.clientY - box.top - h - 14);
+    tip.style.left = `${x}px`;
+    tip.style.top = `${y}px`;
+  }
+
+  // only countries currently drawn get a tooltip, so a filtered-out country stays blank and silent
+  let shown = [];
+  document.getElementById('map').addEventListener('mousemove', (ev) => {
+    const iso = ev.target.dataset ? ev.target.dataset.iso : null;
+    const r = iso ? shown.find((x) => x.iso === iso) : null;
+    if (r) showTip(r, ev); else tip.hidden = true;
+  });
+  document.getElementById('mapwrap').addEventListener('mouseleave', () => { tip.hidden = true; });
+
+  // the whole section disappears when nothing is in it, rather than saying so
+  function drawUnplotted(rows) {
+    const host = document.getElementById('unp');
+    document.getElementById('unplotted').hidden = !rows.length;
+    if (!rows.length) return;
+    host.innerHTML =
+      '<table class="list"><tbody>' +
+      rows.map((r) =>
+        `<tr><td><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${r.country}</td>` +
+        `<td>${TIERS[r.tier][0]}</td><td class="n">${r.note || ''}</td></tr>`
+      ).join('') +
+      '</tbody></table>';
+  }
+
+  // build the tier checkboxes from the tiers actually present
+  const present = [...new Set(ROWS.concat(UNPLOTTED).map((r) => r.tier))]
+    .sort((a, b) => Object.keys(TIERS).indexOf(a) - Object.keys(TIERS).indexOf(b));
+  document.getElementById('tierboxes').innerHTML = present.map((t) =>
+    `<label><input type="checkbox" class="tier" value="${t}" checked>` +
+    `<span class="swatch" style="color:${TIERS[t][1]}"></span> ${TIERS[t][0]}</label>`
+  ).join('');
+
+  const picked = (cls) => [...document.querySelectorAll('input.' + cls + ':checked')].map((i) => i.value);
+
+  const sel = document.getElementById('pick');
+  let tab = 'summary';
+
+  function apply() {
+    const summary = tab === 'summary';
+    document.getElementById('tab-summary').hidden = !summary;
+    document.getElementById('tab-country').hidden = summary;
+    document.getElementById('filters').hidden = !summary;
+    sel.hidden = summary;
+    document.querySelectorAll('button.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+
+    if (summary) {
+      const tiers = picked('tier');
+      const rcs = picked('rc');
+      const keep = ROWS.filter((r) => tiers.includes(r.tier) && rcs.includes(r.recalc ? '1' : '0'));
+      draw(keep);
+      drawUnplotted(UNPLOTTED.filter((r) => tiers.includes(r.tier)));
+      shown = keep;
+      drawMap(keep);
+    } else {
+      if (!sel.value) sel.value = sel.options[0] ? sel.options[0].value : '';
+      document.querySelectorAll('section[data-country]').forEach((s) => {
+        s.hidden = s.dataset.country !== sel.value;
+      });
+    }
+  }
+
+  document.querySelectorAll('button.tab').forEach((b) =>
+    b.addEventListener('click', () => {
+      tab = b.dataset.tab;
+      apply();
+      window.scrollTo({ top: 0 });
+    })
+  );
+  sel.addEventListener('change', apply);
+  document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
+  // a country name in the overview, or a country on the map, opens that country's own page
+  function goToCountry(name) {
+    sel.value = name;
+    tab = 'country';
+    apply();
+    tip.hidden = true;
+    window.scrollTo({ top: 0 });
+  }
+
+  document.getElementById('ov').addEventListener('click', (e) => {
+    const name = e.target.closest('a[data-go]')?.dataset.go;
+    if (!name) return;
+    e.preventDefault();
+    goToCountry(name);
+  });
+
+  // the same countries the tooltip answers for are the ones that can be clicked: drawn, and not
+  // filtered out. Everything else on the map stays inert rather than going somewhere blank.
+  document.getElementById('map').addEventListener('click', (ev) => {
+    const iso = ev.target.dataset ? ev.target.dataset.iso : null;
+    const r = iso ? shown.find((x) => x.iso === iso) : null;
+    if (r) goToCountry(r.country);
+  });
+
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(apply, 150); });
+  drawLegend();
+  apply();
+})();
+</script>
+</div>
