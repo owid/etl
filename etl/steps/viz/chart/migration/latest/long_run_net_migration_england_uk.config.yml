@@ -17,7 +17,7 @@ views:
             name: "Net migration"
     config:
       title: "Net migration to England and the United Kingdom as a share of the population"
-      subtitle: "Number of people moving to the country each year, minus the number leaving, as a share of its population. The orange line shows figures for England up to 1854; these estimates are reconstructed from church records. The red line shows figures for the UK from 1855; these are based on passenger counts, surveys, and administrative records."
+      subtitle: "Number of people moving to the country each year, minus the number leaving, as a share of its population. The brown line shows figures for England from 1541 to 1854; these estimates are reconstructed from church records. The orange line shows figures for the UK from 1855; these are based on passenger counts, surveys, and administrative records."
       note: "Positive values mean more people arrived than left; negative values mean more people left than arrived."
       originUrl: "/migration"
       tab: "chart"
@@ -27,12 +27,13 @@ views:
       addCountryMode: "disabled"
       hideAnnotationFieldsInTitle:
         entity: true
+        time: true
       # The subtitle names each line by its color, so the line labels are hidden.
       hideSeriesLabels: true
       selectedFacetStrategy: "none"
       # Grapher ignores custom colors for a line chart with several indicators and several entities, so the
-      # colors come from the scheme's order instead: England gets its first color (copper), the UK its second (peach).
-      baseColorScheme: "OwidCategoricalE"
+      # colors come from the scheme's order instead: England gets its first color (brown), the UK its second (orange).
+      baseColorScheme: "PuOr"
       selectedEntityNames:
         - "England"
         - "United Kingdom"
