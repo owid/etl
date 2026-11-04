@@ -183,8 +183,13 @@ def calculate_coverage_for_regions_for_age_group(
 
 
 def get_population_of_age_group(ds_population: Dataset, age: str) -> Table:
+    # NOTE: This includes projections from 2024 onwards. We are using the UN WPP "medium" variant for these projections.
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
-    tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
+    tb_pop = tb_pop[
+        (tb_pop["age"] == age)
+        & ((tb_pop["variant"] == "estimates") | (tb_pop["variant"] == "medium"))
+        & (tb_pop["sex"] == "all")
+    ]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
     return tb_pop
 
