@@ -11,10 +11,12 @@ views:
         - catalogPath: "uk_migration_flows#immigration"
           display:
             name: "Immigration"
+            color: "#6d3e91"
         # Emigration is shown below zero, as a mirror of immigration.
         - catalogPath: "uk_migration_flows#emigration"
           display:
             name: "Emigration"
+            color: "#00847e"
             conversionFactor: -1
     config:
       title: "People migrating to and from the United Kingdom"
