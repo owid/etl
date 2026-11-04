@@ -109,6 +109,12 @@ steps:
         - snapshot://migration/2026-08-03/long_term_international_migration.xlsx
       - data://garden/demography/2024-07-15/population
 
+  # Long-run net migration to England and the UK, and UK migration flows — charts authored in ETL.
+  viz://chart/migration/latest/long_run_net_migration_england_uk:
+    - data://grapher/migration/2026-08-03/uk_migration
+  viz://chart/migration/latest/long_run_migration_flows_uk:
+    - data://grapher/migration/2026-08-03/uk_migration
+
   # UN DESA migration flows JSON feed (2024)
   viz://bespoke/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population

@@ -1,0 +1,33 @@
+chart_config_id: 01a1a729-734b-76f2-be32-f133dc8f2932
+grapher_schema: "012"
+slug: long-run-net-migration-england-uk
+topic_tags:
+  - "Migration"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        # England's series ends in 1854, the year before the UK's begins; the two are kept as separate lines.
+        - catalogPath: "england_net_migration#net_migration_share_of_population"
+          display:
+            name: "Net migration"
+        - catalogPath: "uk_migration_flows#net_migration_share_of_population"
+          display:
+            name: "Net migration"
+    config:
+      title: "Net migration to England and the United Kingdom as a share of the population"
+      subtitle: "Number of people moving to the country each year, minus the number leaving, as a share of its population. England's figures, up to 1854, are estimates reconstructed from church records. The UK's figures, from 1855, are based on passenger counts, surveys, and administrative records."
+      note: "Positive values mean more people arrived than left; negative values mean more people left than arrived."
+      originUrl: "/migration"
+      tab: "chart"
+      chartTypes:
+        - "LineChart"
+      hasMapTab: false
+      addCountryMode: "disabled"
+      hideAnnotationFieldsInTitle:
+        entity: true
+      selectedFacetStrategy: "none"
+      selectedEntityNames:
+        - "England"
+        - "United Kingdom"
