@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AQLI and gridded PM2.5 — comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="comparison.css">
+<style>.comparison-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.comparison-grid .map{height:510px}.comparison-grid .panel-head{min-height:90px;padding:14px}.comparison-grid .panel-foot{padding:12px 14px;min-height:68px}.view-controls{flex-wrap:wrap}.selection{display:flex;gap:10px;align-items:center}#status{min-height:24px;font-size:13px;color:#985534}.legend{margin-top:28px}.panel-head h2{font-size:21px}.country-select{min-width:210px}@media(max-width:950px){.comparison-grid{grid-template-columns:1fr}.comparison-grid .panel+.panel{border-left:0;border-top:1px solid #e5e5e5}.comparison-grid .map{height:370px}.selection{flex-wrap:wrap}}</style>
+<link rel="stylesheet" href="site_shell.css">
+</head><body>
+<!-- SITE_SHELL -->
+<main>
+<header class="chart-header">
+<h2 class="view-title">Air pollution at three geographic scales <span class="title-year" id="title-year">2024</span></h2>
+<p class="intro">Compare AQLI’s state and district estimates with fine-resolution PM2.5 grid cells. Choose a country and year, then pan or zoom any map to move all three together.</p></header>
+<div class="view-controls">
+<div class="selection"><label for="country">Country</label><select id="country" class="country-select" disabled></select><button id="reset" disabled>Reset view</button></div></div>
+<div id="status" role="status" aria-live="polite">Loading comparison…</div>
+<div class="comparison-grid">
+<section class="panel"><div class="panel-head"><div><h2>States and provinces</h2><div class="hint">AQLI · GADM level 1</div></div></div><div id="gadm1" class="map" aria-label="GADM1 choropleth"></div><div class="panel-foot" id="info1">Hover over an area to see its PM2.5 bracket.</div></section>
+<section class="panel"><div class="panel-head"><div><h2>Districts and counties</h2><div class="hint">AQLI · GADM level 2</div></div></div><div id="gadm2" class="map" aria-label="GADM2 choropleth"></div><div class="panel-foot" id="info2">Hover over an area to see its PM2.5 bracket.</div></section>
+<section class="panel"><div class="panel-head"><div><h2>Fine-resolution grid</h2><div class="hint">SatPM · 0.01° (approximately 1 km)</div></div></div><div id="grid" class="map" aria-label="Fine resolution PM2.5 grid"></div><div class="panel-foot" id="info3">Hover over a grid cell to see its PM2.5 bracket.</div></section>
+</div>
+<div class="legend"><div class="legend-title">Annual mean PM2.5<br><strong>µg/m³</strong></div><div class="scale" id="scale"></div><div class="no-data">No data</div></div>
+<div class="toolbar"><span class="timeline-bound">1998</span><input type="range" id="year" aria-label="Year" min="1998" max="2024" value="2024" disabled><output id="year-label" class="year" for="year">2024</output></div>
+<p class="note"><strong>Same year and color scale; different geographic detail.</strong> The choropleths use AQLI’s published area estimates, while the grid shows SatPM cells. Differences may reflect aggregation and source processing. These are estimates of total PM2.5, including natural sources such as dust and sea salt.</p>
+<p class="note">Gray administrative areas have no matched AQLI estimate; missing district data are not replaced with state averages. The grid is clipped to the selected country and covers 60°S–70°N. Administrative boundaries and names can differ between the data release and boundary files.</p>
+<p class="source"><strong>Data sources:</strong> <a href="https://aqli.epic.uchicago.edu/">AQLI, Energy Policy Institute at the University of Chicago</a>; <a href="https://www.satpm.org/v6-gl-03">SatPM V6.GL.03</a>. Boundaries: GADM via AQLI. Prototype.</p>
+</main><script>
+const $=id=>document.getElementById(id);
+let manifest,country,payload,request,tiles,outline,epoch=0,syncing=false,loading=false;
+const maps=[],layers=[],baseInfo=[];
+const year=()=>Number($('year').value);
+const value=f=>f.properties.values[manifest.years.indexOf(year())];
+const bucket=v=>v==null?null:manifest.brackets.filter(b=>v>=b).length;
+function bracket(index){if(index==null)return 'No data';const lower=index?manifest.brackets[index-1]:0;return `${lower}${index===manifest.brackets.length?'+':'–<'+manifest.brackets[index]} µg/m³`;}
+function style(f){const i=bucket(value(f));return {fillColor:i==null?'#dce2e8':manifest.colors[i],fillOpacity:1,color:'#8c8177',weight:.6};}
+function areaName(f){return [f.properties.name2,f.properties.name1].filter(Boolean).join(', ');}
+function drawAreas(){
+ ['gadm1','gadm2'].forEach((level,i)=>{
+  if(layers[i])maps[i].removeLayer(layers[i]);
+  const features=payload[level].features, missing=features.filter(f=>value(f)==null).length;
+  baseInfo[i]=features.length?`${features.length.toLocaleString()} areas · ${missing.toLocaleString()} without data in ${year()}`:'No boundaries available at this level.';
+  $('info'+(i+1)).textContent=baseInfo[i];
+  layers[i]=L.geoJSON(payload[level],{style,onEachFeature:(f,layer)=>{
+   layer.on('mouseover',()=>{layer.setStyle({weight:1.5,color:'#002147'});$('info'+(i+1)).textContent=`${areaName(f)} · ${f.properties.ambiguous_years?.includes(year())?"Ambiguous source match":bracket(bucket(value(f)))}`;});
+   layer.on('mouseout',()=>{layer.setStyle(style(f));$('info'+(i+1)).textContent=baseInfo[i];});
+  }}).addTo(maps[i]);
+ });
+}
+function drawGrid(){
+ const token=++epoch,pixels=new Map();if(tiles)maps[2].removeLayer(tiles);
+ $('status').textContent='Loading grid tiles…';
+ const layer=L.tileLayer(`/${manifest.tile_path}/${country.id}/${year()}/{z}/{x}/{y}.png`,{noWrap:true,maxNativeZoom:10,maxZoom:12,keepBuffer:1});
+ let failed=false;
+ layer.on('tileload',e=>{if(token!==epoch)return;const canvas=document.createElement('canvas');canvas.width=canvas.height=256;const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(e.tile,0,0);pixels.set(`${e.coords.z}/${e.coords.x}/${e.coords.y}`,context);});
+ layer.on('tileunload',e=>pixels.delete(`${e.coords.z}/${e.coords.x}/${e.coords.y}`));
+ layer.on('tileerror',()=>{if(token===epoch){failed=true;$('status').textContent='Some grid tiles could not load. Change the year to retry.';}});
+ layer.on('load',()=>{if(token===epoch&&!failed)$('status').textContent='';});
+ layer.read=latlng=>{const z=Math.min(10,Math.round(maps[2].getZoom())),p=maps[2].project(latlng,z),x=Math.floor(p.x/256),y=Math.floor(p.y/256),context=pixels.get(`${z}/${x}/${y}`);if(!context)return undefined;const rgba=context.getImageData(Math.floor(p.x-x*256),Math.floor(p.y-y*256),1,1).data;if(!rgba[3])return null;const i=manifest.colors.indexOf('#'+Array.from(rgba.slice(0,3),v=>v.toString(16).padStart(2,'0')).join(''));return i<0?null:i;};
+ tiles=layer;layer.addTo(maps[2]);$('info3').textContent='Hover over a grid cell to see its PM2.5 bracket.';
+}
+function fit(){if(country)maps[0].fitBounds(country.bounds,{padding:[20,20],maxZoom:9,animate:false});}
+async function select(){
+ if(request)request.abort();request=new AbortController();const signal=request.signal;
+ country=manifest.countries.find(c=>String(c.id)===$('country').value);payload=null;loading=true;
+ ++epoch;if(tiles){maps[2].removeLayer(tiles);tiles=null;}layers.forEach((l,i)=>{if(l)maps[i].removeLayer(l);});
+ if(outline){maps[2].removeLayer(outline);outline=null;}
+ $('status').textContent='Loading administrative areas…';$('info1').textContent=$('info2').textContent='Loading areas…';$('info3').textContent='Loading country…';fit();
+ try{const response=await fetch(`comparison/${country.id}.json`,{signal});if(!response.ok)throw Error('Country data unavailable');const data=await response.json();if(signal.aborted)return;payload=data;loading=false;drawAreas();drawGrid();
+  outline=L.geoJSON(payload.gadm1,{interactive:false,style:{fill:false,color:'#607080',weight:.4,opacity:.4}}).addTo(maps[2]);
+ }catch(error){if(error.name!=='AbortError'){$('status').textContent='Could not load this country. Reselect it to retry.';loading=false;}}
+}
+async function init(){
+ const response=await fetch('comparison/index.json',{cache:'no-store'});if(!response.ok)throw Error('Comparison data unavailable');manifest=await response.json();
+ for(const id of ['gadm1','gadm2','grid']){const map=L.map(id,{minZoom:2,maxZoom:12,zoomSnap:1,preferCanvas:true,worldCopyJump:false}).setView([20,0],2);maps.push(map);map.on('moveend',()=>{if(syncing)return;syncing=true;maps.forEach(other=>{if(other!==map)other.setView(map.getCenter(),map.getZoom(),{animate:false});});syncing=false;});}
+ manifest.countries.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;$('country').append(o);});
+ manifest.colors.forEach((color,i)=>{const bin=document.createElement('div');bin.className='bin';const swatch=document.createElement('div');swatch.className='swatch';swatch.style.background=color;const label=document.createElement('span');label.className='bin-label';label.textContent=(i?manifest.brackets[i-1]:0)+(i===manifest.colors.length-1?'+':'');bin.append(swatch,label);$('scale').append(bin);});
+ $('country').disabled=$('year').disabled=$('reset').disabled=false;
+ $('country').addEventListener('change',select);$('reset').addEventListener('click',fit);
+ $('year').addEventListener('input',()=>{$('year-label').textContent=$('title-year').textContent=year();if(payload&&!loading){drawAreas();drawGrid();}});
+ maps[2].on('mousemove',e=>{if(!tiles)return;const i=tiles.read(e.latlng);$('info3').textContent=i===undefined?'Loading grid tile…':`${bracket(i)} · ${year()}`;});
+ maps[2].on('mouseout',()=>{$('info3').textContent='Hover over a grid cell to see its PM2.5 bracket.';});
+ $('country').value=(manifest.countries.find(c=>c.name==='India')||manifest.countries[0]).id;await select();
+}
+init().catch(error=>{$('status').textContent=error.message;});
+</script></body></html>
