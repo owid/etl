@@ -389,6 +389,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         "Oceania": ["Australia", "New Zealand"],
         "Europe": ["Russia", "Germany", "France", "United Kingdom", "Italy", "Spain"],
     }
+    # NOTE: These lists are sentinels: if any listed country is missing, the aggregate is dropped.
+    # Revise them whenever the World Bank reclassifies one of these countries, or the step fails
+    # with "countries_that_must_have_data contains ... which are not members of the region".
     regions_required = {
         "High-income countries": [
             "United States",
@@ -406,16 +409,17 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
             "Indonesia",
             "Mexico",
             "Iran",
+            # Upper-middle-income since the World Bank's 2026 classification; lower-middle before.
+            "Philippines",
+            "Vietnam",
         ],
         "Lower-middle-income countries": [
             "India",
             "Pakistan",
             "Nigeria",
             "Bangladesh",
-            "Philippines",
             "Egypt",
             "Kenya",
-            "Vietnam",
         ],
         "Low-income countries": [
             # "Ethiopia", Currently not classified as low-income by the World Bank, but historically it was.
