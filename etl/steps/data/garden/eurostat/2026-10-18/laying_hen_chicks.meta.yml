@@ -27,7 +27,7 @@ tables:
       laying_hen_chicks_placed:
         title: Laying hen chicks placed
         description_short: Chicks of laying hen breeds hatched for use in the country, minus those exported, plus those imported, during the year.
-        description_processing: We subtract the chicks exported and add the chicks imported to the chicks hatched for use, in years where Eurostat reports the three.
+        description_processing: We subtract the chicks exported and add the chicks imported to the chicks hatched for use, in years where Eurostat reports the three. Belgium's chicks hatched already exclude the chicks exported, so for Belgium we only add the chicks imported.
       cockerels_from_sexing_hatched:
         title: Cockerels from sexing hatched for use
         description_short: Male chicks of laying hen breeds (cockerels from sexing) hatched for use during the year.

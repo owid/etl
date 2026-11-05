@@ -30,6 +30,10 @@ INDICATORS = [
 ]
 # Eurostat publishes numbers of chicks in thousands.
 THOUSAND = 1000
+# Countries whose chicks hatched already exclude the chicks exported, so these are not subtracted again.
+# NOTE: Eurostat's metadata (SIMS 13.3.4): "The number of chicks hatched is expected to include the chicks that will then
+# be exported. For all the countries but BE, this is the case."
+COUNTRIES_HATCHED_WITHOUT_EXPORTS = ["Belgium"]
 
 
 def run() -> None:
@@ -63,6 +67,11 @@ def run() -> None:
     tb["laying_hen_chicks_placed"] = (
         tb["laying_hen_chicks_hatched"] - tb["laying_hen_chicks_exported"] + tb["laying_hen_chicks_imported"]
     )
+    # Where chicks hatched already exclude the chicks exported, add only the chicks imported.
+    without_exports = tb["country"].isin(COUNTRIES_HATCHED_WITHOUT_EXPORTS)
+    tb.loc[without_exports, "laying_hen_chicks_placed"] = (
+        tb.loc[without_exports, "laying_hen_chicks_hatched"] + tb.loc[without_exports, "laying_hen_chicks_imported"]
+    )
 
     sanity_check_outputs(tb=tb)
 
@@ -93,6 +102,10 @@ def sanity_check_outputs(tb: Table) -> None:
     france = tb[(tb["country"] == "France") & (tb["year"] == 2024)]["laying_hen_chicks_hatched"].item()
     error = f"Unexpected number of laying hen chicks hatched in France in 2024: {france:,.0f}."
     assert 2e7 < france < 1e8, error
+    # Countries whose chicks hatched already exclude exports should never get a negative number of chicks placed.
+    placed = tb[tb["country"].isin(COUNTRIES_HATCHED_WITHOUT_EXPORTS)]["laying_hen_chicks_placed"].dropna()
+    error = "Negative chicks placed in a country whose chicks hatched already exclude exports."
+    assert not placed.empty and (placed >= 0).all(), error
     # Some countries report more cockerels from sexing than laying hen chicks in some years, which Eurostat attributes
     # to differences in how countries interpret the category. Flag them for review rather than fail.
     suspicious = tb[tb["cockerels_from_sexing_hatched"] > tb["laying_hen_chicks_hatched"]]
