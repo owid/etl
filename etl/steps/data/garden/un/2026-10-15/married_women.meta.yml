@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+      attribution_short: UN
+    description_from_producer: The Married/In-union category pertains to women who are married (defined in relation to the marriage laws or customs of a country) and to women in a union, which refers to women living with their partner in the same household (also referred to as cohabiting unions, consensual unions, unmarried unions, or “living together”).
+    description_key:
+      - In this data, a woman counts as married if her marriage is recognized by her country’s laws or customs. She counts as being in a union if she lives with a partner in the same household without being married, sometimes called a cohabiting or consensual union.
+      - The UN Population Division estimates these figures for every country and year by combining census and survey data with population estimates from the UN’s World Population Prospects.
+      - Before a country’s first census or survey, the UN keeps its values at the level of that first data point, so early values can stay flat for many years.
+      - Values for the years after a country’s most recent census or survey are projections, which is why the year when projections start differs between countries. For the world and regions, values from 2025 onward are labeled as projections.
+    description_processing: |-
+      We calculate the shares for the world, continents and income groups from the country data. We don’t use the UN’s own regional figures, because its counts of married women double-count some regions. Each region’s share is the number of women in its countries who are married or in a union, divided by the number of women of the same age in those countries.
+
+  projection: &projection <% if dataprocess == "Projection" %> true <% elif dataprocess == "Estimate" %> false <%- endif -%>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Edouard Mathieu
+tables:
+  married_women:
+    variables:
+      percentage_married_union:
+        title: Share of women aged << agegroup|replace('-', '–') >> who are married or in union (<< dataprocess >>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of women aged << agegroup|replace('-', '–') >> who are married, or who live with a partner without being married.
+        presentation:
+          title_public: Share of women aged << agegroup|replace('-', '–') >> years old who are married or in a union
+        display:
+          name: << agegroup|replace('-', '–') >> years old
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+          tolerance: 0
+          isProjection: *projection

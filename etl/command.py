@@ -10,7 +10,7 @@ import resource
 import sys
 import time
 import traceback
-from collections.abc import Callable, Iterator, MutableMapping
+from collections.abc import Callable, Generator, MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from concurrent.futures.process import BrokenProcessPool
 from contextlib import contextmanager
@@ -32,12 +32,6 @@ if TYPE_CHECKING:
 
 # Simple type alias for runtime use (matches etl.steps.DAG)
 DAG = dict[str, set[str]]
-
-# NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
-#   with owid libraries. It's better to wait for an official pandas 3.0 release and update
-#   it all at once.
-# Use string[pyarrow] by default, this will become True in pandas 3.0
-# pd.options.future.infer_string = True
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
@@ -1067,7 +1061,7 @@ def _detect_strictness_level(step: "Step", strict_after: Any, strict: bool | Non
 
 
 @contextmanager
-def strictness_level(strict: bool) -> Iterator[None]:
+def strictness_level(strict: bool) -> Generator[None, None, None]:
     # start from a clean slate
     if "OWID_STRICT" in environ:
         del environ["OWID_STRICT"]

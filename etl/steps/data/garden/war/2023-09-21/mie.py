@@ -257,7 +257,7 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## By region and hostility_level
     tb_ongoing = tb.groupby(["year", "region", "hostility_level"], as_index=False).agg(ops)
     ## region='World' and by hostility_level
-    tb_ = tb.groupby(["micnum", "year"], as_index=False).agg({"hostility_level": max})
+    tb_ = tb.groupby(["micnum", "year"], as_index=False).agg({"hostility_level": "max"})
     tb_ongoing_world = tb_.groupby(["year", "hostility_level"], as_index=False).agg(ops)
     tb_ongoing_world["region"] = "World"
 
@@ -295,7 +295,7 @@ def _add_new_metrics(tb: Table) -> Table:
 
     # Regions
     ## Keep one row per (micnum, region).
-    tb_ = tb.groupby(["micnum", "region", "styear"], as_index=False).agg({"hostility_level": max})
+    tb_ = tb.groupby(["micnum", "region", "styear"], as_index=False).agg({"hostility_level": "max"})
     tb_ = tb_.sort_values("styear").drop_duplicates(subset=["micnum", "region"], keep="first")
     ## By region and hostility_level
     tb_new = tb_.groupby(["styear", "region", "hostility_level"], as_index=False).agg(ops)
@@ -305,7 +305,7 @@ def _add_new_metrics(tb: Table) -> Table:
 
     # World
     ## Keep one row per (micnum). Otherwise, we might count the same conflict in multiple years!
-    tb_ = tb.groupby(["micnum", "styear"], as_index=False).agg({"hostility_level": max})
+    tb_ = tb.groupby(["micnum", "styear"], as_index=False).agg({"hostility_level": "max"})
     tb_ = tb_.sort_values("styear").drop_duplicates(subset=["micnum"], keep="first")
     ## region='World' and by hostility_level
     tb_new_world = tb_.groupby(["styear", "hostility_level"], as_index=False).agg(ops)

@@ -106,7 +106,7 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
     # Additional information section
     with st.popover("ℹ️ About this Dashboard"):
         st.markdown("""
-        **Data Source**: This dashboard fetches real-time data from LXC containers using the `owid-lxc` command.
+        **Data Source**: This dashboard reads the LXC staging containers through the staging API on `lxc-manager-1`, which runs `owid-lxc` on their host.
 
         **Status Indicators**:
         - 🟢 **Running**: Container is active and operational
@@ -150,7 +150,9 @@ with st.spinner("Fetching staging server data...", show_time=True):
 # Handle errors
 if error:
     st.error(f"Failed to fetch server data: {error}")
-    st.info("Please ensure you have access to the LXC host and the `owid-lxc` command is available.")
+    st.info(
+        "The dashboard reads from the staging API on lxc-manager-1 (ops: infra/staging_api). Check that it's running and reachable from this machine."
+    )
     st.stop()
 
 if servers_df is None or servers_df.empty:

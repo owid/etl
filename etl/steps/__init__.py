@@ -33,6 +33,7 @@ import structlog
 from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
+from owid.catalog.api.utils import session as catalog_session
 from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.orm import Session
 from tqdm import tqdm
@@ -42,10 +43,17 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
+from etl.grapher.entity_selection import UpsertPinsCheck
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
+
+# A forked step gets fresh copies of lib/catalog's pooled clients rather than its parent's open
+# connections, as `etl.http.make_session` does for ours (see `DataStep._run_py_fork`).
+# TODO: move these into lib/catalog with its next release.
+os.register_at_fork(after_in_child=catalog_session.close)
+os.register_at_fork(after_in_child=s3_utils._connect_r2_cached.cache_clear)
 
 DAG = dict[str, set[str]]
 
@@ -743,16 +751,9 @@ class DataStep(Step):
         if pid == 0:
             # ---------- child process ----------
             try:
-                # Close all inherited file descriptors except stdin/stdout/stderr.
-                # The forked child inherits FDs for the multiprocessing Manager
-                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
-                # os._exit() later closes them implicitly it can confuse the
-                # Manager server and cause the parent worker to hang.
-                import resource as _resource
-
-                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
-                os.closerange(3, _max_fd)
-
+                # Don't close inherited descriptors: that never affects the parent's copies, and the
+                # pooled clients still holding them would fail. Those clients reset in the child
+                # instead (`etl.http.make_session`, and the catalog clients at the top of this module).
                 config.enable_structlog_filtering()
                 step_type, path = str(self).split("://", 1)
                 step_type = step_type.replace("-private", "")
@@ -1032,6 +1033,10 @@ class GrapherStep(Step):
 
         catalog_paths = []
 
+        # Before upserting, record what production has for indicators that charts pin entities of
+        pins_check = UpsertPinsCheck(engine, dataset_upsert_results.dataset_id)
+        pins_check.prepare()
+
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
             verbose = True
@@ -1088,6 +1093,7 @@ class GrapherStep(Step):
                     assert len(t.columns) == 1
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
                     catalog_paths.append(catalog_path)
+                    pins_check.add(catalog_path, t)
 
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
@@ -1112,6 +1118,9 @@ class GrapherStep(Step):
 
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
+
+        # Fail if the upsert removed entities that charts pin (the dataset checksum stays unset, so the step reruns)
+        pins_check.run()
 
         # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
         if INSTANT_METADATA_DIFF:

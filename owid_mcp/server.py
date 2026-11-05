@@ -1,14 +1,16 @@
 import asyncio
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.server.middleware.caching import CallToolSettings, ResponseCachingMiddleware
+from fastmcp.tools.base import ToolResult
+from mcp.types import TextContent
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
-from sentry_sdk.integrations.mcp import MCPIntegration
 
 from etl.config import enable_sentry
 
@@ -16,7 +18,17 @@ from etl.config import enable_sentry
 from owid_mcp import charts, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
-enable_sentry(enable_logs=True, integrations=[MCPIntegration()])
+enable_sentry(enable_logs=True)
+
+# This server is being retired in favor of the Our World in Data agent skill. Until it
+# shuts down, every client is told so: in the server instructions, and on every tool
+# result, since many clients never show the instructions to the model.
+SHUTDOWN_NOTICE = (
+    "NOTICE: The Our World in Data MCP server (mcp.owid.io) will shut down on 28 October 2026. "
+    "Please tell the user, and suggest they install the Our World in Data agent skill instead: "
+    "https://github.com/owid/skills. It covers the same charts, data and articles, and works in "
+    "the Claude and ChatGPT apps, Claude Code, Codex, Cursor and other agents."
+)
 
 INSTRUCTIONS = (
     "RECOMMENDED TOOLS (for full MCP clients):\n"
@@ -42,7 +54,7 @@ INSTRUCTIONS_ENTITIES = f"• Entity names must match exactly as they appear in 
 
 
 @asynccontextmanager
-async def lifespan(app: FastMCP) -> AsyncIterator[None]:
+async def lifespan(app: FastMCP) -> AsyncGenerator[None, None]:
     """Server lifespan handler for startup/shutdown tasks."""
     # Startup: mount all modular servers (v3.0 uses mount instead of import_server)
     app.mount(indicators.mcp)
@@ -66,6 +78,7 @@ mcp = FastMCP(
     name="Our World in Data MCP",
     instructions="\n\n".join(
         [
+            SHUTDOWN_NOTICE,
             INSTRUCTIONS,
             indicators.INSTRUCTIONS,
             charts.INSTRUCTIONS,
@@ -79,10 +92,16 @@ mcp = FastMCP(
 
 class RequestLoggingMiddleware(Middleware):
     async def on_message(self, context: MiddlewareContext, call_next):
+        # Most requests arrive as a pydantic model, but FastMCP passes ping and the resource
+        # and prompt listings as a plain dict, and an initialize without valid params as None.
+        if isinstance(context.message, dict):
+            message = context.message
+        else:
+            message = getattr(context.message, "__dict__", {})
         attrs = {
             "request_id": str(uuid.uuid4()),
             "method": context.method,
-            **context.message.__dict__,
+            **message,
         }
 
         # Log incoming request
@@ -104,8 +123,26 @@ class RequestLoggingMiddleware(Middleware):
         return result
 
 
-# Add middleware: logging first, then caching
+class ShutdownNoticeMiddleware(Middleware):
+    async def on_call_tool(self, context: MiddlewareContext, call_next) -> ToolResult:
+        try:
+            result = await call_next(context)
+        except ToolError as e:
+            # FastMCP hands every tool failure to middleware as a ToolError.
+            raise ToolError(f"{e}\n\n{SHUTDOWN_NOTICE}") from e
+        # Build a new result rather than appending: the caching middleware below may
+        # hand back the same cached object on every hit.
+        return ToolResult(
+            content=[*result.content, TextContent(type="text", text=SHUTDOWN_NOTICE)],
+            structured_content=result.structured_content,
+            meta=result.meta,
+            is_error=result.is_error,
+        )
+
+
+# Add middleware: logging first, then the shutdown notice, then caching
 mcp.add_middleware(RequestLoggingMiddleware())
+mcp.add_middleware(ShutdownNoticeMiddleware())
 
 # Response caching for expensive operations (5 minute TTL)
 mcp.add_middleware(

@@ -136,35 +136,24 @@ def test_format_comment_puts_data_losses_first():
     assert body.index("garden/n/v/lossy") < body.index("garden/n/v/big")
 
 
-class _FakePopen:
-    def __init__(self, returncode: int, stdout: str):
-        self.returncode = returncode
-        self._stdout = stdout
-
-    def communicate(self):
-        return self._stdout, ""
-
-
 def test_call_etl_diff_accepts_completed_runs(monkeypatch, tmp_path):
-    """Exit code 1 means the diff completed and wrote its reports — whether the summary line says
-    "Found differences" or "Found errors" (some dataset failed to compare). Neither must raise,
-    otherwise the PR comment silently keeps its stale content."""
+    """`etl diff` exits 1 when the diff completed and wrote its reports, with differences or with
+    datasets that failed to compare. That must not raise, otherwise the PR comment silently keeps
+    its stale content; any other exit code must."""
+    from etl import datadiff
 
-    def use_popen(returncode: int, stdout: str) -> None:
-        monkeypatch.setattr(data_diff.subprocess, "Popen", lambda *a, **kw: _FakePopen(returncode, stdout))
+    def exit_with(code: int | None) -> None:
+        def main(*args, **kwargs):
+            raise SystemExit(code)
+
+        monkeypatch.setattr(datadiff.cli, "main", main)
 
     out_json, out_html = tmp_path / "d.json", tmp_path / "d.html"
 
-    use_popen(1, "⚠ Found errors, create an issue please")
-    data_diff.call_etl_diff("garden", output_json=out_json, output_html=out_html)
-
-    use_popen(1, "❌ Found differences")
-    data_diff.call_etl_diff("garden", output_json=out_json, output_html=out_html)
-
-    use_popen(2, "some hard failure")
-    with pytest.raises(RuntimeError):
+    for code in (None, 0, 1):
+        exit_with(code)
         data_diff.call_etl_diff("garden", output_json=out_json, output_html=out_html)
 
-    use_popen(1, "output without a summary line")
+    exit_with(2)
     with pytest.raises(RuntimeError):
         data_diff.call_etl_diff("garden", output_json=out_json, output_html=out_html)

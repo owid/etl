@@ -712,7 +712,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
     # Sort data (which may be needed for some detectors).
     # NOTE: Here, we first convert the entity_name to string, because otherwise the sorting will be based on categorical order (which can be arbitrary).
-    df = df.astype({"entity_name": "string[pyarrow]"}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
+    df = df.astype({"entity_name": "str"}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
 
     return df
 

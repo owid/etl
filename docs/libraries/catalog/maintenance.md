@@ -26,7 +26,7 @@ The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on
 
 **Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-packages.yml) if needed.
 
-Nothing bumps the version for you: a PR that only changes library source files publishes nothing, and those changes ship with whoever bumps next. The full maintainer guide — release checklist, versioning practice, dev environment, and which checks actually cover `lib/catalog` — is in [:fontawesome-brands-github: `lib/catalog/DEVELOPMENT.md`](https://github.com/owid/etl/blob/master/lib/catalog/DEVELOPMENT.md).
+Nothing bumps the version for you, so a PR that changes the library's code or `pyproject.toml` bumps the version in the same PR. Any edit to `pyproject.toml` publishes, and fails if that version is already on PyPI. The full maintainer guide — release checklist, versioning practice, dev environment, and which checks actually cover `lib/catalog` — is in [:fontawesome-brands-github: `lib/catalog/DEVELOPMENT.md`](https://github.com/owid/etl/blob/master/lib/catalog/DEVELOPMENT.md).
 
 ### Generate `llms.txt`
 

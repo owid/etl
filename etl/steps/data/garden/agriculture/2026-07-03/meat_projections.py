@@ -105,8 +105,9 @@ def run() -> None:
     # Load inputs.
     #
     # Load FAOSTAT food balances dataset and read its main table.
+    # NOTE: Keep categoricals (safe_types=False); converting this ~37M-row table to strings needs ~35 GB of memory.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
-    tb_fbsc = ds_fbsc.read("faostat_fbsc")
+    tb_fbsc = ds_fbsc.read("faostat_fbsc", safe_types=False)
 
     # Load the "future of food and agriculture" projections dataset and read its main table.
     ds_projections = paths.load_dataset("future_of_food_and_agriculture_regions")

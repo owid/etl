@@ -21,7 +21,8 @@ def run(dest_dir: str) -> None:
     # Load JSON data from snapshot.
     with open(snap.path, encoding="utf-8-sig") as f:
         data = json.load(f)
-        tb = pd.DataFrame(data)
+        # CDC wraps the records as {"lastUpdated": ..., "data": [...]}.
+        tb = pd.DataFrame(data["data"])
     #
     # Add country
     tb["country"] = "United States"

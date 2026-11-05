@@ -23,8 +23,7 @@ consumers *outside* the repo: notebooks and other repos that `pip install owid-c
 ## Nothing bumps the version for you
 
 `version = "..."` in `lib/catalog/pyproject.toml` is edited by hand. There is no
-auto-increment, no release-please, no version-from-tag. A PR that changes only source
-files publishes nothing and leaves the version where it was.
+auto-increment, no release-please, no version-from-tag, so every PR that changes what the package ships bumps it by hand (see [Bump in every PR that changes the package](#bump-in-every-pr-that-changes-the-package)).
 
 Publishing is automated *once the version changes*, by
 [`.github/workflows/publish-owid-packages.yml`](../../.github/workflows/publish-owid-packages.yml):
@@ -43,9 +42,8 @@ Publishing is automated *once the version changes*, by
 
 Consequences worth knowing:
 
-- **Source changes accumulate.** Everything merged since the last bump ships with
-  whoever bumps next — they are, in effect, releasing other people's work. Write the
-  changelog from the commit range, not from memory (see below).
+- **Any edit to `pyproject.toml` publishes.** A PR that touches it for another reason (a dependency, a pytest marker) without bumping `version` fails the `publish` job on `master`.
+- **A skipped bump leaves the change unreleased.** It ships with whoever bumps next, who is then releasing other people's work. Write the changelog from the commit range, not from memory (see below).
 - `lib/owl` and `lib/walden` are **not** in this workflow — no release of them happens
   from here (`lib/walden` has no `pyproject.toml` at all).
 - A published version can never be replaced. If you shipped something broken, bump again.
@@ -93,13 +91,11 @@ public API away in minor releases, while `1.2.4` dropped `display.yearIsDay` and
 dropped a `CHANNEL` member — both in patches. So pinning `owid-catalog` loosely is not
 enough to be safe, and when you do remove something, say so prominently in the changelog.
 
-### When a bump is worth it
+### Bump in every PR that changes the package
 
-Bump when someone outside this repo needs the change: an external notebook or repo, a
-security fix in a dependency of the published wheel (`1.2.3`), or a rebuild to pick up
-tooling changes (`1.2.2` was a republish and nothing else). Skip it when the change only
-matters to `etl` itself — it is already live — and accept that it will ride along with
-the next bump.
+A PR that changes `lib/catalog/owid/` or `lib/catalog/pyproject.toml` bumps `version` in the same PR, with its changelog entry and both lockfiles (the checklist above). The change is already live in `etl` either way; the bump is what gets it to PyPI users with a changelog written by whoever made it, and an edit to `pyproject.toml` publishes whether or not the version moved. A PR that only touches tests or docs outside `pyproject.toml` needs no bump.
+
+The same goes for `owid-repack` and `owid-datautils`. When a catalog change relies on new behavior in one of them, bump that package too and raise the floor in this package's `dependencies` (`owid-repack>=…`), so a PyPI install can't pair the new catalog with the old behavior.
 
 ## Development environment
 

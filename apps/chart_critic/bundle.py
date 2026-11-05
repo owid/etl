@@ -44,8 +44,8 @@ GRAPHER_URL = "https://ourworldindata.org/grapher"
 # alternative, a list of findings to suppress, would be maintained for the critic alone and would
 # leave the reader with the unexplained spike.
 #
-# Measured over eight charts: ~520 extra input tokens each, about $0.0004 a chart. The render
-# dominates the bill by an order of magnitude.
+# Measured over eight charts: ~520 extra input tokens each, about $0.0004 a chart. The model's
+# thinking, billed as output, is most of the bill.
 COLUMN_FIELDS = (
     "titleShort",
     "descriptionShort",
@@ -62,6 +62,30 @@ CHART_FIELDS = ("title", "subtitle", "note", "xAxisLabel", "yAxisLabel")
 # Cap how many indicators of a wide chart get summarised, so a 100-column chart cannot blow up
 # the prompt.
 MAX_COLUMNS = 10
+
+
+def indicator_lines(columns: dict[str, dict[str, Any]]) -> list[str]:
+    """Each indicator's ``COLUMN_FIELDS``, with a value already shown for an earlier indicator
+    written as a pointer to it.
+
+    A chart with a line per year carries one indicator per year, all with the same description,
+    so printing every field in full made the metadata of a 77-line chart ~48k tokens, 95% of them
+    repeats. The pointer keeps every distinct value and tells the model the rest are identical.
+    """
+    first_with: dict[tuple[str, str], str] = {}
+    lines = []
+    for name, column in columns.items():
+        entry = [f"indicator [{name}]"]
+        for k in COLUMN_FIELDS:
+            if column.get(k) in (None, ""):
+                continue
+            value = str(column[k])
+            if (seen := first_with.setdefault((k, value), name)) != name:
+                entry.append(f"    {k}: same as [{seen}]")
+            else:
+                entry.append(f"    {k}: {value}")
+        lines.append("\n".join(entry))
+    return lines
 
 
 class DataFetchFailed(Exception):
@@ -225,10 +249,7 @@ def build(
         if chart.get(key):
             lines.append(f"{key}: {chart[key]}")
     lines.append("")
-    for name, column in (meta.get("columns") or {}).items():
-        entry = [f"indicator [{name}]"]
-        entry += [f"    {k}: {column[k]}" for k in COLUMN_FIELDS if column.get(k) not in (None, "")]
-        lines.append("\n".join(entry))
+    lines += indicator_lines(meta.get("columns") or {})
 
     try:
         csv_query = "useColumnShortNames=true&csvType=" + ("filtered" if params else "full")

@@ -225,7 +225,7 @@ def run() -> None:
     tb_gdp = prepare_gdp_data(tb_maddison)
 
     # Build country → OWID continent and country → MPD region maps. Reused below to label
-    # the thousand_bins tables alongside the existing PIP `region` / `region_old` columns.
+    # the thousand_bins tables alongside the existing PIP `region` column.
     owid_members = paths.regions.get_regions(
         names=["Africa", "Asia", "Europe", "North America", "Oceania", "South America"],
         only_subregions=True,
@@ -456,7 +456,7 @@ def run() -> None:
         ["country", "year"], short_name="population_constant_inequality"
     )
     # tb_thousand_bins_constant_inequality = tb_thousand_bins_constant_inequality.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_constant_inequality"
+    #     ["country", "year", "region", "quantile"], short_name="thousand_bins_constant_inequality"
     # )
 
     tb_interpolated_quantiles = tb_interpolated_quantiles.format(
@@ -466,7 +466,7 @@ def run() -> None:
         ["country", "year"], short_name="population_interpolated_quantiles"
     )
     # tb_thousand_bins_interpolated_quantiles = tb_thousand_bins_interpolated_quantiles.format(
-    #     ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_quantiles"
+    #     ["country", "year", "region", "quantile"], short_name="thousand_bins_interpolated_quantiles"
     # )
 
     tb_interpolated_ginis = tb_interpolated_ginis.format(
@@ -478,25 +478,25 @@ def run() -> None:
     # Drop duplicates in profiling mode (filtering causes duplicates in merge logic)
     if PROFILING_MODE:
         tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.drop_duplicates(
-            subset=["country", "year", "region", "region_old", "quantile"]
+            subset=["country", "year", "region", "quantile"]
         )
         tb_thousand_bins_interpolated_ginis_all_lognormal = (
             tb_thousand_bins_interpolated_ginis_all_lognormal.drop_duplicates(
-                subset=["country", "year", "region", "region_old", "quantile"]
+                subset=["country", "year", "region", "quantile"]
             )
         )
     tb_thousand_bins_interpolated_ginis = attach_extra_region_columns(
         tb_thousand_bins_interpolated_ginis, country_to_owid_region, country_to_mpd_region
     )
     tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
-        ["country", "year", "region", "region_old", "owid_region", "mpd_region", "quantile"],
+        ["country", "year", "region", "owid_region", "mpd_region", "quantile"],
         short_name="thousand_bins_interpolated_ginis",
     )
     tb_thousand_bins_interpolated_ginis_all_lognormal = attach_extra_region_columns(
         tb_thousand_bins_interpolated_ginis_all_lognormal, country_to_owid_region, country_to_mpd_region
     )
     tb_thousand_bins_interpolated_ginis_all_lognormal = tb_thousand_bins_interpolated_ginis_all_lognormal.format(
-        ["country", "year", "region", "region_old", "owid_region", "mpd_region", "quantile"],
+        ["country", "year", "region", "owid_region", "mpd_region", "quantile"],
         short_name="thousand_bins_interpolated_ginis_all_lognormal",
     )
 
@@ -609,7 +609,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
                             data={
                                 "country": [successor],
                                 "year": [LATEST_YEAR],
-                                "gdp_per_capita": [pd.NA],
+                                "gdp_per_capita": [
+                                    np.nan
+                                ],  # pandas 3 concat no longer ignores all-NA object columns when picking the dtype
                                 "region": [region],
                             }
                         )
@@ -921,7 +923,7 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: set[int]) -> Tab
     """
     # Convert to categoricals
     # TODO: These should be already categoricals in the first place!
-    tb = tb.astype({"country": "category", "region": "category", "region_old": "category", "year": "UInt16"})
+    tb = tb.astype({"country": "category", "region": "category", "year": "UInt16"})
 
     # Calculate global population per year (sum of all quantile populations)
     tb_global_pop = tb.groupby("year", observed=True)["pop"].sum().reset_index()
@@ -2185,9 +2187,9 @@ def expand_means_and_ginis_to_thousand_bins(
         # Drop temporary column
         tb_expanded = tb_expanded.drop(columns=["total_income"])
 
-    # Add region and region_old columns, from tb_thousand_bins
-    # Create a mapping of country to region and region_old
-    country_region_map = tb_thousand_bins[["country", "region", "region_old"]].drop_duplicates()
+    # Add region column, from tb_thousand_bins
+    # Create a mapping of country to region
+    country_region_map = tb_thousand_bins[["country", "region"]].drop_duplicates()
     tb_expanded = pr.merge(
         tb_expanded,
         country_region_map,
@@ -2204,9 +2206,6 @@ def expand_means_and_ginis_to_thousand_bins(
     )
     assert isinstance(tb_expanded["region"].dtype, pd.CategoricalDtype), (
         f"region must be categorical after merge, got {tb_expanded['region'].dtype}"
-    )
-    assert isinstance(tb_expanded["region_old"].dtype, pd.CategoricalDtype), (
-        f"region_old must be categorical after merge, got {tb_expanded['region_old'].dtype}"
     )
 
     # OPTIMIZATION: Sort tb_expanded before concatenating to avoid sorting the entire concatenated table
@@ -2241,7 +2240,8 @@ def safe_log(values: pd.Series | np.ndarray) -> np.ndarray:
     """
     # Convert to float array
     if isinstance(values, pd.Series):
-        arr = values.values.astype(float)
+        # na_value is needed for nullable dtypes, whose pd.NA can't be cast to float directly in pandas 3.
+        arr = values.to_numpy(dtype=float, na_value=np.nan, copy=True)
     else:
         arr = np.asarray(values, dtype=float).copy()
 
@@ -2268,7 +2268,8 @@ def safe_exp(values: pd.Series | np.ndarray) -> np.ndarray:
     """
     # Convert to float array
     if isinstance(values, pd.Series):
-        arr = values.values.astype(float)
+        # na_value is needed for nullable dtypes, whose pd.NA can't be cast to float directly in pandas 3.
+        arr = values.to_numpy(dtype=float, na_value=np.nan, copy=True)
     else:
         arr = np.asarray(values, dtype=float).copy()
 

@@ -291,7 +291,7 @@ def add_test_units(tb: Table) -> Table:
     tb.loc[tb[COLUMNS_TESTING].isna().all(axis=1), "tests_units"] = pd.NA
 
     # Dtype
-    tb["tests_units"] = tb["tests_units"].astype("string")
+    tb["tests_units"] = tb["tests_units"].astype("str")
     return tb
 
 
@@ -332,7 +332,7 @@ def add_region_indicators(tb: Table, ds_regions: Dataset) -> Table:
     tb_regions = ds_regions.read("regions")
     ## continent
     tb_cont = tb_regions.loc[tb_regions["region_type"] == "continent", ["name", "members"]]  # .explode("members")
-    tb_cont["members"] = tb_cont["members"].astype("string").apply(lambda x: literal_eval(x))
+    tb_cont["members"] = tb_cont["members"].astype("str").apply(lambda x: literal_eval(x))
     tb_cont = tb_cont.explode("members").rename(columns={"name": "continent", "members": "code"})
     ## code
     tb_regions = tb_regions[["code", "name"]].rename(columns={"name": "country"})

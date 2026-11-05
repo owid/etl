@@ -24,7 +24,6 @@ from apps.inspector.config import (
     INSTRUCTION_BUFFER_TOKENS,
     MAX_CONCURRENT_REQUESTS,
     MAX_PROMPT_TOKENS,
-    MODEL_PRICING,
     VARIABLE_FIELDS_TO_CHECK,
 )
 from apps.inspector.db import build_explorer_url, parse_chart_config, parse_dimensions
@@ -35,6 +34,7 @@ from apps.inspector.utils import (
     format_field_value,
     get_text_context,
 )
+from apps.utils.llms.costs import estimate_llm_cost
 from etl import config
 from etl.paths import BASE_DIR
 
@@ -50,9 +50,8 @@ def calculate_cost(
 ) -> float:
     """Calculate cost in USD for given token counts including cache costs.
 
-    TODO: This could be integrated into function `estimate_llm_cost` from `apps.utils.llms.costs`
     Args:
-        input_tokens: Number of regular input tokens (non-cached)
+        input_tokens: Number of regular input tokens (non-cached), as in Anthropic's `usage.input_tokens`
         output_tokens: Number of output tokens
         cache_creation_tokens: Number of tokens written to cache
         cache_read_tokens: Number of tokens read from cache
@@ -61,25 +60,14 @@ def calculate_cost(
     Returns:
         Cost in USD
     """
-    model_name = model or CLAUDE_MODEL
-    if model_name not in MODEL_PRICING:
-        raise ValueError(f"Unknown model '{model_name}'. Please add pricing to MODEL_PRICING dictionary.")
-    pricing = MODEL_PRICING[model_name]
-
-    # Regular input tokens
-    regular_input_tokens = input_tokens - cache_creation_tokens - cache_read_tokens
-    input_cost = (regular_input_tokens / 1_000_000) * pricing["input"]
-
-    # Cache creation cost (25% premium over regular input)
-    cache_write_cost = (cache_creation_tokens / 1_000_000) * pricing["input"] * 1.25
-
-    # Cache read cost (90% discount, so 10% of regular price)
-    cache_read_cost = (cache_read_tokens / 1_000_000) * pricing["input"] * 0.01
-
-    # Output cost
-    output_cost = (output_tokens / 1_000_000) * pricing["output"]
-
-    return input_cost + cache_write_cost + cache_read_cost + output_cost
+    return estimate_llm_cost(
+        f"anthropic:{model or CLAUDE_MODEL}",
+        # genai-prices counts cached tokens as part of the input.
+        input_tokens=input_tokens + cache_creation_tokens + cache_read_tokens,
+        output_tokens=output_tokens,
+        cache_read_tokens=cache_read_tokens,
+        cache_write_tokens=cache_creation_tokens,
+    )
 
 
 def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> dict[int | str, list[dict[str, Any]]]:

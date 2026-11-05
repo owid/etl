@@ -21,7 +21,11 @@ macros: |-
               <% set base = "Age-standardized current cases of " ~ sex ~ " with " ~ cause %>
           <% endif %>
       <% elif age == 'All ages' %>
-          <% set base = "Total current number of " ~ sex ~ " with " ~ cause %>
+          <% if metric == "Number" %>
+              <% set base = "Total current number of " ~ sex ~ " with " ~ cause %>
+          <% else %>
+              <% set base = "Current cases of " ~ sex ~ " with " ~ cause %>
+          <% endif %>
       <% else %>
           <% set base = "Current cases of " ~ cause ~ ", among " ~ sex ~ " aged " ~ age %>
       <% endif %>

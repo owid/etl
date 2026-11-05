@@ -262,7 +262,7 @@ def make_table_wide_and_map_categories(tb: Table, table_name: str = "table", che
     means "no country currently holds this status" (still a legitimate historical value).
     """
     # Make value_formatted a string
-    tb["value_formatted"] = tb["value_formatted"].astype("string")
+    tb["value_formatted"] = tb["value_formatted"].astype("str")
 
     # Make the dataframe wide by pivoting on the issue column.
     tb = tb.pivot(

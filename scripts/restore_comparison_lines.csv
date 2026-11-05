@@ -1,0 +1,104 @@
+chart_id,slug,title,subtitle_describes_the_line,last_archive_before_migration
+177,incidence-of-child-labour-boys-vs-girls,"Share of children in employment, boys vs. girls",0,20260402-163007
+308,trust-in-others-vs-trust-in-police,"Trust in others vs. trust in police, Europe",0,20260402-163007
+633,share-of-rural-population-with-electricity-access-vs-share-of-total-population-with-electricity-access,Share of rural vs. urban population with electricity access,0,20260325-171315
+684,how-much-we-think-we-spend-on-healthcare-vs-how-much-we-actually-do,How much we think we spend on healthcare vs. how much we actually do,0,20260402-163007
+711,child-mortality-vs-level-of-prosperity-regression,Child mortality vs. GDP per capita,0,20260402-164039
+765,birth-rate-vs-death-rate,Birth rate vs. death rate,1,20260402-161824
+811,prevalence-of-hiv-percentage-of-males-and-females-ages-15-24-infected-with-hiv,Share of young men and women living with HIV,1,20260402-163007
+825,daily-protein-supply-of-animal-origin-vs-plant-origin,Daily protein supply of animal origin vs. plant origin,1,20260402-173937
+976,mean-versus-median-monthly-per-capita-expenditure-or-income,Mean vs. median income or consumption,0,20260413-090342
+1169,female-employment-to-population-ratio-latest-vs-1980,"Female employment rate, 1980 vs. 2024",0,20260402-163007
+1178,male-vs-female-informal-employment-as-share-of-total-employment,Share of workers in informal employment: men vs. women,0,20260325-171315
+1255,children-who-experience-violent-discipline-boys-vs-girls,"Children who experience violent discipline, boys vs. girls",0,20260402-163007
+1274,labor-force-participation-rates-for-women-ages-15-24-2020-vs-1980,"Labor force participation rate for women ages 15-24, 1980 vs. 2023",0,20260402-163007
+1374,contraceptive-prevalence-any-methods-vs-modern-methods,Contraceptive usage: modern methods vs. any methods,0,20260325-171315
+1499,urban-improved-water-access-vs-rural-water-access,Using improved water sources: urban vs. rural population,0,20260325-171315
+1502,open-defecation-in-rural-areas-vs-urban-areas,Open defecation in rural areas vs. urban areas,0,20260325-171315
+1796,hourly-earnings-male-vs-female,Average hourly earnings of male and female employees,0,20260325-171315
+1805,road-mortality-rate-comparison,"Road mortality rate, IHME vs. WHO data",0,20260325-171315
+1825,malaria-deaths-comparisons,Malaria deaths: IHME vs. WHO estimates,0,20260402-163007
+1872,suicide-vs-violent-deaths,Suicide rate vs. death rate from violence,0,20260402-163007
+1898,net-enrollment-pre-primary-boys-vs-girls,Net enrollment rate of boys vs. girls in pre-primary education,0,20260325-171315
+1976,proportion-with-ict-skills-by-sex,Share of male vs. female people who can use electronic presentation software,0,20260325-171315
+2002,share-of-children-vaccinated-against-measles-vs-share-vaccinated-against-dpt3,"Share of children vaccinated against measles vs. against diphtheria, tetanus, and pertussis",0,20260402-163007
+2124,depressive-disorders-prevalence-males-vs-females,"Share of people living with depressive disorders, males vs. females",0,20260402-163007
+2130,prevalence-of-alcohol-disorders-males-vs-females,"Share of people who have alcohol use disorders, men vs. women",0,20260402-163007
+2150,prevalence-of-drug-use-disorders-males-vs-females,"Share of the population with drug use disorders, men vs. women",0,20260402-163007
+2160,anxiety-disorders-prevalence-males-vs-females,"Share of the population with anxiety disorders, males vs. females",0,20260402-163007
+2167,eating-disorders-prevalence-males-vs-females,"Share of the population with an eating disorder, males vs. females",0,20260402-163007
+2170,bipolar-disorder-prevalence-males-vs-females,"Share of the population with bipolar disorder, males vs. females",0,20260402-163007
+2190,schizophrenia-prevalence-males-vs-females,"Share of people living with schizophrenia, males vs. females",0,20260402-163007
+2288,prevalence-of-hiv-unaids-vs-ihme-estimates,"Share of the population living with HIV, UNAIDS vs. IHME",0,20260402-163007
+2308,share-of-male-vs-female-employment-in-agri,Share of male vs. female employment in agriculture,0,20260402-163007
+2309,share-of-male-vs-female-employment-in-services,Share of male vs. female employment in services,0,20260402-163007
+2376,urban-vs-rural-population-using-at-least-basic-sanitation,Share of urban vs. rural population using at least basic sanitation,0,20260325-171315
+2397,prevalence-intellectual-disability-males-vs-females,Share of men vs women with developmental intellectual disabilities,0,20260325-171315
+2413,borrowing-to-start-or-expand-business-men-vs-women,"Borrowing to start or expand business, men vs. women",0,20260325-171315
+2415,land-ownership-men-vs-women,Land ownership among men vs. women,0,20260325-171315
+2424,value-added-vs-share-of-emissions-china,Contribution to value added vs. share of CO₂ emissions in China,1,20260306-181537
+2425,value-added-vs-share-of-emissions-usa,Contribution to value added vs. share of CO₂ emissions in USA,1,20260306-181537
+2426,value-added-vs-share-of-emissions-germany,Contribution to value added vs. share of CO₂ emissions in Germany,1,20260306-181537
+2427,value-added-growth-vs-emissions-growth-china,Value added growth vs. CO₂ emissions growth in China,0,20260306-181537
+2428,value-added-growth-vs-emissions-growth-usa,Value added growth vs. CO₂ emissions growth in the USA,0,20260306-181537
+2429,value-added-growth-vs-emissions-growth-germany,Value added growth vs. CO₂ emissions growth in Germany,0,20260306-181537
+2447,share-with-mental-health-males-vs-females,"Share of people with mental health disorders, males vs. females",0,20260402-163007
+2455,alcohol-or-drug-use-disorders-male-vs-female,"Share with alcohol or drug use disorders, men vs. women",0,20260402-163007
+2477,alcohol-consumption-by-15-19-year-old-males-vs-females,Average alcohol consumption by 15-19 year old males vs. females,0,20260402-163007
+2507,knowledge-hiv-prevention-in-males-vs-females,"Share of young people with knowledge on HIV prevention, men vs. women",0,20260402-163007
+2521,employment-to-population-ratio-men-vs-women,"Employment rate, men vs. women",0,20260402-163007
+2524,household-vs-outdoor-air-pollution-death-rates,Indoor air pollution vs. outdoor air pollution death rate,0,20260325-171315
+2529,new-cases-of-hiv-unaids-vs-ihme,"New cases of HIV per 1,000 individuals, UNAIDS vs. IHME",0,20260402-163007
+2597,capital-intensity-vs-labor-productivity,Capital intensity vs. labor productivity,0,20260402-163007
+2606,depressive-disorders-prevalence-ihme-vs-who,"Depressive disorders prevalence, IHME vs. WHO",0,20260402-163007
+2620,share-with-alcohol-vs-drug-use-disorder,Share of population with alcohol use disorder vs. drug use disorder,0,20260402-163007
+2643,loan-from-a-financial-institution-poorest-40-vs-richest-60,"Loan from a financial institution, poorest 40% vs. richest 60%",0,20260304-094028
+2644,share-of-adults-borrowing-from-a-financial-institution-vs-family-or-friends,Share of adults borrowing from a financial institution vs. family or friends,0,20260304-094028
+2664,augmented-human-development-index-comparison,Augmented Human Development Index: with vs. without income metric,0,20260402-163007
+2705,literacy-rate-adult-total-dhs-surveys-vs-unesco,"Literacy rates, survey estimates vs. official UNESCO estimates",0,20260402-163007
+2736,prevalence-of-stunting-male-vs-female,"Malnutrition: Prevalence of childhood stunting, male vs. female",0,20260402-163007
+2775,children-aged-5-17-years-engaged-in-labor,Share of children engaged in labor by gender,0,20260325-171315
+2946,mortality-from-ncds-gender,"Expected chances of death from non-communicable diseases, by gender",0,20260402-163007
+3044,homicide-rate-ihme-vs-unodc,"Homicide rate, UNODC vs. IHME",0,20260402-164039
+3133,hci-males-vs-females,Human Capital Index in males vs. females,0,20260402-163007
+3163,death-rate-from-outdoor-air-pollution-in-1990-vs-2023,Death rate from outdoor air pollution in 1990 vs. 2023,1,20260402-163007
+3185,share-co2-emissions-vs-population,Share of global CO₂ emissions vs. share of population,0,20260402-163007
+3186,consumption-co2-emissions-vs-population,Share of global consumption-based CO₂ emissions vs. share of population,0,20260402-163007
+3187,consumption-vs-production-co2-per-capita,Consumption-based vs. territorial CO₂ emissions per capita,1,20260402-173937
+3350,infant-death-rates-by-cause-by-sex,Global infant mortality by cause for boys vs. girls,1,20260319-180137
+3354,sex-ratio-at-birth-vs-five-years-old,Sex ratio at birth vs. at five years old,1,20260402-161824
+3435,mean-height-males-vs-females,"Mean adult height by year of birth, males vs. females",0,20260325-171315
+3437,increase-male-vs-female-height,Percentage increase in mean male vs. female height over a century,0,20260325-171315
+3449,human-development-index-vs-mean-male-height,Human Development Index vs. mean male height,0,20260402-163007
+3517,average-schooling-vs-expected-schooling,Average years of schooling vs. expected years of schooling,0,20260402-163007
+3583,lung-cancer-deaths-men-women,Lung cancer death rate in men vs. women,0,20260325-171315
+3584,share-of-overweight-men-vs-women,Share of overweight men vs. women,0,20260325-171315
+3617,diphtheria-tetanus-pertussis-vaccine-vs-pneumococcal-vaccine-coverage,Pneumococcal vaccine vs. diphtheria-tetanus-pertussis vaccine coverage,0,20260402-164039
+3761,number-of-deaths-from-indoor-air-pollution-1990-vs-2023,"Number of deaths from indoor air pollution, 1990 vs. 2023",0,20260325-171315
+3762,death-rate-from-indoor-air-pollution-in-1990-vs-2023,Death rate from indoor air pollution in 1990 vs. 2023,0,20260325-171315
+3771,homicide-rate-1990-vs-2020,Homicide rate in 1990 vs. 2020,1,20260402-164039
+3775,smoking-death-rate-in-1990-vs-2023,Smoking death rate in 1990 vs. 2023,0,20260325-171315
+3777,adults-smoking-2007-2018,Share of adults who smoke or use other tobacco in 2000 vs. 2022,0,20260402-164039
+3794,suicide-rate-in-1980-vs-2023,Suicide rate in 1980 vs. 2023,0,20260402-163007
+3803,outdoor-air-pollution-deaths-in-1990-vs-2023,Outdoor air pollution deaths in 1990 vs. 2023,1,20260325-171315
+3804,pm-exposure-1990-2017,Particulate matter exposure in 1990 vs. 2017,0,20260325-171315
+4337,per-capita-ghg-co2-excluding-land-use,Per capita GHG emissions vs. per capita CO₂ emissions,0,20260402-164039
+4338,per-capita-ghg-co2-including-land-use,Per capita GHG emissions vs. per capita CO₂ emissions,0,20260402-164039
+4671,domestic-forest-change-vs-imported-deforestation,Change in domestic forest area vs. deforestation embedded in imported goods,0,20260325-171315
+5087,nitrogen-output-vs-nitrogen-input-to-agriculture,Nitrogen output vs. nitrogen input to agriculture,0,20260325-171315
+5252,deaths-attributed-to-household-air-pollution-vs-deaths-attributed-to-ambient-air-pollution,Deaths attributed to household air pollution vs. deaths attributed to ambient air pollution,0,20260402-163007
+5276,population-subjected-to-physical-violence,"Share of the population subjected to physical violence, male vs. female",0,20260402-163007
+6339,male-vs-female-suicide-who,Male vs. female suicide rate,0,20260402-163007
+6425,share-or-agricultural-population-with-land-ownership-rights-by-sex,"Share of agricultural population with land rights, by sex",0,20260402-163007
+6437,share-of-individuals-who-own-a-mobile-telephone-by-sex,"Share of people who own a mobile phone, by sex",0,20260325-171315
+6438,suicide-rate-2000-2019-who,Suicide rate in 2000 vs. 2021,0,20260402-163007
+6531,homicide-rate-ihme-vs-who-mort-db,"Homicide rate, IHME vs. WHO Mortality Database",0,20260325-171315
+6550,severe-food-insecurity-undernourishment,Share of the population defined as severely food insecure vs. undernourished,0,20260325-171315
+6615,unemployment-rate-by-disability,Unemployment rate in people with vs. without disability,0,20260325-171315
+6751,homicide-rate-by-sex,Homicide rate by sex of the victim,1,20260402-164039
+6752,homicide-rate-who-vs-unodc,"Homicide rate, WHO vs. UNODC",0,20260402-164039
+6913,annual-growth-income-consumption-poorest-vs-total-population,Annual growth of the income or consumption of the poorest 40% vs. the total population,0,20260402-163007
+7311,share-of-young-women-vs-men-who-are-not-in-education-employment-or-training,"Share of young women vs. men who are not in education, employment or training",0,20260410-215714
+7634,willingness-climate-action,People underestimate others' willingness to take climate action,0,20260325-171315
+7663,alcohol-consumption-per-capita-men-women,Alcohol consumption per capita in men and women,0,20260402-163007
+8869,agriculture-vs-non-agriculture-share-in-informal-employment,Share of workers in informal employment: agriculture vs. non-agriculture,0,20260325-171315

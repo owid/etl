@@ -95,12 +95,7 @@ You can adapt the function to your needs, and perform very different kind of int
     You can use any [:octicons-link-external-16: method from pandas](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.interpolate.html).
 
     ```python
-    tb = interpolate_table(
-        tb,
-        entity_col="country",
-        time_col="year",
-        method="quadratic"
-    )
+    tb = interpolate_table(tb, entity_col="country", time_col="year", method="quadratic")
     ```
 
 === "Interpolate within the year range of each country"
@@ -144,12 +139,7 @@ You can adapt the function to your needs, and perform different kinds of expansi
 
     ```python
     # Expand timeseries
-    tb = expand_time_column(
-        tb,
-        entity_col="country",
-        time_col="year",
-        method="full_range_entity"
-    )
+    tb = expand_time_column(tb, entity_col="country", time_col="year", method="full_range_entity")
     ```
 
 === "Expand to a specific range for ell entities"
@@ -158,12 +148,7 @@ You can adapt the function to your needs, and perform different kinds of expansi
 
     ```python
     tb = expand_time_column(
-        tb,
-        entity_col="country",
-        time_col="year",
-        method="full_range",
-        since_time=2000,
-        until_time=2020
+        tb, entity_col="country", time_col="year", method="full_range", since_time=2000, until_time=2020
     )
     ```
 
@@ -172,13 +157,7 @@ You can adapt the function to your needs, and perform different kinds of expansi
     Expand the timeseries to include all years within the minimum and maximum years present in the data for each entity, and fill missing years with a custom value (e.g., 0).
 
     ```python
-    tb = expand_time_column(
-        tb,
-        entity_col="country",
-        time_col="year",
-        method="full_range_entity",
-        fillna_value=0
-    )
+    tb = expand_time_column(tb, entity_col="country", time_col="year", method="full_range_entity", fillna_value=0)
     ```
 
 === "Expand to Observed Years"
@@ -186,12 +165,7 @@ You can adapt the function to your needs, and perform different kinds of expansi
     Expand the timeseries to include all years that appear in the data for any entity. This ensures that all entities have rows for all observed years.
 
     ```python
-    tb = expand_time_column(
-        tb,
-        entity_col="country",
-        time_col="year",
-        method="observed"
-    )
+    tb = expand_time_column(tb, entity_col="country", time_col="year", method="observed")
     ```
 
 ## Deprecate code
@@ -308,6 +282,7 @@ with snap.extracted() as archive:
     json_path = archive.path / "config.json"
     if json_path.exists():
         import json
+
         with open(json_path) as f:
             config = json.load(f)
 ```

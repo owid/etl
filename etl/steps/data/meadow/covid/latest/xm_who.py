@@ -70,7 +70,7 @@ def process_table(tb: Table):
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     # Generate date
     def to_int(s):
-        return s.astype(int).astype("string")
+        return s.astype(int).astype("str")
 
     tb["date"] = to_int(tb["year"]) + "-" + to_int(tb["month"]) + "-1"
     tb["date"] = pd.to_datetime(tb["date"])

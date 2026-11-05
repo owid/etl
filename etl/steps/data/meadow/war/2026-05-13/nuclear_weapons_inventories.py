@@ -23,7 +23,7 @@ def run() -> None:
     tb = tb.melt(id_vars=["country"], var_name="year", value_name="number_of_warheads")
 
     # Improve table format.
-    tb = tb.format(["country", "year"]).astype({"number_of_warheads": "string"})
+    tb = tb.format(["country", "year"]).astype({"number_of_warheads": "str"})
 
     #
     # Save outputs.

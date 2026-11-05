@@ -1,0 +1,30 @@
+grapher_schema: "011"
+chart_config_id: 01944ada-8237-7857-816a-c73394ead021
+slug: share-of-women-who-have-had-no-births-across-their-childbearing-years
+topic_tags:
+  - Fertility Rate
+  - Women's Rights
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort_share_women#share_women__num_births_0
+          display:
+            name: No births
+    config:
+      title: Share of women who have had no births by the end of their childbearing years
+      subtitle: ''
+      originUrl: /fertility-rate
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - Sweden
+        - Spain
+        - United States
+        - Japan
+        - Canada
+      xAxis:
+        label: Women's birth year
+      yAxis:
+        min: 0

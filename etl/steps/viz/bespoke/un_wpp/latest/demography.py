@@ -4,7 +4,7 @@ The feed is built from the `un_wpp` garden dataset, and comes out as `demography
 which lists every entity and the file name carrying it, plus one `demography.<slug>.data.json` per
 entity holding that entity's population by age and sex, age-specific fertility rates, deaths by age
 and sex, and net migration rate -- as estimates up to `LAST_ESTIMATE_YEAR`, and as the UN's medium
-projection variant after it. Alongside them goes `metadata.json`, the feed's provenance derived
+projection variant after it. `demography.metadata.json` also carries the feed's provenance derived
 from the garden columns (see `etl.viz.bespoke`).
 
 The files go to the step's output folder; the framework syncs that folder to the R2 path of the
@@ -28,13 +28,34 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
 
 # The file that indexes the rest of the feed.
 INDEX_FILENAME = "demography.metadata.json"
+
+# What the viz shows about the tool itself. It describes the tool, not one column, so it is set
+# here rather than in the garden metadata (which a feed combining several columns doesn't carry).
+DESCRIPTION_KEY = """\
+We’ve built this tool to be deliberately simple: small enough to run in a browser and nevertheless capable of modeling whole populations based on the key demographic inputs.
+
+It is less detailed than the models expert demographers use, and our aim is not to replace them. We hope it’s useful for developing an understanding of the difference that changes in demographic variables can make to the size and structure of future populations.
+
+In our [technical documentation](https://docs.owid.io/projects/etl/analyses/population_tool/), we provide a much more detailed walkthrough of our methodology and its limitations. Here, we’ll provide a much more brief summary.
+
+The model draws on historical population and demographic data from the United Nations (UN).
+
+The tool uses the UN’s historical data for 2023 for these metrics, then allows the user to select values for three metrics — fertility rates, life expectancy, and net migration — at three points in time: 2030, 2050, and 2100.
+
+The model then shows what would happen to the total population and age structure of that country over the course of this century.
+
+Our model applies the cohort-component method. This approach is also used by the UN in its forecasts, and is commonly used by expert demographers, researchers, and statistical offices.
+
+The approach follows groups of people — cohorts — over time, and applies the expected inputs for fertility, mortality, and migration to each cohort.
+
+Cohorts are broken down by age and sex. The projected change for the first year is then based on four changes: deaths, aging, migration, and births. The output of this model run for one year then becomes the population cohort input for the next year, and this repeats."""
 
 # The five-year bands the visualization draws its population pyramid from. `un_wpp` also carries
 # single years of age and wider bands over the same people (`0-14`, `15-64`), which would double
@@ -258,21 +279,20 @@ def run() -> None:
 
     # The feed's provenance, from the origins of the data it is built on, rather than a source
     # string typed in here that goes stale the next time the dataset is updated.
-    write_feed_metadata(
-        paths.output_dir,
-        build_feed_metadata(
-            title="Population, fertility, deaths and migration",
-            columns={
-                "Population": metadata_column(tb_population, "population"),
-                "Fertility rate": metadata_column(tb_fertility, "fertility_rate"),
-                "Deaths": metadata_column(tb_deaths, "deaths"),
-                "Net migration rate": metadata_column(tb_migration, "net_migration_rate"),
-            },
-            update_period_days=ds_garden.metadata.update_period_days,
-        ),
+    feed_metadata = build_feed_metadata(
+        title="Population, fertility, deaths and migration",
+        columns={
+            "Population": metadata_column(tb_population, "population"),
+            "Fertility rate": metadata_column(tb_fertility, "fertility_rate"),
+            "Deaths": metadata_column(tb_deaths, "deaths"),
+            "Net migration rate": metadata_column(tb_migration, "net_migration_rate"),
+        },
+        update_period_days=ds_garden.metadata.update_period_days,
     )
+    feed_metadata["descriptionKey"] = DESCRIPTION_KEY
 
-    save_json({"countries": entities, "slugs": {entity: slugify(entity) for entity in entities}}, INDEX_FILENAME)
+    manifest = {"countries": entities, "slugs": {entity: slugify(entity) for entity in entities}}
+    save_json(add_feed_metadata(manifest, feed_metadata), INDEX_FILENAME)
 
     for entity in tqdm(entities, desc="Writing entity files"):
         data = {
@@ -301,4 +321,4 @@ def run() -> None:
         sanity_check_entity(entity, data)
         save_json(data, f"demography.{slugify(entity)}.data.json")
 
-    log.info("demography.written", n_files=len(entities) + 2, n_entities=len(entities), dest=str(paths.output_dir))
+    log.info("demography.written", n_files=len(entities) + 1, n_entities=len(entities), dest=str(paths.output_dir))

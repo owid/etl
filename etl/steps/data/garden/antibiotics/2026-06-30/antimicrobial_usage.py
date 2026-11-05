@@ -112,7 +112,7 @@ def aggregate_antimicrobial_classes(tb: Table):
 
     tb = tb.copy(deep=True)
     # Convert the column to strings (if not already done)
-    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype("string")
+    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype("str")
 
     # Create a completely independent copy of antituberculosis rows and reset its index
     msk = tb["antimicrobialclass"] == "Drugs for the treatment of tuberculosis (ATC J04A)"
@@ -165,7 +165,7 @@ def format_notes(tb_notes: Table) -> Table:
     tb_desc = (
         tb_notes.dropna(subset=["description_processing"])  # Remove NaNs
         .groupby(["antimicrobialclass"])["description_processing"]
-        .apply(lambda x: list(set(x)))  # Combine unique values into a list
+        .apply(lambda x: sorted(set(x)))  # Combine unique values into a list, sorted so the order is stable across runs
         .reset_index()
     )
 

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="388.8pt" height="388.8pt" viewBox="0 0 388.8 388.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 388.8 
+L 388.8 388.8 
+L 388.8 0 
+L 0 0 
+L 0 388.8 
+z
+" style="fill: none"/>
+  </g>
+  <g id="band__allocable">
+   <path d="M 43.92 342 
+L 220.32 342 
+L 220.32 195.67064 
+L 43.92 195.67064 
+z
+" style="fill: #f5e2cd"/>
+  </g>
+  <g id="bar__non-allocable">
+   <path d="M 43.92 194.28104 
+L 130.32 194.28104 
+L 130.32 128.16 
+L 43.92 128.16 
+z
+" style="fill: #93989f"/>
+  </g>
+  <g id="bar__allocable">
+   <path d="M 43.92 342.72 
+L 130.32 342.72 
+L 130.32 194.28104 
+L 43.92 194.28104 
+z
+" style="fill: #d4ac7f"/>
+  </g>
+  <g id="bar__non-climate">
+   <path d="M 155.52 292.128307 
+L 220.32 292.128307 
+L 220.32 194.28104 
+L 155.52 194.28104 
+z
+" style="fill: #7f96ba"/>
+  </g>
+  <g id="bar__mitigation-only">
+   <path d="M 155.52 309.754139 
+L 220.32 309.754139 
+L 220.32 292.128307 
+L 155.52 292.128307 
+z
+" style="fill: #18470f"/>
+  </g>
+  <g id="bar__adaptation-only">
+   <path d="M 155.52 325.724912 
+L 220.32 325.724912 
+L 220.32 309.754139 
+L 155.52 309.754139 
+z
+" style="fill: #3b8e1d"/>
+  </g>
+  <g id="bar__overlap">
+   <path d="M 155.52 342.719997 
+L 220.32 342.719997 
+L 220.32 325.724912 
+L 155.52 325.724912 
+z
+" style="fill: #58ac8c"/>
+  </g>
+  <g id="bracket__line">
+   <path d="M 226.08 342 
+L 227.16 342 
+L 227.16 292.848307 
+L 226.08 292.848307 
+z
+" style="fill: #5b5b5b"/>
+  </g>
+  <g id="bracket__top">
+   <path d="M 223.2 293.928307 
+L 227.16 293.928307 
+L 227.16 292.848307 
+L 223.2 292.848307 
+z
+" style="fill: #5b5b5b"/>
+  </g>
+  <g id="bracket__bottom">
+   <path d="M 223.2 342.36 
+L 227.16 342.36 
+L 227.16 341.28 
+L 223.2 341.28 
+z
+" style="fill: #5b5b5b"/>
+  </g>
+  <g id="header__title-0-0">
+   <text style="font-weight: 700; font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="23.38875" transform="rotate(-0 11.52 23.38875)">How much bilateral development aid</text>
+  </g>
+  <g id="header__title-1-0">
+   <text style="font-weight: 700; font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="44.26875" transform="rotate(-0 11.52 44.26875)">is spent on</text>
+  </g>
+  <g id="header__title-1-1">
+   <text style="font-weight: 700; font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #578145" x="111.78668" y="44.26875" transform="rotate(-0 111.78668 44.26875)">climate-related projects</text>
+  </g>
+  <g id="header__title-1-2">
+   <text style="font-weight: 700; font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="314.663555" y="44.26875" transform="rotate(-0 314.663555 44.26875)">?</text>
+  </g>
+  <g id="header__subtitle">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="63.612" transform="rotate(-0 11.52 63.612)">Bilateral aid is given from one country (or EU institution) to another.</text>
+  </g>
+  <g id="header__subtitle-line1">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="77.436" transform="rotate(-0 11.52 77.436)">It makes up almost 90% of development aid; the rest is multilateral aid</text>
+  </g>
+  <g id="header__subtitle-line2">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="91.26" transform="rotate(-0 11.52 91.26)">(money pooled by international organizations).</text>
+  </g>
+  <g id="head__all">
+   <text style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="46.08" y="111.16125" transform="rotate(-0 46.08 111.16125)">All bilateral aid</text>
+  </g>
+  <g id="head__all-value">
+   <text style="font-weight: 700; font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="46.08" y="122.68125" transform="rotate(-0 46.08 122.68125)">$210 billion</text>
+  </g>
+  <g id="label__non-allocable">
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="49.68" y="143.5905" transform="rotate(-0 49.68 143.5905)">Non-allocable</text>
+  </g>
+  <g id="label__non-allocable-value">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="49.68" y="157.29975" transform="rotate(-0 49.68 157.29975)">$65 billion</text>
+  </g>
+  <g id="label__non-allocable-value-line1">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="49.68" y="168.53175" transform="rotate(-0 49.68 168.53175)">31%</text>
+  </g>
+  <g id="label__allocable">
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="49.68" y="209.71154" transform="rotate(-0 49.68 209.71154)">Allocable</text>
+  </g>
+  <g id="label__allocable-value">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="49.68" y="223.42079" transform="rotate(-0 49.68 223.42079)">$145 billion</text>
+  </g>
+  <g id="label__allocable-value-line1">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="49.68" y="234.65279" transform="rotate(-0 49.68 234.65279)">69%</text>
+  </g>
+  <g id="head__allocable">
+   <text style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #c29767" x="156.96" y="166.79189" transform="rotate(-0 156.96 166.79189)">Allocable</text>
+  </g>
+  <g id="head__allocable-line1">
+   <text style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #c29767" x="156.96" y="177.59189" transform="rotate(-0 156.96 177.59189)">bilateral aid</text>
+  </g>
+  <g id="head__allocable-value">
+   <text style="font-weight: 700; font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #c29767" x="156.96" y="188.75189" transform="rotate(-0 156.96 188.75189)">$145 billion</text>
+  </g>
+  <g id="label__non-climate">
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #7f96ba" x="233.28" y="209.71154" transform="rotate(-0 233.28 209.71154)">Other (non-climate): $96 billion</text>
+  </g>
+  <g id="label__non-climate-value">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="233.28" y="223.42079" transform="rotate(-0 233.28 223.42079)">66% of allocable aid</text>
+  </g>
+  <g id="label__mitigation-only-0">
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #18470f" x="233.28" y="304.160973" transform="rotate(-0 233.28 304.160973)">Mitigation only</text>
+  </g>
+  <g id="label__mitigation-only-1">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="304.654753" y="304.160973" transform="rotate(-0 304.654753 304.160973)">$17 bn · 12%</text>
+  </g>
+  <g id="label__adaptation-only-0">
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #338711" x="233.28" y="320.959276" transform="rotate(-0 233.28 320.959276)">Adaptation only</text>
+  </g>
+  <g id="label__adaptation-only-1">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="310.001836" y="320.959276" transform="rotate(-0 310.001836 320.959276)">$16 bn · 11%</text>
+  </g>
+  <g id="label__overlap-0">
+   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2c8465" x="233.28" y="337.442205" transform="rotate(-0 233.28 337.442205)">Overlap (both)</text>
+  </g>
+  <g id="label__overlap-1">
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="302.840339" y="337.442205" transform="rotate(-0 302.840339 337.442205)">$17 bn · 11%</text>
+  </g>
+  <g id="label__climate-related">
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #578145" x="233.28" y="277.549207" transform="rotate(-0 233.28 277.549207)">Climate-related: $50bn</text>
+  </g>
+  <g id="label__climate-related-share">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="233.28" y="288.407707" transform="rotate(-0 233.28 288.407707)">34% of allocable aid</text>
+  </g>
+  <g id="footer__note-0">
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="360.7425" transform="rotate(-0 11.52 360.7425)">Note:</text>
+  </g>
+  <g id="footer__note-1">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="40.194844" y="360.7425" transform="rotate(-0 40.194844 360.7425)">Aid is official development assistance (ODA) commitments. Data is for 2024.</text>
+  </g>
+  <g id="footer__source-0">
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="375.1425" transform="rotate(-0 11.52 375.1425)">Data source:</text>
+  </g>
+  <g id="footer__source-1">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="75.518353" y="375.1425" transform="rotate(-0 75.518353 375.1425)">Based on OECD RioMarkers and Creditor Reporting System.</text>
+  </g>
+  <g id="footer__license">
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #858585" x="377.28" y="375.1425" transform="rotate(-0 377.28 375.1425)">CC BY</text>
+  </g>
+ </g>
+</svg>

@@ -15,11 +15,11 @@ from typing_extensions import Self
 from apps.utils.files import generate_step, generate_step_to_channel
 from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
+from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION
 from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
 from etl.owners import resolve_owner
 from etl.paths import DAG_DIR, STEP_DIR
-from etl.viz.chart.utils import default_grapher_schema_version
 
 
 def _current_git_owner() -> str:
@@ -72,7 +72,7 @@ class StepForm(BaseModel):
         raise NotImplementedError("Needs to be implemented in the child class!")
 
     @property
-    def metadata(self: Self) -> None:
+    def metadata(self: Self) -> dict[str, Any]:
         """Get metadata as dictionary."""
         raise NotADirectoryError("Needs to be implemented in the child class!")
 
@@ -517,7 +517,7 @@ class SnapshotForm(StepForm):
             raise ValueError("attribution must be present!")
 
     @property
-    def metadata(self: Self) -> dict[str, Any]:  # ty: ignore[invalid-method-override]
+    def metadata(self: Self) -> dict[str, Any]:
         """Define metadata for easy YAML-export."""
         license_field = {
             "name": self.license_name,
@@ -647,9 +647,9 @@ class ChartForm(StepForm):
 def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
 
-    # Chart configs must pin `grapher_schema`; scaffold it at the version we vendor today so
+    # Chart configs must pin `grapher_schema`; scaffold it at the current default version so
     # the generated config runs as-is instead of failing on the missing pin.
-    data = {**data, "grapher_schema": default_grapher_schema_version()}
+    data = {**data, "grapher_schema": DEFAULT_GRAPHER_SCHEMA_VERSION}
 
     target_dir = STEP_DIR / "viz" / "chart"
     generate_step(cookiecutter_path, data, target_dir)

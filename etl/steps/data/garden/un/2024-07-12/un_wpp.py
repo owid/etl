@@ -241,6 +241,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
             "Low": "low",
             "High": "high",
             "Constant fertility": "constant_fertility",
+            "Zero migration": "zero_migration",
         },
     )
     tb_sex = harmonize_dimension(
@@ -251,6 +252,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
             "Low": "low",
             "High": "high",
             "Constant fertility": "constant_fertility",
+            "Zero migration": "zero_migration",
         },
     )
     tb = harmonize_dimension(
@@ -277,8 +279,8 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
     del tb_density
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
-    tb_sex["age"] = tb_sex["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
+    tb_sex["age"] = tb_sex["age"].astype("str")
     # Separate january and july data
     msk_jan = tb["month"] == "January"
     tb_jan = tb.loc[msk_jan]
@@ -407,7 +409,7 @@ def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
     tb["net_migration"] *= 1000
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     # Zero value for "World"
     tb.loc[tb["country"] == "World", ["net_migration", "net_migration_rate"]] = 0
@@ -496,7 +498,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="outer")
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
     return tb
 
 
@@ -597,7 +599,7 @@ def process_fertility(tb: Table) -> Table:
     tb = tb.loc[tb["age"] != "55-59"]
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     return tb
 
@@ -651,7 +653,7 @@ def process_mortality(tb: Table) -> Table:
     tb["mortality_rate"] /= 10
 
     # Age as string
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     return tb
 
@@ -683,6 +685,7 @@ def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> T
             "Medium": "medium",
             "Low": "low",
             "High": "high",
+            "Zero migration": "zero_migration",
         },
         strict=False,
     )
@@ -693,7 +696,7 @@ def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> T
     if "age" not in tb.columns:
         tb["age"] = "all"
 
-    tb["age"] = tb["age"].astype("string")
+    tb["age"] = tb["age"].astype("str")
 
     return tb
 
@@ -722,7 +725,7 @@ def estimate_sex_ratio(tb: Table, age_groups: list[str] | None = None):
 
 def set_variant_to_estimates(tb: Table) -> Table:
     """For data before YEAR_SPLIT, make sure to have variant = 'estimates'."""
-    tb["variant"] = tb["variant"].astype("string")
+    tb["variant"] = tb["variant"].astype("str")
     tb.loc[tb["year"] < YEAR_SPLIT, "variant"] = "estimates"
     return tb
 

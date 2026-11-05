@@ -7,7 +7,7 @@ tags:
 
 ## Setting Up OpenAI API Key
 
-Some of our tooling require access to OpenAI's models. To use these tools, you need to set up an API key:
+Only the WDI metadata updater (`update_wdi_metadata.py`) still uses OpenAI's models; everything else uses Claude via `ANTHROPIC_API_KEY`. To run it, you need to set up an API key:
 
 1. Make sure that you are added to the team on OpenAI's platform. If you are not, ask a colleague to add you.
 2. Go to the [:octicons-link-external-16: API keys](https://platform.openai.com/api-keys) page and create a new secret key.

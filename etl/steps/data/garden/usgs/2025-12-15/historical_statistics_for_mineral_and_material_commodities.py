@@ -339,7 +339,7 @@ def harmonize_units(tb: Table) -> Table:
     assert set(tb["unit"]) == {"metric tonnes", "metric tonnes of gross weight"}
     tb["unit"] = (
         tb["unit"]
-        .astype("string")
+        .astype("str")
         .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes of gross weight"})
     )
     tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
@@ -449,7 +449,7 @@ def prepare_unit_value(tb: Table, tb_metadata: Table) -> Table:
         )
     )
     # Remove spurious footnotes like "W".
-    tb_unit_value["unit_value"] = tb_unit_value["unit_value"].astype("string").replace("W", None).astype(float)
+    tb_unit_value["unit_value"] = tb_unit_value["unit_value"].astype("str").replace("W", None).astype(float)
     # Add notes to the table, using the extracted metadata.
     tb_unit_value = tb_unit_value.merge(
         tb_metadata[["commodity", "unit_value_98dollar_t"]].rename(
@@ -520,7 +520,7 @@ def run() -> None:
 
     # Read tables of data and extracted metadata from meadow dataset.
     tb = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities")
-    tb_metadata = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities_metadata").astype("string")
+    tb_metadata = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities_metadata").astype("str")
 
     #
     # Process data.
@@ -725,7 +725,7 @@ def run() -> None:
         ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_unit_value"
     )
     tb_unit_value = tb_unit_value.astype(
-        {column: "string" for column in tb_unit_value.columns if column.startswith("notes_")}
+        {column: "str" for column in tb_unit_value.columns if column.startswith("notes_")}
     )
     tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
 

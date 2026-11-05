@@ -111,8 +111,8 @@ def run(dest_dir: str) -> None:
     tb = add_universal_suffrage(tb)
 
     # Dtypes
-    tb["age_electdem_lied"] = tb["age_electdem_lied"].astype("string")
-    tb["age_polyarchy_lied"] = tb["age_polyarchy_lied"].astype("string")
+    tb["age_electdem_lied"] = tb["age_electdem_lied"].astype("str")
+    tb["age_polyarchy_lied"] = tb["age_polyarchy_lied"].astype("str")
 
     # Checks on countries
     assert set(

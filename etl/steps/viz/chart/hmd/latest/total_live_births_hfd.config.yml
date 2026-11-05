@@ -1,0 +1,30 @@
+grapher_schema: "011"
+chart_config_id: 01935484-6ad4-7734-aa91-39e3ecded4a7
+slug: total-live-births-hfd
+topic_tags:
+  - Fertility Rate
+  - Population Growth
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#b__birth_order_total
+          display:
+            tolerance: 5
+    config:
+      title: Number of live births
+      note: ''
+      variantName: HFD
+      internalNotes: ''
+      originUrl: /fertility-rate
+      hasMapTab: true
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - France
+        - Spain
+        - United Kingdom
+        - Italy
+      yAxis:
+        min: 0

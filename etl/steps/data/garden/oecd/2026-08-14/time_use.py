@@ -109,6 +109,13 @@ def run() -> None:
     #
     tb = paths.regions.harmonize_names(tb)
 
+    # NOTE: Mexico is kept although the OECD flags its estimates as "not fully comparable, due to
+    # methodological differences": the flag is about comparing countries, and within-country
+    # comparisons (women vs men) still hold. On each update, re-check which countries the workbook's
+    # Total sheet stars as not fully comparable (the notes under the table), and keep two things in
+    # step with that list: the `mexico_instrument` caveat in time_use.meta.yml, and `NOT_COMPARABLE`
+    # in viz://static/oecd/<version>/time_use_by_country, which leaves those countries off the chart.
+
     # The dataset has no time dimension of its own: each country reports one survey, whose year(s)
     # the source states as a label like "2009/10". Use the survey's end year as the year.
     tb["year"] = tb["survey_year"].map(parse_survey_end_year).copy_metadata(tb["minutes"])

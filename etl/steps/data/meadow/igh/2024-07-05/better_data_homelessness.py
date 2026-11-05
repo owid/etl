@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns=COLUMN_MAPPING, errors="raise")
 
     # Make people_experiencing_homelessness a string to filter out data.
-    tb["people_experiencing_homelessness"] = tb["people_experiencing_homelessness"].astype("string")
+    tb["people_experiencing_homelessness"] = tb["people_experiencing_homelessness"].astype("str")
 
     # Drop rows in people_experiencing_homelessness equalling "No local or national data available".
     tb = tb[tb["people_experiencing_homelessness"] != "No local or national data available"].reset_index(drop=True)

@@ -384,3 +384,9 @@ steps:
     - data://grapher/war/2026-06-10/ucdp_prio
     - data://grapher/war/2023-09-21/prio_v31
     - data://grapher/war/2023-09-21/cow_mid
+  # archived; last active in bf5dc8e25402 on 2026-10-07
+  data://grapher/war/2026-06-10/ucdp_cumulative:
+    - data://garden/war/2026-06-10/ucdp_cumulative:
+      - data://garden/war/2026-06-10/ucdp
+      - data://garden/demography/2024-07-15/population
+      - data://garden/countries/2024-08-27/gleditsch

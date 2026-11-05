@@ -128,8 +128,8 @@ def correct_outliers_in_data(tb: Table) -> Table:
     # Replace `rgdpo` values of Bermuda with `cgdpo` values, because of issues with the data
     tb.loc[tb["country"] == "Bermuda", "rgdpo"] = tb.loc[tb["country"] == "Bermuda", "cgdpo"]
 
-    # Filter dataframe with i_outlier different to "Outlier"
-    tb = tb[tb["i_outlier"] != "Outlier"].reset_index(drop=True)
+    # Drop outliers, and rows without an i_outlier flag: those have no indicator values at all.
+    tb = tb[tb["i_outlier"].notna() & (tb["i_outlier"] != "Outlier")].reset_index(drop=True)
 
     # Drop i_outlier column
     tb = tb.drop(columns=["i_outlier"])

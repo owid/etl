@@ -96,9 +96,11 @@ def smooth_estimates(tb: Table, poverty_lines: list) -> Table:
 
         # Replace values in LAST_YEAR_HISTORICAL with original values
         # NOTE: check if I need to do this
-        tb_smooth.loc[tb_smooth["year"] == LAST_YEAR_HISTORICAL, f"headcount_ratio_{povline}_smooth"] = tb_smooth.loc[
-            tb_smooth["year"] == LAST_YEAR_HISTORICAL, f"headcount_ratio_{povline}"
-        ].values
+        tb_smooth.loc[tb_smooth["year"] == LAST_YEAR_HISTORICAL, f"headcount_ratio_{povline}_smooth"] = (
+            tb_smooth.loc[tb_smooth["year"] == LAST_YEAR_HISTORICAL, f"headcount_ratio_{povline}"]
+            .astype("float64")
+            .values
+        )
 
     # For CBN
     tb_smooth_cbn["headcount_ratio_cbn_smooth"] = tb_smooth_cbn.groupby("country")["headcount_ratio_cbn"].transform(
@@ -107,9 +109,9 @@ def smooth_estimates(tb: Table, poverty_lines: list) -> Table:
 
     # Replace values in LAST_YEAR_FULL (the last year of the entire dataset) with original values
     # NOTE: check if I need to do this
-    tb_smooth_cbn.loc[tb_smooth_cbn["year"] == LAST_YEAR_FULL, "headcount_ratio_cbn_smooth"] = tb_smooth_cbn.loc[
-        tb_smooth_cbn["year"] == LAST_YEAR_FULL, "headcount_ratio_cbn"
-    ].values
+    tb_smooth_cbn.loc[tb_smooth_cbn["year"] == LAST_YEAR_FULL, "headcount_ratio_cbn_smooth"] = (
+        tb_smooth_cbn.loc[tb_smooth_cbn["year"] == LAST_YEAR_FULL, "headcount_ratio_cbn"].astype("float64").values
+    )
 
     # Select decadal years, FIRST_YEAR and LAST_YEAR (HISTORICAL AND FULL)
     tb_smooth = tb_smooth[

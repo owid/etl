@@ -25,8 +25,10 @@ from apps.wizard.app_pages.metadata_diff import cached, view_nav
 from apps.wizard.app_pages.metadata_diff.core import (
     SECTIONS,
     ViewDiff,
+    before_after_html,
     diff_window_html,
     field_label,
+    is_scattered_edit,
     view_label,
     view_url,
     where_note,
@@ -56,6 +58,11 @@ CONTEXT_CSS = """
 .mdd-context {{ color: #555; }}
 .mdd-context-label {{ color: #999; font-size: 12px; text-transform: uppercase;
   letter-spacing: .04em; margin-right: 6px; }}
+/* Before / After rows for a scattered edit: one changed passage per block, label column on the left. */
+.mdd-ba {{ border-left: 3px solid #e9ecef; padding: 2px 0 2px 10px; margin: 6px 0 10px; line-height: 1.55; }}
+.mdd-ba-row {{ display: flex; gap: 10px; margin: 3px 0; }}
+.mdd-ba-label {{ flex: 0 0 52px; color: #999; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .04em; padding-top: 2px; }}
 </style>
 """.replace("{{", "{").replace("}}", "}")
 
@@ -235,7 +242,21 @@ def st_edit_body(group: EditGroup) -> None:
     than as an "added" statement and a "removed" statement that the reader has to pair up. The context
     line below shows where it lands, windowed on the change inside the first text carrying it: every text
     in the group shares this edit by construction, so one is a fair exemplar, labelled as one.
+
+    A rewrite spread across a passage is the exception: its summary line is a string of fragments and its
+    context line alternates deletions and insertions word by word, so neither can be read. It is shown as
+    the changed passages before and after instead, each side highlighting only its own words.
     """
+    if group.changes and is_scattered_edit(group.inserted, group.deleted):
+        exemplar = group.changes[0]
+        where = "" if group.n_texts == 1 else f" — the first of {group.n_texts} texts carrying it"
+        st.markdown(
+            f'<div class="mdd-diff mdd-context"><span class="mdd-context-label">Changed passages{where}</span>'
+            f"{before_after_html(exemplar.old, exemplar.new)}</div>",
+            unsafe_allow_html=True,
+        )
+        return
+
     deleted = f'<del class="mdd-del">{html.escape(group.deleted)}</del>' if group.deleted else ""
     inserted = f'<ins class="mdd-ins">{html.escape(group.inserted)}</ins>' if group.inserted else ""
 

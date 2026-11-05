@@ -18,10 +18,17 @@ from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.components import st_cache_data
 from etl.analytics.data import get_chart_views_last_n_days, get_post_views_last_n_days
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, OWIDEnv, variable_metadata_url
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files
 from etl.grapher import model as gm
+from etl.grapher.entity_selection import (
+    chart_variable_ids,
+    dead_selected_entities,
+    fetch_entities_with_data,
+    format_dead_entities,
+    renders_selection,
+)
 from etl.io import get_all_changed_catalog_paths
 
 log = get_logger()
@@ -409,8 +416,16 @@ class ChartDiff:
         estimate_relevance: bool = True,
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
+        source_env: OWIDEnv | None = None,
+        check_selected_entities: bool = True,
     ) -> list["ChartDiff"]:
-        """Get chart diffs from chart ids."""
+        """Get chart diffs from chart ids.
+
+        source_env: Environment of `source_session`, used to fetch its indicators' entities. Defaults to this
+            process's own environment.
+        check_selected_entities: Flag pinned entities with no data as errors. Callers that never read `error` (chart-sync)
+            skip the metadata fetches it takes.
+        """
 
         # Return empty list if no chart difference is found
         if df_charts.empty:
@@ -440,6 +455,13 @@ class ChartDiff:
 
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # ty: ignore
+
+        # Get pinned entities with no data
+        dead_entities = (
+            cls._get_dead_selected_entities(df_charts, source_charts, target_charts, source_env)
+            if check_selected_entities
+            else {}
+        )
 
         # Get chart views, anomalies, and articles (skip if not needed for performance)
         # NOTE: These rely on external services (Metabase/Datasette, Anomalist tables). A failure there
@@ -494,6 +516,12 @@ class ChartDiff:
             # Creating new chart, but slug already exists in target
             if not target_chart and source_chart.slug in slugs_in_target:
                 error = f"Slug '{source_chart.slug}' already exists in target environment."
+            # Selection pins entities that the chart's indicators have no data for
+            elif chart_id in dead_entities:
+                error = (
+                    f"Selected entities with no data in the chart's indicators: {format_dead_entities(dead_entities[chart_id])}. "
+                    "Rename them to the names the data uses now, or remove them from the selection."
+                )
             else:
                 error = None
 
@@ -767,6 +795,43 @@ class ChartDiff:
         return conflicts
 
     @staticmethod
+    def _get_dead_selected_entities(
+        df_charts: pd.DataFrame,
+        source_charts: dict[int, gm.Chart],
+        target_charts: dict[int, gm.Chart],
+        source_env: OWIDEnv | None,
+    ) -> dict[int, list[str]]:
+        """Pinned entities with no data, for new charts and charts whose config was edited.
+
+        Data-only diffs are left out: their config is the one production already has, and a dataset upsert that kills
+        a pin is caught by the grapher step instead.
+        """
+        config_edited = set(df_charts.index[df_charts["configEdited"].astype(bool)])
+        configs = {
+            chart_id: chart.config
+            for chart_id, chart in source_charts.items()
+            if chart_id not in target_charts or chart_id in config_edited
+        }
+        variable_ids = [
+            variable_id
+            for config in configs.values()
+            if renders_selection(config)
+            for variable_id in chart_variable_ids(config)
+        ]
+        if not variable_ids:
+            return {}
+
+        metadata_url = source_env.indicator_metadata_url if source_env else variable_metadata_url
+        entities_by_variable = fetch_entities_with_data(variable_ids, metadata_url)
+
+        dead_entities = {}
+        for chart_id, config in configs.items():
+            # None means unknown availability, which isn't an error (fetch failures are logged)
+            if dead := dead_selected_entities(config, entities_by_variable):
+                dead_entities[chart_id] = dead
+        return dead_entities
+
+    @staticmethod
     def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
         checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
         checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
@@ -787,9 +852,17 @@ class ChartDiff:
 class ChartDiffsLoader:
     """Detect charts that differ between staging and production and load them."""
 
-    def __init__(self, source_engine: Engine, target_engine: Engine, chart_ids: list[int] | None = None):
+    def __init__(
+        self,
+        source_engine: Engine,
+        target_engine: Engine,
+        chart_ids: list[int] | None = None,
+        source_env: OWIDEnv | None = None,
+    ):
         self.source_engine = source_engine
         self.target_engine = target_engine
+        # Environment of `source_engine`, used to fetch its indicators' entities (defaults to this process's own)
+        self.source_env = source_env
         self.df = self.load_df(chart_ids=chart_ids)
 
         # Cache
@@ -828,6 +901,7 @@ class ChartDiffsLoader:
         target_session: Session | None = None,
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
+        check_selected_entities: bool = True,
     ) -> list[ChartDiff]:
         """Get chart diffs with the selected change types."""
         if chart_ids:
@@ -844,6 +918,8 @@ class ChartDiffsLoader:
                 target_session=target_session,
                 ignore_conflicts=ignore_conflicts,
                 skip_analytics=skip_analytics,
+                source_env=self.source_env,
+                check_selected_entities=check_selected_entities,
             )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
@@ -853,6 +929,8 @@ class ChartDiffsLoader:
                     target_session=target_session,
                     ignore_conflicts=ignore_conflicts,
                     skip_analytics=skip_analytics,
+                    source_env=self.source_env,
+                    check_selected_entities=check_selected_entities,
                 )
 
         self._diffs = chart_diffs

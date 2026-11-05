@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 
 from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
-from etl.http import USER_AGENT
+from etl.http import make_session
 from etl.http import session as http_session
 
 log = structlog.get_logger()
@@ -356,6 +356,26 @@ class AdminAPI:
             )
         return js
 
+    def get_mdim(self, mdim_id: int) -> dict:
+        resp = http_session.get(
+            self.owid_env.admin_api + f"/multi-dims/{mdim_id}",
+            headers=self._headers(),
+            timeout=TIMEOUT,
+        )
+        return self._json_from_response(resp)["multiDim"]
+
+    def set_mdim_slug(self, mdim_id: int, slug: str, user_id: int | None = None) -> dict:
+        resp = http_session.patch(
+            self.owid_env.admin_api + f"/multi-dims/{mdim_id}",
+            headers=self._headers(user_id),
+            json={"slug": slug},
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "mdim_id": mdim_id, "slug": slug})
+        return js
+
     def put_explorer_config(self, slug: str, tsv: str, user_id: int | None = None) -> dict:
         # Retry in case we're restarting Admin on staging server
         url = self.owid_env.admin_api + f"/explorers/{slug}"
@@ -500,8 +520,7 @@ def requests_with_retry() -> requests.Session:
     fresh connection for every request, which on a dataset like world_bank_pip means tens
     of thousands of them in a single step.
     """
-    s = requests.Session()
-    s.headers["User-Agent"] = USER_AGENT
+    s = make_session()
     # 401 is included because staging's admin API can transiently reject a valid key while
     # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
     # `read=1` keeps a hung server from multiplying TIMEOUT by the full retry budget; the

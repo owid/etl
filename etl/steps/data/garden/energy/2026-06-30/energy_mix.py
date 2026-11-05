@@ -8,9 +8,8 @@ added (Maddison). Traditional biomass (Smil, World only) is kept separate from T
 
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import EXCLUDED_PROVIDER_REGIONS
 
-from etl.data_helpers.geo import add_gdp_to_table
+from etl.data_helpers.geo import REGIONS, add_gdp_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -306,9 +305,12 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     )
     tb_eia = tb_eia.dropna(subset=["total_energy_supply_twh"]).reset_index(drop=True)
 
-    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix): region totals come from the
-    # Statistical Review (OWID regions); EIA is used only to extend country coverage.
-    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix) and the OWID regions its garden step builds:
+    # a region's total must come from the same producer as its sources, so EIA only extends country coverage.
+    is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(
+        list(REGIONS) + ["World"]
+    )
+    tb_eia = tb_eia[~is_aggregate].reset_index(drop=True)
 
     # Combine, prioritizing the Statistical Review *per value*: keep its total energy supply where it has
     # one, fall back to EIA where it is missing, and add EIA-only country-years. Using a plain concat +
@@ -424,6 +426,11 @@ def sanity_check_outputs(tb: Table) -> None:
         col = f"{source}_share_pct"
         valid = tb[col].dropna()
         assert (valid >= -0.01).all() and (valid <= 100.01).all(), f"{col} out of [0, 100]."
+    # Wherever all sources are reported, their shares must add up to ~100%.
+    shares = [f"{source}_share_pct" for source in SR_SOURCES.values()]
+    complete = tb[shares].notna().all(axis=1)
+    off = tb.loc[complete][(tb.loc[complete, shares].sum(axis=1) - 100).abs() > 2]
+    assert off.empty, f"Shares do not add up to 100% for: {sorted(off['country'].unique())}"
     # World total energy supply for the latest year should be in a plausible range (~600 EJ ~= 167000 TWh).
     world_latest = tb[(tb["country"] == "World")].sort_values("year").iloc[-1]
     assert 140000 < world_latest["total_energy_supply_twh"] < 200000, (
@@ -482,10 +489,6 @@ def run() -> None:
 
     # Remove outliers.
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
-
-    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
-    # aggregation inputs, but meaningless to readers).
-    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)

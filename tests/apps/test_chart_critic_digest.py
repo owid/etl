@@ -72,7 +72,7 @@ def test_a_finding_names_the_last_editor():
     (_, message) = _format([_result("a", "chart")], facts)
     assert "<@U1>   ·   _You last edited this chart._" in message.text
     # The ask and the mention share a line near the top, not the footer.
-    assert message.text.splitlines().index(digest.ASK + "   <@U1>   ·   _You last edited this chart._") == 3
+    assert message.text.splitlines().index(digest.ASK + "   <@U1>   ·   _You last edited this chart._") == 1
 
 
 def test_a_finding_with_nobody_to_name_names_nobody():
@@ -88,7 +88,21 @@ def test_an_mdim_view_gets_no_edit_link():
     facts = {"a": {"chart_id": None, "indicators": [], "editor_mention": None}}
     (_, message) = _format([_result("a", "chart")], facts)
     assert "Edit in admin" not in message.text
-    assert "View live chart" in message.text
+    assert "<https://ourworldindata.org/grapher/a|Chart a>" in message.text
+
+
+def test_a_finding_is_laid_out_like_analytics_bites():
+    """Title link and claim, the chart as an image, and the facts in one muted footer."""
+    facts = {"a": {"chart_id": 1, "indicators": [], "editor_mention": None}}
+    (_, message) = _format([_result("a", "chart")], facts)
+    assert message.blocks is not None
+    section, image, context = message.blocks
+    assert "Something is off." in section["text"]["text"]
+    assert image["image_url"] == "https://ourworldindata.org/grapher/thumbnail/a.png"
+    footer = context["elements"][0]["text"]
+    assert "medium" in footer and "10 views/day" in footer
+    assert "View live chart" in footer and "Edit in admin" in footer
+    assert footer.endswith(digest.TICK)
 
 
 def test_the_digest_file_shows_the_split_the_channel_will_see():
@@ -162,11 +176,16 @@ def test_a_second_problem_on_a_posted_chart_waits_for_the_cooldown():
 
 
 def test_one_finding_per_chart_within_a_run_and_the_best_one_goes():
-    result = _result("a", "chart", "Low: a naming inconsistency.")
-    result["issues"][0]["severity"] = "low"
+    result = _result("a", "chart", "Medium: the note is out of date.")
     result["issues"].append(result["issues"][0] | {"severity": "high", "claim": "High: the unit is wrong."})
     ((_, issue),) = digest.new_findings([result], {})
     assert issue["claim"] == "High: the unit is wrong."
+
+
+def test_a_low_severity_finding_is_never_posted():
+    result = _result("a", "data", "Malta's 1981 value looks implausibly high.")
+    result["issues"][0]["severity"] = "low"
+    assert digest.new_findings([result], {}) == []
 
 
 def test_the_same_data_finding_on_a_chart_sharing_an_indicator_is_not_news():

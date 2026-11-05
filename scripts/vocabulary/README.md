@@ -58,15 +58,15 @@ staging server.
 
 ### Choose model
 ```bash
-# Use faster/cheaper model (default: gemini-3.8-flash)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model gemini-2.5-flash-lite
+# Use a faster/cheaper model (default: claude-sonnet-5-5)
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model claude-haiku-5-5
 ```
 
 ## CLI Options
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Output JSON file path (optional, prints to console if not provided)
-- `--model MODEL` - Gemini model to use (default: `gemini-3.8-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
+- `--model MODEL` - Claude model to use (default: `claude-sonnet-5-5`). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
 - `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
 - `--no-upload` - Generate without writing to R2
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
@@ -131,7 +131,7 @@ matters: the terms it lists first are the ones most likely to be shown.
 3. **Sampling**: the 200 most-viewed distinct texts (not a random sample — the
    terms proposed should describe what people actually look at, and two runs
    should see the same input)
-4. **LLM extraction**: Feeds all text to Gemini with instructions to extract modern, searchable keywords
+4. **LLM extraction**: Feeds all text to Claude with instructions to extract modern, searchable keywords. A topic whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
 5. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 
 ## Output Format
@@ -214,26 +214,15 @@ The LLM is instructed to:
 
 ## Cost & Performance
 
-**Gemini 3 Flash Preview pricing (as of Feb 2025):**
-- Input: $0.0375 per 1M tokens
-- Output: $0.15 per 1M tokens
-
-**Gemini 2.5 Flash Lite pricing:**
-- Input: $0.015 per 1M tokens
-- Output: $0.06 per 1M tokens
-
-**Example performance:**
-- Single topic: ~2-4 seconds, $0.0001-0.0002
-- Multiple topics: Runs in parallel, ~4-6 seconds total, $0.0003-0.0006
-- All topics (~125): ~10-15 seconds, $0.02-0.05
+Each run ends with a cost estimate, priced with [genai-prices](https://github.com/pydantic/genai-prices). Models it has no price for report their cost as unknown.
 
 ## Requirements
 
-- Google Gemini API key in `.env` file:
+- Anthropic API key in `.env` file:
   ```
-  GOOGLE_API_KEY=your_key_here
+  ANTHROPIC_API_KEY=your_key_here
   ```
-- Dependencies: `google-genai`, `python-dotenv`, `click`
+- Dependencies: `anthropic`, `python-dotenv`, `click`
 - Database access via `etl.config.OWID_ENV`
 
 ## Use Cases

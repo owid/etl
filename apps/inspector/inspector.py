@@ -198,14 +198,18 @@ def run_checks(
 
                 issues, usage_stats = check_issues(
                     views,
-                    config.ANTHROPIC_API_KEY,
+                    config.ANTHROPIC_API_KEY_INSPECTOR,
                     model=model,
                     display_prompt=display_prompt,
                     progress_callback=progress_callback,
                 )
             else:
                 issues, usage_stats = check_issues(
-                    views, config.ANTHROPIC_API_KEY, model=model, display_prompt=display_prompt, progress_callback=None
+                    views,
+                    config.ANTHROPIC_API_KEY_INSPECTOR,
+                    model=model,
+                    display_prompt=display_prompt,
+                    progress_callback=None,
                 )
 
         all_issues.extend(issues)
@@ -338,9 +342,11 @@ def cli(
     """
     # Get the model name to use
     model_name = get_model_name(model)
-    if not config.ANTHROPIC_API_KEY and not skip_issues:
-        rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-issues[/red]")
-        raise click.ClickException("Missing ANTHROPIC_API_KEY")
+    if not config.ANTHROPIC_API_KEY_INSPECTOR and not skip_issues:
+        rprint(
+            "[red]Error: ANTHROPIC_API_KEY_INSPECTOR (or ANTHROPIC_API_KEY) not found. Add to .env file or use --skip-issues[/red]"
+        )
+        raise click.ClickException("Missing ANTHROPIC_API_KEY_INSPECTOR")
 
     # Load views (explorers, multidims, charts, and posts)
     slug_list = list(slug) if slug else None
@@ -376,8 +382,8 @@ def cli(
 
     # Dry-run: estimate costs and exit
     if dry_run:
-        total_input_tokens, total_output_tokens = estimate_check_costs(views, skip_typos, skip_issues)
-        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views), model=model_name)
+        total_input_tokens, total_output_tokens, views_to_check = estimate_check_costs(views, skip_typos, skip_issues)
+        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, views_to_check, model=model_name)
         return
 
     # Group views by collection (explorerSlug for explorers, slug for charts/posts) for incremental processing
@@ -615,7 +621,7 @@ def cli(
     if all_issues and enable_grouping:
         rprint("  [cyan]Grouping similar issues and pruning false positives...[/cyan]")
         grouped_issues, grouping_tokens = group_issues(
-            all_issues, config.ANTHROPIC_API_KEY, display_prompt=display_prompt
+            all_issues, config.ANTHROPIC_API_KEY_INSPECTOR, display_prompt=display_prompt
         )
         # Note: grouping tokens are tracked separately since they use a different model
     else:

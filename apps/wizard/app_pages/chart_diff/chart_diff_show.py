@@ -6,7 +6,6 @@ If you want to learn more about it, start from its `show` method.
 
 import difflib
 import json
-import os
 from functools import cached_property
 from typing import Any, Literal, cast
 
@@ -21,7 +20,7 @@ from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
 from apps.chart_sync.admin_api import AdminAPI
-from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
+from apps.utils.llms import claude
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.citations import st_show_citations
 from apps.wizard.app_pages.chart_diff.conflict_resolver import (
@@ -36,8 +35,8 @@ from etl.grapher.io import variable_metadata_df_from_s3
 
 log = get_logger()
 
-# GPT model default
-MODEL_DEFAULT = "gpt-5"
+# Model for the AI summary of metadata changes
+MODEL_DEFAULT = "claude-sonnet-5-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -95,12 +94,6 @@ class ChartDiffShow:
         self.target_session = target_session
         self.expander = expander
         self.show_link = show_link
-
-        # OpenAI
-        if "OPENAI_API_KEY" in os.environ:
-            self.openai_api = OpenAIWrapper()
-        else:
-            self.openai_api = None
 
     @property
     def box_icon(self) -> str:
@@ -484,7 +477,7 @@ class ChartDiffShow:
             st.success("No differences found in the metadata fields relevant for comparison.")
             return
 
-        # Placeholder for GPT summary (filled after the diffs render, so the user isn't blocked on the LLM)
+        # Placeholder for the AI summary (filled after the diffs render, so the user isn't blocked on the LLM)
         container = st.container()
 
         # Show diffs
@@ -496,19 +489,19 @@ class ChartDiffShow:
                 st_show_diff(meta_diff)
 
         with container:
-            self._show_metadata_diff_gpt_summary(meta_diffs)
+            self._show_metadata_diff_ai_summary(meta_diffs)
 
-    def _show_metadata_diff_gpt_summary(self, meta_diffs: dict[int, str]) -> None:
-        """Summarise differences in metadata using GPT."""
-        if self.openai_api is None:
-            st.info("Set `OPENAI_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
+    def _show_metadata_diff_ai_summary(self, meta_diffs: dict[int, str]) -> None:
+        """Summarise differences in metadata with an LLM."""
+        if not claude.has_api_key():
+            st.info("Set `ANTHROPIC_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
             return
 
         # Cache the summary in session state, keyed by the diff content, so re-opening the dialog
         # doesn't re-query the API but a changed diff does.
         # NOTE: Don't use `st.cache_data` here — caching a function that *renders* UI (and returns
         # None) makes the summary render once and then vanish on subsequent calls.
-        cache_key = f"gpt-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
+        cache_key = f"ai-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
         cached = st.session_state.get(cache_key)
 
         with st.chat_message("assistant"):
@@ -516,34 +509,16 @@ class ChartDiffShow:
                 response, cost_msg = cached
                 st.markdown(response)
             else:
-                messages = [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You will be presented with the metadata diffs of various indicators, as a dictionary "
-                            "mapping indicator ID to a unified diff (production → staging). Summarise the main "
-                            "changes at a high level, in a few short bullet points. Group similar changes across "
-                            "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": str(meta_diffs),
-                    },
-                ]
+                system = (
+                    "You will be presented with the metadata diffs of various indicators, as a dictionary "
+                    "mapping indicator ID to a unified diff (production → staging). Summarise the main "
+                    "changes at a high level, in a few short bullet points. Group similar changes across "
+                    "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
+                )
+                stream = claude.TextStream(MODEL_DEFAULT, system, str(meta_diffs), effort="low")
                 try:
-                    stream = self.openai_api.chat.completions.create(
-                        model=MODEL_DEFAULT,
-                        messages=messages,  # ty: ignore
-                        # NOTE: gpt-5 is a reasoning model and reasoning tokens count towards this
-                        # limit; keep it well above the expected summary length or the visible
-                        # output may be empty.
-                        max_completion_tokens=4000,
-                        reasoning_effort="low",
-                        stream=True,
-                    )
                     response = cast(str, st.write_stream(stream))
-                except Exception as e:
+                except claude.APIError as e:
                     st.error(f"AI summary failed: {e}")
                     return
 
@@ -551,10 +526,7 @@ class ChartDiffShow:
                     st.warning("The model returned an empty summary.")
                     return
 
-                # Cost information (estimated with tiktoken, hence lower bounds)
-                text_in = "\n".join([m["content"] for m in messages])
-                cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
-                cost_msg = f"Cost: ≥{cost} USD. Tokens: ≥{num_tokens}."
+                cost_msg = stream.summary
                 st.session_state[cache_key] = (response, cost_msg)
         st.caption(cost_msg)
 

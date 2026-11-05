@@ -1,17 +1,17 @@
 # Sketch mode — a data file in, no ETL until the visuals settle
 
-> Read when the input is a data file, or the ask says "sketch", "brainstorm" or "prototype" a **new**
-> static viz. Part of [`/create-static-viz`](../SKILL.md); the spine has the step order this replaces.
+> Read when the ask says "sketch", "draft", "brainstorm" or "prototype" a static viz, or the person
+> picked the sketch when asked. Part of [`/create-static-viz`](../SKILL.md); the spine has the step order this replaces.
 > Lessons from a sketch run are folded in like any other run's — here when they are about sketching,
 > into the step's reference file when they generalize.
 
 A sketch is a `viz://static` step in everything but its home: the same constants-on-top, `run()`,
 helpers-below shape, the same `LAYOUTS` registry, the same `export_frame` per frame — rendered from a
 file next to it instead of a catalog dataset, in a gitignored `ai/static-viz-sketches/<slug>/`
-directory, with no branch, PR, DAG entry or newer-data check behind it. `SketchPaths(__file__)`
+directory. `SketchPaths(__file__)`
 (`etl/viz/static.py`) stands in for `PathFinder(__file__)`, which refuses any file outside `etl/steps`.
 The point is to settle the *visuals* — in matplotlib and then in Figma — before deciding the ETL
-structure; promotion (§7) is a two-line edit because the shape never changed.
+structure; finalizing (§7) is a two-line edit because the shape never changed.
 
 **A Data Insight image is not a static-viz sketch.** DIs are sketched in `/owid-staff:create-figma-chart`'s
 own sketch mode, straight from the grapher chart (occasionally a local SVG), onto `DI_Template`. This
@@ -19,15 +19,24 @@ file covers the four static templates only.
 
 ## Entering the mode
 
-The input decides: a CSV, Excel or parquet file is a sketch; "sketch / brainstorm / prototype a static
-viz from `<indicator or chart>`" is a sketch after a data pull (§0); an old viz, an indicator or a chart
-without those words is the full flow. Don't ask which — say which, in one line, with what it skips:
+The words decide: "sketch / draft / brainstorm / prototype" is a sketch — from a CSV, Excel or parquet
+file as given, or from `<indicator or chart>` after a data pull (§0); "full flow" or "full build" is the
+full flow. **Any other ask gets one question first** (the spine's Sketch mode section), in plain words,
+with a recommendation:
+
+> *"Sketch first, or the full flow? A sketch renders the chart in a scratch folder and puts it into the
+> Figma template quickly, with no ETL steps and only a quick check that the file imports cleanly, so we
+> can iterate on the design; when it settles, say **finalize** and I create the ETL steps and run every
+> check — or only one of those two halves, if you'd rather; I'll ask then. The full flow creates the ETL step in a pull request now and runs the checks before the chart
+> reaches Figma. Since the design isn't settled yet, I'd sketch."*
+
+Once it is a sketch, say so in one line, with what it skips:
 
 > *"Sketching this from `<file>` in `ai/static-viz-sketches/<slug>/` — no branch, PR, DAG entry or
-> newer-data check until the visuals settle; promotion runs all of them."*
+> newer-data check until the visuals settle; finalizing's ETL half runs all of them."*
 
-If the person wanted the real thing, they will say so, and the answer is the full flow: data not in ETL
-goes to `/create-dataset` first, as Step 2 says.
+A full-flow answer means the spine's Steps 1–9: data not in ETL goes to `/create-dataset` first, as
+Step 2 says.
 
 **Skipped, and said aloud every time:** the branch and worktree, the draft PR, the DAG entry, Step 1's
 tracker question, Step 2's newer-data check (ETL and producer side), Step 8's docstring write-back
@@ -38,7 +47,7 @@ render honest.
 ## 0 — When the input is an indicator or a chart: pull the data first
 
 One-off, into the sketch dir, and record where it came from in the sketch's docstring (the
-`Provenance` line), so promotion knows which dataset to point the step at. The scaffold accepts a
+`Provenance` line), so finalizing knows which dataset to point the step at. The scaffold accepts a
 `--data` file that already sits in `ai/static-viz-sketches/<slug>/` and leaves it in place — an existing
 directory is not an existing sketch; only an existing `sketch.py` asks for `--force`:
 
@@ -77,9 +86,9 @@ rule covers the data file: re-passing the copy that is already there (§0) is no
 *different* file under that name is refused. The scaffold owns a name only once it has written a sketch
 here; nothing else in the directory is ever touched.
 
-What the scaffold carries, and why (each line is a promotion marker `promote_sketch.py` looks for):
+What the scaffold carries, and why (each line is a `# FINALIZE` marker `finalize_sketch.py` looks for):
 
-| Line | Now | On promotion |
+| Line | Now | On finalizing |
 |---|---|---|
 | `paths = SketchPaths(__file__)` | writes next to the sketch | `paths = PathFinder(__file__)` — the script swaps it |
 | `load_data()` reads `DATA_FILE` as a `Table(..., underscore=True)` | garden-style column names from day one | `paths.load_dataset(...).read(...)` — you swap it |
@@ -114,8 +123,7 @@ that are not this sketch's — the old chart you are refreshing, a reference exp
 gids, a missing sibling PNG or the frame ratio.
 
 The scaffold passes with `--expect-gid line__placeholder`; once `build()` is real, pass the real data
-layers (`line__<Entity>`, `label__<Entity>`, …) — without them the naming check proves only that *some*
-node was named. Then **read the PNG**: the verifier cannot see a collision or a label on a curve.
+layers (`line__<Entity>`, `label__<Entity>`, …). Then **read the PNG**, as in the spine's Step 5.
 
 ## 4 — Iterate, and try variants cheaply
 
@@ -152,20 +160,38 @@ because the person may not know either exists — and **the first time, say what
 
 > *"This is still a sketch: the chart lives in a scratch folder, nothing has been checked, and the
 > data is not in ETL — so nobody else can rebuild this chart and it will not follow the data when the
-> source updates. When the visuals are settled, say **promote** and I'll **create the ETL steps for
-> it**: the data gets steps of its own, so the chart re-renders whenever the data updates and anyone
-> can see where its numbers came from. Then I check whether the source has published anything newer,
-> verify the numbers, the source line and every piece of text against the data and our style guide,
-> and run the Figma checks on the frame — type, layout, colours, lines and annotations, and that the
-> frame still matches its template — before it is renamed for the website."*
+> source updates. When the visuals are settled, say **finalize**. Finalizing has two halves, and I'll
+> ask whether you want both or one. **The ETL steps:** the data gets steps of its own, so the chart
+> re-renders whenever the data updates and anyone can see where its numbers came from; I also check
+> whether the source has published anything newer, and verify the numbers, the source line and every
+> piece of text against the data and our style guide. **The Figma checks:** type, layout, colours,
+> lines and annotations, and that the frame still matches its template. With both done, the frame is
+> renamed for the website."*
 
-After that, one line is enough — *"Still a sketch and not in ETL: say promote when you're happy with
-it and I'll create the ETL steps."* — but never none. **When they sound done** ("looks good", "that's
-it", "ship it"), don't wait to be asked: propose creating the ETL steps now, and start on a yes. If
-the data is not in ETL at all, say that promotion begins by adding the dataset (§7). The loop ends
-when they say yes.
+After that, one line is enough — *"Still a sketch and not in ETL: say finalize when you're happy with
+it."* — but never none. **When they sound done** ("looks good", "that's it", "ship it"), don't wait
+to be asked: propose finalizing now, and on a yes ask §7's question. If the data is not in ETL at
+all, say that the ETL half begins by adding the dataset (§7). The loop ends when they say yes.
 
-## 7 — Promote
+## 7 — Finalize: ask which halves, then create the ETL step
+
+**Ask first, unless the request already says** (a handoff from `/owid-staff:create-figma-chart`
+carries the choice):
+
+> *"Finalizing has two halves. I can do both: create the ETL steps, then run the Figma checks once,
+> on the chart the steps draw. Or only the ETL steps: the frame stays a sketch, and the checks
+> wait until you ask for them. Or only the Figma checks now, with the ETL steps later. Both is the
+> usual choice, because checking first means checking again if the steps redraw the chart."*
+
+- **Both:** this section, then §8 in full, ending with the Figma handoff.
+- **ETL steps only:** this section and §8 without the Figma handoff; pass `--etl-only` to
+  `finalize_sketch.py` below, so its closing checklist leaves the Figma checks out. The frame keeps its sketch
+  names. Close by saying the checks are still to run, and that saying **finalize** on the frame in
+  `/owid-staff:create-figma-chart` runs them.
+- **Figma checks only:** skip this section and §8. Hand the sketch frame's link to
+  `/owid-staff:create-figma-chart` with **finalize** and *Figma checks only*: its F1 runs the checks
+  on the sketch as it is, keeps the sketch names, and records the result in `sketch.py`'s `Figma
+  handoff` docstring. The ETL half comes later, from §7 again.
 
 Now the ETL work, in a PR branch, per the spine's Step 4 preamble:
 
@@ -177,8 +203,8 @@ If the data is not in ETL, `/create-dataset` first (Step 2's routing table), so 
 `data://garden/...` step to depend on. Then, from inside that worktree:
 
 ```bash
-.venv/bin/python .claude/skills/create-static-viz/scripts/promote_sketch.py <sketch dir> \
-    --step viz://static/<namespace>/<version>/<short_name> --dep data://garden/<ns>/<version>/<short> [--dep ...]
+.venv/bin/python .claude/skills/create-static-viz/scripts/finalize_sketch.py <sketch dir> \
+    --step viz://static/<namespace>/<version>/<short_name> --dep data://garden/<ns>/<version>/<short> [--dep ...] [--etl-only]
 ```
 
 It refuses to write on `master`/`main`, copies `sketch.py` to `etl/steps/viz/static/<ns>/<version>/<short>.py`,
@@ -195,7 +221,10 @@ The step exists; everything the sketch skipped now runs, in the spine's order: *
 the dependency; check for newer data on both sides — the CSV's provenance finally gets its real
 answer), **Step 5** (`etlr`, the verifier with the real `--expect-gid`s, the PNG), **Step 8** (the
 docstring already carries the Figma handoff — complete it with what the finalize pass changes), and
-**Step 9** (the PR and the review chain). On the Figma side, hand the sketch frame's link to
+**Step 9** (the PR and the review chain). On the Figma side, unless the person chose the ETL steps
+only, hand the sketch frame's link to
 `/owid-staff:create-figma-chart` and say **finalize**: it reads the person's Figma edits as decisions,
 proposes labels and annotations, runs the full verification gate, and renames the frame to the bare
-slug. If the promoted step's SVG differs from the sketch's, that mode decides whether to re-import.
+slug. If the new step's SVG differs from the sketch's, that mode decides whether to re-import. If a
+Figma-checks-only pass ran earlier, say so in the handoff: that mode decides whether its result still
+stands or the checks run again.

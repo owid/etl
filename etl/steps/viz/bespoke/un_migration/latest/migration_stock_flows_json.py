@@ -1,8 +1,8 @@
 """Bespoke viz step that generates JSON files for the UN migration flows visualization.
 
 This step reads the migration_stock_flows garden dataset and generates:
-* `metadata.json`, the feed's provenance, derived from the garden columns (see `etl.viz.bespoke`)
-* A metadata JSON file with entity/gender dimensions and time range
+* A metadata JSON file with entity/gender dimensions and time range, plus the feed's provenance,
+  derived from the garden columns (see `etl.viz.bespoke`)
 * Individual data JSON files per country/entity
 
 Each per-country file contains all pairwise immigrant and emigrant stocks for
@@ -26,7 +26,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 
@@ -89,7 +89,7 @@ GENDER_MAP = {
 POPULATION_YEARS = [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]
 
 
-def create_metadata_json(tb: Table, tb_pop: Table, source: str) -> tuple[dict, dict]:
+def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
     """Build the metadata JSON and return it alongside lookup dicts."""
     # All entities = union of destinations and origins
     all_entities = sorted(set(tb["country_destination"].unique()) | set(tb["country_origin"].unique()))
@@ -131,7 +131,6 @@ def create_metadata_json(tb: Table, tb_pop: Table, source: str) -> tuple[dict, d
     metadata = {
         "timeRange": {"start": int(tb["year"].min()), "end": int(tb["year"].max())},
         "years": sorted(tb["year"].unique().tolist()),
-        "source": source,
         "dimensions": {
             "entities": entities,
             "genders": genders,
@@ -209,14 +208,13 @@ def run() -> None:
         columns={"Migrants": tb["migrants"]},
         update_period_days=ds_garden.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
 
-    metadata, mappings = create_metadata_json(tb, tb_pop, source=feed_metadata["feed"]["citation"])
+    metadata, mappings = create_metadata_json(tb, tb_pop)
 
     total_files = len(mappings["entities"]) + 1
     log.info(f"Creating {total_files} JSON files.")
 
-    save_json(metadata, "migration-stock-flows.metadata.json")
+    save_json(add_feed_metadata(metadata, feed_metadata), "migration-stock-flows.metadata.json")
 
     #
     # Per-entity files.

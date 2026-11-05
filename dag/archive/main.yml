@@ -855,7 +855,6 @@ steps:
   data://grapher/oecd/2025-02-19/official_development_assistance:
     - data://garden/oecd/2025-02-19/official_development_assistance
 
-
     ### WHO/UNICEF WASH JMP
   # archived; last active in e4f7d2612282 on 2026-01-16
   data://meadow/wash/2024-01-06/who:
@@ -869,7 +868,7 @@ steps:
   data://grapher/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who
 
-# UNWTO tourism datasets
+  # UNWTO tourism datasets
   # archived; last active in 409ab33bb761 on 2026-02-05
   data://meadow/tourism/2024-08-17/unwto:
     - snapshot://tourism/2024-08-17/unwto.xlsx
@@ -879,12 +878,12 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/oecd/2024-08-19/ppp_exchange_rates
     - data://garden/bls/2025-04-12/us_consumer_prices
-    - data://garden/worldbank_wdi/2024-05-20/wdi  # includes inflation data for every country up to 2022
+    - data://garden/worldbank_wdi/2024-05-20/wdi # includes inflation data for every country up to 2022
   # archived; last active in 409ab33bb761 on 2026-02-05
   data://grapher/tourism/2024-08-17/unwto:
     - data://garden/tourism/2024-08-17/unwto
 
-# UNWTO tourism datasets on environmental and economic impacts
+  # UNWTO tourism datasets on environmental and economic impacts
   # archived; last active in 409ab33bb761 on 2026-02-05
   data://meadow/tourism/2024-08-17/unwto_environment:
     - snapshot://tourism/2024-08-17/unwto_environment.xlsx
@@ -904,14 +903,13 @@ steps:
   data://grapher/tourism/2024-08-17/unwto_gdp:
     - data://garden/tourism/2024-08-17/unwto_gdp
 
-# OECD PPP exchange rates used for tourism data
+  # OECD PPP exchange rates used for tourism data
   # archived; last active in 409ab33bb761 on 2026-02-05
   data://meadow/oecd/2024-08-19/ppp_exchange_rates:
     - snapshot://oecd/2024-08-19/ppp_exchange_rates.csv
   # archived; last active in 409ab33bb761 on 2026-02-05
   data://garden/oecd/2024-08-19/ppp_exchange_rates:
     - data://meadow/oecd/2024-08-19/ppp_exchange_rates
-
 
   # World Happiness report (2025)
   # archived; last active in 5f33a465058a on 2026-03-18
@@ -1224,10 +1222,10 @@ steps:
   # archived; last active in 2818cb9824a0 on 2026-06-16
   data://grapher/unodc/2025-05-28/homicide:
     - data://garden/unodc/2025-05-28/homicide:
-      - data://meadow/unodc/2025-05-28/homicide:
-        - snapshot://unodc/2025-05-28/homicide.xlsx
-      - data://garden/demography/2024-07-15/population
-      - data://garden/un/2024-07-12/un_wpp
+        - data://meadow/unodc/2025-05-28/homicide:
+            - snapshot://unodc/2025-05-28/homicide.xlsx
+        - data://garden/demography/2024-07-15/population
+        - data://garden/un/2024-07-12/un_wpp
 
   # UNESCO data on other policy related education indicators
   # archived; last active in 494aa2668783 on 2026-06-22
@@ -1254,13 +1252,11 @@ steps:
   data://grapher/unesco/2025-05-01/education_sdgs:
     - data://garden/unesco/2025-05-01/education_sdgs
 
-
-
     # Child Mortality Estimates - UN IGME
   # archived; last active in 0fb4cab7c33f on 2026-06-25
   data://garden/un/2025-03-25/igme:
     - data://meadow/un/2025-03-25/igme:
-      - snapshot://un/2025-03-25/igme.zip
+        - snapshot://un/2025-03-25/igme.zip
     - data://garden/un/2018/igme
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
@@ -1284,69 +1280,128 @@ steps:
   # archived; last active in 1c12a82b704c on 2026-07-01
   data://grapher/wvs/2023-06-25/longitudinal_wvs:
     - data://garden/wvs/2023-06-25/longitudinal_wvs:
-      - data://meadow/wvs/2023-06-25/longitudinal_wvs:
-        - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
-        - data://garden/regions/2023-01-01/regions
+        - data://meadow/wvs/2023-06-25/longitudinal_wvs:
+            - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
+            - data://garden/regions/2023-01-01/regions
   # archived; last active in f08d01d5bf75 on 2026-07-10
   data://grapher/wb/2025-07-01/income_groups:
     - data://garden/wb/2025-07-01/income_groups_aggregations:
-      - data://garden/wb/2025-07-01/income_groups:
-        - data://meadow/wb/2025-07-01/income_groups:
-          - snapshot://wb/2025-07-01/income_groups.xlsx
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/demography/2024-07-15/population
+        - data://garden/wb/2025-07-01/income_groups:
+            - data://meadow/wb/2025-07-01/income_groups:
+                - snapshot://wb/2025-07-01/income_groups.xlsx
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/demography/2024-07-15/population
     - data://garden/wb/2025-07-01/income_groups
   # archived; last active in 3f9e92d13c77 on 2026-07-14
   data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
     - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
-      - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
-        - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+        - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+            - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
   # archived; last active in 8ae3ab94ffa3 on 2026-07-20
   data://garden/bls/2026-03-24/us_ppi_construction:
     - snapshot://bls/2026-03-24/us_ppi_construction.csv
   # archived; last active in 64b19ea0388e on 2026-07-27
   data://grapher/oecd/2025-12-23/official_development_assistance:
     - data://garden/oecd/2025-12-23/official_development_assistance:
-      - data://meadow/oecd/2025-12-23/official_development_assistance:
-        - snapshot://oecd/2025-12-23/official_development_assistance_dac5.zip
-        - snapshot://oecd/2025-12-23/official_development_assistance_dac2a.zip
-        - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
-      - data://garden/demography/2024-07-15/population
+        - data://meadow/oecd/2025-12-23/official_development_assistance:
+            - snapshot://oecd/2025-12-23/official_development_assistance_dac5.zip
+            - snapshot://oecd/2025-12-23/official_development_assistance_dac2a.zip
+            - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/demography/2024-07-15/population
   # archived; last active in 7cd4b39ceab8 on 2026-07-29
   data://grapher/worldbank_wdi/2026-07-14/wdi:
     - data://garden/worldbank_wdi/2026-07-14/wdi:
-      - data://garden/un/2024-07-12/un_wpp
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
-      - data://garden/demography/2024-07-15/population
-      - data://meadow/worldbank_wdi/2026-07-14/wdi:
+        - data://garden/un/2024-07-12/un_wpp
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/demography/2024-07-15/population
+        - data://meadow/worldbank_wdi/2026-07-14/wdi:
+            - snapshot://worldbank_wdi/2026-07-14/wdi.zip
         - snapshot://worldbank_wdi/2026-07-14/wdi.zip
-      - snapshot://worldbank_wdi/2026-07-14/wdi.zip
   # archived; last active in 7cd4b39ceab8 on 2026-07-29
   data://grapher/worldbank_wdi/2025-09-08/wdi:
     - data://garden/worldbank_wdi/2025-09-08/wdi:
-      - snapshot://worldbank_wdi/2025-09-08/wdi.zip
-      - data://meadow/worldbank_wdi/2025-09-08/wdi:
         - snapshot://worldbank_wdi/2025-09-08/wdi.zip
-      - data://garden/un/2024-07-12/un_wpp
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
-      - data://garden/demography/2024-07-15/population
+        - data://meadow/worldbank_wdi/2025-09-08/wdi:
+            - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+        - data://garden/un/2024-07-12/un_wpp
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/demography/2024-07-15/population
   # archived; last active in 8b30eb0a0898 on 2026-08-18
   data://garden/bls/2026-07-20/us_ppi_construction:
     - snapshot://bls/2026-07-20/us_ppi_construction.csv
   # archived; last active in be72221eef2d on 2026-08-21
   data://grapher/technology/2024-12-23/internet:
     - data://garden/technology/2024-12-23/internet:
-      - data://garden/worldbank_wdi/2026-07-27/wdi
-      - data://garden/wb/2026-07-01/income_groups
-      - data://garden/demography/2024-07-15/population
-      - data://garden/regions/2023-01-01/regions
+        - data://garden/worldbank_wdi/2026-07-27/wdi
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/demography/2024-07-15/population
+        - data://garden/regions/2023-01-01/regions
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries
+  # archived; last active in 46e84ce73f67 on 2026-09-24
+  data-private://grapher/language/2025-09-03/ethnologue:
+    - data-private://garden/language/2025-09-03/ethnologue:
+        - data-private://meadow/language/2025-09-03/ethnologue:
+            - snapshot-private://language/2025-09-03/ethnologue.zip
+        - data://garden/regions/2023-01-01/regions
+  # archived; last active in 1561731bf7ef on 2026-10-02
+  data://garden/bls/2026-08-18/us_ppi_construction:
+    - snapshot://bls/2026-08-18/us_ppi_construction.csv
+  # archived; last active in 9abb8154211e on 2026-10-12
+  data://grapher/missing_data/2024-03-26/who_md_suicides:
+    - data://garden/missing_data/2024-03-26/who_md_suicides:
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/who/2024-03-24/self_inflicted_injuries
+        - data://garden/demography/2023-03-31/population
+  # archived; last active in c13b29b8ad4a on 2026-10-14
+  data://grapher/missing_data/2026-10-02/who_md_suicides:
+    - data://garden/missing_data/2026-10-02/who_md_suicides:
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/who/2025-08-06/self_inflicted_injuries
+        - data://garden/demography/2023-03-31/population
+  # archived; last active in b5045f314ce8 on 2026-10-15
+  data://grapher/homicide/2025-08-06/who_mort_db:
+    - data://garden/homicide/2025-08-06/who_mort_db:
+        - data://meadow/homicide/2025-08-06/who_mort_db:
+            - snapshot://homicide/2025-08-06/who_mort_db.csv
+        - data://garden/un/2024-07-12/un_wpp
+  # archived; last active in b5045f314ce8 on 2026-10-15
+  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
+    - data://garden/homicide/2024-07-30/homicide_long_run_omm:
+        - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+        - data://garden/homicide/2025-08-06/who_mort_db
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/share_of_foreign_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_mitigation_and_adaptation:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 233b5c9319ea on 2026-10-20
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  # archived; last active in 9aded105cbe0 on 2026-10-22
+  data://grapher/trade/2025-09-22/wto_trade_growth:
+    - data://garden/trade/2025-09-22/wto_trade_growth:
+        - data://garden/trade/2025-09-22/historic_trade
+        - data://meadow/trade/2025-09-22/wto_trade_growth:
+            - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+  # archived; last active in 9aded105cbe0 on 2026-10-22
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/imf/2025-07-08/trade:
+            - snapshot://imf/2025-07-08/trade.csv
+        - data://garden/worldbank_wdi/2026-07-27/wdi
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -1384,3 +1439,4 @@ include:
   - dag/archive/geography.yml
 
   - dag/archive/static_viz.yml
+  - dag/archive/energy_legacy.yml

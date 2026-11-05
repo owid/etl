@@ -15,12 +15,6 @@ macros: |-
         <% elif age == 'All ages' %>
             << unit >> from << cause >> per 100,000 people
         <% endif %>
-    <% elif metric == "Share" %>
-        <% if age == 'Age-standardized' %>
-            Share of total age-standardized << unit >> that are from << cause >>
-        <% elif age == 'All ages' %>
-            Share of total << unit >> that are from << cause >>
-        <% endif %>
     <% endif %>
   <% endmacro %>
 
@@ -30,12 +24,6 @@ macros: |-
             Estimated number of age-standardized << unit >> from << cause >>, per 100,000 people.
         <% elif age == 'All ages' %>
             Estimated number of << unit >> from << cause >>, per 100,000 people.
-        <% endif %>
-    <% elif metric == "Share" %>
-        <% if age == 'Age-standardized' %>
-            Estimated share of age-standardized << unit >> from << cause >>.
-        <% elif age == 'All ages' %>
-            Estimated share of << unit >> from << cause >>.
         <% endif %>
     <% endif %>
   <% endmacro %>
@@ -50,8 +38,8 @@ tables:
     variables:
       dalys__disability_adjusted_life_years__rate:
         title: Disability-adjusted life years (DALYs)
-        unit: DALYs
-        description_short: Disability-adjusted life years (DALYs) from each mental illness
+        unit: DALYs per 100,000 people
+        description_short: Disability-adjusted life years (DALYs) from each mental illness, per 100,000 people
         display:
           numDecimalPlaces: 1
       prevalence_rate:
@@ -77,8 +65,6 @@ tables:
         unit: |-
           <% if metric == "Rate" %>
           DALYs per 100,000 people
-          <% elif metric == "Share" %>
-          share of total DALYs
           <%- endif -%>
         short_unit: |-
           {definitions.short_unit}

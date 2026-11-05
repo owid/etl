@@ -480,7 +480,7 @@ def aggregate_rows_by_periods_extra(tb: Table) -> Table:
     # Get summation (assuming NaN=0) and flag stating if a NaN is found
     index = ["warnum", "conflict_type", "region", "year_start", "year_end"]
     tb_nan = tb.groupby(index, as_index=False).agg({"battle_deaths": has_nan, "nonstate_deaths": has_nan})
-    tb_sum = tb.groupby(index, as_index=False).agg({"battle_deaths": sum, "nonstate_deaths": sum})
+    tb_sum = tb.groupby(index, as_index=False).agg({"battle_deaths": "sum", "nonstate_deaths": "sum"})
     tb = tb_nan.merge(tb_sum, on=index, suffixes=("_has_nan", "_sum"))
 
     # Obtain deaths threshold according to dataset description
@@ -600,7 +600,7 @@ def aggregate_rows_by_periods_inter(tb: Table) -> Table:
     # Get summation (NaN if any NaN, and assuming NaN=0)
     index = ["warnum", "conflict_type", "region", "year_start", "year_end"]
     tb_nan = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": has_nan})
-    tb_sum = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": sum})
+    tb_sum = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": "sum"})
     tb = tb_nan.merge(tb_sum, on=index, suffixes=("_has_nan", "_sum"))
 
     # Obtain deaths threshold according to dataset description
@@ -1229,7 +1229,7 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
     tb_locations_inter["is_location_of_conflict"] = tb_locations_inter["is_location_of_conflict"].fillna(0)
     # Filter irrelevant entries
     tb_locations_inter = tb_locations_inter[tb_locations_inter["year"] <= tb_chupilkin["year"].max()]
-    tb_locations_inter["country"] = tb_locations_inter["country"].astype("string")
+    tb_locations_inter["country"] = tb_locations_inter["country"].astype("str")
     # Reduce
     tb_locations_inter = tb_locations_inter.groupby(["year", "country"], as_index=False).agg(
         {"is_location_of_conflict": lambda x: min(1, x.sum())}

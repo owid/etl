@@ -1,0 +1,28 @@
+chart_config_id: 0191b6c7-3874-735e-b2b1-91a99049c51d
+grapher_schema: "011"
+slug: damage-costs-from-natural-disasters
+topic_tags:
+  - "Natural Disasters"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - "natural_disasters_global_by_type#total_damages"
+    # timelineMaxTime is set in the .py step, and {{date_published}} in the note is filled in there, both from the EM-DAT release date.
+    config:
+      title: "Global damage costs from natural disasters"
+      subtitle: "Total economic cost of damages as a result of global natural disasters in any given year, measured in current US$. Includes those from drought, floods, extreme weather, extreme temperature, landslides, dry mass movements, wildfires, volcanic activity and earthquakes."
+      note: "Data includes disasters reported up to {{date_published}}. The latest year may be incomplete due to reporting delays."
+      originUrl: "/natural-disasters"
+      chartTypes:
+        - "StackedBar"
+      minTime: 1980
+      timelineMinTime: 1980
+      yAxis:
+        min: 0
+      entityType: "disaster category"
+      entityTypePlural: "disaster categories"
+      addCountryMode: "change-country"
+      selectedEntityNames:
+        - "All disasters"

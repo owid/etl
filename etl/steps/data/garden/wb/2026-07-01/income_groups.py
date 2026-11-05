@@ -98,7 +98,7 @@ def run() -> None:
 
 def run_sanity_checks_on_inputs(tb: Table) -> None:
     # Check that raw labels are as expected.
-    assert (labels := set(tb["classification"])) == {
+    assert (labels := set(tb["classification"].dropna())) == {
         # No available classification for country-year (maybe country didn't exist yet/anymore).
         "..",
         # High income.
@@ -111,8 +111,6 @@ def run_sanity_checks_on_inputs(tb: Table) -> None:
         "LM*",
         # Upper middle income.
         "UM",
-        # Another label for when no classification is available.
-        pd.NA,
     }, f"Unknown income group label! Check {labels}"
 
 
