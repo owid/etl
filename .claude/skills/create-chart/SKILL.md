@@ -244,7 +244,7 @@ Key fields:
 
 - `grapher_schema` — **required**, and there is no fallback: the grapher chart-config schema version this
   config is written against, which becomes the chart's `$schema` and is what lets grapher migrate the
-  config after a breaking schema change. Use the version in `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`) when
+  config after a breaking schema change. Use `DEFAULT_GRAPHER_SCHEMA_VERSION` (`etl/config.py`) when
   authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required** for single charts, the chart's identity in grapher (`charts.configId`).
   See Step 4.
@@ -284,7 +284,7 @@ Key fields:
 ```yaml
 # REQUIRED — grapher chart-config schema the view configs below are written against, as a
 # QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
-# current DEFAULT_GRAPHER_SCHEMA version (etl/config.py) when authoring a new chart, then leave it
+# current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
 grapher_schema: "011"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this

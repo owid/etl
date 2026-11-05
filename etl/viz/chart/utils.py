@@ -15,7 +15,13 @@ from owid.catalog import Dataset, Table
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
-from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
+from etl.config import (
+    DEFAULT_GRAPHER_SCHEMA,
+    DEFAULT_GRAPHER_SCHEMA_VERSION,
+    GRAPHER_SCHEMA_URL_TEMPLATE,
+    OWID_ENV,
+    OWIDEnv,
+)
 from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR
@@ -27,16 +33,8 @@ INDICATORS_SLUG = "indicator"
 # A choice of a dimension, as stored in the dimensional metadata of a column (e.g. "female", or 2021).
 DimensionChoice = str | int
 
-# Grapher chart-config schemas are published as
-# https://files.ourworldindata.org/schemas/grapher-schema.011.json
-GRAPHER_SCHEMA_URL_TEMPLATE = "https://files.ourworldindata.org/schemas/grapher-schema.{version}.json"
 _GRAPHER_SCHEMA_VERSION_PATTERN = re.compile(r"^\d{3}$")
 _GRAPHER_SCHEMA_URL_PATTERN = re.compile(r"^https://files\.ourworldindata\.org/schemas/grapher-schema\.\d{3}\.json$")
-
-
-def default_grapher_schema_version() -> str:
-    """Three-digit version of `DEFAULT_GRAPHER_SCHEMA` — the value a new config should pin."""
-    return DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]
 
 
 def resolve_grapher_schema(value: str | int | None) -> str:
@@ -57,8 +55,8 @@ def resolve_grapher_schema(value: str | int | None) -> str:
         raise ValueError(
             "No `grapher_schema` pinned. Add a top-level `grapher_schema` to the config YAML "
             f'recording the version its view configs were authored against — `grapher_schema: "'
-            f'{default_grapher_schema_version()}"` for a config written today. Quote it: an '
-            "unquoted YAML value like `011` is parsed as octal."
+            f'{DEFAULT_GRAPHER_SCHEMA_VERSION}"` for a config written today. Quote it: an '
+            f"unquoted YAML value like `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is parsed as octal."
         )
 
     if isinstance(value, str):
@@ -72,12 +70,13 @@ def resolve_grapher_schema(value: str | int | None) -> str:
     hint = ""
     if isinstance(value, int) or (isinstance(value, str) and re.match(r"^\d{1,2}$", value)):
         hint = (
-            " Quote it: an unquoted YAML value like `011` is parsed as octal and silently becomes"
-            ' a different version, so write `grapher_schema: "011"`.'
+            f" Quote it: an unquoted YAML value like `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is parsed as"
+            f' octal and silently becomes a different version, so write `grapher_schema: "'
+            f'{DEFAULT_GRAPHER_SCHEMA_VERSION}"`.'
         )
     raise ValueError(
         f"Invalid `grapher_schema` value {value!r}. Expected a three-digit version as a quoted "
-        f'string (e.g. "011") or a full schema URL (e.g. {DEFAULT_GRAPHER_SCHEMA}).{hint}'
+        f'string (e.g. "{DEFAULT_GRAPHER_SCHEMA_VERSION}") or a full schema URL (e.g. {DEFAULT_GRAPHER_SCHEMA}).{hint}'
     )
 
 
