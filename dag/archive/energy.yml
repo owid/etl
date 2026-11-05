@@ -1556,3 +1556,12 @@ steps:
   # archived; last active in 274982d3cba6 on 2026-10-27
   data://grapher/energy/2026-07-28/photovoltaic_cost_and_capacity:
     - data://garden/energy/2026-07-28/photovoltaic_cost_and_capacity
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://garden/light/2025-12-29/energy_innovation_long_run:
+    - data://meadow/light/2025-12-29/energy_innovation_long_run
+    - data://garden/ons/2025-12-31/cpi_uk
+    - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
+    - data://garden/ons/2025-12-31/average_weekly_earnings_uk
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://grapher/light/2025-12-29/energy_innovation_long_run:
+    - data://garden/light/2025-12-29/energy_innovation_long_run
