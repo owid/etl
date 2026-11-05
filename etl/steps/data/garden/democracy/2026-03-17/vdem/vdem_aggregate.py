@@ -375,7 +375,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
     tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
-    # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
+    # Estimate the mean only if at least THRESHOLD_SHARE_COUNTRIES of the region's 1900 countries have data (10% for Europe)
     # Get list of countries in regions in 1900
     tb_1900 = tb_.loc[tb_["year"] == REFERENCE_YEAR, ["country"]]
     countries_to_continent = geo.countries_to_continent_mapping(
