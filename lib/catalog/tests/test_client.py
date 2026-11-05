@@ -36,6 +36,7 @@ class TestClient:
 class TestChartsAPI:
     """Test the Charts API."""
 
+    @pytest.mark.integration
     def test_fetch_chart(self):
         """Test fetching chart returns ChartTable directly."""
         client = Client()
@@ -47,6 +48,7 @@ class TestChartsAPI:
         # Chart slug stored in metadata.short_name
         assert tb.metadata.short_name == "life-expectancy"
 
+    @pytest.mark.integration
     def test_fetch_chart_by_url(self):
         """Test fetching chart by URL returns ChartTable."""
         client = Client()
@@ -55,6 +57,7 @@ class TestChartsAPI:
         assert isinstance(tb, ChartTable)
         assert tb.metadata.short_name == "life-expectancy"
 
+    @pytest.mark.integration
     def test_load_chart_table_data(self):
         """Test that fetched chart Table has expected index and columns."""
         client = Client()
@@ -65,6 +68,7 @@ class TestChartsAPI:
         assert "entities" in tb.index.names
         assert "years" in tb.index.names or "dates" in tb.index.names
 
+    @pytest.mark.integration
     def test_load_chart_table_metadata_and_config(self):
         """Test that table metadata, column metadata and chart config are accessible."""
         client = Client()
@@ -95,11 +99,13 @@ class TestChartsAPI:
         assert isinstance(tb.metadata.chart_config, dict)
         assert "title" in tb.metadata.chart_config
 
+    @pytest.mark.integration
     def test_chart_not_found(self):
         client = Client()
         with pytest.raises(ChartNotFoundError):
             client.charts.fetch("this-chart-does-not-exist")
 
+    @pytest.mark.integration
     def test_non_redistributable_chart(self):
         """Test that non-redistributable charts raise LicenseError."""
         client = Client()
@@ -116,6 +122,7 @@ class TestChartsAPI:
 class TestChartsAPISearch:
     """Test the Charts API search functionality."""
 
+    @pytest.mark.integration
     def test_charts_search(self):
         """Test searching for charts via ChartsAPI."""
         client = Client()
@@ -127,6 +134,7 @@ class TestChartsAPISearch:
         assert results[0].slug
         assert results[0].title
 
+    @pytest.mark.integration
     def test_charts_search_with_countries(self):
         """Test searching with country filters."""
         client = Client()
@@ -135,6 +143,7 @@ class TestChartsAPISearch:
         assert isinstance(results, ResponseSet)
         # Results should be filtered by country
 
+    @pytest.mark.integration
     def test_search_results_to_frame(self):
         """Test converting search results to DataFrame."""
         client = Client()
@@ -149,6 +158,7 @@ class TestChartsAPISearch:
 class TestSiteSearchAPI:
     """Test the internal SiteSearchAPI (advanced usage)."""
 
+    @pytest.mark.integration
     def test_site_search_pages(self):
         """Test searching for pages via _site_search."""
         client = Client()
@@ -160,6 +170,7 @@ class TestSiteSearchAPI:
         assert results[0].slug
         assert results[0].title
 
+    @pytest.mark.integration
     def test_site_search_charts(self):
         """Test accessing charts via _site_search (should work but not recommended)."""
         client = Client()
@@ -168,6 +179,7 @@ class TestSiteSearchAPI:
         assert isinstance(results, ResponseSet)
         assert len(results) > 0
 
+    @pytest.mark.integration
     def test_site_search_charts_limit_warning(self):
         """Test that warning is raised when limit > 100 for charts."""
         import warnings
@@ -185,6 +197,7 @@ class TestSiteSearchAPI:
             # Check that limit was clamped to 100
             assert isinstance(results, ResponseSet)
 
+    @pytest.mark.integration
     def test_site_search_pages_limit_warning(self):
         """Test that warning is raised when limit > 100 for pages."""
         import warnings
@@ -206,6 +219,7 @@ class TestSiteSearchAPI:
 class TestIndicatorsAPI:
     """Test the Indicators API."""
 
+    @pytest.mark.integration
     def test_search_indicators(self):
         client = Client()
         results = client.indicators.search("solar power generation")
@@ -221,6 +235,7 @@ class TestIndicatorsAPI:
         assert 0 <= first.score <= 1
         assert first.path
 
+    @pytest.mark.integration
     def test_fetch_indicator(self):
         """Test fetching a specific indicator by path returns Table directly."""
         client = Client()
@@ -246,6 +261,7 @@ class TestIndicatorsAPI:
             # Missing # separator
             client.indicators.fetch("grapher/un/2024/pop/population")
 
+    @pytest.mark.integration
     def test_fetch_indicator_missing_column(self):
         """Test that fetching non-existent column raises error."""
         client = Client()
@@ -263,6 +279,7 @@ class TestIndicatorsAPI:
 class TestTablesAPI:
     """Test the Tables API."""
 
+    @pytest.mark.integration
     def test_search_tables(self):
         client = Client()
         results = client.tables.search(table="population")
@@ -271,6 +288,7 @@ class TestTablesAPI:
         assert len(results) > 0
         assert all(isinstance(r, TableResult) for r in results)
 
+    @pytest.mark.integration
     def test_search_tables_by_namespace(self):
         client = Client()
         results = client.tables.search(table="population", namespace="un")
@@ -279,6 +297,7 @@ class TestTablesAPI:
         assert len(results) > 0
         assert all(r.namespace == "un" for r in results)
 
+    @pytest.mark.integration
     def test_fetch_table(self):
         """Test fetching table by path returns Table directly."""
         client = Client()
@@ -306,6 +325,7 @@ class TestTablesAPI:
         with pytest.raises(KeyError, match="No matching table found"):
             client.tables.fetch("garden/fake/2024-01-01/fake/fake")
 
+    @pytest.mark.integration
     def test_search_with_refresh_index(self):
         """Test that refresh_index parameter forces index re-download."""
         client = Client()
@@ -629,6 +649,7 @@ class TestKeepLatestVersions:
 class TestTablesAPILatest:
     """Integration test for TablesAPI.search with latest=True."""
 
+    @pytest.mark.integration
     def test_latest_deduplicates(self):
         """Search for population with latest=True should have fewer results."""
         client = Client()
@@ -782,6 +803,7 @@ class TestDatasetteAPI:
         assert "DatasetteAPI" in repr(api)
         assert "datasette-public.owid.io" in repr(api)
 
+    @pytest.mark.integration
     def test_query(self):
         """Test executing raw SQL query."""
         import pandas as pd
@@ -793,6 +815,7 @@ class TestDatasetteAPI:
         assert len(df) == 1
         assert df["value"].iloc[0] == 1
 
+    @pytest.mark.integration
     def test_query_raises_on_error(self):
         """Test that invalid SQL raises an exception."""
         import requests
@@ -801,6 +824,7 @@ class TestDatasetteAPI:
         with pytest.raises(requests.HTTPError):
             api.query("SELECT * FROM nonexistent_table_12345")
 
+    @pytest.mark.integration
     def test_list_tables(self):
         """Test listing available tables (fast mode, names only)."""
         api = DatasetteAPI()
@@ -818,6 +842,7 @@ class TestDatasetteAPI:
         assert tables[0].columns == []
         assert tables[0].row_count is None
 
+    @pytest.mark.integration
     def test_list_tables_with_metadata(self):
         """Test listing tables with full metadata (slow mode)."""
         api = DatasetteAPI()
@@ -831,6 +856,7 @@ class TestDatasetteAPI:
             assert len(t.columns) > 0  # Should have columns
             assert t.row_count is not None  # Should have row count
 
+    @pytest.mark.integration
     def test_get_table(self):
         """Test getting metadata for a single table."""
         api = DatasetteAPI()
@@ -842,6 +868,7 @@ class TestDatasetteAPI:
         assert table.row_count > 0
         assert table.is_view is False
 
+    @pytest.mark.integration
     def test_table_fetch(self):
         """Test fetching full metadata for a table from list_tables()."""
         api = DatasetteAPI()
@@ -866,6 +893,7 @@ class TestDatasetteAPI:
 
         assert result == {}
 
+    @pytest.mark.integration
     def test_fetch_popularity_indicator(self):
         """Test fetching indicator popularity."""
         api = DatasetteAPI()
@@ -880,6 +908,7 @@ class TestDatasetteAPI:
             if slug in popularity:
                 assert 0.0 <= popularity[slug] <= 1.0
 
+    @pytest.mark.integration
     def test_fetch_popularity_dataset(self):
         """Test fetching dataset popularity."""
         api = DatasetteAPI()
@@ -902,6 +931,7 @@ class TestDatasetteAPI:
         assert isinstance(result, dict)
         assert "nonexistent_slug_12345" not in result
 
+    @pytest.mark.integration
     def test_custom_timeout(self):
         """Test that custom timeout is respected."""
         api = DatasetteAPI(timeout=5)
@@ -916,6 +946,7 @@ class TestDatasetteAPI:
 class TestQuickSearch:
     """Test the search() convenience function from quick.py."""
 
+    @pytest.mark.integration
     def test_search_charts_default(self):
         """search() with a query returns ResponseSet[ChartResult] by default."""
         results = search("population")
@@ -923,6 +954,7 @@ class TestQuickSearch:
         assert len(results) > 0
         assert all(isinstance(r, ChartResult) for r in results)
 
+    @pytest.mark.integration
     def test_search_tables(self):
         """search(kind='table') returns ResponseSet[TableResult]."""
         results = search("population", kind="table")
@@ -930,6 +962,7 @@ class TestQuickSearch:
         assert len(results) > 0
         assert all(isinstance(r, TableResult) for r in results)
 
+    @pytest.mark.integration
     def test_search_indicators(self):
         """search(kind='indicator') returns ResponseSet[IndicatorResult]."""
         results = search("life expectancy", kind="indicator")
@@ -956,18 +989,21 @@ class TestQuickSearch:
 class TestQuickFetch:
     """Test the fetch() convenience function from quick.py."""
 
+    @pytest.mark.integration
     def test_fetch_chart_slug(self):
         """fetch() with a chart slug returns a ChartTable."""
         tb = fetch("life-expectancy")
         assert isinstance(tb, ChartTable)
         assert len(tb) > 0
 
+    @pytest.mark.integration
     def test_fetch_chart_url(self):
         """fetch() with a full grapher URL returns a ChartTable."""
         tb = fetch("https://ourworldindata.org/grapher/life-expectancy")
         assert isinstance(tb, ChartTable)
         assert len(tb) > 0
 
+    @pytest.mark.integration
     def test_fetch_table_path(self):
         """fetch() with a catalog table path returns a Table."""
         # Find a valid table path first
@@ -1060,6 +1096,7 @@ class TestResponseSetUI:
 class TestIndicatorsSearchParams:
     """Test indicator search with sort_by and latest parameters."""
 
+    @pytest.mark.integration
     def test_indicators_search_latest(self):
         """latest=True deduplicates indicators by namespace/dataset/column."""
         client = Client()
@@ -1069,6 +1106,7 @@ class TestIndicatorsSearchParams:
         assert len(latest_results) > 0
         assert len(latest_results) <= len(all_results)
 
+    @pytest.mark.integration
     def test_indicators_search_sort_by_relevance(self):
         """Default sort_by='relevance' returns results (sanity check)."""
         client = Client()

@@ -371,7 +371,7 @@ def combine_paris_principles(all_tabs: list[pd.DataFrame]) -> list[pd.DataFrame]
         ["country", "year", "goal", "target", "indicator", "seriescode"], verify_integrity=True
     )
     # Shortening the values to improve the source tab
-    paris_principles_table.value = paris_principles_table.value.replace(
+    paris_principles_table.value = paris_principles_table.value.cat.rename_categories(
         {
             "Countries with National Human Rights Institutions in compliance with the Paris Principles, A status (1 = YES; 0 = NO)": "Compliant with Paris Principles",
             "Countries with National Human Rights Institutions not fully compliant with the Paris Principles, B status (1 = YES; 0 = NO)": "Observer Status",

@@ -6,6 +6,84 @@ dataset:
     Our complete CO2 and Greenhouse Gas Emissions dataset is a collection of key metrics maintained by Our World in Data. It includes data on CO2 emissions (annual, per capita, cumulative, and consumption-based), other greenhouse gases, and energy mix.
 
     It is compiled from a variety of secondary sources, including the Global Carbon Project's Global Carbon Budget, Jones et al.'s national contributions to climate change, and the Energy Institute's Statistical Review of World Energy, alongside auxiliary population, income group, and GDP data used to calculate per-capita and per-GDP indicators.
+  changelog:
+    - date: 2026-06-01
+      changes:
+        - Update dataset to use the latest EIA's International Energy Data.
+        - Changed the units of the carbon intensity of energy indicators from kilograms to grams of CO₂ per kilowatt-hour.
+    - date: 2025-12-04
+      changes:
+        - Update greenhouse gases using the latest data from Jones et al. (2025).
+    - date: 2025-11-13
+      changes:
+        - Updated dataset to use the latest version of the Global Carbon Budget (2025).
+    - date: 2024-11-21
+      changes:
+        - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2024), and Jones et al. (2024) (version 2024.2).
+        - Now methane, nitrous oxide, and total greenhouse gas emissions data come from Jones et al. (2024), instead of Climate Watch, to provide a wider data coverage.
+    - date: 2024-06-20
+      changes:
+        - Update data from the Statistical Review of World Energy.
+        - Update data from the Maddison Project Database.
+    - date: 2024-04-10
+      changes:
+        - Updated dataset and codebook to use the latest version of the data on National contributions to climate change (Jones et al. (2024)).
+    - date: 2023-12-28
+      changes:
+        - Enhanced codebook (improved descriptions, added units, updated sources).
+        - Updated primary energy consumption (to update metadata, nothing has changed in the data).
+    - date: 2023-12-05
+      changes:
+        - |-
+          Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2023).
+          - In this version, "International transport" has been replaced by "International aviation" and "International shipping". Also, some overseas territories have no data in this version. More details on the changes can be found in the pdf file hosted [here](https://zenodo.org/records/10177738).
+    - date: 2023-11-08
+      changes:
+        - Updated CO2 emissions data to use the latest emissions by sector from Climate Watch (2023).
+        - Update codebook accordingly.
+    - date: 2023-10-16
+      changes:
+        - Improved codebook.
+        - Fixed issue related to consumption-based emissions in Africa, and Palau emissions.
+    - date: 2023-07-10
+      changes:
+        - Updated primary energy consumption and other indicators relying on energy data, to use the latest Statistical Review of World Energy by the Energy Institute.
+        - Renamed countries 'East Timor' and 'Faroe Islands'.
+    - date: 2023-05-04
+      changes:
+        - Added indicators `share_of_temperature_change_from_ghg`, `temperature_change_from_ch4`, `temperature_change_from_co2`, `temperature_change_from_ghg`, and `temperature_change_from_n2o` using data from Jones et al. (2023).
+    - date: 2022-11-11
+      changes:
+        - Updated CO2 emissions data with the newly released Global Carbon Budget (2022) by the Global Carbon Project.
+        - Added various new indicators related to national land-use change emissions.
+        - Added the emissions of the 1991 Kuwaiti oil fires in Kuwait's emissions (while also keeping 'Kuwaiti Oil Fires (GCP)' as a separate entity), to properly account for these emissions in the aggregate of Asia.
+        - Applied minor changes to entity names (e.g. "Asia (excl. China & India)" -> "Asia (excl. China and India)").
+    - date: 2022-09-06
+      changes:
+        - Updated data on primary energy consumption (from BP & EIA) and greenhouse gas emissions by sector (from CAIT).
+        - Refactored code, since now this repository simply loads the data, generates the output files, and uploads them to the cloud; the code to generate the dataset is now in our [etl repository](https://github.com/owid/etl).
+        - Minor changes in the codebook.
+    - date: 2022-04-15
+      changes:
+        - Updated primary energy consumption data.
+        - Updated CO2 data to include aggregations for the different country income levels.
+    - date: 2022-02-24
+      changes:
+        - Updated greenhouse gas emissions data from CAIT Climate Data Explorer.
+        - 'Included two new columns in dataset: total greenhouse gases excluding land-use change and forestry, and the same as per capita values.'
+    - date: 2021-11-05
+      changes:
+        - Updated CO2 emissions data with the newly released Global Carbon Budget (v2021).
+    - date: 2021-09-16
+      changes:
+        - Fixed data quality issues in CO2 emissions indicators (emissions less than 0, missing data for Eswatini, ...).
+        - Replaced all input CSVs with data retrieved directly from ourworldindata.org.
+    - date: 2021-02-08
+      changes:
+        - Updated this dataset with the latest annual release from the Global Carbon Project.
+    - date: 2020-08-07
+      changes:
+        - The first version of this dataset was made available.
   # License of the compiled OWID dataset (matching the owid/co2-data repo). Takes precedence
   # over per-source origin licenses on the catalog landing page / JSON-LD.
   licenses:

@@ -1,0 +1,60 @@
+grapher_schema: "011"
+chart_config_id: 0191b6c7-36a7-7ff0-a15f-a97ca0a8f3e6
+slug: children-born-per-woman
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: fertility_rate#fertility_rate_hist
+          display:
+            name: Total fertility rate
+            shortUnit: births
+    config:
+      title: 'Fertility rate: births per woman'
+      subtitle: The [total fertility rate](#dod:fertility-rate) summarizes the total number of births a woman would have, if she experienced the birth rates seen in women of each age group in one particular year across her childbearing years.
+      note: ''
+      variantName: Long-run
+      originUrl: /fertility-rate
+      hasMapTab: true
+      hideAnnotationFieldsInTitle:
+        time: true
+      map:
+        colorScale:
+          baseColorScheme: BuPu
+          binningStrategy: manual
+          legendDescription: Children per woman
+          customNumericColors:
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+        columnSlug: fertility_rate#fertility_rate_hist
+        timeTolerance: 5
+      selectedEntityNames:
+        - World
+        - United States
+        - United Kingdom
+        - Russia
+        - Germany
+        - Japan
+        - India
+      yAxis:
+        max: 0
+        min: 0

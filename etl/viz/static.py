@@ -122,6 +122,73 @@ def unclip(fig: Any) -> None:
         artist.set_clip_on(False)
 
 
+def name_furniture(fig: Any) -> int:
+    """Give each axes' own furniture a `<subject>__<role>` gid wherever the step has not set one.
+
+    Figma's re-import of a styled frame learns which library style each mark carries by joining
+    nodes on these names, so gridlines, ticks, tick labels and spines left with matplotlib's
+    `line2d_<n>` / `text_<n>` ids lose any style a designer bound on them. Names are keyed on the
+    tick VALUE rather than its position, so they survive a re-render that adds or drops a tick
+    (`axes__y-grid-50`, `axes__x-tick-label-2010`). The value is written to 15 significant digits, so
+    nearby large ticks stay distinct (`1000001`, not `1e+06`) while float noise such as
+    `0.30000000000000004` still reads `0.3`. A gid the step set itself is never overwritten, and a
+    name already in use in the figure gets a `-2`, `-3`, … suffix, so the SVG never repeats an id.
+    The first axes is always `axes`, and later ones are `axes2`, `axes3`, …, so adding a colorbar or
+    a twin axis in a later render leaves the first axes' names, and the bindings joined on them,
+    intact. Inset and secondary axes are named after their parent (`axes-child1__spine-left`).
+    Returns the number of artists it named.
+
+    Draws the figure once without rendering first: matplotlib builds its tick objects at draw time,
+    so ticks fetched before a draw can be replaced by fresh, unnamed ones when the figure is saved.
+    """
+    fig.draw_without_rendering()
+    named = 0
+    used = {artist.get_gid() for artist in fig.findobj() if artist.get_gid() is not None}
+
+    def name(artist: Any, gid: str) -> None:
+        nonlocal named
+        if artist is not None and artist.get_gid() is None:
+            unique, n = gid, 1
+            while unique in used:
+                n += 1
+                unique = f"{gid}-{n}"
+            artist.set_gid(unique)
+            used.add(unique)
+            named += 1
+
+    # Inset and secondary axes live in their parent's `child_axes`, not in `fig.axes`.
+    def with_children(ax: Any, subject: str) -> list[tuple[str, Any]]:
+        found = [(subject, ax)]
+        for j, child in enumerate(ax.child_axes):
+            found += with_children(child, f"{subject}-child{j + 1}")
+        return found
+
+    all_axes: list[tuple[str, Any]] = []
+    for index, ax in enumerate(fig.axes):
+        all_axes += with_children(ax, "axes" if index == 0 else f"axes{index + 1}")
+
+    for subject, ax in all_axes:
+        for side, spine in ax.spines.items():
+            name(spine, f"{subject}__spine-{side}")
+        name(ax.title, f"{subject}__title")
+        # `set_title(loc="left"|"right")` writes to separate Text artists, which matplotlib only
+        # exposes as private attributes; getattr keeps a future rename from raising.
+        name(getattr(ax, "_left_title", None), f"{subject}__title-left")
+        name(getattr(ax, "_right_title", None), f"{subject}__title-right")
+        for axis_name, axis in (("x", ax.xaxis), ("y", ax.yaxis)):
+            name(axis.label, f"{subject}__{axis_name}-label")
+            name(axis.get_offset_text(), f"{subject}__{axis_name}-offset")
+            for kind, ticks in (("", axis.get_major_ticks()), ("minor-", axis.get_minor_ticks())):
+                for tick in ticks:
+                    value = format(tick.get_loc(), ".15g")
+                    name(tick.gridline, f"{subject}__{axis_name}-{kind}grid-{value}")
+                    name(tick.tick1line, f"{subject}__{axis_name}-{kind}tick-{value}")
+                    name(tick.tick2line, f"{subject}__{axis_name}-{kind}tick2-{value}")
+                    name(tick.label1, f"{subject}__{axis_name}-{kind}tick-label-{value}")
+                    name(tick.label2, f"{subject}__{axis_name}-{kind}tick-label2-{value}")
+    return named
+
+
 # Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
 # timestamp and its own version into every file, so without this an unchanged figure re-rendered
 # under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
@@ -190,8 +257,10 @@ def export_frame(
     short_name: str,
     *,
     template: str | None = None,
+    height_px: int | None = None,
     dpi: int = 300,
     unclip_first: bool = True,
+    name_furniture_first: bool = True,
 ) -> None:
     """Save one frame as the PNG/SVG pair the Figma handoff expects.
 
@@ -208,14 +277,27 @@ def export_frame(
 
     `template` is optional and only validates: it asserts the figure's `figsize` matches that
     template, catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.
+    `height_px` is for a layout that runs a little shorter or taller than its template on purpose: the
+    check then expects the template's width at that height, with the scale held just as strictly.
+
+    The axes' own furniture is named first (`name_furniture`), so the only marks a step still has
+    to give a gid are the ones it draws itself; `verify_static_viz.py --require-named-marks` lists
+    any it missed.
     """
+    # Name first: its draw can create tick objects, and the clipping sweep has to reach those too.
+    if name_furniture_first:
+        name_furniture(fig)
     if unclip_first:
         unclip(fig)
 
+    if height_px is not None and template is None:
+        raise ValueError("height_px adjusts a template's height, so it needs template= too")
     if template is not None:
         if template not in TEMPLATES:
             raise ValueError(f"unknown template {template!r}; expected one of {sorted(TEMPLATES)}")
         want = TEMPLATES[template].figsize
+        if height_px is not None:
+            want = (want[0], height_px / PIXELS_PER_INCH)
         got = (fig.get_figwidth(), fig.get_figheight())
         # Both dimensions, not just their ratio: a figure at the template's aspect but twice its
         # scale needs a uniform rescale on the way into the frame, and that divides every
@@ -225,7 +307,8 @@ def export_frame(
         # check the thing that actually has to hold. Tolerance matches the verifier's 0.002.
         if any(abs(g - w) / w > 0.002 for g, w in zip(got, want)):
             raise AssertionError(
-                f"figure size {got[0]:.4f}x{got[1]:.4f} does not match template {template!r}. "
+                f"figure size {got[0]:.4f}x{got[1]:.4f} does not match template {template!r}"
+                f"{f' at {height_px}px tall' if height_px is not None else ''}. "
                 f"Expected figsize {want} — the aspect and the scale both have to match, because "
                 f"the figure is built at {PIXELS_PER_INCH} template px per inch. "
                 'A `bbox_inches="tight"` on save also breaks this — it crops to the ink.'

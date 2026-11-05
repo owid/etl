@@ -120,6 +120,8 @@ def run() -> None:
         short_name=paths.short_name,
         tolerance_unk_ctype=0.01,
     )
+    # Cumulative deaths since 1989 are only published with the stable release (table `ucdp_cumulative` in `ucdp`)
+    tables = [tb for tb in tables if tb.m.short_name != f"{paths.short_name}_cumulative"]
 
     #
     # Save outputs.

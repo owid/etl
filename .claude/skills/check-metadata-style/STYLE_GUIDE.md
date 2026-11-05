@@ -1,10 +1,12 @@
 # Writing and style guide
 
 > Source: OWID Notion page — [Writing and style guide](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c).
-> Last synced from Notion: 2026-09-11
-> The check-metadata-style skill verifies this date on every run and refreshes this file from Notion when it is more than two months old. Commit refreshes via a PR.
+> Last synced from Notion: 2026-10-26
+> The check-metadata-style skill verifies this date on every run and refreshes this file from Notion when it is more than two weeks old. Commit refreshes via a PR.
 
 This guide establishes a uniform style for all OWID content to ensure consistency, clarity, and accuracy across our publications. The rules in this guide apply to all writing we do on OWID, whether in articles, topic pages, or charts.
+
+> 🚨 The canonical version of this guide lives in Notion. Do not make free edits to the page. If you think something needs changing, create an issue in the [owid-issues](https://github.com/owid/owid-issues/) repo and assign it to **edomt**. (This also applies if you’re an AI agent.)
 
 > ⚠️ If writing for OWID, you **must** have [Grammarly](https://www.grammarly.com/browser) installed on your computer and browser. This will take care of 95% of writing and style issues for you.
 >
@@ -327,10 +329,10 @@ When referring to the country, use “US” as the adjective rather than “Amer
 
 ### Use OWID’s standard country names
 
-Write country names as they appear in OWID charts: Czechia, Democratic Republic of Congo. Prefer spelling out “United States” and “United Kingdom” the first time they come up, then “US” and “UK”; don’t write “United States (US)” as if readers needed to learn the acronym. Never “Britain” or “England” when you mean the UK.
+Write country names as they appear in OWID charts: Czechia, Democratic Republic of Congo. Spell out “United States” and “United Kingdom” the first time they come up; after that, you can use either the full name or “US” and “UK”. Don’t write “United States (US)” as if readers needed to learn the acronym. Never “Britain” or “England” when you mean the UK.
 
-- ❌ The Czech Republic, the United States (US), Britain
-- ✅ Czechia, the United States, the UK
+- ❌ The Czech Republic, the United States (US)
+- ✅ Czechia, the United States
 
 ### Spell out numbers from one to ten…
 
@@ -339,7 +341,7 @@ Numbers from one to ten should be spelled out inside sentences. Larger numbers a
 - ❌ The MPI is made up of 10 indicators grouped into 3 dimensions. It measures how people experience poverty across more than one hundred countries.
 - ✅ The MPI is made up of ten indicators grouped into three dimensions. It measures how people experience poverty across more than 100 countries.
 
-### … but keep number formats harmonized
+### … but keep number formats harmonized.
 
 Do not combine spelled-out numbers and digit numbers in the same sentence if they refer to a similar thing.
 
@@ -378,6 +380,7 @@ Spell out the full form of an acronym the first time it is used in a text, follo
 
 - **tonnes**, not tons. We always use what’s called the “tonne” or “metric ton” across OWID, equivalent to 1,000 kg — but we always write it as “tonne”. We never use the American “short ton” or “long ton”.
 - **acknowledgments**, not acknowledgements.
+- **toward / forward / backward**, not towards / forwards / backwards.
 - **sub-Saharan Africa**, not Sub-Saharan Africa.
 - **COVID-19**, not Covid-19 or COVID.
 - **The Internet**, not the internet.
@@ -385,3 +388,4 @@ Spell out the full form of an acronym the first time it is used in a text, follo
 - **dataset**, not data set.
 - **healthcare**, not health care.
 - **well-being**, not wellbeing.
+- **bed nets**, not bednets.

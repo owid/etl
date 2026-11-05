@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -73,8 +74,11 @@ def add_metadata(tb: Table) -> Table:
         meta = tb_pivoted[column].metadata
         long_definition = tb["long_definition"].loc[tb["indicator_name"] == column]
         short_definition = tb["short_definition"].loc[tb["indicator_name"] == column]
-        meta.description_from_producer = long_definition.iloc[0]
-        meta.description_short = end_with_punctuation(short_definition.iloc[0])
+        # Some indicators have no definitions; leave those fields empty rather than storing a missing value.
+        long_definition = long_definition.iloc[0]
+        short_definition = short_definition.iloc[0]
+        meta.description_from_producer = long_definition if pd.notna(long_definition) else None
+        meta.description_short = end_with_punctuation(short_definition) if pd.notna(short_definition) else None
         meta.title = column
         meta.unit = "%"
         meta.short_unit = "%"

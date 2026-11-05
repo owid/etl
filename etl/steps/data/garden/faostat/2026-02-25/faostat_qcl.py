@@ -220,6 +220,8 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     error = "Element codes for 'Producing or slaughtered animals' have overlapping items."
     items_for_different_elements = (
         tb[(tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS))]
+        # pandas 3 fails to aggregate a categorical column into lists.
+        .astype({"item_code": object})
         .groupby("element_code", observed=True)
         .agg({"item_code": lambda x: list(x.unique())})
         .to_dict()["item_code"]

@@ -2,8 +2,8 @@
 
 Loads the `food_trade` garden table and writes two kinds of files:
 
-  * one metadata JSON at `food-trade.metadata.json` listing the year, source,
-    the entity/product id-to-name mappings, and a `productsByEntity` map
+  * one metadata JSON at `food-trade.metadata.json` listing the year, the
+    entity/product id-to-name mappings, and a `productsByEntity` map
     that tells the viz which (entity, product) combinations have any data;
   * one per-product JSON at `food-trade.<product_id>.json` carrying that
     product's `flows` (every (exporter, importer, value) triple in the data
@@ -14,7 +14,7 @@ the viz: pick a product, fetch one JSON, render. The metadata's
 `productsByEntity` map lets the viz pre-compute "what can this country be
 the exporter / importer of?" without loading every product file.
 
-It also writes `metadata.json`, the feed's provenance derived from the garden columns (see
+The metadata JSON also carries the feed's provenance, derived from the garden columns (see
 `etl.viz.bespoke`).
 
 The files go to the step's output folder; the framework syncs that folder to the R2 path of the
@@ -31,7 +31,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -42,6 +42,20 @@ FILE_SLUG = "food-trade"
 # quantities are large, so 3 decimals is far below any meaningful precision
 # while keeping the files compact.
 NUM_DECIMALS = 3
+
+# What the viz shows about the data and how we processed it. It is set here, not in the garden
+# metadata, so that it only changes this feed.
+DESCRIPTION_KEY = """\
+This tool is built from country-to-country [trade data](https://www.fao.org/faostat/en/#data/TM) from the Food and Agriculture Organization of the United Nations.
+
+We made a number of steps to make the data easier to digest and present. For example, we sum together some detailed categories reported by the FAO only separately (e.g. "milled rice" and "broken rice" are shown together as a total for traded rice).
+
+Importantly, when digging into this data, we found that what exporting countries say they’ve exported to a given country doesn’t always match what the receiving country says they’ve imported. This is a common issue for all trade data, not just food. To keep things balanced, we had to make choices about how to align the data. Where only one country reports a trade flow, we take that figure and apply it to both parties. Where both an exporting and importing country report a flow but disagree about its quantity, we use the importer’s reported quantity. The FAO considers imports to typically be more reliable.
+
+Pablo Rosado, our data scientist behind this work, explains how we processed the original FAO data in more detail in our [technical documentation](https://docs.owid.io/projects/etl/analyses/food_trade/food_trade)."""
+
+# Fields the garden column carries that the viz does not show.
+FIELDS_NOT_SHOWN = ["unit", "shortUnit", "descriptionProcessing"]
 
 
 def _build_product_data(df: pd.DataFrame, product: str, entity_to_id: dict) -> dict:
@@ -95,14 +109,15 @@ def run() -> None:
     ds = paths.load_dataset("food_trade")
     tb = ds.read("food_trade", safe_types=False)
 
-    # The feed's provenance, derived from the origins of the data it is built on, in the same
-    # shape the MDIM download packages publish.
+    # The feed's provenance, derived from the origins of the data it is built on.
     feed_metadata = build_feed_metadata(
         title="Food trade",
         columns={"Bilateral trade flow": tb["value"]},
         update_period_days=ds.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
+    for field in FIELDS_NOT_SHOWN:
+        feed_metadata.pop(field, None)
+    feed_metadata["descriptionKey"] = DESCRIPTION_KEY
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
@@ -137,7 +152,6 @@ def run() -> None:
     #
     metadata = {
         "year": year,
-        "source": feed_metadata["feed"]["citation"],
         "dimensions": {
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
             "products": [{"id": product_to_id[p], "name": p} for p in products],
@@ -145,7 +159,7 @@ def run() -> None:
         "productsByEntity": _build_products_by_entity(df, entity_to_id, product_to_id),
     }
     log.info("food_trade.write_metadata", n_entities=len(countries), n_products=len(products))
-    _save(metadata, f"{FILE_SLUG}.metadata.json")
+    _save(add_feed_metadata(metadata, feed_metadata), f"{FILE_SLUG}.metadata.json")
 
     #
     # Write one file per product.

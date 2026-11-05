@@ -27,12 +27,26 @@ import pyarrow.parquet as pq
 import structlog
 from owid.datautils import dataframes
 from owid.repack import repack_frame
+from pandas._libs.lib import no_default
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
 from owid.catalog.api.utils import session, storage_options_for_http
-from owid.catalog.core import indicators, utils, warnings
+from owid.catalog.core import docs, indicators, utils, warnings
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, TableMeta, VariableMeta
+
+# Columns of Table.codebook, in order.
+CODEBOOK_COLUMNS = [
+    "column",
+    "title",
+    "description",
+    "unit",
+    "date_range",
+    "source",
+    "description_key",
+    "description_from_producer",
+    "description_processing",
+]
 
 log = structlog.get_logger()
 
@@ -357,17 +371,16 @@ class Table(pd.DataFrame):
     def codebook(self) -> pd.DataFrame:
         """Generate a human-readable codebook for this table.
 
-        Creates a DataFrame summarizing all variables in the table with their
-        titles, descriptions, units, and source attributions.
+        One row per column (index columns included) with its title, short description, unit, the
+        short labels of its sources, and the longer texts: what you should know about the indicator
+        (``description_key``), how its producer describes it (``description_from_producer``) and how we
+        processed it (``description_processing``), all as markdown.
+        The source labels match the ``label`` column of :attr:`sources`, which carries the full
+        details (URLs, licenses, citations).
 
         Returns:
-            DataFrame with columns:
-
-                - column: Column name (including index columns)
-                - title: Title from metadata (title_public > display.name > title)
-                - description: Short description of the indicator
-                - unit: Unit of measurement with short unit in parentheses
-                - source: Formatted source attribution with URLs
+            DataFrame with columns ``column``, ``title``, ``description``, ``unit``, ``date_range``, ``source``,
+            ``description_key``, ``description_from_producer``, ``description_processing``.
 
         Example:
             ```python
@@ -375,76 +388,35 @@ class Table(pd.DataFrame):
             print(codebook.to_markdown())
             ```
         """
-        # Initialize lists to store the codebook information.
-        columns = []
-        titles = []
-        descriptions = []
-        units = []
-        sources = []
-
-        # Use all_columns to include both index and regular columns.
+        rows = []
         for column in self.all_columns:
-            # Use get_column_or_index to access both regular and index columns.
             md = self.get_column_or_index(column).metadata
-            columns.append(column)
+            rows.append(
+                {
+                    "column": column,
+                    "title": docs.variable_title(column, md),
+                    "description": utils.remove_details_on_demand(md.description_short or ""),
+                    "unit": docs.unit_label(md),
+                    "date_range": docs.year_range(self, column) or "",
+                    "source": docs.column_source_labels(list(md.origins)),
+                    "description_key": docs.description_key_text(md) or "",
+                    "description_from_producer": utils.remove_details_on_demand(md.description_from_producer or ""),
+                    "description_processing": utils.remove_details_on_demand(md.description_processing or ""),
+                }
+            )
+        return pd.DataFrame(rows, columns=CODEBOOK_COLUMNS)
 
-            # Determine the best title to use.
-            # Priority: presentation.title_public > display.name > title
-            title = md.title or ""
-            if md.presentation and md.presentation.title_public:
-                title = md.presentation.title_public
-            elif md.display and "name" in md.display:
-                title = md.display["name"]
+    @property
+    def sources(self) -> pd.DataFrame:
+        """One row per unique origin used by any column of this table.
 
-            titles.append(title)
-
-            # Use short description.
-            descriptions.append(md.description_short or "")
-
-            # Prepare indicator's unit, including short_unit if available.
-            unit = md.unit or ""
-            if md.short_unit and md.short_unit != md.unit:
-                unit += f" ({md.short_unit})"
-            units.append(unit)
-
-            # Gather unique origins of current variable.
-            unique_sources = []
-            for origin in md.origins:
-                # Construct the source name from the origin's attribution.
-                # If not defined, build it using the default format "Producer - Data product (year)".
-                if origin.attribution:
-                    source_name = origin.attribution
-                else:
-                    # Build default format
-                    source_name = origin.producer
-                    if origin.title or origin.title_snapshot:
-                        source_name += f" - {origin.title or origin.title_snapshot}"
-                    if origin.date_published:
-                        # Extract year from date_published (can be YYYY or YYYY-MM-DD)
-                        year = str(origin.date_published).split("-")[0]
-                        source_name += f" ({year})"
-
-                # Add URL at the end of the source in brackets.
-                if origin.url_main:
-                    source_name += f" [{origin.url_main}]"
-
-                # Add the source to the list of unique sources.
-                if source_name not in unique_sources:
-                    unique_sources.append(source_name)
-
-            # Concatenate all sources.
-            sources_combined = "; ".join(unique_sources)
-            sources.append(sources_combined)
-
-        # Apply remove_details_on_demand to all descriptions at once.
-        descriptions = [utils.remove_details_on_demand(desc) for desc in descriptions]
-
-        # Create a DataFrame with the codebook.
-        codebook = pd.DataFrame(
-            {"column": columns, "title": titles, "description": descriptions, "unit": units, "source": sources}
-        )
-
-        return codebook
+        Columns: ``label`` (as printed in the codebook's ``source`` column), ``producer``, ``title``,
+        ``description``, ``date_published``, ``date_accessed``, ``url_main``, ``url_download``,
+        ``citation_full``, ``license_name``, ``license_url``. Origins that render identically are
+        one row; rows are ordered by how many columns reference them.
+        """
+        origins = {column: list(self.get_column_or_index(column).metadata.origins) for column in self.all_columns}
+        return docs.sources_frame(origins)
 
     def to_excel(
         self,
@@ -456,8 +428,8 @@ class Table(pd.DataFrame):
     ) -> None:
         """Save table to Excel file with optional metadata codebook.
 
-        Exports the table data to an Excel file, optionally including a separate
-        sheet with the codebook metadata.
+        Exports the table data to an Excel file, optionally including a codebook sheet
+        and a ``sources`` sheet with the details of every origin.
 
         Args:
             excel_writer: File path or ExcelWriter object to save to.
@@ -477,12 +449,14 @@ class Table(pd.DataFrame):
             super().to_excel(excel_writer, sheet_name=sheet_name, **kwargs)
             if with_metadata:
                 self.codebook.to_excel(excel_writer, sheet_name=metadata_sheet_name, index=False)
+                self.sources.to_excel(excel_writer, sheet_name="sources", index=False)
         else:
             # If excel_writer is a file path, create a new ExcelWriter context.
             with pd.ExcelWriter(excel_writer) as writer:  # ty: ignore
                 super().to_excel(writer, sheet_name=sheet_name, **kwargs)
                 if with_metadata:
                     self.codebook.to_excel(writer, sheet_name=metadata_sheet_name, index=False)
+                    self.sources.to_excel(writer, sheet_name="sources", index=False)
 
     def to_feather(
         self,
@@ -1152,6 +1126,9 @@ class Table(pd.DataFrame):
             # TODO: make this work with append=True
             dimensions = [{"name": self[col].title or key, "slug": key} for key in keys]
 
+        # pandas 3 deprecates `verify_integrity` in set_index, so check uniqueness here instead.
+        verify_integrity = kwargs.pop("verify_integrity", False)
+
         if kwargs.get("inplace"):
             super().set_index(keys, **kwargs)
             t = self
@@ -1159,6 +1136,10 @@ class Table(pd.DataFrame):
         else:
             t = super().set_index(keys, **kwargs)
             to_return = cast(Table, t)
+
+        if verify_integrity and not t.index.is_unique:
+            duplicates = t.index[t.index.duplicated()].unique()
+            raise ValueError(f"Index has duplicate keys: {duplicates}")
 
         t.metadata.primary_key = keys
         t.metadata.dimensions = dimensions  # ty: ignore
@@ -1696,6 +1677,30 @@ class Table(pd.DataFrame):
         """
         return cast(Table, super().drop(*args, **kwargs))
 
+    def replace(  # ty: ignore[invalid-method-override]
+        self,
+        to_replace: Any = None,
+        value: Any = no_default,
+        *,
+        inplace: bool = False,
+        regex: Any = False,
+        **kwargs: Any,
+    ) -> Table:
+        # A replacement given per column ({col: {old: new}} or {col: old} with a value) goes through
+        # Indicator.replace, which keeps the pandas 2 behavior for categoricals. A replacement for all columns goes
+        # through the block manager instead, so apply it to categorical columns one by one.
+        categorical_columns = [col for col in self.columns if isinstance(self[col].dtype, pd.CategoricalDtype)]
+        per_column = isinstance(to_replace, dict) and (
+            value is not no_default or any(isinstance(v, dict) for v in to_replace.values())
+        )
+        if not indicators.PANDAS_3 or not categorical_columns or per_column or inplace or regex is not False:
+            return cast(Table, super().replace(to_replace, value, inplace=inplace, regex=regex, **kwargs))
+
+        tb = cast(Table, super(Table, self.drop(columns=categorical_columns)).replace(to_replace, value))
+        for col in categorical_columns:
+            tb[col] = self[col].replace(to_replace, value)
+        return cast(Table, tb[self.columns])
+
     def filter(self, *args: Any, **kwargs: Any) -> Table:
         """Subset rows or columns based on their labels.
 
@@ -1760,43 +1765,43 @@ class Table(pd.DataFrame):
         return super().reorder_levels(*args, **kwargs)  # ty: ignore
 
     def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__add__(other)).copy_metadata(self))
 
     def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__add__(other)
 
     def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__sub__(other)).copy_metadata(self))
 
     def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__sub__(other)
 
     def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__mul__(other)).copy_metadata(self))
 
     def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mul__(other)
 
     def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__truediv__(other)).copy_metadata(self))
 
     def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__truediv__(other)
 
     def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__floordiv__(other)).copy_metadata(self))
 
     def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__floordiv__(other)
 
     def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__mod__(other)).copy_metadata(self))
 
     def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mod__(other)
 
     def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__pow__(other)).copy_metadata(self))
 
     def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__pow__(other)
@@ -1932,15 +1937,40 @@ class TableGroupBy:
     ) -> Table | indicators.Indicator:
         mem = {}
 
+        # pandas 3 removed `include_groups=True`, so groups always arrive without the grouping columns.
+        # Emulate it: hand `func` the full group from the original object (all columns, same order).
+        obj = self.groupby.obj
+        keys = self.groupby.keys
+        keys = keys if isinstance(keys, list) else [keys]
+        key_columns = [k for k in keys if isinstance(k, str) and k in obj.columns] if include_groups else []
+        indices = self.groupby.indices if key_columns else {}
+
+        def _with_group_columns(g: Any) -> Any:
+            positions = indices.get(g.name)
+            if positions is not None and len(positions) == len(g):
+                full = obj.iloc[positions]
+            else:
+                # Group names that can't be looked up (e.g. NaN keys): re-insert the key values instead.
+                values = g.name if len(keys) > 1 else (g.name,)
+                full = g.copy()
+                for i, k in enumerate(keys):
+                    if k in key_columns:
+                        full[k] = pd.Series(values[i], index=g.index, dtype=obj[k].dtype)
+                full = full[[c for c in obj.columns if c in full.columns]]
+            object.__setattr__(full, "name", g.name)
+            return full
+
         @wraps(func)
         def f(g: Any) -> Any:
+            if key_columns:
+                g = _with_group_columns(g)
             tb = func(g, *args, **kwargs)
             # remember one table to use its metadata
             if not mem:
                 mem["table"] = tb
             return tb
 
-        df = self.groupby.apply(f, *args, include_groups=include_groups)
+        df = self.groupby.apply(f, *args, include_groups=False)
         if not mem:
             return Table(df)
         elif type(mem["table"]) is pd.DataFrame:
@@ -2438,6 +2468,11 @@ def read_csv(
 ) -> Table:
     if so := storage_options_for_http(filepath_or_buffer):
         kwargs.setdefault("storage_options", so)
+    # Chunked parsing (low_memory=True) can infer different category dtypes per chunk (e.g. an all-empty
+    # chunk), which fails with "dtype of categories must be the same" under the pandas str dtype.
+    dtype = kwargs.get("dtype")
+    if isinstance(dtype, dict) and any(isinstance(d, pd.CategoricalDtype) or d == "category" for d in dtype.values()):
+        kwargs.setdefault("low_memory", False)
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)

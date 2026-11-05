@@ -19,8 +19,8 @@ metadata:
 
 # Creating charts from ETL
 
-A chart authored in ETL is a `viz://chart` step: a `.config.yml` next to a small Python step in
-`etl/steps/viz/chart/<namespace>/latest/`, registered in the DAG and pushed to the grapher DB with
+A chart authored in ETL is a `viz://chart` step: a `.config.yml` (plus a Python step only when it does real
+work) in `etl/steps/viz/chart/<namespace>/latest/`, registered in the DAG and pushed to the grapher DB with
 `--grapher`. The same step type covers two shapes:
 
 - **Single chart** — `dimensions: []` and exactly one view. Pushes as a plain Grapher chart with a slug,
@@ -35,11 +35,12 @@ interchangeable. Explorers (`viz://explorer`) are the sibling with their own ski
 
 ## Overview
 
-Every chart step needs three things:
+Every chart step needs:
 
-1. A **Python step** file (minimal boilerplate)
-2. A **config YAML** file (views, chart settings; dimensions for multidims)
-3. A **DAG entry** in the appropriate `dag/*.yml` file
+1. A **config YAML** file (views, chart settings; dimensions for multidims)
+2. A **DAG entry** in the appropriate `dag/*.yml` file
+3. A **Python step** file — *only* when the chart needs code beyond the YAML (see "Python file: only when it
+   does real work"). Like a snapshot that is just a `.dvc`, a chart can be just a `.config.yml`.
 
 ## Step 1: Identify the indicators
 
@@ -85,8 +86,8 @@ Ask one question: **does the reader need to switch between views?**
 
 ```
 etl/steps/viz/chart/{namespace}/latest/
-├── {short_name}.py
-└── {short_name}.config.yml
+├── {short_name}.config.yml
+└── {short_name}.py          # optional: only if the chart needs code (see below)
 ```
 
 Create the directory if it doesn't exist:
@@ -94,10 +95,17 @@ Create the directory if it doesn't exist:
 mkdir -p etl/steps/viz/chart/{namespace}/latest
 ```
 
-The chart's public slug is derived from the short name with underscores replaced by dashes
-(`banning_of_chick_culling` → `banning-of-chick-culling`).
+The top-level `slug:` is the chart's public URL (`ourworldindata.org/grapher/<slug>`). Single charts must
+set it; a multidim without it gets its slug in the admin. Naming the step after the slug is not required,
+but strongly recommended, so the file and the URL match (`banning_of_chick_culling.config.yml` →
+`slug: banning-of-chick-culling`). Ask the user for the slug before merging: ETL applies it only when it
+creates the chart (or the multidim has no slug yet) and never renames one afterwards, so a later rename in
+the admin shows as drift.
 
-### Python file (same boilerplate for both shapes)
+### Python file: only when it does real work
+
+**Default: don't write one.** When the step has no `.py`, ETL runs this boilerplate itself
+(`VizStep._run_chart_yaml_only` in `etl/steps/__init__.py`), for single charts and multidims alike:
 
 ```python
 from etl.helpers import PathFinder
@@ -110,10 +118,26 @@ def run() -> None:
     c.save()
 ```
 
-This is sufficient for config-driven charts (explicit views in YAML). For more advanced patterns
-(programmatic view generation from table data, combining charts, grouping views, post-processing the config
-before saving — `banning_of_chick_culling.py` expands its map colors from the data), look at existing
-examples in `etl/steps/viz/chart/`.
+So a chart whose views are all written out in the YAML needs only the `.config.yml` and its DAG entry. A
+`.py` that contains exactly the boilerplate above is redundant: don't add one, and delete it when you find
+one.
+
+Write a `.py` when the chart needs something the YAML can't express, e.g.:
+
+- **Generating views from the data**: many dimension combinations built from a table's columns instead of
+  listed by hand (`paths.create_chart(tb=..., ...)`), often after filtering columns to the choices you want
+  (`etl/steps/viz/chart/wb/latest/incomes_pip.py`).
+- **Grouping or combining views**: `c.group_views(...)` to put several indicators on one view, or combining
+  several charts/datasets into one multidim (`incomes_pip.py`, the energy and education multidims).
+- **Config that depends on the data**: values only known after reading the dataset, e.g. map colors for every
+  category present in the data (`etl/steps/viz/chart/animal_welfare/latest/banning_of_chick_culling.py`).
+- **Text built in code**: per-view titles, subtitles or `description_key` assembled from metadata or a
+  pattern, when Jinja in the garden `.meta.yml` isn't enough.
+- **Editing views after they're created**: renaming, reordering or dropping views, or other post-processing
+  before `c.save()`.
+
+The `.py` must keep the same short name as the `.config.yml`, and `paths.load_config()` still loads the YAML,
+so the two work together: put what is static in the YAML and only the dynamic part in code.
 
 ### Config YAML file
 
@@ -168,9 +192,7 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 
 ## Step 6: Run and verify
 
-**Always run the step after creating it** — schema validation only happens at runtime, so errors (like
-invalid fields in `config`, or a missing `chart_config_id`) won't surface until the step is executed. CI
-will catch these, but fix them locally first.
+**Always run the step after creating it, with `--grapher`** — ETL checks only its own structure (dimensions, views, a missing `chart_config_id`); the view `config` blocks are validated by the grapher admin API on upsert. A run without `--grapher` therefore passes a misspelled or invalid `config` field, and the upsert is where it fails, with a 400 naming the path (e.g. `/titel: must NOT have additional properties`). Valid fields and values are in the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
 ```bash
 # Chart steps write to the grapher DB, so they need the --grapher flag
@@ -194,6 +216,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ```yaml
 grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
+slug: banning-of-chick-culling
 topic_tags:
   - "Animal Welfare"
 dimensions: []
@@ -202,6 +225,7 @@ views:
     indicators:
       y:
         - catalogPath: "<dataset_short_name>#<indicator_short_name>"
+    # Single-indicator chart: leave `config` out and set these in garden (see below).
     config:
       title: "Your chart title"
       subtitle: "One-line context for the chart."
@@ -220,10 +244,12 @@ Key fields:
 
 - `grapher_schema` — **required**, and there is no fallback: the grapher chart-config schema version this
   config is written against, which becomes the chart's `$schema` and is what lets grapher migrate the
-  config after a breaking schema change. Use the version in `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`) when
+  config after a breaking schema change. Use `DEFAULT_GRAPHER_SCHEMA_VERSION` (`etl/config.py`) when
   authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required** for single charts, the chart's identity in grapher (`charts.configId`).
   See Step 4.
+- `slug` — **required** for single charts, optional for multidims: the chart's public URL. See "Directory
+  structure".
 - `topic_tags` — **required**, see "Topic tags".
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not a multidim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
@@ -232,13 +258,33 @@ Key fields:
   while being far less visible (ETL warns when it does).
 - No top-level `title:`, `default_selection:` or `default_dimensions:` block — those exist only for multidim
   pages and are ignored for single charts.
+- **Single-indicator chart: configure it in garden, not here.** A chart that shows one indicator inherits
+  every field of that indicator's `presentation.grapher_config`, except `$schema`, `id`, `slug`, `version` and
+  `isPublished`. So put its FAUST (`title`, `subtitle`, `note`) and its settings (`originUrl`, `hasMapTab`,
+  `tab`, `chartTypes`, `map` with its `colorScale`, `yAxis`, `selectedEntityNames`, `selectedFacetStrategy`,
+  `addCountryMode`…) there, and leave `views[0].config` empty. These become the indicator's defaults, so any
+  other chart, multidim or explorer on it gets them too: if the indicator is already shown elsewhere and a
+  setting is only for this chart, keep that setting in `views[0].config`. Later edits to an existing chart go
+  through `edit-faust-metadata`, which reports the other surfaces first.
+  - Put settings shared by all indicators, such as `originUrl`, once in
+    `definitions.common.presentation.grapher_config`: it merges into each indicator's own `grapher_config`.
+    But a variable's `map` block replaces the common one instead of merging into it.
+  - A field set in the chart config overrides the inherited one, so keep only what is specific to this chart.
+  - When `title_public` isn't set, `grapher_config.title` also becomes the indicator's data page title.
+  - Grapher only inherits from a chart's single y-indicator (`getParentVariableIdFromChartConfig`): a chart
+    with several y-indicators, or a scatter plot, has nothing to inherit from, whatever its
+    `charts.isInheritanceEnabled` says. So does any chart whose `isInheritanceEnabled` is 0, such as some
+    charts adopted from the admin. Their FAUST and settings stay in the chart config.
+  - To check, read `charts.isInheritanceEnabled` and the chart's own layers on staging (the `chart_configs`
+    rows named by `charts.patchConfigIdETL` and `charts.patchConfigId`), not the rendered config, where an
+    override looks the same as an inherited value.
 
 ## Config YAML: multidim
 
 ```yaml
 # REQUIRED — grapher chart-config schema the view configs below are written against, as a
 # QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
-# current DEFAULT_GRAPHER_SCHEMA version (etl/config.py) when authoring a new chart, then leave it
+# current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
 grapher_schema: "011"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
@@ -386,13 +432,16 @@ Inheritance is from `grapher_config` only — there is no fallback to the indica
 template), rebuild the grapher step, and leave the view configs thin. To verify what will actually render,
 read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
+Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): show the user its links before you write, check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
+
 ## Chart config options
 
 Key fields for `config` in views or `common_views`:
 
 | What | Field | Notes |
 |---|---|---|
-| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko` |
+| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko`, `Dumbbell` |
+| Dumbbell connector | `dumbbell: { connectorStyle: line }` | The default arrow reads as a change from the first series to the second, so keep it only for a before and after (two dates, before vs. after tax). Use `line` for categories with no order, such as men vs. women |
 | Default tab | `tab: "chart"` | `chart`, `map`, `table`, `line`, `slope`, `discrete-bar`, `marimekko` |
 | Map tab visible? | `hasMapTab: true` | Set with `tab: "map"` for map-by-default charts; avoid with multi-indicator views |
 | Facet strategy | `selectedFacetStrategy: entity` | `entity`, `metric`, `none` — how to facet multi-indicator charts |
@@ -405,6 +454,16 @@ Key fields for `config` in views or `common_views`:
 | Hide map timeline | `map.hideTimeline: true` | For point-in-time map charts |
 
 For the authoritative list, see the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
+
+### Map palettes
+
+Common practice in OWID charts, not a hard rule:
+
+- **Set `baseColorScheme` explicitly** on every numeric map. Without it, grapher picks a default, which may not suit the indicator.
+- **Match the palette to whether more is good or bad.** Use blues and greens when a higher value is good, such as aid received or vaccination coverage. Use reds, oranges and browns when it's bad, such as deaths or emissions. Purples work for either.
+- **Give each indicator its own palette** when several maps sit together, e.g. charts from the same dataset or for the same article. Then readers can tell the maps apart at a glance.
+
+[`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the other scheme families (diverging, perceptual, binary, categorical, `SingleColorGradient*`) are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
 
 ## Common dimension patterns
 
@@ -444,13 +503,17 @@ the rendered config (charts.configId) = merge(indicator config, ETL layer, admin
 ```
 
 Admin overrides always win on a per-field basis. To "unlink" a field back to the ETL-authored value, click
-the chip next to the field in the admin editor — it clears that field from the admin layer.
+the chip next to the field in the admin editor — it clears that field from the admin layer. To go the other
+way, copying admin edits into the YAML so the chart is defined in ETL again, use the `pull-chart` skill
+(`etl chart-pull`).
 
 ### Adopting a chart that exists only in the admin
 
-Write the `.config.yml` (single-chart shape), then point it at the existing chart with
-`etl chart-config-id lookup <config.yml> --chart-id <id>` (see Step 4), and edit here from then on. Tooling
-to generate the rest of the YAML from the live config (`chart_pull` CLI) is a follow-up.
+Write a minimal `.config.yml` (single-chart shape with the chart's current `slug`, one empty view) and its DAG entry with the grapher
+dataset as dependency, then point it at the existing chart with
+`etl chart-config-id lookup <config.yml> --chart-id <id>` (see Step 4). Then run
+`etl chart-pull <config.yml> --env <production env file> --apply`, which copies the rest of the live config
+(indicators, FAUST, settings) into the YAML. Edit here from then on.
 
 ## Troubleshooting
 

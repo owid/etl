@@ -61,7 +61,7 @@ def clean_values(tb: Table) -> Table:
     ]
     tb[columns_to_clean] = tb[columns_to_clean].mask(tb[columns_to_clean].eq("--"), np.nan)
 
-    tb[columns_to_clean] = tb[columns_to_clean].applymap(clean_text)
+    tb[columns_to_clean] = tb[columns_to_clean].map(clean_text)
     tb[columns_to_clean] = tb[columns_to_clean].astype(float)
 
     return tb

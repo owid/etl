@@ -1,0 +1,37 @@
+grapher_schema: "011"
+chart_config_id: 01935484-6ec6-7f53-bfbf-d3fb79afe261
+slug: total-number-of-births-by-birth-order
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#b__birth_order_1
+          display:
+            name: First-borns
+        - catalogPath: period#b__birth_order_2
+          display:
+            name: Second-borns
+        - catalogPath: period#b__birth_order_3
+          display:
+            name: Third-borns
+        - catalogPath: period#b__birth_order_4
+          display:
+            name: Fourth-borns
+        - catalogPath: period#b__birth_order_5p
+          display:
+            name: Fifth-borns or higher
+    config:
+      title: Total number of births by birth order
+      subtitle: ''
+      originUrl: /fertility-rate
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - Spain
+      selectedFacetStrategy: metric
+      yAxis:
+        min: 0
+        facetDomain: independent

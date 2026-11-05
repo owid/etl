@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     #
     # For each SCORECARD_COLUMNS, replace "X" with "Yes" and "-" with "No".
     for col in SCORECARD_COLUMNS:
-        tb[col] = tb[col].astype("string").str.strip().replace({"X": "Yes", "-": "No"})
+        tb[col] = tb[col].astype("str").str.strip().replace({"X": "Yes", "-": "No"})
 
     tb = add_igh_framework_category_simplified(tb)
 
@@ -86,7 +86,7 @@ def add_igh_framework_category_simplified(tb: Table) -> Table:
     d) a+b
     e) a+b+c
     """
-    tb["igh_framework_category"] = tb["igh_framework_category"].astype("string")
+    tb["igh_framework_category"] = tb["igh_framework_category"].astype("str")
 
     tb["igh_framework_category_simplified"] = tb["igh_framework_category"]
 

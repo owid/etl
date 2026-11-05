@@ -51,7 +51,7 @@ def run() -> None:
     tb["peace_scale_level"] = tb["peace_scale_level"].replace({-9: np.nan})
 
     # Column code as "string"
-    tb["code"] = tb["code"].astype("string")
+    tb["code"] = tb["code"].astype("str")
 
     # Map code -> code_1, code_2
     ## Check on lengths. Can be 4, 5 or 6

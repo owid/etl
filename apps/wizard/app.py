@@ -53,7 +53,7 @@ if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
 # RUN PAGES
 ###########################################
 # Create navigation
-page = st.navigation(
+page = st.navigation(  # ty: ignore[call-non-callable]
     pages,
     expanded=False,
     position="sidebar",

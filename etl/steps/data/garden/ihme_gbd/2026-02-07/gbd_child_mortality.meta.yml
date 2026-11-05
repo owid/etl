@@ -16,9 +16,9 @@ definitions:
 macros: |-
   <% macro title(metric, age, cause, sex, unit) %>
       <% if metric == "Number" %>
-          << unit|capitalize >> from << cause >>, among << sex >> aged << age >>
+          << (unit[0]|upper) ~ unit[1:] >> from << cause >>, among << sex >> aged << age >>
       <% elif metric == "Rate" %>
-          << unit|capitalize >> from << cause >>, among << sex >> aged << age >> per 100,000 people
+          << (unit[0]|upper) ~ unit[1:] >> from << cause >>, among << sex >> aged << age >> per 100,000 children
       <% elif metric == "Percent" %>
           <% if unit|lower == "deaths" %>
               Share of total deaths among << sex >> aged << age >> from << cause >>
@@ -32,7 +32,7 @@ macros: |-
       <% if metric == "Number" %>
           Estimated number of << unit >> from << cause >> among << sex >> aged << age >>.
       <% elif metric == "Rate" %>
-          Estimated number of << unit >> from << cause >> among << sex >> aged << age >>, per 100,000 people.
+          Estimated number of << unit >> from << cause >> among << sex >> aged << age >>, per 100,000 children.
       <% elif metric == "Percent" %>
           Estimated share of << unit >> from << cause >> among << sex >> aged << age >>.
       <% endif %>
@@ -108,19 +108,19 @@ tables:
     variables:
       infant_death_rate_both:
         title: Infant mortality rate by cause for both sexes
-        unit: deaths per 100,000 people
-        description_short: Estimated number of deaths among children under one year old, from each disease or injury, per 100,000 people.
+        unit: deaths per 100,000 children
+        description_short: Estimated number of deaths among children under one year old, from each disease or injury, per 100,000 children.
         display:
           numDecimalPlaces: 1
       infant_death_rate_female:
         title: Infant mortality rate by cause for girls
-        unit: deaths per 100,000 people
-        description_short: Estimated number of deaths among girls under one year old, from each disease or injury, per 100,000 people.
+        unit: deaths per 100,000 girls
+        description_short: Estimated number of deaths among girls under one year old, from each disease or injury, per 100,000 girls.
         display:
           numDecimalPlaces: 1
       infant_death_rate_male:
         title: Infant mortality rate by cause for boys
-        unit: deaths per 100,000 people
-        description_short: Estimated number of deaths among boys under one year old, from each disease or injury, per 100,000 people.
+        unit: deaths per 100,000 boys
+        description_short: Estimated number of deaths among boys under one year old, from each disease or injury, per 100,000 boys.
         display:
           numDecimalPlaces: 1

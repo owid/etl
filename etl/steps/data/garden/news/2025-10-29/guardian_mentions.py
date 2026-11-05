@@ -234,8 +234,8 @@ def format_maxroser(tb: Table, ds_regions, ds_income_groups) -> Table:
     # Dtypes
     tb = tb.astype(
         {
-            "country": "string",
-            "code": "string",
+            "country": "str",
+            "code": "str",
         }
     )
 

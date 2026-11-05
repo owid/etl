@@ -146,6 +146,7 @@ and run the following code:
 
 ```python
 from owid.catalog import fetch
+
 tb = fetch("garden/covid/latest/cases_deaths/cases_deaths")
 ```
 

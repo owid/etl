@@ -1,0 +1,37 @@
+grapher_schema: "011"
+chart_config_id: 01938e01-e169-7a09-80a1-204ffc9777cd
+slug: tempo-adjusted-total-fertility-rate-by-birth-order
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: period#adjtfr__birth_order_1
+          display:
+            name: After first birth
+        - catalogPath: period#adjtfr__birth_order_total
+          display:
+            name: Total
+        - catalogPath: period#adjtfr__birth_order_2
+          display:
+            name: After second birth
+        - catalogPath: period#adjtfr__birth_order_3
+          display:
+            name: After third birth
+        - catalogPath: period#adjtfr__birth_order_4
+          display:
+            name: After fourth birth
+        - catalogPath: period#adjtfr__birth_order_5p
+          display:
+            name: After fifth birth or higher
+    config:
+      title: Tempo-adjusted total fertility rate by birth order
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - United States
+      yAxis:
+        min: 0

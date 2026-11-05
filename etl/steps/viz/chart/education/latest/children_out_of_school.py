@@ -1,5 +1,7 @@
 """Create multidimensional chart for children out of school data."""
 
+# Rebuild with the shared chart-combining fix that preserves missing choice descriptions and groups.
+
 import re
 
 from etl.helpers import PathFinder

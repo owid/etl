@@ -1,6 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: major
+    display:
+      numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Fertility Rate
@@ -20,15 +23,15 @@ tables:
         title: Mean age at childbearing
         unit: years
         description_short: &cb_description_short |-
-          Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. UN Medium projections for 2024-2100.
+          Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. UN Medium projections for 2024–2100.
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
 
-          - Before 1950: Historical estimates by Human Fertility Database (2025).
+          - Before 1950: Historical estimates by Human Fertility Database (2026).
 
-          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+          - 1950–2023: Population records by the UN World Population Prospects (2024 revision).
 
-          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+          - 2024–2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
         presentation:
           title_public: |-
             Mean age at childbearing
@@ -43,9 +46,9 @@ tables:
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
 
-          - Before 1950: Historical estimates by Human Fertility Database (2025).
+          - Before 1950: Historical estimates by Human Fertility Database (2026).
 
-          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+          - 1950–2023: Population records by the UN World Population Prospects (2024 revision).
         presentation:
           title_public: |-
             Mean age at childbearing

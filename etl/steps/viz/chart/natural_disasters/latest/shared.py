@@ -10,22 +10,12 @@ Per-export logic (indicator maps, titles, subtitles) stays in each step file
 because the wording and dimensionality genuinely differ.
 """
 
+import datetime as dt
 from collections.abc import Callable
 
 from owid.catalog import Table
 
 from etl.viz.chart.model.view import Indicator
-
-########################################################################################################################
-# Last fully-reported year for which EM-DAT data is complete enough to display.
-# Used as the chart timeline's `maxTime` and the map's pinned `time`. The current
-# snapshot's most recent year is typically partial — showing it as "latest" on the
-# map or extending the bar chart to it would be misleading.
-#
-# When the next EM-DAT release brings a full extra year of data (e.g. all of
-# 2026 reported), bump this to that year.
-LAST_FULLY_REPORTED_YEAR = 2025
-########################################################################################################################
 
 # Disaster types to expose, in the order they appear in the dimension choices.
 DISASTER_TYPES = [
@@ -140,53 +130,82 @@ RELATED_QUESTIONS = [
     }
 ]
 
-COMMON_VIEW_CONFIG = {
-    "chartTypes": ["StackedBar"],
-    "hasMapTab": True,
-    "tab": "chart",
-    "yAxis": {"min": 0},
-    "originUrl": "https://ourworldindata.org/natural-disasters",
-    # Default chart timeline starts at 2000, when reporting coverage becomes more complete.
-    # The slider lets users drag back further (with the footnote warning about coverage).
-    "minTime": 2000,
-    # Hard-stop on the timeline slider — users cannot navigate past this year. The
-    # current snapshot's most recent year is partial; allowing the slider to reach
-    # it would surface incomplete data. See LAST_FULLY_REPORTED_YEAR at the top.
-    "timelineMaxTime": LAST_FULLY_REPORTED_YEAR,
-    # Default endpoint of the displayed range. Same value so the chart opens on it.
-    "maxTime": LAST_FULLY_REPORTED_YEAR,
-    # Pin the map to a single year so it doesn't fall back to a "first year vs last year"
-    # comparison view when minTime/maxTime defines a range on the chart.
-    "map": {"time": LAST_FULLY_REPORTED_YEAR},
-    "relatedQuestions": RELATED_QUESTIONS,
-}
 
-STACKED_VIEW_CONFIG = {
-    "chartTypes": ["StackedBar"],
-    # Map tab is enabled and shows the all-disasters total via map.columnSlug;
-    # see _add_total_indicator_for_map in each step file for how the total indicator is
-    # exposed to the map without being plotted on the stacked bar chart.
-    "hasMapTab": True,
-    "tab": "chart",
-    "yAxis": {"min": 0},
-    "originUrl": "https://ourworldindata.org/natural-disasters",
-    "minTime": 2000,
-    "timelineMaxTime": LAST_FULLY_REPORTED_YEAR,
-    "maxTime": LAST_FULLY_REPORTED_YEAR,
-    # Pin map to a single year so it doesn't fall back to a "first vs last year"
-    # comparison view when minTime/maxTime defines a range on the chart.
-    "map": {"time": LAST_FULLY_REPORTED_YEAR},
-    # Without this, a year drops out of the stack as soon as one disaster type has
-    # no reported data — even if other types had a non-zero value.
-    "missingDataStrategy": "show",
-    "relatedQuestions": RELATED_QUESTIONS,
-}
+def get_common_view_config(last_fully_reported_year: int) -> dict:
+    return {
+        "chartTypes": ["StackedBar"],
+        "hasMapTab": True,
+        "tab": "chart",
+        "yAxis": {"min": 0},
+        "originUrl": "https://ourworldindata.org/natural-disasters",
+        # Default chart timeline starts at 2000, when reporting coverage becomes more complete.
+        # The slider lets users drag back further (with the footnote warning about coverage).
+        "minTime": 2000,
+        # Hard-stop on the timeline slider — users cannot navigate past this year. The
+        # current snapshot's most recent year is partial; allowing the slider to reach
+        # it would surface incomplete data. See get_last_fully_reported_year.
+        "timelineMaxTime": last_fully_reported_year,
+        # Default endpoint of the displayed range. Same value so the chart opens on it.
+        "maxTime": last_fully_reported_year,
+        # Pin the map to a single year so it doesn't fall back to a "first year vs last year"
+        # comparison view when minTime/maxTime defines a range on the chart.
+        "map": {"time": last_fully_reported_year},
+        "relatedQuestions": RELATED_QUESTIONS,
+    }
+
+
+def get_stacked_view_config(last_fully_reported_year: int) -> dict:
+    return {
+        "chartTypes": ["StackedBar"],
+        # Map tab is enabled and shows the all-disasters total via map.columnSlug;
+        # see _add_total_indicator_for_map in each step file for how the total indicator is
+        # exposed to the map without being plotted on the stacked bar chart.
+        "hasMapTab": True,
+        "tab": "chart",
+        "yAxis": {"min": 0},
+        "originUrl": "https://ourworldindata.org/natural-disasters",
+        "minTime": 2000,
+        "timelineMaxTime": last_fully_reported_year,
+        "maxTime": last_fully_reported_year,
+        # Pin map to a single year so it doesn't fall back to a "first vs last year"
+        # comparison view when minTime/maxTime defines a range on the chart.
+        "map": {"time": last_fully_reported_year},
+        # Without this, a year drops out of the stack as soon as one disaster type has
+        # no reported data — even if other types had a non-zero value.
+        "missingDataStrategy": "show",
+        "relatedQuestions": RELATED_QUESTIONS,
+    }
+
 
 # Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
 NOTE = (
     "Based on recorded events; coverage is more limited before the year 2000. "
     "Longer historical trends may partly reflect reporting improvements."
 )
+
+
+def get_note(view) -> str:
+    """Footnote of a view. Annual views also flag that the latest year shown may still be incomplete."""
+    if view.dimensions["timespan"] == "annual":
+        return f"{NOTE} The latest year may be incomplete due to reporting delays."
+    return NOTE
+
+
+def get_date_published(tb: Table) -> dt.date:
+    """Publication date of the EM-DAT release behind the table, from its EM-DAT origins."""
+    dates = {
+        origin.date_published
+        for column in tb.columns
+        for origin in tb[column].metadata.origins
+        if origin.producer == "EM-DAT"
+    }
+    assert len(dates) == 1, f"Expected one EM-DAT publication date in {tb.metadata.short_name}, found {dates}."
+    return dt.date.fromisoformat(dates.pop())
+
+
+def get_last_fully_reported_year(tb: Table) -> int:
+    """Last year shown on the charts: the year before the EM-DAT release, since the release year is still partial."""
+    return get_date_published(tb).year - 1
 
 
 def disaster_type_from_path(catalog_path: str) -> str | None:

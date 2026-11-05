@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: species
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      attribution_short: Marconi et al.
+      topic_tags:
+        - Biodiversity
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 730
+
+
+  owners:
+    - Fiona Spooner
+    - Hannah Ritchie
+tables:
+  living_planet_index_completeness:
+    variables:
+      species_in_lpi:
+        title: Number of species included in the LPI
+        description_short: Number of known vertebrate species in each taxonomic group that are included in the Living Planet Index.
+      species_total:
+        title: Number of species in the taxonomic group
+        description_short: Total number of known vertebrate species in each taxonomic group.
+      species_not_in_lpi:
+        title: Number of species not included in the LPI
+        description_short: Number of known vertebrate species in each taxonomic group that are not included in the Living Planet Index.

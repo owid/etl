@@ -1,0 +1,49 @@
+grapher_schema: "011"
+chart_config_id: 01935484-6cab-7370-8b63-60321fbcd225
+slug: average-age-of-mothers-birth-cohort
+topic_tags:
+  - Fertility Rate
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: cohort#cmab__birth_order_1
+          display:
+            name: 1st birth
+            color: '#002147'
+        - catalogPath: cohort#cmab__birth_order_2
+          display:
+            name: 2nd birth
+            color: '#294668'
+        - catalogPath: cohort#cmab__birth_order_3
+          display:
+            name: 3rd birth
+            color: '#526c89'
+        - catalogPath: cohort#cmab__birth_order_4
+          display:
+            name: 4th birth
+            color: '#7b91a9'
+        - catalogPath: cohort#cmab__birth_order_5p
+          display:
+            name: 5th birth or higher
+            color: '#a4b6ca'
+        - catalogPath: cohort#cmab__birth_order_total
+          display:
+            name: All
+            color: '#b13507'
+    config:
+      title: Average age of mothers at childbirth by mother's birth year
+      subtitle: Each line shows the average age at which women, born in a specific year, had their first child, second child, third child, or more.
+      note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+      variantName: by birth order
+      originUrl: /fertility-rate
+      addCountryMode: change-country
+      hideAnnotationFieldsInTitle:
+        time: true
+      selectedEntityNames:
+        - United States
+      xAxis:
+        label: Women's birth year
+      yAxis:
+        min: 0

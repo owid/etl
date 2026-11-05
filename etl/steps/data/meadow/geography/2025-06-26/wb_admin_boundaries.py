@@ -26,7 +26,7 @@ def run() -> None:
     # Process data.
     #
     # Type
-    tb["geometry"] = tb["geometry"].astype("string")
+    tb["geometry"] = tb["geometry"].astype("str")
 
     # Improve tables format.
     tb = tb.rename(columns={"NAM_0": "name"})

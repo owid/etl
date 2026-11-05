@@ -144,10 +144,9 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
             "same ceiling the MDims badge reports."
         )
 
-    # The grid leads, but only when there is one to draw: on a branch that changes no MDim it would
-    # open on "nothing to draw" while the real changes sat one click away. Both names are unchanged, so
-    # existing `?blast-group=` links still resolve.
-    has_mdim = any(r.mdims for r in reach)
+    # The tree leads whenever it has anything to draw — MDim grids, explorer grids or the charts branch.
+    # Both names are unchanged, so existing `?blast-group=` links still resolve.
+    has_tree = any(r.mdims or r.explorers or r.charts or r.draft_charts for r in reach)
     options = ["dimensions", "change"]
     # A link written before "By surface" was dropped would otherwise reach url_persist's strict check and
     # raise on every load. Sanitize it here rather than let a stale bookmark break the page.
@@ -162,7 +161,7 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
         options=options,
         format_func=lambda g: {"dimensions": "🌳 Dimension tree", "change": "🧬 By edit"}[g],
         key=GROUP_KEY,
-        value="dimensions" if has_mdim else "change",
+        value="dimensions" if has_tree else "change",
         label_visibility="collapsed",
     )
 
@@ -385,23 +384,20 @@ def _dimension_tree(
         else []
     )
     if not affected:
-        if _wants(surface, "mdims"):
-            st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
+        # No MDim on this branch: the tree is drawn from what it does reach, the same way it is drawn
+        # beside MDims. Nothing is said about the missing MDims — the tree shows what is there, and a
+        # caption about what is not read as the headline of a section about where edits land.
         hierarchies = [explorer_hierarchy] if explorer_hierarchy else []
         branches = _chart_branches(source_engine, reach, surface)
+        if explorer_hierarchy is None and _wants(surface, "explorers"):
+            # Explorers whose views could not be laid out on a grid still get their flat branch.
+            branches += [b for b in (_explorer_branch(reach),) if b]
         if not hierarchies and not branches:
             # Filtered to a surface these edits do not reach at all. Said plainly, rather than drawn as an
             # empty shell — and only reachable by choosing it, since a surface with nothing on it is not
             # offered in the first place.
             st.caption(f"Nothing on this surface renders any of these changes ({SURFACE_LABELS[surface]}).")
             return
-        if surface == "all" and not hierarchies:
-            # No grid anywhere on this branch: the charts are all there is, and they read better as the
-            # grouped list than as a lone branch of a tree that is not being drawn.
-            _chart_reach(reach, badged=set())
-            _explorer_reach(reach)
-            return
-        # Explorer views have dimensions of their own, so there is still a grid worth drawing.
         tree_html, height = render_multi_tree_html(
             [],
             branches=branches,

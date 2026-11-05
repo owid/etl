@@ -94,6 +94,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_config(fname)
@@ -119,7 +120,7 @@ In this example, we note that we can group together indicators from any dataset.
 
     **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
 
-    **There is no default.** Omitting the field fails the step — schema validation rejects it when `create_chart` builds the config, and `Chart.save()` re-checks. That is deliberate: a fallback would resolve an unpinned config to whatever version the repo vendors *on the day the step runs*, which both tells Grapher the config is already current (so the next breaking schema change skips the migration for those views) and silently resolves to a different version the next time the step runs. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
+    **There is no default.** Omitting the field fails the step — schema validation rejects it when `create_chart` builds the config, and `Chart.save()` re-checks. That is deliberate: a fallback would resolve an unpinned config to whatever `DEFAULT_GRAPHER_SCHEMA` is *on the day the step runs*, which both tells Grapher the config is already current (so the next breaking schema change skips the migration for those views) and silently resolves to a different version the next time the step runs. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
 
     The one exception is a pin that **contradicts the config body** — e.g. pinned `005` while the config uses `chartTypes`, a field that only exists from `006` onwards (the 005→006 migration is what creates it). That is a stale pin rather than a record, and leaving it means Grapher runs migrations over a config they were never meant to touch. Correct such a pin to the version the config is actually written against.
 
@@ -227,7 +228,6 @@ def run() -> None:
     #
     mdim = paths.create_chart(config=config)
     mdim.save()
-
 ```
 
 You can also combine manually defined views with generated ones. See the `etl.viz` module for available helper functions or refer to examples from `etl/steps/viz/chart/`.
@@ -244,12 +244,12 @@ However, you can also do it programmatically after creating an MDIM object.
 
 ```python
 def add_display_settings(mdim):
-  for view in mdim.views:
-      # Set default display settings
-      if view.dimensions["indicator"] == "emigrants":
-          view.config = CUSTOM_CONFIG_1
-      elif view.dimensions["indicator"] == "immigrants":
-          view.config = CUSTOM_CONFIG_1
+    for view in mdim.views:
+        # Set default display settings
+        if view.dimensions["indicator"] == "emigrants":
+            view.config = CUSTOM_CONFIG_1
+        elif view.dimensions["indicator"] == "immigrants":
+            view.config = CUSTOM_CONFIG_1
 ```
 
 Also, you can use the fields `common_views` in the YAML file to define a common configuration for certain subset of views. This is very useful (and recommended) when you want to define different-level of granularity of configs. For instance, imagine you want to define the same subtitle for all views with dimension `sex=age`, but then if you have a view with `sex=age, year=2020`, you want to be able to a different subtitle. etc.

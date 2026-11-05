@@ -162,7 +162,7 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb, tb_strategy, on=["country", "year"], how="outer", short_name=paths.short_name)
 
     # Fill nan in type_of_strategy with Not applicable
-    tb["type_of_strategy"] = tb["type_of_strategy"].astype("string").fillna("Not applicable")
+    tb["type_of_strategy"] = tb["type_of_strategy"].astype("str").fillna("Not applicable")
 
     tb = tb.format(["country", "year"])
 

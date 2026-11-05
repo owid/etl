@@ -1,10 +1,12 @@
 import datetime as dt
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Literal, get_args
 
 import click
 import structlog
+from github import UnknownObjectException
 from rich import print
 from rich_click.rich_command import RichCommand
 
@@ -14,6 +16,10 @@ from etl.git_api_helpers import GithubApiRepo
 
 # Cloudflare Pages subdomain limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
 CLOUDFLARE_SUBDOMAIN_LIMIT = 28
+
+# Every status comment written by create_comment_body carries this marker; other comments posted as
+# owidbot don't, so they are never edited or deleted.
+STATUS_COMMENT_MARKER = "<!--grapher-start-->"
 
 
 def get_cloudflare_subdomain(branch_name: str) -> str:
@@ -78,46 +84,57 @@ def cli(
         log.warning(f"No open PR found for branch {branch}")
         return
 
-    # recalculate services
-    services_body = {}
-    for service in services:
+    # Recalculate services in parallel: they are independent and spend their time waiting on
+    # databases, the catalog and GitHub, so the run takes as long as the slowest one.
+    def run_service(service: str) -> str | None:
         if service == "data-diff":
-            services_body["data-diff"] = data_diff.run(include, branch=branch)
+            return data_diff.run(include, branch=branch)
 
         elif service == "chart-diff":
             charts_df = chart_diff.call_chart_diff(branch)
-            services_body["chart-diff"] = chart_diff.run(branch, charts_df)
-
             # update github check run
             chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
+            return chart_diff.run(branch, charts_df)
 
         elif service == "metadata-diff":
-            metadata_summary = metadata_diff.call_metadata_diff(branch)
-            services_body["metadata-diff"] = metadata_diff.run(branch, metadata_summary)
-
             # No check run on purpose: metadata ships through ETL on merge and gates nothing, so a
             # red check here would be noise rather than a signal.
+            return metadata_diff.run(branch, metadata_diff.call_metadata_diff(branch))
 
         elif service == "grapher":
-            services_body["grapher"] = grapher.run(branch, head_sha=pr.head.sha)
+            return grapher.run(branch, head_sha=pr.head.sha)
 
         elif service == "anomalist":
             # TODO: anomalist could post a summary of anomalies to the PR
             anomalist.run(branch)
+            return None
 
         else:
             # We raise a warning instead of an error to make it backward compatible on old
             # staging servers when adding a new service.
             log.warning("Invalid service", service=service)
-            continue
+            return None
 
-    # get existing comment (do this as late as possible to avoid race conditions)
-    comment = repo.get_comment_from_pr(pr)
+    services_body = {}
+    if services:
+        with ThreadPoolExecutor(max_workers=len(services)) as executor:
+            futures = {service: executor.submit(run_service, service) for service in services}
+        for service, future in futures.items():
+            body = future.result()
+            if body is not None:
+                services_body[service] = body
 
-    # fill in services from existing comment if not run via --services to avoid deleting them
-    if comment:
-        for service, content in services_from_comment(comment).items():
-            services_body.setdefault(service, content)
+    # get existing status comments (do this as late as possible to avoid race conditions)
+    comments = [c for c in repo.get_comments_from_pr(pr) if STATUS_COMMENT_MARKER in c.body]
+    comment = comments[0] if comments else None
+
+    # fill in services from existing comments if not run via --services to avoid deleting them.
+    # Concurrent runs can each create a comment, so read them all, newest first; every comment
+    # carries every section, so skip empty ones or they'd hide another comment's content.
+    for existing in reversed(comments):
+        for service, content in services_from_comment(existing).items():
+            if content:
+                services_body.setdefault(service, content)
 
     body = create_comment_body(branch, services_body, start_time)
 
@@ -131,6 +148,17 @@ def cli(
         else:
             log.info("Updating comment.", repo=repo, branch=branch, services=services)
             comment.edit(body=body)
+
+    # Keep the oldest comment and delete duplicates, only once their content is merged and posted.
+    if len(comments) > 1:
+        log.warning("Found duplicate owidbot comments.", branch=branch, duplicates=len(comments) - 1)
+        if not dry_run:
+            for duplicate in comments[1:]:
+                try:
+                    duplicate.delete()
+                except UnknownObjectException:
+                    # A concurrent run already deleted it.
+                    pass
 
 
 def strip_appendix(body: str) -> str:

@@ -1,6 +1,7 @@
 """Script to create a snapshot of dataset."""
 
 import datetime as dt
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -45,17 +46,12 @@ def get_date_of_update() -> str:
     response.raise_for_status()  # Check that the request was successful
     # Parse the HTML content
     soup = BeautifulSoup(response.content, "html.parser")
-    # Find the div containing the date of the latest update of this data
-    div = soup.find("div", {"data-section": "cdc_data_surveillance_section_5"})
-    date_element = div.find("p")
-    if date_element:
-        date_text = date_element.get_text(strip=True)
-        date_str = date_text.lower().replace("as of ", "").title()  # "February 6, 2025"
-    else:
-        print("Could not find the <p> tag in the target div.")
-
-    # Parse the date string using datetime.strptime
-    date_obj = datetime.strptime(date_str, "%B %d, %Y")
+    # Each year's paragraph opens with "As of <Month> <day>, <year>, ..."; the current year's is the latest.
+    # Search the whole page text, since CDC renumbers the page sections whenever it rearranges them.
+    date_strs = re.findall(r"As of ([A-Z][a-z]+ \d{1,2}, \d{4})", soup.get_text(" "))
+    if not date_strs:
+        raise ValueError(f"Could not find an 'As of <date>' string on {url}")
+    date_obj = max(datetime.strptime(date_str, "%B %d, %Y") for date_str in date_strs)
 
     # Convert to ISO format
     standard_date = date_obj.strftime("%Y-%m-%d")

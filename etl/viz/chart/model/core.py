@@ -9,7 +9,7 @@ from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Literal, TypedDict
 
 import fastjsonschema
 import pandas as pd
@@ -21,22 +21,15 @@ from typing_extensions import Self
 
 import etl.config as etl_config
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import SCHEMAS_DIR, VIZ_DIR
 from etl.viz.chart.exceptions import DuplicateChartViews, DuplicateValuesError
 from etl.viz.chart.model.base import MDIMBase, pruned_json
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.params import GroupViewsConfig
-from etl.viz.chart.model.schema_types import (
-    ViewConfig,
-    ViewConfigParam,
-    ViewMetadata,
-    ViewMetadataParam,
-)
 from etl.viz.chart.model.view import CommonView, View, ViewIndicators
 from etl.viz.chart.utils import (
-    default_grapher_schema_version,
     fill_placeholders,
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
@@ -134,6 +127,10 @@ class Chart(MDIMBase):
     # valid on — single charts (`dimensions: []`); mdims are identified by
     # their catalog path instead. See `validate_chart_config_id()`.
     chart_config_id: str | None = None
+
+    # Public URL slug. Required for single charts; optional for mdims. Applied only when grapher
+    # creates the chart or the mdim has no slug yet; an existing slug is never changed from ETL.
+    slug: str | None = None
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
@@ -321,6 +318,9 @@ class Chart(MDIMBase):
         # Single charts must declare their grapher identity (`chart_config_id`); mdims must not.
         self.validate_chart_config_id()
 
+        # Single charts must declare their slug.
+        self.validate_slug()
+
         # Run sanity checks on grouped views
         self.validate_grouped_views()
 
@@ -379,7 +379,7 @@ class Chart(MDIMBase):
 
         Two kinds of chart are skipped, both because there is no page to attach a
         package to: explorers, which have no `multi_dim_data_pages` row at all, and
-        MDIMs that have a row but no slug because nobody has published them yet. The
+        MDIMs that have a row but that nobody has published yet. The
         latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
         staging server -- so it must not fail the step. A chart published later
         gets its package on the next run.
@@ -445,15 +445,36 @@ class Chart(MDIMBase):
         config.pop("grapher_schema", None)
         config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
+        # The slug is not part of the mdim config; grapher stores it on the mdim row.
+        config.pop("slug", None)
+
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
-        admin_api.put_mdim_config(self.catalog_path, config)
+        mdim_id = admin_api.put_mdim_config(self.catalog_path, config)["id"]
+
+        if self.slug:
+            self._set_mdim_slug_if_missing(admin_api, mdim_id)
 
         # Link to preview
         log.info(f"PREVIEW: {owid_env.chart_preview(self.catalog_path)}")
+
+    def _set_mdim_slug_if_missing(self, admin_api: AdminAPI, mdim_id: int) -> None:
+        """Give the mdim the config's `slug` if it has none yet. Renaming stays an admin act."""
+        slug_in_grapher = admin_api.get_mdim(mdim_id)["slug"]
+        if not slug_in_grapher:
+            admin_api.set_mdim_slug(mdim_id, self.slug)
+            log.info("chart.mdim.slug_set", catalog_path=self.catalog_path, slug=self.slug)
+        elif slug_in_grapher != self.slug:
+            log.warning(
+                "chart.mdim.slug_not_applied",
+                catalog_path=self.catalog_path,
+                slug_in_grapher=slug_in_grapher,
+                slug_in_config=self.slug,
+                reason="an existing mdim's slug cannot be changed from ETL; rename it in the admin instead",
+            )
 
     def snake_case_slugs(self):
         """
@@ -611,8 +632,6 @@ class Chart(MDIMBase):
             # support file references out of the box
             s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
             s = s.replace("definitions.json#", "file://definitions.json#")
-            # Same for $refs to the vendored grapher schema (any version), e.g. "grapher-schema.010.json#/..."
-            s = re.sub(r'"(grapher-schema\.[\w.]+\.json)#', r'"file://\1#', s)
 
             schema = json.loads(s)
 
@@ -623,20 +642,6 @@ class Chart(MDIMBase):
             with local_file.open() as f:
                 return json.load(f)
 
-        # https handler: resolve $refs to published OWID schemas (e.g. the grapher schema) from the
-        # vendored copies in SCHEMAS_DIR instead of fetching them over the network. This keeps
-        # validation offline and deterministic, and consistent with the generated
-        # etl/viz/chart/model/schema_types.py (which is built from the same vendored copy).
-        def https_handler(uri):
-            local_file = SCHEMAS_DIR / Path(uri.split("://", 1)[1]).name
-            if not local_file.exists():
-                raise FileNotFoundError(
-                    f"Schema $ref {uri} has no vendored copy at {local_file}. "
-                    "Run `python scripts/generate_schema_types.py --refresh` to vendor it."
-                )
-            with local_file.open() as f:
-                return json.load(f)
-
         # Pass custom format for date validation
         # NOTE: we use fastjsonschema because schema uses multiple $ref to an external schema.
         #   python-jsonschema doesn't cache external resources and is extremely slow. It should be
@@ -644,7 +649,7 @@ class Chart(MDIMBase):
         #   fastjsonschema becomes hard to maintain.
         validator = fastjsonschema.compile(
             schema,
-            handlers={"file": file_handler, "https": https_handler},
+            handlers={"file": file_handler},
             formats={"date": r"^\d{4}-\d{2}-\d{2}$"},
         )
 
@@ -861,6 +866,17 @@ class Chart(MDIMBase):
                 ),
             )
 
+    def validate_slug(self):
+        """`slug` is required for single charts, since grapher cannot create a chart without one."""
+        if self._chart_type != "multidim" or self.dimensions:
+            return
+        if not self.slug:
+            raise ValueError(
+                f"Chart '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing a "
+                "top-level `slug`, the chart's public URL. For a chart that already exists, use its "
+                "current slug; for a new one, preferably the step's short name with dashes."
+            )
+
     def validate_default_selection(self):
         """Warn per-view when a non-map-only view has no entity-selection fallback.
 
@@ -931,8 +947,8 @@ class Chart(MDIMBase):
         """Fail when an mdim or single chart pins no schema version.
 
         The pin has to live in the config, because it is the only record of what the view configs
-        were authored against: without one, the version Grapher is told about is whatever this repo
-        vendors on the day the step runs, which (a) claims the config is already current, so a
+        were authored against: without one, the version Grapher is told about is whatever
+        `DEFAULT_GRAPHER_SCHEMA` is on the day the step runs, which (a) claims the config is already current, so a
         config written against an older schema skips migration, and (b) silently changes the next
         time the step runs after a version bump. `multidim-schema.json` requires the field, which
         catches every authored config; this re-check covers charts built without schema
@@ -948,8 +964,8 @@ class Chart(MDIMBase):
             raise ValueError(
                 f"Chart '{self.catalog_path}' pins no `grapher_schema`. Add a top-level "
                 "`grapher_schema` to the config YAML recording the version its view configs were "
-                f'authored against — `grapher_schema: "{default_grapher_schema_version()}"` for a '
-                "config written today (quoted: an unquoted `011` is YAML octal)."
+                f'authored against — `grapher_schema: "{DEFAULT_GRAPHER_SCHEMA_VERSION}"` for a '
+                f"config written today (quoted: an unquoted `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is YAML octal)."
             )
 
     def validate_description_keys(self):
@@ -961,7 +977,6 @@ class Chart(MDIMBase):
         from `create_dataset`, never for `viz://` steps.
         """
         for view in self.views:
-            # `ViewMetadata` is a TypedDict, so view metadata is a plain dict at runtime.
             metadata = view.metadata
             if metadata is None:
                 continue
@@ -1422,7 +1437,7 @@ class Chart(MDIMBase):
 
     def set_global_config(
         self,
-        config: ViewConfigParam,
+        config: dict[str, Any],
         params: dict[str, Any] | None = None,
     ):
         self.edit_views(
@@ -1437,7 +1452,7 @@ class Chart(MDIMBase):
 
     def set_global_metadata(
         self,
-        metadata: ViewMetadataParam,
+        metadata: dict[str, Any],
         params: dict[str, Any] | None = None,
     ):
         self.edit_views(
@@ -1518,8 +1533,8 @@ class Chart(MDIMBase):
         dimension: str,
         choices: list[str],
         choice_new_slug: str,
-        view_config: ViewConfigParam | None = None,
-        view_metadata: ViewMetadataParam | None = None,
+        view_config: dict[str, Any] | None = None,
+        view_metadata: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
     ) -> list[View]:
         """Create new grouped views."""
@@ -1577,8 +1592,8 @@ def _expand_params(params: dict[str, Any], view: View) -> dict[str, Any]:
 
 def _set_config_metadata_with_params(
     view,
-    view_config: ViewConfigParam | GrapherConfig | None = None,
-    view_metadata: ViewMetadataParam | Any | None = None,
+    view_config: dict[str, Any] | GrapherConfig | None = None,
+    view_metadata: Any | None = None,
     params: dict[str, Any] | None = None,
 ) -> View:
     # Set params to dict if None
@@ -1602,9 +1617,8 @@ def _set_config_metadata_with_params(
     new_metadata = run_callbacks(new_metadata, view)
 
     # Add config and metadata to new view
-    # For now, keep as dicts to maintain compatibility with existing merge logic
-    view.config = cast(ViewConfig, new_config)
-    view.metadata = cast(ViewMetadata, new_metadata)
+    view.config = new_config
+    view.metadata = new_metadata
 
     return view
 
@@ -1780,7 +1794,7 @@ def sanity_check_grouped_view(view: View) -> None:
         )
         return
 
-    # Convert to dict if it's a ViewMetadata object for easier checking
+    # Normalise to a dict for easier checking
     metadata_dict = (
         view.metadata
         if isinstance(view.metadata, dict)

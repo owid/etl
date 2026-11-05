@@ -12,19 +12,18 @@ Usage:
 """
 
 import json
-import os
 import re
 from importlib import import_module
 from pathlib import Path
 
+import anthropic
 import click
-from openai import OpenAI
 from owid.catalog import Dataset
 from rich.console import Console
 from rich.table import Table
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV
+from etl.config import ANTHROPIC_API_KEY, OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import DATA_DIR
@@ -210,13 +209,68 @@ def update_titles(dry_run: bool):
         console.print("[yellow]Dry run - no changes written[/yellow]")
 
 
+SOURCES_MODEL = "claude-haiku-5-5"
+
+# Structured output: the answer is exactly this JSON, one entry per source sent.
+SOURCES_SCHEMA = {
+    "type": "json_schema",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "sources": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {"rawName": {"type": "string"}, "name": {"type": "string"}},
+                    "required": ["rawName", "name"],
+                    "additionalProperties": False,
+                },
+            }
+        },
+        "required": ["sources"],
+        "additionalProperties": False,
+    },
+}
+
+
+def sources_system_prompt(examples: list[dict]) -> str:
+    """Instructions for turning raw WDI source strings into short citation names, with worked examples."""
+    return f"""
+You are tasked with creating short citation names for data sources based on their raw names and data publisher sources.
+
+Input format: You will receive rawName and dataPublisherSource fields.
+Output format: Return a JSON object with a "sources" field containing an array of objects with rawName and name fields.
+
+Rules for creating the "name" field in addition to what you infer from examples:
+1. World Bank MUST appear in every citation name
+2. rawName may contain multiple sources separated by \\n, but the output name should be a single citation.
+
+Check out these good examples. Make sure these examples are followed closely.
+{json.dumps(examples, indent=2)}
+"""
+
+
+def generate_source_names(client: anthropic.Anthropic, system_prompt: str, batch: list[dict]) -> list[dict]:
+    """Ask the model for a short citation name per {rawName, dataPublisherSource}; returns [{rawName, name}]."""
+    message = client.messages.create(
+        model=SOURCES_MODEL,
+        max_tokens=16000,
+        system=system_prompt,
+        messages=[{"role": "user", "content": json.dumps(batch, ensure_ascii=False, indent=2)}],
+        output_config={"format": SOURCES_SCHEMA},
+    )
+    if message.stop_reason != "end_turn":
+        raise RuntimeError(f"the model stopped early ({message.stop_reason})")
+    # The answer is in the text blocks; thinking blocks can come first.
+    return json.loads("".join(block.text for block in message.content if block.type == "text"))["sources"]
+
+
 @cli.command()
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing")
 def update_sources(dry_run: bool):
-    """Update source citations using GPT-4o-mini."""
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if not openai_key:
-        console.print("[red]Error: OPENAI_API_KEY environment variable not set.[/red]")
+    """Update source citations using Claude."""
+    if not ANTHROPIC_API_KEY:
+        console.print("[red]Error: ANTHROPIC_API_KEY not set (in .env or the environment).[/red]")
         raise click.Abort()
 
     version = Path.cwd().name
@@ -251,7 +305,7 @@ def update_sources(dry_run: bool):
     console.print(table)
 
     if dry_run:
-        console.print("[yellow]Dry run - would fetch source names from GPT-4[/yellow]")
+        console.print(f"[yellow]Dry run - would fetch source names from {SOURCES_MODEL}[/yellow]")
         return
 
     # Load good examples from file
@@ -261,21 +315,9 @@ def update_sources(dry_run: bool):
 
     console.print(f"[green]Loaded {len(GOOD_EXAMPLES)} example source citations[/green]")
 
-    SYSTEM_PROMPT = f"""
-You are tasked with creating short citation names for data sources based on their raw names and data publisher sources.
+    SYSTEM_PROMPT = sources_system_prompt(GOOD_EXAMPLES)
 
-Input format: You will receive rawName and dataPublisherSource fields.
-Output format: Return a JSON object with a "sources" field containing an array of objects with rawName and name fields.
-
-Rules for creating the "name" field in addition to what you infer from examples:
-1. World Bank MUST appear in every citation name
-2. rawName may contain multiple sources separated by \\n, but the output name should be a single citation.
-
-Check out these good examples. Make sure these examples are followed closely.
-{json.dumps(GOOD_EXAMPLES, indent=2)}
-"""
-
-    client = OpenAI(api_key=openai_key)
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     MAX_BATCH_SIZE = 30
     all_new_sources = []
 
@@ -297,25 +339,13 @@ Check out these good examples. Make sure these examples are followed closely.
         if not missing_sources_data:
             continue
 
-        input_text = json.dumps(missing_sources_data, ensure_ascii=False, indent=2)
+        new_sources = generate_source_names(client, SYSTEM_PROMPT, missing_sources_data)
 
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": input_text},
-        ]
-
-        # Use GPT-4o-mini (same as notebook)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini", messages=messages, response_format={"type": "json_object"}
+        assert len(new_sources) == len(batch_missing_sources), (
+            f"Expected {len(batch_missing_sources)} sources, got {len(new_sources)}"
         )
 
-        r = json.loads(response.choices[0].message.content)
-
-        assert len(r["sources"]) == len(batch_missing_sources), (
-            f"Expected {len(batch_missing_sources)} sources, got {len(r['sources'])}"
-        )
-
-        all_new_sources.extend(r["sources"])
+        all_new_sources.extend(new_sources)
 
     console.print(
         f"[green]✓ Processed {len(all_new_sources)} sources across {(len(missing_sources) + MAX_BATCH_SIZE - 1) // MAX_BATCH_SIZE} batches[/green]"

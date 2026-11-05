@@ -334,7 +334,7 @@ def adapt_dates(tb: Table) -> Table:
 def prepare_inputs(tb: Table) -> Table:
     # Values sometimes include a letter, which is a flag. Extract those letters and create a separate column with them.
     # Note that sometimes there can be multiple letters (which means multiple flags).
-    tb["flag"] = tb["value"].astype("string").str.extract(r"([a-z]+)", expand=False)
+    tb["flag"] = tb["value"].astype("str").str.extract(r"([a-z]+)", expand=False)
     tb["value"] = tb["value"].str.replace(r"[a-z]", "", regex=True)
 
     # Some values are start with ':' (namely ':', ': ', ': c', ': u', ': cd'). Replace them with nan.
@@ -369,7 +369,7 @@ def harmonize_indexes_and_countries(tb: Table) -> Table:
     # Harmonize all other index names.
     for field, mapping in INDEXES_MAPPING.items():
         # Avoid categorical dtypes.
-        tb[field] = tb[field].astype("string")
+        tb[field] = tb[field].astype("str")
         not_null_mask = tb[field].notnull()
         tb.loc[not_null_mask, field] = map_series(
             tb[not_null_mask][field],

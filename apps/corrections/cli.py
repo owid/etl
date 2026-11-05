@@ -37,9 +37,12 @@ STATUS_ORDER = ["open", "reported", "acknowledged", "fixed_upstream"]
 
 def _locator(correction: dict[str, Any]) -> str:
     """A human-readable description of which rows a correction targets."""
+    parts = []
+    if "entity" in correction:
+        parts.append(f"{correction.get('entity')} · {correction.get('years')}")
     if "match" in correction:
-        return "match " + ", ".join(f"{k}={v}" for k, v in correction["match"].items())
-    return f"{correction.get('entity')} · {correction.get('years')}"
+        parts.append("match " + ", ".join(f"{k}={v}" for k, v in correction["match"].items()))
+    return " · ".join(parts)
 
 
 def _action_detail(correction: dict[str, Any]) -> str:

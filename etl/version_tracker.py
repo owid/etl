@@ -1019,7 +1019,7 @@ class VersionTracker:
     def check_that_all_steps_have_update_state(self) -> None:
         """Check that all steps have an update state."""
         missing_update_state = self.steps_df[
-            (self.steps_df["update_state"].isnull()) | (self.steps_df["update_state"] == UpdateState.UNKNOWN)
+            (self.steps_df["update_state"].isnull()) | (self.steps_df["update_state"] == UpdateState.UNKNOWN.value)
         ]["step"].tolist()
         self._log_warnings_and_errors(
             message="Some steps have no update state:",

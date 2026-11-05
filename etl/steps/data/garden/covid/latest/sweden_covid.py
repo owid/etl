@@ -36,8 +36,8 @@ def run(dest_dir: str) -> None:
     tb = tb.astype(
         {
             "date": "datetime64[ns]",
-            "confirmed_deaths": "string",
-            "confirmed_deaths_avg": "string",
+            "confirmed_deaths": "str",
+            "confirmed_deaths_avg": "str",
         }
     )
 

@@ -1,0 +1,31 @@
+chart_config_id: 0191b6c7-5955-7cea-8ad8-1bd483332ad7
+grapher_schema: "011"
+slug: affected-by-disasters-vs-gdp
+topic_tags:
+  - "Natural Disasters"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "natural_disasters_yearly#total_affected_per_100k_people_all_disasters_excluding_extreme_temperature_yearly"
+          display:
+            name: "People affected by disasters"
+      x: "wdi#ny_gdp_pcap_pp_kd"
+      color: "regions#owid_region"
+    # timelineMaxTime is set in the .py step, from the EM-DAT release date.
+    config:
+      title: "People affected by disasters vs. GDP per capita"
+      subtitle: "The total number of people affected is the sum of injured, requiring assistance and homeless. Measured as the rate per 100,000 people. GDP per capita is adjusted for inflation and differences in living costs between countries."
+      note: "Extreme temperatures are not included because their geographical and time coverage is poor. The latest year may be incomplete due to reporting delays."
+      originUrl: "/natural-disasters"
+      chartTypes:
+        - "ScatterPlot"
+      minTime: "latest"
+      timelineMinTime: 2000
+      xAxis:
+        scaleType: "log"
+        canChangeScaleType: true
+      yAxis:
+        scaleType: "log"
+        canChangeScaleType: true

@@ -234,7 +234,7 @@ def process_zi(tb: Table) -> Table:
     tb = tb.astype(
         {
             "age": "Int64",
-            "sex": "string",
+            "sex": "str",
         }
     )
 
@@ -266,7 +266,7 @@ def process_ri(tb: Table) -> Table:
     tb = tb.astype(
         {
             "age": "Int64",
-            "sex": "string",
+            "sex": "str",
         }
     )
 
@@ -308,7 +308,7 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
         tb["source"].isin(["Riley", "Zijdeman et al.", "UN World Population Prospects", "Human Mortality Database"])
     ), "No source found in table!"
     # For some reason, 'sex' is assigned type object
-    tb["sex"] = tb["sex"].astype("string")
+    tb["sex"] = tb["sex"].astype("str")
 
     return tb
 

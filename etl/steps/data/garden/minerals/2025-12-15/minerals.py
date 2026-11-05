@@ -596,7 +596,7 @@ def combine_data(
     # Keep the "World" that was aggregated with BGS data as "World (BGS)" just for sanity checks.
     # This will be removed after sanity checks are completed.
     # NOTE: The only global data from BGS that will be kept is coal and petroleum production.
-    tb_bgs_flat["country"] = tb_bgs_flat["country"].astype("string").replace("World", "World (BGS)")
+    tb_bgs_flat["country"] = tb_bgs_flat["country"].astype("str").replace("World", "World (BGS)")
     tb_bgs_and_usgs = combine_two_overlapping_dataframes(
         df1=tb_usgs_combined_flat, df2=tb_bgs_flat, index_columns=["country", "year"]
     )
