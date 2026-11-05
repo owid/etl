@@ -1,11 +1,11 @@
-#Data must be downloaded manually from here: https://www.ethnologue.com/codes/Language_Code_Data_20260217.zip
-#Available at: https://www.ethnologue.com/codes/
-#The site blocks automated requests (HTTP 403 for both browser-like and plain user agents), so download the file in a browser and run:
-#etls language/2026-09-24/ethnologue --path-to-file ~/Downloads/Language_Code_Data_20260217.zip
+# Data must be downloaded manually from here: https://www.ethnologue.com/codes/Language_Code_Data_20260217.zip
+# Available at: https://www.ethnologue.com/codes/
+# The site blocks automated requests (HTTP 403 for both browser-like and plain user agents), so download the file in a browser and run:
+#   etls language/2026-09-24/ethnologue --path-to-file ~/Downloads/Language_Code_Data_20260217.zip
 
 meta:
   origin:
-    producer: Summer Institute of Linguistics (SIL) International
+    producer: SIL Global
     title: Ethnologue
     description: |-
       Ethnologue is a comprehensive reference work cataloging the world’s languages, providing data on over 7,000 living languages, including their distribution, number of speakers, and classification. It serves as a key resource for linguists, educators, and researchers interested in global linguistic diversity.
