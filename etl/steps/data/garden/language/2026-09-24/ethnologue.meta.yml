@@ -32,9 +32,9 @@ tables:
         unit: languages
         display:
           name: Living languages
-        description_short: Number of languages, indigenous and non-indigenous, that are still used by at least one person as their first language. For a non-indigenous language to be counted, it must be established, meaning it is being acquired by the next generation and its use is the norm within a language community.
+        description_short: Number of languages, indigenous and non-indigenous, that are not extinct, meaning they are still in use or an ethnic community still identifies with them. For a non-indigenous language to be counted, it must be established, meaning it is being acquired by the next generation and its use is the norm within a language community.
         description_key:
-          - A living language is one that is still in use, with at least one person using it as their first language.
+          - A living language is one that is not extinct. This includes languages that no one speaks as a first language anymore but that a community still associates with its identity, and languages that are used only as a second language.
           - For a living language to be counted in each country, it must either be indigenous to that country or be non-indigenous and counted as established.
           - To be considered established, a non-indigenous language must be both being acquired by the next generation, either in the home, or through mandatory schooling or in the workplace. Additionally, its use must be the norm, either as a first or second language within a language community or community of practice, for example students who learn it as a second language in a school system.
           - Living languages can be classified as either institutional, stable or endangered, based on how likely they are to be transmitted to future generations. Institutional languages are those most likely to be passed on, while endangered languages are at the highest risk of falling out of use.
