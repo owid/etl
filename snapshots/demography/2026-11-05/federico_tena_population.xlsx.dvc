@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Population Historical Database (1991 borders)
+    description: |-
+      Annual population estimates for all polities from 1800 to 1938, re-expressed on 1991 political borders. The Federico–Tena World Population Historical Database re-estimates historical population series from first-hand sources and country-specific literature, and the 1991-borders layer re-allocates those series onto constant modern territories so that they join the United Nations series from 1950 onwards.
+
+      Two methods build the 1991-borders layer. Where a modern country was created by the break-up of a larger polity, such as the post-Soviet republics, the parent's population is split between successors using their shares of the parent's population in 1950. Where a territory moved between two existing countries, such as Alsace-Lorraine, the transferred territory's population is estimated as a census-derived share of the origin country and then subtracted from it and added to the destination. Both methods leave continent and world totals unchanged.
+
+      The November 2026 revision reworks the 1991-borders series. Germany, Poland and the Soviet successor states are rebuilt from period-specific province lists; Estonia, Latvia and Lithuania are now estimated directly from Russian statistical yearbooks instead of being given a share of the Soviet total; Ireland and the United Kingdom are split using a fixed 29% share for Northern Ireland; the Balkan territories the Ottoman Empire lost between 1878 and 1912 are re-apportioned among Greece, Bulgaria, Serbia, Montenegro and Albania; Aden and Bahrain are revised; and Saint Barthélemy is separated from Guadeloupe. The file also carries a reconciliation sheet documenting the shares used and checking that the rebuilt series still sum to the world total.
+
+      Values are reported in thousands of people.
+    date_published: "2026-11-04"
+    version_producer: "November 2026 revision (1991 borders)"
+
+    # Citation
+    producer: Federico and Tena-Junguito
+    citation_full: |-
+      Federico, Giovanni and Antonio Tena-Junguito (2026). Federico–Tena World Population Historical Database: World Population borders 1991, November 2026 revision. Building on Federico, G. and Tena-Junguito, A. (2023). "How many people on Earth? World Population 1800-1938". Working Papers in Economic History 23-02, Instituto Figuerola, Universidad Carlos III de Madrid.
+    attribution: Federico–Tena (2026)
+    attribution_short: Federico–Tena
+
+    # Files
+    url_main: https://www.uc3m.es/research/federico-tena-population
+    date_accessed: "2026-11-05"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://doi.org/10.21950/GW7SOZ
+outs:
+  - md5: 0615cbaeb73c7cece7ac1100e6153d1b
+    size: 459025
+    path: federico_tena_population.xlsx
