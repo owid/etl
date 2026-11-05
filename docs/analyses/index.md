@@ -70,8 +70,7 @@ This is just a sneak peek into some of our data work. But note that all our code
 !!! note ""
 
     ## [How many chickens are killed in egg production?](chickens_killed_in_egg_production/chickens_killed_in_egg_production.html)
-    Technical companion to our work on the welfare impact of egg production.
-    It explains how we estimate the number of hens and male chicks killed each year to produce eggs, starting from FAOSTAT's count of laying hens, and how this estimate relates to FAOSTAT's count of chickens slaughtered for meat.
+    Technical companion to the article ["Egg production kills more animals than beef, pork, and lamb combined"](https://ourworldindata.org/egg-production-kills-more-animals-than-beef-pork-and-lamb-combined).
 
     [:material-notebook: View notebook](chickens_killed_in_egg_production/chickens_killed_in_egg_production.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/chickens_killed_in_egg_production/chickens_killed_in_egg_production.ipynb){ .md-button }
