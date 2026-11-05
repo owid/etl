@@ -85,3 +85,17 @@ steps:
     # OWID regions indicator — referenced as the `color` dimension on BTI views to
     # colour Marimekko bars by region (see democracy.py).
     - data://grapher/regions/2023-01-01/regions
+
+  # "How democracy relates to development" — JSON feed for the bespoke visualization
+  # (owid-grapher bespoke/projects/democracy-development): four development measures against a
+  # switchable democracy index, one year at a time.
+  viz://bespoke/democracy/latest/democracy_development:
+    - data://garden/democracy/2026-03-17/vdem
+    - data://garden/democracy/2025-03-05/eiu
+    - data://garden/democracy/2026-03-23/fh
+    - data://garden/worldbank_wdi/2026-07-27/wdi
+    - data://garden/un/2026-06-09/igme
+    - data://garden/wb/2026-06-26/world_bank_pip
+    - data://garden/un/2025-05-07/undp_hdr
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
