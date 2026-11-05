@@ -46,4 +46,4 @@ tables:
           name: Extinct languages
         description_short: Number of extinct languages. Extinct languages are those that were formerly used but are no longer in use in any country and no one retains a sense of ethnic identity associated with them.
         description_key:
-          - Extinct languages are those that were once used but have ceased to exist in the last 200 years.
+          - Extinct languages are those that were once used but have gone out of use since around 1950, when Ethnologue began cataloging languages.
