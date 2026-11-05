@@ -13,13 +13,9 @@ This guide covers how to manage schema updates in the ETL system, particularly f
 
 ETL does not vendor the grapher chart-config schema, and its steps do not validate the chart configs they write against it. The grapher admin API validates indicator configs, chart configs and multidim view configs on upsert and rejects a bad one, so a typo in one of those fails the `grapher://` or `viz://` step that pushes it, not the local build. Grapher does not check explorer view configs or the per-indicator `display` overrides in a multidim. What ETL keeps is the *version*, because grapher keys its config migrations on it.
 
-That version lives in exactly one place, `etl/config.py`:
+That version lives in exactly one place, `DEFAULT_GRAPHER_SCHEMA_VERSION` in `etl/config.py`. The schema URL stamped on configs (`DEFAULT_GRAPHER_SCHEMA`), the pin the wizard scaffolds into new chart configs and the version suggested in error messages all derive from it, so a bump is a one-line change.
 
-```python
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
-```
-
-Upstream publishes a new version rarely — most changes are made in place to the current one, and those need nothing here. `test_no_newer_grapher_schema_version` (integration-marked) watches for a new version being published. Bump the constant only once grapher renders that version: stamping an older one is safe, because grapher migrates the config forward, while stamping one grapher does not know is rejected outright.
+Upstream publishes a new version rarely — most changes are made in place to the current one, and those need nothing here. `test_no_newer_grapher_schema_version` (integration-marked) watches for a new version being published. Bump the version only once grapher has deployed it (and `files.ourworldindata.org/schemas/` serves it): stamping an older one is safe, because grapher migrates the config forward, while stamping one grapher does not know is rejected outright.
 
 !!! warning "Don't touch the `grapher_schema` pins in chart configs"
 

@@ -10,8 +10,13 @@ session cannot reach it: prepare the files and the texts, and the user enters th
 
 - **Export each frame at its family's scale** (`/owid-staff:create-figma-chart` →
   `reference/NODE-MAP.md` → *Export scale per family*: 2× for the 850-wide desktop frames, 3× for
-  the 540-wide mobile ones). From a session, clone the frame, `rescale` the clone, `get_screenshot` it
-  at its natural size, and delete the clone. Save the files under the user's `ai/` folder.
+  the 540-wide mobile ones). From a session, use Figma's own exporter, all frames in one read-only
+  `use_figma`: per frame, `const bytes = await frame.exportAsync({ format: "PNG", constraint: { type:
+  "SCALE", value: <scale> } })`, then `figma.io.write("<frame name>.png", bytes)`. Claude Code saves
+  each file and names its path in the result, and nothing is written to the shared file. This is the
+  export itself, not a render of it (`/owid-staff:create-figma-chart` → SKILL.md → Step 9 has the
+  measurements), and it runs through the Figma connector, so it works in a cloud session too. Save
+  the files under the user's `ai/` folder, named after their frames.
 - **Upload them in Admin → Images under a filename the library does not hold yet**: each frame's name
   plus `.png` the first time, and the frame's name plus the refresh's date
   (`<frame name>-2027-03-14.png`) when a later refresh finds that taken; if that is taken too, add

@@ -11,11 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("multidimensional_poverty_index")
+    ds_garden = paths.load_dataset("ethnologue")
 
     # Read table from garden dataset.
-    tb = ds_garden["multidimensional_poverty_index"]
-
+    tb = ds_garden.read("languages_by_status", reset_index=False)
     #
     # Save outputs.
     #

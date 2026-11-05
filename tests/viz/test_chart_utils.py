@@ -477,14 +477,12 @@ def test_resolve_grapher_schema_rejects_missing_pin():
     the step runs: it tells Grapher the config is already current (skipping migrations for a config
     authored earlier), and it silently resolves to a different version after the next version bump.
     """
-    from etl.config import DEFAULT_GRAPHER_SCHEMA
-    from etl.viz.chart.utils import default_grapher_schema_version, resolve_grapher_schema
+    from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION
+    from etl.viz.chart.utils import resolve_grapher_schema
 
-    with pytest.raises(ValueError, match="No `grapher_schema` pinned"):
+    # The error suggests the current version, in short quoted form.
+    with pytest.raises(ValueError, match=f'No `grapher_schema` pinned.*"{DEFAULT_GRAPHER_SCHEMA_VERSION}"'):
         resolve_grapher_schema(None)
-
-    # The version suggested in the error is `DEFAULT_GRAPHER_SCHEMA`, in short quoted form.
-    assert DEFAULT_GRAPHER_SCHEMA.endswith(f"grapher-schema.{default_grapher_schema_version()}.json")
 
 
 def test_resolve_grapher_schema_rejects_unquoted_yaml_version():
