@@ -1,3 +1,8 @@
+#Data must be downloaded manually from here: https://www.ethnologue.com/codes/Language_Code_Data_20260217.zip
+#Available at: https://www.ethnologue.com/codes/
+#The site blocks automated requests (HTTP 403 for both browser-like and plain user agents), so download the file in a browser and run:
+#etls language/2026-09-24/ethnologue --path-to-file ~/Downloads/Language_Code_Data_20260217.zip
+
 meta:
   origin:
     producer: Summer Institute of Linguistics (SIL) International
@@ -7,8 +12,8 @@ meta:
     citation_full: |-
       Eberhard, David M., Gary F. Simons, and Alison J. Robinson (eds.). 2026. Ethnologue: Languages of the World. Twenty-ninth edition. Dallas, Texas: SIL Global. Online version: https://www.ethnologue.com/codes/.
     url_main: https://www.ethnologue.com/codes/
-    date_accessed: '2026-09-24'
-    date_published: '2026-02-17'
+    date_accessed: "2026-09-24"
+    date_published: "2026-02-17"
     license:
       name: © 2026 SIL Global
       url: https://www.ethnologue.com/codes/#terms-of-use
