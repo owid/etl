@@ -20,7 +20,7 @@ definitions:
   # Common fields to be used in all indicators (unless overridden for specific indicators below).
   common:
     description_processing: &description_processing |-
-      - Global emissions are converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a factor of 3.664. This is the conversion factor [recommended by the Global Carbon Project](https://globalcarbonbudgetdata.org/downloads/jGJH0-data/Global+Carbon+Budget+v2024+Dataset+Descriptions.pdf). It reflects that one tonne of carbon, when fully oxidized, forms 3.664 tonnes of CO₂, based on the relative molecular weights of carbon and oxygen in CO₂.
+      - Global emissions are converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a factor of 3.664. This is the conversion factor [recommended by the Global Carbon Project](https://globalcarbonbudget.org/download/2454/). It reflects that one tonne of carbon, when fully oxidized, forms 3.664 tonnes of CO₂, based on the relative molecular weights of carbon and oxygen in CO₂.
       - Emissions from the 1991 Kuwaiti oil fires are included in Kuwait's emissions for that year.
     description_key:
       # NOTE: The description key points are re-defined for each indicator on consumption-based emissions and traded emissions, as well as on per-capita indicators.
