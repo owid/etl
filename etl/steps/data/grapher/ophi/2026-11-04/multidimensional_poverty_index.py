@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("multidimensional_poverty_index")
 
     # Read table from garden dataset.
-    tb = ds_garden["multidimensional_poverty_index"]
+    tb = ds_garden.read("multidimensional_poverty_index", reset_index=False)
 
     #
     # Save outputs.
