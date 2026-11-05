@@ -25,6 +25,10 @@ tables:
         title: Total number of languages
         unit: languages
         description_short: Total number of languages, indigenous and non-indigenous, that have been spoken.
+        description_key:
+          - This count includes both living and extinct languages.
+          - A living language is one that is not extinct. This includes languages that no one speaks as a first language anymore but that a community still associates with its identity, and languages that are used only as a second language.
+          - Extinct languages are those that were formerly used but are no longer in use in any country and no one retains a sense of ethnic identity associated with them.
         display:
           name: All languages
       living:

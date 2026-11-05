@@ -45,9 +45,6 @@ def run() -> None:
         for col in table.columns:
             table[col].metadata.origins = [snap.metadata.origin]
     #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-
-    #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
