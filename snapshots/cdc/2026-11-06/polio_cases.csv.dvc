@@ -9,7 +9,9 @@ meta:
 
       Sources for each year are as follows:
 
-      * 1950-1960: [Morbidity and Mortality Weekly Report Annual Supplement Summary 1960 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.](https://www.globalhealthchronicles.org/items/show/6303)
+      * 1950: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993, Table 6](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
+
+      * 1951-1960: [Morbidity and Mortality Weekly Report Annual Supplement Summary 1960 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.](https://www.globalhealthchronicles.org/items/show/6303)
 
       * 1961-1993: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
 
@@ -68,6 +70,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 2aef81300b85aa58b77d5aaadeab1deb
+  - md5: d2df61b38844f21f8f5caac812b91e91
     size: 5501
     path: polio_cases.csv

@@ -33,6 +33,7 @@ dataset:
       changes:
         - Added 2023, and 2024–2025 as provisional counts.
         - Counts for 1951–1960 now include paralytic cases only, as they already did from 1961.
+        - Corrected the 1950 count from 33,303 to 33,300, the value in CDC's 1993 summary of notifiable diseases.
 tables:
   polio_cases:
     variables:

@@ -4,7 +4,8 @@ The counts are typed in by hand from CDC publications (see the `source` column a
 Each update adds the new years to the `cases` and `source` lists and moves the year range forward.
 
 Which count we take for each year:
-- 1950: all reported cases ("Poliomyelitis, total"); national data did not split cases by paralytic status yet.
+- 1950: all reported cases ("Poliomyelitis, total"), from Table 6 of the MMWR Summary of Notifiable Diseases,
+  United States, 1993; national data did not split cases by paralytic status yet.
 - 1951 onward: paralytic cases only ("Paralytic" / "Poliomyelitis, paralytic"). For 1951-1960 these come from Table 2
   of the MMWR 1960 annual supplement (Vol. 9, No. 53), which lists total, paralytic, nonparalytic and unspecified cases.
 
@@ -34,7 +35,7 @@ DATA_CDC = pd.DataFrame(
         "year": list(range(1950, 2026)),
         "cases": [
             # 1950: all reported cases (paralytic and nonparalytic).
-            33303,
+            33300,
             # 1951-1960: paralytic cases only (national data split cases by paralytic status from 1951).
             10037,
             21269,
@@ -114,7 +115,8 @@ DATA_CDC = pd.DataFrame(
             0,
         ],
         "source": [
-            *["https://www.globalhealthchronicles.org/items/show/6303"] * 11,
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm",
+            *["https://www.globalhealthchronicles.org/items/show/6303"] * 10,
             *["https://www.cdc.gov/mmwr/preview/index93.html"] * 33,
             *["https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm"] * 8,
             "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5153a1.htm",
