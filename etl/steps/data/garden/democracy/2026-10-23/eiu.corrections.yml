@@ -1,0 +1,28 @@
+# Known errors in the EIU data we use (Gapminder's compilation of EIU's yearly reports), patched locally.
+# See etl/data_corrections.py for the format.
+#
+# Spain 2019: the 2019 report contradicts itself. Its main table gives an overall score of 8.29 (political
+# participation 7.78), while its regional table and its history table give 8.18 (participation 7.22). All later
+# reports and EIU's own multi-year spreadsheet say 8.18, so the main table looks like a misprint.
+- indicator: democracy_eiu
+  entity: Spain
+  years: [2019]
+  action: override
+  value: 8.18
+  expect: {gt: 8.28, lt: 8.30} # still the misprinted 8.29; fails once the source carries 8.18
+  reason: >-
+    The 2019 Democracy Index report's main table says 8.29, but its regional table, its history table, all later
+    reports and EIU's multi-year spreadsheet say 8.18.
+  producer: Economist Intelligence Unit
+  status: open
+- indicator: pol_part_eiu
+  entity: Spain
+  years: [2019]
+  action: override
+  value: 7.22
+  expect: {gt: 7.77, lt: 7.79} # still the misprinted 7.78; fails once the source carries 7.22
+  reason: >-
+    The 2019 Democracy Index report's main table gives political participation 7.78, but its regional table gives
+    7.22, which is consistent with the corrected overall score of 8.18 (the average of the five categories).
+  producer: Economist Intelligence Unit
+  status: open
