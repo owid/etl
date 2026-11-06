@@ -1,8 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table, VariableMeta, VariablePresentationMeta
+from owid.catalog import Table, VariableMeta, VariablePresentationMeta
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -22,7 +21,6 @@ def run() -> None:
     #
     # Load the garden gender statistics datasets.
     ds_garden = paths.load_dataset("gender_statistics")
-    ds_regions = paths.load_dataset("regions")
 
     tb = ds_garden.read("gender_statistics")
 
@@ -36,14 +34,16 @@ def run() -> None:
         if col not in ["country", "year"]:
             # Get unique non-NaN values for this column
             unique_vals = set(tb[col].dropna().unique())
-            # Check if unique values are only 0, 1 (and potentially NaN which we excluded)
-            if unique_vals.issubset({0, 1, 0.0, 1.0}):
+            # Check if unique values are only 0, 1 (and potentially NaN which we excluded), skipping empty columns
+            if unique_vals and unique_vals.issubset({0, 1, 0.0, 1.0}):
                 indicators_for_sums.append(col)
 
     # Select only the columns of interest
     tb = tb[indicators_for_sums + ["country", "year"]]
 
-    tb = add_country_counts_and_population_by_status(tb, ds_regions)
+    sanity_check_inputs(indicators_for_sums)
+
+    tb = add_country_counts_and_population_by_status(tb)
     # Remove columns that are not needed and are in the original dataset
     columns_to_keep = [col for col in tb.columns if col not in indicators_for_sums]
 
@@ -61,7 +61,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset) -> Table:
+def add_country_counts_and_population_by_status(tb: Table) -> Table:
     """
     Add country counts and population by status for the columns in the list
     """
@@ -149,11 +149,8 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset) 
     columns_count = [item for sublist in columns_count_dict.values() for item in sublist]
     columns_pop = [item for sublist in columns_pop_dict.values() for item in sublist]
 
-    tb_regions = geo.add_regions_to_table(
-        tb=tb_regions,
-        ds_regions=ds_regions,
-        regions=REGIONS,
-        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    tb_regions = paths.regions.add_aggregates(
+        tb_regions, regions=REGIONS, frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR
     )
 
     # Remove population column
@@ -192,46 +189,55 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset) 
     return tb_regions
 
 
+def sanity_check_inputs(indicators_for_sums: list) -> None:
+    """Check that the yes/no indicators we count are the 35 Women, Business and the Law (WBL 1.0) questions."""
+    # NOTE: Gender Statistics now gets these from the WBL website (see its garden step). If this fails, the set of
+    # yes/no indicators changed: check that nothing new is being counted, or that a WBL question hasn't gone missing.
+    assert len(indicators_for_sums) == 35, f"Expected 35 yes/no indicators, found {len(indicators_for_sums)}."
+    assert all(column.startswith(("sg_", "sh_")) for column in indicators_for_sums), (
+        f"Unexpected yes/no indicators: {sorted(indicators_for_sums)}"
+    )
+
+
+# How each answer to a yes/no question is labeled in titles and legends.
+STATUS_LABELS = {"yes": "Yes", "no": "No", "missing": "No data"}
+
+
 def add_metadata_for_aggregated_columns(
     column_title: str, description_from_producer: str, status: str, count_or_pop: str, origins
 ) -> VariableMeta:
-    # Remove the unwanted part "(1=yes; 0=no)" from the column_title
-    clean_column_title = column_title.replace(" (1=yes; 0=no)", "")
+    """Build the metadata of the number of countries (or of people living in them) with a given answer to a question."""
+    assert count_or_pop in ("count", "pop"), f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}."
+    statement = column_title.replace(" (1=yes; 0=no)", "")
+    label = STATUS_LABELS[status]
+
+    if status == "missing":
+        countries = f"countries for which Women, Business and the Law has no data on: “{statement}”"
+    else:
+        countries = f"countries where Women, Business and the Law answers “{status}” to: “{statement}”"
 
     if count_or_pop == "count":
-        meta = VariableMeta(
-            title=f"{column_title} - {status.capitalize()} (Count)",
-            description_short=f"Number of countries with the status '{status}' for \"{clean_column_title}\".",
-            description_from_producer=description_from_producer,
-            unit="countries",
-            short_unit="",
-            sort=[],
-            origins=origins,
-        )
-        meta.display = {
-            "name": meta.title,
-            "numDecimalPlaces": 0,
-            "tolerance": 0,
-        }
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-    elif count_or_pop == "pop":
-        meta = VariableMeta(
-            title=f"{column_title} - {status.capitalize()} (Population)",
-            description_short=f"Population of countries with the status '{status}' for \"{clean_column_title}\".",
-            description_from_producer=description_from_producer,
-            unit="people",
-            short_unit="",
-            sort=[],
-            origins=origins,
-        )
-        meta.display = {
-            "name": meta.title,
-            "numDecimalPlaces": 0,
-            "tolerance": 0,
-        }
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
+        title = f"{statement}: number of countries ({label.lower()})"
+        description_short = f"Number of {countries}."
+        unit = "countries"
     else:
-        paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
+        title = f"{statement}: population of countries ({label.lower()})"
+        description_short = f"Number of people living in {countries}."
+        if status == "missing":
+            # The missing population also includes countries that Women, Business and the Law does not cover.
+            description_short = description_short[:-1] + ", including countries it does not cover."
+        unit = "people"
 
-    return meta  # ty: ignore
+    meta = VariableMeta(
+        title=title,
+        description_short=description_short,
+        description_from_producer=description_from_producer,
+        unit=unit,
+        short_unit="",
+        sort=[],
+        origins=origins,
+    )
+    meta.display = {"name": label, "numDecimalPlaces": 0, "tolerance": 0}
+    meta.presentation = VariablePresentationMeta(title_public=title)
+
+    return meta
