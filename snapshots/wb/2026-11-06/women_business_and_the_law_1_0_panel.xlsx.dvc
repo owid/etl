@@ -6,9 +6,9 @@ meta:
     description: |-
       Women, Business and the Law is a World Bank project that tracks laws affecting women's economic opportunities in 190 economies.
 
-      This file is the historical panel for the original framework (known as WBL 1.0), covering the reports from 1971 to 2024. For each economy and report year, it answers 35 yes-or-no questions about the law across eight topics: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension. It also gives a score from 0 to 100 for each topic, and an overall index score, which is the average of the eight topic scores. A higher score means laws treat women and men more equally.
+      This file is the historical panel for the original framework (known as WBL 1.0), covering report years 1971 to 2024. For each economy and report year, it answers 35 yes-or-no questions about the law across eight topics: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension. It also gives a score from 0 to 100 for each topic, and an overall index score, which is the average of the eight topic scores. A higher score means laws treat women and men more equally.
 
-      Each report describes the laws in force on October 1 of the year before the report year.
+      Each report describes the laws in force in the year before it is published (on October 1, in recent reports).
     date_published: '2024-03-04'
     citation_full: 'World Bank (2024). Women, Business and the Law 2024 - 1.0 data for 1971-2024 [dataset]. Washington, DC: World Bank.'
     url_main: https://wbl.worldbank.org/en/wbl-data
@@ -16,7 +16,7 @@ meta:
     date_accessed: '2026-11-06'
     license:
       name: CC BY 4.0
-      url: https://datacatalog.worldbank.org/public-licenses#cc-by
+      url: https://datacatalog.worldbank.org/search/dataset/0038489
 outs:
   - md5: e6edf3eeec027a7ae0140ac2e9364ff3
     size: 9575624
