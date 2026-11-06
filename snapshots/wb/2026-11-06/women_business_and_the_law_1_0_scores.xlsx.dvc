@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Bank
+    title: Women, Business and the Law
+    title_snapshot: Women, Business and the Law 1.0 - Latest report year
+    description: |-
+      Women, Business and the Law is a World Bank project that tracks laws affecting women's economic opportunities in 190 economies.
+
+      Since its 2026 edition, the project uses a broader framework (known as WBL 2.0). To keep the long-run series comparable, the World Bank also recalculates the latest report year under the original framework (known as WBL 1.0). This file contains that recalculation: for each economy, it answers 35 yes-or-no questions about the law across eight topics (mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension). It also gives a score from 0 to 100 for each topic, and an overall index score, which is the average of the eight topic scores. A higher score means laws treat women and men more equally.
+
+      Each report describes the laws in force on October 1 of the year before the report year.
+    date_published: '2026-02-23'
+    citation_full: 'World Bank (2026). Women, Business and the Law 2026 - 1.0 scores for comparison purposes [dataset]. Washington, DC: World Bank.'
+    url_main: https://wbl.worldbank.org/en/wbl-data
+    url_download: https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026-02-26-WBL-2026-1-0-Scores-Values_F.xlsx
+    date_accessed: '2026-11-06'
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses#cc-by
+outs:
+  - md5: 4652f12e41bbd92009cf1b2f0e0d9887
+    size: 73324
+    path: women_business_and_the_law_1_0_scores.xlsx
