@@ -100,8 +100,6 @@ tables:
         title: "Democracy score"
         description_short: |-
           Captures the extent of democratic features — political participation, rule of law, stable democratic institutions, political and social integration, and a capable state. It ranges from 1 to 10 (most democratic).
-        description_processing: |-
-          Values for continents have been obtained by averaging the values of the countries in the continent.
         unit: ""
         presentation:
           grapher_config:
@@ -408,5 +406,5 @@ tables:
           <%- else -%>
           Number of people living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <%- endif -%>
-        description_short: "Number of countries with available data."
+        description_short: "Number of people living in countries with each type of political regime. People in countries the BTI doesn't assess count as living in countries with unknown regime."
         unit: "people"

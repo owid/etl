@@ -166,7 +166,6 @@ def correct_female_flag(tb: Table) -> Table:
     """v2exfemhos and v2exfemhog refer to whether the country had a female hog/hos during the year. There are some errors in V-Dem, so we correct them here."""
     ## HOG
     # Moldova: 2019: Female
-    # Mali: 2012 Male
     # Canada: 1993: Female
     # Norway:: 1981 Female
     # Ukraine:: 2005 Female
@@ -180,8 +179,7 @@ def correct_female_flag(tb: Table) -> Table:
     # Lesotho: 1990, 1996, 1960, 1970 Female
     # Ivory Coast: 1932 male (for "Dieudonné François Joseph Marie Reste")
 
-    ## HOG
-    tb.loc[(tb["year"] == 2012) & (tb["country"] == "Mali"), "v2exfemhog"] = 0
+    # NOTE: Mali 2012 is not corrected here: V-Dem's 1 is right for "at any point in the year" (Cissé Mariam Kaïdama Sidibé was prime minister until March 2012). Only the December 31 flag (add_female_flag_31d) sets it to 0.
     ## HOS
     tb.loc[(tb["year"] == 1990) & (tb["country"] == "Lesotho"), "v2exfemhos"] = 1
     tb.loc[(tb["year"] == 1932) & (tb["country"] == "Ivory Coast"), "v2exfemhos"] = 0
@@ -197,6 +195,7 @@ def estimate_mulpar_indicators(tb: Table) -> Table:
         "v2elmulpar_osp_codehigh": "v2elmulpar_osp_high",
         "v2elmulpar_osp_codelow": "v2elmulpar_osp_low",
         # Create indicators for free and fair elections with imputed values between election-years
+        # NOTE: The original Stata script (L90, L93) builds the high and low versions from the central estimate, which looks like a typo; we use the bounds, as for multi-party elections.
         "v2elfrfair_osp": "v2elfrfair_osp",
         "v2elfrfair_osp_codehigh": "v2elfrfair_osp_high",
         "v2elfrfair_osp_codelow": "v2elfrfair_osp_low",
@@ -204,18 +203,35 @@ def estimate_mulpar_indicators(tb: Table) -> Table:
     columns_old = list(columns.keys())
     columns_new = list(columns.values())
 
-    ## Forward fill indicators when there are regularly scheduled national elections on course, as stipulated by election law or well-established precedent
-    mask = tb["v2x_elecreg"] == 1
+    ## Carry indicators forward when there are regularly scheduled national elections on course, as stipulated by election law or well-established precedent
     tb[columns_new] = tb[columns_old].copy()
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
-    # condition = (tb['v2x_elecreg'] == 1) & (tb['v2elmulpar_osp_imp'].isna())
-    # tb.loc[:, columns_new] = tb.groupby(["country"])[columns_old].transform(lambda x: x.ffill().where(x.bfill().eq(1)))
+    tb = fill_from_previous_year(tb, columns_new, tb["v2x_elecreg"] == 1)
+    return tb
+
+
+def fill_from_previous_year(tb: Table, columns: list[str], condition) -> Table:
+    """Fill missing values with the previous year's value, in years where `condition` holds.
+
+    This is Stata's `replace x = l.x if x == . & condition`: the value is carried forward one year at a time, so the chain stops at any year where the condition doesn't hold (e.g. elections were suspended) or that doesn't follow the previous year. A pandas `ffill()` would instead skip over those years and reach back to the last value before the break.
+
+    Expects `tb` sorted by country and year.
+    """
+    follows_previous_year = (tb.groupby("country", observed=True)["year"].diff() == 1).fillna(False)
+    can_fill = (condition.fillna(False) & follows_previous_year).astype(bool)
+    for column in columns:
+        while True:
+            previous = tb.groupby("country", observed=True)[column].shift(1)
+            to_fill = tb[column].isna() & previous.notna() & can_fill
+            if not to_fill.any():
+                break
+            tb.loc[to_fill, column] = previous[to_fill]
     return tb
 
 
 def estimate_ex_indicators(tb: Table) -> Table:
     """Create indicators for multi-party executive elections, and multi-party executive elections with imputed values between election-years."""
-    MASK_PRESIDENTIAL = (tb["v2eltype_6"] == 1) | (tb["v2eltype_7"] == 1)
+    # A missing election type counts as no election, as in Stata (where `. == 1` is false).
+    MASK_PRESIDENTIAL = ((tb["v2eltype_6"] == 1) | (tb["v2eltype_7"] == 1)).fillna(False).astype(bool)
     columns = {
         "v2elmulpar_osp": "v2elmulpar_osp_ex",
         "v2elmulpar_osp_codehigh": "v2elmulpar_osp_ex_high",
@@ -226,16 +242,20 @@ def estimate_ex_indicators(tb: Table) -> Table:
     tb[columns_new] = tb[columns_old].copy()
     tb.loc[~MASK_PRESIDENTIAL, columns_new] = np.nan
 
-    ## Forward fill indicators when there are regularly scheduled national elections on the executive on course, as stipulated by election law or well-established precedent
-    mask = tb["v2xex_elecreg"] == 1
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
+    ## Carry indicators forward when there are regularly scheduled national elections on the executive on course, as stipulated by election law or well-established precedent
+    tb = fill_from_previous_year(tb, columns_new, tb["v2xex_elecreg"] == 1)
     return tb
 
 
 def estimate_leg_indicators(tb: Table) -> Table:
     """Create indicators for multi-party legislative elections, and multi-party legislative elections with imputed values between election-years."""
     ## v2eltype_4 and v2eltype_5 excluded in Marcus Tannenberg and Anna Lührmann's Stata code; included here to align coding with code in V-Dem's data pipeline.
-    MASK_LEG = (tb["v2eltype_0"] == 1) | (tb["v2eltype_1"] == 1) | (tb["v2eltype_4"] == 1) | (tb["v2eltype_5"] == 1)
+    ## A missing election type counts as no election, as in Stata (where `. == 1` is false).
+    MASK_LEG = (
+        ((tb["v2eltype_0"] == 1) | (tb["v2eltype_1"] == 1) | (tb["v2eltype_4"] == 1) | (tb["v2eltype_5"] == 1))
+        .fillna(False)
+        .astype(bool)
+    )
     columns = {
         "v2elmulpar_osp": "v2elmulpar_osp_leg",
         "v2elmulpar_osp_codehigh": "v2elmulpar_osp_leg_high",
@@ -246,9 +266,8 @@ def estimate_leg_indicators(tb: Table) -> Table:
     tb[columns_new] = tb[columns_old].copy()
     tb.loc[~MASK_LEG, columns_new] = np.nan
 
-    ## Forward fill indicators when there are regularly scheduled national elections on the legislature on course, as stipulated by election law or well-established precedent
-    mask = tb["v2xlg_elecreg"] == 1
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
+    ## Carry indicators forward when there are regularly scheduled national elections on the legislature on course, as stipulated by election law or well-established precedent
+    tb = fill_from_previous_year(tb, columns_new, tb["v2xlg_elecreg"] == 1)
     return tb
 
 
@@ -578,26 +597,26 @@ def compare_with_row_coding(tb: Table) -> Table:
     # Albania 1912-1913, Lebanon 1918, Libya 1912-1921, Montenegro 1918, Republic of Vietnam 1901, Slovakia 1939-1944, Tanzania 1914, and Uzbekistan 1901-1911 can be coded because they had no legislative elections on course (v2xlg_elecreg == 0)
     # Honduras in 1934 and 1935, Kazakhstan in 1990, and Turkmenistan in 1990 can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
-    # 13 observations own classification identifies as electoral autocracies, whereas RoW does not provide data
+    # 12 observations own classification identifies as electoral autocracies, whereas RoW does not provide data
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 1) & (tb["v2x_regime"].isna() & (tb["year"] > 1900)),
             ["country", "year", "v2x_polyarchy"],
         ].shape[0]
-        == 13
+        == 12  # NOTE: 13 -> 12 on carrying election scores forward year by year, as the Stata script does (Dominican Republic 1905 can no longer be coded)
     )
     # Observations can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
     # Observations our classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
     assert (
-        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 238
-    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026); 139 -> 143 on fixing the head-of-government election path; 143 -> 238 on coding countries without legislative elections on course as closed autocracies
+        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 237
+    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026); 139 -> 143 on fixing the head-of-government election path; 143 -> 238 on coding countries without legislative elections on course as closed autocracies; 238 -> 237 on treating a missing election type as no election and carrying election scores forward year by year, as the Stata script does
 
     # Belgium in 1919 is hard-recoded in RoW code, though Marcus Tannenberg does not know why that happens even if the errors in a previous version of the V-Dem dataset should by now be remedied; it only continues to make a difference for Belgium in 1919; I keep the recode.
     # replace regime_row_owid = 1 if country_name == "Belgium" & year == 1919
     tb.loc[(tb["country"] == "Belgium") & (tb["year"] == 1919), "regime_row_owid"] = 1
 
-    # 179 observations with chief executives that were heads of state, which RoW codes higher than we do. Most had multi-party elections for legislature and executive (hence the RoW coding); but their chief executive was neither directly or indirectly chosen through multiparty elections, nor accountable to a legislature chosen through multi-party elections. The rest had no legislative elections on course (v2xlg_elecreg == 0). I therefore do not recode them.
+    # 178 observations with chief executives that were heads of state, which RoW codes higher than we do. Most had multi-party elections for legislature and executive (hence the RoW coding); but their chief executive was neither directly or indirectly chosen through multiparty elections, nor accountable to a legislature chosen through multi-party elections. The rest had no legislative elections on course (v2xlg_elecreg == 0). I therefore do not recode them.
     assert (
         tb.loc[
             (tb["regime_row_owid"] < tb["v2x_regime"])
@@ -606,7 +625,7 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] > 0.5),
             ["country", "year", "v2exnamhos"],
         ].shape[0]
-        == 179  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026); 106 -> 179 on coding countries without legislative elections on course as closed autocracies
+        == 178  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026); 106 -> 179 on coding countries without legislative elections on course as closed autocracies; 179 -> 178 on following the Stata script's election-score rules
     )
     # Examples include many prominent heads of state which came to office in coup d'etats or rebellions, such as Boumedienne (Algeria 1965), Anez (Bolivia 2019), Buyoya (Burundi 1987), Batista (Cuba 1952), Ankrah (Ghana 1966), Khomeini (Iran 1980), Buhari (Nigeria 1983), Jammeh (The Gambia 1994), and Eyadema (1967 Togo)
 
@@ -655,7 +674,7 @@ def compare_with_row_coding(tb: Table) -> Table:
             (tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0) & (tb["v2ex_hosw"] <= 0.5),
             ["v2elmulpar_osp_leg", "v2elmulpar_osp_hoe", "v2elmulpar_osp", "v2xlg_elecreg"],
         ].shape[0]
-        == 16  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026); 81 -> 16 on fixing the head-of-government election path
+        == 10  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026); 81 -> 16 on fixing the head-of-government election path; 16 -> 10 on following the Stata script's election-score rules
     )
 
     # No observations which RoW identifies as electoral autocracies, but which own classification identifies as missing:
