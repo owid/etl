@@ -1288,3 +1288,10 @@ steps:
       - data://meadow/public_health_reports/2025-03-12/polio_cases
       - data://meadow/cdc/2025-03-12/polio_cases:
         - snapshot://cdc/2025-03-12/polio_cases.csv
+  # archived; last active in c152552c3996 on 2026-11-06
+  data://grapher/health/2025-03-14/polio_deaths:
+    - data://garden/health/2025-03-14/polio_deaths:
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/cdc/2025-03-14/polio_deaths:
+        - snapshot://cdc/2025-03-14/polio_deaths.csv
+      - data://meadow/public_health_reports/2025-03-14/polio_deaths
