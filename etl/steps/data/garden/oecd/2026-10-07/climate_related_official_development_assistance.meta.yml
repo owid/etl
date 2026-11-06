@@ -86,7 +86,7 @@ definitions:
   processing_european_investment_bank: |-
     We left out aid from the European Investment Bank (EIB), one of the EU institutions, as the OECD does in its own climate-related shares. The EIB tracks its climate finance with a different method, not with the Rio markers, so all its aid would otherwise count as non-climate aid.
   processing_per_capita: |-
-    We calculated this indicator by dividing climate-related ODA received by the population of the recipient. We only calculated it for countries, not for groups of recipients.
+    We calculated this indicator by dividing climate-related ODA received by the population of the recipient, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN. We only calculated it for countries, not for groups of recipients.
 
 dataset:
   update_period_days: 365

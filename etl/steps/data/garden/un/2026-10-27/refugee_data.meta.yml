@@ -11,7 +11,7 @@ definitions:
     processing_level: major
     description_processing: |-
       - The United Nations High Commissioner for Refugees (UNHCR) collects data on refugee populations for each country of origin and country of asylum separately. To calculate the total number of refugees living in a country, we sum up the data from all origin countries. To calculate the total number of refugees from a country, we sum up the data from all asylum countries.
-      - To calculate the number of refugees per 1,000 or 100,000 people in a country, we divide the number of refugees by the total population of the country (for the same year) and multiply by the factor. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+      - To calculate the number of refugees per 1,000 or 100,000 people in a country, we divide the number of refugees by the total population of the country (for the same year) and multiply by the factor. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
       - We remove refugee populations where the country of origin and country of asylum are the same, as refugees are defined as people who have fled their country and crossed an international border. We also remove asylum seekers where the country of origin and country of asylum are the same.
     display:
       numDecimalPlaces: 0

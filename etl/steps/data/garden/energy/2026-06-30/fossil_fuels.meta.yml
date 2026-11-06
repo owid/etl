@@ -9,6 +9,9 @@ definitions:
       - Fossil fuel production is taken from the Energy Institute's Statistical Review of World Energy (from 1965), extended before then with Etemad & Luciani's historical estimates (1900-1979) and, for coal, with Vaclav Smil (2017) for the World and the NIC / Fouquet historical dataset for the United Kingdom (before 1900). It is extended to countries not covered by the Statistical Review, and to recent years, with the U.S. Energy Information Administration's data.
       - Fossil fuel consumption in energy units comes from the Energy Institute's Statistical Review of World Energy, extended to countries it does not cover, and to recent years, with the U.S. Energy Information Administration's data. Global consumption before 1965 is given by global production.
       - Fossil fuel production, proved reserves, trade (imports, exports, and net imports), and consumption — all in physical units — come from the U.S. Energy Information Administration.
+  # Per capita indicators.
+  description_processing_per_capita: |-
+    - We calculate per capita figures by dividing by population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
 
 dataset:
   title: Fossil fuels
@@ -23,6 +26,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -32,6 +38,9 @@ tables:
         unit: tonnes per person
         short_unit: t
         description_short: Measured in tonnes per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -59,6 +68,9 @@ tables:
         unit: tonnes per person
         short_unit: t
         description_short: Measured in tonnes per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -77,6 +89,9 @@ tables:
         unit: tonnes per person
         short_unit: t
         description_short: Measured in tonnes per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -95,6 +110,9 @@ tables:
         unit: tonnes per person
         short_unit: t
         description_short: Measured in tonnes per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -131,6 +149,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -140,6 +161,9 @@ tables:
         unit: tonnes per person
         short_unit: t
         description_short: Measured in tonnes per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -167,6 +191,9 @@ tables:
         unit: tonnes per person
         short_unit: t
         description_short: Proved reserves, measured in tonnes per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -205,6 +232,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -214,6 +244,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -241,6 +274,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -259,6 +295,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -277,6 +316,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -313,6 +355,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -322,6 +367,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -349,6 +397,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Proved reserves, measured in cubic meters per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -378,6 +429,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Includes refined petroleum products and other liquid fuels.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -387,6 +441,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Includes all petroleum products and other liquid fuels, such as biofuels.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -414,6 +471,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Includes crude oil and lease condensate; refined petroleum products are not included.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -432,6 +492,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Includes crude oil and lease condensate; refined petroleum products are not included.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -450,6 +513,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports. Includes crude oil and lease condensate; refined petroleum products are not included.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -486,6 +552,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Includes crude oil, condensates, natural gas liquids, and other liquid fuels.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -495,6 +564,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Measured in cubic meters per person. Includes crude oil and lease condensate.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -522,6 +594,9 @@ tables:
         unit: cubic meters per person
         short_unit: m³
         description_short: Proved reserves, measured in cubic meters per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information. Includes crude oil and lease condensate.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -542,6 +617,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Fossil fuels include coal, oil, and gas.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Fossil fuels
         presentation:
@@ -560,6 +638,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Fossil fuels include coal, oil, and gas.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_per_capita}
         display:
           name: Fossil fuels
         presentation:

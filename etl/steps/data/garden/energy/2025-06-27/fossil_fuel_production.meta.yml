@@ -7,7 +7,7 @@ definitions:
   description_processing_oil_twh: |-
     - Oil production is approximately converted from million tonnes to energy using a standard average oil-equivalent conversion factor of 41.868 petajoules per million tonnes. We then convert 1 petajoule to 0.278 terawatt-hours.
   description_processing_per_capita: |-
-    - Production per capita has been calculated by dividing by our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
+    - Production per capita has been calculated by dividing by our population dataset, based on [different sources](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
   common:
     presentation:
       topic_tags:

@@ -418,3 +418,5 @@ tables:
           <%- endif -%>
         description_short: "Number of countries with available data."
         unit: "people"
+        description_processing: |-
+          We calculate the number of people living under each type of regime using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.

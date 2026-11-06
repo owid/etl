@@ -62,7 +62,7 @@ tables:
         description_processing: |
           {definitions.expanded_list}
 
-          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data.
+          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data. Population estimates from 2024 onwards are projections released by the UN.
         display:
           name: Population of UN member states
           numDecimalPlaces: 0
@@ -76,7 +76,7 @@ tables:
         description_processing: |
           {definitions.expanded_list}
 
-          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data.
+          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data. Population estimates from 2024 onwards are projections released by the UN.
         display:
           name: Population of non UN member states
           numDecimalPlaces: 0

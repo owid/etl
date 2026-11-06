@@ -100,7 +100,7 @@ tables:
           - Calculated by dividing total plastic waste imports by the country's population.
           - *per_capita_explanation
           - *data_caveat
-        description_processing: We calculated this by converting total imports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
+        description_processing: We calculated this by converting total imports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -122,7 +122,7 @@ tables:
           - Calculated by dividing total plastic waste exports by the country's population.
           - *per_capita_explanation
           - *data_caveat
-        description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
+        description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -200,7 +200,7 @@ tables:
           - Positive values indicate net exports per capita, while negative values indicate net imports per capita.
           - *per_capita_explanation
           - *data_caveat
-        description_processing: We calculated this by converting net exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
+        description_processing: We calculated this by converting net exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         display:
           numDecimalPlaces: 1
           tolerance: 5

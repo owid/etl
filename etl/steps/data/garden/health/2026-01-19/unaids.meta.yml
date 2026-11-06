@@ -931,6 +931,8 @@ tables:
             The data counts condoms leaving central or regional warehouses for onward distribution, not condoms actually used.
           - |-
             Condoms are counted only once, even if they pass between distribution channels (for example, from public sector warehouses to NGOs or community workers).
+        description_processing: |-
+          We calculate the number of condoms distributed and sold per 1,000 people by dividing the total number of condoms by population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         presentation:
           title_public: "Condoms distributed and sold per 1,000 population"
 

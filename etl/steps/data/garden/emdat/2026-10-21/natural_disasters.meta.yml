@@ -28,7 +28,7 @@ definitions:
     The total damage is defined as the value of all economic losses directly or indirectly due to the disaster, unadjusted for inflation.
   # Definition of processing.
   description_processing_per_100k: &description-processing-100k |-
-    Disaster-related impacts from EM-DAT have been normalized by Our World in Data to provide data in terms of occurrences per 100,000 people.
+    Disaster-related impacts from EM-DAT have been normalized by Our World in Data to provide data in terms of occurrences per 100,000 people, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
   description_processing_per_gdp: &description-processing-gdp |-
     Our World in Data has calculated economic damage metrics adjusted for gross domestic product (GDP).
   # Definitions of disasters.

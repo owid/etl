@@ -60,6 +60,8 @@ tables:
         unit: ""
         short_unit: ""
         description_short: "{definitions.same_sex_marriage}"
+        description_processing: &description_processing_population |-
+          {definitions.common.description_processing} Population estimates from 2024 onwards are projections released by the UN.
         presentation:
           title_public: Population in countries where same-sex marriage is not legal
         display:
@@ -71,6 +73,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: "{definitions.same_sex_marriage}"
+        description_processing: *description_processing_population
         presentation:
           title_public: Population in countries where same-sex marriage is legal
         display:

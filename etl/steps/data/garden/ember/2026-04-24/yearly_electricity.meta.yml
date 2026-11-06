@@ -179,6 +179,8 @@ tables:
           name: Demand per capita
         description_short: |-
           Sum of power production and net imports divided by the population, measured in [kilowatt-hours](#dod:watt-hours).
+        description_processing: |-
+          We calculate demand per capita by dividing total demand by population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         presentation:
           title_public: Total electricity demand per person
       generation__clean__pct:
