@@ -12,6 +12,9 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Labels of the nuclear weapons status, in order. It is stored as text, so the Swimlane chart can show it.
+# NOTE: On each update, check in the source's codebook (or in this step, for codes we build) that every code still
+#   means the category labeled here, and that no codes were added or removed. The recoding fails on a code with no
+#   label, but not on a code whose meaning changed.
 STATUS_LABELS = {
     0: "Does not consider",
     1: "Considers",

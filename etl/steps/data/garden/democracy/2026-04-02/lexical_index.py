@@ -40,6 +40,9 @@ REGIME_LABELS = {
 }
 
 # Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
+# NOTE: On each update, check in the source's codebook (or in this step, for codes we build) that every code still
+#   means the category labeled here, and that no codes were added or removed. The recoding fails on a code with no
+#   label, but not on a code whose meaning changed.
 LABELS_NO_YES = {0: "No", 1: "Yes"}
 LABELS = {
     "regime_lied": {

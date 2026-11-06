@@ -120,6 +120,9 @@ def add_new_indicators(tb: Table) -> Table:
 
 def dummies_to_no_yes(tb: Table, columns: list[str]) -> Table:
     """Replace the 0/1 values of dummy indicators with "No"/"Yes", as a categorical indicator (`sort` is ignored by Grapher)."""
+    # NOTE: On each update, check in the source's codebook (or in this step, for codes we build) that every code still
+    #   means the category labeled here, and that no codes were added or removed. The recoding fails on a code with no
+    #   label, but not on a code whose meaning changed.
     labels = {0: "No", 1: "Yes"}
     for column in columns:
         unknown = set(tb[column].dropna().unique()) - set(labels)
