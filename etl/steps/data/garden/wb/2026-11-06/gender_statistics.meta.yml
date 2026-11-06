@@ -278,7 +278,8 @@ tables:
         description_key: |-
           Deputy prime ministers count as ministers. Prime ministers and other heads of government count only if they also run a ministry. Vice-presidents and heads of government agencies are not counted.
         display:
-          numDecimalPlaces: 1
+          roundingMode: significantFigures
+          numSignificantFigures: 2
           tolerance: 5
 
       sg_law_nodc_hr:
