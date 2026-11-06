@@ -118,6 +118,6 @@ def sanity_check_outputs(tb: Table) -> None:
         )
         assert min(provisional_years) == max(final_years), "Provisional series should start at the last final year."
 
-    # US polio cases peaked at 57,879 in 1952, about 37 per 100,000 people.
+    # The highest values are around 42,000 cases (1949, all reported cases), about 29 per 100,000 people.
     assert tb[["cases", "cases_provisional"]].max().max() < 60_000, "Implausibly high case count."
     assert tb[["case_rate", "case_rate_provisional"]].max().max() < 50, "Implausibly high case rate."

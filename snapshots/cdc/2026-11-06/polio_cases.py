@@ -3,6 +3,11 @@
 The counts are typed in by hand from CDC publications (see the `source` column and the .dvc description).
 Each update adds the new years to the `cases` and `source` lists and moves the year range forward.
 
+Which count we take for each year:
+- 1950: all reported cases ("Poliomyelitis, total"); national data did not split cases by paralytic status yet.
+- 1951 onward: paralytic cases only ("Paralytic" / "Poliomyelitis, paralytic"). For 1951-1960 these come from Table 2
+  of the MMWR 1960 annual supplement (Vol. 9, No. 53), which lists total, paralytic, nonparalytic and unspecified cases.
+
 - Finalized counts come from CDC's annual tables of nationally notifiable diseases ("Poliomyelitis, paralytic").
   Since 2025 these are on CDC Stacks (https://stacks.cdc.gov/cbrowse?pid=cdc%3A49375&parentId=cdc%3A49375),
   e.g. the 2023 Table 1 is https://stacks.cdc.gov/view/cdc/251097, where "—" means no reported cases.
@@ -10,6 +15,9 @@ Each update adds the new years to the `cases` and `source` lists and moves the y
   week, from the NNDSS Weekly Data on data.cdc.gov (https://data.cdc.gov/NNDSS/NNDSS-Weekly-Data/x9gk-5huc).
 
 NOTE: www.cdc.gov and wonder.cdc.gov return 403 to browser-like user agents, but a plain request works.
+NOTE: In the weekly data, the US-residents row is labeled "US RESIDENTS" up to 2024 and "U.S. Residents" from 2025,
+and some years end in MMWR week 53, so match the label case-insensitively and use each year's last week.
+A count of zero shows as an empty value with the flag "-".
 """
 
 from pathlib import Path
@@ -25,17 +33,19 @@ DATA_CDC = pd.DataFrame(
         "country": ["United States"] * 76,
         "year": list(range(1950, 2026)),
         "cases": [
+            # 1950: all reported cases (paralytic and nonparalytic).
             33303,
-            28386,
-            57879,
-            35592,
-            38476,
-            28985,
-            15140,
-            5485,
-            5787,
-            8425,
-            3190,
+            # 1951-1960: paralytic cases only (national data split cases by paralytic status from 1951).
+            10037,
+            21269,
+            15648,
+            18308,
+            13850,
+            7911,
+            2499,
+            3697,
+            6289,
+            2525,
             988,
             762,
             396,
