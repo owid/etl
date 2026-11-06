@@ -1,0 +1,34 @@
+chart_config_id: 0191b6c7-4920-709a-9f8e-bb34e50595f6
+grapher_schema: "012"
+slug: per-capita-co2-emissions-vs-per-capita-energy-use
+topic_tags:
+  - CO2 & Greenhouse Gas Emissions
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "global_carbon_budget#emissions_total_per_capita"
+          display:
+            name: "Per capita emissions"
+      x:
+        catalogPath: "energy_mix#total_energy_supply_per_capita_kwh"
+      size:
+        catalogPath: "population/historical#population_historical"
+      color:
+        catalogPath: "regions#owid_region"
+    config:
+      title: "Per capita CO₂ emissions vs. per capita energy use"
+      xAxis:
+        scaleType: "log"
+        canChangeScaleType: true
+      yAxis:
+        min: 0
+        canChangeScaleType: true
+      subtitle: "Emissions from [fossil fuels and industry](#dod:fossilemissions) are included. [Land-use change emissions](#dod:land-use-change-emissions) are not included. Energy is measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person."
+      originUrl: "/co2-and-greenhouse-gas-emissions"
+      chartTypes:
+        - "ScatterPlot"
+      relatedQuestions:
+        - url: "https://ourworldindata.org/primary-energy-measurement-change"
+          text: "Why has our energy data changed?"
