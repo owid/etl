@@ -432,11 +432,11 @@ steps:
       - snapshot://fasttrack/latest/measles_cases.csv
       - data://garden/cdc/2026-11-06/measles_state_level
 
-  # US measles cases by state: finalized annual counts (CDC WONDER) and provisional counts for later years (NNDSS weekly)
+  # US measles cases by state: finalized annual counts (CDC WONDER) and preliminary counts for later years (CDC measles page)
   data://garden/cdc/2026-11-06/measles_state_level:
     - data://meadow/cdc/2026-11-06/measles_state_level:
       - snapshot://cdc/2026-11-06/measles_state_level.csv
-      - snapshot://cdc/2026-11-06/nndss_weekly_measles.csv
+      - snapshot://cdc/2026-11-06/measles_cases_by_state.json
 
   # WHO Vaccine Safety
   data://grapher/who/2025-01-28/vaccine_safety:

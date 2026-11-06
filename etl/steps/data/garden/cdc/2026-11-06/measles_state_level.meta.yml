@@ -18,6 +18,8 @@ tables:
       case_count:
         title: Reported measles cases at the state level
         unit: cases
+        description_processing: |-
+          Finalized counts come from CDC WONDER. For the complete years after the last finalized one, we use the preliminary counts from the CDC's Measles Cases and Outbreaks page, which assigns cases to years by when the rash began and gives only total cases. For those years, the national count is the sum of the states, DC and New York City, so it excludes international visitors.
       source:
         title: Source of the data
         unit: ""
@@ -26,6 +28,8 @@ tables:
       case_count:
         title: Reported measles cases at the national level
         unit: cases
+        description_processing: |-
+          Finalized counts come from CDC WONDER. For the complete years after the last finalized one, we use the preliminary counts from the CDC's Measles Cases and Outbreaks page, which assigns cases to years by when the rash began and gives only total cases. For those years, the national count is the sum of the states, DC and New York City, so it excludes international visitors.
       source:
         title: Source of the data
         unit: ""

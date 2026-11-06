@@ -1,5 +1,7 @@
 """Load the snapshots and create a meadow dataset."""
 
+import json
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -10,25 +12,35 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshots: finalized annual counts (CDC WONDER) and provisional weekly counts (NNDSS Weekly Data).
+    # Retrieve snapshots: finalized annual counts (CDC WONDER) and preliminary counts for recent years (CDC measles page).
     snap_annual = paths.load_snapshot("measles_state_level.csv")
-    snap_weekly = paths.load_snapshot("nndss_weekly_measles.csv")
+    snap_recent = paths.load_snapshot("measles_cases_by_state.json")
     tb_annual = snap_annual.read()
-    tb_weekly = snap_weekly.read()
+    with open(snap_recent.path) as f:
+        data_recent = json.load(f)
 
     #
     # Process data.
     #
     tb_annual = tb_annual.rename(columns={"Regions/States": "country"})
     tb_annual["country"] = tb_annual["country"].astype("category")
-    # Keep the cumulative year-to-date count for the current year (m3) and its flag; drop map coordinates.
-    tb_weekly = tb_weekly[["states", "year", "week", "label", "m3", "m3_flag"]]
-    tb_weekly["states"] = tb_weekly["states"].astype("category")
+    # Keep the cases for each state and year, and the date the page was last updated.
+    tb_recent = snap_recent.read_from_records(
+        [
+            {
+                "geography": row["geography"],
+                "year": int(row["year"]),
+                "cases_calendar_year": row["cases_calendar_year"],
+                "last_updated": data_recent["lastUpdated"],
+            }
+            for row in data_recent["data"]
+        ]
+    )
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
         tb_annual.format(["country", "year", "disease"], short_name="measles_state_level"),
-        tb_weekly.format(["states", "year", "week", "label"], short_name="nndss_weekly_measles"),
+        tb_recent.format(["geography", "year"], short_name="measles_cases_by_state"),
     ]
 
     #

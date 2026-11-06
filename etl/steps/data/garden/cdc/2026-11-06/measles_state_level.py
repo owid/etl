@@ -1,4 +1,4 @@
-"""Combine finalized annual and provisional weekly measles cases by US state."""
+"""Combine finalized annual and preliminary recent measles cases by US state."""
 
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -9,17 +9,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 SOURCE_ANNUAL = "CDC WONDER - https://wonder.cdc.gov/nndss-annual-summary.html"
-SOURCE_WEEKLY = "CDC NNDSS Weekly Data (provisional) - https://data.cdc.gov/NNDSS/NNDSS-Weekly-Data/x9gk-5huc"
-# Reporting areas in the weekly data that are named differently in the annual data.
-WEEKLY_TO_ANNUAL_NAMES = {
-    "NEW YORK": "New York (excluding New York City)",
-    "US RESIDENTS": "United States",
-    "U.S. RESIDENTS": "United States",
-    "NON-US RESIDENTS": "Non-U.S. Residents",
-    "US TERRITORIES": "Territories",
-    "U.S. TERRITORIES": "Territories",
-    "NORTHERN MARIANA ISLANDS": "Commonwealth of Northern Mariana Islands",
-}
+SOURCE_RECENT = "CDC Measles Cases and Outbreaks (preliminary) - https://www.cdc.gov/measles/data-research/index.html"
 # Reporting areas that are neither the US total nor a state, DC or New York City.
 NON_STATE_AREAS = {
     "New England",
@@ -38,8 +28,6 @@ NON_STATE_AREAS = {
     "Puerto Rico",
     "U.S. Virgin Islands",
     "Non-U.S. Residents",
-    # US residents plus territories and non-residents, in the weekly data.
-    "Total",
 }
 # 50 states (with New York State excluding New York City), the District of Columbia and New York City.
 N_STATE_AREAS = 52
@@ -52,7 +40,7 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("measles_state_level")
     tb_annual = ds_meadow.read("measles_state_level")
-    tb_weekly = ds_meadow.read("nndss_weekly_measles")
+    tb_recent = ds_meadow.read("measles_cases_by_state")
 
     #
     # Process data.
@@ -67,14 +55,13 @@ def run() -> None:
     tb_annual["source"] = SOURCE_ANNUAL
     last_annual_year = tb_annual["year"].max()
 
-    # Add provisional counts for the complete years since the last finalized one.
-    tb_weekly = year_end_counts(tb_weekly, after_year=last_annual_year)
-    tb_weekly = tb_weekly[~tb_weekly["country"].isin(NON_STATE_AREAS)]
-    tb_weekly["source"] = SOURCE_WEEKLY
+    # Add preliminary counts for the complete years since the last finalized one.
+    tb_recent = recent_counts(tb_recent, after_year=last_annual_year)
+    tb_recent["source"] = SOURCE_RECENT
 
-    tb = pr.concat([tb_annual, tb_weekly], ignore_index=True)
+    tb = pr.concat([tb_annual, tb_recent], ignore_index=True)
     tb["source"] = tb["source"].copy_metadata(tb["case_count"])
-    check_reporting_areas(tb)
+    check_reporting_areas(tb, recent_years=set(tb_recent["year"]))
 
     # Separate the national data into a separate table.
     msk = tb["country"] == "United States"
@@ -95,43 +82,40 @@ def run() -> None:
     ds_garden.save()
 
 
-def year_end_counts(tb: Table, after_year: int) -> Table:
-    """Annual provisional counts by reporting area, for the complete years after `after_year`.
+def recent_counts(tb: Table, after_year: int) -> Table:
+    """Preliminary counts by state for the complete years after `after_year`, with their sum as the US total.
 
-    The weekly data gives each week's cumulative count for the year so far (`m3`), so the year's last week holds the
-    count for the whole year. A blank count flagged "-" means no reported cases.
+    The page only gives total cases (not split into imported and indigenous), and its US total includes international
+    visitors, so we add up the states instead, to match the annual data's US residents total.
     """
-    tb = tb[tb["year"] > after_year]
-    last_week = tb.groupby("year")["week"].transform("max")
-    tb = tb[tb["week"] == last_week]
-    # Skip the current, incomplete year (MMWR years have 52 or 53 weeks).
-    tb = tb[tb["week"] >= 52]
-    assert tb["year"].nunique() > 0, f"No complete year of weekly data after {after_year}."
+    # Skip the year the page was last updated in, which is still in progress.
+    current_year = pr.to_datetime(tb["last_updated"]).dt.year.max()
+    tb = tb[(tb["year"] > after_year) & (tb["year"] < current_year)]
+    assert tb["year"].nunique() > 0, f"No complete year of preliminary data after {after_year}."
 
-    assert tb.loc[tb["m3"].isna(), "m3_flag"].eq("-").all(), "Unexpected blank counts in the weekly data."
-    tb["m3"] = tb["m3"].fillna(0)
+    # The page reports New York City separately from the rest of New York State, as the annual data does.
+    tb["country"] = tb["geography"].replace({"New York": "New York (excluding New York City)"})
+    tb["case_count"] = pr.to_numeric(tb["cases_calendar_year"])
+    tb["disease"] = "Total"
+    tb = tb[["country", "year", "disease", "case_count"]]
 
-    tb["country"] = tb["states"].astype(str).str.upper().replace(WEEKLY_TO_ANNUAL_NAMES)
-    # Match the annual data's capitalization (e.g. "DISTRICT OF COLUMBIA" -> "District of Columbia").
-    tb["country"] = tb["country"].where(tb["country"] != tb["country"].str.upper(), tb["country"].str.title())
-    tb["country"] = tb["country"].str.replace(" Of ", " of ").copy_metadata(tb["states"])
-    tb["disease"] = tb["label"].str.replace("Measles, ", "").copy_metadata(tb["label"])
-    tb = tb.rename(columns={"m3": "case_count"})[["country", "year", "disease", "case_count"]]
-
-    # Add the total (imported plus indigenous) to match the annual data.
-    tb_total = tb.groupby(["country", "year"], as_index=False, observed=True)["case_count"].sum()
-    tb_total["disease"] = "Total"
-    tb = pr.concat([tb, tb_total], ignore_index=True)
+    tb_usa = tb.groupby(["year", "disease"], as_index=False)["case_count"].sum()
+    tb_usa["country"] = "United States"
+    tb = pr.concat([tb, tb_usa], ignore_index=True)
 
     return tb
 
 
-def check_reporting_areas(tb: Table) -> None:
+def check_reporting_areas(tb: Table, recent_years: set[int]) -> None:
     """Each year and disease should have the US total plus exactly one row for each state, DC and New York City."""
     counts = tb.groupby(["year", "disease"])["country"].agg(["nunique", "size"])
     assert (counts["nunique"] == counts["size"]).all(), "Duplicate reporting areas."
     assert (counts["size"] == N_STATE_AREAS + 1).all(), f"Unexpected reporting areas:\n{counts}"
-    assert set(tb["disease"]) == {"Imported", "Indigenous", "Total"}
+    # Finalized years are split into imported and indigenous cases; preliminary years only have the total.
+    diseases = tb.groupby("year")["disease"].agg(set)
+    for year, found in diseases.items():
+        expected = {"Total"} if year in recent_years else {"Imported", "Indigenous", "Total"}
+        assert found == expected, f"Unexpected diseases in {year}: {found}"
 
 
 def check_states_add_up_to_national(tb: Table, tb_usa: Table) -> None:

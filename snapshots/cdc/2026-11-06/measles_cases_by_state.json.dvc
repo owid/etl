@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    producer: Centers for Disease Control and Prevention
+    title: Measles Cases and Outbreaks
+    description: |-
+      Confirmed measles cases among US residents, by state and year, for the current year and the two years before it. New York City is reported separately from the rest of New York State. Cases among international visitors to the United States are not included.
+
+      Cases are assigned to a year based on the week in which the person's rash began. For example, cases with a rash that began during the last week of 2025 (December 28, 2025, to January 3, 2026) count toward 2025.
+
+      These counts are preliminary and updated weekly, and can change as health departments finish their investigations.
+    date_published: "2026-10-29"
+    # Citation
+    citation_full: |-
+      Centers for Disease Control and Prevention. Measles Cases and Outbreaks. Updated October 29, 2026.
+    attribution_short: CDC
+    # Files
+    url_main: https://www.cdc.gov/measles/data-research/index.html
+    url_download: https://www.cdc.gov/wcms/vizdata/measles/MeaslesCasesMap.json
+    date_accessed: 2026-11-06
+    # License
+    license:
+      name: Public domain
+      url: https://www.cdc.gov/other/agencymaterials.html
+outs:
+  - md5: 6b11325cc976295788dbd4f6d63a0902
+    size: 26426
+    path: measles_cases_by_state.json
