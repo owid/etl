@@ -69,6 +69,8 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: Women, Business and the Law; World Bank
 
       total_paternity_leave_to:
         title: Paid leave reserved for fathers
@@ -95,6 +97,8 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: Women, Business and the Law; World Bank
 
       total_maternity_leave_for:
         title: Paid leave available to mothers, including shared parental leave
@@ -125,6 +129,8 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: Women, Business and the Law; World Bank
 
       total_paternity_leave_for:
         title: Paid leave available to fathers, including shared parental leave
@@ -155,6 +161,8 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: Women, Business and the Law; World Bank
 
       sl_agr_empl_zs:
         title: Share of employment in agriculture
@@ -281,6 +289,14 @@ tables:
           roundingMode: significantFigures
           numSignificantFigures: 2
           tolerance: 5
+
+      se_ter_grad_fe_si_zs:
+        presentation:
+          # NOTE: The October 2026 release has no source for this series; the previous release named the UNESCO Institute for Statistics.
+          attribution: UNESCO via World Bank
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
 
       sg_law_nodc_hr:
         title: Law prohibits discrimination in employment based on gender
@@ -722,7 +738,8 @@ tables:
 
           {definitions.description_key_dhs}
         display:
-          numDecimalPlaces: 1
+          roundingMode: significantFigures
+          numSignificantFigures: 2
           tolerance: 10
 
       sg_law_eqrm_wk:
@@ -772,7 +789,7 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           tolerance: 5
 
       # Women, Business and the Law (WBL 1.0) indicators that have no curated text yet.
