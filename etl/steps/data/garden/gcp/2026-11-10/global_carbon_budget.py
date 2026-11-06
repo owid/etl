@@ -978,6 +978,9 @@ def add_projected_emissions(tb_combined: Table, tb_historical: Table) -> Table:
         columns={historical: f"projected_{observed}" for observed, historical in PROJECTED_EMISSIONS_COLUMNS.items()},
         errors="raise",
     )
+    tb_projected["projected_emissions_total_including_land_use_change"] = (
+        tb_projected["projected_emissions_total"] + tb_projected["projected_emissions_from_land_use_change"]
+    )
 
     tb_combined = pr.merge(tb_combined, tb_projected, on=["country", "year"], how="outer")
 
