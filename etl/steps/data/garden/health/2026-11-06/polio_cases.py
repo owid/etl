@@ -12,8 +12,9 @@ paths = PathFinder(__file__)
 # for them. The CDC snapshot links each of those years to this page.
 PROVISIONAL_SOURCE = "https://data.cdc.gov/NNDSS/NNDSS-Weekly-Data/x9gk-5huc"
 
-# Indicators that get a separate provisional series.
-INDICATORS = ["cases", "case_rate"]
+# NOTE: The metadata (description_key_provisional and the chart footnotes) names these years. When the provisional
+# years change, update that text too.
+PROVISIONAL_YEARS = [2024, 2025]
 
 
 def run() -> None:
@@ -32,18 +33,12 @@ def run() -> None:
 
     # Combine the three sources, which cover different years.
     tb = pr.concat([tb_phr, tb_census, tb_cdc], axis=0, ignore_index=True)
-
-    # Flag the provisional years before dropping the source links.
-    tb["is_provisional"] = tb["source"] == PROVISIONAL_SOURCE
     tb = tb.drop(columns=["source"])
 
     # Add the number of cases per 100,000 people.
     tb = paths.regions.add_population(tb, population_col="population", warn_on_missing_countries=False)
     tb["case_rate"] = tb["cases"] / tb["population"] * 100000
     tb = tb.drop(columns=["population"])
-
-    # Split each indicator into a finalized and a provisional series, so charts can show the provisional years dashed.
-    tb = split_final_and_provisional(tb)
 
     sanity_check_outputs(tb)
 
@@ -58,23 +53,6 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
-
-
-def split_final_and_provisional(tb: Table) -> Table:
-    """Move the provisional years of each indicator into a separate `<indicator>_provisional` column.
-
-    The provisional series also holds the last finalized year, so that on a line chart the dashed provisional
-    segment starts where the solid finalized line ends, e.g. final 1910-2023 and provisional 2023-2025.
-    """
-    last_final_year = tb.loc[~tb["is_provisional"], "year"].max()
-    is_bridge_year = tb["year"] == last_final_year
-    for indicator in INDICATORS:
-        tb[f"{indicator}_provisional"] = tb[indicator].copy()
-        tb.loc[~(tb["is_provisional"] | is_bridge_year), f"{indicator}_provisional"] = None
-        tb.loc[tb["is_provisional"], indicator] = None
-    tb = tb.drop(columns=["is_provisional"])
-
-    return tb
 
 
 def sanity_check_inputs(tb_phr: Table, tb_census: Table, tb_cdc: Table) -> None:
@@ -92,32 +70,24 @@ def sanity_check_inputs(tb_phr: Table, tb_census: Table, tb_cdc: Table) -> None:
     duplicated = sorted({year for year in years if years.count(year) > 1})
     assert not duplicated, f"Years reported by more than one source: {duplicated}."
 
-    # Provisional years come only from the CDC, and only after its last finalized year.
+    # Provisional years come only from the CDC, and are the ones the metadata names.
     assert not (tb_phr["source"] == PROVISIONAL_SOURCE).any(), "Provisional years in Public Health Reports."
     assert not (tb_census["source"] == PROVISIONAL_SOURCE).any(), "Provisional years in US Census Bureau."
     provisional = tb_cdc["source"] == PROVISIONAL_SOURCE
-    if provisional.any():
-        assert tb_cdc.loc[provisional, "year"].min() > tb_cdc.loc[~provisional, "year"].max(), (
-            "Provisional CDC years must all come after the last finalized year."
-        )
+    provisional_years = sorted(int(year) for year in tb_cdc.loc[provisional, "year"])
+    assert provisional_years == PROVISIONAL_YEARS, (
+        f"Provisional years {provisional_years} differ from PROVISIONAL_YEARS "
+        f"{PROVISIONAL_YEARS}: update the constant and the metadata text that names them."
+    )
+    assert min(PROVISIONAL_YEARS) > tb_cdc.loc[~provisional, "year"].max(), (
+        "Provisional CDC years must all come after the last finalized year."
+    )
 
 
 def sanity_check_outputs(tb: Table) -> None:
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
     assert tb["case_rate"].notna().sum() == tb["cases"].notna().sum(), "Case rate missing for some years with cases."
-    assert tb["case_rate_provisional"].notna().sum() == tb["cases_provisional"].notna().sum(), (
-        "Provisional case rate missing for some provisional years."
-    )
-
-    # Final and provisional series overlap only in the bridge year (the last finalized year).
-    final_years = set(tb.loc[tb["cases"].notna(), "year"])
-    provisional_years = set(tb.loc[tb["cases_provisional"].notna(), "year"])
-    if provisional_years:
-        assert final_years & provisional_years == {max(final_years)}, (
-            "Final and provisional series should share only the last finalized year."
-        )
-        assert min(provisional_years) == max(final_years), "Provisional series should start at the last final year."
 
     # The highest values are around 42,000 cases (1949, all reported cases), about 29 per 100,000 people.
-    assert tb[["cases", "cases_provisional"]].max().max() < 60_000, "Implausibly high case count."
-    assert tb[["case_rate", "case_rate_provisional"]].max().max() < 50, "Implausibly high case rate."
+    assert tb["cases"].max() < 60_000, "Implausibly high case count."
+    assert tb["case_rate"].max() < 50, "Implausibly high case rate."

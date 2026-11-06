@@ -16,12 +16,9 @@ definitions:
     Before the 1950s, nonparalytic polio could not be confirmed in a laboratory. Some of the cases counted until 1950 were probably other viral infections with similar symptoms.
   description_key_unspecified: |-
     In the early 1950s, many cases were reported without saying whether they were paralytic: 45% of reported cases in 1951, falling to 18% in 1954. The paralytic counts for these years are therefore likely too low.
-  description_key_paralytic_only: |-
-    These counts include paralytic polio cases only.
+  # NOTE: This text names the provisional years; keep it in sync with PROVISIONAL_YEARS in polio_cases.py.
   description_key_provisional: |-
-    Counts for the most recent years are provisional. They come from the Centers for Disease Control and Prevention's (CDC) weekly surveillance data, which can still be revised before the CDC publishes its finalized annual tables.
-  description_key_split: |-
-    We show finalized and provisional counts as two series. The provisional series repeats the last finalized year, so that the two lines join.
+    Counts for 2024 and 2025 are provisional. They come from the Centers for Disease Control and Prevention's (CDC) weekly surveillance data, which can still be revised before the CDC publishes its finalized annual tables.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -49,28 +46,11 @@ tables:
           - "{definitions.description_key_definition_change}"
           - "{definitions.description_key_nonparalytic_diagnosis}"
           - "{definitions.description_key_unspecified}"
-          - This series shows finalized counts only. Counts for the most recent years, which are still provisional, are shown as a separate series.
+          - "{definitions.description_key_provisional}"
         unit: cases
         display:
           name: Reported cases
           numDecimalPlaces: 0
-      cases_provisional:
-        title: Reported polio cases (provisional)
-        presentation:
-          title_public: Reported polio cases (provisional)
-        description_short: Number of reported polio cases in the United States in a given year, for recent years whose counts are still provisional.
-        description_key:
-          - "{definitions.description_key_provisional}"
-          - "{definitions.description_key_paralytic_only}"
-          - "{definitions.description_key_reported}"
-          - "{definitions.description_key_split}"
-        description_processing: This series includes the last year with finalized counts, so that it joins the finalized series on a chart.
-        processing_level: major
-        unit: cases
-        display:
-          name: Reported cases (provisional)
-          numDecimalPlaces: 0
-          isProjection: true
       case_rate:
         title: Reported polio cases per 100,000 people
         presentation:
@@ -81,27 +61,10 @@ tables:
           - "{definitions.description_key_definition_change}"
           - "{definitions.description_key_nonparalytic_diagnosis}"
           - "{definitions.description_key_unspecified}"
-          - This series shows finalized counts only. Counts for the most recent years, which are still provisional, are shown as a separate series.
+          - "{definitions.description_key_provisional}"
         description_processing: We divide the number of reported cases by the population of the United States in each year, and multiply by 100,000.
         processing_level: major
         unit: cases per 100,000 people
         display:
           name: Reported cases per 100,000 people
           numDecimalPlaces: 2
-      case_rate_provisional:
-        title: Reported polio cases per 100,000 people (provisional)
-        presentation:
-          title_public: Reported polio cases per 100,000 people (provisional)
-        description_short: Number of reported polio cases per 100,000 people in the United States in a given year, for recent years whose counts are still provisional.
-        description_key:
-          - "{definitions.description_key_provisional}"
-          - "{definitions.description_key_paralytic_only}"
-          - "{definitions.description_key_reported}"
-          - "{definitions.description_key_split}"
-        description_processing: We divide the number of reported cases by the population of the United States in each year, and multiply by 100,000. This series includes the last year with finalized counts, so that it joins the finalized series on a chart.
-        processing_level: major
-        unit: cases per 100,000 people
-        display:
-          name: Reported cases per 100,000 people (provisional)
-          numDecimalPlaces: 2
-          isProjection: true
