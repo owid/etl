@@ -275,8 +275,8 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
             if column in metadata_dict:
                 meta_info = metadata_dict[column]
 
-                # Set title from Indicator Name
-                indicator_name = meta_info.get("Indicator Name", column)
+                # Set title from Indicator Name (some producer names contain double spaces).
+                indicator_name = " ".join(str(meta_info.get("Indicator Name", column)).split())
                 meta.title = indicator_name
 
                 # Set source attribution

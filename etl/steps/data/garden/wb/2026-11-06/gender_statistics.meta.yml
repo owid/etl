@@ -24,7 +24,7 @@ definitions:
   description_key_ilo_modeled: |-
     These are modeled estimates from the International Labour Organization (ILO). Where countries have not reported data, the ILO fills the gaps with statistical models, so these values are more uncertain than reported ones.
   description_key_dhs: |-
-    The data come from the Demographic and Health Surveys (DHS), which interview a sample of households in each country. Surveys are carried out only in some years, so there are gaps between data points.
+    The data comes from the Demographic and Health Surveys (DHS), which interview a sample of households in each country. Surveys are carried out only in some years, so there are gaps between data points.
   wbl_limitations: |-
     **Limitations and exceptions:** The Women, Business and the Law methodology has limitations that should be considered when interpreting the data. All eight indicators are based on standardized assumptions to ensure comparability across economies. Comparability is one of the strengths of the data, but the assumptions can also be limitations as they may not capture all restrictions or represent all particularities in a country. It is assumed that the woman resides in the economy's main business city. In federal economies, laws affecting women can vary by state or province. Even in nonfederal economies, women in rural areas and small towns could face more restrictive local legislation. Such restrictions are not captured by Women, Business and the Law unless they are also found in the main business city. The woman has reached the legal age of majority and is capable of making decisions as an adult, is in good health and has no criminal record. She is a lawful citizen of the economy being examined, and she works as a cashier in the food retail sector in a supermarket or grocery store that has 60 employees. She is a cisgender, heterosexual woman in a monogamous first marriage registered with the appropriate authorities (de facto marriages and customary unions are not measured), she is of the same religion as her husband, and is in a marriage under the rules of the default marital property regime, or the most common regime for that jurisdiction, which will not change during the course of the marriage. She is not a member of a union, unless membership is mandatory. Membership is considered mandatory when collective bargaining agreements cover more than 50 percent of the workforce in the food retail sector and when they apply to individuals who were not party to the original collective bargaining agreement. Where personal law prescribes different rights and obligations for different groups of women, the data focus on the most populous group, which may mean that restrictions that apply only to minority populations are missed. Women, Business and the Law focuses solely on the ways in which the formal legal and regulatory environment determines whether women can work or open their own businesses. The data set is constructed using laws and regulations that are codified (de jure) and currently in force, therefore implementation of laws (de facto) is not measured. The data looks only at laws that apply to the private sector. These assumptions can limit the representativeness of the data for the entire population in each country. Finally, Women, Business and the Law recognizes that the laws it measures do not apply to all women in the same way. Women face intersectional forms of discrimination based on gender, sex, sexuality, race, gender identity, religion, family status, ethnicity, nationality, disability, and a myriad of other grounds. Women, Business and the Law therefore encourages readers to interpret the data in conjunction with other available research.
 
@@ -165,7 +165,7 @@ tables:
         description_key: |-
           The International Labour Organization (ILO) counts people as employed if they are of working age and did any work for pay or profit, including people temporarily away from their job, for example because of illness or leave.
 
-          Countries define and measure employment in different ways, for example in how they count self-employed people and unpaid family workers. Where a country’s data cover only employees, or only urban areas, the share of people working in agriculture can be too low.
+          Countries define and measure employment in different ways, for example in how they count self-employed people and unpaid family workers. Where a country’s data covers only employees, or only urban areas, the share of people working in agriculture can be too low.
 
           {definitions.description_key_ilo_modeled}
         display:
@@ -396,7 +396,7 @@ tables:
           tolerance: 5
 
       sl_uem_neet_fe_zs:
-        title: Share of young women not in education, employment or training
+        title: Share of young women not in education, employment, or training
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -410,7 +410,7 @@ tables:
           tolerance: 10
 
       sl_uem_neet_ma_zs:
-        title: Share of young men not in education, employment or training
+        title: Share of young men not in education, employment, or training
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -453,7 +453,7 @@ tables:
         unit: (1=yes; 0=no)
         short_unit: ''
         description_short: |-
-          Countries score “yes” if sons and daughters have the same rights to inherit their parents’ assets, and “no” if the law treats them differently as heirs. The data apply to cases where the parent left no will.
+          Countries score “yes” if sons and daughters have the same rights to inherit their parents’ assets, and “no” if the law treats them differently as heirs. The data applies to cases where the parent left no will.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1357,7 +1357,7 @@ tables:
         unit: (1=yes; 0=no)
         short_unit: ''
         description_short: |-
-          Countries score “yes” if a widow and a widower have the same rights to inherit their spouse’s assets, and “no” if the law treats them differently. The data apply to cases where the spouse left no will and no children.
+          Countries score “yes” if a widow and a widower have the same rights to inherit their spouse’s assets, and “no” if the law treats them differently. The data applies to cases where the spouse left no will and no children.
         description_key: |-
           {definitions.description_key_wbl_as_written}
 
