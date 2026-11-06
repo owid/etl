@@ -18,6 +18,7 @@ import vdem_refine as refine  # VDEM's imputing library
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
+from etl.steps.data.garden.democracy.shared import codes_to_categories
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -65,12 +66,15 @@ REGIONS = {
 # INDICATORS THAT FOR SOME UNKNOWN REASON HAVE LOST THEIR ORIGINS DURING THE PROCESSING
 INDICATORS_NO_ORIGINS = [
     "regime_row_owid",
+    "regime_row_owid_score",
     "regime_amb_row_owid",
     "regime_redux_row_owid",
     "wom_hoe_vdem",
     "wom_hoe_ever",
     "wom_hoe_ever_dem",
-    "v2exfemhoe",
+    "wom_hos_ever_dem",
+    "wom_hog_ever_dem",
+    "femhoe_owid",
     "regime_imputed",
     "num_years_in_electdem_consecutive",
     "num_years_in_libdem_consecutive",
@@ -79,6 +83,58 @@ INDICATORS_NO_ORIGINS = [
     "num_years_in_electdem_consecutive_cat",
     "num_years_in_libdem_consecutive_cat",
 ]
+
+# LABELS OF CATEGORICAL INDICATORS, IN ORDER (they are stored as text, so the Swimlane chart can show them)
+# NOTE: On each update, check in the source's codebook (or in this step, for codes we build) that every code still
+#   means the category labeled here, and that no codes were added or removed. The recoding fails on a code with no
+#   label, but not on a code whose meaning changed.
+LABELS_NO_YES = {0: "No", 1: "Yes"}
+LABELS_GENDER = {0: "Man", 1: "Woman"}
+LABELS_UNI = {
+    "regime_row_owid": {
+        0: "Closed autocracy",
+        1: "Electoral autocracy",
+        2: "Electoral democracy",
+        3: "Liberal democracy",
+    },
+    "regime_redux_row_owid": {
+        0: "Closed autocracy",
+        1: "Electoral autocracy",
+        2: "Electoral democracy",
+    },
+    "regime_amb_row_owid": {
+        0: "Closed autocracy",
+        1: "Closed, leaning electoral autocracy",
+        2: "Electoral, leaning closed autocracy",
+        3: "Electoral autocracy",
+        4: "Electoral autocracy, leaning democracy",
+        5: "Electoral democracy, leaning autocracy",
+        6: "Electoral democracy",
+        7: "Electoral, leaning liberal democracy",
+        8: "Liberal, leaning electoral democracy",
+        9: "Liberal democracy",
+    },
+}
+# Categories with no ranking, stored as plain categorical indicators.
+LABELS_UNI_UNORDERED = {
+    "wom_hog_vdem": LABELS_GENDER,
+    "wom_hos_vdem": LABELS_GENDER,
+    "wom_hoe_vdem": LABELS_GENDER,
+}
+LABELS_MULTI_UNORDERED = {
+    column: LABELS_NO_YES
+    for column in [
+        "accessjust_m_row",
+        "accessjust_w_row",
+        "electdem_dich_row_owid",
+        "electfreefair_row",
+        "electmulpar_hoe_row_owid",
+        "electmulpar_leg_row",
+        "electmulpar_row",
+        "lib_dich_row",
+        "transplaws_row",
+    ]
+}
 
 
 def run() -> None:
@@ -135,6 +191,15 @@ def run() -> None:
         tb_uni_without_regions["year"] == tb_uni_without_regions["year"].max()
     ].shape[0]
     tb_countries_share = estimate_share_countries(tb_countries_counts, num_countries_last=num_countries)
+
+    # %% PART 4C: Store categorical indicators as text
+    # Done after the aggregates, which count countries by numeric code. The numeric regime score is kept for the chart
+    # that compares the classifications of several sources on a common 0-1 scale.
+    paths.log.info("4C/ Storing categorical indicators as text...")
+    tb_uni_without_regions["regime_row_owid_score"] = tb_uni_without_regions["regime_row_owid"].copy()
+    tb_uni_without_regions = codes_to_categories(tb_uni_without_regions, LABELS_UNI)
+    tb_uni_without_regions = codes_to_categories(tb_uni_without_regions, LABELS_UNI_UNORDERED, ordered=False)
+    tb_multi_without_regions = codes_to_categories(tb_multi_without_regions, LABELS_MULTI_UNORDERED, ordered=False)
 
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
@@ -413,8 +478,7 @@ def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     )
 
     columns_rename = {
-        "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
-        "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
+        column: column.replace("num_countries_", "share_countries_") for column in aggregate.COLUMNS_COUNTS_EVER
     }
     columns = list(columns_rename.keys())
     tb_share = (
@@ -427,20 +491,10 @@ def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     # Keep only category "yes", and entity "World"
     tb_share = tb_share[(tb_share["category"] == "yes") & (tb_share["country"] == "World")].drop(columns=["category"])
 
-    # Add a column with the total count of countries per year-country
-    tb_share["total_countries"] = tb_share.groupby(["country", "year"], as_index=False)[
-        "share_countries_wom_hoe_ever"
-    ].transform("sum")
-
-    assert tb_share["total_countries"].notna().all(), "NA detected!"
-
-    # Option 1: Share of countries relative to current number of countries
-    # tb_share["share_countries_wom_hoe_ever"] /= tb_share["total_countries"] * 0.01
-    # tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
-    tb_share = tb_share.drop(columns=["total_countries"])
-
-    # Option 2: Share of countries relative to number of countries in the most recent year of the data
-    tb_share["share_countries_wom_hoe_ever"] /= num_countries_last * 0.01
-    tb_share["share_countries_wom_hoe_ever_demelect"] /= num_countries_last * 0.01
+    # Share of countries relative to the number of countries in the most recent year of the data
+    for column in columns_rename.values():
+        assert tb_share[column].notna().all(), f"NA detected in `{column}`!"
+        tb_share[column] /= num_countries_last * 0.01
+        assert tb_share[column].max() <= 100, f"`{column}` exceeds 100%."
 
     return tb_share

@@ -32,6 +32,8 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
 | Build a chart from ETL (a single chart or a multidim), or an explorer | `/create-chart`, `/create-explorer` |
+| Sketch a small MDim visually, with the real Grapher, and take it to a live MDim (for non-ETL users) | `/sketch-mdim` — uses `/create-chart` for the step itself |
+| Bring admin edits of an ETL-authored chart back into ETL (the admin's "ETL" badge shows it drifted) | `/pull-chart` — wraps `etl chart-pull` |
 | Review a dataset-update PR | `/review-data-pr` |
 | Announce a finished update, internally | `/draft-data-update-slack-post` — the #data-updates-comms Slack form |
 | Announce a finished update, to readers | `/owid-staff:draft-data-update-post` — the "Data update" post on ourworldindata.org/latest; from the `owid-staff` plugin (owid/skills-private), auto-installed here |
@@ -225,7 +227,7 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 
 ### Comments in steps
 
-Label each stage of `run()` with a short comment, so a reader can follow the step without reading every line, e.g. `# Step 2: Add regional aggregates.`. Add the *why* where the code doesn't show it (e.g. why a value is computed rather than taken from the source). Keep comments short: one line where possible, labels rather than paragraphs, so the code isn't buried under comments. A worked example belongs once, in the docstring of the helper it explains. Instructions for the next update go in `# NOTE:` comments (see `/create-dataset`).
+Label each stage of `run()` with a short comment, so a reader can follow the step without reading every line, e.g. `# Add regional aggregates.`. Don't number the labels (`# Step 2: ...`): the prefix repeats on every line and has to be renumbered whenever a stage is added. Add the *why* where the code doesn't show it (e.g. why a value is computed rather than taken from the source). Keep comments short: one line where possible, labels rather than paragraphs, so the code isn't buried under comments. A worked example belongs once, in the docstring of the helper it explains. Instructions for the next update go in `# NOTE:` comments (see `/create-dataset`).
 
 ### Preserving metadata/origins in steps
 
@@ -244,7 +246,7 @@ Label each stage of `run()` with a short comment, so a reader can follow the ste
 - **Attach population with `paths.regions.add_population(tb, population_col=...)`** — never read population columns directly (`historical.population_historical`, `population_original.population`). Only the `population` table's `population` column carries the single collapsed *"Various sources"* origin; the other tables carry disaggregated HYDE/Gapminder/UN WPP origins that then leak onto your indicators. Add `data://garden/demography/<version>/population` as a dep.
 - **`Table.format(keys, short_name=paths.short_name)`** sets the index, sorts, verifies integrity, and sets `short_name` in one call — use it in data steps. It takes an explicit key list; if `keys` is None (default) it uses `country` + `year`, but it is not limited to those. For a year-only table use `tb.format(["year"], short_name=paths.short_name)`. Don't hand-roll `set_index` + `tb.metadata.short_name`.
 - **`*.meta.yml`**: the `dataset:` block carries only `update_period_days` and `owners` (plus `changelog` for the few datasets that keep release notes, and `title` when the inherited one doesn't fit: a dataset combining several sources, or one that must be told apart from a sibling dataset) — everything else is inherited from origin. Always make sure `owners` is set (new dataset: the user; update: append the user if missing) — first entry is the accountable owner; canonical names per the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`.
-- **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
+- **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is stamped automatically by `AdminAPI.put_grapher_config` on upsert.
 - **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — chart and explorer `viz://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*. The string form is an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
 
 ### Performance
@@ -297,7 +299,7 @@ with open(file_path, 'w') as f:
 
 **Consult the reference first.** Before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields. Each field has one job — don't fold content that belongs in one field into another. Don't infer field usage by copying other `.dvc` files; they may use optional fields for reasons that don't apply to your snapshot.
 
-**Read the producer's latest documentation too** — the dataset page, methodology, codebook, main report and what's new — both to fill the fields and to check the text already written against it. Ask the user when it is missing, insufficient or inaccessible. The procedure is `.claude/rules/producer-documentation.md`.
+**Read the producer's latest documentation too** — the dataset page, methodology, indicator definitions, codebook, main report and what's new — both to fill the fields and to check the text already written against it. Ask the user when it is missing, insufficient or inaccessible. The procedure is `.claude/rules/producer-documentation.md`.
 
 Mistakes the reference already covers but that keep happening:
 

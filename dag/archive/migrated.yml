@@ -419,6 +419,10 @@ steps:
   data-private://grapher/biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022:
     - data-private://garden/biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022:
       - snapshot-private://biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022.feather
+  # archived; last active in 2a0dbed93ab0 on 2026-10-24
+  data://grapher/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
+    - data://garden/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
+      - snapshot://food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather

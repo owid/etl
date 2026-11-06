@@ -1,11 +1,10 @@
 steps:
-  # ===========================================================================
+  ##########
   # NOT UPDATEABLE
   # These steps receive no new data; skip them in the monthly climate update.
-  # ===========================================================================
-  #
+  ##########
+
   # Migrated legacy datasets (frozen one-off papers and historical sources).
-  #
   data://grapher/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
     - data://garden/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
       - snapshot://climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data.feather
@@ -42,15 +41,13 @@ steps:
   data-private://grapher/climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021:
     - data-private://garden/climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021:
       - snapshot-private://climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021.feather
-  #
+
   # IPCC scenarios (frozen; namespace migration emissions -> climate pending).
-  #
   viz://explorer/emissions/latest/ipcc_scenarios:
     - data://grapher/emissions/2022-08-30/ipcc_scenarios:
       - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
-  #
+
   # EPA - Climate change indicators (frozen). Consumed by climate_change_impacts below.
-  #
   data://garden/epa/2024-04-17/ghg_concentration:
     - data://meadow/epa/2024-04-17/ghg_concentration:
       - snapshot://epa/2024-04-17/co2_concentration.csv
@@ -66,18 +63,17 @@ steps:
   data://garden/epa/2024-04-17/mass_balance_us_glaciers:
     - data://meadow/epa/2024-04-17/mass_balance_us_glaciers:
       - snapshot://epa/2024-04-17/mass_balance_us_glaciers.csv
-  #
+
   # NOAA Climate.gov - Global sea level (frozen). Consumed by climate_change_impacts below.
-  #
   data://garden/climate/2024-01-28/global_sea_level:
     - data://meadow/climate/2024-01-28/global_sea_level:
       - snapshot://climate/2024-01-28/global_sea_level.csv
-  # ===========================================================================
+
+  ##########
   # UPDATEABLE
-  # ===========================================================================
-  #
+  ##########
+
   # Copernicus Climate Change Service - Surface temperature.
-  #
   data://garden/climate/2026-10-12/surface_temperature:
     - data://meadow/climate/2026-10-12/surface_temperature:
       - snapshot://climate/2026-10-12/surface_temperature.zip
@@ -95,17 +91,15 @@ steps:
     - data://garden/climate/2026-10-12/surface_temperature
   data://grapher/climate/2026-10-12/surface_global_monthly_anomaly_all_countries:
     - data://garden/climate/2026-10-12/surface_temperature
-  #
+
   # Copernicus Climate Change Service - Precipitation.
-  #
   data://grapher/climate/2026-10-12/total_precipitation_annual:
     - data://garden/climate/2026-10-12/total_precipitation:
       - data://meadow/climate/2026-10-12/total_precipitation:
         - snapshot://climate/2026-10-12/total_precipitation.zip
         - snapshot://countries/2023-12-27/world_bank.zip
-  #
+
   # Global Wildfire Information System - Weekly wildfires.
-  #
   data://garden/climate/2026-10-12/weekly_wildfires:
     - data://meadow/climate/2026-10-12/weekly_wildfires:
       - snapshot://climate/2026-10-12/weekly_wildfires.csv
@@ -118,9 +112,8 @@ steps:
   data://grapher/climate/2026-10-12/wildfires_by_week_average:
     - data://grapher/climate/2026-10-12/wildfires_by_week:
       - data://garden/climate/2026-10-12/weekly_wildfires
-  #
+
   # Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña
-  #
   data://garden/climate/2026-10-12/sst:
     - data://meadow/climate/2026-10-12/sst:
       - snapshot://climate/2026-10-12/sst.csv
@@ -128,9 +121,8 @@ steps:
     - data://garden/climate/2026-10-12/sst
   data://grapher/climate/2026-10-12/sst_by_month:
     - data://garden/climate/2026-10-12/sst
-  #
+
   # Climate change impacts data explorer.
-  #
   viz://explorer/climate/latest/climate_change:
     # Various sources - Climate change impacts (annual).
     - data://grapher/climate/2026-10-12/climate_change_impacts_annual:
@@ -138,46 +130,39 @@ steps:
     # Various sources - Climate change impacts (monthly).
     - data://grapher/climate/2026-10-12/climate_change_impacts_monthly:
       - data://garden/climate/2026-10-12/climate_change_impacts
-  #
+
   # NASA Ozone Watch - Ozone hole area and concentration.
-  #
   data://grapher/climate/2026-10-12/nasa_ozone_hole:
     - data://garden/climate/2026-10-12/nasa_ozone_hole:
       - data://meadow/climate/2026-10-12/nasa_ozone_hole:
         - snapshot://climate/2026-10-12/nasa_ozone_hole_annual.txt
         - snapshot://climate/2026-10-12/nasa_ozone_hole_extremes.txt
-  #
+
   # NSIDC - Arctic sea ice extent.
-  #
   data://garden/climate/2026-10-12/sea_ice_index:
     - data://meadow/climate/2026-10-12/sea_ice_index:
       - snapshot://climate/2026-10-12/sea_ice_index.xlsx
-  #
+
   # NOAA Global Monitoring Laboratory - GHG concentration.
-  #
   data://garden/climate/2026-10-12/ghg_concentration:
     - data://meadow/climate/2026-10-12/ghg_concentration:
       - snapshot://climate/2026-10-12/co2_concentration_monthly.csv
       - snapshot://climate/2026-10-12/ch4_concentration_monthly.csv
       - snapshot://climate/2026-10-12/n2o_concentration_monthly.csv
-  #
+
   # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
-  #
   data://grapher/climate/2026-10-12/sea_ice_extent_by_decade:
     - data://garden/climate/2026-10-12/sea_ice_index
-  #
+
   # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
-  #
   data://grapher/climate/2026-10-12/sea_ice_anomalies_by_month:
     - data://garden/climate/2026-10-12/sea_ice_index
-  #
+
   # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
-  #
   data://grapher/climate/2026-10-12/sea_ice_extent_by_year:
     - data://garden/climate/2026-10-12/sea_ice_index
-  #
+
   # Various sources - Climate change impacts.
-  #
   data://garden/climate/2026-10-12/climate_change_impacts:
     # Various sources - Long-run greenhouse gas concentration.
     - data://garden/climate/2026-10-12/long_run_ghg_concentration:
@@ -221,9 +206,8 @@ steps:
         - snapshot://climate/2026-10-12/ocean_heat_content_annual_world_700m.csv
         - snapshot://climate/2026-10-12/ocean_heat_content_monthly_world_700m.csv
     - data://garden/climate/2026-10-12/ghg_concentration
-  #
+
   # Global Wildfire Information System - Yearly burned area by type.
-  #
   data://grapher/climate/2026-10-12/yearly_burned_area:
     - data://garden/climate/2026-10-12/yearly_burned_area:
       - data://garden/wb/2026-07-01/income_groups

@@ -3,6 +3,7 @@
 steps:
   data-private://grapher/fasttrack/2022-11-29/ai_index:
     - snapshot-private://fasttrack/2022-11-29/ai_index.csv
+
   # Long-term homicide rates in Europe - Eisner (2014)
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
     - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv

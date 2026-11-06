@@ -21,7 +21,7 @@ views:
         catalogPath: regions#owid_region
     config:
       title: Fertility rate vs. average years of schooling
-      subtitle: The [total fertility rate](#dod:fertility-rate), in a given year. Before 2015, the share without education are based on estimates; from 2015 onwards, they are based on projections.
+      subtitle: The [total fertility rate](#dod:fertility-rate), in a given year. Average years of schooling are estimates before 2015 and projections from 2015 onwards.
       originUrl: /fertility-rate
       chartTypes:
         - ScatterPlot
