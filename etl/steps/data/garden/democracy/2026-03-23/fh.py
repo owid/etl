@@ -12,7 +12,7 @@ from etl.steps.data.garden.democracy.shared import (
     add_imputes,
     add_population_in_dummies,
     add_regions_and_global_aggregates,
-    codes_to_ordinal,
+    codes_to_categories,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -63,6 +63,9 @@ LABELS = {
         1: "Partly free",
         2: "Free",
     },
+}
+# Categories with no ranking, stored as plain categorical indicators.
+LABELS_UNORDERED = {
     "electdem": {
         0: "No",
         1: "Yes",
@@ -123,7 +126,8 @@ def run() -> None:
     # Store categorical indicators as text. Done after the regional aggregates, which use the numeric codes. The numeric
     # regime score is kept for the chart that compares the classifications of several sources.
     tb["regime_score"] = tb["regime"].copy()
-    tb = codes_to_ordinal(tb, LABELS)
+    tb = codes_to_categories(tb, LABELS)
+    tb = codes_to_categories(tb, LABELS_UNORDERED, ordered=False)
 
     # Table list
     tables = [

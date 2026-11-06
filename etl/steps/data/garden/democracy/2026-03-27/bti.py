@@ -9,7 +9,7 @@ from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_population_in_dummies,
     add_regions_and_global_aggregates,
-    codes_to_ordinal,
+    codes_to_categories,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -88,7 +88,7 @@ def run() -> None:
     # Store categorical indicators as text. Done after the aggregates, which use the numeric codes. The numeric regime
     # score is kept for the chart that compares the classifications of several sources.
     tb["regime_bti_score"] = tb["regime_bti"].copy()
-    tb = codes_to_ordinal(tb, LABELS)
+    tb = codes_to_categories(tb, LABELS)
 
     #
     # Save outputs.

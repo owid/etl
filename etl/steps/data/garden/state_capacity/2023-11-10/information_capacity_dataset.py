@@ -119,7 +119,7 @@ def add_new_indicators(tb: Table) -> Table:
 
 
 def dummies_to_no_yes(tb: Table, columns: list[str]) -> Table:
-    """Replace the 0/1 values of dummy indicators with "No"/"Yes", as an ordered category."""
+    """Replace the 0/1 values of dummy indicators with "No"/"Yes", as a categorical indicator (`sort` is ignored by Grapher)."""
     labels = {0: "No", 1: "Yes"}
     for column in columns:
         unknown = set(tb[column].dropna().unique()) - set(labels)
@@ -127,7 +127,7 @@ def dummies_to_no_yes(tb: Table, columns: list[str]) -> Table:
         metadata = tb[column].metadata
         tb[column] = tb[column].map(labels).astype("category")
         tb[column].metadata = metadata
-        tb[column].metadata.type = "ordinal"
+        tb[column].metadata.type = "string"
         tb[column].metadata.sort = list(labels.values())
     return tb
 

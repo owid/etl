@@ -490,12 +490,16 @@ def add_imputes(
     return tb_
 
 
-def codes_to_ordinal(tb: Table, labels: dict[str, dict[int, str]]) -> Table:
+def codes_to_categories(tb: Table, labels: dict[str, dict[int, str]], ordered: bool = True) -> Table:
     """Replace the numeric codes of categorical indicators with their labels.
 
-    Grapher's Swimlane chart only shows indicators stored as text, so each column becomes an
-    ordinal indicator whose `sort` follows the order of `labels`, e.g.
+    Grapher's Swimlane chart only shows indicators stored as text, e.g.
     `{"regime_row_owid": {0: "Closed autocracy", 1: "Electoral autocracy", ...}}`.
+
+    With `ordered=True`, each column becomes an ordinal indicator (a ranked scale, shown with a single color strip as
+    legend). With `ordered=False`, it becomes a plain categorical one (`type: string`, shown with one swatch per
+    category), for categories with no ranking, such as No/Yes. Either way, `sort` keeps the order of `labels`, but
+    Grapher only uses it for ordinal indicators, and lists categorical ones alphabetically.
     """
     for column, column_labels in labels.items():
         unknown = set(tb[column].dropna().unique()) - set(column_labels)
@@ -503,6 +507,6 @@ def codes_to_ordinal(tb: Table, labels: dict[str, dict[int, str]]) -> Table:
         metadata = tb[column].metadata
         tb[column] = tb[column].map(column_labels).astype("category")
         tb[column].metadata = metadata
-        tb[column].metadata.type = "ordinal"
+        tb[column].metadata.type = "ordinal" if ordered else "string"
         tb[column].metadata.sort = list(column_labels.values())
     return tb

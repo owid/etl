@@ -18,7 +18,7 @@ import vdem_refine as refine  # VDEM's imputing library
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
-from etl.steps.data.garden.democracy.shared import codes_to_ordinal
+from etl.steps.data.garden.democracy.shared import codes_to_categories
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -111,11 +111,14 @@ LABELS_UNI = {
         8: "Liberal, leaning electoral democracy",
         9: "Liberal democracy",
     },
+}
+# Categories with no ranking, stored as plain categorical indicators.
+LABELS_UNI_UNORDERED = {
     "wom_hog_vdem": LABELS_GENDER,
     "wom_hos_vdem": LABELS_GENDER,
     "wom_hoe_vdem": LABELS_GENDER,
 }
-LABELS_MULTI = {
+LABELS_MULTI_UNORDERED = {
     column: LABELS_NO_YES
     for column in [
         "accessjust_m_row",
@@ -191,8 +194,9 @@ def run() -> None:
     # that compares the classifications of several sources on a common 0-1 scale.
     paths.log.info("4C/ Storing categorical indicators as text...")
     tb_uni_without_regions["regime_row_owid_score"] = tb_uni_without_regions["regime_row_owid"].copy()
-    tb_uni_without_regions = codes_to_ordinal(tb_uni_without_regions, LABELS_UNI)
-    tb_multi_without_regions = codes_to_ordinal(tb_multi_without_regions, LABELS_MULTI)
+    tb_uni_without_regions = codes_to_categories(tb_uni_without_regions, LABELS_UNI)
+    tb_uni_without_regions = codes_to_categories(tb_uni_without_regions, LABELS_UNI_UNORDERED, ordered=False)
+    tb_multi_without_regions = codes_to_categories(tb_multi_without_regions, LABELS_MULTI_UNORDERED, ordered=False)
 
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")

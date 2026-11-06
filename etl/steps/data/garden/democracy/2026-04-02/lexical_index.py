@@ -14,7 +14,7 @@ from etl.steps.data.garden.democracy.shared import (
     add_imputes,
     add_population_in_dummies,
     add_regions_and_global_aggregates,
-    codes_to_ordinal,
+    codes_to_categories,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -62,6 +62,9 @@ LABELS = {
         1: "Broad voting rights for men",
         2: "Universal voting rights",
     },
+}
+# Categories with no ranking, stored as plain categorical indicators.
+LABELS_UNORDERED = {
     **{
         column: LABELS_NO_YES
         for column in [
@@ -212,7 +215,8 @@ def run() -> None:
     # Store categorical indicators as text. Done after the regional aggregates, which count countries by numeric
     # code. The numeric regime score is kept for the chart that compares the classifications of several sources.
     tb["regime_lied_score"] = tb["regime_lied"].copy()
-    tb = codes_to_ordinal(tb, LABELS)
+    tb = codes_to_categories(tb, LABELS)
+    tb = codes_to_categories(tb, LABELS_UNORDERED, ordered=False)
 
     # Format
     tb = tb.format(["country", "year"])
