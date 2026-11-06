@@ -180,8 +180,8 @@ tables:
         title: Regime
         unit: ""
         description_short: |-
-          Political regime of a country. It distinguishes between authoritarian regimes (score 0), hybrid regimes (score 1), flawed democracies (score 2), and full democracies (score 3).
-        description_key:
+          Political regime of a country. It distinguishes between authoritarian regimes, hybrid regimes, flawed democracies, and full democracies.
+        description_key: &regime_eiu_key
           - Full democracies have comprehensive democratic features, with a high extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf.
           - Flawed democracies have some weaknesses in democratic institutions and culture.
           - Hybrid regimes have serious weaknesses in democratic institutions and culture.
@@ -190,37 +190,30 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
-            note: The Chart tab uses numeric values, ranging from 3 for full democracies to 0 for authoritarian regimes.
             chartTypes:
-              - LineChart
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 3
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_regime
-              binningStrategy: manual
-              customNumericColors:
-                - "#f88a50"
-                - "#feeea5"
-                - "#c7e7f1"
-                - "#5e94c4"
-              customNumericLabels:
-                - Authoritarian regime
-                - Hybrid regime
-                - Flawed democracy
-                - Full democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-              customNumericColorsActive: true
+              customCategoryColors:
+                Authoritarian regime: "#f88a50"
+                Hybrid regime: "#feeea5"
+                Flawed democracy: "#c7e7f1"
+                Full democracy: "#5e94c4"
             map:
               colorScale: *color_regime
-              tooltipUseCustomLabels: true
+
+      regime_eiu_score:
+        title: Regime (score)
+        unit: ""
+        description_short: |-
+          Political regime of a country. It distinguishes between authoritarian regimes (0), hybrid regimes (1), flawed democracies (2), and full democracies (3).
+        description_key: *regime_eiu_key
+        presentation:
+          title_public: Regime
+          title_variant: score
+        display:
+          numDecimalPlaces: 0
 
   num_countries:
     common:

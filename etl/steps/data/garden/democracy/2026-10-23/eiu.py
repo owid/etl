@@ -9,6 +9,7 @@ from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_population_in_dummies,
     add_regions_and_global_aggregates,
+    codes_to_categories,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -37,6 +38,16 @@ COLUMNS_CATEGORIES = ["elect_freefair_eiu", "funct_gov_eiu", "pol_part_eiu", "de
 NUM_COUNTRIES_MIN = 167
 # Tolerance when comparing the overall score with the average of the category scores (both are rounded to 2 decimals).
 TOLERANCE_AVERAGE = 0.01
+# Labels of the regime classification, in order. It is stored as text, so the Swimlane chart can show it.
+# NOTE: On each update, check that the codes from `add_regime_identifier` still mean the regimes labeled here.
+LABELS = {
+    "regime_eiu": {
+        0: "Authoritarian regime",
+        1: "Hybrid regime",
+        2: "Flawed democracy",
+        3: "Full democracy",
+    },
+}
 
 
 def run() -> None:
@@ -82,6 +93,11 @@ def run() -> None:
 
     # Add regions to main table
     tb = concat([tb, tb_avg_countries, tb_avg_w_countries], ignore_index=True)
+
+    # Store the regime as text, so the Swimlane chart can show it. Done after the aggregates, which use the numeric
+    # codes. The numeric score is kept for the chart that compares the classifications of several sources.
+    tb["regime_eiu_score"] = tb["regime_eiu"].astype("Int64").copy_metadata(tb["regime_eiu"])
+    tb = codes_to_categories(tb, LABELS)
 
     #
     # Save outputs.
