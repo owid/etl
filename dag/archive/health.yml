@@ -1280,3 +1280,7 @@ steps:
   data://grapher/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
       - data://garden/who/2026-10-13/mortality_database
+  # archived; last active in c152552c3996 on 2026-11-06
+  data://garden/cdc/2025-01-26/measles_state_level:
+    - data://meadow/cdc/2025-01-26/measles_state_level:
+      - snapshot://cdc/2025-01-26/measles_state_level.txt
