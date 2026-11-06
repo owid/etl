@@ -91,9 +91,15 @@ PRIMARY_ENERGY_COLUMNS = {
 HISTORICAL_EMISSIONS_COLUMNS = {
     "country": "country",
     "year": "year",
-    # Global fossil emissions are used only for sanity checks.
+    # Global fossil emissions are used only for sanity checks and for the projection of the current year.
     "global_fossil_emissions": "global_fossil_emissions",
     "global_land_use_change_emissions": "global_emissions_from_land_use_change",
+}
+
+# Projected World emissions: column in the main table, and column of historical emissions data that has the projection.
+PROJECTED_EMISSIONS_COLUMNS = {
+    "emissions_total": "global_fossil_emissions",
+    "emissions_from_land_use_change": "global_emissions_from_land_use_change",
 }
 
 # Columns to use from consumption-based emissions data and how to rename them.
@@ -947,6 +953,37 @@ def combine_data_and_add_variables(
     return tb_co2_with_regions
 
 
+def add_projected_emissions(tb_combined: Table, tb_historical: Table) -> Table:
+    # The global data file has a projection for the year after the latest year of observed data.
+    tb_world = tb_combined[tb_combined["country"] == "World"].set_index("year")
+    latest_year = tb_world["emissions_total"].dropna().index.max()
+    projection_year = latest_year + 1
+    error = "Expected the global data file to end one year after the latest year of observed data."
+    assert tb_historical["year"].max() == projection_year, error
+
+    # Each projected column also has the latest observed value, so that charts connect the projection to the observed data.
+    tb_projected = tb_historical[tb_historical["year"].isin([latest_year, projection_year])][
+        ["country", "year"] + list(PROJECTED_EMISSIONS_COLUMNS.values())
+    ].reset_index(drop=True)
+    for observed_column, historical_column in PROJECTED_EMISSIONS_COLUMNS.items():
+        observed_value = tb_world.loc[latest_year, observed_column]
+        historical_value = tb_projected.loc[tb_projected["year"] == latest_year, historical_column].item()
+        # Check that the projection is on the same basis as the observed data.
+        error = f"Global data file and main table disagree on {observed_column} for the World in {latest_year}."
+        assert abs(historical_value - observed_value) / abs(observed_value) < 1e-4, error
+        tb_projected.loc[tb_projected["year"] == latest_year, historical_column] = observed_value
+        error = f"Projection of {observed_column} for the World is missing."
+        assert tb_projected[historical_column].notnull().all(), error
+    tb_projected = tb_projected.rename(
+        columns={historical: f"projected_{observed}" for observed, historical in PROJECTED_EMISSIONS_COLUMNS.items()},
+        errors="raise",
+    )
+
+    tb_combined = pr.merge(tb_combined, tb_projected, on=["country", "year"], how="outer")
+
+    return tb_combined
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -1057,6 +1094,9 @@ def run() -> None:
     tb_combined.loc[(tb_combined["year"] < 1990), "emissions_from_other_industry_as_share_of_global"] = None
     tb_combined.loc[(tb_combined["year"] < 1990), "cumulative_emissions_from_other_industry_as_share_of_global"] = None
     ####################################################################################################################
+
+    # Add World emissions projected for the current year.
+    tb_combined = add_projected_emissions(tb_combined=tb_combined, tb_historical=tb_historical)
 
     # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
     tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)

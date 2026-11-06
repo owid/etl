@@ -1260,6 +1260,20 @@ tables:
         unit: "terawatt-hours"
         short_unit: "TWh"
         description_short: "Primary energy consumption, measured in terawatt-hours per year."
+      projected_emissions_from_land_use_change:
+        title: "Projected annual CO₂ emissions from land-use change"
+        unit: "tonnes"
+        short_unit: "t"
+        description_short: "Projected annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes."
+        display:
+          isProjection: true
+      projected_emissions_total:
+        title: "Projected annual CO₂ emissions"
+        unit: "tonnes"
+        short_unit: "t"
+        description_short: "Projected annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes."
+        display:
+          isProjection: true
       traded_emissions:
         title: "Annual CO₂ emissions embedded in trade"
         unit: "tonnes"
