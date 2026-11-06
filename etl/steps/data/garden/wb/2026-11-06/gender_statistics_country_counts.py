@@ -199,46 +199,45 @@ def sanity_check_inputs(indicators_for_sums: list) -> None:
     )
 
 
+# How each answer to a yes/no question is labeled in titles and legends.
+STATUS_LABELS = {"yes": "Yes", "no": "No", "missing": "No data"}
+
+
 def add_metadata_for_aggregated_columns(
     column_title: str, description_from_producer: str, status: str, count_or_pop: str, origins
 ) -> VariableMeta:
-    # Remove the unwanted part "(1=yes; 0=no)" from the column_title
-    clean_column_title = column_title.replace(" (1=yes; 0=no)", "")
+    """Build the metadata of the number of countries (or of people living in them) with a given answer to a question."""
+    assert count_or_pop in ("count", "pop"), f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}."
+    statement = column_title.replace(" (1=yes; 0=no)", "")
+    label = STATUS_LABELS[status]
+
+    if status == "missing":
+        countries = f"countries for which Women, Business and the Law has no data on: “{statement}”"
+    else:
+        countries = f"countries where Women, Business and the Law answers “{status}” to: “{statement}”"
 
     if count_or_pop == "count":
-        meta = VariableMeta(
-            title=f"{column_title} - {status.capitalize()} (Count)",
-            description_short=f"Number of countries with the status '{status}' for \"{clean_column_title}\".",
-            description_from_producer=description_from_producer,
-            unit="countries",
-            short_unit="",
-            sort=[],
-            origins=origins,
-        )
-        meta.display = {
-            "name": meta.title,
-            "numDecimalPlaces": 0,
-            "tolerance": 0,
-        }
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-    elif count_or_pop == "pop":
-        meta = VariableMeta(
-            title=f"{column_title} - {status.capitalize()} (Population)",
-            description_short=f"Population of countries with the status '{status}' for \"{clean_column_title}\".",
-            description_from_producer=description_from_producer,
-            unit="people",
-            short_unit="",
-            sort=[],
-            origins=origins,
-        )
-        meta.display = {
-            "name": meta.title,
-            "numDecimalPlaces": 0,
-            "tolerance": 0,
-        }
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
+        title = f"{statement}: number of countries ({label.lower()})"
+        description_short = f"Number of {countries}."
+        unit = "countries"
     else:
-        paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
+        title = f"{statement}: population of countries ({label.lower()})"
+        description_short = f"Number of people living in {countries}."
+        if status == "missing":
+            # The missing population also includes countries that Women, Business and the Law does not cover.
+            description_short = description_short[:-1] + ", including countries it does not cover."
+        unit = "people"
 
-    return meta  # ty: ignore
+    meta = VariableMeta(
+        title=title,
+        description_short=description_short,
+        description_from_producer=description_from_producer,
+        unit=unit,
+        short_unit="",
+        sort=[],
+        origins=origins,
+    )
+    meta.display = {"name": label, "numDecimalPlaces": 0, "tolerance": 0}
+    meta.presentation = VariablePresentationMeta(title_public=title)
+
+    return meta

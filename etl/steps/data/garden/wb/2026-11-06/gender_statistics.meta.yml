@@ -2,16 +2,29 @@
 definitions:
   common:
     presentation:
+
       topic_tags:
         - Women's Rights
         - Global Education
 
-  desc_standardized_assumptions: &desc_standardized_assumptions
-    - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups.
-  desc_law_enforcement: &desc_law_enforcement
-    - Having a law does not mean it is enforced or effective in practice.
   wbl_description_processing: |-
-    The World Bank's Gender Statistics no longer includes this indicator, so we take it directly from the Women, Business and the Law (WBL) website: the historical data for 1971 to 2024, and the latest report recalculated by the World Bank under the original WBL framework. Each WBL report describes the laws in force on October 1 of the year before the report is published, so we show each report's data in that earlier year, as Gender Statistics did. For example, the 2026 report is shown as 2025. The World Bank has not published data under the original framework for the 2025 report year, so there is no data point for 2024.
+    The World Bank’s Gender Statistics no longer includes this indicator, so we take it directly from the historical data on the Women, Business and the Law (WBL) website, which covers the report years 1971 to 2024. Each WBL report describes the laws in force in the year before it is published (on October 1, in recent reports), so we show each report’s data in that earlier year, as Gender Statistics did. For example, the 2024 report is shown as 2023.
+  wbl_description_processing_averages: |-
+    For the world, World Bank income groups, and five World Bank regions, we calculate the simple average of the scores of the countries in each group, as the World Bank does. We use each country’s latest classification for all years. In this data, the World Bank groups high-income members of the Organization for Economic Co-operation and Development (OECD) separately, so its regions do not include them.
+  note_wbl_maps: |-
+    This data reflects laws as written, not how they are enforced. It covers the laws that apply to a woman living in the country’s main business city, so laws elsewhere in the country may differ. Where different groups of women follow different religious or family laws, it covers the largest group.
+  description_key_wbl_as_written: |-
+    Women, Business and the Law measures laws as written, not how they are enforced in practice.
+  description_key_wbl_assumptions: |-
+    To make countries comparable, Women, Business and the Law makes the same assumptions everywhere. For example, it looks at the laws that apply to a woman living in the country’s main business city, so laws elsewhere in the country may differ. Where different groups of women follow different religious or family laws, it covers the largest group.
+  description_key_wbl_leave_assumptions: |-
+    Women, Business and the Law looks at the leave available for the birth of a first child, born without complications, to parents who have worked long enough to qualify for leave benefits.
+  description_key_wbl_shared_leave: |-
+    Shared parental leave is counted in full in both the mother’s and the father’s totals, because either parent can take it. A couple cannot take both totals in full.
+  description_key_ilo_modeled: |-
+    These are modeled estimates from the International Labour Organization (ILO). Where countries have not reported data, the ILO fills the gaps with statistical models, so these values are more uncertain than reported ones.
+  description_key_dhs: |-
+    The data come from the Demographic and Health Surveys (DHS), which interview a sample of households in each country. Surveys are carried out only in some years, so there are gaps between data points.
   wbl_limitations: |-
     **Limitations and exceptions:** The Women, Business and the Law methodology has limitations that should be considered when interpreting the data. All eight indicators are based on standardized assumptions to ensure comparability across economies. Comparability is one of the strengths of the data, but the assumptions can also be limitations as they may not capture all restrictions or represent all particularities in a country. It is assumed that the woman resides in the economy's main business city. In federal economies, laws affecting women can vary by state or province. Even in nonfederal economies, women in rural areas and small towns could face more restrictive local legislation. Such restrictions are not captured by Women, Business and the Law unless they are also found in the main business city. The woman has reached the legal age of majority and is capable of making decisions as an adult, is in good health and has no criminal record. She is a lawful citizen of the economy being examined, and she works as a cashier in the food retail sector in a supermarket or grocery store that has 60 employees. She is a cisgender, heterosexual woman in a monogamous first marriage registered with the appropriate authorities (de facto marriages and customary unions are not measured), she is of the same religion as her husband, and is in a marriage under the rules of the default marital property regime, or the most common regime for that jurisdiction, which will not change during the course of the marriage. She is not a member of a union, unless membership is mandatory. Membership is considered mandatory when collective bargaining agreements cover more than 50 percent of the workforce in the food retail sector and when they apply to individuals who were not party to the original collective bargaining agreement. Where personal law prescribes different rights and obligations for different groups of women, the data focus on the most populous group, which may mean that restrictions that apply only to minority populations are missed. Women, Business and the Law focuses solely on the ways in which the formal legal and regulatory environment determines whether women can work or open their own businesses. The data set is constructed using laws and regulations that are codified (de jure) and currently in force, therefore implementation of laws (de facto) is not measured. The data looks only at laws that apply to the private sector. These assumptions can limit the representativeness of the data for the entire population in each country. Finally, Women, Business and the Law recognizes that the laws it measures do not apply to all women in the same way. Women face intersectional forms of discrimination based on gender, sex, sexuality, race, gender identity, religion, family status, ethnicity, nationality, disability, and a myriad of other grounds. Women, Business and the Law therefore encourages readers to interpret the data in conjunction with other available research.
 
@@ -19,13 +32,12 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Tuna Acisu
     - Edouard Mathieu
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   gender_statistics:
     # Learn more about the available fields:
@@ -33,6 +45,19 @@ tables:
     variables:
 
       total_maternity_leave_to:
+        title: Paid leave reserved for mothers
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid leave that only the mother can take for the birth of a child: maternity leave plus any parental leave reserved for her.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
+        description_processing: |-
+          We add up two Women, Business and the Law indicators: the length of paid maternity leave and the length of paid parental leave for the mother.
+
+          {definitions.wbl_description_processing}
         description_from_producer: |-
           **This indicator is a sum of 2 different leave indicators provided by the World Bank:**
 
@@ -41,21 +66,24 @@ tables:
           The indicator 'Length of paid parental leave for mother (calendar days)' is described by the World Bank as: The indicator refers to days of parental leave reserved specifically for mothers—through “use-it-or-lose-it” policies or mothers’ quotas; or days of parental leave that employees are individually entitled to.
 
           {definitions.wbl_limitations}
-        title: Total days of leave available to the mother
-        unit: days
-        short_unit: ''
-        description_processing: This indicator was created by Our World in Data by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**.
-        description_key:
-          - This indicator is created by combining two specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to mothers in relation to childbirth and early childcare.
-          - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers around the time of childbirth. This includes the days taken just before, during, and immediately after giving birth. The primary focus of this leave is on the mother's recovery and the essential bonding time with the newborn. It's a critical period that supports the mother's health and wellbeing, as well as the initial development of the child.
-          - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by "use-it-or-lose-it" policies or mothers’ quotas. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period. It ensures that mothers have dedicated time for child-rearing and recovery, which cannot be transferred to fathers. This acknowledges the unique needs of mothers in the postnatal period and supports their role in early childcare.
-          - The sum of these components reflects the total days of leave available specifically for the mother, emphasizing the support for maternal health and well-being.
-          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
 
       total_paternity_leave_to:
+        title: Paid leave reserved for fathers
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid leave that only the father can take for the birth of a child: paternity leave plus any parental leave reserved for him.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
+        description_processing: |-
+          We add up two Women, Business and the Law indicators: the length of paid paternity leave and the length of paid parental leave for the father.
+
+          {definitions.wbl_description_processing}
         description_from_producer: |-
           **This indicator is a sum of 2 different leave indicators provided by the World Bank:**
 
@@ -64,21 +92,26 @@ tables:
           The indicator 'Length of paid paternity leave (calendar days)' is described by the World Bank as: The indicator refers to leave available only to the father for the birth of a child.
 
           {definitions.wbl_limitations}
-        title: Total days of leave available to the father
-        unit: days
-        short_unit: ''
-        description_processing: This indicator was created by Our World in Data by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
-        description_key:
-          - This indicator is created by combining two specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to fathers in relation to childbirth and early childcare.
-          - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the father's engagement during the early stages of a child's life.
-          - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas. This part of the indicator represents additional support provided to fathers, extending beyond the traditional paternity leave period. It ensures that fathers have dedicated time for child-rearing, promoting their active involvement in early childcare and supporting gender equality in parental responsibilities.
-          - The sum of these components reflects the total days of leave available specifically for the father, highlighting the support for paternal involvement and gender equality in parenting.
-          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
 
       total_maternity_leave_for:
+        title: Paid leave available to mothers, including shared parental leave
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid leave a mother can take for the birth of a child: maternity leave, parental leave reserved for her, and parental leave the parents can share as they choose.
+        description_key: |-
+          {definitions.description_key_wbl_shared_leave}
+
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
+        description_processing: |-
+          We add up three Women, Business and the Law indicators: the length of paid maternity leave, of paid parental leave for the mother, and of paid shared parental leave.
+
+          {definitions.wbl_description_processing}
         description_from_producer: |-
           **This indicator is a sum of 3 different leave indicators provided by the World Bank:**
 
@@ -89,22 +122,26 @@ tables:
           The indicator 'Length of paid shared parental leave (calendar days)' is described by the World Bank as: The indicator refers to parental leave that can be shared amongst the parents as they choose. Parental leave refers to leave available equally to parents—regardless of gender—for the purpose of childcare immediately following maternity and paternity leave OR instead of maternity and paternity leave.
 
           {definitions.wbl_limitations}
-        title: Total days of leave available for the mother
-        unit: days
-        short_unit: ''
-        description_processing: This indicator was created by Our World in Data by combining maternity leave, parental leave mother quota and shared parental leave indicators. For more details on each indicator see **How producer describes this data**.
-        description_key:
-          - This indicator is created by combining three specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to mothers in relation to childbirth and early childcare.
-          - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers at the time of childbirth. This includes the days available exclusively to mothers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the mother's engagement during the early stages of a child's life.
-          - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by policies that support gender equality in parental responsibilities. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period.
-          - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
-          - By integrating these components, the indicator provides a total count of the calendar days of leave available to mothers.
-          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
 
       total_paternity_leave_for:
+        title: Paid leave available to fathers, including shared parental leave
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid leave a father can take for the birth of a child: paternity leave, parental leave reserved for him, and parental leave the parents can share as they choose.
+        description_key: |-
+          {definitions.description_key_wbl_shared_leave}
+
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
+        description_processing: |-
+          We add up three Women, Business and the Law indicators: the length of paid paternity leave, of paid parental leave for the father, and of paid shared parental leave.
+
+          {definitions.wbl_description_processing}
         description_from_producer: |-
           **This indicator is a sum of 3 different leave indicators provided by the World Bank:**
 
@@ -115,64 +152,64 @@ tables:
           The indicator 'Length of paid shared parental leave (calendar days)' is described by the World Bank as: The indicator refers to parental leave that can be shared amongst the parents as they choose. Parental leave refers to leave available equally to parents—regardless of gender—for the purpose of childcare immediately following maternity and paternity leave OR instead of maternity and paternity leave.
 
           {definitions.wbl_limitations}
-        title: Total days of leave available for the father
-        unit: days
-        short_unit: ''
-        description_processing: This indicator was created by Our World in Data by combining paternity leave, parental leave father quota and shared parental leave indicators. For more details on each indicator see **How producer describes this data**.
-        description_key:
-          - This indicator is created by combining three specific types of parental leave. These components, together, provide a detailed understanding of the total leave available for the fathers in relation to childbirth and early childcare.
-          - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare.
-          - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas.
-          - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
-          - By integrating these components, the indicator provides a total count of the calendar days of leave available for fathers.
-          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
 
       sl_agr_empl_zs:
-        title: Share of people employed in agricultural sector
-        description_short: The share of people employed in agriculture includes working-age people with a job in farming, forestry, fishing, and related activities, including those temporarily absent.
-        description_key:
-          - This measures the percentage of all workers who are employed in agriculture.
-          - Agriculture includes farming, forestry, fishing, and related activities.
-          - People are counted even if they are temporarily absent from work due to sickness, leave, or seasonal factors.
+        title: Share of employment in agriculture
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of all workers who work in agriculture, hunting, forestry, or fishing.
+        description_key: |-
+          The International Labour Organization (ILO) counts people as employed if they are of working age and did any work for pay or profit, including people temporarily away from their job, for example because of illness or leave.
+
+          Countries define and measure employment in different ways, for example in how they count self-employed people and unpaid family workers. Where a country’s data cover only employees, or only urban areas, the share of people working in agriculture can be too low.
+
+          {definitions.description_key_ilo_modeled}
         display:
           numDecimalPlaces: 1
           tolerance: 5
 
       sg_own_ldal_ma_zs:
         title: Share of men who own land alone
-        description_short: Share of men aged 15–49 with land registered in their name or requiring their signature to sell.
-        description_key:
-          - This measures the proportion of men aged 15–49 who are the sole owners of land.
-          - Sole ownership means the land is legally registered in their name or cannot be sold without their approval.
-          - Land ownership gives men economic security and influence within households and communities.
-          - The indicator does not include land held jointly with others.
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of men who own land on their own, without sharing ownership with anyone.
+        description_key: |-
+          In this data, a man owns land if it is legally registered in his name or, where there are no official property records, if it is recognized as his and can’t be sold without his signature. Land includes both farmland and other land.
+
+          Men who own some land alone and some jointly with others are not counted here.
+
+          {definitions.description_key_dhs}
         display:
           numDecimalPlaces: 1
           tolerance: 10
 
       sg_own_ldal_fe_zs:
         title: Share of women who own land alone
-        description_short: Share of women aged 15–49 with land registered in their name or requiring their signature to sell.
-        description_key:
-          - This measures the proportion of women aged 15–49 who are the sole owners of land.
-          - Sole ownership means the land is legally registered in their name or cannot be sold without their approval.
-          - Land ownership gives women economic security and a stronger role in decision-making.
-          - Women often face barriers to ownership due to inheritance laws, marital rules, or social customs.
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of women aged 15 to 49 who own land on their own, without sharing ownership with anyone.
+        description_key: |-
+          In this data, a woman owns land if it is legally registered in her name or, where there are no official property records, if it is recognized as hers and can’t be sold without her signature. Land includes both farmland and other land.
+
+          Women who own some land alone and some jointly with others are not counted here.
+
+          {definitions.description_key_dhs}
         display:
           numDecimalPlaces: 1
           tolerance: 10
 
       sg_leg_dvaw:
-        short_unit: ""
+        title: There is legislation specifically addressing domestic violence
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if a law on domestic violence sets criminal penalties or provides protection orders for victims. They score “no” if there is no such law, if it provides neither penalties nor protection orders, or if it protects only some groups of women or family members. A law that only raises the penalties for general crimes committed within the family also scores “no”.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -183,36 +220,36 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: There is legislation specifically addressing domestic violence
-        description_short: The law on domestic violence may punish offenders, provide protection orders for victims, or address harassment that causes physical or mental harm.
-        description_key:
-          - Domestic violence includes physical, sexual, psychological, and economic abuse in families or intimate relationships.
-          - The indicator measures whether legislation specifically addresses domestic violence.
-          - The answer is "yes" if the law explicitly covers all forms of domestic violence, includes criminal sanctions or protection orders, and criminalizes marital rape or allows a wife to file a complaint.
-          - The answer is "no" if there is no such legislation, if the law omits one or more forms of domestic violence, lacks sanctions or protection orders, protects only certain women or family members, does not criminalize marital rape, or only increases penalties for general crimes when committed within families.
-          - In the absence of such laws, survivors usually have only limited protection under general criminal law.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Is there a law specifically on domestic violence?
+            subtitle: |-
+              This map shows countries where a law specifically on domestic violence sets criminal penalties for it or lets victims get protection orders.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       ic_frm_femm_zs:
         title: Share of firms with a female top manager
-        description_short: Top manager refers to the highest ranking manager or CEO of the establishment. This may be the owner if she works as the manager of the firm.
-        description_key:
-          - This measures the percentage of firms where the top manager is a woman.
-          - The top manager is usually the CEO or highest-ranking executive, but may also be the owner if she manages the firm.
-          - Female leadership is important for gender equality in business and decision-making.
         unit: "% of firms"
         short_unit: "%"
+        description_short: |-
+          “Top manager” refers to the highest-ranking manager or chief executive officer of the organization. This may be the owner if she works as the manager of the firm.
+        presentation:
+          grapher_config:
+            subtitle: |-
+              “Top manager” refers to the highest-ranking manager or chief executive officer of the organization. This may be the owner if she works as the manager of the firm.
         display:
-          numDecimalPlaces: 1
+          roundingMode: significantFigures
+          numSignificantFigures: 2
           tolerance: 5
 
       sg_law_obhb_mr_no:
-        short_unit: ""
+        title: Married women are not required by law to obey their husbands
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score 1 if the law has no provision requiring a married woman to obey her husband. They score 0 if any provision says she must obey him, or if disobeying him has legal consequences for her, such as losing her right to financial support from him.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -223,39 +260,33 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Married women are not required by law to obey their husbands
-        description_short: This indicator captures whether family law includes any provision requiring a married woman to obey her husband or penalizing her for disobedience, such as loss of maintenance rights.
-        description_key:
-          - Family law in some countries includes provisions requiring married women to obey their husbands, often rooted in traditional or religious legal frameworks.
-          - This indicator measures whether national family law includes any legal obligation for married women to obey their husbands.
-          - The answer is "yes" (women are not required to obey) if family law treats spouses as equals without requiring obedience from either party.
-          - The answer is "no" (women are required to obey) if family law explicitly requires wives to obey husbands or imposes legal penalties for disobedience, such as loss of maintenance rights or other consequences.
-          - Such provisions restrict women's autonomy, reinforce unequal treatment within marriage, and can limit women's ability to make independent decisions.
-          - If such provisions exist, they restrict women’s autonomy and reinforce unequal treatment within marriage.
-          - Disobedience can carry legal consequences, such as loss of the right to maintenance.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Are married women required by law to obey their husbands?
+            subtitle: |-
+              This map shows countries where the law requires married women to obey their husbands, or punishes them for disobeying, for example by taking away their right to financial support from their husband.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_gen_mnst_zs:
         title: Share of women in ministerial positions
-        description_short: Deputy prime ministers and prime ministers or heads of government that hold ministerial portfolios are included, vice-presidents and heads of governmental or public agencies are excluded.
-        description_key:
-          - This measures the percentage of ministerial positions held by women.
-          - It includes deputy prime ministers and prime ministers if they also hold a ministerial role.
-          - It excludes vice-presidents and leaders of public agencies that are not part of the cabinet.
-          - A higher share indicates greater representation of women in senior government positions.
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of government ministers who are women.
+        description_key: |-
+          Deputy prime ministers count as ministers. Prime ministers and other heads of government count only if they also run a ministry. Vice-presidents and heads of government agencies are not counted.
         display:
           numDecimalPlaces: 1
           tolerance: 5
 
       sg_law_nodc_hr:
-        short_unit: ""
+        title: Law prohibits discrimination in employment based on gender
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law bans employers from discriminating based on sex or gender, or requires equal treatment of women and men at work. They score “no” if there is no such law, or if it covers only one part of employment, such as pay or dismissal.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -266,22 +297,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Employment discrimination based on gender prohibited
-        description_short: The law prohibits employers from discriminating based on sex or gender, or mandates equal treatment of women and men in employment.
-        description_key:
-          - This indicator records whether national laws prohibit gender-based discrimination in employment.
-          - Such laws may cover hiring, pay, promotion, and conditions of work.
-          - A “yes” means the law requires equal treatment of women and men at work.
-          - Without such protections, women and men may face unequal opportunities in the labor market.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Does the law ban gender discrimination in employment?
+            subtitle: |-
+              This map shows countries where the law bans employers from discriminating against workers based on their sex or gender, or requires them to treat women and men equally.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_get_jobs_eq:
-        short_unit: ""
+        title: Women can get a job in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women getting a job or working in a trade or profession. They score “no” if a husband can stop his wife from working, if women need permission or documents that men don’t, or if a woman working counts as disobeying her husband, with legal consequences such as losing her right to financial support from him.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -292,22 +322,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women can get a job in the same way as men
-        description_short: Husbands cannot prevent their wives from working, women don't need more permissions or additional documentation to work relative to men, and their work is not considered a form of disobedience with legal consequences.
-        description_key:
-          - This indicator records whether women face legal barriers to entering employment.
-          - In some countries, women need permission from a husband or guardian to work.
-          - A “yes” means women can take a job without needing more approvals or documents than men.
-          - Equal rights to employment allow women to participate more fully in the labor market.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women get a job in the same way as men?
+            subtitle: |-
+              This map shows countries where a husband can’t stop his wife from working, and where women don’t need any permission or documents to get a job that men don’t need.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_leg_sxhr_em:
-        short_unit: ""
+        title: There is legislation on sexual harassment in employment
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law specifically protects against sexual harassment at work, including unwanted verbal or physical conduct of a sexual nature. They score “no” if there is no such law, if the law covers harassment in general without mentioning acts of a sexual nature, or if it only says employers must prevent sexual harassment, without banning it or setting penalties or other remedies.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -318,38 +347,35 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Legislation on sexual harassment in employment
-        description_short: Legal provisions specifically protect against sexual harassment in employment, including unwelcome verbal or physical conduct of a sexual nature.
-        description_key:
-          - This indicator records whether a country has laws against sexual harassment in employment.
-          - Sexual harassment includes unwelcome physical, verbal, or non-verbal conduct of a sexual nature at work.
-          - Laws may define harassment and set penalties or remedies for victims.
-          - A “yes” means that workers are legally protected, though enforcement may vary.
-          - The absence of such laws leaves employees without legal protection from harassment.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Is there a law against sexual harassment at work?
+            subtitle: |-
+              This map shows countries where the law specifically protects workers against sexual harassment at work, including unwanted sexual remarks or physical contact.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sl_tlf_cact_fm_zs:
         title: Female-to-male labor force participation ratio
-        description_short: The female-to-male labor force participation ratio compares the share of women and men aged 15+ who are working or actively looking for work.
-        description_key:
-          - This measures the ratio of women’s to men’s labor force participation rates.
-          - Labor force participation includes people who are working or actively seeking work.
-          - A value of 100% means equal participation between women and men.
-          - A lower value means fewer women are in the labor force relative to men.
-          - This indicator highlights gender gaps in access to and participation in employment.
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Women’s labor force participation rate divided by men’s. The rate is the share of people aged 15 and older who are working or looking for work.
+        description_key: |-
+          A value of 100% means that women and men take part in the labor force at the same rate. A value of 50% means that women’s rate is half of men’s.
+
+          {definitions.description_key_ilo_modeled}
         display:
           numDecimalPlaces: 1
           tolerance: 5
 
       sg_own_prrt_im:
-        short_unit: ""
+        title: Women and men have the same rights to own property
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women’s rights to land and buildings. They score “no” if women’s rights to own or manage such property are restricted, or if the law treats spouses’ property differently by gender, for example by giving the husband control over the couple’s property.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -360,52 +386,49 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women and men have the same rights to own property
-        description_short: The law gives women and men the same rights to own and manage property, without granting husbands special control over marital property.
-        description_key:
-          - This indicator records whether women and men have equal legal rights to own property.
-          - Equal rights mean both spouses can own, buy, or sell property in their own name.
-          - Husbands do not have special control over marital property if equality is guaranteed.
-          - Property rights are a foundation of economic independence and security.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Do women and men have the same rights to own property?
+            subtitle: |-
+              This map shows countries where women and men have the same rights to own and manage land and buildings, and where husbands have no extra control over the couple’s property.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sl_uem_neet_fe_zs:
         title: Share of young women not in education, employment or training
-        description_short: Share of women aged 15–24 who are not in education, employment, or vocational training.
-        description_key:
-          - This measures the percentage of young women aged 15–24 who are not studying, working, or in training.
-          - It shows how many are outside both the education system and the labor market.
-          - High rates can reflect limited opportunities, social barriers, or economic challenges.
-          - Being out of education or work can affect future earnings and independence.
-          - Reducing NEET rates is important for supporting youth development and gender equality.
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of women aged 15 to 24 who are not working and not in school or training.
+        description_key: |-
+          The International Labour Organization (ILO) counts young people as being in education or training if they are enrolled in school or in a formal training program, such as vocational training.
+
+          Not everyone has finished their education by age 24, so some young people outside work and education at that age will still go back to studying.
         display:
           numDecimalPlaces: 1
           tolerance: 10
 
       sl_uem_neet_ma_zs:
         title: Share of young men not in education, employment or training
-        description_short: Share of men aged 15–24 who are not in education, employment, or vocational training.
-        description_key:
-          - This measures the percentage of young men aged 15–24 who are not studying, working, or in training.
-          - It captures how many are excluded from both education and the labor market.
-          - High NEET rates suggest barriers to learning or employment that affect young men.
-          - Being outside education and work can lead to long-term disadvantages.
-          - Monitoring NEET rates helps track youth inclusion and economic opportunities.
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of men aged 15 to 24 who are not working and not in school or training.
+        description_key: |-
+          The International Labour Organization (ILO) counts young people as being in education or training if they are enrolled in school or in a formal training program, such as vocational training.
+
+          Not everyone has finished their education by age 24, so some young people outside work and education at that age will still go back to studying.
         display:
           numDecimalPlaces: 1
           tolerance: 10
 
       sg_pen_sxhr_em:
-        short_unit: ""
+        title: Criminal penalties or civil remedies for sexual harassment in employment
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law sets criminal penalties, such as fines or prison, for sexual harassment at work, or lets victims claim damages or compensation, even after they have been dismissed. They score “no” if the law provides neither, or if it only bans sexual harassment and leaves any penalties to the employer.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -416,23 +439,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Criminal sanctions or compensation for sexual harassment in employment
-        description_short: The law punishes sexual harassment at work with fines or prison, requires offenders to compensate victims, or allows victims to seek civil remedies even after losing their job.
-        description_key:
-          - This indicator records whether laws provide penalties or remedies for workplace sexual harassment.
-          - Penalties may include fines, prison sentences, or disciplinary measures.
-          - Victims may also have the right to compensation or civil remedies.
-          - A “yes” means legal systems recognize harassment as a punishable offense.
-          - Strong sanctions can deter harassment and support safer workplaces.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Does the law punish sexual harassment at work, or let victims claim compensation?
+            subtitle: |-
+              This map shows countries where sexual harassment at work can be punished with fines or prison, or where victims can claim compensation, even if they have lost their job.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_iht_asst_pt_eq:
-        short_unit: ""
+        title: Sons and daughters have equal rights to inherit from their parents
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if sons and daughters have the same rights to inherit their parents’ assets, and “no” if the law treats them differently as heirs. The data apply to cases where the parent left no will.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -443,22 +464,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Equal rights of inheritance for sons and daughters when no will is left
-        description_short: When parents die without a will, sons and daughters have the same rights to inherit.
-        description_key:
-          - This indicator records whether sons and daughters inherit equally when parents die without a will.
-          - Equal inheritance means children are treated the same regardless of gender.
-          - A “no” indicates daughters receive less or different inheritance rights than sons.
-          - Inheritance laws shape the distribution of wealth and economic opportunities.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Do sons and daughters have equal rights to inherit from their parents?
+            subtitle: |-
+              This map shows countries where sons and daughters have the same rights to inherit from their parents when no will is left.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_opn_bank_eq:
-        short_unit: ""
+        title: Women can open a bank account in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women opening a bank account. They score “no” if women need permission or documents that men don’t, or if the law limits their right in other ways, for example by letting a married woman open an account in her own name only if she works separately from her husband.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -469,22 +489,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women can open a bank account on the same terms as men
-        description_short: The law does not limit women’s ability to open a bank account, whether they are married or unmarried, and they do not need approval beyond what is required of men.
-        description_key:
-          - This indicator records whether women face restrictions on opening a bank account.
-          - A “yes” means women can open accounts independently, without extra approvals.
-          - Equal access to banking is crucial for financial independence and participation in the economy.
-          - Restrictions can limit women’s ability to save, borrow, or build credit.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women open a bank account in the same way as men?
+            subtitle: |-
+              This map shows countries where women can open a bank account without any permission or documents that men don’t need.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_apl_pspt_eq:
-        short_unit: ""
+        title: Women can apply for a passport in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if passport rules are the same for women and men. They score “no” if an adult woman needs permission or a signature from her husband, father, another relative, or a guardian, or must give details about them or documents, such as a marriage certificate, that men don’t need.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -495,22 +514,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women can apply for a passport in the same way as men
-        description_short: Women can apply for a passport without needing permission, a signature, or details from their husband, father, or another relative.
-        description_key:
-          - This indicator records whether women can apply for a passport on the same terms as men.
-          - A “yes” means women do not need a husband’s or guardian’s approval to obtain a passport.
-          - Equal rights to passports are essential for freedom of movement and travel.
-          - Restrictions can prevent women from working, studying, or traveling abroad.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women apply for a passport in the same way as men?
+            subtitle: |-
+              This map shows countries where women can apply for a passport without permission from a husband, father, other relative, or guardian, and without details or documents that men don’t need.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_law_crdd_gr:
-        short_unit: ""
+        title: Law prohibits discrimination in access to credit based on gender
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law bans lenders from discriminating based on gender, guarantees women and men equal access when doing financial transactions or running a business, or bans gender discrimination in access to goods and services, including financial services. They score “no” if there is no such law, or if it gives victims no effective way to seek redress.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -521,23 +539,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Equal access to financial services for women and men
-        description_short: The law prohibits gender discrimination by banks or other financial institutions, and requires equal treatment of women and men in financial transactions, business activities, financial assistance, and access to goods and services.
-        description_key:
-          - This indicator records whether women and men have equal legal access to financial services.
-          - Equal access means banks and lenders cannot discriminate by gender.
-          - It covers services like loans, credit, business financing, and other transactions.
-          - A “yes” shows the law supports fairness in financial opportunities.
-          - Equal financial rights allow women to invest, grow businesses, and build assets.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Does the law ban gender discrimination in access to credit?
+            subtitle: |-
+              This map shows countries where the law bans lenders from discriminating based on gender, or guarantees women and men equal access to financial services.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_bus_regt_eq:
-        short_unit: ""
+        title: Women can register a business in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women registering a business. They score “no” if women need their husband’s or guardian’s permission, signature, or consent, or if, at any stage of registration, they must give information or documents that men don’t.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -548,23 +564,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women can register a business on the same terms as men
-        description_short: Women face no legal restrictions when registering a business, such as needing a husband’s consent or providing extra documents not required of men.
-        description_key:
-          - This indicator records whether women can legally register a business without extra restrictions.
-          - A “yes” means women follow the same process as men, with no need for consent from a husband or guardian.
-          - Equal rights to register a business support women’s participation in entrepreneurship and the economy.
-          - Restrictions can discourage women from starting companies and reduce economic opportunities.
-          - Legal equality in business registration is an important step toward gender equality in economic life.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women register a business in the same way as men?
+            subtitle: |-
+              This map shows countries where women can register a business without their husband’s or guardian’s permission, and without giving information or documents that men don’t need to give.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_obt_dvrc_eq:
-        short_unit: ""
+        title: Women can get a divorce in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the process to get a divorce is the same for women and men, or if it gives women extra protections. They score “no” if women face different procedures or must give different evidence, if only men can start divorce proceedings, or if divorce is not allowed.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -575,23 +589,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women can get a divorce on the same terms as men
-        description_short: The divorce process is equal for women and men, unless the law provides women with added safeguards, such as during pregnancy. It is unequal if women face extra barriers, only men can initiate, or divorce is prohibited.
-        description_key:
-          - This indicator records whether women and men have equal legal rights to divorce.
-          - A “yes” means either spouse can start divorce proceedings under the same conditions.
-          - A “no” means women face additional barriers, such as requiring a husband’s consent or being prohibited from divorcing.
-          - Equal rights to divorce are central to women’s autonomy and freedom of choice in marriage.
-          - Safeguards for women, such as during pregnancy, do not make the law unequal if men and women otherwise have the same rights.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women get a divorce in the same way as men?
+            subtitle: |-
+              This map shows countries where the process to get a divorce is the same for women and men, or gives women extra protections, such as stopping a husband from filing for divorce while his wife is pregnant.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_rem_rigt_eq:
-        short_unit: ""
+        title: Women have the same rights to remarry as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if women and men have equal rights to remarry. They score “no” if the law limits women’s right to remarry, for example with a waiting period that doesn’t apply to men, or if divorce is not allowed.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -602,38 +614,33 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women have the same rights to remarry as men
-        description_short: Women and men have the same right to remarry. Unequal rights exist if women face restrictions—such as waiting periods not applied to men—or if divorce is not legally allowed.
-        description_key:
-          - This indicator records whether women and men have equal rights to remarry.
-          - A “yes” means both men and women can remarry under the same conditions.
-          - A “no” means women face restrictions, such as longer waiting periods or bans after divorce or widowhood.
-          - Equal rights to remarry reflect fairness in family law and personal freedom.
-          - Restrictions on remarriage often reflect discriminatory cultural or legal norms.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Do women have the same rights to remarry as men?
+            subtitle: |-
+              This map shows countries where women have the same right to remarry as men, without restrictions such as a waiting period that men don’t face.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_dmk_prch_fn_zs:
-        title: Share of women involved in major household purchases
-        description_short: Share of currently married women aged 15-49 who say that they alone or jointly have a say in major household purchase decisions.
-        description_key:
-          - This measures the percentage of married women aged 15–49 involved in making major household purchases.
-          - Women are counted if they decide alone or together with their spouse.
-          - Participation in spending decisions reflects women’s influence within the household.
-          - Greater involvement suggests stronger bargaining power and autonomy.
-          - Low involvement highlights gender gaps in family decision-making.
+        title: Share of women involved in decisions about major household purchases
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of married women aged 15 to 49 who say they have the final say on major household purchases, alone or together with their husband.
+        description_key: |-
+          {definitions.description_key_dhs}
         display:
           numDecimalPlaces: 1
           tolerance: 10
 
       sg_cnt_sign_eq:
-        short_unit: ""
+        title: Women can sign a contract in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if women gain full legal rights when they reach adulthood and face no limits on signing legally binding contracts. They score “no” if women’s right to sign contracts is limited, or if they need their husband’s or guardian’s signature, consent, or permission.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -644,23 +651,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women can sign a contract on the same terms as men
-        description_short: Women can sign contracts on their own, without permission or signatures from a husband or guardian.
-        description_key:
-          - This indicator records whether women can legally sign contracts without extra conditions.
-          - A “yes” means women can enter agreements independently, just like men.
-          - Restrictions may require the approval of a husband, guardian, or relative.
-          - Equal rights to sign contracts are key to economic independence.
-          - Without this right, women may be excluded from business, property, or employment opportunities.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women sign a contract in the same way as men?
+            subtitle: |-
+              This map shows countries where adult women can sign legally binding contracts on their own, without needing their husband’s or guardian’s permission, consent, or signature.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_loc_live_eq:
-        short_unit: ""
+        title: Women can choose where to live in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women choosing where to live. They score “no” if it does, if the husband chooses the family home or has more say over where the family lives, or if a married woman’s legal home automatically follows her husband’s.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -671,23 +676,21 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women have full legal rights to decide where to live
-        description_short: The law does not restrict women’s choice of residence or give husbands more power in deciding where the family lives.
-        description_key:
-          - This indicator records whether women have the same legal rights as men to decide where to live.
-          - A “yes” means women can freely choose their residence, either alone or with their family.
-          - A “no” means the law gives husbands greater authority over the family’s place of residence.
-          - Equal rights to residence reflect personal freedom and equality within marriage.
-          - Restrictions reduce women’s independence and control over their lives.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Can women choose where to live in the same way as men?
+            subtitle: |-
+              This map shows countries where the law doesn’t restrict where women can live, or give husbands more say over where the family lives.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_law_asst_ar:
-        short_unit: ""
+        title: Spouses have equal authority over assets during marriage
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if each spouse manages the assets they brought into the marriage or acquired during it, possibly needing the other’s consent for major deals such as selling the property or using it to secure a loan, or if both have equal rights over joint property. They score “no” if the husband controls the couple’s property, including his wife’s own property, or if his word wins when they disagree.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -698,38 +701,39 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Spouses have equal rights to manage their own and joint assets
-        description_short: In marriage, women and men keep control over the property they bring in or acquire, and both have equal rights to manage joint assets, with consent required only for major transactions like selling or pledging property.
-        description_key:
-          - This indicator records whether women and men have equal legal rights to manage assets in marriage.
-          - Equal rights mean both spouses control their own property and share equal authority over joint assets.
-          - Major transactions, like selling or pledging property, may require the consent of both spouses.
-          - A “no” means the law gives husbands greater control over family property.
-          - Equal management of assets supports fairness and independence within marriage.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+          grapher_config:
+            title: Do husbands and wives have equal control over assets during marriage?
+            subtitle: |-
+              This map shows countries where husbands and wives have equal rights to manage property during marriage.
+            note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_dmk_hlth_wf_zs:
-        title: Share of married women making their own health care decisions
-        description_short: Share of married women aged 15–49 reporting that they themselves are the main decision-makers for their health care.
-        description_key:
-          - This measures the percentage of married women aged 15–49 who decide on their own health care.
-          - Women are counted if they report being the main decision-maker.
-          - Health care autonomy is important for women’s well-being and reproductive rights.
-          - Greater decision-making power suggests stronger independence and bargaining power.
-          - Limited autonomy may reflect cultural or household barriers to women’s control over health.
+        title: Share of married women making their own healthcare decisions
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          Share of married women aged 15 to 49 who say they are the main person deciding on their own healthcare.
+        description_key: |-
+          Women who say they decide jointly with their husband are not counted here.
+
+          {definitions.description_key_dhs}
         display:
           numDecimalPlaces: 1
           tolerance: 10
 
       sg_law_eqrm_wk:
-        short_unit: ""
+        title: Law mandates equal pay for work of equal value
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if employers must, by law, pay women and men equally for work of equal value: not only for the same job, but also for different jobs of the same value. Pay here includes not just wages but any other payments from the employer, in cash or in kind. Countries score “no” if the law only requires equal pay for the same or similar work, or covers only basic wages.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -740,57 +744,53 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Law mandates equal pay for work of equal value for women and men
-        description_short: '"Work of equal value" means not just the same job, but also different jobs that are similar in skills, responsibilities, and working conditions.'
-        description_key:
-          - Equal pay for work of equal value means men and women should receive the same pay for jobs that require similar skills, effort, and responsibility.
-          - This is also known as pay equity, which goes further than equal pay for equal work.
-          - Equal pay for equal work ensures men and women in the same job receive the same wage.
-          - Pay equity covers different jobs if they are judged to have the same overall value.
-          - The value of jobs is assessed by comparing skills, responsibilities, effort, and working conditions.
-          - Proving jobs are of equal value can be difficult, as different roles may be valued unequally in practice.
-          - Equal pay laws are designed to reduce gender wage gaps and ensure fairness in the labor market.
-          - *desc_law_enforcement
-          - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
-
       sg_law_indx:
+        title: Women, Business and the Law Index
+        unit: "index (0–100)"
         short_unit: ""
+        description_short: |-
+          Score from 0 to 100 measuring how laws affect women’s economic opportunities. Higher scores mean laws that are more equal for women and men, and 100 is the best possible score.
+        description_key: |-
+          The index is based on 35 yes/no questions about the law, grouped into eight areas: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension. Each area’s score is the share of its questions answered “yes”, from 0 to 100. The index is the average of the eight area scores.
+
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The index measures how laws and regulations affect women's economic opportunity. Overall scores are calculated by taking the average score of each index (Mobility, Workplace, Pay, Marriage, Parenthood, Entrepreneurship, Assets and Pension), with 100 representing the highest possible score.
 
           {definitions.wbl_limitations}
         presentation:
           attribution: Women, Business and the Law; World Bank
-        title: Women, Business and the Law Index
-        description_short: "The index measures how laws and regulations affect women’s economic opportunity on a scale from 0 to 100, where 100 means equal legal rights for men and women. It is the average score of eight categories: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension."
-        description_key:
-          - The Women, Business and the Law Index measures legal gender equality in the areas that shape women’s economic participation.
-          - "It scores economies on eight categories: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension."
-          - Each category score is based on legal provisions that affect women’s rights and opportunities in that domain.
-          - The index ranges from 0 to 100, where 100 indicates equal legal rights for men and women.
-          - The overall score is calculated as the simple average of the eight category scores.
-          - The index captures laws and regulations as written (de jure), not how effectively they are implemented (de facto).
-          - *desc_standardized_assumptions
-        unit: "index (0–100)"
         display:
           numDecimalPlaces: 1
           tolerance: 5
 
       # Women, Business and the Law (WBL 1.0) indicators that have no curated text yet.
       # They are no longer in Gender Statistics, so we take them from the WBL website (see the meadow step).
+
       sg_law_indx_mo:
-        title: "Women, Business and the Law: Mobility Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Mobility score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of four yes/no questions on mobility that are answered “yes”. They ask whether women can choose where to live, travel within the country and abroad, and apply for a passport in the same way as men.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Mobility indicator measures constraints on a woman’s agency and freedom of movement, both of which are likely to influence her decision to enter the labor force and engage in entrepreneurial activity. Mobility indicator score is obtained by calculating the unweighted average of the following: 1. SG.APL.PSPT.EQ; 2. SG.CTR.TRVL.EQ; 3. SG.HME.TRVL.EQ; 4. SG.LOC.LIVE.EQ (= 25 points each) and scaling the result to 100.
 
@@ -798,10 +798,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_hme_trvl_eq:
-        title: "A woman can travel outside her home in the same way as a man (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women can travel outside the home in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women traveling alone within the country. They score “no” if women need permission, extra documents, or their husband or guardian with them, if they must justify leaving the home, or if leaving without a valid reason counts as disobeying their husband, with legal consequences.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -813,10 +823,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_ctr_trvl_eq:
-        title: "A woman can travel outside the country in the same way as a man (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women can travel abroad in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on women traveling abroad alone. They score “no” if women need permission, extra documents, or their husband or guardian with them to leave the country, or if a married woman must go abroad with her husband if he wants her to.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -828,12 +848,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_law_indx_wp:
-        title: "Women, Business and the Law: Workplace Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Workplace score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of four yes/no questions on workplace that are answered “yes”. They ask whether women can get a job in the same way as men, and whether the law bans gender discrimination at work, addresses sexual harassment at work, and punishes it or lets victims claim compensation.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Workplace indicator analyzes laws affecting women’s decisions to enter the labor market, including women’s legal capacity and ability to work, as well as protections in the workplace against discrimination and sexual harassment. The Workplace indicator score is obtained by calculating the unweighted average of the following: 1. SG.GET.JOBS.EQ; 2. SG.LAW.NODC.HR; 3. SG.LEG.SXHR.EM; 4. SG.PEN.SXHR.EM (= 25 points each) and scaling the result to 100.
 
@@ -841,12 +873,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_law_indx_py:
-        title: "Women, Business and the Law: Pay Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Pay score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of four yes/no questions on pay that are answered “yes”. They ask whether the law requires equal pay for work of equal value, and whether women can work at night, in jobs deemed dangerous, and in industrial jobs in the same way as men.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Pay indicator measures laws affecting occupational segregation and the gender wage gap.  The Pay indicator score is obtained by calculating the unweighted average of the following: 1. SG.LAW.EQRM.WK; 2. SG.NGT.WORK.EQ; 3. SG.DNG.WORK.DN.EQ; 4. SG.IND.WORK.EQ (= 25 points each) and scaling the result to 100.
 
@@ -854,10 +898,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_ngt_work_eq:
-        title: "A woman can work at night in the same way as a man (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women can work at night in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if women who are not pregnant or breastfeeding can work at night in the same way as men. Rules that only require the woman’s consent, or safety measures from the employer such as transportation, still count as “yes”. Countries score “no” if the law bans women from working at night, limits their night hours, or lets the authorities do so.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -869,10 +923,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_dng_work_dn_eq:
-        title: "A woman can work in a job deemed dangerous in the same way as a man (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women can work in jobs deemed dangerous in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if no law bans or restricts women who are not pregnant or breastfeeding from working in jobs deemed hazardous, arduous, or morally inappropriate. They score “no” if the law does, or if it lets the authorities decide which jobs are too dangerous or unsuitable for women but not for men.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -884,10 +948,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_ind_work_eq:
-        title: "A woman can work in an industrial job in the same way as a man (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women can work in industrial jobs in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if women who are not pregnant or breastfeeding can work in mining, construction, manufacturing, energy, water, agriculture, and transportation in the same way as men. They score “no” if the law bans or restricts their work in any of these industries, for example by banning them from working at night in industry.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -899,12 +973,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_law_indx_mr:
-        title: "Women, Business and the Law: Marriage Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Marriage score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of five yes/no questions on marriage that are answered “yes”. They ask whether the law is free of rules requiring wives to obey their husbands, whether women can be head of household, get a divorce, and remarry in the same way as men, and whether there is a law on domestic violence.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Marriage indicator measures legal constraints related to marriage and divorce. The Marriage indicator score is obtained by calculating the unweighted average of the following: 1. SG.LAW.OBHB.MR.NO;  2. SG.HLD.HEAD.EQ;  3. SG.LEG.DVAW; 4. SG.OBT.DVRC.EQ; 5. SG.REM.RIGT.EQ (= 20 points each) and scaling the result to 100.
 
@@ -912,10 +998,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_hld_head_eq:
-        title: "A woman can be \"head of household\" in the same way as a man (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women can be head of household in the same way as men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law places no limits on a woman being “head of household” or “head of family”. They score “no” if the law names the husband as head of household or says he leads the family, or if a man is by default the family member who receives the family book or similar document needed to access services.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -927,12 +1023,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_law_indx_pr:
-        title: "Women, Business and the Law: Parenthood Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Parenthood score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of five yes/no questions on parenthood that are answered “yes”. They ask whether mothers get at least 14 weeks of paid leave, the government pays all maternity leave benefits, fathers get paid leave, there is paid parental leave, and dismissing pregnant workers is banned.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Parenthood indicator examines laws affecting women’s work during and after pregnancy. The Parenthood indicator score is obtained by calculating the unweighted average of the following: 1. SH.MMR.LEVE.AL; 2.SH.MMR.LEVE.GT; 3. SH.PTR.LEVE.AL; 4.SH.PAR.LEVE.AL; 5.SG.DML.PRGW (= 20 points each) and scaling the result to 100.
 
@@ -940,10 +1048,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sh_mmr_leve_al:
-        title: "Paid leave of at least 14 weeks available to mothers (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Paid leave of at least 14 weeks is available to mothers
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if mothers are legally entitled to at least 14 weeks (98 days) of paid leave for the birth of a child, through maternity leave, parental leave, or both.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -955,10 +1073,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_mmr_leve:
-        title: "Length of paid maternity leave (calendar days)"
-        unit: ""
-        short_unit: ""
+        title: Length of paid maternity leave
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid leave that only the mother can take, just before, during, and right after giving birth.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -970,10 +1098,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_mmr_leve_gt:
-        title: "The government administers 100 percent of maternity leave benefits (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: The government pays all maternity leave benefits
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if maternity leave benefits are fully paid through the government, such as social security, public funds, or insurance the government requires, or if employers get back any benefits they pay. They score “no” if employers pay part of the cost, if only women pay the contributions or taxes that fund these benefits, if the insurance scheme is optional, or if there is no paid leave for mothers.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -985,10 +1123,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_ptr_leve_al:
-        title: "Paid leave is available to fathers (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Paid leave is available to fathers
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if fathers are legally entitled to at least one day of paid paternity leave for the birth of a child, or to paid parental leave that is reserved for them or that they are entitled to on their own. They score “no” if not, or if leave for the birth has to be taken from annual or sick leave.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1000,10 +1148,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_ptr_leve:
-        title: "Length of paid paternity leave (calendar days)"
-        unit: ""
-        short_unit: ""
+        title: Length of paid paternity leave
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid leave that only the father can take for the birth of a child.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1015,10 +1173,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_par_leve_al:
-        title: "There is paid parental leave (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: There is paid parental leave
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if parents are legally entitled to full-time paid parental leave, either shared between them (at least two weeks) or as a separate entitlement for each parent (at least one week each), or if paid maternity and paternity leave are equally long.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1030,10 +1198,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_par_leve:
-        title: "Length of paid shared parental leave (calendar days)"
-        unit: ""
-        short_unit: ""
+        title: Length of paid shared parental leave
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid parental leave that the parents can share between them as they choose.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1045,10 +1223,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_par_leve_fe:
-        title: "Length of paid parental leave for mother (calendar days)"
-        unit: ""
-        short_unit: ""
+        title: Length of paid parental leave for mothers
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid parental leave reserved for the mother, or that she is entitled to on her own.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1060,10 +1248,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sh_par_leve_ma:
-        title: "Length of paid parental leave for father (calendar days)"
-        unit: ""
-        short_unit: ""
+        title: Length of paid parental leave for fathers
+        unit: days
+        short_unit: ''
+        description_short: |-
+          Number of days of paid parental leave reserved for the father, or that he is entitled to on his own.
+        description_key: |-
+          {definitions.description_key_wbl_leave_assumptions}
+
+          {definitions.description_key_wbl_as_written}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1075,10 +1273,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_dml_prgw:
-        title: "Dismissal of pregnant workers is prohibited (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Dismissal of pregnant workers is prohibited
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the law bans dismissing pregnant workers, says pregnancy can’t be a reason to end a contract, or treats such a dismissal as unlawful. They score “no” if there is no such ban, or if it applies only during maternity leave, during part of the pregnancy, or when the pregnancy causes illness or disability.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1090,12 +1298,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_law_indx_en:
-        title: "Women, Business and the Law: Entrepreneurship Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Entrepreneurship score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of four yes/no questions on entrepreneurship that are answered “yes”. They ask whether the law bans gender discrimination in access to credit, and whether women can sign a contract, register a business, and open a bank account in the same way as men.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Entrepreneurship indicator measures constraints on women starting and running a business.. The Entrepreneurship indicator score is obtained by calculating the unweighted average of the following: 1. SG.CNT.SIGN.EQ; 2. SG.BUS.REGT.EQ; 3. SG.OPN.BANK.EQ; 4. SG.LAW.CRDD.GR (= 25 points each) and scaling the result to 100.
 
@@ -1103,12 +1323,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_law_indx_as:
-        title: "Women, Business and the Law: Assets Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Assets score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of five yes/no questions on assets that are answered “yes”. They ask whether women and men have equal rights to own property, sons and daughters and widows and widowers have equal rights to inherit, spouses have equal control over assets during marriage, and the law values unpaid contributions to the household.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Assets indicator examines gender differences in property and inheritance law, including instances in which legal systems are supported by customary law and judicial precedent. The Assets indicator score is obtained by calculating the unweighted average of the following: 1. SG.OWN.PRRT.IM; 2. SG.IHT.ASST.PT.EQ; 3. SG.IHT.ASST.EQ; 4. SG.LAW.ASST.AR; 5. SG.LAW.NMCN (= 20 points each) and scaling the result to 100.
 
@@ -1116,10 +1348,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_iht_asst_eq:
-        title: "Male and female surviving spouses have equal rights to inherit assets (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Widows and widowers have equal rights to inherit
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if a widow and a widower have the same rights to inherit their spouse’s assets, and “no” if the law treats them differently. The data apply to cases where the spouse left no will and no children.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1131,10 +1373,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_law_nmcn:
-        title: "The law provides for the valuation of nonmonetary contributions (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: The law values unpaid contributions to the household
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Unpaid contributions include caring for children and looking after the home. Countries score “yes” if the law explicitly recognizes them and divides property equally or fairly when a marriage ends, or if, by default, the law treats the couple’s property as shared, regardless of who paid for it or whose name it is in. They score “no” otherwise.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1146,12 +1398,24 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_law_indx_pe:
-        title: "Women, Business and the Law: Pension Indicator Score (scale 1-100)"
-        unit: ""
-        short_unit: ""
+        title: 'Women, Business and the Law: Pension score'
+        unit: ''
+        short_unit: ''
+        description_short: |-
+          Score from 0 to 100, showing the share of four yes/no questions on pension that are answered “yes”. They ask whether women and men can retire with full and with partial pension benefits at the same age, the mandatory retirement age is the same, and time off for childcare counts toward pensions.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
+
+          {definitions.wbl_description_processing_averages}
         description_from_producer: |-
           **Definition:** The Pension indicator assesses laws affecting the size of a woman’s pension. The Pension indicator score is obtained by calculating the unweighted average of the following: 1. SG.AGE.FUPN.EQ; 2. SG.AGE.PAPN.EQ; 3. SG.AGE.MRET.EQ; 4. SG.ABS.PENB (= 25 points each) and scaling the result to 100.
 
@@ -1159,10 +1423,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sg_age_fupn_eq:
-        title: "The age at which women and men can retire with full pension benefits is the same (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women and men can retire with full pension benefits at the same age
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the legal age at which women and men can retire and receive a full minimum old-age pension is the same. They score “no” if the ages differ, or if there is no mandatory pension scheme for private-sector workers.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1174,10 +1448,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_age_papn_eq:
-        title: "The age at which women and men can retire with partial pension benefits is the same (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Women and men can retire with partial pension benefits at the same age
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          A partial pension is a reduced pension for workers who haven’t worked or contributed long enough, or haven’t reached the age, to get a full minimum pension. Countries score “yes” if women and men can retire with partial benefits at the same age, or if the law sets no such age. They score “no” if the ages differ, or if there is no mandatory pension scheme for private-sector workers.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1189,10 +1473,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_age_mret_eq:
-        title: "The mandatory retirement age for women and men is the same (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: The mandatory retirement age is the same for women and men
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if the age at which women and men must retire is the same, or if there is no mandatory retirement age, and “no” if the ages differ.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1204,10 +1498,20 @@ tables:
         presentation:
           attribution: Women, Business and the Law; World Bank
 
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       sg_abs_penb:
-        title: "There are periods of absence due to childcare accounted for in pension benefits (1=yes; 0=no)"
-        unit: ""
-        short_unit: ""
+        title: Time off for childcare counts toward pension benefits
+        unit: (1=yes; 0=no)
+        short_unit: ''
+        description_short: |-
+          Countries score “yes” if pension contributions are paid or credited during maternity or parental leave, if that leave counts as time worked when calculating pensions, or if other rules make sure the leave doesn’t reduce pensions. Countries with no mandatory contributory pension scheme also score “yes” if they have a universal pension that is not means-tested.
+        description_key: |-
+          {definitions.description_key_wbl_as_written}
+
+          {definitions.description_key_wbl_assumptions}
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -1218,3 +1522,6 @@ tables:
           **Notes from original source:** This is one of the 35 scored indicators.
         presentation:
           attribution: Women, Business and the Law; World Bank
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5

@@ -13,8 +13,9 @@ paths = PathFinder(__file__)
 
 # Women, Business and the Law (WBL 1.0) topic scores, and the yes/no questions each one is the share of (times 100).
 # NOTE: Gender Statistics dropped all of these in its October 2026 release, when WBL moved to its 2.0 framework, so we
-# take them from the WBL website instead (see the women_business_and_the_law meadow step). On the next update, check
-# whether Gender Statistics publishes them again, or whether WBL still publishes 1.0 data at all.
+# take them from the WBL website's 1971-2024 historical panel instead (see the women_business_and_the_law meadow step,
+# which also explains why the 2026 report isn't used yet). On the next update, check whether Gender Statistics publishes
+# them again, and whether the World Bank has published a corrected WBL 1.0 history.
 WBL_TOPICS = {
     "sg_law_indx_mo": ["sg_loc_live_eq", "sg_hme_trvl_eq", "sg_apl_pspt_eq", "sg_ctr_trvl_eq"],
     "sg_law_indx_wp": ["sg_get_jobs_eq", "sg_law_nodc_hr", "sg_leg_sxhr_em", "sg_pen_sxhr_em"],
@@ -224,10 +225,9 @@ def add_wbl_averages(tb_wbl: Table) -> Table:
     """Add unweighted averages of the WBL scores for the world, World Bank regions, and income groups.
 
     This is how the World Bank computes them: the averages Gender Statistics published until 2025 are reproduced exactly
-    (to 1e-3). Like WBL's own panel, we apply each economy's latest classification to all years.
+    (to 1e-3). Like WBL's own panel, we apply each economy's classification in the latest report year to all years.
     """
-    latest = tb_wbl.sort_values("year").groupby("country", observed=True, as_index=False)[["region", "income_group"]]
-    latest = latest.last()
+    latest = tb_wbl.sort_values("year").groupby("country", observed=True).tail(1)[["country", "region", "income_group"]]
     tb_wbl = pr.merge(tb_wbl.drop(columns=["region", "income_group"]), latest, on="country", how="left")
 
     groups = [tb_wbl.assign(group="World")]
@@ -246,8 +246,7 @@ def sanity_check_outputs(tb: Table) -> None:
     """Check the combined output table."""
     wbl = tb[WBL_COLUMNS].dropna(how="all")
     years = set(wbl.index.get_level_values("year"))
-    # NOTE: There is no WBL 1.0 data for the 2025 report year, so no data point for 2024.
-    assert years == set(range(1970, 2024)) | {2025}, f"Unexpected WBL years: {sorted(years)}"
+    assert years == set(range(1970, 2024)), f"Unexpected WBL years: {sorted(years)}"
     for column in WBL_QUESTIONS:
         assert set(wbl[column].dropna().unique()) <= {0, 1}, f"{column} is not 1/0."
     # Each total is at least as long as each of its parts.
@@ -288,19 +287,9 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
                         meta.presentation = {"attribution": cleaned_source}
 
                 # Handle units
-                unit_of_measure = meta_info.get("Unit of measure", "")
-                if pd.notna(unit_of_measure) and str(unit_of_measure).strip():
-                    unit_lower = str(unit_of_measure).lower()
-                    if "percent" in unit_lower or "%" in unit_lower:
-                        meta.unit = "%"
-                        meta.short_unit = "%"
-                    else:
-                        meta.unit = unit_of_measure
-                        meta.short_unit = ""
-                else:
-                    # Set default unit if missing or NaN
-                    meta.unit = ""
-                    meta.short_unit = ""
+                meta.unit, meta.short_unit = clean_unit(meta_info.get("Unit of measure", ""), title=meta.title)
+                if meta.unit == "%":
+                    meta.display = {"numDecimalPlaces": 1}
 
                 # Build description from producer
                 description_parts = []
@@ -346,6 +335,41 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
                 meta.description_from_producer = f"World Bank indicator: {column}"
 
     return tb
+
+
+def clean_unit(unit_of_measure, title: str) -> tuple[str, str]:
+    """Return (unit, short_unit) from the producer's unit, or from the indicator name when the producer gives none.
+
+    Many series have no unit in the series file, but their name ends with it, e.g. "... (% of women age 15-49)" or
+    "... (per 100,000 female population)".
+    """
+    import re
+
+    unit = str(unit_of_measure).strip() if pd.notna(unit_of_measure) else ""
+    if "percent" in unit.lower() or "%" in unit:
+        return "%", "%"
+    # Labels that say nothing about the unit (counts, scores and indexes, whose scale is in the name).
+    if unit in ("Unit", "Number", "Count", "Score") or unit.startswith(("Index", "Number of 15-year old women")):
+        unit = ""
+    if unit == "Persons":
+        unit = "people"
+    if unit:
+        # Lowercase "Per 1000 live births", "Years", etc., but not acronyms.
+        if len(unit) > 1 and unit[1].islower():
+            unit = unit[0].lower() + unit[1:]
+        return unit, ""
+
+    # Fall back to the unit given in the indicator name.
+    if "(%" in title:
+        return "%", "%"
+    match = re.search(r"\(([^()]*)\)\s*$", title)
+    if match:
+        unit_in_title = match.group(1).strip()
+        if unit_in_title in ("days", "calendar days"):
+            return "days", ""
+        if unit_in_title.startswith("per "):
+            return unit_in_title, ""
+    return "", ""
 
 
 def clean_source_field(source: str) -> str:
@@ -397,6 +421,7 @@ def clean_source_field(source: str) -> str:
         # Other UN agencies
         "international monetary fund": "IMF via World Bank",
         "joint united nations programme on hiv/aids": "UNAIDS via World Bank",
+        "unaids": "UNAIDS via World Bank",
         "international telecommunication union": "ITU via World Bank",
         "inter-parliamentary union": "IPU via World Bank",
         "un women": "UN Women via World Bank",
@@ -469,6 +494,10 @@ def clean_source_field(source: str) -> str:
 
     if not found_orgs:
         return ""
+
+    # "united nations" also matches the full names of UN agencies, so drop the generic UN when an agency was found.
+    if "UN via World Bank" in found_orgs and any(org.startswith("UN") for org in found_orgs - {"UN via World Bank"}):
+        found_orgs.discard("UN via World Bank")
 
     # Return up to 2 organizations, sorted for consistency
     result_orgs = sorted(list(found_orgs))[:2]
