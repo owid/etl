@@ -220,6 +220,9 @@ def get_notion_table_period(
         max_rows=max_rows,
     )
 
+    # Keep only reviewed highlights (the table also holds drafts awaiting review, and rejected ones).
+    df = df[df["Status"] == "Approved"].reset_index(drop=True)
+
     # Filter by date.
     df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
     df = df[(df[date_col] >= pd.to_datetime(min_date)) & (df[date_col] <= pd.to_datetime(max_date))].reset_index(
@@ -239,7 +242,7 @@ def get_impact_highlights(
     df: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     # Name of column of related data producers.
-    producer_col = "Data producer(s) related"
+    producer_col = "Data producers"
     # Name of column containing the date.
     if df is None:
         df = get_notion_table_period(min_date=min_date, max_date=max_date, max_rows=max_rows)
