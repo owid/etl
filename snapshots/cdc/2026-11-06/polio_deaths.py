@@ -107,7 +107,7 @@ DATA_CDC = pd.DataFrame(
         ],
         "source": [
             *["https://www.globalhealthchronicles.org/items/show/6303"] * 10,
-            *["https://www.jstor.org/stable/44323897"] * 8,
+            *["https://stacks.cdc.gov/view/cdc/951"] * 8,
             *["https://wonder.cdc.gov/cmf-icd8.html"] * 11,
             *["https://wonder.cdc.gov/cmf-icd9.html"] * 20,
             *["https://wonder.cdc.gov/deaths-by-underlying-cause.html"] * 25,
