@@ -130,46 +130,38 @@ tables:
         title: Political regime
         unit: ""
         description_short: |-
-          The variable identifies the political regime of a country. It distinguishes between free countries (score 2), partly free countries (score 1), and not free countries (score 0).
-        description_key:
+          The variable identifies the political regime of a country. It distinguishes between free countries, partly free countries, and not free countries.
+        description_key: &regime_key
           - Free countries are understood as countries in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy).
           - Partly free country are countries in which citizens have some political rights and civil liberties.
           - Not free country are countries in which citizens have few political rights and civil liberties.
-        description_processing: |-
-          score 0: Not free
-          Score 1: Partly free
-          Score 2: Free
         presentation:
           grapher_config:
             title: Free country
             subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house). Free countries are those in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy)."
             chartTypes:
-              - LineChart
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 2
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_regime
-              binningStrategy: manual
-              customNumericColors:
-                - "#a588c3"
-                - "#e8b864"
-                - "#58ac8c"
-              customNumericLabels:
-                - Not free
-                - Partly free
-                - Free
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-              customNumericColorsActive: true
+              customCategoryColors:
+                Not free: "#a588c3"
+                Partly free: "#e8b864"
+                Free: "#58ac8c"
             map:
               colorScale: *color_regime
-              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
+
+      regime_score:
+        title: Political regime (score)
+        unit: ""
+        description_short: |-
+          The variable identifies the political regime of a country. It distinguishes between free countries (2), partly free countries (1), and not free countries (0).
+        description_key: *regime_key
+        presentation:
+          title_public: Political regime
+          title_variant: score
         display:
           numDecimalPlaces: 0
 
@@ -289,45 +281,30 @@ tables:
         title: Electoral democracy
         unit: ""
         description_short: |-
-          Identifies if the political regime of a country is an electoral democracy. It identifies whether a country is an electoral democracy (score 1) or not (score 0).
+          Identifies if the political regime of a country is an electoral democracy. It identifies whether a country is an electoral democracy ("Yes") or not ("No").
         description_key:
           - Electoral democracies are understood as political systems in which citizens have the right to choose chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties.
         description_processing: |-
           This is a binary indicator which we define as follows:
 
-          * score 1: If `electprocess >= 7`, `polrights_score >= 20` and `civlibs_score >= 30`.
-          * score NA: If `electprocess`, `polrights_score` and `civlibs_score` values are all missing.
-          * score 0: Otherwise.
+          * "Yes": If `electprocess >= 7`, `polrights_score >= 20` and `civlibs_score >= 30`.
+          * Missing: If `electprocess`, `polrights_score` and `civlibs_score` values are all missing.
+          * "No": Otherwise.
 
         presentation:
           grapher_config:
             title: Democracy
             subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house). Democracies are political systems in which citizens have the right to choose the chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties."
             chartTypes:
-              - LineChart
-            note: The Chart tab uses numeric values, with 1 for electoral democracies and 0 for non-democracies.
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 1
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &color_electdem
-              binningStrategy: manual
-              customNumericColorsActive: true
-              customNumericColors:
-                - "#ef8a62"
-                - "#2c7bb6"
-              customNumericLabels:
-                - "No"
-                - "Yes"
-              customNumericValues:
-                - 0
-                - 0
-                - 1
+              customCategoryColors:
+                "No": "#ef8a62"
+                "Yes": "#2c7bb6"
             map:
               colorScale: *color_electdem
-              tooltipUseCustomLabels: true
   fh_regions:
     variables:
       num_regime:

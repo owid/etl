@@ -22,27 +22,13 @@ definitions:
     hasMapTab: true
     tab: map
     chartTypes:
-      - LineChart
-    yAxis:
-      max: 1
-      min: 0
-    selectedFacetStrategy: entity
+      - Swimlane
     colorScale: &color_yn
-      binningStrategy: manual
-      customNumericColors:
-        - "#ef8a62"
-        - "#2c7bb6"
-      customNumericLabels:
-        - "No"
-        - "Yes"
-      customNumericValues:
-        - 0
-        - 0
-        - 1
-      customNumericColorsActive: true
+      customCategoryColors:
+        "No": "#ef8a62"
+        "Yes": "#2c7bb6"
     map:
       colorScale: *color_yn
-      tooltipUseCustomLabels: true
 
   common:
     presentation:
@@ -108,7 +94,7 @@ tables:
         description_short: |-
           The variable indicates whether some citizens elect both the chief executive and the legislature.
         description_processing: |-
-          Takes on the value of 1 if indicators "Legislative elections" and "Elections for chief executive" have the value of 1, otherwise 0.
+          "Yes" if both "Legislative elections" and "Elections for chief executive" are "Yes", and "No" otherwise.
         description_from_producer: |-
           Estimated from indicators: `legislative_elections` and `executive_elections`
 
@@ -193,8 +179,8 @@ tables:
         title: Political regime (LIED+)
         unit: ""
         description_short: |-
-          Identifies the political regime of a country. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6), and full democracies (score 7).
-        description_key:
+          Identifies the political regime of a country. It distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies, and full democracies.
+        description_key: &regime_lied_key
           - In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
           - In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
           - Multiparty autocracies without an elected executive are otherwise one-party autocracies, but the chief executive of the government is not elected even if citizens have more than one choice in legislative elections.
@@ -203,7 +189,7 @@ tables:
           - Male democracies are exclusive democracies that have comprehensive suffrage for men.
           - Electoral democracies are male democracies that also have comprehensive suffrage for women.
           - Polyarchies are electoral democracies that also protect the freedoms of expression, assembly, and association.
-        description_from_producer: |-
+        description_from_producer: &regime_lied_from_producer |-
           This index, LIED+, add an extra layer to the upper-end of LIED in the form of political liberties. This is done to distinguish between electoral democracies and full democracies. The meaning of the scores from 0 to 5 are identical to LIED, whereas 6 and 7 refer to the following configurations of indicator values:
 
           6: legislative_elections=1 & multi-party_legislative_elections=1 & executive_elections=1 & competitive_elections=1 & male_suffrage=1 & female_suffrage=1 & political_liberties=0 (regime type: electoral democracies)
@@ -213,15 +199,8 @@ tables:
           Equivalent indicator: `lexical_index_plus`
 
           {definitions.aux.polyarchy_fulldem}
-        description_processing: |-
-          0: non-electoral autocracy
-          1: one-party autocracy
-          2: multi-party autocracy without elected executive
-          3: multi-party autocracy
-          4: exclusive democracy
-          5: male democracy
-          6: electoral democracy
-          7: full democracy (polyarchy)
+        description_processing: &regime_lied_processing |-
+          We use the source's scores from 0 to 7 to assign each country-year its regime type, from non-electoral autocracy (0) to full democracy (7). Skaaning et al. call full democracies "polyarchies".
         presentation:
           grapher_config:
             title: Democracy
@@ -229,40 +208,25 @@ tables:
             hasMapTab: true
             tab: map
             chartTypes:
-              - LineChart
-            yAxis:
-              max: 7
-              min: 0
-            selectedFacetStrategy: entity
+              - Swimlane
             colorScale: &color_regime
               baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericLabels:
-                - Non-elect. autocracy
-                - One-party autocracy
-                - ""
-                - Multi-party autocracy
-                - Exclusive democracy
-                - Male democracy
-                - Electoral democracy
-                - Full democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-                - 6
-                - 7
-              customNumericColorsActive: true
             map:
-              colorScale:
-                <<: *color_regime
-                customCategoryLabels:
-                  No data: No data
-              tooltipUseCustomLabels: true
+              colorScale: *color_regime
+        display:
+          numDecimalPlaces: 0
+
+      regime_lied_score:
+        title: Political regime (LIED+, score)
+        unit: ""
+        description_short: |-
+          Identifies the political regime of a country. It distinguishes between non-electoral autocracies (0), one-party autocracies (1), multi-party autocracies without elected executive (2), multi-party autocracies (3), exclusive democracies (4), male democracies (5), electoral democracies (6), and full democracies (7).
+        description_key: *regime_lied_key
+        description_from_producer: *regime_lied_from_producer
+        description_processing: *regime_lied_processing
+        presentation:
+          title_public: Political regime
+          title_variant: LIED+, score
         display:
           numDecimalPlaces: 0
 
@@ -304,7 +268,7 @@ tables:
         title: Universal suffrage
         unit: ""
         description_short: |-
-          Indicates whether virtually all men and women that are citizens are allowed to vote in national elections (score 2), whether it is only men (score 1), or there is no universal rights to vote for either men or women (score 0). It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
+          Indicates whether virtually all men and women that are citizens are allowed to vote in national elections, whether it is only men, or whether there is no universal right to vote for either men or women. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
         description_processing: |-
           It combines the indicators `male_suffrage` and `female_suffrage` in Skaaning et al. (2015).
 
@@ -320,14 +284,14 @@ tables:
         title: Universal right to vote in practice
         unit: ""
         description_short: |-
-          Indicates whether virtually all adult citizens have the right to vote in practice (score 2), only men have broad voting rights in practice (score 1), or there are no broad voting rights in practice (score 0).
+          Indicates whether virtually all adult citizens have the right to vote in practice, only men have broad voting rights in practice, or there are no broad voting rights in practice.
         description_key:
-          - Countries with universal voting rights in practice (score 2) have universal suffrage for both men and women, and hold elections for both the chief executive and the legislature.
-          - Countries with broad voting rights for men in practice (score 1) have universal suffrage for men but not women, and hold elections for both the chief executive and the legislature.
-          - Countries with no broad voting rights in practice (score 0) do not hold elections for the chief executive or the legislature, or do not have universal suffrage for men.
+          - Countries with universal voting rights in practice have universal suffrage for both men and women, and hold elections for both the chief executive and the legislature.
+          - Countries with broad voting rights for men in practice have universal suffrage for men but not women, and hold elections for both the chief executive and the legislature.
+          - Countries with no broad voting rights in practice do not hold elections for the chief executive or the legislature, or do not have universal suffrage for men.
           - The indicator neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
         description_processing: |-
-          Takes on the value of 2 if both men and women have the right to vote (universal suffrage) and there are elections for both the chief executive and the legislature; the value of 1 if men (but not women) have the right to vote and there are elections for both the chief executive and the legislature; and the value of 0 otherwise. It differs from the "universal suffrage" indicator in that it also considers whether elections for the chief executive and the legislature are actually held.
+          "Universal voting rights" if both men and women have the right to vote (universal suffrage) and there are elections for both the chief executive and the legislature; "Broad voting rights for men" if men (but not women) have the right to vote and there are elections for both the chief executive and the legislature; and "No broad voting rights" otherwise. It differs from the "universal suffrage" indicator in that it also considers whether elections for the chief executive and the legislature are actually held.
         presentation:
           grapher_config:
             title: Voting rights in practice
@@ -335,30 +299,14 @@ tables:
             hasMapTab: true
             tab: map
             chartTypes:
-              - LineChart
-            yAxis:
-              max: 2
-              min: 0
-            selectedFacetStrategy: entity
+              - Swimlane
             colorScale: &color_suffrage_practice
-              binningStrategy: manual
-              customNumericColors:
-                - "#ef8a62"
-                - "#67a9cf"
-                - "#2c7bb6"
-              customNumericLabels:
-                - "No broad voting rights"
-                - "Broad voting rights for men"
-                - "Universal voting rights"
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-              customNumericColorsActive: true
+              customCategoryColors:
+                No broad voting rights: "#ef8a62"
+                Broad voting rights for men: "#67a9cf"
+                Universal voting rights: "#2c7bb6"
             map:
               colorScale: *color_suffrage_practice
-              tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
 
@@ -386,7 +334,7 @@ tables:
         description_short: |-
           Identifies if a country is a full democracy using the extended Lexical Index of Electoral Democracy (LIED+).
         description_processing: |-
-          It is a boolean indicator that indicates whether the country is a full democracy (score 7 in the `lexical_index_plus` indicator).
+          "Yes" if the country is a full democracy (score 7 in the source's `lexical_index_plus` indicator), and "No" otherwise.
         unit: ""
         presentation:
           grapher_config:
@@ -552,10 +500,10 @@ tables:
           Indicates whether the country experienced an electoral turnover event within the last 12 years.
         description_key:
           - An electoral turnover is when partisan control of government alternates to the opposition as a result of an election.
-          - The indicator equals 1 if a turnover event occurred in the current year or any of the preceding 11 years (12-year window).
-          - "Values are binary: 1 = recent turnover, 0 = no recent turnover."
+          - The indicator equals "Yes" if a turnover event occurred in the current year or any of the preceding 11 years (12-year window).
+          - "Values are \"Yes\" (recent turnover) or \"No\" (no recent turnover)."
         description_processing: |-
-          Derived from the `turnover_event` indicator. For each country, if `turnover_event` = 1 in year Y, then `recent_turnover_event_lied` = 1 for years Y through Y+11. If multiple turnover events occur, their windows overlap.
+          Derived from the `turnover_event` indicator. For each country, if a turnover event happened in year Y, `recent_turnover_event_lied` is "Yes" for years Y through Y+11. If multiple turnover events occur, their windows overlap.
 
       democratic_breakdown:
         title: Democratic breakdown
