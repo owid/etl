@@ -13,10 +13,12 @@ definitions:
     For the world, World Bank income groups, and five World Bank regions, we calculate the simple average of the scores of the countries in each group, as the World Bank does. We use each country’s latest classification for all years. In this data, the World Bank groups high-income members of the Organization for Economic Co-operation and Development (OECD) separately, so its regions do not include them.
   note_wbl_maps: |-
     This data reflects laws as written, not how they are enforced. It covers the laws that apply to a woman living in the country’s main business city, so laws elsewhere in the country may differ. Where different groups of women follow different religious or family laws, it covers the largest group.
+  description_key_wbl_index: |-
+    The index is built from 35 yes-or-no questions about the law, such as whether a woman can get a job, open a bank account, or inherit property in the same way as a man. A score of 100 means the law treats women and men the same on all 35 questions, not on every legal issue.
   description_key_wbl_as_written: |-
-    Women, Business and the Law measures laws as written, not how they are enforced in practice.
+    This data shows what the law says, not what happens in practice. A country can have equal laws on paper while women still face discrimination, and some laws are rarely enforced.
   description_key_wbl_assumptions: |-
-    To make countries comparable, Women, Business and the Law makes the same assumptions everywhere. For example, it looks at the laws that apply to a woman living in the country’s main business city, so laws elsewhere in the country may differ. Where different groups of women follow different religious or family laws, it covers the largest group.
+    It covers the laws in each country’s main business city, so laws in other parts of the country can differ. Where different groups follow different religious or family laws, it describes the laws for the largest group, so other women may live under different rules.
   description_key_wbl_leave_assumptions: |-
     Women, Business and the Law looks at the leave available for the birth of a first child, born without complications, to parents who have worked long enough to qualify for leave benefits.
   description_key_wbl_shared_leave: |-
@@ -746,7 +748,7 @@ tables:
         description_short: |-
           Score from 0 to 100 measuring how laws affect women’s economic opportunities. Higher scores mean laws that are more equal for women and men, and 100 is the best possible score.
         description_key: |-
-          The index is based on 35 yes/no questions about the law, grouped into eight areas: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension. Each area’s score is the share of its questions answered “yes”, from 0 to 100. The index is the average of the eight area scores.
+          {definitions.description_key_wbl_index}
 
           {definitions.description_key_wbl_as_written}
 
