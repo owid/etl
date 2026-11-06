@@ -6,13 +6,15 @@ It combines the following snapshots:
 - GCP's official GCB national emissions (excel file) containing consumption-based emissions for each country.
   - Production-based emissions from this file are also used, but just to include total emissions of regions
     according to GCP (e.g. "Africa (GCP)") and for sanity checks.
-- GCP's official GCB national land-use change emissions (excel file) with land-use change emissions for each country.
+- GCP's official GCB national land-use change emissions (excel file) with land-use change emissions for each country,
+  from each of the three models (BLUE, OSCAR and LUCE).
 - GCP's GCB summary for the media (excel file) with fossil emissions of a few countries, including a projection of the
   current year.
 
 """
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -69,13 +71,15 @@ def prepare_historical_budget(tb_historical: Table) -> Table:
     return tb_historical
 
 
-def prepare_land_use_emissions(tb_land_use: Table) -> Table:
+def prepare_land_use_emissions(tb_land_use: Table, model: str) -> Table:
     """Prepare data from a specific sheet of the land-use change data file.
 
     Parameters
     ----------
     tb_land_use : Table
         Data from a specific sheet of the land-use change emissions data file.
+    model : str
+        Name of the model of land-use change emissions (which is also the name of the sheet).
 
     Returns
     -------
@@ -86,7 +90,7 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     tb_land_use = tb_land_use.copy()
 
     # Sanity check.
-    error = "'BLUE' sheet in national land-use change data file has changed (consider changing 'skiprows')."
+    error = f"'{model}' sheet in national land-use change data file has changed (consider changing 'skiprows')."
     assert tb_land_use.columns[1] == "Afghanistan", error
 
     # Rename year column.
@@ -99,13 +103,7 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     tb_land_use = tb_land_use[tb_land_use["year"].astype(str).str.match(r"^\d{4}$")].reset_index(drop=True)
 
     # Restructure data to have a column for country and another for emissions.
-    tb_land_use = tb_land_use.melt(id_vars="year", var_name="country", value_name="emissions")
-
-    # Set an index and sort row and columns conveniently.
-    tb_land_use = tb_land_use.format(["country", "year"], sort_columns=True)
-
-    # Rename table.
-    tb_land_use.metadata.short_name = "global_carbon_budget_land_use_change"
+    tb_land_use = tb_land_use.melt(id_vars="year", var_name="country", value_name=f"emissions_{model.lower()}")
 
     return tb_land_use
 
@@ -199,8 +197,10 @@ def run() -> None:
     # Load historical budget from the global emissions file.
     tb_historical = snap_global.read(sheet_name="Historical Budget", skiprows=15)
 
-    # Load land-use emissions.
-    tb_land_use = snap_land_use.read(sheet_name="BLUE", skiprows=7)
+    # Load land-use emissions from each of the three models.
+    tb_land_use_blue = snap_land_use.read(sheet_name="BLUE", skiprows=7)
+    tb_land_use_oscar = snap_land_use.read(sheet_name="OSCAR", skiprows=7)
+    tb_land_use_luce = snap_land_use.read(sheet_name="LUCE", skiprows=7)
 
     # Load production-based national emissions.
     tb_production = snap_national.read(sheet_name="Territorial Emissions", skiprows=11)
@@ -220,8 +220,21 @@ def run() -> None:
     # Prepare data for historical emissions.
     tb_historical = prepare_historical_budget(tb_historical=tb_historical)
 
-    # Prepare data for land-use emissions.
-    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use)
+    # Prepare data for land-use emissions from each model, and combine them in one table.
+    tb_land_use = pr.merge(
+        prepare_land_use_emissions(tb_land_use=tb_land_use_blue, model="BLUE"),
+        prepare_land_use_emissions(tb_land_use=tb_land_use_oscar, model="OSCAR"),
+        on=["country", "year"],
+        how="outer",
+    )
+    tb_land_use = pr.merge(
+        tb_land_use,
+        prepare_land_use_emissions(tb_land_use=tb_land_use_luce, model="LUCE"),
+        on=["country", "year"],
+        how="outer",
+    )
+    tb_land_use = tb_land_use.format(["country", "year"], sort_columns=True)
+    tb_land_use.metadata.short_name = "global_carbon_budget_land_use_change"
 
     # Prepare data for production-based emissions, from the file of national emissions.
     tb_production = prepare_national_emissions(tb=tb_production, column_name="production_emissions")

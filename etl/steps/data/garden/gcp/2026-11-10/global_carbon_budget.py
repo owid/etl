@@ -522,16 +522,37 @@ def prepare_production_emissions(tb_production: Table) -> Table:
     return tb_production
 
 
-def prepare_land_use_emissions(tb_land_use: Table) -> Table:
+def prepare_land_use_emissions(tb_land_use: Table, tb_historical: Table) -> Table:
     """Prepare land-use change emissions data (basic processing)."""
+    # Take the average of the three models, which is how GCP estimates global land-use change emissions.
+    models = ["emissions_blue", "emissions_oscar", "emissions_luce"]
+    error = "Expected land-use change emissions from all three models for every country and year."
+    assert tb_land_use[models].notnull().all().all(), error
+    tb_land_use["emissions"] = (
+        tb_land_use["emissions_blue"] + tb_land_use["emissions_oscar"] + tb_land_use["emissions_luce"]
+    ) / 3
+    tb_land_use = tb_land_use.drop(columns=models, errors="raise")
+
     # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
     tb_land_use["emissions"] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
 
+    # Check that the global average of the three models coincides with the global emissions in the global file.
+    comparison = pr.merge(
+        tb_land_use[tb_land_use["country"] == "Global"][["year", "emissions"]],
+        tb_historical[["year", "global_emissions_from_land_use_change"]].dropna(),
+        on="year",
+        how="inner",
+    )
+    error = "Average of the three models of land-use change emissions does not coincide with the global data."
+    assert len(comparison) > 150, error
+    assert (
+        abs(comparison["emissions"] - comparison["global_emissions_from_land_use_change"])
+        / comparison["global_emissions_from_land_use_change"]
+        < 1e-4
+    ).all(), error
+
     # There are two additional regions in the land-use change file, namely Global and EU27.
-    # It makes sense to extract national land-use change contributions from one of the sheets of that file (we currently
-    # do so from the "BLUE" sheet), since there are no other national land-use change emissions in other files.
-    # But for global emissions, it makes more sense to take the ones estimated by GCP, which are given in the
-    # "Historical Budget" sheet of the global emissions file.
+    # For global emissions, take the ones in the "Historical Budget" sheet of the global emissions file.
     # So, remove the data for "Global".
     # We also remove EU27 data, as explained above, since we aggregate that data ourselves.
     tb_land_use = tb_land_use[~tb_land_use["country"].isin(["Global", "EU27"])].reset_index(drop=True)
@@ -1067,14 +1088,14 @@ def run() -> None:
     # Prepare production-based emission data.
     tb_production = prepare_production_emissions(tb_production=tb_production)
 
-    # Prepare land-use emission data.
-    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use)
-
     # Select and rename columns from primary energy data.
     tb_energy = tb_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")
 
     # Prepare historical emissions data.
     tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
+
+    # Prepare land-use emission data.
+    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use, tb_historical=tb_historical)
 
     # Run sanity checks on input data.
     sanity_checks_on_input_data(
