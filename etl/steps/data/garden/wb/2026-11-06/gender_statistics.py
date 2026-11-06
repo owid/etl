@@ -41,6 +41,21 @@ WBL_REGIONS = {
     "South Asia": "South Asia (WB)",
     "Sub-Saharan Africa": "Sub-Saharan Africa (WB)",
 }
+# Series the producer ships with no data at all, which we drop.
+# NOTE: In the October 2026 release, these "female share of graduates" series are empty, although the previous release
+# had data for them. On the next update, check whether the data is back (and remove them from this list).
+EMPTY_SERIES = [
+    "se_ter_grad_fe_ag_zs",
+    "se_ter_grad_fe_ed_zs",
+    "se_ter_grad_fe_en_zs",
+    "se_ter_grad_fe_hl_zs",
+    "se_ter_grad_fe_hu_zs",
+    "se_ter_grad_fe_ot_zs",
+    "se_ter_grad_fe_sc_zs",
+    "se_ter_grad_fe_ss_zs",
+    "se_ter_grad_fe_sv_zs",
+]
+
 WBL_INCOME_GROUPS = {
     "High income": "High-income countries",
     "Upper middle income": "Upper-middle-income countries",
@@ -111,6 +126,11 @@ def run() -> None:
 
     # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
+
+    # Drop series that have no data at all.
+    empty = sorted(column for column in tb.columns if tb[column].isna().all())
+    assert empty == EMPTY_SERIES, f"Series with no data changed. Now empty: {empty}"
+    tb = tb.drop(columns=empty)
     # Combine maternity and paternity leave indicators (time only available TO each parent)
     tb["total_maternity_leave_to"] = tb["sh_mmr_leve"] + tb["sh_par_leve_fe"]
     tb["total_paternity_leave_to"] = tb["sh_par_leve_ma"] + tb["sh_ptr_leve"]
