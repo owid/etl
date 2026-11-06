@@ -48,18 +48,6 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
-      male_embryos_removed:
-        title: Estimated number of male embryos removed before hatching
-        unit: embryos
-        short_unit: ""
-        display:
-          numDecimalPlaces: 0
-      share_of_males_spared:
-        title: Share of male chicks spared by in-ovo sexing
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
       hens_killed_per_capita:
         title: Estimated number of hens killed in egg production per person
         unit: hens per person
@@ -75,12 +63,6 @@ tables:
       chickens_killed_per_capita:
         title: Estimated number of chickens killed in egg production per person
         unit: chickens per person
-        short_unit: ""
-        display:
-          numDecimalPlaces: 2
-      male_embryos_removed_per_capita:
-        title: Estimated number of male embryos removed before hatching per person
-        unit: embryos per person
         short_unit: ""
         display:
           numDecimalPlaces: 2

@@ -2,9 +2,8 @@
 
 Starting from the number of laying hens reported by FAOSTAT, this step estimates how many hens are killed each year to
 keep that flock in production, and how many male chickens (the brothers of those hens) are killed as well, either as
-day-old chicks or later on. In countries that use in-ovo sexing, a share of the male embryos is removed before hatching;
-those are counted separately, and not as killed chickens. The share of hens sexed in ovo in each country and year is
-taken from the in-ovo sexing market penetration dataset. For the United States, the results are checked against the
+day-old chicks or later on. In-ovo sexing, which removes some male embryos before they hatch, is not taken into account,
+since there are no figures of its use in each country. For the United States, the results are checked against the
 figures published by the US Department of Agriculture (USDA).
 """
 
@@ -65,7 +64,7 @@ FAOSTAT_AGGREGATE_SUFFIX = "(FAO)"
 # this is also (in effect) what FAOSTAT does.
 MAX_YEARS_TO_FILL = 5
 # Columns with counts, that are estimated from the number of laying hens.
-COUNT_COLUMNS = ["hens_killed", "male_embryos_removed", "male_chickens_killed", "chickens_killed"]
+COUNT_COLUMNS = ["hens_killed", "male_chickens_killed", "chickens_killed"]
 # Tolerances of the checks against USDA's figures for the United States:
 # - FAOSTAT's number of laying hens is USDA's annual average number of layers, sometimes taken from a preliminary release
 #   (which has differed from the revised figure by up to about 1%).
@@ -82,10 +81,6 @@ def run() -> None:
     # Load FAOSTAT QCL dataset and read its main (long) table.
     ds_qcl = paths.load_dataset("faostat_qcl")
     tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
-
-    # Load in-ovo sexing market penetration dataset and read the share of hens sexed in ovo by country and year.
-    ds_in_ovo = paths.load_dataset("in_ovo_sexing_market_penetration")
-    tb_in_ovo = ds_in_ovo.read("share_of_hens_sexed_in_ovo")
 
     # Load USDA's figures of laying hens and egg-type chicks in the United States, used only to check our estimates.
     ds_usda = paths.load_dataset("us_laying_hens_and_chicks")
@@ -109,15 +104,6 @@ def run() -> None:
         drop=True
     )
 
-    # Add the share (0 to 1) of hens sexed in ovo.
-    tb = tb.merge(tb_in_ovo, on=["country", "year"], how="left")
-    error = (
-        "Some country-years have no share of hens sexed in ovo (it should be zero where the technology is not used)."
-    )
-    assert tb["share_of_hens_sexed_in_ovo"].notna().all(), error
-    tb["share_in_ovo"] = tb["share_of_hens_sexed_in_ovo"] / 100
-    tb = tb.drop(columns=["share_of_hens_sexed_in_ovo"])
-
     # Estimate the number of hens and male chickens killed each year.
     tb = estimate_chickens_killed(tb=tb)
 
@@ -129,11 +115,6 @@ def run() -> None:
     )
     tb_aggregates = tb_aggregates[tb_aggregates["country"].isin(REGIONS)].reset_index(drop=True)
     tb = pr.concat([tb, tb_aggregates], ignore_index=True)
-
-    # Share of male chicks spared thanks to in-ovo sexing (computed after aggregating, so that it is a ratio of sums).
-    tb["share_of_males_spared"] = (
-        100 * tb["male_embryos_removed"] / (tb["male_embryos_removed"] + tb["male_chickens_killed"])
-    )
 
     # Add per capita indicators.
     tb = paths.regions.add_per_capita(tb=tb, columns=COUNT_COLUMNS, warn_on_missing_countries=False)
@@ -210,16 +191,11 @@ def estimate_chickens_killed(tb: Table) -> Table:
     """Estimate the number of hens and male chickens killed each year from the number of laying hens."""
     # Hens killed each year: all hens in the flock are replaced (and killed) every WEEKS_IN_LAY weeks.
     tb["hens_killed"] = tb["laying_hens"] * 52 / WEEKS_IN_LAY
-    # Male chicks hatched alongside the female chicks that replace those hens (assuming one male hatches per female).
-    males = tb["hens_killed"]
-    # Male embryos removed before hatching thanks to in-ovo sexing.
-    tb["male_embryos_removed"] = males * tb["share_in_ovo"]
-    # Male chickens killed, either as day-old chicks, or later on if they were raised for meat.
-    tb["male_chickens_killed"] = males - tb["male_embryos_removed"]
+    # Male chickens killed: the male chicks hatched alongside the female chicks that replace those hens (assuming one
+    # male hatches per female), killed either as day-old chicks, or later on if they were raised for meat.
+    tb["male_chickens_killed"] = tb["hens_killed"]
     # All chickens killed to produce eggs.
     tb["chickens_killed"] = tb["hens_killed"] + tb["male_chickens_killed"]
-
-    tb = tb.drop(columns=["share_in_ovo"])
 
     return tb
 
@@ -239,12 +215,6 @@ def sanity_check_outputs(tb: Table, tb_qcl: Table, tb_usda: Table) -> None:
 
     error = "Hens killed should be fewer than laying hens (the flock turns over in more than a year)."
     assert (tb["hens_killed"] <= tb["laying_hens"]).all(), error
-
-    error = "Male chickens killed should never exceed the number of male chicks hatched."
-    assert (tb["male_chickens_killed"] <= tb["hens_killed"] * (1 + 1e-6)).all(), error
-
-    error = "The share of males spared should be between 0 and 100."
-    assert tb["share_of_males_spared"].between(0, 100).all(), error
 
     # A hen lays a few hundred eggs per year, so there should be roughly 10 chickens killed per 1,000 eggs. Much larger
     # values point to inconsistent FAOSTAT data (e.g. Benin reports about 7 eggs per hen from 1991 to 2015).
