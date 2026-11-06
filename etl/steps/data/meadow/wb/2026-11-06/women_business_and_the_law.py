@@ -1,8 +1,13 @@
 """Load the Women, Business and the Law (WBL 1.0) snapshots and create a meadow dataset.
 
 The World Bank's Gender Statistics stopped publishing the WBL 1.0 indicators (yes/no legal questions and scores) when
-WBL moved to its 2.0 framework. To keep those series going, we take them directly from the WBL website: the 1971-2024
-historical panel, plus the latest report year recalculated under the 1.0 methodology.
+WBL moved to its 2.0 framework. To keep those series going, we take them directly from the WBL website's 1971-2024
+historical panel.
+
+NOTE: WBL also publishes its 2026 report recalculated under the 1.0 methodology, but we don't use it yet. In that
+report, the World Bank corrected some earlier answers ("revisions" in its "Data Changes" sheet) without correcting the
+1971-2024 panel, so appending it would show those corrections as changes in the law. On the next update, check whether
+the World Bank has published a corrected 1.0 history (we asked), and add the latest report year then.
 
 Columns are renamed to the World Bank indicator codes that Gender Statistics used for the same series, so that the
 garden step can slot them back into the gender_statistics table.
@@ -20,7 +25,6 @@ paths = PathFinder(__file__)
 # Sheet holding the full data in each snapshot.
 SHEETS = {
     "women_business_and_the_law_1_0_panel.xlsx": "WBL Panel 2024",
-    "women_business_and_the_law_1_0_scores.xlsx": "WBL 2026 1.0",
 }
 
 # Identifier columns we keep, and their new names (region and income group are used for the World Bank's averages).
@@ -114,7 +118,7 @@ def run() -> None:
     #
     # Process data.
     #
-    # Combine the historical panel with the latest report year.
+    # Combine the tables from all snapshots.
     tb = pr.concat(tables, ignore_index=True)
     for column in ["country", "region", "income_group"]:
         tb[column] = tb[column].astype("category")

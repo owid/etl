@@ -62,7 +62,6 @@ steps:
       - snapshot://wb/2026-11-06/gender_statistics.zip
       - data://meadow/wb/2026-11-06/women_business_and_the_law:
         - snapshot://wb/2026-11-06/women_business_and_the_law_1_0_panel.xlsx
-        - snapshot://wb/2026-11-06/women_business_and_the_law_1_0_scores.xlsx
   data://grapher/wb/2026-11-06/gender_statistics_country_counts:
     - data://garden/wb/2026-11-06/gender_statistics_country_counts:
       - data://garden/wb/2026-11-06/gender_statistics
