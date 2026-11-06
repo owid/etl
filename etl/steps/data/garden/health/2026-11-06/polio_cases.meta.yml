@@ -31,6 +31,11 @@ dataset:
 
   owners:
     - Fiona Spooner
+  changelog:
+    - date: 2026-11-06
+      changes:
+        - Added 2023, and 2024–2025 as provisional counts.
+        - Counts for 1951–1960 now include paralytic cases only, as they already did from 1961.
 tables:
   polio_cases:
     variables:
