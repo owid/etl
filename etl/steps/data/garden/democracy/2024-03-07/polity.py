@@ -95,11 +95,11 @@ LABELS = {
     },
     "exec_constr_polity": {
         1: "Unconstrained",
-        2: "Between unconstrained and slight to moderate",
+        2: "Unconstrained to slight",
         3: "Slight to moderate",
-        4: "Between slight to moderate and substantial",
+        4: "Moderate to substantial",
         5: "Substantial",
-        6: "Between substantial and executive parity or subordination",
+        6: "Substantial to parity",
         7: "Executive parity or subordination",
     },
     "polpart_reg_polity": {

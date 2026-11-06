@@ -214,10 +214,6 @@ tables:
             chartTypes: ["Swimlane"]
             colorScale: &color_constr
               baseColorScheme: PuBu
-              customCategoryColors:
-                Unconstrained: "#e74731"
-                Between unconstrained and slight to moderate: "#b66162"
-                Slight to moderate: "#967282"
             map:
               colorScale: *color_constr
               timeTolerance: 2

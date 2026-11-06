@@ -45,7 +45,7 @@ LABELS = {
     "regime_lied": {
         0: "Non-electoral autocracy",
         1: "One-party autocracy",
-        2: "Multi-party autocracy without elected executive",
+        2: "Multi-party autocracy, unelected executive",
         3: "Multi-party autocracy",
         4: "Exclusive democracy",
         5: "Male democracy",

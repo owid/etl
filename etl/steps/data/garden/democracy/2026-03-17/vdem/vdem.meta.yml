@@ -870,12 +870,12 @@ tables:
               baseColorScheme: RdYlBu
               customCategoryColors:
                 Closed autocracy: "#d7191c"
-                Closed autocracy, may be electoral autocracy: "#e74731"
-                Electoral autocracy, may be closed autocracy: "#f88e52"
-                Electoral autocracy, may be electoral democracy: "#f0cda5"
-                Electoral democracy, may be electoral autocracy: "#d0dcc1"
-                Electoral democracy, may be liberal democracy: "#8dc1dc"
-                Liberal democracy, may be electoral democracy: "#5496c5"
+                Closed, leaning electoral autocracy: "#e74731"
+                Electoral, leaning closed autocracy: "#f88e52"
+                Electoral autocracy, leaning democracy: "#f0cda5"
+                Electoral democracy, leaning autocracy: "#d0dcc1"
+                Electoral, leaning liberal democracy: "#8dc1dc"
+                Liberal, leaning electoral democracy: "#5496c5"
                 Liberal democracy: "#2c7bb6"
             map:
               colorScale: *colorscale_regime_amb

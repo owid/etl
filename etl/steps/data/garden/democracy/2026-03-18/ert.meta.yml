@@ -36,9 +36,6 @@ tables:
               - China
             colorScale: &color_regime_ert
               baseColorScheme: RdBu
-              customCategoryColors:
-                Hardening autocracy: "#d7191c"
-                Stable autocracy: "#bc8e5a"
             map:
               colorScale: *color_regime_ert
       regime_dich_ert:
