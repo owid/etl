@@ -119,7 +119,7 @@ tables:
         title: "Political regime"
         description_short: |-
           Identifies the political regime of a country. It distinguishes between hard-line autocracies, moderate autocracies, highly defective democracies, defective democracies, and consolidating democracies.
-        description_key:
+        description_key: &regime_bti_key
           - Consolidating democracies have comprehensive democratic features and minimum democratic characteristics (citizens can choose political leaders in free and fair elections and enjoy freedoms of association, expression and some further civil liberties, political power is separated, and leaders can effectively govern a state that fulfills basic functions).
           - Defective democracies have minimum democratic characteristics, but limited other democratic features.
           - Very defective democracies have minimum democratic characteristics, but very limited other democratic features.
@@ -149,9 +149,8 @@ tables:
         title: Political regime (score)
         unit: ""
         description_short: |-
-          Political regime of a country as a score: 1 for hard-line autocracies, 2 for moderate autocracies, 3 for highly defective democracies, 4 for defective democracies, and 5 for consolidating democracies.
-        description_key:
-          - It is the same classification as our political regime indicator from the Bertelsmann Transformation Index, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+          Identifies the political regime of a country. It distinguishes between hard-line autocracies (1), moderate autocracies (2), highly defective democracies (3), defective democracies (4), and consolidating democracies (5).
+        description_key: *regime_bti_key
         presentation:
           title_public: Political regime
           title_variant: score

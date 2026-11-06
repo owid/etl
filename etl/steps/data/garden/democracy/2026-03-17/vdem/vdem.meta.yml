@@ -794,7 +794,7 @@ tables:
         description_short: |-
           Identifies the political regime of a country by distinguishing between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
         unit: ""
-        description_key:
+        description_key: &regime_row_owid_key
           - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
           - The classification distinguishes between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
           - In _closed autocracies_, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
@@ -824,11 +824,9 @@ tables:
       regime_row_owid_score:
         title: Political regime (score)
         description_short: |-
-          Political regime of a country as a score: 0 for closed autocracies, 1 for electoral autocracies, 2 for electoral democracies, and 3 for liberal democracies.
+          Identifies the political regime of a country by distinguishing between closed autocracies (0), electoral autocracies (1), electoral democracies (2), and liberal democracies (3).
         unit: ""
-        description_key:
-          - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
-          - It is the same classification as our political regime indicator, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+        description_key: *regime_row_owid_key
         description_processing: |-
           {definitions.aux.description_processing_row_no_legislative_elections}
 

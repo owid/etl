@@ -180,7 +180,7 @@ tables:
         unit: ""
         description_short: |-
           Identifies the political regime of a country. It distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies, and full democracies.
-        description_key:
+        description_key: &regime_lied_key
           - In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
           - In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
           - Multiparty autocracies without an elected executive are otherwise one-party autocracies, but the chief executive of the government is not elected even if citizens have more than one choice in legislative elections.
@@ -189,7 +189,7 @@ tables:
           - Male democracies are exclusive democracies that have comprehensive suffrage for men.
           - Electoral democracies are male democracies that also have comprehensive suffrage for women.
           - Polyarchies are electoral democracies that also protect the freedoms of expression, assembly, and association.
-        description_from_producer: |-
+        description_from_producer: &regime_lied_from_producer |-
           This index, LIED+, add an extra layer to the upper-end of LIED in the form of political liberties. This is done to distinguish between electoral democracies and full democracies. The meaning of the scores from 0 to 5 are identical to LIED, whereas 6 and 7 refer to the following configurations of indicator values:
 
           6: legislative_elections=1 & multi-party_legislative_elections=1 & executive_elections=1 & competitive_elections=1 & male_suffrage=1 & female_suffrage=1 & political_liberties=0 (regime type: electoral democracies)
@@ -199,7 +199,7 @@ tables:
           Equivalent indicator: `lexical_index_plus`
 
           {definitions.aux.polyarchy_fulldem}
-        description_processing: |-
+        description_processing: &regime_lied_processing |-
           We use the source's scores from 0 to 7 to assign each country-year its regime type, from non-electoral autocracy (0) to full democracy (7). Skaaning et al. call full democracies "polyarchies".
         presentation:
           grapher_config:
@@ -220,9 +220,10 @@ tables:
         title: Political regime (LIED+, score)
         unit: ""
         description_short: |-
-          Political regime of a country as a score from 0 to 7: non-electoral autocracies (0), one-party autocracies (1), multi-party autocracies without elected executive (2), multi-party autocracies (3), exclusive democracies (4), male democracies (5), electoral democracies (6), and full democracies (7).
-        description_key:
-          - It is the same classification as our political regime indicator from the Lexical Index, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+          Identifies the political regime of a country. It distinguishes between non-electoral autocracies (0), one-party autocracies (1), multi-party autocracies without elected executive (2), multi-party autocracies (3), exclusive democracies (4), male democracies (5), electoral democracies (6), and full democracies (7).
+        description_key: *regime_lied_key
+        description_from_producer: *regime_lied_from_producer
+        description_processing: *regime_lied_processing
         presentation:
           title_public: Political regime
           title_variant: LIED+, score

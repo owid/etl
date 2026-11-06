@@ -316,7 +316,7 @@ tables:
         unit: ""
         description_short: |-
           Identifies the political regime of a country using the Polity 5 data by the Center for Systemic Peace. It distinguishes between autocracies, anocracies, and democracies.
-        description_key:
+        description_key: &regime_polity_key
           - *other_sources
           - Democracies have mostly democratic characteristics, understood as open, multi-party, and competitive elections choosing a chief executive who faces comprehensive institutional constraints, and competitive political participation.
           - Anocracies have neither clearly democratic nor autocratic characteristics.
@@ -346,13 +346,13 @@ tables:
         title: Political regime (score)
         unit: ""
         description_short: |-
-          Political regime of a country as a score: 0 for autocracies, 1 for anocracies, and 2 for democracies.
-        description_key:
-          - It is the same classification as our political regime indicator from Polity 5, stored as a score so that it can be compared with the classifications of other sources on a common scale.
+          Identifies the political regime of a country using the Polity 5 data by the Center for Systemic Peace. It distinguishes between autocracies (0), anocracies (1), and democracies (2).
+        description_key: *regime_polity_key
         presentation:
           title_public: Political regime
           title_variant: score
         display:
+          includeInTable: true
           numDecimalPlaces: 0
 
       democracy_recod_polity:
