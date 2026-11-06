@@ -10,6 +10,7 @@ meta:
 
       Each report describes the laws in force in the year before it is published (on October 1, in recent reports).
     date_published: '2024-03-04'
+    attribution: World Bank – Women, Business and the Law (2024)
     citation_full: 'World Bank (2024). Women, Business and the Law 2024 - 1.0 data for 1971-2024 [dataset]. Washington, DC: World Bank.'
     url_main: https://wbl.worldbank.org/en/wbl-data
     url_download: https://wbl.worldbank.org/content/dam/sites/wbl/documents/2024/WBL2024-1-0-Historical-Panel-Data.xlsx
