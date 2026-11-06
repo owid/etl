@@ -49,7 +49,14 @@ Since 2001, the GCP has published estimates of global and national fossil CO₂ 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-folder", prompt=True, type=str, help="Path to local folder where data files are.")
+@click.option(
+    "--path-to-file",
+    "--path-to-folder",
+    "path_to_folder",
+    prompt=True,
+    type=str,
+    help="Path to local folder where data files are.",
+)
 def run(path_to_folder: str, upload: bool) -> None:
     # Create a new snapshot for each dataset.
     for data_file in DATA_FILES:
@@ -74,7 +81,3 @@ def run(path_to_folder: str, upload: bool) -> None:
         assert path_to_file.exists(), f"File {path_to_file} does not exist."
         snap.create_snapshot(filename=path_to_file, upload=upload)
         ################################################################################################################
-
-
-if __name__ == "__main__":
-    run()
