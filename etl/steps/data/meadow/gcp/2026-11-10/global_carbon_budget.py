@@ -7,6 +7,8 @@ It combines the following snapshots:
   - Production-based emissions from this file are also used, but just to include total emissions of regions
     according to GCP (e.g. "Africa (GCP)") and for sanity checks.
 - GCP's official GCB national land-use change emissions (excel file) with land-use change emissions for each country.
+- GCP's GCB summary for the media (excel file) with fossil emissions of a few countries, including a projection of the
+  current year.
 
 """
 
@@ -153,6 +155,33 @@ def prepare_national_emissions(tb: Table, column_name: str) -> Table:
     return tb
 
 
+def prepare_media_summary(tb_media: Table) -> Table:
+    # Sanity check.
+    error = "Sheet in summary for the media has changed (consider changing 'skiprows')."
+    assert tb_media.columns[0] == "Year", error
+
+    # Select the columns of country-level fossil emissions.
+    columns = ["China", "USA", "India", "EU27", "Japan", "Intnl. Aviation", "Intnl. Shipping", "Rest of World"]
+    error = "Columns of country-level fossil emissions in summary for the media have changed."
+    assert set(columns) <= set(tb_media.columns), error
+    tb_media = tb_media[["Year"] + columns].rename(columns={"Year": "year"}, errors="raise")
+
+    # Keep only rows of annual data (the rows below them have changes and averages).
+    tb_media = tb_media[tb_media["year"].astype(str).str.match(r"^\d{4}$")].astype({"year": int}).reset_index(drop=True)
+
+    # Restructure data to have a column for country and another for emissions.
+    tb_media = tb_media.melt(id_vars="year", var_name="country", value_name="fossil_emissions")
+    tb_media = tb_media.astype({"fossil_emissions": float})
+
+    # Set an index and sort row and columns conveniently.
+    tb_media = tb_media.format(["country", "year"], sort_columns=True)
+
+    # Rename table.
+    tb_media.metadata.short_name = "global_carbon_budget_media_summary"
+
+    return tb_media
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -162,6 +191,7 @@ def run() -> None:
     snap_global = paths.load_snapshot("global_carbon_budget_global_emissions.xlsx")
     snap_national = paths.load_snapshot("global_carbon_budget_national_emissions.xlsx")
     snap_land_use = paths.load_snapshot("global_carbon_budget_land_use_change_emissions.xlsx")
+    snap_media = paths.load_snapshot("global_carbon_budget_media_summary.xlsx")
 
     # Load data from fossil CO2 emissions.
     tb_fossil_co2 = snap_fossil_co2.read()
@@ -177,6 +207,9 @@ def run() -> None:
 
     # Load consumption-based national emissions.
     tb_consumption = snap_national.read(sheet_name="Consumption Emissions", skiprows=8)
+
+    # Load the summary for the media.
+    tb_media = snap_media.read(skiprows=4)
 
     #
     # Process data.
@@ -196,12 +229,15 @@ def run() -> None:
     # Prepare data for consumption-based emissions, from the file of national emissions.
     tb_consumption = prepare_national_emissions(tb=tb_consumption, column_name="consumption_emissions")
 
+    # Prepare country-level fossil emissions from the summary for the media.
+    tb_media = prepare_media_summary(tb_media=tb_media)
+
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(
-        tables=[tb_fossil_co2, tb_historical, tb_land_use, tb_production, tb_consumption],
+        tables=[tb_fossil_co2, tb_historical, tb_land_use, tb_production, tb_consumption, tb_media],
         default_metadata=snap_fossil_co2.metadata,
     )
     ds_meadow.save()

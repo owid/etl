@@ -102,6 +102,18 @@ PROJECTED_EMISSIONS_COLUMNS = {
     "emissions_from_land_use_change": "global_emissions_from_land_use_change",
 }
 
+# Countries with projected fossil emissions in the summary for the media, and how to rename them.
+# NOTE: The summary also has "Rest of World", which is used only to check that all entities add up to the World.
+PROJECTED_COUNTRIES = {
+    "China": "China",
+    "USA": "United States",
+    "India": "India",
+    "EU27": "European Union (27)",
+    "Japan": "Japan",
+    "Intnl. Aviation": "International aviation",
+    "Intnl. Shipping": "International shipping",
+}
+
 # Columns to use from consumption-based emissions data and how to rename them.
 CONSUMPTION_EMISSIONS_COLUMNS = {
     "country": "country",
@@ -117,6 +129,9 @@ BILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e9
 
 # Conversion factor to change from million tonnes of carbon to tonnes of CO2.
 MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e6
+
+# Conversion from billion tonnes of CO2 to tonnes of CO2.
+BILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e9
 
 # Conversion from million tonnes of CO2 to tonnes of CO2.
 MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
@@ -953,7 +968,7 @@ def combine_data_and_add_variables(
     return tb_co2_with_regions
 
 
-def add_projected_emissions(tb_combined: Table, tb_historical: Table) -> Table:
+def add_projected_emissions(tb_combined: Table, tb_historical: Table, tb_media: Table) -> Table:
     # The global data file has a projection for the year after the latest year of observed data.
     tb_world = tb_combined[tb_combined["country"] == "World"].set_index("year")
     latest_year = tb_world["emissions_total"].dropna().index.max()
@@ -982,6 +997,36 @@ def add_projected_emissions(tb_combined: Table, tb_historical: Table) -> Table:
         tb_projected["projected_emissions_total"] + tb_projected["projected_emissions_from_land_use_change"]
     )
 
+    # The summary for the media has projected fossil emissions for a few countries.
+    tb_media = tb_media.copy()
+    tb_media["fossil_emissions"] *= BILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
+    error = "Expected the summary for the media to end on the same projection year as the global data file."
+    assert tb_media["year"].max() == projection_year, error
+    error = "Projected fossil emissions of all entities in the summary for the media do not add up to the World's."
+    projection_world = tb_projected.loc[tb_projected["year"] == projection_year, "projected_emissions_total"].item()
+    projection_sum = tb_media.loc[tb_media["year"] == projection_year, "fossil_emissions"].sum()
+    assert abs(projection_sum - projection_world) / projection_world < 1e-4, error
+
+    # As for the World, each country also has its latest observed value.
+    tb_countries = tb_media[
+        tb_media["country"].isin(PROJECTED_COUNTRIES) & tb_media["year"].isin([latest_year, projection_year])
+    ].reset_index(drop=True)
+    tb_countries["country"] = tb_countries["country"].astype(str).replace(PROJECTED_COUNTRIES)
+    for country in PROJECTED_COUNTRIES.values():
+        observed_value = tb_combined.loc[
+            (tb_combined["country"] == country) & (tb_combined["year"] == latest_year), "emissions_total"
+        ].item()
+        latest = (tb_countries["country"] == country) & (tb_countries["year"] == latest_year)
+        media_value = tb_countries.loc[latest, "fossil_emissions"].item()
+        # Check that the projection is on the same basis as the observed data.
+        error = f"Summary for the media and main table disagree on emissions_total for {country} in {latest_year}."
+        assert abs(media_value - observed_value) / abs(observed_value) < 1e-4, error
+        tb_countries.loc[latest, "fossil_emissions"] = observed_value
+    error = "Projection of emissions_total for some countries is missing."
+    assert tb_countries["fossil_emissions"].notnull().all() and len(tb_countries) == 2 * len(PROJECTED_COUNTRIES), error
+    tb_countries = tb_countries.rename(columns={"fossil_emissions": "projected_emissions_total"}, errors="raise")
+    tb_projected = pr.concat([tb_projected, tb_countries], ignore_index=True)
+
     tb_combined = pr.merge(tb_combined, tb_projected, on=["country", "year"], how="outer")
 
     return tb_combined
@@ -998,6 +1043,7 @@ def run() -> None:
     tb_consumption = ds_meadow.read("global_carbon_budget_consumption_emissions", safe_types=False)
     tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
     tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
+    tb_media = ds_meadow.read("global_carbon_budget_media_summary")
 
     # Load primary energy consumption dataset and read its main table.
     ds_energy = paths.load_dataset("primary_energy_consumption")
@@ -1098,8 +1144,8 @@ def run() -> None:
     tb_combined.loc[(tb_combined["year"] < 1990), "cumulative_emissions_from_other_industry_as_share_of_global"] = None
     ####################################################################################################################
 
-    # Add World emissions projected for the current year.
-    tb_combined = add_projected_emissions(tb_combined=tb_combined, tb_historical=tb_historical)
+    # Add emissions projected for the current year.
+    tb_combined = add_projected_emissions(tb_combined=tb_combined, tb_historical=tb_historical, tb_media=tb_media)
 
     # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
     tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)
