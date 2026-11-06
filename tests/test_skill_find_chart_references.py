@@ -382,3 +382,39 @@ def test_unresolved_image_filename_is_a_coverage_gap(mod, monkeypatch):
     monkeypatch.setattr(mod, "COVERAGE_GAPS", [])
     assert mod.resolve_image_filenames(["real.png", "typo.png"]) == ["real.png"]
     assert len(mod.COVERAGE_GAPS) == 1 and "typo.png" in mod.COVERAGE_GAPS[0]
+
+
+def test_slugless_chart_is_labelled_by_id_and_is_a_transitive_gap(mod, monkeypatch):
+    """A draft chart with no slug must not leak NaN into `where`, and the transitive hop must
+    report it as unswept rather than crash sorting it next to real slugs.
+
+    A NULL slug arrives as NaN, not None, once the column also holds strings, and NaN is truthy.
+    """
+    charts = pd.DataFrame(
+        [
+            {"variableId": 1, "chart_id": 10, "config_id": "c10", "slug": "a-chart", "published": 1, "inheritance": 1},
+            {"variableId": 1, "chart_id": 11, "config_id": "c11", "slug": float("nan"), "published": 0, "inheritance": 0},
+        ]
+    )  # fmt: skip
+
+    def fake_read_sql(sql, params=None):
+        if "chart_dimensions" in sql:
+            return charts
+        if "SELECT c.id, cc.slug" in sql:
+            assert (params or {})["slugs"] == ("a-chart",)
+            return pd.DataFrame([{"id": 10, "slug": "a-chart"}])
+        return pd.DataFrame()
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    for name in [n for n in dir(mod) if n.startswith("sweep_") and n != "sweep_charts_of_indicators"]:
+        monkeypatch.setattr(mod, name, lambda *a, **k: [])
+    monkeypatch.setattr(mod, "resolve_variable_ids", lambda ids, dataset_id: [1])
+    monkeypatch.setattr(mod, "COVERAGE_GAPS", [])
+    monkeypatch.setattr("sys.argv", ["find_references.py", "--variable-ids", "1", "--transitive"])
+
+    hits = mod.sweep_charts_of_indicators([1])
+    draft = next(h for h in hits if h["surface_id"] == 11)
+    assert draft["where"] == "(chart 11, no slug)" and draft["where_path"] == ""
+
+    assert mod.main() == 0
+    assert len(mod.COVERAGE_GAPS) == 1 and "chart id(s) [11]" in mod.COVERAGE_GAPS[0]
