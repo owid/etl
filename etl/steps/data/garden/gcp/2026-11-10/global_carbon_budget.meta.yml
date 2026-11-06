@@ -89,7 +89,8 @@ tables:
           - *per_capita_description_key
           - *international_aviation_description_key
         description_processing: |-
-          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         unit: tonnes per person
         short_unit: t/person
         display:
@@ -167,7 +168,8 @@ tables:
           - The data comes from the Global Carbon Budget. Fossil CO₂ emissions are estimated using national statistics on energy use — such as coal, oil, and gas consumption — and industrial production, particularly cement. These figures are converted into CO₂ emissions using standardized emission factors. For more details, read [the Global Carbon Budget paper](https://doi.org/10.5194/essd-18-3211-2026).
           - *per_capita_description_key
         description_processing: |-
-          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           title_public: CO₂ emissions per capita
           ##################################################################################################################
