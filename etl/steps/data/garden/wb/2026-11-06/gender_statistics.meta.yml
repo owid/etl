@@ -951,7 +951,7 @@ tables:
 
           {definitions.wbl_limitations}
 
-          **Notes from original source:** This is one of the 35 scored indicators. The underlying inidcator is "Length of paid maternity leave (days)" (SH.MMR.LEVE).
+          **Notes from original source:** This is one of the 35 scored indicators. The underlying indicator is "Length of paid maternity leave (days)" (SH.MMR.LEVE).
         presentation:
           attribution: Women, Business and the Law; World Bank
 
@@ -996,7 +996,7 @@ tables:
 
           {definitions.wbl_limitations}
 
-          **Notes from original source:** This is one of the 35 scored indicators.  The underlying inidcator is "Length of paid paternity leave (days)" (SH.PTR.LEVE).
+          **Notes from original source:** This is one of the 35 scored indicators.  The underlying indicator is "Length of paid paternity leave (days)" (SH.PTR.LEVE).
         presentation:
           attribution: Women, Business and the Law; World Bank
 
@@ -1026,7 +1026,7 @@ tables:
 
           {definitions.wbl_limitations}
 
-          **Notes from original source:** This is one of the 35 scored indicators.  The underlying inidcators are as follows: 1. Length of paid shared parental leave (days) (SH.PAR.LEVE), 2. Length of paid parental leave for mother (days) (SH.PAR.LEVE.FE), 3. Length of paid parental leave for father (days) (SH.PAR.LEVE.MA)
+          **Notes from original source:** This is one of the 35 scored indicators.  The underlying indicators are as follows: 1. Length of paid shared parental leave (days) (SH.PAR.LEVE), 2. Length of paid parental leave for mother (days) (SH.PAR.LEVE.FE), 3. Length of paid parental leave for father (days) (SH.PAR.LEVE.MA)
         presentation:
           attribution: Women, Business and the Law; World Bank
 
@@ -1170,7 +1170,7 @@ tables:
 
           {definitions.wbl_limitations}
 
-          **Notes from original source:** This is one of the 35 scored indicators. The underlying inidcators are as follows: 1. Retirement age with full benefits, female (SG.AGE.RTRE.FL.FE), 2. Retirement age with full benefits, male (SG.AGE.RTRE.FL.MA)
+          **Notes from original source:** This is one of the 35 scored indicators. The underlying indicators are as follows: 1. Retirement age with full benefits, female (SG.AGE.RTRE.FL.FE), 2. Retirement age with full benefits, male (SG.AGE.RTRE.FL.MA)
         presentation:
           attribution: Women, Business and the Law; World Bank
 
@@ -1185,7 +1185,7 @@ tables:
 
           {definitions.wbl_limitations}
 
-          **Notes from original source:** This is one of the 35 scored indicators. The underlying inidcators are as follows: 1 .Retirement age with partial benefits, female (SG.AGE.RTRE.PL.FE), 2. Retirement age with partial benefits, male (SG.AGE.RTRE.PL.MA)
+          **Notes from original source:** This is one of the 35 scored indicators. The underlying indicators are as follows: 1 .Retirement age with partial benefits, female (SG.AGE.RTRE.PL.FE), 2. Retirement age with partial benefits, male (SG.AGE.RTRE.PL.MA)
         presentation:
           attribution: Women, Business and the Law; World Bank
 
@@ -1200,7 +1200,7 @@ tables:
 
           {definitions.wbl_limitations}
 
-          **Notes from original source:** This is one of the 35 scored indicators. The underlying inidcators are as follows: 1.Mandatory retirement age, female (SG.AGE.RTRE.FE), 2. Mandatory retirement age, male (SG.AGE.RTRE.MA)
+          **Notes from original source:** This is one of the 35 scored indicators. The underlying indicators are as follows: 1.Mandatory retirement age, female (SG.AGE.RTRE.FE), 2. Mandatory retirement age, male (SG.AGE.RTRE.MA)
         presentation:
           attribution: Women, Business and the Law; World Bank
 
