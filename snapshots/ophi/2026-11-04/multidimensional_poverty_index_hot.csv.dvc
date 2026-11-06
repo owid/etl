@@ -12,21 +12,21 @@ meta:
       This makes the MPI and its linked information platform invaluable as an analytical tool to identify the most vulnerable people – the poorest among the poor, revealing poverty patterns within countries and over time, enabling policy makers to target resources and design policies more effectively.
 
       The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
-    title_snapshot: Global Multidimensional Poverty Index (MPI) – Current margin estimates (CME)
-    description_snapshot: This dataset contains current margin estimates (CME), based on the most recent survey data.
+    title_snapshot: Global Multidimensional Poverty Index (MPI) – Harmonized over time (HOT)
+    description_snapshot: |-
+      This dataset contains harmonized over time (HOT) estimates. This harmonization seeks to make two or more MPI estimations comparable by aligning the indicator definitions in each survey.
     citation_full: |-
-      - Alkire, S., Mishra, R., Selden, L. and Suppa, N. (2025). The Global Multidimensional Poverty Index (MPI) 2025. Country Results and Methodological Note. OPHI MPI Methodological Note 61, Oxford Poverty and Human Development Initiative, University of Oxford.
-      - Alkire, S., Mishra, R., Selden, L. and Suppa, N. (2025). The Global Multidimensional Poverty Index (MPI) 2025. Disaggregation Results and Methodological Note. OPHI MPI Methodological Note 62, Oxford Poverty and Human Development Initiative, University of Oxford.
-    attribution: Alkire et al. (2025) – The Global Multidimensional Poverty Index (MPI) 2025
-    version_producer: '2025'
+      - Alkire, S., Mishra, R. and Suppa, N. (2026). The Global Multidimensional Poverty Index (MPI) 2026: Changes over Time Results for 89 Countries. OPHI MPI Methodological Note 66, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford.
+      - Alkire, S., Mishra, R. and Suppa, N. (2026). The Global Multidimensional Poverty Index (MPI) 2026: Disaggregation Results and Methodological Note. OPHI MPI Methodological Note 65, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford.
+    attribution: Alkire et al. (2026) – The Global Multidimensional Poverty Index (MPI) 2026
+    version_producer: '2026'
     url_main: https://ophi.org.uk/global-mpi
-    url_download: https://cloud-ophi.qeh.ox.ac.uk/index.php/s/nmrnMs2oaLNDKx7/download?path=%2F&files=GMPI2025_puf.csv
-    date_accessed: '2025-12-23'
-    date_published: '2025-10-17'
+    date_accessed: '2026-11-04'
+    date_published: '2026-10-12'
     license:
       name: CC BY 4.0
       url: https://ophi.org.uk/global-mpi-frequently-asked-questions
 outs:
-  - md5: 0f374b78509050b2ee9d0f8f6d95df94
-    size: 19000648
-    path: multidimensional_poverty_index_cme.csv
+  - md5: 19c0b76872c3c2d01c0a8106e9b938e6
+    size: 35053023
+    path: multidimensional_poverty_index_hot.csv
