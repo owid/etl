@@ -418,24 +418,25 @@ steps:
     - snapshot://health/2025-01-22/measles_state_level.zip
   data://external/health/latest/measles_state_level:
     - data://meadow/health/2025-01-22/measles_state_level
-    - data://garden/demography/2025-01-23/us_state_population
+    - data://garden/demography/2026-11-06/us_state_population
     - data://garden/demography/2024-07-15/population
     - snapshot://fasttrack/latest/cdc_measles.csv
     - snapshot://fasttrack/latest/measles_cases.csv
-    - data://garden/cdc/2025-01-26/measles_state_level
+    - data://garden/cdc/2026-11-06/measles_state_level
   data://grapher/health/2025-01-22/measles_state_level:
     - data://garden/health/2025-01-22/measles_state_level:
       - data://meadow/health/2025-01-22/measles_state_level
-      - data://garden/demography/2025-01-23/us_state_population
+      - data://garden/demography/2026-11-06/us_state_population
       - data://garden/demography/2024-07-15/population
       - snapshot://fasttrack/latest/cdc_measles.csv
       - snapshot://fasttrack/latest/measles_cases.csv
-      - data://garden/cdc/2025-01-26/measles_state_level
+      - data://garden/cdc/2026-11-06/measles_state_level
 
-  # TODO: add step name (just something recognizable)
-  data://garden/cdc/2025-01-26/measles_state_level:
-    - data://meadow/cdc/2025-01-26/measles_state_level:
-      - snapshot://cdc/2025-01-26/measles_state_level.txt
+  # US measles cases by state: finalized annual counts (CDC WONDER) and provisional counts for later years (NNDSS weekly)
+  data://garden/cdc/2026-11-06/measles_state_level:
+    - data://meadow/cdc/2026-11-06/measles_state_level:
+      - snapshot://cdc/2026-11-06/measles_state_level.csv
+      - snapshot://cdc/2026-11-06/nndss_weekly_measles.csv
 
   # WHO Vaccine Safety
   data://grapher/who/2025-01-28/vaccine_safety:
