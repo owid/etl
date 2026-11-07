@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Defra
+    title: Poultry and poultry meat statistics
+    title_snapshot: Poultry and poultry meat statistics - UK chick and poultry placings
+    description: |-
+      Monthly statistics on the activity of UK hatcheries and poultry slaughterhouses, published by the Department for Environment, Food & Rural Affairs (Defra) of the United Kingdom.
+    description_snapshot: |-
+      Chicks and poults placed by UK hatcheries (commercial broilers, commercial layers, turkeys and female broiler breeders), and eggs set, per month and per year.
+    citation_full: |-
+      Department for Environment, Food & Rural Affairs (2026). Poultry and poultry meat statistics: UK chick and poultry placings - monthly dataset.
+    url_main: https://www.gov.uk/government/statistics/poultry-and-poultry-meat-statistics
+    url_download: https://assets.publishing.service.gov.uk/media/6aaa66e92f29b38884818557/Hatcheries_dataset_20260917.ods
+    date_accessed: '2026-10-18'
+    date_published: '2026-09-17'
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.gov.uk/government/statistics/poultry-and-poultry-meat-statistics
+outs:
+  - md5: 0e066aa3725579beaf86420d855726d8
+    size: 188158
+    path: uk_poultry_placings.ods

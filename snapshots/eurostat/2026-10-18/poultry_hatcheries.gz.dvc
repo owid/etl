@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Eurostat
+    title: Poultry - annual data
+    description: |-
+      Annual statistics on the activity of hatcheries in the European Union and other European countries: eggs placed in incubation and chicks hatched for use, by species and type of chick (laying hen breeds, meat broiler breeds, mixed breeds, cockerels from sexing, turkeys, ducks, geese and guinea fowl), and imports and exports of chicks.
+    citation_full: |-
+      Eurostat (2026). Poultry - annual data (online data code apro_ec_poula). https://ec.europa.eu/eurostat/databrowser/view/apro_ec_poula/default/table?lang=en
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/apro_ec_poula/default/table?lang=en
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/apro_ec_poula?format=TSV&compressed=true
+    date_accessed: '2026-10-18'
+    date_published: '2026-07-03'
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: f2e2e058fc0a0ba0b7c2917b8c027419
+    size: 101146
+    path: poultry_hatcheries.gz

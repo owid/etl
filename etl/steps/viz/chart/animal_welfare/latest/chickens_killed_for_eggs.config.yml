@@ -1,0 +1,64 @@
+grapher_schema: "011"
+slug: chickens-killed-for-eggs
+
+title:
+  title: Chickens killed in egg production
+  title_variant: ""
+topic_tags:
+  - Animal Welfare
+
+default_selection:
+  - World
+
+default_dimensions:
+  metric: total
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/animal-welfare
+        subtitle: Around half of the estimated total are laying hens, killed when their productivity declines. The other half are male chickens, most of which are killed within a day of hatching.
+        note: Calculated by Our World in Data based on FAOSTAT's live hen estimates, assuming hens are killed after 65 weeks of laying, as on commercial farms. This may overestimate numbers in areas dominated by traditional flocks in Africa and Asia. In-ovo sexing, used e.g. in Germany and France, is not taken into account.
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart", "DiscreteBar"]
+        yAxis:
+          min: 0
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+
+views:
+  - dimensions:
+      metric: total
+    indicators:
+      y:
+        - catalogPath: chickens_killed_for_eggs#chickens_killed
+    config:
+      title: Chickens killed in egg production
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1000000000, 1]
+
+  - dimensions:
+      metric: per_capita
+    indicators:
+      y:
+        - catalogPath: chickens_killed_for_eggs#chickens_killed_per_capita
+    config:
+      title: Chickens killed in egg production per person
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 1]

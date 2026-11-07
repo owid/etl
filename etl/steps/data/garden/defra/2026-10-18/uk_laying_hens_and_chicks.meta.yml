@@ -1,0 +1,36 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  uk_laying_hens_and_chicks:
+    variables:
+      layer_chicks_placed:
+        title: Commercial layer chicks placed
+        unit: chicks
+        description_short: Female chicks of laying breeds placed by UK hatcheries during the year.
+      boiling_fowl_slaughtered:
+        title: Boiling fowl slaughtered
+        unit: birds
+        description_short: Number of boiling fowl (spent hens and spent breeders) slaughtered in the UK during the year.
+      total_breeding_and_laying_fowl:
+        title: Breeding and laying fowl
+        unit: birds
+        description_short: Number of breeding and laying fowl on UK farms at 1 June.
+      hens_and_pullets_laying_eggs_for_eating:
+        title: Hens and pullets laying eggs for eating
+        unit: birds
+        description_short: Number of hens and pullets laying eggs for eating on UK farms at 1 June.
+      breeding_flock:
+        title: Breeding flock
+        unit: birds
+        description_short: Number of birds in the breeding flock on UK farms at 1 June.

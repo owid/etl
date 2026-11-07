@@ -66,3 +66,12 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
+
+!!! note ""
+
+    ## [How many chickens are killed in egg production?](chickens_killed_in_egg_production/chickens_killed_in_egg_production.html)
+    Technical companion to the article ["Egg production kills more animals than beef, pork, and lamb combined"](https://ourworldindata.org/egg-production-kills-more-animals-than-beef-pork-and-lamb-combined).
+
+    [:material-notebook: View notebook](chickens_killed_in_egg_production/chickens_killed_in_egg_production.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/chickens_killed_in_egg_production/chickens_killed_in_egg_production.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/chickens_killed_in_egg_production/chickens_killed_in_egg_production.ipynb){ .md-button }
