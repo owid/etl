@@ -2,8 +2,9 @@
 
 Chart for a data insight: "The global decline in child labor has been driven by a sharp reduction in hazardous
 work". Seven stacked columns (2000, 2004, ..., 2024): other child labor at the bottom, hazardous child labor on top,
-the total above each column, the two segment values on the first and last columns, and the two category names
-beside the last column instead of a legend.
+the total above each column, both segment values inside every column, and the two category names beside the last
+column instead of a legend. Every value is in millions, rounded to a whole number half up (170.5 -> 171), so the two
+segment values of a column always add up to its total.
 
 Data: table `child_labor` of `garden/un/2026-04-08/child_labor_report` (ILO-UNICEF Global Estimates of Child Labour
 2024), World, sex "total", age "5-17", columns `number_child_labor` and `number_hazardous_work`. Hazardous work is a
@@ -68,6 +69,7 @@ composited at 0.9 on white): min ΔE 46.5 (protanopia), grayscale seam 1.92:1; #
 """
 
 import logging
+from decimal import ROUND_HALF_UP, Decimal
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -146,6 +148,14 @@ def run() -> None:
     tb["hazardous"] = tb["number_hazardous_work"] / 1e6
     tb["other"] = tb["total"] - tb["hazardous"]
 
+    # Printed values: whole millions, rounded half up from the exact counts (Python's round() sends 170.5 to 170).
+    tb["total_label"] = [millions_half_up(v) for v in tb["number_child_labor"]]
+    tb["hazardous_label"] = [millions_half_up(v) for v in tb["number_hazardous_work"]]
+    tb["other_label"] = [
+        millions_half_up(cl - hw) for cl, hw in zip(tb["number_child_labor"], tb["number_hazardous_work"])
+    ]
+    sanity_check_labels(tb)
+
     # The template's source slot is filled in Figma; log the string it takes.
     source = source_citation(tb["number_child_labor"], tb["number_hazardous_work"])
     log.info(f"Data source slot: {source}")
@@ -166,6 +176,17 @@ def sanity_check_inputs(tb) -> None:
     hazardous = [round(v / 1e6, 1) for v in tb["number_hazardous_work"]]
     assert total == REPORT_TOTAL, f"Child labor differs from the report: {total}."
     assert hazardous == REPORT_HAZARDOUS, f"Hazardous work differs from the report: {hazardous}."
+
+
+def millions_half_up(count) -> int:
+    """Round a count to whole millions, half up."""
+    return int((Decimal(int(count)) / Decimal(10**6)).quantize(Decimal(1), rounding=ROUND_HALF_UP))
+
+
+def sanity_check_labels(tb) -> None:
+    # A column's printed segments must add up to its printed total, or the chart reads as an arithmetic error.
+    mismatched = tb[tb["hazardous_label"] + tb["other_label"] != tb["total_label"]]
+    assert mismatched.empty, f"Rounded segments do not add up to the rounded total in {list(mismatched['year'])}."
 
 
 def build(tb):
@@ -217,7 +238,7 @@ def build(tb):
         ax.text(
             x,
             row.total + VALUE_GAP_PX * px_y,
-            f"{row.total:.1f}",
+            f"{row.total_label}",
             ha="center",
             va="bottom",
             fontsize=SIZE_VALUE * PT,
@@ -236,28 +257,27 @@ def build(tb):
             color=AXIS_TEXT,
             gid=f"horizontal-axis__{year}",
         )
-        # Segment values on the first and last columns only.
-        if year in (EXPECTED_YEARS[0], EXPECTED_YEARS[-1]):
-            ax.text(
-                x,
-                row.other / 2,
-                f"{row.other:.1f}",
-                ha="center",
-                va="center",
-                fontsize=SIZE_VALUE * PT,
-                color=DARK_TEXT,
-                gid=f"value__other-{year}",
-            )
-            ax.text(
-                x,
-                row.other + row.hazardous / 2,
-                f"{row.hazardous:.1f}",
-                ha="center",
-                va="center",
-                fontsize=SIZE_VALUE * PT,
-                color="#ffffff",
-                gid=f"value__hazardous-{year}",
-            )
+        # Segment values, centered on their segments.
+        ax.text(
+            x,
+            row.other / 2,
+            f"{row.other_label}",
+            ha="center",
+            va="center",
+            fontsize=SIZE_VALUE * PT,
+            color=DARK_TEXT,
+            gid=f"value__other-{year}",
+        )
+        ax.text(
+            x,
+            row.other + row.hazardous / 2,
+            f"{row.hazardous_label}",
+            ha="center",
+            va="center",
+            fontsize=SIZE_VALUE * PT,
+            color="#ffffff",
+            gid=f"value__hazardous-{year}",
+        )
 
     # Category names beside the last column, centered on its segments.
     last = tb.iloc[-1]

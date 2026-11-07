@@ -141,58 +141,88 @@ L 289.741796 203.976
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
    </g>
    <g id="value__total-2000">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="15.538204" y="9.3618" transform="rotate(-0 15.538204 9.3618)">245.5</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="15.538204" y="9.3618" transform="rotate(-0 15.538204 9.3618)">246</text>
    </g>
    <g id="horizontal-axis__2000">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="15.538204" y="212.3973" transform="rotate(-0 15.538204 212.3973)">2000</text>
    </g>
    <g id="value__other-2000">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="15.538204" y="174.355704" transform="rotate(-0 15.538204 174.355704)">75.0</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="15.538204" y="174.355704" transform="rotate(-0 15.538204 174.355704)">75</text>
    </g>
    <g id="value__hazardous-2000">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="15.538204" y="81.259704" transform="rotate(-0 15.538204 81.259704)">170.5</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="15.538204" y="81.259704" transform="rotate(-0 15.538204 81.259704)">171</text>
    </g>
    <g id="value__total-2004">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="61.238802" y="26.957134" transform="rotate(-0 61.238802 26.957134)">222.3</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="61.238802" y="26.957134" transform="rotate(-0 61.238802 26.957134)">222</text>
    </g>
    <g id="horizontal-axis__2004">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="61.238802" y="212.3973" transform="rotate(-0 61.238802 212.3973)">2004</text>
    </g>
+   <g id="value__other-2004">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="61.238802" y="167.18864" transform="rotate(-0 61.238802 167.18864)">94</text>
+   </g>
+   <g id="value__hazardous-2004">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="61.238802" y="82.890306" transform="rotate(-0 61.238802 82.890306)">128</text>
+   </g>
    <g id="value__total-2008">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.939401" y="32.341912" transform="rotate(-0 106.939401 32.341912)">215.2</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.939401" y="32.341912" transform="rotate(-0 106.939401 32.341912)">215</text>
    </g>
    <g id="horizontal-axis__2008">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="106.939401" y="212.3973" transform="rotate(-0 106.939401 212.3973)">2008</text>
    </g>
+   <g id="value__other-2008">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.939401" y="164.913381" transform="rotate(-0 106.939401 164.913381)">100</text>
+   </g>
+   <g id="value__hazardous-2008">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="106.939401" y="83.307437" transform="rotate(-0 106.939401 83.307437)">115</text>
+   </g>
    <g id="value__total-2012">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="152.64" y="68.139315" transform="rotate(-0 152.64 68.139315)">168.0</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="152.64" y="68.139315" transform="rotate(-0 152.64 68.139315)">168</text>
    </g>
    <g id="horizontal-axis__2012">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="152.64" y="212.3973" transform="rotate(-0 152.64 212.3973)">2012</text>
    </g>
+   <g id="value__other-2012">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="152.64" y="171.435789" transform="rotate(-0 152.64 171.435789)">83</text>
+   </g>
+   <g id="value__hazardous-2012">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="152.64" y="107.728547" transform="rotate(-0 152.64 107.728547)">85</text>
+   </g>
    <g id="value__total-2016">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="198.340599" y="80.577396" transform="rotate(-0 198.340599 80.577396)">151.6</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="198.340599" y="80.577396" transform="rotate(-0 198.340599 80.577396)">152</text>
    </g>
    <g id="horizontal-axis__2016">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="198.340599" y="212.3973" transform="rotate(-0 198.340599 212.3973)">2016</text>
    </g>
+   <g id="value__other-2016">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="198.340599" y="172.800944" transform="rotate(-0 198.340599 172.800944)">79</text>
+   </g>
+   <g id="value__hazardous-2016">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="198.340599" y="115.312742" transform="rotate(-0 198.340599 115.312742)">73</text>
+   </g>
    <g id="value__total-2020">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="244.041198" y="74.206672" transform="rotate(-0 244.041198 74.206672)">160.0</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="244.041198" y="74.206672" transform="rotate(-0 244.041198 74.206672)">160</text>
    </g>
    <g id="horizontal-axis__2020">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="244.041198" y="212.3973" transform="rotate(-0 244.041198 212.3973)">2020</text>
    </g>
+   <g id="value__other-2020">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="244.041198" y="172.080446" transform="rotate(-0 244.041198 172.080446)">81</text>
+   </g>
+   <g id="value__hazardous-2020">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="244.041198" y="111.406881" transform="rotate(-0 244.041198 111.406881)">79</text>
+   </g>
    <g id="value__total-2024">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="289.741796" y="91.22409" transform="rotate(-0 289.741796 91.22409)">137.6</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="289.741796" y="91.22409" transform="rotate(-0 289.741796 91.22409)">138</text>
    </g>
    <g id="horizontal-axis__2024">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="289.741796" y="212.3973" transform="rotate(-0 289.741796 212.3973)">2024</text>
    </g>
    <g id="value__other-2024">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="289.741796" y="171.09943" transform="rotate(-0 289.741796 171.09943)">83.6</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="289.741796" y="171.09943" transform="rotate(-0 289.741796 171.09943)">84</text>
    </g>
    <g id="value__hazardous-2024">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="289.741796" y="118.934575" transform="rotate(-0 289.741796 118.934575)">54.0</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="289.741796" y="118.934575" transform="rotate(-0 289.741796 118.934575)">54</text>
    </g>
    <g id="label__hazardous-child-labor">
     <text style="font-weight: 600; font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; fill: #9a5129" transform="translate(311.04 113.288897)">Hazardous</text>
