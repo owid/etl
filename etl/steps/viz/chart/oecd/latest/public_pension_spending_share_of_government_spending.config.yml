@@ -1,0 +1,39 @@
+chart_config_id: 01a18df5-9512-7097-a21e-0326ee594b41
+slug: public-pension-spending-share-of-government-spending
+grapher_schema: "011"
+topic_tags:
+  - Government Spending
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Tolerance lets the map and bars of the latest year use 2021 or 2022 for countries without newer data.
+      y:
+        - catalogPath: social_expenditure#share_gov_expenditure__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age_and_survivors__programme_type_total
+          display:
+            name: Public spending on pensions
+            tolerance: 2
+    config:
+      title: Public spending on pensions as share of government spending
+      subtitle: Government spending on pensions and other cash benefits for older people and survivors, divided by total government spending, expressed as a percentage.
+      note: Government includes central, state, and local governments and social security funds.
+      tab: chart
+      hasMapTab: true
+      chartTypes:
+        - LineChart
+        - DiscreteBar
+      yAxis:
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: YlOrBr
+      selectedEntityNames:
+        - OECD countries
+        - Italy
+        - France
+        - Germany
+        - Japan
+        - United Kingdom
+        - United States
+        - South Korea
+      addCountryMode: add-country

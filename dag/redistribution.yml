@@ -32,6 +32,14 @@ steps:
       - snapshot://oecd/2025-12-11/social_expenditure.csv
   data://grapher/oecd/2025-12-11/social_expenditure:
     - data://garden/oecd/2025-12-11/social_expenditure
+  viz://chart/oecd/latest/pension_spending_public_and_mandatory_private:
+    - data://grapher/oecd/2025-12-11/social_expenditure
+  viz://chart/oecd/latest/public_pension_spending_share_of_government_spending:
+    - data://grapher/oecd/2025-12-11/social_expenditure
+  viz://chart/oecd/latest/spending_on_older_people_and_survivors_by_benefit:
+    - data://grapher/oecd/2025-12-11/social_expenditure
+  viz://chart/oecd/latest/social_expenditure_as_percentage_of_gdp:
+    - data://grapher/oecd/2025-12-11/social_expenditure
 
   # Social expenditure OMM
   data://grapher/social_expenditure/2025-03-07/social_expenditure_omm:
