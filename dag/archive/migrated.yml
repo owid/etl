@@ -423,6 +423,10 @@ steps:
   data://grapher/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
     - data://garden/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
       - snapshot://food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus.feather
+  # archived; last active in ab4733ed02b2 on 2026-10-28
+  data-private://grapher/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
+    - data-private://garden/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
+      - snapshot-private://labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather
