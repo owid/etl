@@ -49,6 +49,30 @@ steps:
     - data://grapher/gcp/2025-11-13/global_carbon_budget
     - data://grapher/emissions/2025-12-04/national_contributions
 
+  # CO₂ charts with data-dependent thresholds and reporting years.
+  # NOTE: Switch these dependencies to data:// with the GCP release below.
+  viz://chart/emissions/latest/per_capita_co2_vs_average:
+    - data-private://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/emissions/latest/consumption_co2_per_capita_equity:
+    - data-private://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/emissions/latest/per_capita_co2_emissions_vs_per_capita_energy_use:
+    - data-private://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/energy/2026-06-30/energy_mix
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/emissions/latest/share_co2_vs_population:
+    - data-private://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/demography/2024-07-15/population
+  viz://chart/emissions/latest/share_of_global_consumption_based_co_emissions_and_population:
+    - data-private://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/demography/2024-07-15/population
+  viz://chart/emissions/latest/heat_death_rate_vs_co2:
+    - data-private://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/fasttrack/latest/heat_deaths_undp_climate_horizons
+    - data://grapher/regions/2023-01-01/regions
+
   # GCP - Global Carbon Budget.
   data://garden/gcp/2025-11-13/global_carbon_budget:
     - data://garden/wb/2026-07-01/income_groups
@@ -65,6 +89,22 @@ steps:
   # GCP - Global Carbon Budget.
   data://grapher/gcp/2025-11-13/global_carbon_budget:
     - data://garden/gcp/2025-11-13/global_carbon_budget
+
+  # GCP - Global Carbon Budget.
+  # NOTE: These steps are private while the data is under embargo; switch them to data:// when it is released.
+  data-private://grapher/gcp/2026-11-10/global_carbon_budget:
+    - data-private://garden/gcp/2026-11-10/global_carbon_budget:
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2024-07-15/population
+      - data://garden/ggdc/2024-04-26/maddison_project_database
+      - data://garden/energy/2026-05-05/primary_energy_consumption
+      - data-private://meadow/gcp/2026-11-10/global_carbon_budget:
+        - snapshot-private://gcp/2026-11-10/global_carbon_budget_fossil_co2_emissions.csv
+        - snapshot-private://gcp/2026-11-10/global_carbon_budget_land_use_change_emissions.xlsx
+        - snapshot-private://gcp/2026-11-10/global_carbon_budget_global_emissions.xlsx
+        - snapshot-private://gcp/2026-11-10/global_carbon_budget_national_emissions.xlsx
+        - snapshot-private://gcp/2026-11-10/global_carbon_budget_media_summary.xlsx
 
   # IPCC - Emission Factor Database.
   data://grapher/emissions/2025-11-26/emission_factors:

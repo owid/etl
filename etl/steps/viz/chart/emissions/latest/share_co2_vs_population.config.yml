@@ -1,0 +1,40 @@
+chart_config_id: 0191b6c7-558e-7a5e-b355-05b719225832
+grapher_schema: "012"
+slug: share-co2-vs-population
+topic_tags:
+  - CO2 & Greenhouse Gas Emissions
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "population#world_pop_share"
+          display:
+            name: "Share of population"
+            color: "#4c6a9c"
+            includeInTable: true
+            numDecimalPlaces: 1
+        - catalogPath: "global_carbon_budget#emissions_total_as_share_of_global"
+          display:
+            name: "Share of emissions"
+            color: "#963d47"
+            includeInTable: true
+            numDecimalPlaces: 1
+    config:
+      title: "Share of global CO₂ emissions and population"
+      yAxis:
+        max: 50
+      sortBy: "custom"
+      subtitle: "Carbon dioxide (CO₂) emissions from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included."
+      originUrl: "/co2-and-greenhouse-gas-emissions"
+      chartTypes:
+        - "DiscreteBar"
+      entityType: "country"
+      hideTimeline: true
+      hideRelativeToggle: false
+      selectedEntityNames:
+        - "High-income countries"
+        - "Upper-middle-income countries"
+        - "Lower-middle-income countries"
+        - "Low-income countries"
+      selectedFacetStrategy: "entity"

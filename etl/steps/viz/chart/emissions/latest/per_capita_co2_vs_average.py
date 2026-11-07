@@ -1,0 +1,18 @@
+"""Compare countries with the World average for the same reporting year."""
+
+from etl.helpers import PathFinder
+from etl.steps.viz.chart.emissions.latest.shared import configure_average_map, country_names
+
+paths = PathFinder(__file__)
+
+
+def run() -> None:
+    # Load the chart and its emissions data.
+    config = paths.load_config()
+    tb = paths.load_dataset("global_carbon_budget").read("global_carbon_budget")
+
+    # Set the threshold and map year together.
+    configure_average_map(config, tb, "emissions_total_per_capita", country_names(paths))
+
+    # Save the existing chart with the calculated settings.
+    paths.create_chart(config=config).save()
