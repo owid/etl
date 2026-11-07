@@ -199,3 +199,25 @@ def add_suffix_to_regions(tb: Table, col: str) -> Table:
     """
     tb[col] = tb[col].astype("str").replace({r: f"{r} (UCDP)" for r in REGIONS_UCDP})
     return tb
+
+
+# Labels of the 0/1 country-level conflict flags. They are stored as text, so the Swimlane chart can show them.
+# NOTE: On each update, check that the flags are still 0/1. The recoding fails on any other value.
+FLAG_LABELS = {0: "No", 1: "Yes"}
+
+
+def flags_to_no_yes(tb: Table, columns: list[str]) -> Table:
+    """Replace the 0/1 values of country-level conflict flags with "No"/"Yes", as categorical indicators.
+
+    Run it after any step that sums the flags, such as the number of countries in conflict by region. Grapher lists
+    categorical values alphabetically and ignores `sort` for them, which here gives "No", "Yes" anyway.
+    """
+    for column in columns:
+        unknown = set(tb[column].dropna().unique()) - set(FLAG_LABELS)
+        assert not unknown, f"Column `{column}` has values other than 0 and 1: {unknown}"
+        metadata = tb[column].metadata
+        tb[column] = tb[column].map(FLAG_LABELS).astype("category")
+        tb[column].metadata = metadata
+        tb[column].metadata.type = "string"
+        tb[column].metadata.sort = list(FLAG_LABELS.values())
+    return tb
