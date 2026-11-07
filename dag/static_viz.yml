@@ -32,3 +32,7 @@ steps:
   # How much bilateral development aid is spent on climate-related projects? (OECD RioMarkers and CRS)
   viz://static/oecd/2026-10-22/climate_related_bilateral_oda:
     - data://garden/oecd/2026-10-07/climate_related_official_development_assistance
+
+  # Global number of children in child labor, hazardous vs other child labor (ILO-UNICEF), for a data insight
+  viz://static/un/2026-11-07/child_labor_hazardous_decline:
+    - data://garden/un/2026-04-08/child_labor_report
