@@ -1,0 +1,93 @@
+grapher_schema: "011"
+slug: aggregate-replacement-ratio-pensions
+
+title:
+  title: Pensions compared with earnings before retirement
+  title_variant: ""
+topic_tags:
+  - Government Spending
+  - Economic Inequality
+  - Economic Inequality by Gender
+
+default_selection:
+  - European Union (27)
+  - Germany
+  - France
+  - Italy
+  - Spain
+  - Poland
+
+default_dimensions:
+  sex: both
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like the European Union (27).
+        matchingEntitiesOnly: true
+    - dimensions:
+        sex: men_vs_women
+      config:
+        hasMapTab: false
+        chartTypes: ["LineChart", "Dumbbell"]
+        selectedFacetStrategy: entity
+        dumbbell:
+          connectorStyle: line
+        # Sort countries by men's value (the first indicator), highest first.
+        sortBy: startValue
+        sortOrder: desc
+
+dimensions:
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: both
+        name: Both sexes
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+      - slug: men_vs_women
+        name: Men vs. women
+        description: Compare the ratios of men and women
+
+views:
+  - dimensions:
+      sex: both
+    indicators:
+      y:
+        - catalogPath: aggregate_replacement_ratio#aggregate_replacement_ratio__sex_both_sexes
+      color: regions#owid_region
+
+  - dimensions:
+      sex: men
+    indicators:
+      y:
+        - catalogPath: aggregate_replacement_ratio#aggregate_replacement_ratio__sex_men
+      color: regions#owid_region
+
+  - dimensions:
+      sex: women
+    indicators:
+      y:
+        - catalogPath: aggregate_replacement_ratio#aggregate_replacement_ratio__sex_women
+      color: regions#owid_region
+
+  # Comparison view: one line per sex, one panel per country.
+  - dimensions:
+      sex: men_vs_women
+    indicators:
+      y:
+        - catalogPath: aggregate_replacement_ratio#aggregate_replacement_ratio__sex_men
+          display:
+            name: Men
+        - catalogPath: aggregate_replacement_ratio#aggregate_replacement_ratio__sex_women
+          display:
+            name: Women
+    config:
+      title: Pensions compared with earnings before retirement, men and women
+      subtitle: Median gross pension of men aged 65 to 74, as a share of the median gross earnings from work of men aged 55 to 64, and the same ratio for women. Pensions exclude other social benefits, such as unemployment or disability benefits.
+      note: Pensions and earnings are measured before taxes, for each person rather than for the household.

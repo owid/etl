@@ -1,0 +1,97 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Government Spending
+        - Economic Inequality
+        - Economic Inequality by Gender
+      attribution_short: Eurostat
+    display:
+      numDecimalPlaces: 0
+      # Lets the map fill a country's missing latest year with the year before.
+      tolerance: 1
+
+  # Who the ratio is about, for each value of the sex dimension.
+  people_by_sex: <% if sex == "men" %>men<% elif sex == "women" %>women<% else %>people<% endif %>
+
+  # NOTE: Eurostat's texts disagree on the age group of the earnings denominator: the current glossary, table tespm100 and the Statistics Explained article on old-age poverty say 55–64; table tespn070, the EU-SILC methodology article and the 2014 description of datasets say 50–59. Re-check on every update.
+  definition_short: |-
+    The aggregate replacement ratio is the median gross pension of {definitions.people_by_sex} aged 65 to 74, as a share of the median gross earnings from work of {definitions.people_by_sex} aged 55 to 64.
+
+  description_key_definition: |-
+    The aggregate replacement ratio compares the typical pension of people in their first years of retirement with the typical earnings of people in the decade before retirement. A ratio of 60% means that the median pension of people aged 65 to 74 is 60% of the median earnings from work of people aged 55 to 64.
+
+  description_key_what_counts: |-
+    Pensions include old-age pensions, survivor pensions (paid after the death of a spouse or another family member), and pensions from individual private plans, but not other social benefits, such as unemployment, family, sickness, or disability benefits. Earnings from work include wages and income from self-employment. Only people who receive a pension count toward the median pension, and only people who work count toward median earnings.
+
+  description_key_gross_individual: |-
+    Pensions and earnings are measured before taxes and social contributions, for each person rather than for the household. So the ratio doesn’t show how well-off retirees are once taxes and the people they live with are taken into account.
+
+  description_key_two_groups: |-
+    The ratio compares two different groups of people in the same year, rather than following the same people as they retire.<% if sex != "both sexes" %> A higher share of women work part-time, which lowers their median earnings and raises their ratio.<% endif %>
+
+  description_key_survey: |-
+    The data comes from the EU Statistics on Income and Living Conditions (EU-SILC), a yearly household survey. The year shown is the survey year; in most countries, incomes refer to the year before.
+
+  description_key_breaks: |-
+    Eurostat marks breaks in the series for some countries and years, for example when a country changes how it runs the survey. Values on either side of a break may not be fully comparable.
+
+  description_processing_percent: |-
+    Eurostat publishes the aggregate replacement ratio as a ratio (for example, 0.60). We multiply it by 100 to show it as a percentage.
+
+  description_processing_turkey: |-
+    <% if sex == "women" %>
+    We don’t show Eurostat’s data for women in Turkey, because it looks broken: the ratio is 0% in every year from 2010 to 2020, and then jumps above 1,400% in 2021 and 2022.
+    <%- endif %>
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Arriagada
+
+
+tables:
+  aggregate_replacement_ratio:
+    variables:
+      aggregate_replacement_ratio:
+        title: Aggregate replacement ratio for pensions<% if sex != "both sexes" %> (<<sex>>)<% endif %>
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.definition_short}"
+        description_key:
+          - "{definitions.description_key_definition}"
+          - "{definitions.description_key_what_counts}"
+          - "{definitions.description_key_gross_individual}"
+          - "{definitions.description_key_two_groups}"
+          - "{definitions.description_key_survey}"
+          - "{definitions.description_key_breaks}"
+        description_from_producer: |-
+          The aggregate replacement ratio is gross median individual pension income of the population aged 65–74 relative to gross median individual earnings from work of the population aged 55-64, excluding other social benefits.
+        description_processing: |-
+          {definitions.description_processing_percent}
+
+          {definitions.description_processing_turkey}
+        presentation:
+          grapher_config:
+            title: Pensions compared with earnings before retirement<% if sex != "both sexes" %>, <<sex>><% endif %>
+            subtitle: "{definitions.definition_short} Pensions exclude other social benefits, such as unemployment or disability benefits."
+            note: Pensions and earnings are measured before taxes, for each person rather than for the household.
+            hasMapTab: true
+            selectedEntityNames:
+              - European Union (27)
+              - Germany
+              - France
+              - Italy
+              - Spain
+              - Poland
+            map:
+              region: Europe
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues: [30, 40, 50, 60, 70, 80, 90]
