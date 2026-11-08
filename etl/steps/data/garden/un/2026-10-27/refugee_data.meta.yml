@@ -184,7 +184,7 @@ tables:
       ooc:
         title: Other persons of concern to UNHCR by country of origin
         description_short: |-
-          [Others of concern](#dod:unhcr-concern) are people who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
+          "[Others of concern](#dod:unhcr-concern)" are people who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
         description_from_producer: "{definitions.description_unhcr_ooc}"
         description_key:
           - Before 2025, UNHCR counted some groups of Afghans in Pakistan (Afghan Citizen Card holders) as others of concern. From 2025, it counts them as "other people in need of international protection", which we show separately.
@@ -309,7 +309,7 @@ tables:
       ooc:
         title: Other persons of concern to UNHCR by country they live in
         description_short: |-
-          [Others of concern](#dod:unhcr-concern) are people who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
+          "[Others of concern](#dod:unhcr-concern)" are people who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
         description_key:
           - Before 2025, UNHCR counted some groups of Afghans in Pakistan (Afghan Citizen Card holders) as others of concern. From 2025, it counts them as "other people in need of international protection", which we show separately.
         description_from_producer: "{definitions.description_unhcr_ooc}"
