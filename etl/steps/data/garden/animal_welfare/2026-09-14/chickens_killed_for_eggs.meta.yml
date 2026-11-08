@@ -7,7 +7,7 @@ definitions:
     description_processing: |-
       FAOSTAT has no data for some countries in some years. Those gaps are filled by repeating the latest reported value, for at most five years.
   description_processing_killed: &description_processing_killed |-
-    We estimate the number of hens killed each year by assuming that each of FAOSTAT's laying hens is killed after 65 weeks of laying, so that 80% of them are killed and replaced every year. We also assume that one male chick is killed for each hen.
+    We estimate the number of hens killed each year following [a methodology by Faunalytics](https://faunalytics.org/global-chick-culling-2019-2024/), assuming that each of FAOSTAT's laying hens is killed after 65 weeks of laying, so that 80% of them are killed and replaced every year. We also assume that one male chick is killed for each hen. For more details, see [our technical publication](https://docs.owid.io/projects/etl/analyses/chickens_killed_in_egg_production/chickens_killed_in_egg_production).
 
     FAOSTAT has no data for some countries in some years. Those gaps are filled by repeating the latest reported value, for at most five years.
 
