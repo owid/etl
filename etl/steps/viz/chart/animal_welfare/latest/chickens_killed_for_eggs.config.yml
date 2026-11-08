@@ -18,7 +18,7 @@ definitions:
     - config:
         originUrl: ourworldindata.org/animal-welfare
         subtitle: Around half of the estimated total are laying hens, killed when their productivity declines. The other half are male chickens, most of which are killed within a day of hatching.
-        note: In-ovo sexing, used in countries like Germany and France, is not taken into account.
+        note: The estimate does not account for the reduction in male chicks killed due to in-ovo sexing in countries like Germany and France.
         hasMapTab: true
         tab: map
         chartTypes: ["LineChart", "DiscreteBar"]
