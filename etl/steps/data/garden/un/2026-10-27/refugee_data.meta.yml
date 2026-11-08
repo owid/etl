@@ -243,7 +243,7 @@ tables:
       refugees_per_1000:
         title: Refugees by country of asylum per 1,000 people
         description_short: |-
-          [Refugees](#dod:refugee) are people who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This is given per 1,000 people living in the country of asylum.
+          [Refugees](#dod:refugee) are people who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This is given per 1,000 people living in the asylum country.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -259,7 +259,7 @@ tables:
       refugees_per_100k:
         title: Refugees by country of asylum per 100,000 people
         description_short: |-
-          [Refugees](#dod:refugee) are people who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the country of asylum.
+          [Refugees](#dod:refugee) are people who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the asylum country.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -280,7 +280,7 @@ tables:
       asylum_seekers_per_100k:
         title: Asylum seekers by country they live in per 100,000 people
         description_short: |-
-          [Asylum seekers](#dod:asylumseeker) are people who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This data is given per 100,000 people living in the country of asylum.
+          [Asylum seekers](#dod:asylumseeker) are people who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This data is given per 100,000 people living in the asylum country.
         description_from_producer: "{definitions.description_unhcr_asylum}"
         display:
           numDecimalPlaces: 1
