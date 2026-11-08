@@ -18,7 +18,7 @@ definitions:
     - config:
         originUrl: ourworldindata.org/animal-welfare
         subtitle: Around half of the estimated total are laying hens, killed when their productivity declines. The other half are male chickens, most of which are killed within a day of hatching.
-        note: Calculated by Our World in Data based on FAOSTAT's live hen estimates, assuming hens are killed after 65 weeks of laying, as on commercial farms. This may overestimate numbers in areas dominated by traditional flocks in Africa and Asia. In-ovo sexing, used e.g. in Germany and France, is not taken into account.
+        note: Calculated by Our World in Data following a similar methodology to Faunalytics. In-ovo sexing, used in countries like Germany and France, is not taken into account.
         hasMapTab: true
         tab: map
         chartTypes: ["LineChart", "DiscreteBar"]
