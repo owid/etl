@@ -15,6 +15,7 @@ def _chart(chart_id: int, created_at: datetime, catalog_path: str | None = None,
         id=chart_id,
         createdAt=created_at,
         updatedAt=created_at + timedelta(hours=1),
+        lastEditedAt=created_at + timedelta(minutes=30),
         etlConfigCatalogPath=catalog_path,
         configId=config_id or f"config-uuid-{chart_id}",
     )
@@ -25,7 +26,7 @@ def test_config_uuid_identifies_chart_twins():
         ChartDiff,
         _is_cross_env_twin,
         _same_chart_across_envs,
-        _target_updated_at_for_review,
+        _target_version_for_review,
     )
 
     # Same config UUID, different numeric ids: a chart synced from staging to
@@ -36,7 +37,7 @@ def test_config_uuid_identifies_chart_twins():
 
     assert _same_chart_across_envs(source, target)
     assert _is_cross_env_twin(source, target)
-    assert _target_updated_at_for_review(source, target) is None
+    assert _target_version_for_review(source, target) is None
 
     diff = ChartDiff(source_chart=source, target_chart=target, approval=None, conflict=None)
     assert diff.chart_id == source.id
@@ -67,7 +68,7 @@ def test_catalog_path_identifies_etl_chart_twins():
         ChartDiff,
         _is_cross_env_twin,
         _same_chart_across_envs,
-        _target_updated_at_for_review,
+        _target_version_for_review,
     )
 
     source = _chart(100, datetime(2026, 1, 1), "animal_welfare/latest/chart#chart")
@@ -75,7 +76,7 @@ def test_catalog_path_identifies_etl_chart_twins():
 
     assert _same_chart_across_envs(source, target)
     assert _is_cross_env_twin(source, target)
-    assert _target_updated_at_for_review(source, target) is None
+    assert _target_version_for_review(source, target) is None
 
     diff = ChartDiff(source_chart=source, target_chart=target, approval=None, conflict=None)
     assert diff.chart_id == source.id
@@ -85,7 +86,7 @@ def test_regular_charts_still_match_by_id_and_created_at():
     from apps.wizard.app_pages.chart_diff.chart_diff import (
         _is_cross_env_twin,
         _same_chart_across_envs,
-        _target_updated_at_for_review,
+        _target_version_for_review,
     )
 
     created_at = datetime(2026, 1, 1)
@@ -97,7 +98,55 @@ def test_regular_charts_still_match_by_id_and_created_at():
 
     assert _same_chart_across_envs(source, target)
     assert not _is_cross_env_twin(source, target)
-    assert _target_updated_at_for_review(source, target) == target.updatedAt
+    assert _target_version_for_review(source, target) == (target.updatedAt, target.lastEditedAt)
+
+
+# --- When a review stops applying to the target chart -------------------------
+
+
+def test_review_holds_through_an_indicator_rebuild_of_the_target():
+    from etl.grapher.model import TargetVersion, review_still_holds
+
+    # Approved on staging while production was last edited at 10:00 ...
+    edited = datetime(2026, 11, 6, 10, 0)
+    recorded = edited
+    # ... then the production ETL rewrote the chart's inherited config: only updatedAt moves.
+    rebuilt = TargetVersion(updated_at=datetime(2026, 11, 6, 16, 40), edited_at=edited)
+
+    assert review_still_holds(recorded, rebuilt)
+
+
+def test_review_expires_when_the_target_is_edited():
+    from etl.grapher.model import TargetVersion, review_still_holds
+
+    recorded = datetime(2026, 11, 6, 10, 0)
+    edited_later = TargetVersion(updated_at=datetime(2026, 11, 6, 12, 0), edited_at=datetime(2026, 11, 6, 12, 0))
+
+    assert not review_still_holds(recorded, edited_later)
+
+
+def test_reviews_recorded_with_updated_at_still_hold():
+    from etl.grapher.model import TargetVersion, review_still_holds
+
+    # Reviews recorded before the switch hold the target's updatedAt. A tag edit moves only
+    # lastEditedAt, so it can sit above the recorded updatedAt with nothing changed since.
+    untouched = TargetVersion(updated_at=datetime(2026, 11, 1, 9, 0), edited_at=datetime(2026, 11, 1, 9, 5))
+    assert review_still_holds(untouched.updated_at, untouched)
+
+    # Usual case: updatedAt >= lastEditedAt, so a later indicator rebuild keeps it valid too.
+    recorded = datetime(2026, 11, 1, 9, 0)
+    rebuilt = TargetVersion(updated_at=datetime(2026, 11, 6, 16, 40), edited_at=datetime(2026, 11, 1, 9, 0))
+    assert review_still_holds(recorded, rebuilt)
+
+
+def test_review_without_a_target_version_matches_only_none():
+    from etl.grapher.model import TargetVersion, review_still_holds
+
+    target = TargetVersion(updated_at=datetime(2026, 1, 1), edited_at=datetime(2026, 1, 1))
+
+    assert review_still_holds(None, None)
+    assert not review_still_holds(None, target)
+    assert not review_still_holds(datetime(2026, 1, 1), None)
 
 
 # --- What a sync would drop from the target's authored layer ------------------

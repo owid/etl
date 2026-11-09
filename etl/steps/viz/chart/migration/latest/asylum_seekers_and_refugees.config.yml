@@ -42,7 +42,7 @@ definitions:
   # Footnotes
   footnote_refugees: This data includes all refugees, not just those who fled that year.
   footnote_asylum: This data includes all asylum-seekers, not just those who fled or applied for asylum that year.
-  footnote_refugees_asylum: This data includes all refugees who live in this country, not just those who arrived that year.
+  footnote_refugees_asylum: This data includes all refugees who live in the country, not just those who arrived that year.
   footnote_asylum_asylum: This data includes all asylum-seekers who live in this country, not just those who arrived or applied for asylum that year.
 
 dimensions:
