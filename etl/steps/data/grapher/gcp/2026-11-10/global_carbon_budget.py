@@ -19,7 +19,7 @@ def run() -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("global_carbon_budget")
-    tb_garden = ds_garden["global_carbon_budget"]
+    tb_garden = ds_garden.read("global_carbon_budget", safe_types=False)
 
     #
     # Process data.
@@ -27,9 +27,11 @@ def run() -> None:
     # Ensure all countries span all years (from 1750 to the latest observation), even if many of those rows are empty.
     # This will increase the size of the dataset, but we do this so that stacked area charts span the maximum possible
     # range of years.
-    countries = tb_garden.reset_index()["country"].unique()
-    years = np.arange(tb_garden.reset_index()["year"].min(), tb_garden.reset_index()["year"].max() + 1, dtype=int)
-    tb_garden = tb_garden.reindex(pd.MultiIndex.from_product([countries, years], names=["country", "year"]))
+    countries = tb_garden["country"].unique()
+    years = np.arange(tb_garden["year"].min(), tb_garden["year"].max() + 1, dtype=int)
+    tb_garden = tb_garden.set_index(["country", "year"]).reindex(
+        pd.MultiIndex.from_product([countries, years], names=["country", "year"])
+    )
 
     #
     # Save outputs.

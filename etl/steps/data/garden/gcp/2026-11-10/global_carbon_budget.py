@@ -982,7 +982,7 @@ def run() -> None:
 
     # Load primary energy consumption dataset and read its main table.
     ds_energy = paths.load_dataset("primary_energy_consumption")
-    tb_energy = ds_energy["primary_energy_consumption"].reset_index()
+    tb_energy = ds_energy.read("primary_energy_consumption", safe_types=False)
 
     # Load GDP dataset.
     ds_gdp = paths.load_dataset("maddison_project_database")
