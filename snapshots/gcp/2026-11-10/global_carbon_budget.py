@@ -5,7 +5,6 @@ A snapshot will be created for each of the following datasets:
 * Global Carbon Budget - Global emissions.
 * Global Carbon Budget - Land-use change emissions.
 * Global Carbon Budget - National emissions.
-* Global Carbon Budget - Summary for the media (used for the projections of the current year for individual countries).
 
 """
 
@@ -24,7 +23,6 @@ DATA_FILES = [
     "global_carbon_budget_global_emissions.xlsx",
     "global_carbon_budget_land_use_change_emissions.xlsx",
     "global_carbon_budget_national_emissions.xlsx",
-    "global_carbon_budget_media_summary.xlsx",
 ]
 
 # Define common metadata fields (to be written to dvc files).
