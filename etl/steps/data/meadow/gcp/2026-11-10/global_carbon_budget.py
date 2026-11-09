@@ -188,20 +188,18 @@ def run() -> None:
     tb_historical = prepare_historical_budget(tb_historical=tb_historical)
 
     # Prepare data for land-use emissions from each model, and combine them in one table.
-    tb_land_use = pr.merge(
-        prepare_land_use_emissions(tb_land_use=tb_land_use_blue, model="BLUE"),
-        prepare_land_use_emissions(tb_land_use=tb_land_use_oscar, model="OSCAR"),
+    tb_land_use = pr.multi_merge(
+        [
+            prepare_land_use_emissions(tb_land_use=tb_land_use_blue, model="BLUE"),
+            prepare_land_use_emissions(tb_land_use=tb_land_use_oscar, model="OSCAR"),
+            prepare_land_use_emissions(tb_land_use=tb_land_use_luce, model="LUCE"),
+        ],
         on=["country", "year"],
         how="outer",
     )
-    tb_land_use = pr.merge(
-        tb_land_use,
-        prepare_land_use_emissions(tb_land_use=tb_land_use_luce, model="LUCE"),
-        on=["country", "year"],
-        how="outer",
+    tb_land_use = tb_land_use.format(
+        ["country", "year"], sort_columns=True, short_name="global_carbon_budget_land_use_change"
     )
-    tb_land_use = tb_land_use.format(["country", "year"], sort_columns=True)
-    tb_land_use.metadata.short_name = "global_carbon_budget_land_use_change"
 
     # Prepare data for production-based emissions, from the file of national emissions.
     tb_production = prepare_national_emissions(tb=tb_production, column_name="production_emissions")
