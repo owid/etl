@@ -1741,8 +1741,10 @@ def review_still_holds(recorded_at: datetime | None, target: TargetVersion | Non
     tag changes, an ETL push that changes the rendered chart).
 
     Reviews recorded before this rule hold the target's `updatedAt`, which sits below `lastEditedAt`
-    when the last edit was a tag change; for those an exact `updatedAt` match still means the target
-    is untouched.
+    when the last edit was a tag change; for those an exact `updatedAt` match is taken to mean the
+    target is untouched, as it was before. That match can't see a tag change (it moves only
+    `lastEditedAt`), so a tag added after the review doesn't expire it when the two timestamps were
+    equal at review time — the old rule's blind spot, kept until reviews recorded before it are gone.
 
     `target=None` means there was no target version to record (a chart the branch created), and
     matches only reviews that recorded none.
@@ -1765,6 +1767,7 @@ class ChartDiffApprovals(Base):
     chartId: Mapped[int] = mapped_column(Integer)
     sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
+    # The target chart's `lastEditedAt` at review time (`updatedAt` in rows recorded before that rule)
     targetUpdatedAt: Mapped[datetime | None] = mapped_column(DateTime)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
@@ -1834,6 +1837,7 @@ class ChartDiffConflicts(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     chartId: Mapped[int] = mapped_column(Integer)
+    # The target chart's `lastEditedAt` when the conflict was resolved (see `ChartDiffApprovals.targetUpdatedAt`)
     targetUpdatedAt: Mapped[datetime | None] = mapped_column(DateTime)
     conflict: Mapped[Literal["resolved", "pending"]] = mapped_column(VARCHAR(255))
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())

@@ -304,10 +304,9 @@ def cli(
                             # chart after the merge, and if someone edits it there before this
                             # runs, the approval still matches and we would overwrite them.
                             # Compare what each side authored and refuse instead. Tags count too:
-                            # `set_tags` below replaces the target's set wholesale, and adding a
-                            # tag in the target moves no timestamp (grapher's `setChartTags`
-                            # rewrites `chart_tags` without touching `charts.updatedAt`), so
-                            # nothing else would notice one going missing.
+                            # `set_tags` below replaces the target's set wholesale, and with no
+                            # target version recorded, nothing else would notice a tag added in
+                            # the target going missing.
                             # A field the reviewer *deleted* on the source looks the same from
                             # here as one added in the target, so `--ignore-conflicts` is the way
                             # to say "I know, sync anyway", as it is for every other conflict.
