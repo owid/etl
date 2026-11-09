@@ -300,14 +300,13 @@ def cli(
                             # A chart this branch created has no counterpart in the target at
                             # review time, so its approval records no target version and never
                             # goes stale (unlike an existing chart's — see
-                            # `_target_updated_at_for_review`). The target's own ETL creates the
+                            # `_target_version_for_review`). The target's own ETL creates the
                             # chart after the merge, and if someone edits it there before this
                             # runs, the approval still matches and we would overwrite them.
                             # Compare what each side authored and refuse instead. Tags count too:
-                            # `set_tags` below replaces the target's set wholesale, and adding a
-                            # tag in the target moves no timestamp (grapher's `setChartTags`
-                            # rewrites `chart_tags` without touching `charts.updatedAt`), so
-                            # nothing else would notice one going missing.
+                            # `set_tags` below replaces the target's set wholesale, and with no
+                            # target version recorded, nothing else would notice a tag added in
+                            # the target going missing.
                             # A field the reviewer *deleted* on the source looks the same from
                             # here as one added in the target, so `--ignore-conflicts` is the way
                             # to say "I know, sync anyway", as it is for every other conflict.
@@ -368,6 +367,7 @@ def cli(
                                 target_chart_id=target_chart_id,
                                 source_updatedAt=str(diff.source_chart.updatedAt),
                                 target_updatedAt=str(diff.target_chart.updatedAt),
+                                target_lastEditedAt=str(diff.target_chart.lastEditedAt),
                                 staging_created_at=SERVER_CREATION_TIME,
                             )
                             _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
@@ -499,7 +499,7 @@ def _notify_slack_target_edited(chart_id: int, source: str, diff: ChartDiff, los
 <http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
 Syncing would have dropped these fields, authored in the target's admin: `{"`, `".join(lost)}`
 *Staging Edited*: {str(diff.source_chart.updatedAt)} UTC
-*Production Edited*: {str(diff.target_chart.updatedAt)} UTC
+*Production Edited*: {str(diff.target_chart.lastEditedAt)} UTC
 ```
 {_chart_config_diff(diff.target_chart.config, diff.source_chart.config, tabs=0, color=False)}
 ```
@@ -519,7 +519,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_
 :warning: *ETL chart-sync: Pending Chart Update Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
 *Staging        Edited*: {str(diff.source_chart.updatedAt)} UTC
-*Production Edited*: {str(diff.target_chart.updatedAt)} UTC
+*Production Edited*: {str(diff.target_chart.lastEditedAt)} UTC
 ```
 {_chart_config_diff(diff.target_chart.config, diff.source_chart.config, tabs=0, color=False)}
 ```
