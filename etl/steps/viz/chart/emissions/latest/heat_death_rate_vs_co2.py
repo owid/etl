@@ -1,31 +1,37 @@
 """Label the emissions year actually compared with future heat-related mortality."""
 
 from etl.helpers import PathFinder
-from etl.steps.viz.chart.emissions.latest.shared import country_names, latest_common_observations, observations
 
 paths = PathFinder(__file__)
 
 
 def run() -> None:
-    # Load observed emissions and the separate future mortality series.
+    # Load observed emissions, the separate future mortality series, and the list of countries.
     config = paths.load_config()
-    emissions = observations(
-        paths.load_dataset("global_carbon_budget").read("global_carbon_budget"), "emissions_total_per_capita"
+    tb_emissions = (
+        paths.load_dataset("global_carbon_budget")
+        .read("global_carbon_budget")[["country", "year", "emissions_total_per_capita"]]
+        .dropna()
     )
-    heat = observations(
-        paths.load_dataset("heat_deaths_undp_climate_horizons").read("heat_deaths_undp_climate_horizons"),
-        "heat_death_rate",
+    tb_heat = (
+        paths.load_dataset("heat_deaths_undp_climate_horizons")
+        .read("heat_deaths_undp_climate_horizons")[["country", "year", "heat_death_rate"]]
+        .dropna()
     )
+    tb_regions = paths.load_dataset("regions").read("regions")
+    countries = tb_regions[tb_regions["owid_region"].notnull()]["country"]
 
-    # Require a common emissions year so the axis label holds for every displayed country.
-    emissions = emissions[emissions["country"].isin(country_names(paths))]
-    latest = latest_common_observations([emissions])
-    emissions_year = int(latest["year"].iloc[0])
+    # Use the latest emissions year with country data, so the axis label holds for every displayed country.
+    tb_emissions = tb_emissions[tb_emissions["country"].isin(countries)]
+    emissions_year = int(tb_emissions["year"].max())
     # Preserve the chart's nearest future projection horizon, which Grapher previously selected implicitly.
-    future_years = heat.loc[heat["year"] > emissions_year, "year"]
+    future_years = tb_heat[tb_heat["year"] > emissions_year]["year"]
     assert not future_years.empty, "No mortality projections after the latest emissions year."
     heat_year = int(future_years.min())
-    countries = sorted(set(latest["country"]) & set(heat.loc[heat["year"] == heat_year, "country"]))
+    countries = sorted(
+        set(tb_emissions[tb_emissions["year"] == emissions_year]["country"])
+        & set(tb_heat[tb_heat["year"] == heat_year]["country"])
+    )
     assert countries, "No countries with both recent emissions and projected mortality."
 
     # Grapher carries emissions forward to the projection year; exclude older country observations.

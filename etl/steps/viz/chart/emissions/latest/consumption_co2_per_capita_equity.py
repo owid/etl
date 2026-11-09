@@ -1,18 +1,35 @@
 """Compare consumption emissions with the World average in a year with country data."""
 
 from etl.helpers import PathFinder
-from etl.steps.viz.chart.emissions.latest.shared import configure_average_map, country_names
 
 paths = PathFinder(__file__)
 
 
 def run() -> None:
-    # Load the chart and its emissions data.
+    # Load the chart, its emissions data, and the list of countries.
     config = paths.load_config()
-    tb = paths.load_dataset("global_carbon_budget").read("global_carbon_budget")
+    column = "consumption_emissions_per_capita"
+    tb = paths.load_dataset("global_carbon_budget").read("global_carbon_budget")[["country", "year", column]].dropna()
+    tb_regions = paths.load_dataset("regions").read("regions")
+    countries = tb_regions[tb_regions["owid_region"].notnull()]["country"]
 
     # Country consumption data can end before the World series does.
-    configure_average_map(config, tb, "consumption_emissions_per_capita", country_names(paths))
+    # So, use the latest year with country data, and the World average of that same year as the threshold.
+    tb_countries = tb[tb["country"].isin(countries)]
+    year = int(tb_countries["year"].max())
+    world = tb[(tb["country"] == "World") & (tb["year"] == year)][column]
+    assert len(world) == 1, f"Missing World average in {year}."
+    threshold = float(world.iloc[0])
+    assert threshold > 0, "Expected a positive World average."
+    largest = float(tb_countries[tb_countries["year"] == year][column].max())
+
+    # Pin the chart and its map to that year.
+    view = config["views"][0]
+    view["config"].update(minTime=year, maxTime=year, timelineMaxTime=year)
+    view["config"]["map"].update(time=year, timeTolerance=0)
+    # The final bracket must contain even the largest country's value.
+    view["config"]["map"]["colorScale"]["customNumericValues"] = [0, threshold, max(threshold, largest) + 1]
+    view["indicators"]["y"][0].setdefault("display", {})["tolerance"] = 0
 
     # Save the existing chart with the calculated settings.
     paths.create_chart(config=config).save()
