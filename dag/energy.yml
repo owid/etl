@@ -99,11 +99,16 @@ steps:
     - data://garden/energy/2026-06-30/energy_mix
   data://grapher/energy/2026-06-30/carbon_intensity_of_energy:
     - data://garden/energy/2026-06-30/carbon_intensity_of_energy
+  data://garden/energy/2026-11-10/carbon_intensity_of_energy:
+    - data://garden/gcp/2026-11-10/global_carbon_budget
+    - data://garden/energy/2026-06-30/energy_mix
+  data://grapher/energy/2026-11-10/carbon_intensity_of_energy:
+    - data://garden/energy/2026-11-10/carbon_intensity_of_energy
   viz://chart/energy/latest/energy_mix:
     - data://grapher/energy/2026-06-30/energy_mix
     # Carbon intensity view: sourced from the dedicated carbon_intensity_of_energy step (TES basis),
     # so the energy_mix subtree stays on a single Statistical Review version.
-    - data://grapher/energy/2026-06-30/carbon_intensity_of_energy
+    - data://grapher/energy/2026-11-10/carbon_intensity_of_energy
 
   # Energy - Fossil fuels (production, trade, consumption and reserves; 2026 Statistical Review + EIA).
   data://garden/energy/2026-06-30/fossil_fuels:
