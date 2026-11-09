@@ -1,0 +1,18 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Press freedom - Freedom House (2017)
+  # Freedom House discontinued the Freedom of the Press report in 2017.
+  update_period_days: 0
+  owners:
+    - Pablo Arriagada
+
+tables:
+  fh_press_freedom:
+    variables:
+      freedom_of_the_press:
+        title: Freedom of the Press
+        unit: ""
+        presentation:
+          topic_tags:
+            - Human Rights

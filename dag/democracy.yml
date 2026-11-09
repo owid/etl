@@ -26,6 +26,11 @@ steps:
         - snapshot://democracy/2026-03-23/fh.xlsx
       - data://garden/regions/2023-01-01/regions
 
+  # Freedom House - Freedom of the Press (2017, discontinued)
+  data://grapher/democracy/2026-03-23/fh_press_freedom:
+    - data://garden/democracy/2026-03-23/fh_press_freedom:
+      - snapshot://journalism/2022-03-08/press_freedom__freedom_house__2017.feather
+
   # Bertelsmann Transformation Index (2026)
   data://grapher/democracy/2026-03-27/bti:
     - data://garden/democracy/2026-03-27/bti:

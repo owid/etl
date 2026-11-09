@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
@@ -86,10 +88,16 @@ def run(dest_dir: str) -> None:
     tb_census = add_uk(tb_census)
     tb_census = tb_census.format(["country", "year"])
 
-    # create indicator that shows if a census was conducted in the last 10 years
+    # Create an indicator that shows if a census was conducted in the last 10 years, as No/Yes so the Swimlane chart
+    # can show it.
     tb_census["recent_census"] = tb_census["years_since_last_census"].apply(
-        lambda x: np.nan if np.isnan(x) else 1 if x <= 10 else 0
+        lambda x: np.nan if np.isnan(x) else "Yes" if x <= 10 else "No"
     )
+    tb_census["recent_census"] = tb_census["recent_census"].astype("category")
+    # Its own copy of the metadata: `apply` shares the metadata object with `years_since_last_census`.
+    tb_census["recent_census"].metadata = deepcopy(tb_census["years_since_last_census"].metadata)
+    tb_census["recent_census"].metadata.type = "string"
+    tb_census["recent_census"].metadata.sort = ["No", "Yes"]
 
     tb = tb.format(["country", "date"])
     #
