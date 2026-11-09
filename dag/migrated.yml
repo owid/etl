@@ -229,9 +229,6 @@ steps:
   data-private://grapher/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
     - data-private://garden/emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
       - snapshot-private://emissions/2021/ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021.feather
-  data://grapher/journalism/2022-03-08/press_freedom__freedom_house__2017:
-    - data://garden/journalism/2022-03-08/press_freedom__freedom_house__2017:
-      - snapshot://journalism/2022-03-08/press_freedom__freedom_house__2017.feather
   data://grapher/demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013:
     - data://garden/demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013:
       - snapshot://demography/2013-04-01/international_historical_statistics__births_per_1_000__brian_mitchell__2013.feather
