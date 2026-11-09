@@ -357,6 +357,8 @@ A **clean Codex review has a different shape**: no inline comments and zero revi
 
 ### 14. Final report
 
+When handing out your report, focus on the points to resolve; a long list of points that you checked but that didn't surface anything wrong is pointless to the user.
+
 Structure the review with:
 
 1. **Overview** — one-paragraph summary of what the PR does
