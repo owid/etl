@@ -86,7 +86,7 @@ The `--grapher` upload is required to verify MySQL ingestion and the indicator m
 
 ### 5. Snapshot field comparison
 
-Read both `.dvc` files (old and new) and produce a side-by-side table for these fields:
+Read both `.dvc` files (old and new) and compare them side by side on these fields (report only the fields that fail):
 
 | Field | Check |
 |---|---|
@@ -187,7 +187,7 @@ Either way, do a cheap manual spot-check as part of the base review: open 2–3 
 
 ### 9. Indicator metadata coverage & dataset block
 
-The mandatory-fields checklist, the `dataset.update_period_days` requirement, and the `presentation.attribution_short` non-inheritance gotcha all live in `/update-dataset` § 6c. As reviewer, build the indicator × field matrix from that checklist and flag any missing field as 🔴.
+The mandatory-fields checklist, the `dataset.update_period_days` requirement, and the `presentation.attribution_short` non-inheritance gotcha all live in `/update-dataset` § 6c. As reviewer, check every indicator against that checklist and flag any missing field as 🔴 (report the gaps, not the full matrix).
 
 Quick verification that `presentation.attribution_short` actually landed on the produced indicators (origin's value does NOT propagate):
 
@@ -361,15 +361,12 @@ When handing out your report, focus on the points to resolve; a long list of poi
 
 Structure the review with:
 
-1. **Overview** — one-paragraph summary of what the PR does
-2. **Pipeline test result** — ✅/❌ for each step + grapher upload
-3. **Snapshot comparison table** — old vs new
-4. **Indicator metadata table** — fields × indicators, ✓/❌ matrix
-5. **🔴 Blockers** — must-fix before merge
-6. **🟡 Suggestions** — nice-to-have
-7. **🟢 Informational** — observations, no action needed
-8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, whether the QA hand-off included Metadata Diff when the PR changed reader-facing text, etc. (Not the Slack + `/latest` drafts — see §3b.)
-9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Unactioned Metadata Diff rejections belong here — nothing in the merge enforces them. Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+1. **Overview** — one-paragraph summary of what the PR does, plus one line on what the verdict rests on (staging build, local run, or pipeline skipped)
+2. **🔴 Blockers** — must-fix before merge
+3. **🟡 Suggestions** — nice-to-have
+4. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Unactioned Metadata Diff rejections belong here — nothing in the merge enforces them. Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+
+Failures from the earlier sections (a pipeline step, a snapshot field, a missing metadata field, an `/update-dataset` workflow gap such as a missing Codex review or Metadata Diff hand-off, but not the Slack + `/latest` drafts, see §3b) go under 🔴 or 🟡 per the rubric below. Checks that passed get no table, row or section, and 🟢 items are left out unless the user needs one to act or decide.
 
 **Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
@@ -377,7 +374,7 @@ Structure the review with:
 
 - 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (confirmed dead by a human browser check or documented retirement — automated all-three failure alone is 🟡), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data, downstream consumer that fails to build or silently lost coverage after a same-PR repoint (a "− lost N data point(s)" entry / red coverage chip in the data-diff report) without triage in the PR body, upgraded view (chart, MDim view, narrative chart, or article link) that pins an entity with data on production but none on staging (renders with that series missing, or empty), narrative chart whose own title/subtitle states an unbounded claim the new data contradicts, with neither a retitle nor a `maxTime` pin applied on staging, metadata claim contradicted by the producer's own documentation, data value confirmed wrong by two independent sources without a `corrections.yml` entry or PR-body triage
 - 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, count series mis-routed into a rate/average aggregation branch, `citation_full` year ≠ `date_published` year (verify), pre-existing inherited metadata gap (`update_period_days`/`attributionShort`/`description_short` already missing in the prior version), PR author missing from `dataset.owners`, missing tracking-issue link in the PR body, owid-issues scheduled workflow missing, mis-timed, or not pointing at `/update-dataset`, pre-existing empty-entity gap surfaced by the `check-empty-entities` audit or a spot-check (identical on production — needs a chart-config or gdoc fix via follow-up, just not necessarily in this PR), mandatory audit (`check-empty-entities`, `check-hardcoded-years`, or the `/fact-check-dataset` adversarial review) missing without the user's skip recorded in the PR's open items, a non-deliberate `maxTime`/`map.time`/`timelineMaxTime` pin below the new data's latest time left unfixed and undocumented (the update is invisible on that surface), "verify manually" item from an adversarial-review report left untriaged
-- 🟢 **Informational**: things to be aware of but not action items
+- 🟢 **Informational**: things to be aware of but not action items; left out of the report unless the user needs one to act or decide
 
 ## Notes
 
