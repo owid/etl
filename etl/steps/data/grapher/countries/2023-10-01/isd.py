@@ -30,6 +30,16 @@ def run(dest_dir: str) -> None:
     # Fill zeroes
     column_index = ["year", "country"]
     tb_countries = fill_gaps_with_zeroes(tb_countries, columns=column_index)
+    # Store the sovereign state flag as No/Yes, so the Swimlane chart can show it.
+    # NOTE: On each update, check that the flag is still 0/1. The recoding fails on any other value.
+    unknown = set(tb_countries["is_present"].dropna().unique()) - {0, 1}
+    assert not unknown, f"`is_present` has values other than 0 and 1: {unknown}"
+    metadata = tb_countries["is_present"].metadata
+    tb_countries["is_present"] = tb_countries["is_present"].map({0: "No", 1: "Yes"}).astype("category")
+    tb_countries["is_present"].metadata = metadata
+    tb_countries["is_present"].metadata.type = "string"
+    tb_countries["is_present"].metadata.sort = ["No", "Yes"]
+
     tb_countries = tb_countries.set_index(column_index, verify_integrity=True)
 
     #
