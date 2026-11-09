@@ -666,6 +666,9 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           grapher_config:
             title: Per capita CO₂ emissions from cement
@@ -721,6 +724,9 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           grapher_config:
             title: Per capita CO₂ emissions from coal
@@ -775,6 +781,9 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           grapher_config:
             title: Per capita CO₂ emissions from flaring
@@ -830,6 +839,9 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           grapher_config:
             title: Per capita CO₂ emissions from gas
@@ -918,6 +930,7 @@ tables:
         description_processing: |-
           {definitions.common.description_processing}
           {definitions.land_use_change_description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -978,6 +991,9 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           grapher_config:
             title: Per capita CO₂ emissions from oil
@@ -1016,6 +1032,9 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
       emissions_total:
         title: "Annual CO₂ emissions"
         unit: "tonnes"
@@ -1134,6 +1153,7 @@ tables:
         description_processing: |-
           {definitions.common.description_processing}
           {definitions.land_use_change_description_processing}
+          {definitions.per_capita_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -1325,3 +1345,6 @@ tables:
           - *per_capita_description_key
           - *traded_emissions_description_key
           - *international_aviation_description_key
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
