@@ -136,9 +136,6 @@ def select_faostat_data(tb_qcl: Table) -> Table:
     tb = tb.rename(columns=columns, errors="raise")
     tb = tb.astype({"country": str}).reset_index(drop=True)
 
-    # Only keep rows with a number of laying hens (eggs produced is a secondary variable).
-    tb = tb.dropna(subset=["laying_hens"]).reset_index(drop=True)
-
     return tb
 
 
@@ -168,9 +165,12 @@ def fill_gaps(tb: Table) -> Table:
         gap_length = missing.groupby([tb_current["country"], (missing != missing.shift()).cumsum()]).transform("size")
         short_gap = missing & (gap_length <= MAX_YEARS_TO_FILL)
         tb_current.loc[short_gap, column] = tb_current.groupby("country")[column].ffill()[short_gap]
-    tb_current = tb_current.dropna(subset=["laying_hens"])
 
     tb_filled = pr.concat([tb_current, tb[tb["country"].isin(historical)]], ignore_index=True)
+
+    # Only keep rows with a number of laying hens (eggs produced is a secondary variable). This is done after filling
+    # gaps, so that the eggs reported in years without a number of laying hens are kept, instead of being overwritten.
+    tb_filled = tb_filled.dropna(subset=["laying_hens"]).reset_index(drop=True)
 
     return tb_filled
 
