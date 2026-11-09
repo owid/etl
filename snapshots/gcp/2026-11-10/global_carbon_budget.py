@@ -10,8 +10,6 @@ A snapshot will be created for each of the following datasets:
 
 from pathlib import Path
 
-import click
-
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
@@ -47,17 +45,10 @@ Since 2001, the GCP has published estimates of global and national fossil CO₂ 
 """
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option(
-    "--path-to-file",
-    "--path-to-folder",
-    "path_to_folder",
-    prompt=True,
-    type=str,
-    help="Path to local folder where data files are.",
-)
-def run(path_to_folder: str, upload: bool) -> None:
+def run(upload: bool = True, path_to_file: str | None = None) -> None:
+    error = "Pass the path to the local folder where data files are, with --path-to-file."
+    assert path_to_file is not None, error
+
     # Create a new snapshot for each dataset.
     for data_file in DATA_FILES:
         snap = Snapshot(f"gcp/{SNAPSHOT_VERSION}/{data_file}")
@@ -75,9 +66,9 @@ def run(path_to_folder: str, upload: bool) -> None:
         # Download data from source, add file to DVC and upload to S3.
         # snap.create_snapshot(upload=upload)
         ################################################################################################################
-        # Once all files are public, we could remove this block, add url_download to each snapshot dvc file, uncomment previous line, and remove click.option for path to folder.
+        # Once all files are public, we could remove this block, add url_download to each snapshot dvc file, uncomment previous line, and remove the path_to_file argument.
         # However, it is convenient to have this block, as normally we update this dataset using local files (a few days before the files are publicly released).
-        path_to_file = Path(path_to_folder) / data_file
-        assert path_to_file.exists(), f"File {path_to_file} does not exist."
-        snap.create_snapshot(filename=path_to_file, upload=upload)
+        path_to_data_file = Path(path_to_file) / data_file
+        assert path_to_data_file.exists(), f"File {path_to_data_file} does not exist."
+        snap.create_snapshot(filename=path_to_data_file, upload=upload)
         ################################################################################################################
