@@ -29,6 +29,14 @@ PROCESSING_NOTES = {
     "SL_DOM_TSPDDC": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
 }
 
+# Indicators reported as codes, stored as ordered text categories so the Swimlane chart can show them.
+# NOTE: On each update, check in the UN SDG metadata that every code still means the category labeled here. The
+#   recoding fails on a code with no label, but not on a code whose meaning changed.
+CODED_INDICATORS = {
+    # 16.a.1: compliance of the national human rights institution with the Paris Principles.
+    "_16_a_1__sg_nhr_cmplnc": {0: "No status", 1: "Partially compliant", 2: "Fully compliant"},
+}
+
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
@@ -113,6 +121,10 @@ def run() -> None:
                 # table is generated for every column, use it as a table name
                 # shorten it under 255 characteres as this is the limit for file name
                 wide_table.metadata.short_name = wide_table.columns[0][:245]
+                if wide_table.columns[0] in CODED_INDICATORS:
+                    wide_table = codes_to_ordinal(
+                        wide_table, wide_table.columns[0], CODED_INDICATORS[wide_table.columns[0]]
+                    )
 
                 # ds_grapher.add(wide_table)
                 all_tables.append(wide_table)
@@ -411,3 +423,15 @@ def value_convert(value: Any) -> Any:
             return value
     else:
         return value
+
+
+def codes_to_ordinal(tb: Table, column: str, labels: dict[int, str]) -> Table:
+    """Replace the codes of a categorical indicator with their labels, as an ordinal indicator sorted like `labels`."""
+    unknown = set(tb[column].dropna().unique()) - set(labels)
+    assert not unknown, f"Column `{column}` has codes without a label: {unknown}"
+    metadata = tb[column].metadata
+    tb[column] = tb[column].map(labels).astype("category")
+    tb[column].metadata = metadata
+    tb[column].metadata.type = "ordinal"
+    tb[column].metadata.sort = list(labels.values())
+    return tb
