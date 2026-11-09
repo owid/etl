@@ -59,20 +59,25 @@ def run(upload: bool = True) -> None:
     # Fetch each data item separately (the API takes one data item per request).
     tables = []
     for data_item in DATA_ITEMS:
-        response = requests.get(
-            API_URL,
-            params={
-                "key": API_KEY,
-                "source_desc": "SURVEY",
-                "commodity_desc": "CHICKENS",
-                "short_desc": data_item,
-                "agg_level_desc": "NATIONAL",
-                "domain_desc": "TOTAL",
-                "format": "CSV",
-            },
-            timeout=300,
-        )
-        response.raise_for_status()
+        try:
+            response = requests.get(
+                API_URL,
+                params={
+                    "key": API_KEY,
+                    "source_desc": "SURVEY",
+                    "commodity_desc": "CHICKENS",
+                    "short_desc": data_item,
+                    "agg_level_desc": "NATIONAL",
+                    "domain_desc": "TOTAL",
+                    "format": "CSV",
+                },
+                timeout=300,
+            )
+            response.raise_for_status()
+        except requests.RequestException as e:
+            # Raise a new error without the original one, whose message includes the request URL, and hence the API key.
+            status = e.response.status_code if e.response is not None else type(e).__name__
+            raise RuntimeError(f"Quick Stats request failed for {data_item} ({status}).") from None
         table = pd.read_csv(io.BytesIO(response.content), low_memory=False)
         assert len(table) > 0, f"No data returned for {data_item}."
         tables.append(table)
