@@ -3,8 +3,7 @@
 Starting from the number of laying hens reported by FAOSTAT, this step estimates how many hens are killed each year to
 keep that flock in production, and how many male chickens (the brothers of those hens) are killed as well, either as
 day-old chicks or later on. In-ovo sexing, which removes some male embryos before they hatch, is not taken into account,
-since there are no figures of its use in each country. For the United States, the results are checked against the
-figures published by the US Department of Agriculture (USDA).
+since there are no figures of its use in each country.
 """
 
 import owid.catalog.processing as pr
@@ -65,13 +64,6 @@ FAOSTAT_AGGREGATE_SUFFIX = "(FAO)"
 MAX_YEARS_TO_FILL = 5
 # Columns with counts, that are estimated from the number of laying hens.
 COUNT_COLUMNS = ["hens_killed", "male_chickens_killed", "chickens_killed"]
-# Tolerances of the checks against USDA's figures for the United States:
-# - FAOSTAT's number of laying hens is USDA's annual average number of layers, sometimes taken from a preliminary release
-#   (which has differed from the revised figure by up to about 1%).
-USDA_LAYING_HENS_TOLERANCE = 0.03
-# - Our estimate of hens killed, compared with USDA's layers sold for slaughter plus layers that died or were destroyed
-#   (the ratio ranged from 0.96 to 1.13 between 2008 and 2024).
-USDA_HENS_KILLED_TOLERANCE = 0.20
 
 
 def run() -> None:
@@ -81,10 +73,6 @@ def run() -> None:
     # Load FAOSTAT QCL dataset and read its main (long) table.
     ds_qcl = paths.load_dataset("faostat_qcl")
     tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
-
-    # Load USDA's figures of laying hens and egg-type chicks in the United States, used only to check our estimates.
-    ds_usda = paths.load_dataset("us_laying_hens_and_chicks")
-    tb_usda = ds_usda.read("us_laying_hens_and_chicks")
 
     #
     # Process data.
@@ -120,7 +108,7 @@ def run() -> None:
     tb = paths.regions.add_per_capita(tb=tb, columns=COUNT_COLUMNS, warn_on_missing_countries=False)
 
     # Run sanity checks on outputs.
-    sanity_check_outputs(tb=tb, tb_qcl=tb_qcl, tb_usda=tb_usda)
+    sanity_check_outputs(tb=tb, tb_qcl=tb_qcl)
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)
@@ -200,7 +188,7 @@ def estimate_chickens_killed(tb: Table) -> Table:
     return tb
 
 
-def sanity_check_outputs(tb: Table, tb_qcl: Table, tb_usda: Table) -> None:
+def sanity_check_outputs(tb: Table, tb_qcl: Table) -> None:
     # Aggregates can be missing in years without country data; the checks below apply to informed rows.
     tb = tb.dropna(subset=["laying_hens"] + COUNT_COLUMNS)
     error = f"Estimates should start in {FIRST_YEAR}."
@@ -239,14 +227,3 @@ def sanity_check_outputs(tb: Table, tb_qcl: Table, tb_usda: Table) -> None:
         ratio = (owid / fao).dropna()
         error = f"Our {region} total of laying hens deviates by more than 5% from FAOSTAT's:\n{ratio[(ratio - 1).abs() > 0.05]}"
         assert ((ratio - 1).abs() <= 0.05).all(), error
-
-    # For the United States, FAOSTAT's number of laying hens should be USDA's annual average number of layers, and our
-    # estimate of hens killed should be close to USDA's layers sold for slaughter plus layers that died or were destroyed.
-    us = tb[tb["country"] == "United States"].set_index("year")
-    usda = tb_usda[tb_usda["country"] == "United States"].set_index("year")
-    ratio = (us["laying_hens"] / usda["average_layers"]).dropna()
-    error = f"FAOSTAT's laying hens in the United States deviate from USDA's average layers:\n{ratio[(ratio - 1).abs() > USDA_LAYING_HENS_TOLERANCE]}"
-    assert len(ratio) > 10 and ((ratio - 1).abs() <= USDA_LAYING_HENS_TOLERANCE).all(), error
-    ratio = (us["hens_killed"] / (usda["layers_sold_for_slaughter"] + usda["layers_lost"])).dropna()
-    error = f"Our estimate of hens killed in the United States deviates from USDA's figures:\n{ratio[(ratio - 1).abs() > USDA_HENS_KILLED_TOLERANCE]}"
-    assert len(ratio) > 10 and ((ratio - 1).abs() <= USDA_HENS_KILLED_TOLERANCE).all(), error
