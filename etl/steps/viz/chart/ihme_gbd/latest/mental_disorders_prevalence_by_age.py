@@ -46,7 +46,7 @@ def run() -> None:
         ages = AGES_YOUNG | (AGES_OLD_EATING if disorder == "eating_disorders" else AGES_OLD)
         subtitle = (
             f"Estimated share of people in each age group who have {subtitle_name}, whether or not they are "
-            "diagnosed, based on representative surveys, medical data, and statistical modelling."
+            "diagnosed, based on representative surveys, medical data, and statistical modeling."
             f" Prevalence is measured as the share experiencing {name} at a given point in time."
             " It does not measure lifetime prevalence."
         )

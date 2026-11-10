@@ -85,7 +85,7 @@ def _view(
     measure = "number" if metric == "number" else "share"
     subtitle = (
         f"Estimated {measure} of {subtitle_end}, whether or not they are diagnosed, "
-        "based on representative surveys, medical data and statistical modelling."
+        "based on representative surveys, medical data and statistical modeling."
     )
     if disorder in DISORDER_NOTES:
         subtitle += " " + DISORDER_NOTES[disorder]
