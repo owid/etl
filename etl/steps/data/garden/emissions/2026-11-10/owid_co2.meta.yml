@@ -95,3 +95,8 @@ dataset:
       url: https://creativecommons.org/licenses/by/4.0/
   owners:
     - Pablo Rosado
+
+tables:
+  owid_co2:
+    title: OWID CO2 dataset
+    description: ""
