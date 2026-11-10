@@ -95,14 +95,16 @@ def main() -> None:
     # first indicator, so match on the indicators listed in the view's own chart config.
     variable_ids = {row["id"] for row in variables}
     view_ids: set[int] = set()
+    view_config_ids: set[str] = set()
     mdim_slugs: set[str] = set()
     for row in _query(
-        "SELECT mx.id, m.slug, vc.config FROM multi_dim_x_chart_configs mx "
+        "SELECT mx.id, mx.chartConfigId, m.slug, vc.config FROM multi_dim_x_chart_configs mx "
         "JOIN multi_dim_data_pages m ON m.id = mx.multiDimId JOIN chart_configs vc ON vc.id = mx.chartConfigId "
         "WHERE m.published"
     ):
         if variable_ids & {d.get("variableId") for d in _json(row["config"]).get("dimensions") or []}:
             view_ids.add(row["id"])
+            view_config_ids.add(row["chartConfigId"])
             mdim_slugs.add(row["slug"])
             for name in DOD_RE.findall(str(row["config"])):
                 refs[name].add(f"MDim view {row['slug']}")
@@ -119,13 +121,20 @@ def main() -> None:
     narrative_names = {row["name"] for row in narratives}
     narrative_ids = {str(row["id"]) for row in narratives}
 
-    # Slugs posts can use for those charts: the current one, old slugs that redirect to it, and the slugs of the
-    # MDims whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's).
+    # Slugs posts can use for those charts: the current one, old slugs that redirect to it, the slugs of the MDims
+    # whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's), and retired
+    # chart or explorer slugs that redirect into one of those views.
+    redirect_slugs, gap = _mdim_redirect_slugs(view_config_ids, args.staging)
+    gaps = [gap] if gap else []
     dataset_slugs = (
         f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
         f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts}) "
         f"UNION SELECT m.slug FROM multi_dim_data_pages m WHERE m.slug IN ({_sql_list(mdim_slugs)})"
     )
+    if redirect_slugs:
+        # A VALUES list: the mirror rewrites `[...]` list literals as quoted identifiers.
+        values = ",".join("('" + s.replace("'", "''") + "')" for s in sorted(redirect_slugs))
+        dataset_slugs += f" UNION SELECT slug FROM (VALUES {values}) AS t(slug)"
     slugs = {row["slug"] for row in _query(dataset_slugs)}
 
     # ETL viz configs (MDims, explorers, ETL-authored charts) whose step depends on the dataset in the DAG.
@@ -160,7 +169,7 @@ def main() -> None:
         "FROM posts_gdocs_links l1 JOIN posts_gdocs g ON g.id = l1.sourceId "
         "JOIN posts_gdocs_links l2 ON l2.sourceId = g.id AND l2.linkType = 'dod' "
         "WHERE g.published AND ("
-        f"(l1.linkType IN ('grapher', 'guided-chart') AND l1.target IN ({dataset_slugs})) "
+        f"(l1.linkType IN ('grapher', 'guided-chart', 'explorer') AND l1.target IN ({dataset_slugs})) "
         f"OR (l1.linkType = 'narrative-chart' AND l1.target IN ({_sql_list(narrative_names)})) "
         f"OR g.id IN ({_sql_list(post_ids)}))"
     )
@@ -202,6 +211,8 @@ def main() -> None:
 
     print(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
     print(f"DoD text from {source}.\n")
+    for note in gaps:
+        print(f"Not scanned: {note}\n")
     missing = sorted(set(refs) - set(dods))
     if missing:
         print("## Referenced but missing from the dods table (broken links)\n")
@@ -252,6 +263,35 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
             files |= {*(folder / name).rglob("*.yml"), *(folder / name).rglob("*.py")}
         paths += sorted(files | _local_imports(files))
     return sorted(set(paths))
+
+
+def _mdim_redirect_slugs(view_config_ids: set[str], staging: str | None) -> tuple[set[str], str]:
+    """Retired chart or explorer slugs that redirect into the given MDim views, and a gap note if unreadable.
+
+    `multi_dim_redirects` is not in the public Datasette mirror, so it is read from the staging server's MySQL
+    (a copy of production from when the server was created) when `--staging` is given.
+    """
+    if not view_config_ids:
+        return set(), ""
+    if not staging:
+        return set(), (
+            "posts that still use a retired chart or explorer slug redirecting into an MDim view "
+            "(`multi_dim_redirects` is not in the public mirror; pass `--staging <branch>` to include them)."
+        )
+    from etl.config import OWIDEnv
+
+    df = OWIDEnv.from_staging(staging).read_sql(
+        "SELECT DISTINCT source FROM multi_dim_redirects WHERE viewConfigId IN %(ids)s",
+        params={"ids": tuple(view_config_ids)},
+    )
+    slugs = set()
+    for source in df["source"]:
+        for marker in ("/grapher/", "/explorers/"):
+            if marker in source:
+                source = source.split(marker)[-1]
+                break
+        slugs.add(source.split("?")[0].strip("/"))
+    return slugs, ""
 
 
 def _local_imports(files: set[Path]) -> set[Path]:
