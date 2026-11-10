@@ -119,7 +119,7 @@ tables:
           <%- endif -%>
         description_key:
           - |-
-            '1' indicates that the state participated in a war. '0' indicates that the state did not participate in a war.
+            'Yes' indicates that the state participated in a war. 'No' indicates that the state did not participate in a war.
 
       number_participants:
         title: Number of states involved in war

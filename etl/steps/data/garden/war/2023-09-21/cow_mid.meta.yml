@@ -56,7 +56,7 @@ tables:
           State participated in at least one conflict with another state where force was threatened, displayed, or used that year.
         description_key:
           - |-
-            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+            'Yes' indicates that the state participated in a conflict. 'No' indicates that the state did not participate in a conflict.
 
       number_participants:
         title: Number of states involved in conflict
