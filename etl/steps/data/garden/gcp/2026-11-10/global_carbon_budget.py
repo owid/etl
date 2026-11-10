@@ -2,7 +2,7 @@
 
 It harmonizes and further processes meadow data, and uses the following auxiliary datasets:
 - GGDC's Maddison dataset on GDP, used to calculate emissions per GDP.
-- Primary Energy Consumption (mix of sources from the 'energy' namespace) to calculate emissions per unit energy.
+- Energy mix (from the 'energy' namespace), whose total energy supply is used to calculate emissions per unit energy.
 - Population (mix of sources), to calculate emissions per capita.
 - Regions (mix of sources), to generate aggregates for different continents.
 - WorldBank's Income groups, to generate aggregates for different income groups.
@@ -80,11 +80,11 @@ CO2_COLUMNS = {
 # List all sources of emissions considered.
 EMISSION_SOURCES = [column for column in CO2_COLUMNS.values() if column not in ["country", "year"]]
 
-# Columns to use from primary energy consumption data and how to rename them.
-PRIMARY_ENERGY_COLUMNS = {
+# Columns to use from energy mix data and how to rename them.
+ENERGY_COLUMNS = {
     "country": "country",
     "year": "year",
-    "primary_energy_consumption__twh": "primary_energy_consumption",
+    "total_energy_supply_twh": "total_energy_supply",
 }
 
 # Columns to use from historical emissions data and how to rename them.
@@ -743,7 +743,7 @@ def combine_data_and_add_variables(
     tb_land_use : Table
         National land-use change emissions from GCP's official dataset (excel file), after harmonization.
     tb_energy : Table
-        Primary energy data.
+        Total energy supply data.
     ds_gdp : Dataset
         GDP dataset.
     ds_population : Dataset
@@ -786,7 +786,7 @@ def combine_data_and_add_variables(
     # Add GDP to main table.
     tb_co2_with_regions = geo.add_gdp_to_table(tb=tb_co2_with_regions, ds_gdp=ds_gdp)
 
-    # Add primary energy to main table.
+    # Add total energy supply to main table.
     tb_co2_with_regions = pr.merge(tb_co2_with_regions, tb_energy, on=["country", "year"], how="left")
 
     # For convenience, rename columns in land-use change emissions data.
@@ -814,7 +814,7 @@ def combine_data_and_add_variables(
     )
 
     # Add region aggregates.
-    # Aggregate not only emissions data, but also population, gdp and primary energy.
+    # Aggregate not only emissions data, but also population, gdp and total energy supply.
     # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
     tb_co2_with_regions = paths.regions.add_aggregates(
         tb=tb_co2_with_regions, regions=REGIONS, min_num_values_per_year=1
@@ -866,23 +866,18 @@ def combine_data_and_add_variables(
             100 * tb_co2_with_regions[f"cumulative_{column}"] / tb_co2_with_regions[f"global_cumulative_{column}"]
         )
 
-    # Add total emissions per unit energy (in grams of emissions per kWh).
-    # NOTE: This still divides by the old substitution-method primary energy. A Total Energy Supply
-    # version now lives in energy/latest/carbon_intensity_of_energy. On the next update, repoint this
-    # step's energy input to Total Energy Supply (energy_mix) and remove that separate step — but note
-    # that carbon_intensity_of_energy currently depends on this step, so drop that dependency first to
-    # avoid a cycle.
+    # Add total emissions per unit energy (in grams of emissions per kWh of total energy supply).
     tb_co2_with_regions["emissions_total_per_unit_energy"] = (
         TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total"]
-        / (tb_co2_with_regions["primary_energy_consumption"] * TWH_TO_KWH)
+        / (tb_co2_with_regions["total_energy_supply"] * TWH_TO_KWH)
     )
 
-    # Add total emissions (including land-use change) per unit energy (in grams of emissions per kWh).
+    # Add total emissions (including land-use change) per unit energy (in grams of emissions per kWh of total energy supply).
     tb_co2_with_regions["emissions_total_including_land_use_change_per_unit_energy"] = (
         TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total_including_land_use_change"]
-        / (tb_co2_with_regions["primary_energy_consumption"] * TWH_TO_KWH)
+        / (tb_co2_with_regions["total_energy_supply"] * TWH_TO_KWH)
     )
 
     # Add total emissions per unit GDP.
@@ -980,9 +975,9 @@ def run() -> None:
     tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
     tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
 
-    # Load primary energy consumption dataset and read its main table.
-    ds_energy = paths.load_dataset("primary_energy_consumption")
-    tb_energy = ds_energy.read("primary_energy_consumption", safe_types=False)
+    # Load energy mix dataset and read its main table.
+    ds_energy = paths.load_dataset("energy_mix")
+    tb_energy = ds_energy.read("energy_mix", safe_types=False)
 
     # Load GDP dataset.
     ds_gdp = paths.load_dataset("maddison_project_database")
@@ -1002,8 +997,8 @@ def run() -> None:
     # Prepare production-based emission data.
     tb_production = prepare_production_emissions(tb_production=tb_production)
 
-    # Select and rename columns from primary energy data.
-    tb_energy = tb_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")
+    # Select and rename columns from energy mix data.
+    tb_energy = tb_energy[list(ENERGY_COLUMNS)].rename(columns=ENERGY_COLUMNS, errors="raise")
 
     # Prepare historical emissions data.
     tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
