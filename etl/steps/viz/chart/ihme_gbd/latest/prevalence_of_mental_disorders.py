@@ -94,10 +94,14 @@ def _view(
         " It does not measure lifetime prevalence."
     )
     note = {"share_age_standardized": NOTE_AGE_STANDARDIZED, "share_crude": NOTE_CRUDE, "number": NOTE_NUMBER}[metric]
+    display = {"name": display_name}
+    if measure == "share":
+        # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 3 so small shares (e.g. 0.031%) keep 2 significant figures.
+        display |= {"roundingMode": "significantFigures", "numSignificantFigures": 2, "numDecimalPlaces": 3}
 
     return {
         "dimensions": {"disorder": disorder, "sex": sex, "age": age, "metric": metric},
-        "indicators": {"y": [{"catalogPath": catalog_path, "display": {"name": display_name}}]},
+        "indicators": {"y": [{"catalogPath": catalog_path, "display": display}]},
         "config": {
             "title": f"{measure.capitalize()} of {title_end}",
             "subtitle": subtitle,
