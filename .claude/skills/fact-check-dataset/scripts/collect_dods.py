@@ -7,10 +7,10 @@ shows them and a metadata review that reads only the `.meta.yml` misses them. Th
 Surfaces scanned:
   - indicator metadata: the local grapher build (new text, if built) and production variables (any version)
   - chart configs of production charts that use the dataset's indicators (any version), of the views of published
-    MDims that use them, and of the narrative charts built on either
+    MDims and explorers that use them, and of the narrative charts built on those charts or MDim views
   - ETL viz configs and code (charts, MDims, explorers) of the viz steps that depend on the dataset (any version) in
     the DAG
-  - articles and data insights that embed or link those charts or MDims (by current or redirected slug, as a chart, a
+  - articles and data insights that embed or link those charts, MDims or explorers (by current or redirected slug, as a
     guided chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show
     one of them in their `grapher-url` or `narrative-chart` front matter
 
@@ -121,15 +121,30 @@ def main() -> None:
     narrative_names = {row["name"] for row in narratives}
     narrative_ids = {str(row["id"]) for row in narratives}
 
+    # Published explorers that use those indicators, and the rendered configs of their views that show them.
+    dataset_explorers = (
+        "SELECT DISTINCT ev.explorerSlug FROM explorer_variables ev JOIN explorers e ON e.slug = ev.explorerSlug "
+        "JOIN variables v ON v.id = ev.variableId JOIN datasets d ON d.id = v.datasetId "
+        f"WHERE e.isPublished AND d.catalogPath LIKE '{namespace}/%/{short_name}'"
+    )
+    for row in _query(
+        "SELECT ex.explorerSlug, cc.config FROM explorer_views ex JOIN chart_configs cc ON cc.id = ex.chartConfigId "
+        f"WHERE ex.explorerSlug IN ({dataset_explorers})"
+    ):
+        if variable_ids & {d.get("variableId") for d in _json(row["config"]).get("dimensions") or []}:
+            for name in DOD_RE.findall(str(row["config"])):
+                refs[name].add(f"explorer view {row['explorerSlug']}")
+
     # Slugs posts can use for those charts: the current one, old slugs that redirect to it, the slugs of the MDims
-    # whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's), and retired
-    # chart or explorer slugs that redirect into one of those views.
+    # whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's), the slugs of
+    # those explorers, and retired chart or explorer slugs that redirect into one of the MDim views.
     redirect_slugs, gap = _mdim_redirect_slugs(view_config_ids, args.staging)
     gaps = [gap] if gap else []
     dataset_slugs = (
         f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
         f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts}) "
-        f"UNION SELECT m.slug FROM multi_dim_data_pages m WHERE m.slug IN ({_sql_list(mdim_slugs)})"
+        f"UNION SELECT m.slug FROM multi_dim_data_pages m WHERE m.slug IN ({_sql_list(mdim_slugs)}) "
+        f"UNION SELECT explorerSlug AS slug FROM ({dataset_explorers}) AS ex"
     )
     if redirect_slugs:
         # A VALUES list: the mirror rewrites `[...]` list literals as quoted identifiers.
