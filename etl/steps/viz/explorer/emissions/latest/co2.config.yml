@@ -2,7 +2,7 @@ config:
   explorerTitle: CO₂ and Greenhouse Gas Emissions
   explorerSubtitle: Explore data on greenhouse gas emissions.
   isPublished: true
-  downloadDataLink: https://github.com/owid/co2-data
+  downloadDataLink: https://catalog.ourworldindata.org/emissions/owid_co2/
   selection:
     - China
     - United States
