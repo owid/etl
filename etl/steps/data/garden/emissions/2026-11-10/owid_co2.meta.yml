@@ -1,7 +1,7 @@
 dataset:
   # Canary for the public catalog landing page / Schema.org JSON-LD (catalog-discovery project).
   jsonld: true
-  title: OWID CO2 dataset
+  title: CO₂ and greenhouse gas emissions dataset
   description: |-
     Our complete CO2 and Greenhouse Gas Emissions dataset is a collection of key metrics maintained by Our World in Data. It includes data on CO2 emissions (annual, per capita, cumulative, and consumption-based), other greenhouse gases, and energy mix.
 
@@ -100,5 +100,5 @@ dataset:
 
 tables:
   owid_co2:
-    title: OWID CO2 dataset
+    title: CO₂ and greenhouse gas emissions dataset
     description: ""
