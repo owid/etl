@@ -19,6 +19,7 @@ meta:
     attribution: Global Carbon Budget (2026)
     version_producer: v11
     url_main: https://globalcarbonbudget.org/
+    url_download: https://zenodo.org/records/23667912/files/GCB2026v11_MtCO2_flat.csv?download=1
     date_accessed: '2026-11-05'
     date_published: '2026-11-10'
     license:

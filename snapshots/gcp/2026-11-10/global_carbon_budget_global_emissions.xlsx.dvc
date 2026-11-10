@@ -19,6 +19,7 @@ meta:
     attribution: Global Carbon Budget (2026)
     version_producer: v11
     url_main: https://globalcarbonbudget.org/
+    url_download: https://globalcarbonbudget.org/download/3700/
     date_accessed: '2026-11-05'
     date_published: '2026-11-10'
     license:

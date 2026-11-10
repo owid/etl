@@ -46,9 +46,6 @@ Since 2001, the GCP has published estimates of global and national fossil CO₂ 
 
 
 def run(upload: bool = True, path_to_file: str | None = None) -> None:
-    error = "Pass the path to the local folder where data files are, with --path-to-file."
-    assert path_to_file is not None, error
-
     # Create a new snapshot for each dataset.
     for data_file in DATA_FILES:
         snap = Snapshot(f"gcp/{SNAPSHOT_VERSION}/{data_file}")
@@ -63,12 +60,12 @@ def run(upload: bool = True, path_to_file: str | None = None) -> None:
         # Rewrite metadata to dvc file.
         snap.metadata_path.write_text(snap.metadata.to_yaml())
 
-        # Download data from source, add file to DVC and upload to S3.
-        # snap.create_snapshot(upload=upload)
-        ################################################################################################################
-        # Once all files are public, we could remove this block, add url_download to each snapshot dvc file, uncomment previous line, and remove the path_to_file argument.
-        # However, it is convenient to have this block, as normally we update this dataset using local files (a few days before the files are publicly released).
-        path_to_data_file = Path(path_to_file) / data_file
-        assert path_to_data_file.exists(), f"File {path_to_data_file} does not exist."
-        snap.create_snapshot(filename=path_to_data_file, upload=upload)
-        ################################################################################################################
+        if path_to_file is None:
+            # Download the public file (url_download in the dvc file), add it to DVC and upload it to R2.
+            snap.create_snapshot(upload=upload)
+        else:
+            # NOTE: GCB shares the files privately a few days before the public release, while they are under embargo.
+            # In that case, pass --path-to-file with the local folder that holds them.
+            path_to_data_file = Path(path_to_file) / data_file
+            assert path_to_data_file.exists(), f"File {path_to_data_file} does not exist."
+            snap.create_snapshot(filename=path_to_data_file, upload=upload)
