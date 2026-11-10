@@ -4,7 +4,7 @@ Datasets combined:
 * Global Carbon Budget - Global Carbon Project.
 * National contributions to climate change - Jones et al.
 * Greenhouse gas emissions by sector - Climate Watch.
-* Primary energy consumption - EI & EIA.
+* Energy mix (total energy supply) - EI, EIA & Smil.
 
 Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2023) on
 GDP are included.
@@ -129,12 +129,12 @@ JONES_COLUMNS = {
 #     "total_n2o_emissions_including_lucf": "nitrous_oxide",
 #     "total_n2o_emissions_including_lucf_per_capita": "nitrous_oxide_per_capita",
 # }
-PRIMARY_ENERGY_COLUMNS = {
+ENERGY_COLUMNS = {
     "country": "country",
     "year": "year",
-    "primary_energy_consumption__twh": "primary_energy_consumption",
-    "primary_energy_consumption_per_capita__kwh": "energy_per_capita",
-    "primary_energy_consumption_per_gdp__kwh_per_dollar": "energy_per_gdp",
+    "total_energy_supply_twh": "total_energy_supply",
+    "total_energy_supply_per_capita_kwh": "energy_per_capita",
+    "total_energy_supply_per_gdp_kwh_per_dollar": "energy_per_gdp",
 }
 REGIONS_COLUMNS = {
     "name": "country",
@@ -217,7 +217,7 @@ def combine_tables(
     # tb_climate_watch_n2o : Table
     #     N2O emissions table (from Climate Watch).
     tb_energy : Table
-        Primary energy consumption table (from BP & EIA).
+        Energy mix table (total energy supply, from EI, EIA & Smil).
     tb_gdp : Table
         Maddison GDP table (from GGDC).
     tb_population : Table
@@ -349,8 +349,8 @@ def run() -> None:
     # Load the GDP dataset by GGDC Maddison.
     ds_gdp = paths.load_dataset("maddison_project_database")
 
-    # Load primary energy consumption dataset (by different sources in our 'energy' namespace).
-    ds_energy = paths.load_dataset("primary_energy_consumption")
+    # Load energy mix dataset (from our 'energy' namespace).
+    ds_energy = paths.load_dataset("energy_mix")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -364,7 +364,7 @@ def run() -> None:
     # tb_climate_watch_ghg = ds_climate_watch["greenhouse_gas_emissions_by_sector"]
     # tb_climate_watch_ch4 = ds_climate_watch["methane_emissions_by_sector"]
     # tb_climate_watch_n2o = ds_climate_watch["nitrous_oxide_emissions_by_sector"]
-    tb_energy = ds_energy["primary_energy_consumption"]
+    tb_energy = ds_energy["energy_mix"]
     tb_gdp = ds_gdp["maddison_project_database"]
     tb_population = ds_population["population"]
     tb_regions = ds_regions["regions"]
@@ -384,9 +384,7 @@ def run() -> None:
     # tb_climate_watch_n2o = tb_climate_watch_n2o.reset_index()[list(CLIMATE_WATCH_N2O_COLUMNS)].rename(
     #     columns=CLIMATE_WATCH_N2O_COLUMNS, errors="raise"
     # )
-    tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(
-        columns=PRIMARY_ENERGY_COLUMNS, errors="raise"
-    )
+    tb_energy = tb_energy.reset_index()[list(ENERGY_COLUMNS)].rename(columns=ENERGY_COLUMNS, errors="raise")
     tb_gdp = tb_gdp.reset_index()[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS, errors="raise")
     tb_population = tb_population.reset_index()[list(POPULATION_COLUMNS)].rename(
         columns=POPULATION_COLUMNS, errors="raise"
