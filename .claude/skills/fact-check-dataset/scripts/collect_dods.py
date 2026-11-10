@@ -9,9 +9,9 @@ Surfaces scanned:
   - chart configs of production charts that use the dataset's indicators (any version), and of the narrative charts
     built on those charts or on views of published MDims that use those indicators
   - ETL viz configs (charts, MDims, explorers) of the viz steps that depend on the dataset (any version) in the DAG
-  - articles and data insights that embed or link those charts (by current or redirected slug) or their narrative
-    charts (their own DoD links), including data insights that show one of those charts in their `grapher-url`
-    front matter
+  - articles and data insights that embed or link those charts (by current or redirected slug, as a chart, a guided
+    chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show one of
+    those charts in their `grapher-url` front matter
 
 References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
 mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
@@ -112,12 +112,16 @@ def main() -> None:
         for name in DOD_RE.findall(path.read_text()):
             refs[name].add(f"viz config {path.relative_to(REPO)}")
 
-    # Articles and data insights that embed or link those charts or their narrative charts.
+    # Articles and data insights that embed or link those charts (as a chart, a guided chart or a pasted URL) or
+    # their narrative charts.
+    url_slug = "rtrim(split_part(split_part(split_part(l1.target, '/grapher/', 2), '?', 1), '#', 1), '/')"
     rows = _query(
         "SELECT DISTINCT g.slug AS gdoc, g.type, l2.target AS dod "
         "FROM posts_gdocs_links l1 JOIN posts_gdocs g ON g.id = l1.sourceId "
         "JOIN posts_gdocs_links l2 ON l2.sourceId = g.id AND l2.linkType = 'dod' "
-        f"WHERE g.published AND ((l1.linkType = 'grapher' AND l1.target IN ({dataset_slugs})) "
+        "WHERE g.published AND ("
+        f"(l1.linkType IN ('grapher', 'guided-chart') AND l1.target IN ({dataset_slugs})) "
+        f"OR (l1.linkType = 'url' AND {url_slug} IN ({dataset_slugs})) "
         f"OR (l1.linkType = 'narrative-chart' AND l1.target IN ({dataset_narratives})))"
     )
     for row in rows:
