@@ -37,7 +37,7 @@ you learn something new, add it to the file that owns that side rather than to b
 | `Static Chart Template_Mobile (example 2)` | `24590:32` | 540 × 824 | portrait; two panels side by side |
 
 Do not confuse the 540×540 mobile frame with `DI_Template` (`6799:1859`) or
-`InstagramPost_Template_English` (`798:161`), which are also 540×540. The tells, per
+`InstagramPost_Template` (`798:161`), which are also 540×540. The tells, per
 `/owid-staff:create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
 license wording (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static).
 Footer row count does not separate them: DI carries one row, static mobile and IG square two.
@@ -53,6 +53,22 @@ geometry comes from a grapher `imType=thumbnail` export, handled entirely by
 
 So do not add a `"small"` entry to `scripts/verify_static_viz.py`'s `TEMPLATE_RATIOS`. It would be
 wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chosen per chart.
+
+### Not a static-viz target: the Instagram templates
+
+The `instagram post Charts` section holds `InstagramPost_Template` (`798:161`, 540 × 540),
+`InstagramPost_Template_Portrait` (`6689:8`, **540 × 720**, 3:4) and
+`InstagramReel_template` (`7336:8`, 616 × 1096), all on the beige `Instagram/Beige Background`. No
+`viz://static` step targets them. An Instagram or Reddit image is made from a **finished 540 × 540** DI or
+static mobile frame by `/owid-staff:create-figma-chart`'s Instagram/Reddit route (its
+INSTA-REDDIT.md), which clones the portrait template and reads its geometry at run time. So hand a
+finished square static viz to that route for its Instagram version, rather than laying out a second step at
+3:4, and do not add an Instagram size to `TEMPLATE_RATIOS`.
+
+The portrait is as wide as static mobile, so tell them apart by more than the width: it is beige
+rather than cream, insets its content **26 px** rather than 16 (content width 488), ends at 720
+rather than 824, and carries `CC BY` with an `OurWorldinData.org/[Topic]` line instead of the
+author license.
 
 ## Slot positions
 
