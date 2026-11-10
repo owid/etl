@@ -570,6 +570,31 @@
                             ]
                         ]
                     },
+                    "presentation": {
+                        "type": "object",
+                        "title": "Dimension presentation",
+                        "description": "Optional settings for how the dimension's control is shown on the page.",
+                        "requirement_level": "optional",
+                        "additionalProperties": false,
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "title": "Dimension control type",
+                                "description": "The control the dimension gets on the page: `dropdown` (a plain dropdown), `dropdown-with-search` (a dropdown with a search field in its menu) or `toggle-buttons` (a segmented group of toggle buttons). This is a recommendation, not a guarantee: toggle buttons that don't fit the controls row are shown as a dropdown. When omitted, Grapher picks the control automatically: toggle buttons for a dimension with at most two choices and no choice groups (at most four when the chart has only that one dimension), a dropdown with search when ten or more choices are available, and a plain dropdown otherwise.",
+                                "requirement_level": "optional",
+                                "enum": [
+                                    "dropdown",
+                                    "dropdown-with-search",
+                                    "toggle-buttons"
+                                ],
+                                "guidelines": [
+                                    [
+                                        "Don't use `toggle-buttons` on a dimension whose choices have a `group`: the Grapher admin rejects such a config."
+                                    ]
+                                ]
+                            }
+                        }
+                    },
                     "choices": {
                         "type": "array",
                         "title": "Dimension choices",

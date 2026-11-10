@@ -2605,3 +2605,50 @@ def test_save_download_package_skips_unpublished_charts():
     assert build.call_count == 0
     assert upsert.call_count == 0
     assert chart.download_package is None
+
+
+def _config_with_presentation(presentation_type: str, group: str | None = None) -> dict:
+    """Minimal config whose only dimension requests `presentation_type`."""
+    choices = [{"slug": "total", "name": "Total"}, {"slug": "per_capita", "name": "Per capita"}]
+    if group is not None:
+        for choice in choices:
+            choice["group"] = group
+    return _make_minimal_config(
+        grapher_schema="011",
+        dimensions=[
+            {"slug": "metric", "name": "Metric", "choices": choices, "presentation": {"type": presentation_type}}
+        ],
+    )
+
+
+@pytest.mark.parametrize("presentation_type", ["dropdown", "dropdown-with-search", "toggle-buttons"])
+def test_chart_dimension_presentation_types_pass_schema_validation(presentation_type):
+    """
+    Test Chart.validate_schema - the control types Grapher supports for mdim dimensions are accepted.
+    """
+    chart = Chart.from_dict(_config_with_presentation(presentation_type))
+    chart.validate_schema()
+    assert chart.to_dict()["dimensions"][0]["presentation"] == {"type": presentation_type}
+
+
+def test_chart_dimension_presentation_rejects_radio():
+    """
+    Test Chart.validate_schema - `radio` (renamed to `toggle-buttons` in Grapher) is rejected for mdims.
+
+    Grapher no longer recognizes it and would silently render a plain dropdown.
+    """
+    chart = Chart.from_dict(_config_with_presentation("radio"))
+    with pytest.raises(ValueError, match="must be one of"):
+        chart.validate_schema()
+
+
+def test_dimension_toggle_buttons_rejects_grouped_choices():
+    """
+    Test Dimension - `toggle-buttons` on a dimension with grouped choices fails at authoring time,
+    since the Grapher admin rejects such a config.
+    """
+    with pytest.raises(ValueError, match="not allowed when its choices have groups"):
+        Chart.from_dict(_config_with_presentation("toggle-buttons", group="Group A"))
+
+    # Grouped choices are fine with a dropdown.
+    Chart.from_dict(_config_with_presentation("dropdown", group="Group A")).validate_schema()

@@ -51,7 +51,7 @@ dimensions:
       - slug: share
         name: Share of population
     presentation:
-      type: radio
+      type: toggle-buttons
 
 views:
   - dimensions:

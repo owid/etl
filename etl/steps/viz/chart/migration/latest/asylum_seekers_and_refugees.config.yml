@@ -71,7 +71,7 @@ dimensions:
         name: By country of asylum
         description: The country where people are seeking or have been granted asylum.
     presentation:
-      type: radio
+      type: toggle-buttons
   - slug: unit
     name: Unit
     choices:
@@ -80,7 +80,7 @@ dimensions:
       - slug: per_capita
         name: Rate (per 1,000 or 100,000)
     presentation:
-      type: radio
+      type: toggle-buttons
   - slug: age
     name: Age
     choices:
@@ -89,7 +89,7 @@ dimensions:
       - slug: under_18
         name: Under 18
     presentation:
-      type: radio
+      type: toggle-buttons
 
 views:
   # Refugees

@@ -329,4 +329,4 @@ For better reference, read [:fontawesome-brands-github: this issue](https://gith
 
 - MDIMs are not yet public.
 - MDIMs are not yet embeddable.
-- MDIMs only support dropdowns (explorers support other UI elements: radio buttons, checkboxes)
+- MDIMs support dropdowns, dropdowns with search, and toggle buttons (set with a dimension's `presentation.type`; see the schema), but not checkboxes like explorers.

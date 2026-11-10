@@ -65,7 +65,7 @@ dimensions:
         name: People who returned after displacement
         description: The number of internally displaced persons who have returned to their area of origin during the year.
     presentation:
-      type: radio
+      type: toggle-buttons
   - slug: unit
     name: Unit
     choices:
@@ -74,7 +74,7 @@ dimensions:
       - slug: per_capita
         name: Per capita
     presentation:
-      type: radio
+      type: toggle-buttons
   - slug: age
     name: Age
     choices:
@@ -83,7 +83,7 @@ dimensions:
       - slug: under_18
         name: Under 18
     presentation:
-      type: radio
+      type: toggle-buttons
 
 views:
   # All causes

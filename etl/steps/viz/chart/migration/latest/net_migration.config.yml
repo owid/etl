@@ -41,7 +41,7 @@ dimensions:
         name: Net migration rate
         description: Net migration per 1,000 people in the population.
     presentation:
-      type: radio
+      type: toggle-buttons
 
 views:
   - dimensions:
