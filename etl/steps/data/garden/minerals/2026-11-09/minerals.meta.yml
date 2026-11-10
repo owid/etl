@@ -21,7 +21,7 @@ definitions:
     - When no direct price series is available, unit values are derived using export, import, and production data.
     - To ensure consistency over time, these values are reported in 1998 constant dollars, adjusted for inflation.
   mercury_description_key: &mercury-description-key
-    - We show data only up to 2021, because estimates for later years are inconsistent. For example, USGS put the 2024 production of China, the largest producer, at 1,000 tonnes in its 2025 release, and at 200 tonnes in its 2026 release.
+    - We show data only up to 2021, because estimates for later years are inconsistent. For example, the United States Geological Survey put the 2024 production of China, the largest producer, at 1,000 tonnes in its 2025 release and at 200 tonnes in its 2026 release.
 
 
 dataset:

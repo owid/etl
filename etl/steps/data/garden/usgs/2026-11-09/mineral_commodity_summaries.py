@@ -1658,7 +1658,7 @@ def run() -> None:
 
     ####################################################################################################################
     # Corrections to USGS current data: known upstream data errors, declared in
-    # mineral_commodity_summaries.corrections.yml (Australia zinc reserves 2022, Kazakhstan asbestos 2020).
+    # mineral_commodity_summaries.corrections.yml.
     tb_flat = paths.apply_corrections(tb_flat)
 
     # As explained above (in the mapping) Chromium production is in gross weight, but reserves are not.

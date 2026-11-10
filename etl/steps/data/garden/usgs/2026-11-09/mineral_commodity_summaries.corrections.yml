@@ -18,3 +18,33 @@
   reason: Asbestos mine production for Kazakhstan in 2020 is reported as 27400, but BGS reports 227400, which is consistent with prior and posterior years; the USGS value looks like a data-entry error.
   producer: USGS
   status: open
+
+- indicator: reserves|Rare earths|Mine|tonnes
+  entity: Brazil
+  years: [2025]
+  action: override
+  value: 11000000
+  expect: {eq: 21000000}
+  reason: USGS corrected Brazil's rare earth reserves from 21,000,000 t to 11,000,000 t in version 1.3 (May 27, 2026) of the Mineral Commodity Summaries 2026 report (p. 153, see https://pubs.usgs.gov/periodicals/mcs2026/versionHist.txt), but the data release still has the old value.
+  producer: USGS
+  status: open
+
+- indicator: reserves|Rare earths|Mine|tonnes
+  entity: World
+  years: [2025]
+  action: override
+  value: 75000000
+  expect: {eq: 85000000}
+  reason: USGS revised the world total of rare earth reserves from more than 85,000,000 t to more than 75,000,000 t in version 1.3 (May 27, 2026) of the Mineral Commodity Summaries 2026 report, after correcting Brazil (see https://pubs.usgs.gov/periodicals/mcs2026/versionHist.txt), but the data release still has the old value.
+  producer: USGS
+  status: open
+
+- indicator: reserves|Manganese|Mine|tonnes
+  entity: World
+  years: [2025]
+  action: override
+  value: 1800000000
+  expect: {eq: 1700000000}
+  reason: The data release gives world manganese reserves of 1,700,000 thousand tonnes, less than the sum of the listed countries (1,798,000); the table in the report gives 1,800,000 (https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-manganese.pdf).
+  producer: USGS
+  status: open
