@@ -18,7 +18,7 @@ definitions:
     This data comes from the Colonial Dates Dataset (COLDAT), compiled by Bastian Becker at the University of Bremen. COLDAT doesn’t collect new historical evidence. Instead, it combines the start and end dates of colonial rule recorded in four existing datasets: the Correlates of War project, and datasets by Lange and coauthors (2006), Wimmer and Min (2006), and Olsson (2009).
 
   description_key_missing_colonies: |-
-    Colonies that none of these four datasets records are missing from COLDAT, and in those years the data treats the country as not colonized. For example, it doesn’t include the Dutch colonies in today’s Malaysia (Malacca), Sri Lanka (Ceylon), and Ghana (the Dutch Gold Coast). It also leaves out colonies of European countries other than the eight it covers, such as Denmark and Sweden.
+    Colonies that none of these four datasets records are missing from COLDAT, and in those years the data treats the country as not colonized. For example, it doesn’t include the Dutch colonies in today’s Malaysia (Malacca) and Sri Lanka (Ceylon). It also leaves out colonies of European countries other than the eight it covers, such as Denmark and Sweden.
 
 tables:
   colonial_dates_dataset:
