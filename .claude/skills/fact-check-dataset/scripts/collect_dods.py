@@ -6,15 +6,16 @@ shows them and a metadata review that reads only the `.meta.yml` misses them. Th
 
 Surfaces scanned:
   - indicator metadata: the local grapher build (new text, if built) and production variables (any version)
-  - chart configs of production charts that use the dataset's indicators (any version)
+  - chart configs of production charts that use the dataset's indicators (any version), and of their narrative charts
   - ETL viz configs (charts, MDims, explorers) in this repo that mention the dataset's short name
-  - articles and data insights that embed or link those charts (their own DoD links), including data insights
-    that show one of those charts in their `grapher-url` front matter
+  - articles and data insights that embed or link those charts (by current or redirected slug) or their narrative
+    charts (their own DoD links), including data insights that show one of those charts in their `grapher-url`
+    front matter
 
 References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
-mirror can lag production by a few days). DoD edits are made on the branch's staging server and only reach
-production on merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead
-(needs the staging network); entries whose staging text differs from production are flagged.
+mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
+merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead (needs the
+staging network); entries whose staging text differs from the production mirror are flagged.
 
 Usage:
     .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <namespace>/<version>/<short_name>
@@ -30,7 +31,8 @@ from etl.http import session
 
 DATASETTE = "https://datasette-public.owid.io/owid.json"
 REPO = Path(__file__).resolve().parents[4]
-DOD_RE = re.compile(r"#dod:\s*([A-Za-z0-9_\-]+)")
+# A DoD link is `[text](#dod:<name>)`; names can contain colons, so match up to the closing parenthesis.
+DOD_RE = re.compile(r"#dod:\s*([^\s)\]\"'\\]+)")
 
 
 def main() -> None:
@@ -39,7 +41,7 @@ def main() -> None:
     parser.add_argument(
         "--staging",
         metavar="BRANCH",
-        help="read the DoD text from this branch's staging server (where DoD edits are made) instead of production",
+        help="read the DoD text from this branch's staging server instead of production",
     )
     args = parser.parse_args()
     parts = args.step.replace("data://", "").strip("/").split("/")
@@ -79,6 +81,22 @@ def main() -> None:
         for name in DOD_RE.findall(str(row["config"])):
             refs[name].add(f"chart {row['slug']}")
 
+    # Narrative charts built on those charts render their own config, which can add DoD links.
+    dataset_narratives = f"SELECT nc.name FROM narrative_charts nc WHERE nc.parentChartId IN ({dataset_charts})"
+    narratives = _query(
+        "SELECT nc.name, cc.config FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+        f"WHERE nc.parentChartId IN ({dataset_charts})"
+    )
+    for row in narratives:
+        for name in DOD_RE.findall(str(row["config"])):
+            refs[name].add(f"narrative chart {row['name']}")
+
+    # Slugs posts can use for those charts: the current one, plus old slugs that redirect to it.
+    dataset_slugs = (
+        f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
+        f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts})"
+    )
+
     # ETL viz configs (MDims, explorers, ETL-authored charts) that mention the dataset.
     for path in (REPO / "etl" / "steps" / "viz").rglob("*.yml"):
         text = path.read_text()
@@ -86,13 +104,13 @@ def main() -> None:
             for name in DOD_RE.findall(text):
                 refs[name].add(f"viz config {path.relative_to(REPO)}")
 
-    # Articles and data insights that embed or link those charts.
+    # Articles and data insights that embed or link those charts or their narrative charts.
     rows = _query(
         "SELECT DISTINCT g.slug AS gdoc, g.type, l2.target AS dod "
         "FROM posts_gdocs_links l1 JOIN posts_gdocs g ON g.id = l1.sourceId "
         "JOIN posts_gdocs_links l2 ON l2.sourceId = g.id AND l2.linkType = 'dod' "
-        f"WHERE l1.linkType = 'grapher' AND g.published AND l1.target IN "
-        f"(SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}))"
+        f"WHERE g.published AND ((l1.linkType = 'grapher' AND l1.target IN ({dataset_slugs})) "
+        f"OR (l1.linkType = 'narrative-chart' AND l1.target IN ({dataset_narratives})))"
     )
     for row in rows:
         refs[row["dod"].strip()].add(f"{row['type']} {row['gdoc']}")
@@ -103,7 +121,7 @@ def main() -> None:
         "FROM posts_gdocs g JOIN posts_gdocs_links l ON l.sourceId = g.id AND l.linkType = 'dod' "
         "WHERE g.type = 'data-insight' AND g.published "
         "AND split_part(split_part(g.content->>'$.\"grapher-url\"', '/grapher/', 2), '?', 1) IN "
-        f"(SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}))"
+        f"({dataset_slugs})"
     )
     for row in rows:
         refs[row["dod"].strip()].add(f"data-insight {row['gdoc']}")
@@ -127,7 +145,7 @@ def main() -> None:
         dods = {r["name"]: r for r in df.to_dict("records")}
         for name, row in dods.items():
             if production.get(name, {}).get("content", "").strip() != (row["content"] or "").strip():
-                row["note"] = "edited on staging: differs from production"
+                row["note"] = "staging text differs from the production mirror"
         source = f"staging server {staging.conf.DB_HOST}"
 
     print(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
@@ -172,7 +190,8 @@ def _query(sql: str) -> list[dict]:
         response = session.get(DATASETTE, params={"sql": paged, "_shape": "objects"}, timeout=120)
         response.raise_for_status()
         data = response.json()
-        if "rows" not in data:
+        # A failed query still returns `rows: []`, so check the error flag, not just the key.
+        if data.get("ok") is False or data.get("error") or "rows" not in data:
             raise RuntimeError(f"Datasette query failed: {data.get('error', data)}")
         rows.extend(data["rows"])
         if len(data["rows"]) < page_size:
