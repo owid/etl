@@ -26,7 +26,7 @@ def run() -> None:
     for disorder, (name, dod) in DISORDERS.items():
         subtitle = (
             f"Estimated share of women and men who have [{name}](#dod:{dod}), whether or not they are diagnosed, "
-            "based on representative surveys, medical data and statistical modeling."
+            "based on representative surveys, medical data, and statistical modeling."
         )
         if disorder in DISORDER_NOTES:
             subtitle += " " + DISORDER_NOTES[disorder]
