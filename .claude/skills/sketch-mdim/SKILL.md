@@ -242,7 +242,11 @@ container name from `etl.config.get_container_name(<branch>)`. Then send somethi
 > change, or say it looks right.
 
 Send it as soon as every view returns 200, without waiting for Codex. If they ask for changes, make them, push,
-repeat items 5 and 6 of step 5c, and send the link again. **Don't merge until they say it looks right.**
+and repeat items 5 and 6 of step 5c. **Show them every change as soon as it is on staging,** without being
+asked: they can't tell from the page they have open when it has landed. If the session has Claude Desktop's
+built-in browser (`mcp__Claude_Browser__*` tools), open the preview there, or reload it if it is already open.
+Otherwise send the link again, to the view they changed, and tell them to reload. **Don't merge until they say
+it looks right.**
 
 ### 5e. Merge, once they say it looks right
 
