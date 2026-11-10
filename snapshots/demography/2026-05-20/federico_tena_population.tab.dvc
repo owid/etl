@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Population Historical Database (1991 borders)
+    description: |-
+      Annual population estimates for all polities from 1800 to 1938, harmonized to 1991 political borders. The Federico–Tena World Population Historical Database is the result of re-estimating historical population series using first-hand sources and country-specific literature; the 2026 update revises the Africa series using Patrick Manning's African Population Database 1850–1960 and other regional sources. Values are reported in thousands of people.
+    date_published: "2026-01-26"
+    version_producer: "V2 (2026 update, 1991 borders)"
+
+    # Citation
+    producer: Federico and Tena-Junguito
+    citation_full: |-
+      Federico, Giovanni and Antonio Tena-Junguito (2025). Federico–Tena World Population Historical Database: World Population borders 1991 (2026), V2. doi:10.21950/GW7SOZ. Building on Federico, G. and Tena-Junguito, A. (2023). "How many people on Earth? World Population 1800-1938". Working Papers in Economic History 23-02, Instituto Figuerola, Universidad Carlos III de Madrid.
+    attribution: Federico–Tena (2026)
+    attribution_short: Federico–Tena
+
+    # Files
+    url_main: https://www.uc3m.es/research/federico-tena-population
+    url_download: https://edatos.consorciomadrono.es/api/access/datafile/51077
+    date_accessed: "2026-05-20"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 9d635a855627e9619371c42306068e8d
+    size: 673520
+    path: federico_tena_population.tab
