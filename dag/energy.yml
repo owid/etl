@@ -263,6 +263,10 @@ steps:
   viz://chart/worldbank_wdi/latest/access_to_electricity:
     - data://grapher/worldbank_wdi/2026-07-27/wdi
 
+  # Second access to electricity MDim from WDI, sketched in the MDim simulator: opens on the map, with World and continents selected.
+  viz://chart/worldbank_wdi/latest/electricity_access:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+
   # Energy: global historical electricity scaling.
   data://grapher/energy/2026-06-30/global_historical_electricity_scaling:
     - data://garden/energy/2026-06-30/global_historical_electricity_scaling:

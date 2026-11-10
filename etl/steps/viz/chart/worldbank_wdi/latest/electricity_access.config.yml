@@ -1,0 +1,76 @@
+grapher_schema: "012"
+slug: "access-to-electricity"
+title:
+  title: "Access to electricity"
+topic_tags:
+  - "Access to Energy"
+  - "Energy"
+default_selection:
+  - "World"
+  - "Africa"
+  - "Asia"
+  - "Europe"
+  - "North America"
+  - "South America"
+  - "Oceania"
+default_dimensions:
+  access: with_access
+  metric: share_of_population
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+          - "SlopeChart"
+        hasMapTab: true
+        tab: "map"
+        hideAnnotationFieldsInTitle:
+          time: true
+        originUrl: "/energy-access"
+        yAxis:
+          min: 0
+dimensions:
+  - slug: access
+    name: "Access"
+    choices:
+      - slug: with_access
+        name: "With access"
+      - slug: without_access
+        name: "Without access"
+  - slug: metric
+    name: "Metric"
+    choices:
+      - slug: share_of_population
+        name: "Share of population"
+      - slug: number_of_people
+        name: "Number of people"
+views:
+  - dimensions:
+      access: with_access
+      metric: share_of_population
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs"
+    config:
+      map:
+        colorScale:
+          baseColorScheme: "GnBu"
+  - dimensions:
+      access: with_access
+      metric: number_of_people
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_number"
+  - dimensions:
+      access: without_access
+      metric: share_of_population
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_without"
+  - dimensions:
+      access: without_access
+      metric: number_of_people
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_without_number"
