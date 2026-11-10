@@ -609,21 +609,22 @@ COMMODITY_MAPPING = {
     ("Stone (dimension)", "Mine production"): None,
     ("Strontium", "Reserves"): ("Strontium", "Mine"),
     ("Sulfur", "Production, all forms"): ("Sulfur", "Processing"),
-    # NOTE: As in earlier releases, only the main talc and pyrophyllite rows are used (not those for crude talc, steatite, etc.).
+    # NOTE: The talc types (crude, steatite, etc.) are notes on what each country's figure covers (one type per country),
+    #  and all countries add up to the world total. So they are all included.
     ("Talc and pyrophyllite", "Mine production"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Mine production: crude"): None,
-    ("Talc and pyrophyllite", "Mine production: crude and beneficiated"): None,
-    ("Talc and pyrophyllite", "Mine production: includes crude"): None,
-    ("Talc and pyrophyllite", "Mine production: includes steatite"): None,
-    ("Talc and pyrophyllite", "Mine production: steatite"): None,
-    ("Talc and pyrophyllite", "Mine production: unspecified minerals"): None,
+    ("Talc and pyrophyllite", "Mine production: crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: crude and beneficiated"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: includes crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: includes steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: unspecified minerals"): ("Talc and pyrophyllite", "Mine"),
     ("Talc and pyrophyllite", "Reserves"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Reserves: crude"): None,
-    ("Talc and pyrophyllite", "Reserves: crude and beneficiated"): None,
-    ("Talc and pyrophyllite", "Reserves: includes crude"): None,
-    ("Talc and pyrophyllite", "Reserves: includes steatite"): None,
-    ("Talc and pyrophyllite", "Reserves: steatite"): None,
-    ("Talc and pyrophyllite", "Reserves: unspecified minerals"): None,
+    ("Talc and pyrophyllite", "Reserves: crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: crude and beneficiated"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: includes crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: includes steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: unspecified minerals"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Reserves"): ("Tantalum", "Mine"),
     ("Tellurium", "Refinery production"): None,
     ("Tellurium", "Refinery production: concentrate"): None,
@@ -886,9 +887,10 @@ def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int,
         d = d.rename(columns={"Reserves_kt_2023": "Reserves_kt"}, errors="raise")
     if mineral == "POTASH":
         # Reserves are given as "Reserves_ore_kt" and "Reserves_ore_K2O_equiv_kt".
-        # For consistency with other minerals, keep only the former.
+        # Keep only the latter, which is given for all countries (and for the world), in the same unit as production,
+        # and is the one given in the 2025 and 2026 releases.
         # NOTE: This happens for 2023 and 2024, not 2022.
-        d = d.drop(columns=["Reserves_ore_K2O_equiv_kt"], errors="ignore")
+        d = d.drop(columns=["Reserves_ore_kt"], errors="ignore")
     if (year == 2023) & (mineral == "PEAT"):
         # There are spurious notes in "Reserves_kt", and no column for "Reserves_notes".
         # Fix this.
@@ -1114,7 +1116,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
 
         else:
             unit_reserves = "_".join(column_reserves.split("_")[1:])
-            assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
+            assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt", "ore_K2O_equiv_kt"]
             if unit_reserves in ["mct", "million carats"]:
                 d["Reserves_mct"] *= MILLION_CARATS_TO_TONNES
                 d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
@@ -1125,6 +1127,9 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
                 d["Reserves_ore_kt"] *= 1e3
                 d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
                 # A footnote will mention that reserves refer to ore (see FOOTNOTES).
+            elif unit_reserves == "ore_K2O_equiv_kt":
+                d["Reserves_ore_K2O_equiv_kt"] *= 1e3
+                d = d.rename(columns={"Reserves_ore_K2O_equiv_kt": "Reserves_t"}, errors="raise")
             elif unit_reserves in ["Mt", "mt"]:
                 # TODO: Double-check that "mt" means million tonnes.
                 d[f"Reserves_{unit_reserves}"] *= 1e6
