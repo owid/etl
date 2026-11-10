@@ -97,8 +97,8 @@ def _view(
     # Shares to 2 significant figures, numbers of people to 3.
     display = {"name": display_name, "roundingMode": "significantFigures"}
     if measure == "share":
-        # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 3 so small shares (e.g. 0.031%) keep 2 significant figures.
-        display |= {"numSignificantFigures": 2, "numDecimalPlaces": 3}
+        # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 5 so shares down to 0.0001% keep 2 significant figures.
+        display |= {"numSignificantFigures": 2, "numDecimalPlaces": 5}
     else:
         display |= {"numSignificantFigures": 3, "numDecimalPlaces": 0}
 

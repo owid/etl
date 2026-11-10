@@ -64,7 +64,7 @@ def _share(disorder: str, sex: str) -> dict:
             "name": f"Share of {who}",
             "roundingMode": "significantFigures",
             "numSignificantFigures": 2,
-            # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 3 so small shares (e.g. 0.031%) keep 2 significant figures.
-            "numDecimalPlaces": 3,
+            # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 5 so shares down to 0.0001% keep 2 significant figures.
+            "numDecimalPlaces": 5,
         },
     }
