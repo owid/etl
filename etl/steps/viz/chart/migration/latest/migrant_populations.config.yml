@@ -50,8 +50,6 @@ dimensions:
         name: Number of people
       - slug: share
         name: Share of population
-    presentation:
-      type: toggle-buttons
 
 views:
   - dimensions:

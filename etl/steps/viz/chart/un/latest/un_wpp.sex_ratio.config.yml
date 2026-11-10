@@ -30,8 +30,6 @@ dimensions:
       - slug: all
         name: Both sexes
         description: null
-    presentation:
-      type: toggle-buttons
 
   - slug: age
     name: Age
@@ -59,7 +57,5 @@ dimensions:
       - slug: high
         name: High
         description: Higher fertility than the medium variant
-    presentation:
-      type: toggle-buttons
 
 views: []

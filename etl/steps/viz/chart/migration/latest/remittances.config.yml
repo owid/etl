@@ -41,8 +41,6 @@ dimensions:
       - slug: cost_of_receiving
         name: Cost of receiving remittances
         description: The average cost of receiving remittances from abroad, as a share of the amount sent.
-    presentation:
-      type: toggle-buttons
 
 views:
   - dimensions:
