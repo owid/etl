@@ -1,4 +1,4 @@
-"""List every DoD (glossary entry) a dataset's readers see, with where it appears and its current text.
+"""List every Details on Demand (DoD) a dataset's readers see, with where it appears and its current text.
 
 DoDs are reader-facing text (shown on hover) that live in the grapher DB, not in the repo, so a PR diff never
 shows them and a metadata review that reads only the `.meta.yml` misses them. This script collects every
