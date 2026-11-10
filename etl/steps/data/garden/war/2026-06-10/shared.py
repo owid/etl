@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -215,7 +217,8 @@ def flags_to_no_yes(tb: Table, columns: list[str]) -> Table:
     for column in columns:
         unknown = set(tb[column].dropna().unique()) - set(FLAG_LABELS)
         assert not unknown, f"Column `{column}` has values other than 0 and 1: {unknown}"
-        metadata = tb[column].metadata
+        # Copy it: a flag can share its metadata object with a numeric regional count, which must stay numeric.
+        metadata = deepcopy(tb[column].metadata)
         tb[column] = tb[column].map(FLAG_LABELS).astype("category")
         tb[column].metadata = metadata
         tb[column].metadata.type = "string"
