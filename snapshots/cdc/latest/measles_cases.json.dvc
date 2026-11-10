@@ -7,12 +7,12 @@ meta:
     attribution_short: CDC
     url_main: https://www.cdc.gov/measles/data-research/
     url_download: https://www.cdc.gov/wcms/vizdata/measles/MeaslesCasesYear.json
-    date_accessed: 2026-11-06
-    date_published: '2026-10-29'
+    date_accessed: 2026-11-10
+    date_published: '2026-11-05'
     license:
       name: Public domain
       url: https://www.cdc.gov/other/agencymaterials.html
 outs:
-  - md5: e76cf88c1ce824fc680326d77abd935a
-    size: 6085
+  - md5: 9b84474e1c0aec79aebe47048ca4dd37
+    size: 6087
     path: measles_cases.json

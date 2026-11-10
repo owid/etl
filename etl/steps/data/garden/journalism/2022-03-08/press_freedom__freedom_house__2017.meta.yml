@@ -2,6 +2,7 @@ dataset:
   title: Press freedom - Freedom House (2017)
   owners:
     - Max Roser  # backport
+    - Pablo Arriagada
 tables:
   press_freedom__freedom_house__2017:
     variables:
