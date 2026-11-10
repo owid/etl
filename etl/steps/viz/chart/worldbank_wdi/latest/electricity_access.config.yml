@@ -7,12 +7,13 @@ topic_tags:
   - "Energy"
 default_selection:
   - "World"
-  - "Africa"
-  - "Asia"
-  - "Europe"
-  - "North America"
-  - "South America"
-  - "Oceania"
+  - "Sub-Saharan Africa (WB)"
+  - "South Asia (WB)"
+  - "East Asia and Pacific (WB)"
+  - "Middle East, North Africa, Afghanistan and Pakistan (WB)"
+  - "Latin America and Caribbean (WB)"
+  - "Europe and Central Asia (WB)"
+  - "North America (WB)"
 default_dimensions:
   access: with_access
   metric: share_of_population
