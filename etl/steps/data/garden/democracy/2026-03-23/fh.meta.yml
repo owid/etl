@@ -11,6 +11,7 @@ definitions:
 dataset:
   update_period_days: 365
   owners:
+    - Pablo Arriagada
     - Lucas Rodés-Guirao
 
 tables:
