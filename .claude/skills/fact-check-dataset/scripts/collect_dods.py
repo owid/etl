@@ -6,12 +6,13 @@ shows them and a metadata review that reads only the `.meta.yml` misses them. Th
 
 Surfaces scanned:
   - indicator metadata: the local grapher build (new text, if built) and production variables (any version)
-  - chart configs of production charts that use the dataset's indicators (any version), and of the narrative charts
-    built on those charts or on views of published MDims that use those indicators
-  - ETL viz configs (charts, MDims, explorers) of the viz steps that depend on the dataset (any version) in the DAG
-  - articles and data insights that embed or link those charts (by current or redirected slug, as a chart, a guided
-    chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show one of
-    those charts or narrative charts in their `grapher-url` or `narrative-chart` front matter
+  - chart configs of production charts that use the dataset's indicators (any version), of the views of published
+    MDims that use them, and of the narrative charts built on either
+  - ETL viz configs and code (charts, MDims, explorers) of the viz steps that depend on the dataset (any version) in
+    the DAG
+  - articles and data insights that embed or link those charts or MDims (by current or redirected slug, as a chart, a
+    guided chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show
+    one of them in their `grapher-url` or `narrative-chart` front matter
 
 References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
 mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
@@ -89,17 +90,28 @@ def main() -> None:
         "SELECT nc.id, nc.name, cc.config FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
         f"WHERE nc.parentChartId IN ({dataset_charts})"
     )
-    # So do narrative charts built on views of published MDims. `multi_dim_x_chart_configs.variableId` holds only a
-    # view's first indicator, so match on the indicators listed in the view's own chart config.
+    # Views of published MDims that show those indicators render their own config, which can add DoD links (text
+    # generated in Python or edited outside the YAML). `multi_dim_x_chart_configs.variableId` holds only a view's
+    # first indicator, so match on the indicators listed in the view's own chart config.
     variable_ids = {row["id"] for row in variables}
+    view_ids: set[int] = set()
+    mdim_slugs: set[str] = set()
     for row in _query(
-        "SELECT nc.id, nc.name, cc.config, vc.config AS view_config FROM narrative_charts nc "
-        "JOIN chart_configs cc ON cc.id = nc.chartConfigId "
-        "JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
+        "SELECT mx.id, m.slug, vc.config FROM multi_dim_x_chart_configs mx "
         "JOIN multi_dim_data_pages m ON m.id = mx.multiDimId JOIN chart_configs vc ON vc.id = mx.chartConfigId "
         "WHERE m.published"
     ):
-        if variable_ids & {d.get("variableId") for d in _json(row["view_config"]).get("dimensions") or []}:
+        if variable_ids & {d.get("variableId") for d in _json(row["config"]).get("dimensions") or []}:
+            view_ids.add(row["id"])
+            mdim_slugs.add(row["slug"])
+            for name in DOD_RE.findall(str(row["config"])):
+                refs[name].add(f"MDim view {row['slug']}")
+    # So do narrative charts built on those MDim views.
+    for row in _query(
+        "SELECT nc.id, nc.name, cc.config, nc.parentMultiDimXChartConfigId AS view_id FROM narrative_charts nc "
+        "JOIN chart_configs cc ON cc.id = nc.chartConfigId WHERE nc.parentMultiDimXChartConfigId IS NOT NULL"
+    ):
+        if row["view_id"] in view_ids:
             narratives.append(row)
     for row in narratives:
         for name in DOD_RE.findall(str(row["config"])):
@@ -107,10 +119,12 @@ def main() -> None:
     narrative_names = {row["name"] for row in narratives}
     narrative_ids = {str(row["id"]) for row in narratives}
 
-    # Slugs posts can use for those charts: the current one, plus old slugs that redirect to it.
+    # Slugs posts can use for those charts: the current one, old slugs that redirect to it, and the slugs of the
+    # MDims whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's).
     dataset_slugs = (
         f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
-        f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts})"
+        f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts}) "
+        f"UNION SELECT m.slug FROM multi_dim_data_pages m WHERE m.slug IN ({_sql_list(mdim_slugs)})"
     )
     slugs = {row["slug"] for row in _query(dataset_slugs)}
 
@@ -217,10 +231,11 @@ def _dods_in_local_dataset(path: Path) -> set[str]:
 
 
 def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
-    """Config files of the viz steps that list any version of the dataset as a direct DAG dependency.
+    """Config and code files of the viz steps that list any version of the dataset as a direct DAG dependency.
 
-    A viz step `viz://<type>/<ns>/<version>/<name>` keeps its configs in `etl/steps/viz/<type>/<ns>/<version>/` as
-    `<name>.yml` or `<name>.<part>.yml`.
+    A viz step `viz://<type>/<ns>/<version>/<name>` keeps its files in `etl/steps/viz/<type>/<ns>/<version>/` as
+    `<name>.yml`, `<name>.<part>.yml` and `<name>.py`, or in a `<name>/` folder. The Python files count too, since
+    some steps write reader-facing text (with DoD links) in code rather than in the YAML.
     """
     from etl.dag_helpers import load_dag
 
@@ -231,7 +246,10 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
             continue
         folder = REPO / "etl" / "steps" / "viz" / Path(step.removeprefix("viz://")).parent
         name = step.rsplit("/", 1)[-1]
-        paths += sorted({*folder.glob(f"{name}.yml"), *folder.glob(f"{name}.*.yml")})
+        files = {*folder.glob(f"{name}.yml"), *folder.glob(f"{name}.*.yml"), *folder.glob(f"{name}.py")}
+        if (folder / name).is_dir():
+            files |= {*(folder / name).rglob("*.yml"), *(folder / name).rglob("*.py")}
+        paths += sorted(files)
     return paths
 
 
