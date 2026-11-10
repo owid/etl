@@ -11,6 +11,8 @@ dataset:
       changes:
         - Updated dataset to use the latest version of the Global Carbon Budget (2026).
         - Land-use change emissions for each country are now the average of the three models used by the Global Carbon Project (BLUE, OSCAR and LUCE). Before, they came from the BLUE model only.
+        - Energy is now measured as total energy supply instead of using the substitution method. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change).
+        - Renamed `primary_energy_consumption` to `total_energy_supply`. The columns `energy_per_capita`, `energy_per_gdp`, `co2_per_unit_energy` and `co2_including_luc_per_unit_energy` keep their names, but now use total energy supply.
     - date: 2026-06-01
       changes:
         - Update dataset to use the latest EIA's International Energy Data.
