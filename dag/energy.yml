@@ -106,9 +106,8 @@ steps:
     - data://garden/energy/2026-11-10/carbon_intensity_of_energy
   viz://chart/energy/latest/energy_mix:
     - data://grapher/energy/2026-06-30/energy_mix
-    # Carbon intensity view: sourced from the dedicated carbon_intensity_of_energy step (TES basis),
-    # so the energy_mix subtree stays on a single Statistical Review version.
-    - data://grapher/energy/2026-11-10/carbon_intensity_of_energy
+    # Carbon intensity view: CO2 emissions per unit of total energy supply, from the Global Carbon Budget.
+    - data://grapher/gcp/2026-11-10/global_carbon_budget
 
   # Energy - Fossil fuels (production, trade, consumption and reserves; 2026 Statistical Review + EIA).
   data://garden/energy/2026-06-30/fossil_fuels:
