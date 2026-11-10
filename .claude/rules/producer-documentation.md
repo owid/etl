@@ -36,7 +36,7 @@ Where to look: the dataset page and the pages it links to; the data files themse
 
 ## Contrast what's already written
 
-Once the documentation is in hand, read the existing text against it, not only the fields you are filling: the `.dvc` origin, the `.meta.yml` fields, `description_from_producer`, and chart, MDim and explorer text. Look for text that is:
+Once the documentation is in hand, read the existing text against it, not only the fields you are filling: the `.dvc` origin, the `.meta.yml` fields, `description_from_producer`, chart, MDim and explorer text, and the glossary entries (DoDs) that text links to. DoDs live in the grapher database, so no diff shows them: list them with `.claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<version>/<short_name>`, and fix one in the admin's glossary editor on the branch's staging server, which chart-sync copies to production on merge (unless production edited that entry after the server was created). Look for text that is:
 
 - **wrong**: the documentation contradicts a definition, unit, scope or coverage claim;
 - **stale**: it describes an earlier edition's method, or a "what's new" item has made it outdated;

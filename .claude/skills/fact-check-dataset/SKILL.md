@@ -41,7 +41,7 @@ Where the table says **mandatory**, the calling skill always runs it, in the bac
 | `/create-dataset` Step 6b (**mandatory**, background) | All indicators if there are few; otherwise the main ones, with a few value cross-checks each |
 | `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
 | `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
-| `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |
+| `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively, plus the DoDs it links — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |
 | Standalone | Top-N + anomalies (or `--full`) |
 
 ## Step 1 — Prioritize indicators by chart views (heaviness control)
@@ -200,6 +200,7 @@ Treat each prioritized indicator's user-facing text as a set of claims and attac
 - Are causal or certainty words ("shows", "proves", "leads to", "drives") backed by the source's methodology, or do they smuggle in an interpretation?
 - For categorical indicators built from label maps, list the distinct source labels and verify each maps **explicitly** — values routed to a fallback bucket ("unknown", "other") are silent misclassifications, because the fallback is an existing category and no validation fires. Recommend an `observed labels ⊆ map keys` assert where one is missing.
 - For Jinja-templated metadata, spot-check the *rendered* text readers actually see: `Dataset("data/grapher/<ns>/<version>/<short_name>").read(t, load_data=False)[col].metadata`.
+- **Attack the DoDs too.** `.venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<version>/<short_name>` lists every `#dod:` glossary entry linked from the dataset's indicator metadata, its charts and narrative charts, the ETL viz configs, and the articles and data insights that show those charts, with each entry's text and any link to a missing entry. It reads production; `--staging <branch>` reads a staging server instead, to re-check an entry edited there. Hold each entry to the Phase-0 documentation like any metadata: a DoD lives in the grapher DB, so no PR diff shows it, yet it is the definition readers get on hover. An entry linked only from an article can be off-topic (articles link many topics); check it only when it defines something the dataset measures.
 
 Lead with the concrete rewrite, not the objection. "Add a link" is a valid fix. Match the register and length of the original — prefer a word swap over an added clause.
 
@@ -208,6 +209,7 @@ Lead with the concrete rewrite, not the objection. "Add a link" is a valid fix. 
 | Finding | Author flows (update/create/standalone) | Review flow |
 |---|---|---|
 | Metadata contradicts producer docs (unit/definition/scope; content in the wrong field per the `.dvc`-vs-`description_processing` split) | Edit `.meta.yml`/`.dvc`, re-run the step (`--grapher` for grapher channel) | 🔴/🟡 with quote + doc link |
+| DoD text contradicts the producer docs, or a link points to a missing DoD | Edit the DoD on the branch's staging server (admin glossary editor, or `AdminAPI.update_dod`); chart-sync copies it to production on merge, unless production edited that DoD after the staging server was created | 🔴/🟡 with quote + doc link + proposed text |
 | Value wrong in our output but correct in the raw snapshot | Fix the step code — never corrections.yml, never mask | 🔴 |
 | Value confirmed wrong **at the source** (raw snapshot carries it; confirmed via route (a) or route (b) of the Step 4 Tolerance gate — for (b), *with the erroneous term identified*) | Add `<short_name>.corrections.yml` next to the garden step + `tb = paths.apply_corrections(tb)` (format: `etl/data_corrections.py`); fill `reason`/`producer`/`status`, add an `expect` guard; tell the user to notify the producer and record the `reported:` date | 🔴 if confirmed and uncorrected |
 | Suspicious but unconfirmed (independent sources disagree with each other, or methodology plausibly explains the gap) | "Verify manually" item in the report — do **not** add a correction | 🟡 |
@@ -232,6 +234,7 @@ Write to `ai/adversarial-review-<short_name>-<YYYY-MM-DD>.md`:
 - Data-quality flags stated in the source's own docs
 - Flags the docs SHOULD state but don't (from the artifact-literature search)
 - Existing corrections.yml entries acknowledged
+- DoDs linked (from `collect_dods.py`): each one checked, or why not
 
 ## Part 1 — Findings (numbered, ordered 🔴 → 🟡 → 🟢)
 N. 🔴|🟡|🟢 [data-level|text-level] <one-line defect>
