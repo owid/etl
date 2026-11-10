@@ -419,6 +419,6 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb])
-    ds_grapher.save()
+    # Create a new garden dataset, also saved as CSV and parquet so the catalog page links to them for this version.
+    ds_garden = paths.create_dataset(tables=[tb], formats=["feather", "parquet", "csv"])
+    ds_garden.save()
