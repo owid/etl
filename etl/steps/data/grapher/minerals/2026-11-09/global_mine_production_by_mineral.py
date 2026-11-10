@@ -109,6 +109,11 @@ def run() -> None:
             # NOTE: Ignore the frequent footnote saying that "The sum of all countries may exceed World data on certain years (by up to 10%), due to discrepancies between data sources."
             if "The sum of all countries" not in grapher_config["note"]:
                 footnotes.append(f"{column} - {grapher_config['note']}")
+        # Also gather the key descriptions of each mineral (e.g. why mercury data ends in 2021).
+        mineral_description_key = tb[column].metadata.description_key or []
+        if isinstance(mineral_description_key, str):
+            mineral_description_key = [mineral_description_key]
+        footnotes.extend([f"{column} - {item}" for item in mineral_description_key])
         # description_key.append(tb[column].metadata.description_short)
         _description_processing.append(tb[column].metadata.description_processing)
         # _description_from_producer.append(f"- {column}\n{tb[column].metadata.description_from_producer}")
