@@ -21,13 +21,6 @@ steps:
       - data://meadow/emissions/2023-11-06/global_warming_potential_factors:
         - snapshot://emissions/2023-11-06/global_warming_potential_factors.csv
 
-  # Emissions - CO2 dataset.
-  # NOTE: The following step should be run after the github step, which is why the latter is added as a dependency.
-  export://s3/co2_data/latest/owid_co2:
-    - data://garden/emissions/2026-11-10/owid_co2
-    - export://github/co2_data/latest/owid_co2:
-      - data://garden/emissions/2026-11-10/owid_co2
-
   # Hoesly et al. (2024): CEDS air pollutants
   data://grapher/emissions/2025-02-12/ceds_air_pollutants:
     - data://garden/emissions/2025-02-12/ceds_air_pollutants:
@@ -73,30 +66,13 @@ steps:
     - data://grapher/regions/2023-01-01/regions
 
   # GCP - Global Carbon Budget.
-  data://garden/gcp/2025-11-13/global_carbon_budget:
-    - data://garden/wb/2026-07-01/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2026-05-05/primary_energy_consumption
-    - data://meadow/gcp/2025-11-13/global_carbon_budget:
-      - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
-      - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
-      - snapshot://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
-      - snapshot://gcp/2025-11-13/global_carbon_budget_national_emissions.xlsx
-
-  # GCP - Global Carbon Budget.
-  data://grapher/gcp/2025-11-13/global_carbon_budget:
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-
-  # GCP - Global Carbon Budget.
   data://grapher/gcp/2026-11-10/global_carbon_budget:
     - data://garden/gcp/2026-11-10/global_carbon_budget:
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
       - data://garden/ggdc/2024-04-26/maddison_project_database
-      - data://garden/energy/2026-05-05/primary_energy_consumption
+      - data://garden/energy/2026-06-30/energy_mix
       - data://meadow/gcp/2026-11-10/global_carbon_budget:
         - snapshot://gcp/2026-11-10/global_carbon_budget_fossil_co2_emissions.csv
         - snapshot://gcp/2026-11-10/global_carbon_budget_land_use_change_emissions.xlsx
@@ -127,36 +103,13 @@ steps:
     - data://garden/emissions/2025-12-04/national_contributions
 
   # Emissions - CO2 dataset.
-  data://garden/emissions/2025-12-04/owid_co2:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/emissions/2025-12-04/national_contributions
-    - data://garden/energy/2026-05-05/primary_energy_consumption
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/demography/2024-07-15/population
-
-  # Emissions - CO2 dataset.
   data://garden/emissions/2026-11-10/owid_co2:
     - data://garden/regions/2023-01-01/regions
     - data://garden/emissions/2025-12-04/national_contributions
-    - data://garden/energy/2026-05-05/primary_energy_consumption
+    - data://garden/energy/2026-06-30/energy_mix
     - data://garden/gcp/2026-11-10/global_carbon_budget
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
-
-  # Decoupling of GDP and CO2.
-  data://garden/emissions/2026-03-05/gdp_and_co2_decoupling:
-    - data://garden/worldbank_wdi/2026-07-27/wdi
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-    - data://garden/regions/2023-01-01/regions
-
-  # Decoupling of GDP and CO2.
-  data://grapher/emissions/2026-03-05/gdp_and_co2_decoupling:
-    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
-
-  # Decoupling of GDP and CO2.
-  data://external/emissions/2026-03-05/gdp_and_co2_decoupling:
-    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
 
   # Decoupling of GDP and CO2.
   data://garden/emissions/2026-11-10/gdp_and_co2_decoupling:

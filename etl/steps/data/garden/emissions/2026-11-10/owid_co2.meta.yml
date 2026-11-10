@@ -1,16 +1,16 @@
 dataset:
   # Canary for the public catalog landing page / Schema.org JSON-LD (catalog-discovery project).
   jsonld: true
-  title: OWID CO2 dataset
+  title: CO₂ and greenhouse gas emissions dataset
   description: |-
-    Our complete CO2 and Greenhouse Gas Emissions dataset is a collection of key metrics maintained by Our World in Data. It includes data on CO2 emissions (annual, per capita, cumulative, and consumption-based), other greenhouse gases, and energy mix.
-
-    It is compiled from a variety of secondary sources, including the Global Carbon Project's Global Carbon Budget, Jones et al.'s national contributions to climate change, and the Energy Institute's Statistical Review of World Energy, alongside auxiliary population, income group, and GDP data used to calculate per-capita and per-GDP indicators.
+    Our complete data on CO₂ and other greenhouse gas emissions in one table. For every country and year, it has emissions by source, per person, cumulative and adjusted for trade, and each country's contribution to global warming.
   changelog:
     - date: 2026-11-10
       changes:
         - Updated dataset to use the latest version of the Global Carbon Budget (2026).
         - Land-use change emissions for each country are now the average of the three models used by the Global Carbon Project (BLUE, OSCAR and LUCE). Before, they came from the BLUE model only.
+        - Energy is now measured as total energy supply instead of using the substitution method. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change).
+        - Renamed `primary_energy_consumption` to `total_energy_supply`. The columns `energy_per_capita`, `energy_per_gdp`, `co2_per_unit_energy` and `co2_including_luc_per_unit_energy` keep their names, but now use total energy supply.
     - date: 2026-06-01
       changes:
         - Update dataset to use the latest EIA's International Energy Data.
@@ -95,3 +95,13 @@ dataset:
       url: https://creativecommons.org/licenses/by/4.0/
   owners:
     - Pablo Rosado
+
+tables:
+  owid_co2:
+    title: CO₂ and greenhouse gas emissions dataset
+    description: |-
+      CO₂ emissions come from the Global Carbon Project's [Global Carbon Budget](https://globalcarbonbudget.org/). Emissions of methane, nitrous oxide and all greenhouse gases, and each country's contribution to global warming, come from Jones et al.'s [national contributions to climate change](https://zenodo.org/records/7636699/latest).
+
+      The table also includes total energy supply (from our [energy dataset](https://catalog.ourworldindata.org/energy/owid_energy/)), [population](https://ourworldindata.org/population-sources) and GDP, so that indicators per unit of energy, per person and per GDP can be recalculated.
+
+      Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the Global Carbon Project are also included, marked "(GCP)", for example "Africa (GCP)".
