@@ -11,7 +11,7 @@ Surfaces scanned:
   - ETL viz configs (charts, MDims, explorers) of the viz steps that depend on the dataset (any version) in the DAG
   - articles and data insights that embed or link those charts (by current or redirected slug, as a chart, a guided
     chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show one of
-    those charts in their `grapher-url` front matter
+    those charts or narrative charts in their `grapher-url` or `narrative-chart` front matter
 
 References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
 mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
@@ -24,9 +24,11 @@ Usage:
 """
 
 import argparse
+import json
 import re
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 from etl.http import session
 
@@ -82,47 +84,71 @@ def main() -> None:
         for name in DOD_RE.findall(str(row["config"])):
             refs[name].add(f"chart {row['slug']}")
 
-    # Narrative charts built on those charts, or on views of published MDims that use the dataset's indicators,
-    # render their own config, which can add DoD links.
-    dataset_mdim_views = (
-        "SELECT mx.id FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages m ON m.id = mx.multiDimId "
-        "JOIN variables v ON v.id = mx.variableId JOIN datasets d ON d.id = v.datasetId "
-        f"WHERE m.published AND d.catalogPath LIKE '{namespace}/%/{short_name}'"
-    )
-    narrative_filter = (
-        f"nc.parentChartId IN ({dataset_charts}) OR nc.parentMultiDimXChartConfigId IN ({dataset_mdim_views})"
-    )
-    dataset_narratives = f"SELECT nc.name FROM narrative_charts nc WHERE {narrative_filter}"
+    # Narrative charts built on those charts render their own config, which can add DoD links.
     narratives = _query(
-        "SELECT nc.name, cc.config FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
-        f"WHERE {narrative_filter}"
+        "SELECT nc.id, nc.name, cc.config FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+        f"WHERE nc.parentChartId IN ({dataset_charts})"
     )
+    # So do narrative charts built on views of published MDims. `multi_dim_x_chart_configs.variableId` holds only a
+    # view's first indicator, so match on the indicators listed in the view's own chart config.
+    variable_ids = {row["id"] for row in variables}
+    for row in _query(
+        "SELECT nc.id, nc.name, cc.config, vc.config AS view_config FROM narrative_charts nc "
+        "JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+        "JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
+        "JOIN multi_dim_data_pages m ON m.id = mx.multiDimId JOIN chart_configs vc ON vc.id = mx.chartConfigId "
+        "WHERE m.published"
+    ):
+        if variable_ids & {d.get("variableId") for d in _json(row["view_config"]).get("dimensions") or []}:
+            narratives.append(row)
     for row in narratives:
         for name in DOD_RE.findall(str(row["config"])):
             refs[name].add(f"narrative chart {row['name']}")
+    narrative_names = {row["name"] for row in narratives}
+    narrative_ids = {str(row["id"]) for row in narratives}
 
     # Slugs posts can use for those charts: the current one, plus old slugs that redirect to it.
     dataset_slugs = (
         f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
         f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts})"
     )
+    slugs = {row["slug"] for row in _query(dataset_slugs)}
 
     # ETL viz configs (MDims, explorers, ETL-authored charts) whose step depends on the dataset in the DAG.
     for path in _viz_configs_using(namespace, short_name):
         for name in DOD_RE.findall(path.read_text()):
             refs[name].add(f"viz config {path.relative_to(REPO)}")
 
+    # Posts that show those charts as a pasted URL, possibly behind a Google redirect wrapper.
+    post_ids = {
+        row["sourceId"]
+        for row in _query(
+            "SELECT sourceId, target FROM posts_gdocs_links WHERE linkType = 'url' "
+            "AND (target LIKE '%/grapher/%' OR target LIKE '%google.%/url?%')"
+        )
+        if _grapher_slug(row["target"]) in slugs
+    }
+    # Data insights that show one of those narrative charts in their `narrative-chart` front matter (its name or
+    # its admin URL), which creates no link row.
+    for row in _query(
+        "SELECT id, content->>'$.\"narrative-chart\"' AS target FROM posts_gdocs "
+        "WHERE type = 'data-insight' AND published AND coalesce(content->>'$.\"narrative-chart\"', '') <> ''"
+    ):
+        target = row["target"].strip()
+        admin_id = re.search(r"/narrative-charts/(\d+)", target)
+        if target in narrative_names or (admin_id and admin_id.group(1) in narrative_ids):
+            post_ids.add(row["id"])
+
     # Articles and data insights that embed or link those charts (as a chart, a guided chart or a pasted URL) or
     # their narrative charts.
-    url_slug = "rtrim(split_part(split_part(split_part(l1.target, '/grapher/', 2), '?', 1), '#', 1), '/')"
     rows = _query(
         "SELECT DISTINCT g.slug AS gdoc, g.type, l2.target AS dod "
         "FROM posts_gdocs_links l1 JOIN posts_gdocs g ON g.id = l1.sourceId "
         "JOIN posts_gdocs_links l2 ON l2.sourceId = g.id AND l2.linkType = 'dod' "
         "WHERE g.published AND ("
         f"(l1.linkType IN ('grapher', 'guided-chart') AND l1.target IN ({dataset_slugs})) "
-        f"OR (l1.linkType = 'url' AND {url_slug} IN ({dataset_slugs})) "
-        f"OR (l1.linkType = 'narrative-chart' AND l1.target IN ({dataset_narratives})))"
+        f"OR (l1.linkType = 'narrative-chart' AND l1.target IN ({_sql_list(narrative_names)})) "
+        f"OR g.id IN ({_sql_list(post_ids)}))"
     )
     for row in rows:
         refs[row["dod"].strip()].add(f"{row['type']} {row['gdoc']}")
@@ -207,6 +233,27 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
         name = step.rsplit("/", 1)[-1]
         paths += sorted({*folder.glob(f"{name}.yml"), *folder.glob(f"{name}.*.yml")})
     return paths
+
+
+def _grapher_slug(url: str) -> str:
+    """Chart slug of a pasted grapher URL, looking through a `google.com/url?` redirect wrapper (`q=` or `url=`)."""
+    parts = urlsplit(url)
+    if "google." in parts.netloc and parts.path == "/url":
+        params = parse_qs(parts.query)
+        url = next((params[k][0] for k in ("q", "url") if params.get(k, [""])[0].startswith("http")), url)
+    path = urlsplit(url).path
+    return path.split("/grapher/", 1)[1].rstrip("/") if "/grapher/" in path else ""
+
+
+def _json(value) -> dict:
+    """A JSON column as a dict (Datasette returns some JSON columns as text)."""
+    return json.loads(value) if isinstance(value, str) else (value or {})
+
+
+def _sql_list(values) -> str:
+    """Quoted SQL list for `IN (...)`; `NULL` when empty, which matches nothing."""
+    quoted = ["'" + str(v).replace("'", "''") + "'" for v in sorted(values)]
+    return ",".join(quoted) or "NULL"
 
 
 def _query(sql: str) -> list[dict]:
