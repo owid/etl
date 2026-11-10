@@ -57,7 +57,7 @@ def run() -> None:
                     "y": [
                         {
                             "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_both__age_{age}",
-                            "display": {"name": label, "color": color},
+                            "display": {"name": label, "color": color, "numSignificantFigures": 2},
                         }
                         for age, label in ages.items()
                     ]
