@@ -235,7 +235,8 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
 
     A viz step `viz://<type>/<ns>/<version>/<name>` keeps its files in `etl/steps/viz/<type>/<ns>/<version>/` as
     `<name>.yml`, `<name>.<part>.yml` and `<name>.py`, or in a `<name>/` folder. The Python files count too, since
-    some steps write reader-facing text (with DoD links) in code rather than in the YAML.
+    some steps write reader-facing text (with DoD links) in code rather than in the YAML, including in sibling
+    helper modules they import (`from view_edits import ...`), which are followed as well.
     """
     from etl.dag_helpers import load_dag
 
@@ -249,8 +250,23 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
         files = {*folder.glob(f"{name}.yml"), *folder.glob(f"{name}.*.yml"), *folder.glob(f"{name}.py")}
         if (folder / name).is_dir():
             files |= {*(folder / name).rglob("*.yml"), *(folder / name).rglob("*.py")}
-        paths += sorted(files)
-    return paths
+        paths += sorted(files | _local_imports(files))
+    return sorted(set(paths))
+
+
+def _local_imports(files: set[Path]) -> set[Path]:
+    """Sibling `.py` modules that the given Python files import (directly or through each other)."""
+    import_re = re.compile(r"^\s*(?:from\s+\.?([A-Za-z_]\w*)\s+import|import\s+([A-Za-z_]\w*))", re.MULTILINE)
+    found: set[Path] = set()
+    todo = [f for f in files if f.suffix == ".py"]
+    while todo:
+        path = todo.pop()
+        for match in import_re.finditer(path.read_text()):
+            module = path.parent / f"{match.group(1) or match.group(2)}.py"
+            if module.exists() and module not in files and module not in found:
+                found.add(module)
+                todo.append(module)
+    return found
 
 
 def _grapher_slug(url: str) -> str:
