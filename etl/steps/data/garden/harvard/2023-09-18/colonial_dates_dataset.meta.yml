@@ -1,5 +1,5 @@
 dataset:
-  update_period_days: 365
+  update_period_days: 0
 
   owners:
     - Pablo Arriagada
@@ -14,6 +14,12 @@ definitions:
 
     Years have been expanded to show the full range of years in the dataset, from 1462 to 2022. The original dataset only includes the years where a country was colonized.
 
+  description_key_coldat: |-
+    This data comes from the Colonial Dates Dataset (COLDAT), compiled by Bastian Becker at the University of Bremen. COLDAT doesn’t collect new historical evidence. Instead, it combines the start and end dates of colonial rule recorded in four existing datasets: the Correlates of War project, and datasets by Lange and coauthors (2006), Wimmer and Min (2006), and Olsson (2009).
+
+  description_key_missing_colonies: |-
+    COLDAT doesn’t include every colony. For example, it doesn’t record Dutch rule in today’s Malaysia (Malacca) or Sri Lanka (Ceylon), and its author notes that colonies none of the four datasets mentions are missing. In such cases, the data can miss years in which a country was colonized, or show the wrong colonizer for them. It also leaves out colonies of European countries other than the eight it covers, such as Denmark and Sweden.
+
 tables:
   colonial_dates_dataset:
     variables:
@@ -23,6 +29,9 @@ tables:
         short_unit: ""
         description_short: |
           Name of European colonial power(s) that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
 
@@ -41,6 +50,9 @@ tables:
         short_unit: ""
         description_short: |
           Name of European colonial power that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as "Multiple colonizers".
 
@@ -59,6 +71,9 @@ tables:
         short_unit: "years"
         description_short: |
           Number of years the country has been colonized from overseas by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is a cumulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
 
@@ -77,6 +92,9 @@ tables:
         short_unit: ""
         description_short: |
           Name of the last European colonial power(s) that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           The indicator is constructed by filling years with no colonizers with the last colonizer in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
 
@@ -95,6 +113,9 @@ tables:
         short_unit: ""
         description_short: |
           Name of the last European colonial power that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           The indicator is constructed by filling years with no colonizers with the last colonizer (grouped) in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as "Multiple colonizers".
 
@@ -128,6 +149,9 @@ tables:
         short_unit: ""
         description_short: |
           Total number of overseas colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is the count of countries each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
 
@@ -148,6 +172,9 @@ tables:
         short_unit: ""
         description_short: |
           Population of overseas territories colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is the sum of the population each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
 
@@ -168,6 +195,9 @@ tables:
         short_unit: ""
         description_short: |
           Total number of overseas colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
 
@@ -188,6 +218,9 @@ tables:
         short_unit: ""
         description_short: |
           Population of overseas colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is is an aggregation of the population of territories each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
 
@@ -208,6 +241,9 @@ tables:
         short_unit: ""
         description_short: |
           Number of countries not colonized in each region by an European colonial power. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is is an aggregation of the number of countries that are not colonized nor are colonizers in a given year, by OWID geographic region or World Bank income groups.
 
@@ -228,6 +264,9 @@ tables:
         short_unit: ""
         description_short: |
           Population of countries not colonized in each region by an European colonial power. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is is an aggregation of the population of territories not colonized not colonizers in a given year, by OWID geographic region or World Bank income groups.
 
@@ -248,6 +287,9 @@ tables:
         short_unit: ""
         description_short: |
           Number of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is is an aggregation of the number of countries considered European colonial powers, by OWID geographic region or World Bank income groups.
 
@@ -268,6 +310,9 @@ tables:
         short_unit: ""
         description_short: |
           Population of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_key:
+          - "{definitions.description_key_coldat}"
+          - "{definitions.description_key_missing_colonies}"
         description_processing: |
           This is is an aggregation of the population of European colonial powers, by OWID geographic region or World Bank income groups.
 
