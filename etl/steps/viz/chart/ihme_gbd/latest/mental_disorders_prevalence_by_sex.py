@@ -60,5 +60,11 @@ def _share(disorder: str, sex: str) -> dict:
     who = {"female": "women and girls", "male": "men and boys"}[sex]
     return {
         "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_{sex}__age_age_standardized",
-        "display": {"name": f"Share of {who}"},
+        "display": {
+            "name": f"Share of {who}",
+            "roundingMode": "significantFigures",
+            "numSignificantFigures": 2,
+            # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 3 so small shares (e.g. 0.031%) keep 2 significant figures.
+            "numDecimalPlaces": 3,
+        },
     }
