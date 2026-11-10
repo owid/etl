@@ -16,6 +16,8 @@ definitions:
     - However, for commodities like chromium, which encompass multiple forms (e.g., metal, ferroalloys, ore), weighted averages are used, with each form's price weighted by its contribution to total consumption.
     - When no direct price series is available, unit values are derived using export, import, and production data.
     - To ensure consistency over time, these values are reported in 1998 constant dollars, adjusted for inflation.
+  mercury_description_key: &mercury-description-key
+    - We show data only up to 2021, because estimates for later years are inconsistent. For example, USGS put the 2024 production of China, the largest producer, at 1,000 tonnes in its 2025 release, and at 200 tonnes in its 2026 release.
 
 
 dataset:
@@ -370,6 +372,7 @@ tables:
         unit: tonnes
         short_unit: t
         description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        description_key: *mercury-description-key
         presentation:
           title_public: Mercury production
       production_mica_mine__scrap_and_flake_tonnes:
@@ -1910,6 +1913,7 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        description_key: *mercury-description-key
         presentation:
           title_public: Mercury production as a share of the global total
       share_of_global_production_mica_mine__scrap_and_flake_tonnes:

@@ -102,7 +102,6 @@ ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Tungsten|Mine|tonnes", [2020, 2021, 2022]),
     ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
     ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
-    ("World (BGS)", "production|Mercury|Mine|tonnes", [2022, 2023, 2024]),
     ("World (BGS)", "production|Molybdenum|Mine|tonnes", [2023, 2024]),
     ("World (BGS)", "production|Barite|Mine|tonnes", [2021]),
     ("World (aggregated)", "production|Magnesium compounds|Mine|tonnes", [2021]),
@@ -631,6 +630,9 @@ def combine_data(
         (tb["country"] != "World") & (tb["year"].isin([1990, 1993, 1998, 1999, 2001, 2002, 2003, 2007])),
         "production|Mercury|Mine|tonnes",
     ] = None
+    # Remove all mercury production data after 2021 (including World), since estimates for later years are inconsistent.
+    # NOTE: USGS cut China's 2024 estimate from 1,000 t (2025 release) to 200 t (2026 release), and BGS keeps 1,000 t.
+    tb.loc[tb["year"] > 2021, "production|Mercury|Mine|tonnes"] = None
     tb.loc[
         (tb["country"] != "World") & (tb["year"].isin([1997, 2006, 2008, 2010, 2011])), "production|Barite|Mine|tonnes"
     ] = None
