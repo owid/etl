@@ -2605,3 +2605,116 @@ def test_save_download_package_skips_unpublished_charts():
     assert build.call_count == 0
     assert upsert.call_count == 0
     assert chart.download_package is None
+
+
+def _config_with_presentation(presentation_type: str, group: str | None = None) -> dict:
+    """Minimal config whose only dimension requests `presentation_type`."""
+    choices = [{"slug": "total", "name": "Total"}, {"slug": "per_capita", "name": "Per capita"}]
+    if group is not None:
+        for choice in choices:
+            choice["group"] = group
+    return _make_minimal_config(
+        grapher_schema="011",
+        dimensions=[
+            {"slug": "metric", "name": "Metric", "choices": choices, "presentation": {"type": presentation_type}}
+        ],
+    )
+
+
+@pytest.mark.parametrize("presentation_type", ["dropdown", "dropdown-with-search", "toggle-buttons"])
+def test_chart_dimension_presentation_types_pass_schema_validation(presentation_type):
+    """
+    Test Chart.validate_schema - the control types Grapher supports for mdim dimensions are accepted.
+    """
+    chart = Chart.from_dict(_config_with_presentation(presentation_type))
+    chart.validate_schema()
+    assert chart.to_dict()["dimensions"][0]["presentation"] == {"type": presentation_type}
+
+
+def test_chart_dimension_presentation_rejects_radio():
+    """
+    Test Chart.validate_schema - `radio` (renamed to `toggle-buttons` in Grapher) is rejected for mdims.
+
+    Grapher no longer recognizes it and would silently render a plain dropdown.
+    """
+    chart = Chart.from_dict(_config_with_presentation("radio"))
+    with pytest.raises(ValueError, match="must be one of"):
+        chart.validate_schema()
+
+
+def test_dimension_toggle_buttons_rejects_grouped_choices():
+    """
+    Test Dimension - `toggle-buttons` on a dimension with grouped choices fails at authoring time,
+    since the Grapher admin rejects such a config.
+    """
+    with pytest.raises(ValueError, match="not allowed when its choices have groups"):
+        Chart.from_dict(_config_with_presentation("toggle-buttons", group="Group A"))
+
+    # Grouped choices are fine with a dropdown.
+    Chart.from_dict(_config_with_presentation("dropdown", group="Group A")).validate_schema()
+
+
+_DATA_EXPLORER_PRESENTATION = {"page_type": "data-explorer", "explorer_subtitle": "Explore data on population."}
+
+
+def test_chart_presentation_passes_schema_validation_and_is_camelized():
+    """
+    Test Chart.presentation - a data-explorer presentation validates, and reaches grapher in camelCase.
+    """
+    from etl.viz.chart.model.core import camelize
+
+    chart = Chart.from_dict(_make_minimal_config(grapher_schema="011", presentation=_DATA_EXPLORER_PRESENTATION))
+    chart.validate_schema()
+    chart.validate_presentation()
+
+    config = camelize(chart.to_dict(), exclude_keys={"dimensions"})
+    assert config["presentation"] == {"pageType": "data-explorer", "explorerSubtitle": "Explore data on population."}
+
+
+@pytest.mark.parametrize(
+    "presentation, match",
+    [
+        ({"page_type": "topic-page", "explorer_subtitle": "Subtitle."}, "Invalid `presentation.page_type`"),
+        ({"page_type": "data-explorer", "explorer_subtitle": ""}, "must not be empty"),
+    ],
+)
+def test_chart_presentation_rejects_invalid_values(presentation, match):
+    """
+    Test ChartPresentation - an unknown page type or an empty subtitle fails at authoring time.
+    """
+    with pytest.raises(ValueError, match=match):
+        Chart.from_dict(_make_minimal_config(grapher_schema="011", presentation=presentation))
+
+
+def test_chart_presentation_requires_explorer_subtitle_in_schema():
+    """
+    Test Chart.validate_schema - grapher requires `explorerSubtitle` with a data-explorer page type.
+    """
+    chart = Chart.from_dict(_make_minimal_config(grapher_schema="011", presentation=_DATA_EXPLORER_PRESENTATION))
+    chart.presentation.explorer_subtitle = None  # ty: ignore  # bypasses __post_init__
+    with pytest.raises(ValueError, match="explorer_subtitle"):
+        chart.validate_schema()
+
+
+def test_single_chart_rejects_presentation():
+    """
+    Test Chart.validate_presentation - a single chart (`dimensions: []`) is not a multidim page.
+    """
+    config = _make_minimal_config(grapher_schema="011", presentation=_DATA_EXPLORER_PRESENTATION)
+    config["dimensions"] = []
+    config["views"][0]["dimensions"] = {}
+    chart = Chart.from_dict(config)
+    with pytest.raises(ValueError, match="only applies to multidims"):
+        chart.validate_presentation()
+
+
+def test_explorer_rejects_presentation():
+    """
+    Test Explorer - `presentation` is multidim-only and must not be silently ignored.
+    """
+    from etl.viz.explorer import Explorer
+
+    with pytest.raises(ValueError, match="`presentation` is only supported for multidim charts"):
+        Explorer.from_dict(
+            _make_minimal_config(presentation=_DATA_EXPLORER_PRESENTATION, config={"explorerTitle": "T"})
+        )

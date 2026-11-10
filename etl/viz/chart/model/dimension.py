@@ -17,7 +17,17 @@ class DimensionChoice(MDIMBase):
 
 @dataclass(frozen=True)
 class DimensionPresentationUIType:
+    """Control types a dimension can request.
+
+    MDims accept `dropdown`, `dropdown-with-search` and `toggle-buttons` (enforced by
+    `schemas/multidim-schema.json`). Explorers accept `dropdown`, `radio` and `checkbox`.
+    """
+
     DROPDOWN: ClassVar[str] = "dropdown"
+    # MDim only.
+    DROPDOWN_WITH_SEARCH: ClassVar[str] = "dropdown-with-search"
+    TOGGLE_BUTTONS: ClassVar[str] = "toggle-buttons"
+    # Explorer only.
     CHECKBOX: ClassVar[str] = "checkbox"
     RADIO: ClassVar[str] = "radio"
     TEXT_AREA: ClassVar[str] = "text_area"  # Adding a new type automatically works!
@@ -75,6 +85,12 @@ class Dimension(MDIMBase):
             # assert self.presentation.choice_slug_true is not None
             if self.presentation.choice_slug_true not in self.choice_slugs:
                 raise ValueError(f"True slug '{self.presentation.choice_slug_true}' must be one of the choices.")
+
+        # Grapher's admin rejects toggle buttons on a dimension whose choices are grouped.
+        if self.ui_type == DimensionPresentationUIType.TOGGLE_BUTTONS and any(c.group for c in self.choices):
+            raise ValueError(
+                f"Dimension '{self.slug}' uses '{DimensionPresentationUIType.TOGGLE_BUTTONS}', which is not allowed when its choices have groups."
+            )
 
     @property
     def ui_type(self):
