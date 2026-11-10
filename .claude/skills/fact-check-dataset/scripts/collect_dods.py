@@ -8,14 +8,17 @@ Surfaces scanned:
   - indicator metadata: the local grapher build (new text, if built) and production variables (any version)
   - chart configs of production charts that use the dataset's indicators (any version)
   - ETL viz configs (charts, MDims, explorers) in this repo that mention the dataset's short name
-  - articles and data insights that embed or link those charts (their own DoD links)
+  - articles and data insights that embed or link those charts (their own DoD links), including data insights
+    that show one of those charts in their `grapher-url` front matter
 
-DoD text is read from the public Datasette mirror of production (no DB credentials needed; the mirror can lag
-production by a few days). The DoD extension's script (vscode_extensions/dod-syntax/scripts/fetch_dod.py) reads
-the same `dods` table straight from MySQL, preferring the branch's staging server when `.env` sets STAGING.
+References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
+mirror can lag production by a few days). DoD edits are made on the branch's staging server and only reach
+production on merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead
+(needs the staging network); entries whose staging text differs from production are flagged.
 
 Usage:
     .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <namespace>/<version>/<short_name>
+    .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<version>/<short_name> --staging <branch>
 """
 
 import argparse
@@ -33,6 +36,11 @@ DOD_RE = re.compile(r"#dod:\s*([A-Za-z0-9_\-]+)")
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("step", help="<namespace>/<version>/<short_name> (a garden/ or grapher/ prefix is ignored)")
+    parser.add_argument(
+        "--staging",
+        metavar="BRANCH",
+        help="read the DoD text from this branch's staging server (where DoD edits are made) instead of production",
+    )
     args = parser.parse_args()
     parts = args.step.replace("data://", "").strip("/").split("/")
     namespace, version, short_name = parts[-3:]
@@ -89,15 +97,41 @@ def main() -> None:
     for row in rows:
         refs[row["dod"].strip()].add(f"{row['type']} {row['gdoc']}")
 
+    # Data insights hold their chart in the `grapher-url` front matter, which creates no `grapher` link row.
+    rows = _query(
+        "SELECT DISTINCT g.slug AS gdoc, l.target AS dod "
+        "FROM posts_gdocs g JOIN posts_gdocs_links l ON l.sourceId = g.id AND l.linkType = 'dod' "
+        "WHERE g.type = 'data-insight' AND g.published "
+        "AND split_part(split_part(g.content->>'$.\"grapher-url\"', '/grapher/', 2), '?', 1) IN "
+        f"(SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}))"
+    )
+    for row in rows:
+        refs[row["dod"].strip()].add(f"data-insight {row['gdoc']}")
+
     if not refs:
         print("No DoD references found.")
         return
 
-    # Fetch the DoD text from production.
+    # Fetch the DoD text from production, and from the staging server when asked.
     names = ",".join(f"'{n}'" for n in sorted(refs))
     dods = {r["name"]: r for r in _query(f"SELECT name, updatedAt, content FROM dods WHERE name IN ({names})")}
+    source = "production"
+    if args.staging:
+        from etl.config import OWIDEnv
+
+        production = dods
+        staging = OWIDEnv.from_staging(args.staging)
+        df = staging.read_sql(
+            "SELECT name, updatedAt, content FROM dods WHERE name IN %(n)s", params={"n": tuple(refs)}
+        )
+        dods = {r["name"]: r for r in df.to_dict("records")}
+        for name, row in dods.items():
+            if production.get(name, {}).get("content", "").strip() != (row["content"] or "").strip():
+                row["note"] = "edited on staging: differs from production"
+        source = f"staging server {staging.conf.DB_HOST}"
 
     print(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
+    print(f"DoD text from {source}.\n")
     missing = sorted(set(refs) - set(dods))
     if missing:
         print("## Referenced but missing from the dods table (broken links)\n")
@@ -107,7 +141,8 @@ def main() -> None:
     for name in sorted(dods):
         surfaces = sorted(refs[name])
         shown = ", ".join(surfaces[:5]) + (f", and {len(surfaces) - 5} more" if len(surfaces) > 5 else "")
-        print(f"## {name} (last edited {dods[name]['updatedAt']})\n")
+        note = f"; {dods[name]['note']}" if dods[name].get("note") else ""
+        print(f"## {name} (last edited {dods[name]['updatedAt']}{note})\n")
         print(f"Referenced from: {shown}\n")
         print(dods[name]["content"].strip() + "\n")
 
