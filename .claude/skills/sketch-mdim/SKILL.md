@@ -51,6 +51,13 @@ Find each indicator's full catalog path (`grapher/<namespace>/<version>/<dataset
 - **Indicator ID**: the `catalogPath` from the same metadata URL.
 - **Catalog path**: use it as it is. The build stops with a clear message if it doesn't exist.
 
+**Check whether an MDim on these indicators already exists,** before building the page. Search the chart
+configs in `etl/steps/viz/chart/` for each indicator's short name (the part after `#`). The public Datasette
+doesn't show this: it lists only published MDims, and an MDim can sit in ETL unpublished and with no web address.
+If one covers the same indicators, tell the person what it is called, who added it and how it differs from what
+they asked for, and ask whether to change that one, add a second, or stop. The page can't open an existing MDim,
+so a change to it starts from a setup you write from its config.
+
 Write the draft to `ai/mdim_simulator/<name>.setup.yml`, in the same format the page copies out. `<name>` is a
 short kebab-case name for the MDim, such as `internet-users`. A typical draft has one dropdown, with one option
 per indicator:
@@ -182,6 +189,11 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
 - **The comments at the end:** use the text changes against each indicator's original in the PR description.
   Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
   using that indicator first.
+- **Check the default countries against the data.** The page lets them tick any country or region, but a chart
+  only draws the ones its indicators have data for, and drops the rest without a message. Compare
+  `default_selection` with each indicator's entities (`dimensions.entities` in its metadata JSON). World Bank
+  data, for example, has "Sub-Saharan Africa (WB)" but no "Africa". If a view would lose some, ask them which
+  countries or regions to show instead, in step 5a.
 - **Don't build it locally.** That pulls in the whole upstream chain, often with private datasets the laptop
   can't download. The staging build in step 5c checks the config against the real indicators instead.
 - **To show the setup in the page again,** for example if they want to adjust it there, save it as
@@ -199,18 +211,22 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
    "Codex Review Summary" comment showing `✅ Completed` with no review or inline comments. That summary comment
    appears within seconds showing `🔄 Running`, which is not a verdict. Don't hold step 5d for it.
 5. **Let the staging server write the MDim.** Don't run the step from the laptop, even with `STAGING=1`: chart
-   steps read their upstream datasets from local disk, and private ones can't be downloaded. After each push,
-   wait for `buildkite/etl-automated-staging-environment` to succeed on the head commit
-   (`gh api repos/owid/etl/commits/<sha>/status`). That build writes the MDim to staging, and is the check that
-   the step builds: if it fails, read its log and fix the step.
-6. **Re-upload the views, then check they draw,** after every successful staging build. The preview loads each
-   view's config from `http://<container>/grapher/by-uuid/<id>.config.json`, which is served from R2, not the
-   database, and the build's own upload often doesn't reach it. So always take the MDim's config from
-   `multi_dim_data_pages.config` in the staging database (`query-grapher-db` skill), drop `fullConfigId` from
-   every view, and send it back unchanged with
-   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`. Then
-   check that each view's new `fullConfigId` returns 200 at that URL; retry a 502 once, since it can show briefly
-   before the real answer. Do this silently, and bring it up only if views still fail after the re-upload.
+   steps read their upstream datasets from local disk, and private ones can't be downloaded. Each push starts
+   `buildkite/etl-automated-staging-environment`, which writes the MDim partway through, in its "Build ETL
+   catalog" step, well before the build as a whole reports a result. So don't wait for the build to finish, and
+   don't tell the person how long it will take. Poll the staging database (`query-grapher-db` skill) for the
+   MDim's row in `multi_dim_data_pages`, and after a later push for the change in its `config`, then go on to
+   item 6. The build's status on the head commit (`gh api repos/owid/etl/commits/<sha>/status`) is still the
+   check that the step builds: if it fails, read its log and fix the step.
+6. **Check that the views draw, and re-upload them if they don't.** The preview loads each view's config from
+   `http://<container>/grapher/by-uuid/<id>.config.json`, with `<id>` the view's `fullConfigId` in
+   `multi_dim_data_pages.config`. It is served from R2, not the database, and the build's own upload doesn't
+   always reach it. Check that every view returns 200 at that URL; retry a 502 once, since it can show briefly
+   before the real answer. If a view fails, take the MDim's config from the staging database, drop
+   `fullConfigId` from every view, and send it back unchanged with
+   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`, then
+   check the new `fullConfigId`s. Check again once the build has finished, since a later step can rewrite the
+   MDim. Do this silently, and bring it up only if views still fail after the re-upload.
 
 When Codex's verdict comes in, fix what's valid, push, repeat items 5 and 6, and reply to and resolve each
 thread. Don't start a second round. Tell the person about the review only if it changed something they'll see.
