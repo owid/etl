@@ -6,8 +6,9 @@ shows them and a metadata review that reads only the `.meta.yml` misses them. Th
 
 Surfaces scanned:
   - indicator metadata: the local grapher build (new text, if built) and production variables (any version)
-  - chart configs of production charts that use the dataset's indicators (any version), and of their narrative charts
-  - ETL viz configs (charts, MDims, explorers) in this repo that mention the dataset's short name
+  - chart configs of production charts that use the dataset's indicators (any version), and of the narrative charts
+    built on those charts or on views of published MDims that use those indicators
+  - ETL viz configs (charts, MDims, explorers) of the viz steps that depend on the dataset (any version) in the DAG
   - articles and data insights that embed or link those charts (by current or redirected slug) or their narrative
     charts (their own DoD links), including data insights that show one of those charts in their `grapher-url`
     front matter
@@ -81,11 +82,20 @@ def main() -> None:
         for name in DOD_RE.findall(str(row["config"])):
             refs[name].add(f"chart {row['slug']}")
 
-    # Narrative charts built on those charts render their own config, which can add DoD links.
-    dataset_narratives = f"SELECT nc.name FROM narrative_charts nc WHERE nc.parentChartId IN ({dataset_charts})"
+    # Narrative charts built on those charts, or on views of published MDims that use the dataset's indicators,
+    # render their own config, which can add DoD links.
+    dataset_mdim_views = (
+        "SELECT mx.id FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages m ON m.id = mx.multiDimId "
+        "JOIN variables v ON v.id = mx.variableId JOIN datasets d ON d.id = v.datasetId "
+        f"WHERE m.published AND d.catalogPath LIKE '{namespace}/%/{short_name}'"
+    )
+    narrative_filter = (
+        f"nc.parentChartId IN ({dataset_charts}) OR nc.parentMultiDimXChartConfigId IN ({dataset_mdim_views})"
+    )
+    dataset_narratives = f"SELECT nc.name FROM narrative_charts nc WHERE {narrative_filter}"
     narratives = _query(
         "SELECT nc.name, cc.config FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
-        f"WHERE nc.parentChartId IN ({dataset_charts})"
+        f"WHERE {narrative_filter}"
     )
     for row in narratives:
         for name in DOD_RE.findall(str(row["config"])):
@@ -97,12 +107,10 @@ def main() -> None:
         f"UNION SELECT r.slug FROM chart_slug_redirects r WHERE r.chart_id IN ({dataset_charts})"
     )
 
-    # ETL viz configs (MDims, explorers, ETL-authored charts) that mention the dataset.
-    for path in (REPO / "etl" / "steps" / "viz").rglob("*.yml"):
-        text = path.read_text()
-        if short_name in text:
-            for name in DOD_RE.findall(text):
-                refs[name].add(f"viz config {path.relative_to(REPO)}")
+    # ETL viz configs (MDims, explorers, ETL-authored charts) whose step depends on the dataset in the DAG.
+    for path in _viz_configs_using(namespace, short_name):
+        for name in DOD_RE.findall(path.read_text()):
+            refs[name].add(f"viz config {path.relative_to(REPO)}")
 
     # Articles and data insights that embed or link those charts or their narrative charts.
     rows = _query(
@@ -176,6 +184,25 @@ def _dods_in_local_dataset(path: Path) -> set[str]:
         for col in tb.columns:
             found |= set(DOD_RE.findall(str(tb[col].metadata.to_dict())))
     return found
+
+
+def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
+    """Config files of the viz steps that list any version of the dataset as a direct DAG dependency.
+
+    A viz step `viz://<type>/<ns>/<version>/<name>` keeps its configs in `etl/steps/viz/<type>/<ns>/<version>/` as
+    `<name>.yml` or `<name>.<part>.yml`.
+    """
+    from etl.dag_helpers import load_dag
+
+    dep_re = re.compile(rf"data(-private)?://(garden|grapher)/{re.escape(namespace)}/[^/]+/{re.escape(short_name)}")
+    paths: list[Path] = []
+    for step, deps in load_dag().items():
+        if not step.startswith("viz://") or not any(dep_re.fullmatch(dep) for dep in deps):
+            continue
+        folder = REPO / "etl" / "steps" / "viz" / Path(step.removeprefix("viz://")).parent
+        name = step.rsplit("/", 1)[-1]
+        paths += sorted({*folder.glob(f"{name}.yml"), *folder.glob(f"{name}.*.yml")})
+    return paths
 
 
 def _query(sql: str) -> list[dict]:
