@@ -19,8 +19,8 @@ DISORDER_NOTES = {
 # Sexes: slug in the MDim and the source, and who it refers to in titles, for children (under 15), adults and all ages.
 SEXES = {
     "both": {"child": "people", "adult": "people", "all": "people"},
-    "female": {"child": "girls", "adult": "women", "all": "women and girls"},
-    "male": {"child": "boys", "adult": "men", "all": "men and boys"},
+    "female": {"child": "girls", "adult": "women", "all": "women"},
+    "male": {"child": "boys", "adult": "men", "all": "men"},
 }
 # Ages: slug in the MDim -> (slug in the source, phrase used in titles, age bracket for SEXES).
 AGES = {

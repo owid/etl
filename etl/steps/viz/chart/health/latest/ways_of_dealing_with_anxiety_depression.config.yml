@@ -34,8 +34,8 @@ definitions:
         min: 0
     metadata:
       description_key:
-      - Respondents were first asked whether they had "felt so anxious or depressed that they could not continue their regular
-        daily activities as they normally would for two weeks or longer". Those who replied "yes" were then asked about different
+      - Respondents were first asked whether they had “felt so anxious or depressed that they could not continue their regular
+        daily activities as they normally would for two weeks or longer”. Those who replied “yes” were then asked about different
         approaches to dealing with this anxiety or depression.
       - Answers from demographic groups with fewer than 100 participants were left out of this data.
       - This data comes from the Wellcome Global Monitor 2020, a survey that Wellcome ran with Gallup. It asked about views

@@ -57,7 +57,7 @@ def run() -> None:
 
 def _share(disorder: str, sex: str) -> dict:
     """Age-standardized share of the population with the disorder, for one sex, with a short name for tooltips."""
-    who = {"female": "women and girls", "male": "men and boys"}[sex]
+    who = {"female": "women", "male": "men"}[sex]
     return {
         "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_{sex}__age_age_standardized",
         "display": {
