@@ -20,9 +20,10 @@ plausible, and the problem only shows up once a designer opens the SVG:
   balanced for: tick labels not at 15px on a 540-wide template (14px on an 850-wide one), y-axis tick
   labels not right-aligned against the plot, or a year axis with no tick marks (each axes judged on
   its own; an x axis is a year axis when its labels are bare integers, one of four digits, since
-  grapher writes any other number with a thousands separator). Judged on the
-  ``<subject>__<axis>-tick-label-<value>`` and ``<subject>__x-tick-<value>`` gids
-  ``etl.viz.static.name_furniture`` gives every axis
+  grapher writes any other number with a thousands separator, unless an era suffix makes it a year,
+  as in "12,000 BCE"). Judged on the ``<subject>__<axis>-tick-label-<value>`` and
+  ``<subject>__x-tick-<value>`` gids ``etl.viz.static.name_furniture`` gives every axis, reading a
+  label's text however deeply it is nested (MathText labels such as ``$10^5$`` are)
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -46,6 +47,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import NamedTuple
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -299,17 +301,64 @@ def check_svg(
 # the 540-wide templates, 14 on the 850-wide ones. A label within LABEL_TOLERANCE of it passes.
 TICK_LABEL_PX = {540: 15.0, 850: 14.0}
 LABEL_TOLERANCE = 0.3
-# Groups: subject, axis, tick value, style, and the label's text as drawn (empty if it is in tspans).
-TICK_LABEL = re.compile(r'<g id="([^"]+)__([xy])-tick-label-([^"]+)">\s*<text style="([^"]*)"[^>]*>([^<]*)')
+# Groups: subject, axis. Matched on a whole id, so `-tick-label2-` (the opposite side) is left out.
+TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-tick-label-.+$")
 TICK_MARK = re.compile(r'<g id="([^"]+)__x-tick-([^"]+?)"(/?)>')
+FONT_SIZE = re.compile(r"font-size:\s*([0-9.]+)px")
+TEXT_ANCHOR = re.compile(r"text-anchor:\s*(\w+)")
+
+
+class TickLabel(NamedTuple):
+    subject: str
+    axis: str
+    anchor: str | None  # None when no text node declares one, as for a MathText label
+    size: float | None  # the largest font size in the label: a superscript is smaller on purpose
+    text: str
+
+
+def tick_labels(svg: str) -> list[TickLabel]:
+    """Every `<subject>__<axis>-tick-label-<value>` group, read from its text however deeply it is nested.
+
+    A plain label is one `<text>` straight under the group. A MathText label (`$10^5$`) is a comment,
+    a transform group, and a `<text>` holding one `<tspan>` per glyph, with no text-anchor (matplotlib
+    places it by the transform). Glyphs on another baseline (a superscript or subscript) are joined
+    with a space, so `10^5` reads `10 5` and never passes for the year `105`.
+    """
+    labels = []
+    for group in ET.fromstring(svg).iter():
+        match = TICK_LABEL_GID.match(group.get("id") or "")
+        if match is None or group.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        parts: list[str] = []
+        sizes: list[float] = []
+        anchor = None
+        baseline = None
+        for node in group.iter():
+            tag = node.tag.rsplit("}", 1)[-1]
+            if tag not in ("text", "tspan"):
+                continue
+            style = node.get("style") or ""
+            sizes += [float(s) for s in FONT_SIZE.findall(style)]
+            if anchor is None and (m := TEXT_ANCHOR.search(style)):
+                anchor = m.group(1)
+            if node.text and node.text.strip():
+                if tag == "tspan":
+                    if parts and node.get("y") != baseline:
+                        parts.append(" ")
+                    baseline = node.get("y")
+                parts.append(node.text.strip())
+        labels.append(TickLabel(match.group(1), match.group(2), anchor, max(sizes, default=None), "".join(parts)))
+    return labels
 
 
 def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[str]:
     """Return failures where the axes differ from grapher's own download (module docstring)."""
     failures = []
-    labels = TICK_LABEL.findall(svg)
-    y_anchors = [re.search(r"text-anchor:\s*(\w+)", style) for _, axis, _, style, _ in labels if axis == "y"]
-    off = sorted({m.group(1) for m in y_anchors if m and m.group(1) != "end"})
+    try:
+        labels = tick_labels(svg)
+    except ET.ParseError as error:
+        return [f"the SVG does not parse as XML ({error}), so its axes could not be checked"]
+    off = sorted({label.anchor for label in labels if label.axis == "y" and label.anchor not in (None, "end")})
     if off:
         failures.append(
             f"y-axis tick labels are anchored {', '.join(off)}, not right-aligned against the plot. Grapher "
@@ -317,9 +366,9 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         )
     # Each axes is judged on its own, so a year axis next to a non-year one is still checked.
     x_texts: dict[str, list[str]] = {}
-    for subject, axis, _, _, text in labels:
-        if axis == "x":
-            x_texts.setdefault(subject, []).append(text)
+    for label in labels:
+        if label.axis == "x":
+            x_texts.setdefault(label.subject, []).append(label.text)
     empty_marks: dict[str, list[bool]] = {}
     for m in TICK_MARK.finditer(svg):
         if not m.group(2).startswith("label"):
@@ -339,12 +388,7 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         want = TICK_LABEL_PX.get(width)
         root = SVG_ROOT.search(svg)
         in_pt = bool(root and re.search(r'\bwidth="[0-9.]+pt"', root.group()))
-        sizes = {
-            float(m.group(1))
-            for _, _, _, style, _ in labels
-            for m in [re.search(r"font-size:\s*([0-9.]+)px", style)]
-            if m
-        }
+        sizes = {label.size for label in labels if label.size is not None}
         if want and sizes:
             px = {round(s / 0.72 if in_pt else s, 2) for s in sizes}
             wrong = sorted(p for p in px if abs(p - want) > LABEL_TOLERANCE)
@@ -357,9 +401,10 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     return failures
 
 
-# A tick label that reads as a year: a bare integer, with no thousands separator, maybe signed or
-# marked BCE/CE. Grapher writes years that way and every other number with a separator (2,000).
-YEAR_LABEL = re.compile(r"[-\u2212]?(\d+)(?: BCE| CE)?")
+# A tick label that reads as a year: a bare integer, maybe signed or marked BCE/CE. Grapher writes
+# years with no thousands separator and every other number with one (2,000), so a separator is a
+# count unless an era suffix makes it a year: long-run axes write "12,000 BCE".
+YEAR_LABEL = re.compile(r"[-\u2212]?(?:(\d+)(?: BCE| CE)?|(\d{1,3}(?:,\d{3})+) (?:BCE|CE))")
 
 
 def is_year_axis(texts: list[str]) -> bool:
@@ -367,13 +412,15 @@ def is_year_axis(texts: list[str]) -> bool:
 
     Judged on the label text rather than the tick values, which cannot tell years from a count axis
     that also ends at 2000: grapher labels that count axis `2,000` and the year `2000`. Every drawn
-    label must be a bare integer and at least one must have four digits, which admits long-run axes
-    that start at 0 or before year 0 and projections that run past 2100, and leaves out axes of
-    shares, rates or small counts. Blank labels (a step thinning the ticks) are skipped.
+    label must be a bare integer (or a grouped one with an era suffix) and at least one must have
+    four digits, which admits long-run axes that start at 0 or before year 0 and projections that run
+    past 2100, and leaves out axes of shares, rates or small counts. Blank labels (a step thinning
+    the ticks) are skipped.
     """
     drawn = [t.strip() for t in texts if t.strip()]
     years = [YEAR_LABEL.fullmatch(t) for t in drawn]
-    return bool(years) and all(years) and any(len(m.group(1)) >= 4 for m in years if m)
+    digits = [(m.group(1) or m.group(2)).replace(",", "") for m in years if m]
+    return bool(years) and all(years) and any(len(d) >= 4 for d in digits)
 
 
 def scale_failures(svg: str, target: tuple[str, tuple[int, int]]) -> list[str]:
