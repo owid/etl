@@ -299,7 +299,7 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
     ax.spines["bottom"].set_color(TICK_COLOR)
     ax.yaxis.grid(True, linestyle=GRID_DASHES, color=GRID_COLOR, linewidth=1.0)
     ax.set_axisbelow(True)
-    ax.tick_params(colors=TEXT_COLOR, labelsize=px_to_pt(body_px(width_px)), length=5, width=1)
+    ax.tick_params(colors=TEXT_COLOR, labelsize=px_to_pt(body_px(width_px)), length=px_to_pt(5), width=px_to_pt(1))
     ax.tick_params(axis="y", length=0)
     x, y = placeholder_series(tb)
     ax.plot(x, y, color="C0", linewidth=2, gid="line__placeholder")

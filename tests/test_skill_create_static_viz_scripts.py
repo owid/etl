@@ -106,6 +106,17 @@ def test_scaffold_names_every_mark(sketch):
     assert verify.returncode == 0, verify.stdout + verify.stderr
 
 
+def test_scaffold_draws_tick_marks_at_grapher_size(sketch):
+    """matplotlib takes tick length and width in points, so grapher's 5px x 1px mark is 3.6pt x 0.72pt."""
+    if not (sketch / "demo.svg").is_file():
+        assert run(sketch / "sketch.py").returncode == 0
+    svg = (sketch / "demo.svg").read_text()
+    mark = re.search(r'<g id="axes__x-tick-\d+">\s*<defs>\s*<path [^>]*d="M 0 0\s+L 0 ([0-9.]+)\s*"[^>]*>', svg)
+    assert mark, "no x tick mark found in the scaffold's SVG"
+    width = re.search(r"stroke-width: ([0-9.]+)", mark.group())
+    assert (float(mark.group(1)), float(width.group(1)) if width else None) == (3.6, 0.72), mark.group()
+
+
 # --- verify_static_viz.py: named marks --------------------------------------------------------------
 
 SVG_HEAD = (
@@ -716,7 +727,7 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path):
     ax.plot([2000, 2010, 2020], [1e3, 1e4, 1e5], gid="line__value")
     ax.set_yscale("log")
     # Only the MathText labels are off-size, so only reading them can fail the frame.
-    ax.tick_params(axis="x", labelsize=15 * 0.72, length=5, width=1)
+    ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
     ax.tick_params(axis="y", which="both", labelsize=13 * 0.72)
     export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
     plt.close(fig)
