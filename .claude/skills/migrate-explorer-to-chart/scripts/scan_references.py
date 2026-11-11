@@ -55,21 +55,56 @@ def url_pattern(slug: str) -> re.Pattern:
     return re.compile(r"(?:https?://[^\s\"'<>()\[\]]*)?/explorers/" + re.escape(slug) + r"(?![\w-])[^\s\"'<>()\[\]\\]*")
 
 
-def gdoc_uses(content: dict, pat: re.Pattern) -> list[tuple[str, str]]:
-    """(url, how it's used) for every URL in a gdoc's content: the type of the block holding it."""
+def plain_text(node) -> str:
+    """The text a reader sees in a gdoc node (spans, children, values), joined."""
+    if isinstance(node, dict):
+        if "text" in node and isinstance(node["text"], str):
+            return node["text"]
+        return "".join(plain_text(node.get(k)) for k in ("children", "value", "text") if k in node)
+    if isinstance(node, list):
+        return "".join(plain_text(v) for v in node)
+    return ""
+
+
+def gdoc_uses(content: dict, pat: re.Pattern) -> list[dict]:
+    """Every URL in a gdoc's content: how it's used, and text to search for in the doc.
+
+    A link in a doc shows only its text, so `link_text` is what to search for: the linked words
+    for a text link, the title for a card. `context` is the text just before it (for an embed, the
+    end of the paragraph above it), to tell repeated link texts apart.
+    """
     found = []
+    last_text = ""
 
     def walk(node, kind):
+        nonlocal last_text
         if isinstance(node, dict):
             kind = node.get("type") or node.get("spanType") or kind
-            for v in node.values():
-                walk(v, kind)
+            url = node.get("url")
+            if isinstance(url, str) and pat.search(url):
+                if node.get("spanType") == "span-link":
+                    link_text = plain_text(node.get("children"))
+                else:
+                    link_text = node.get("title") or ""
+                for m in pat.finditer(url):
+                    found.append(
+                        {"url": m.group(0), "how": kind or "text", "link_text": link_text, "context": last_text[-90:]}
+                    )
+            if node.get("type") == "text" and "value" in node:
+                # Walk the spans one by one so a link's context is the text right before it.
+                for span in node["value"]:
+                    walk(span, kind)
+                    last_text = (last_text + plain_text(span))[-300:]
+                return
+            for k, v in node.items():
+                if k != "url":
+                    walk(v, kind)
         elif isinstance(node, list):
             for v in node:
                 walk(v, kind)
         elif isinstance(node, str):
             for m in pat.finditer(node):
-                found.append((m.group(0), kind or "text"))
+                found.append({"url": m.group(0), "how": kind or "text", "link_text": "", "context": last_text[-90:]})
 
     walk(content, None)
     return found
@@ -119,7 +154,7 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
 
     def add(surface, where, edit_url, old, how, **extra):
         # One entry per place and URL: a doc keeps a copy in its markdown, a line may repeat a URL.
-        key = (surface, re.sub(r":\d+$", "", where), old, how)
+        key = (surface, re.sub(r":\d+$", "", where), old, how, extra.get("link_text"), extra.get("context"))
         if key in seen:
             return
         seen.add(key)
@@ -144,7 +179,8 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 params=(like,),
             )
             for r in rows.to_dict("records"):
-                for old, how in gdoc_uses(json.loads(r["content"]), pat):
+                for use in gdoc_uses(json.loads(r["content"]), pat):
+                    old, how = use["url"], use["how"]
                     add(
                         "Google Doc" if r["published"] else "Google Doc (unpublished draft)",
                         f"{r['slug'] or r['title']} ({r['type']})",
@@ -152,6 +188,8 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         old,
                         how,
                         page_url=f"{SITE}/{r['slug']}" if r["published"] else None,
+                        link_text=use["link_text"],
+                        context=use["context"],
                         preview_url=f"{ADMIN}/gdocs/{r['id']}/preview",
                     )
         elif t in {"posts_gdocs", "posts_gdocs_components", "posts_gdocs_links"}:

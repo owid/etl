@@ -176,7 +176,9 @@ tbody tr:last-child td{border-bottom:0}
 tr.pick{cursor:pointer} tr.pick:hover td{background:var(--soft)} tr.sel td{background:var(--soft)}
 td.c{text-align:center;font-variant-numeric:tabular-nums}
 .y{color:var(--ok);font-weight:600} .n{color:var(--bad);font-weight:600} .e{color:var(--warn);font-weight:600} .na{color:var(--muted)}
-.url{font-family:var(--mono);font-size:.74rem;overflow-wrap:anywhere;max-width:46ch}
+.url{font-family:var(--mono);font-size:.74rem;overflow-wrap:anywhere;max-width:40ch}
+.find{min-width:16ch;max-width:34ch} .find b{font-weight:600}
+button.mini{font-size:.72rem;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .group{display:flex;flex-direction:column;gap:8px}
 .group-head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline}
 .dimgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
@@ -345,6 +347,12 @@ document.querySelectorAll("#mtable tr.pick").forEach(tr => { tr.onclick = () => 
 const R = D.refs.references;
 const breaks = R.filter(r=>r.breaks_on_redirect).length;
 $("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"} found, ${breaks} of them break the moment the redirects exist (swap those first). Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.`;
+// What to search for in the doc: the linked words (or card title), and the text just before them.
+const findCell = r => {
+  if (!r.link_text && !r.context) return '<span class="small">—</span>';
+  const what = r.link_text ? `<b>“${esc(r.link_text)}”</b><button class="mini" data-copy="${esc(r.link_text)}">Copy</button>` : `<span class="small">${r.how==="chart"?"embed, below:":"after:"}</span>`;
+  return `${what}${r.context?`<div class="small">…${esc(r.context.trim())}</div>`:""}`;
+};
 const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
 const groups = {};
 R.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
@@ -353,7 +361,7 @@ $("linkgroups").innerHTML = order.length ? order.map(([k, rs]) => {
   const [surface, where] = k.split("|"), r0 = rs[0];
   const links = [r0.edit_url&&`<a href="${esc(r0.edit_url)}" target="_blank" rel="noopener">Edit ↗</a>`, r0.preview_url&&`<a href="${esc(r0.preview_url)}" target="_blank" rel="noopener">Admin preview ↗</a>`, r0.page_url&&`<a href="${esc(r0.page_url)}" target="_blank" rel="noopener">Live page ↗</a>`].filter(Boolean).join(" · ");
   return `<div class="group"><div class="group-head"><h3>${esc(where)}</h3><span class="small">${esc(surface)} · ${rs.length} link${rs.length===1?"":"s"}</span><span class="small">${links}</span></div>
-    <div class="tablebox"><table><thead><tr><th>Use</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="url">${esc(r.old_url)}</td><td class="url">${esc(r.new_url)}</td><td>${esc(r.match)}${Object.keys(r.stale_params||{}).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
+    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${esc(r.old_url)}</td><td class="url">${esc(r.new_url)}</td><td>${esc(r.match)}${Object.keys(r.stale_params||{}).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
 }).join("") : `<div class="okline">✓ Nothing references this explorer.</div>`;
 document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
 
