@@ -773,6 +773,54 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, rot
 
 
 @pytest.mark.parametrize(
+    "ha, edge, message",
+    [
+        ("right", "grid", None),
+        ("right", "spine", None),
+        ("left", "grid", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("center", "grid", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("left", "spine", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("right", None, "are MathText of one width with no y gridline"),
+    ],
+)
+def test_mathtext_labels_of_one_width_are_judged_against_the_plot_edge(tmp_path, ha, edge, message):
+    """A log axis of 10^1, 10^2, 10^3: labels of one width line up on every edge, so where they end is what is read.
+
+    `edge` is what marks the plot's left edge in the SVG: grapher's horizontal gridlines, the left
+    spine, or nothing, when the alignment cannot be read at all.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [10, 100, 1000], gid="line__value")
+    ax.set_yscale("log")
+    ax.set_yticks([10, 100, 1000])
+    ax.minorticks_off()
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
+    # As the scaffold draws a y axis: no tick marks, and the left spine only when `edge` asks for it.
+    ax.tick_params(axis="y", labelsize=15 * 0.72, length=0)
+    ax.yaxis.grid(edge == "grid")
+    ax.spines["left"].set_visible(edge == "spine")
+    for tick_label in ax.get_yticklabels():
+        tick_label.set_horizontalalignment(ha)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
     "kwargs, message",
     [
         ({"label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),

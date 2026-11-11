@@ -304,6 +304,9 @@ LABEL_TOLERANCE = 0.3
 # Groups: subject, axis. Matched on a whole id, so `-tick-label2-` (the opposite side) is left out.
 TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-tick-label(2?)-.+$")  # label2: the right (or top) side
 TICK_MARK_GID = re.compile(r"^(.+)__x-tick-(?!label)")
+# What marks a y axis' plot edge: its gridlines, tick marks and left spine. Groups: subject.
+Y_EDGE_GID = re.compile(r"^(.+)__(?:y-(?:minor-)?(?:grid|tick)-(?!label)|spine-left$)")
+NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
 FONT_SIZE = re.compile(r"font-size:\s*([0-9.]+)px")
 TEXT_ANCHOR = re.compile(r"text-anchor:\s*(\w+)")
 TRANSFORM_STEP = re.compile(r"(\w+)\(([^)]*)\)")
@@ -318,6 +321,8 @@ class TickLabel(NamedTuple):
     # A MathText label's left edge and the x of its last glyph from there, in SVG units; None otherwise.
     left: float | None = None
     extent: float | None = None
+    # That last glyph's font size, to estimate how far past its x the label ends.
+    last_size: float | None = None
     # A MathText label placed by more than a translate (rotated), so where it sits says nothing of its alignment.
     rotated: bool = False
     # Drawn on the axis' second side (`labelright=True`, `labeltop=True`): matplotlib's `tick-label2`.
@@ -341,6 +346,7 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
         parts: list[str] = []
         sizes: list[float] = []
         glyph_xs: list[float] = []
+        glyph_sizes: list[float | None] = []
         anchor = None
         baseline = None
         for node in group.iter():
@@ -356,9 +362,12 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
                     if parts and node.get("y") != baseline:
                         parts.append(" ")
                     baseline = node.get("y")
-                    glyph_xs += [float(x) for x in [node.get("x")] if x and re.fullmatch(r"[-+0-9.eE]+", x)]
+                    x = node.get("x")
+                    if x and re.fullmatch(r"[-+0-9.eE]+", x):
+                        glyph_xs.append(float(x))
+                        glyph_sizes.append(max((float(f) for f in FONT_SIZE.findall(style)), default=None))
                 parts.append(node.text.strip())
-        left = extent = None
+        left = extent = last_size = None
         rotated = False
         if anchor is None and glyph_xs:
             offset = _translate_x(group)
@@ -366,6 +375,7 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
                 rotated = True
             else:
                 left, extent = offset + min(glyph_xs), max(glyph_xs) - min(glyph_xs)
+                last_size = glyph_sizes[glyph_xs.index(max(glyph_xs))]
         size = max(sizes, default=None)
         labels.append(
             TickLabel(
@@ -376,6 +386,7 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
                 "".join(parts),
                 left,
                 extent,
+                last_size,
                 rotated,
                 second=match.group(3) == "2",
             )
@@ -395,7 +406,7 @@ def _translate_x(group: ET.Element) -> float | None:
         if node is group or transform is None or node.tag.rsplit("}", 1)[-1] != "g":
             continue
         for name, args in TRANSFORM_STEP.findall(transform):
-            numbers = [float(n) for n in re.findall(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?", args)]
+            numbers = [float(n) for n in NUMBER.findall(args)]
             if name == "translate" and numbers:
                 total += numbers[0]
             elif not (name == "rotate" and numbers and numbers[0] == 0):
@@ -455,7 +466,7 @@ def mathtext_anchor(labels: list[TickLabel]) -> str | None:
     one x shared by the whole axis, so the alignment is the edge that lines up best. The right edge is
     approximated by the last glyph's x, which only differs by that glyph's own advance. It can only be
     told when the labels differ in width, by at least 0.3 of their font size; labels of one width
-    line up on every edge, and return None.
+    line up on every edge, and return None (`mathtext_past_plot_edge` then judges them).
     """
     placed = [label for label in labels if label.left is not None and label.extent is not None]
     if len(placed) < 2:
@@ -475,6 +486,53 @@ def mathtext_anchor(labels: list[TickLabel]) -> str | None:
         "end": [lo + e for lo, e in zip(lefts, extents)],
     }
     return min(edges, key=lambda name: spread(edges[name]))
+
+
+def plot_left_edges(root: ET.Element) -> dict[str, float]:
+    """The x of each axes' left plot edge, where its y gridlines, y tick marks or left spine start.
+
+    matplotlib writes a gridline or spine as a path in SVG units (`M 48.6 332.4 L 349.9 332.4`) and a
+    tick mark as a `<use x=...>` of a mark in `<defs>`, all starting at the plot's left edge. A hidden
+    one is not written and a zero-length tick is an empty group, so each subject takes the leftmost x
+    of what is there.
+    """
+    edges: dict[str, float] = {}
+    for group in root.iter():
+        match = Y_EDGE_GID.match(group.get("id") or "")
+        if match is None:
+            continue
+        xs = []
+        for node in group.iter():
+            tag = node.tag.rsplit("}", 1)[-1]
+            start = re.match(rf"\s*M\s*({NUMBER.pattern})", node.get("d") or "") if tag == "path" else None
+            if start:
+                xs.append(float(start.group(1)))
+            elif tag == "use" and NUMBER.fullmatch(node.get("x") or ""):
+                xs.append(float(node.get("x") or 0))
+        if xs:
+            subject = match.group(1)
+            edges[subject] = min([*xs, edges.get(subject, min(xs))])
+    return edges
+
+
+def mathtext_past_plot_edge(labels: list[TickLabel], edge: float | None) -> bool | None:
+    """Whether one axis' MathText labels reach past the plot's left edge; None if there is no edge to judge by.
+
+    Labels of one width line up on every edge, so `mathtext_anchor` cannot tell their alignment; what
+    still shows is where they end. Right-aligned, matplotlib ends them a pad short of the plot's left
+    edge; left-aligned or centred, the same pad is where they start or centre, and they run into the
+    plot. A label's right edge is taken as its last glyph's x plus half that glyph's size, short of
+    any digit's advance, so a right-aligned label never reads as past the edge.
+    """
+    placed = [label for label in labels if label.left is not None and label.extent is not None]
+    if not placed:
+        return False
+    if edge is None:
+        return None
+    return any(
+        (label.left or 0) + (label.extent or 0) + 0.5 * (label.last_size or label.size or 0) > edge + 0.01
+        for label in placed
+    )
 
 
 def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[str]:
@@ -499,14 +557,36 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         )
     labels_left = [label for label in labels if not (label.axis == "y" and label.second)]
     anchors = {label.anchor for label in labels_left if label.axis == "y" and label.anchor is not None}
-    # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit.
+    # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit,
+    # and for labels of one width, off where they end against the plot's left edge.
+    edges = plot_left_edges(root)
+    past, unread = [], []
     for subject in sorted({label.subject for label in labels_left if label.axis == "y"}):
-        anchors.add(mathtext_anchor([label for label in labels_left if label.axis == "y" and label.subject == subject]))
+        axis = [label for label in labels_left if label.axis == "y" and label.subject == subject]
+        anchor = mathtext_anchor(axis)
+        anchors.add(anchor)
+        reach = mathtext_past_plot_edge(axis, edges.get(subject)) if anchor is None else False
+        if reach:
+            past.append(subject)
+        elif reach is None:
+            unread.append(subject)
     off = sorted(a for a in anchors if a not in (None, "end"))
     if off:
         failures.append(
             f"y-axis tick labels are anchored {', '.join(off)}, not right-aligned against the plot. Grapher "
             "right-aligns them; leave matplotlib's default (ha='right') or set it back."
+        )
+    if past:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(past)} run past the plot's left edge, so they are not "
+            "right-aligned against it. Grapher right-aligns them; leave matplotlib's default (ha='right') or set it back."
+        )
+    if unread:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(unread)} are MathText of one width with no y gridline, y tick or "
+            "left spine to measure them against, so their alignment cannot be read from the SVG. Grapher writes a "
+            "log axis in plain numbers (10, 100, 1,000): format the ticks so (ax.yaxis.set_major_formatter), or draw "
+            "grapher's horizontal gridlines."
         )
     # Each axes is judged on its own, so a year axis next to a non-year one is still checked.
     x_texts: dict[str, list[str]] = {}
