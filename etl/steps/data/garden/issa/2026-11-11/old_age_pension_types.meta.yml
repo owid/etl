@@ -1,0 +1,363 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  # Map colors.
+  color_no: &color_no "#e3a38b"
+  color_yes: &color_yes "#2c6fa5"
+  color_yes_detail_1: &color_yes_detail_1 "#6a9fcb"
+  color_yes_detail_2: &color_yes_detail_2 "#a5c6e4"
+  color_yes_detail_3: &color_yes_detail_3 "#1c4870"
+  color_yes_closed: &color_yes_closed "#b8b0c9"
+
+  # Text shared by several indicators.
+  key_mandatory: &key_mandatory |-
+    This data covers the mandatory old-age programs that each country sets in law, as described by the International Social Security Association (ISSA). It doesn't include voluntary pensions.
+  key_several_programs: &key_several_programs |-
+    A country can have several types of programs at once. For example, many countries pair a pension financed by contributions with a means-tested pension for older people with low incomes.
+  key_reference_dates: &key_reference_dates |-
+    The ISSA updates its information region by region. This data is up to date as of July 2023 for most of Europe, January 2024 for Asia and the Pacific and for Eurasia, July 2024 for Africa, and July 2025 for the Americas. We show all countries in 2025, the year of the most recent information.
+  key_closed: &key_closed |-
+    "Yes, closed to new entrants" means the program still pays pensions, but new workers can no longer join it, and it is being phased out.
+  processing_program: &processing_program |-
+    The ISSA marks each country that has the program, sometimes with a footnote that adds detail. We show the mark as "Yes" or "No", and add the footnote's detail to "Yes", for example "Yes, closed to new entrants".
+  processing_classification: &processing_classification |-
+    We classify each country by the programs that new workers join. We leave out the programs the ISSA marks as closed to new entrants and being phased out.
+
+    - A country has a contributory pension if it has a contributory flat-rate or earnings-related pension.
+    - It has a tax-funded pension if it has a means-tested or universal pension, which the government pays for without contributions from workers or employers.
+    - It has mandatory savings if it has a provident fund, a mandatory occupational pension, or individual pension accounts.
+
+  common:
+    unit: ""
+    short_unit: ""
+    processing_level: minor
+    type: ordinal
+    description_processing: *processing_program
+    presentation:
+      attribution_short: ISSA
+      topic_tags:
+        - Government Spending
+        - Poverty
+      grapher_config:
+        hasMapTab: true
+        tab: map
+        chartTypes: []
+        map:
+          hideTimeline: true
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 730
+  owners:
+    - Pablo Arriagada
+
+tables:
+  old_age_pension_types:
+    variables:
+      type_of_public_pension:
+        title: Type of public old-age pension
+        description_short: |-
+          Whether the main public old-age pension is paid for by contributions from workers and employers, or by the government from taxes. In some countries, the only mandatory programs are savings schemes, and the government pays no pension.
+        description_key:
+          - *key_mandatory
+          - |-
+            "Contributory pension" means the country has a pension paid for by contributions from workers, employers or both. Many of these countries also have a tax-funded pension, or require workers to save for retirement.
+          - |-
+            "Tax-funded pension only" means the country has no contributory pension that new workers can join, but pays a means-tested or universal pension from taxes. Many of these countries also require workers to save in individual accounts or a provident fund.
+          - |-
+            "Mandatory savings only" means the only mandatory programs are savings schemes: a provident fund, a mandatory occupational pension, or individual pension accounts. The government pays no regular pension.
+          - *key_reference_dates
+        processing_level: major
+        description_processing: *processing_classification
+        sort:
+          - Contributory pension
+          - Tax-funded pension only
+          - Mandatory savings only
+        presentation:
+          grapher_config:
+            title: What type of public pension do older people get?
+            subtitle: >-
+              Whether the main public old-age pension is paid for by contributions from workers and employers, or by the government from taxes. In some countries, the government pays no pension, and the only mandatory programs are savings schemes.
+            note: >-
+              Programs closed to new workers are not counted. Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  Contributory pension: "#2c6fa5"
+                  Tax-funded pension only: "#58ac8c"
+                  Mandatory savings only: "#e09f46"
+
+      pension_system_mix:
+        title: Mix of mandatory old-age pension programs
+        description_short: |-
+          Which kinds of mandatory programs each country uses to provide income in old age: a pension paid for by contributions, a pension paid for by the government from taxes, and mandatory savings schemes.
+        description_key:
+          - *key_mandatory
+          - |-
+            A "contributory pension" is paid for by contributions from workers, employers or both. Its amount can be flat or depend on past earnings.
+          - |-
+            A "tax-funded pension" is paid for by the government, without contributions from workers or employers. It can go to everyone above a certain age who meets residence rules (a universal pension), or only to those with low incomes or few assets (a means-tested pension).
+          - |-
+            "Mandatory savings" are schemes in which workers or employers must save for retirement: a provident fund, a pension that employers must provide, or individual pension accounts.
+          - *key_reference_dates
+        processing_level: major
+        description_processing: *processing_classification
+        sort:
+          - Contributory pension only
+          - Contributory and tax-funded pensions
+          - Contributory pension and mandatory savings
+          - Contributory and tax-funded pensions, and mandatory savings
+          - Tax-funded pension only
+          - Tax-funded pension and mandatory savings
+          - Mandatory savings only
+        presentation:
+          grapher_config:
+            title: Which mandatory pension programs do countries use?
+            subtitle: >-
+              Countries can pay older people a pension financed by contributions from workers and employers, a pension financed by the government from taxes, or require workers to save for retirement. Many combine them.
+            note: >-
+              Programs closed to new workers are not counted. Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  Contributory pension only: "#1c4870"
+                  Contributory and tax-funded pensions: "#2c6fa5"
+                  Contributory pension and mandatory savings: "#6a9fcb"
+                  Contributory and tax-funded pensions, and mandatory savings: "#a5c6e4"
+                  Tax-funded pension only: "#3a8c6e"
+                  Tax-funded pension and mandatory savings: "#8fcbb0"
+                  Mandatory savings only: "#e09f46"
+
+      contributory_flat_rate:
+        title: Contributory flat-rate pension
+        description_short: |-
+          Whether the country has a pension paid for by contributions from workers, employers or both, whose amount doesn't depend on past earnings.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines a contributory flat-rate pension as a pension whose amount doesn't depend on earnings, but can vary with years of work, years of residence or other factors. Contributions from workers, employers or both pay for it.
+          - |-
+            "Yes, with flat-rate and earnings-related parts" means the pension formula has a flat part and a part based on earnings or years of contributions.
+          - *key_closed
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+          - Yes, with flat-rate and earnings-related parts
+          - Yes, closed to new entrants
+        presentation:
+          grapher_config:
+            title: Which countries have a contributory flat-rate pension?
+            subtitle: >-
+              A pension paid for by contributions from workers, employers or both, whose amount doesn't depend on past earnings. It can vary with years of work or residence.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+                  Yes, with flat-rate and earnings-related parts: *color_yes_detail_1
+                  Yes, closed to new entrants: *color_yes_closed
+
+      contributory_earnings_related:
+        title: Contributory earnings-related pension
+        description_short: |-
+          Whether the country has a pension paid for by contributions from workers, employers or both, whose amount depends on past earnings.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines a contributory earnings-related pension as a pension based on earnings, paid for by contributions from workers, employers or both.
+          - |-
+            "Yes, with flat-rate and earnings-related parts" means the pension formula has a flat part and a part based on earnings or years of contributions.
+          - |-
+            "Yes, based on notional accounts" means each worker's pension equals their own and their employers' contributions plus interest, divided by the average life expectancy at the time of retirement. These schemes are often called notional defined contribution (NDC) schemes.
+          - |-
+            "Yes, the pension equals contributions plus interest" means each worker's pension equals their own and their employers' contributions plus interest.
+          - |-
+            "Yes, workers can choose individual accounts instead" means workers choose between this pension and a mandatory individual account.
+          - *key_closed
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+          - Yes, with flat-rate and earnings-related parts
+          - Yes, based on notional accounts
+          - Yes, with flat-rate and earnings-related parts, based on notional accounts
+          - Yes, the pension equals contributions plus interest
+          - Yes, workers can choose individual accounts instead
+          - Yes, closed to new entrants
+        presentation:
+          grapher_config:
+            title: Which countries have a contributory earnings-related pension?
+            subtitle: >-
+              A pension paid for by contributions from workers, employers or both, whose amount depends on past earnings.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+                  Yes, with flat-rate and earnings-related parts: *color_yes_detail_1
+                  Yes, based on notional accounts: *color_yes_detail_3
+                  Yes, with flat-rate and earnings-related parts, based on notional accounts: *color_yes_detail_3
+                  Yes, the pension equals contributions plus interest: *color_yes_detail_2
+                  Yes, workers can choose individual accounts instead: *color_yes_detail_2
+                  Yes, closed to new entrants: *color_yes_closed
+
+      non_contributory_means_tested:
+        title: Means-tested pension
+        description_short: |-
+          Whether the country has a pension for older people with low incomes or few assets, which the government pays for without contributions from workers or employers.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines a means-tested pension as a pension paid to people whose own or family income, assets or other means are below a set level. The government usually pays for it, without contributions from workers or employers.
+          - *key_closed
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+          - Yes, closed to new entrants
+        presentation:
+          grapher_config:
+            title: Which countries have a means-tested pension for older people?
+            subtitle: >-
+              A pension for older people whose income, assets or other means are below a set level. The government pays for it, without contributions from workers or employers.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+                  Yes, closed to new entrants: *color_yes_closed
+
+      non_contributory_universal:
+        title: Universal pension
+        description_short: |-
+          Whether the country has a pension paid to older people mainly based on residence, not on their earnings or their means, which the government pays for from taxes.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines a universal pension as a pension paid to people based mainly on residence, not on earnings or financial means. The government usually pays for it from general taxes or earmarked taxes, and the people it covers usually don't contribute.
+          - |-
+            "Yes, the amount can vary or be reduced at higher incomes" means the pension is paid regardless of earnings or contributions, but its amount may vary. In some of these countries, it is reduced or not paid if a person's income from work or other pensions is above a certain level.
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+          - Yes, the amount can vary or be reduced at higher incomes
+        presentation:
+          grapher_config:
+            title: Which countries have a universal pension for older people?
+            subtitle: >-
+              A pension paid to older people mainly based on residence, not on their earnings or their means. The government pays for it from taxes.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+                  Yes, the amount can vary or be reduced at higher incomes: *color_yes_detail_1
+
+      provident_fund:
+        title: Provident fund
+        description_short: |-
+          Whether workers and employers must save for retirement in a single, publicly managed fund, which usually pays out a lump sum.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines a provident fund as a single, publicly managed fund where contributions from workers and employers are set aside for each worker. It usually pays out the savings as a lump sum with interest, although some funds also pay regular benefits.
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+        presentation:
+          grapher_config:
+            title: Which countries have a provident fund for retirement?
+            subtitle: >-
+              Workers and employers must save for retirement in a single, publicly managed fund, which usually pays out the savings as a lump sum.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+
+      mandatory_occupational_pension:
+        title: Mandatory occupational pension
+        description_short: |-
+          Whether employers must provide and pay for a pension scheme for their workers.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines a mandatory occupational pension as a pension scheme that employers provide and pay for, in some cases with contributions from workers. It pays out a lump sum, an annuity or a pension.
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+        presentation:
+          grapher_config:
+            title: Which countries require employers to provide a pension?
+            subtitle: >-
+              Employers must provide and pay for a pension scheme for their workers, in some cases with contributions from the workers themselves.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+
+      individual_accounts:
+        title: Mandatory individual pension accounts
+        description_short: |-
+          Whether workers must save for retirement in their own individual account, run by a public or private fund manager.
+        description_key:
+          - *key_mandatory
+          - |-
+            The ISSA defines individual accounts as accounts into which workers, and in some cases employers, must pay a set share of earnings or a fixed amount. A public or private fund manager the worker chooses runs the account. The savings pay for an annuity, regular withdrawals or a mix of the two, and may be paid out as a lump sum.
+          - |-
+            "Yes, with a guaranteed minimum pension" means the government guarantees a minimum pension to the people in these accounts.
+          - |-
+            "Yes, workers can choose social insurance instead" means workers choose between these accounts and a pension paid for by contributions to social insurance.
+          - *key_several_programs
+          - *key_reference_dates
+        sort:
+          - "No"
+          - "Yes"
+          - Yes, with a guaranteed minimum pension
+          - Yes, with a guaranteed minimum pension, workers can choose social insurance instead
+        presentation:
+          grapher_config:
+            title: Which countries require workers to save in individual pension accounts?
+            subtitle: >-
+              Workers must pay part of their earnings into their own retirement account, run by a public or private fund manager.
+            note: >-
+              Information as of 2023 to 2025, depending on the region.
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                customCategoryColors:
+                  "No": *color_no
+                  "Yes": *color_yes
+                  Yes, with a guaranteed minimum pension: *color_yes_detail_1
+                  Yes, with a guaranteed minimum pension, workers can choose social insurance instead: *color_yes_detail_2
