@@ -26,10 +26,6 @@ definitions:
         yAxis:
           min: 0
         originUrl: https://ourworldindata.org/war-and-peace
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
         relatedQuestions:
           - url: https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths
             text: How do different approaches measure armed conflicts and their deaths?
