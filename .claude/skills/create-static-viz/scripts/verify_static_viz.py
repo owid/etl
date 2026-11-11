@@ -19,7 +19,8 @@ plausible, and the problem only shows up once a designer opens the SVG:
 - axes that differ from grapher's own download, which is what the design team's templates are
   balanced for: tick labels not at 15px on a 540-wide template (14px on an 850-wide one), y-axis tick
   labels not right-aligned against the plot, or a year axis with no tick marks (each axes judged on
-  its own, so one panel's count axis cannot hide another's bare year axis). Judged on the
+  its own; an x axis is a year axis when its labels are bare integers, one of four digits, since
+  grapher writes any other number with a thousands separator). Judged on the
   ``<subject>__<axis>-tick-label-<value>`` and ``<subject>__x-tick-<value>`` gids
   ``etl.viz.static.name_furniture`` gives every axis
 - a frame that no longer matches the template it targets, because something reintroduced
@@ -298,7 +299,8 @@ def check_svg(
 # the 540-wide templates, 14 on the 850-wide ones. A label within LABEL_TOLERANCE of it passes.
 TICK_LABEL_PX = {540: 15.0, 850: 14.0}
 LABEL_TOLERANCE = 0.3
-TICK_LABEL = re.compile(r'<g id="([^"]+)__([xy])-tick-label-([^"]+)">\s*<text style="([^"]*)"')
+# Groups: subject, axis, tick value, style, and the label's text as drawn (empty if it is in tspans).
+TICK_LABEL = re.compile(r'<g id="([^"]+)__([xy])-tick-label-([^"]+)">\s*<text style="([^"]*)"[^>]*>([^<]*)')
 TICK_MARK = re.compile(r'<g id="([^"]+)__x-tick-([^"]+?)"(/?)>')
 
 
@@ -306,7 +308,7 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     """Return failures where the axes differ from grapher's own download (module docstring)."""
     failures = []
     labels = TICK_LABEL.findall(svg)
-    y_anchors = [re.search(r"text-anchor:\s*(\w+)", style) for _, axis, _, style in labels if axis == "y"]
+    y_anchors = [re.search(r"text-anchor:\s*(\w+)", style) for _, axis, _, style, _ in labels if axis == "y"]
     off = sorted({m.group(1) for m in y_anchors if m and m.group(1) != "end"})
     if off:
         failures.append(
@@ -314,20 +316,22 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             "right-aligns them; leave matplotlib's default (ha='right') or set it back."
         )
     # Each axes is judged on its own, so a year axis next to a non-year one is still checked.
-    x_values: dict[str, list[str]] = {}
-    for subject, axis, value, _ in labels:
+    x_texts: dict[str, list[str]] = {}
+    for subject, axis, _, _, text in labels:
         if axis == "x":
-            x_values.setdefault(subject, []).append(value)
+            x_texts.setdefault(subject, []).append(text)
     empty_marks: dict[str, list[bool]] = {}
     for m in TICK_MARK.finditer(svg):
         if not m.group(2).startswith("label"):
             empty_marks.setdefault(m.group(1), []).append(m.group(3) == "/")
-    for subject in sorted(x_values):
+    for subject in sorted(x_texts):
         marks = empty_marks.get(subject, [])
-        if is_year_axis(x_values[subject]) and marks and all(marks):
+        if is_year_axis(x_texts[subject]) and marks and all(marks):
             failures.append(
                 f"the year axis of {subject} has no tick marks (every x-tick group is empty). Grapher draws "
-                'them 5px long, 1px, #999, below the axis: ax.tick_params(axis="x", length=5, width=1).'
+                'them 5px long, 1px, #999, below the axis: ax.tick_params(axis="x", length=5, width=1). '
+                "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
+                "(2,000), and this check leaves it alone."
             )
     if target is not None and labels:
         width = target[1][0]
@@ -335,7 +339,10 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         root = SVG_ROOT.search(svg)
         in_pt = bool(root and re.search(r'\bwidth="[0-9.]+pt"', root.group()))
         sizes = {
-            float(m.group(1)) for _, _, _, style in labels for m in [re.search(r"font-size:\s*([0-9.]+)px", style)] if m
+            float(m.group(1))
+            for _, _, _, style, _ in labels
+            for m in [re.search(r"font-size:\s*([0-9.]+)px", style)]
+            if m
         }
         if want and sizes:
             px = {round(s / 0.72 if in_pt else s, 2) for s in sizes}
@@ -349,20 +356,23 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     return failures
 
 
-# A tick value as name_furniture writes it: an integer, plus the `-2`, `-3`, … it adds to a repeated name.
-TICK_INTEGER = re.compile(r"(-?\d+)(?:-\d+)?")
+# A tick label that reads as a year: a bare integer, with no thousands separator, maybe signed or
+# marked BCE/CE. Grapher writes years that way and every other number with a separator (2,000).
+YEAR_LABEL = re.compile(r"[-\u2212]?(\d+)(?: BCE| CE)?")
 
 
-def is_year_axis(values: list[str]) -> bool:
-    """Whether an axis' tick values read as calendar years: all integers, the latest from 1000 to 2100.
+def is_year_axis(texts: list[str]) -> bool:
+    """Whether an axis' tick labels, as drawn, read as years.
 
-    Admits long-run axes that start at 0, at 500 or before year 0, and rules out axes of counts or
-    shares, whose integer ticks rarely top out inside that window.
+    Judged on the label text rather than the tick values, which cannot tell years from a count axis
+    that also ends at 2000: grapher labels that count axis `2,000` and the year `2000`. Every drawn
+    label must be a bare integer and at least one must have four digits, which admits long-run axes
+    that start at 0 or before year 0 and projections that run past 2100, and leaves out axes of
+    shares, rates or small counts. Blank labels (a step thinning the ticks) are skipped.
     """
-    years = [TICK_INTEGER.fullmatch(v) for v in values]
-    if not years or not all(years):
-        return False
-    return 1000 <= max(int(m.group(1)) for m in years if m) <= 2100
+    drawn = [t.strip() for t in texts if t.strip()]
+    years = [YEAR_LABEL.fullmatch(t) for t in drawn]
+    return bool(years) and all(years) and any(len(m.group(1)) >= 4 for m in years if m)
 
 
 def scale_failures(svg: str, target: tuple[str, tuple[int, int]]) -> list[str]:

@@ -626,11 +626,13 @@ def write_axes_frame(
     y_anchor: str = "end",
     tick_marks: bool = True,
     x_values: tuple[int, ...] = (2000, 2010, 2020),
+    x_format: str = "{}",
     second_axes: bool = False,
 ) -> Path:
     """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture.
 
-    `second_axes` adds an `axes2` panel whose x axis counts (0, 50, 100) with tick marks drawn.
+    `x_format` turns each x tick value into its label text. `second_axes` adds an `axes2` panel whose x
+    axis counts (0, 50, 100) with tick marks drawn.
     """
     from PIL import Image
 
@@ -642,7 +644,7 @@ def write_axes_frame(
         else '<g id="axes__x-tick-{v}"/>'
     )
     xs = "".join(
-        f'<g id="xtick_{i}">{mark.format(v=v)}<g id="axes__x-tick-label-{v}"><text style="{style}">{v}</text></g></g>'
+        f'<g id="xtick_{i}">{mark.format(v=v)}<g id="axes__x-tick-label-{v}"><text style="{style}">{x_format.format(v)}</text></g></g>'
         for i, v in enumerate(x_values)
     )
     if second_axes:
@@ -680,6 +682,8 @@ def test_grapher_axes_pass(tmp_path):
         ({"tick_marks": False}, "the year axis of axes has no tick marks"),
         ({"tick_marks": False, "second_axes": True}, "the year axis of axes has no tick marks"),
         ({"tick_marks": False, "x_values": (-500, 0, 500, 1000, 1500, 2000)}, "the year axis of axes has no tick"),
+        ({"tick_marks": False, "x_values": (2000, 2100, 2200, 2300)}, "the year axis of axes has no tick"),
+        ({"tick_marks": False, "x_values": (0, 1000, 2000)}, "with a thousands separator (2,000)"),
     ],
 )
 def test_axes_that_differ_from_grapher_fail(tmp_path, kwargs, message):
@@ -687,8 +691,15 @@ def test_axes_that_differ_from_grapher_fail(tmp_path, kwargs, message):
     assert result.returncode == 1 and message in result.stdout, result.stdout
 
 
-def test_a_count_axis_needs_no_tick_marks(tmp_path):
-    """An x axis of counts or shares is not a year axis, so drawing it without tick marks passes."""
-    frame = write_axes_frame(tmp_path, tick_marks=False, x_values=(0, 25, 50, 75, 100))
-    result = run(VERIFY, frame, "--template", "mobile-square")
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"x_values": (0, 25, 50, 75, 100)},
+        {"x_values": (0, 1000, 2000), "x_format": "{:,}"},
+        {"x_values": (0, 50, 100), "x_format": "{}%"},
+    ],
+)
+def test_a_non_year_axis_needs_no_tick_marks(tmp_path, kwargs):
+    """Shares, small counts and counts labelled with a thousands separator are not years."""
+    result = run(VERIFY, write_axes_frame(tmp_path, tick_marks=False, **kwargs), "--template", "mobile-square")
     assert result.returncode == 0, result.stdout
