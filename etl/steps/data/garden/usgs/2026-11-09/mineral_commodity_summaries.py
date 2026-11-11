@@ -1516,6 +1516,15 @@ def clean_notes(notes):
         return notes_clean
 
     for note in notes:
+        # Remove references to an appendix of the USGS report, which readers of our charts don't have.
+        note = note.replace(
+            " Additional information is available in Appendix C of the Mineral Commodity Summaries, included in this data release, for resource and reserve definitions and information concerning data sources.",
+            "",
+        )
+        appendix_note = "See Appendix C for resource and reserve definitions and information concerning data sources"
+        if appendix_note in note:
+            parts = note.replace(appendix_note, "").split(" -- ")
+            note = " -- ".join(part.strip() for part in parts if part.strip() not in ["", "."])
         if len(note) > 1:
             if "ms excel" in note.lower():
                 # Skip unnecessary notes about how to download the data.
