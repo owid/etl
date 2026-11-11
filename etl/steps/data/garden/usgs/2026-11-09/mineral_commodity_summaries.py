@@ -974,6 +974,11 @@ def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int,
             values = d.loc[is_palladium].set_index("Country")[column]
             d.loc[is_platinum, column] = d.loc[is_platinum, "Country"].map(values)
             d.loc[is_palladium, column] = pd.NA
+    if (year == 2025) & (mineral in ["INDIUM", "MAGNESIUM METAL"]):
+        # The reserves column contains refinery (indium) and smelter (magnesium) capacity, not reserves.
+        # See the capacity tables in the report, and the note "Moved to capacity column not a reserve". Remove it.
+        assert d["Reserves_2024"].notnull().any()
+        d = d.drop(columns=["Reserves_2024", "Reserves_notes"], errors="ignore")
     if (year == 2026) & (mineral == "SCANDIUM"):
         # The only production value is a rough world estimate for 2025 (and scandium is not used). Remove it.
         d = d.drop(columns=["Prod_est_2025"])
