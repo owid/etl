@@ -10,7 +10,7 @@ definitions:
 
   # Text shared by several indicators.
   key_mandatory: &key_mandatory |-
-    This data covers the mandatory old-age programs that each country sets in law, as described by the International Social Security Association (ISSA). It doesn’t include voluntary pensions.
+    This data covers the mandatory old-age programs that each country sets in law, as described by the International Social Security Association (ISSA). It doesn’t include programs that aren’t required by law, such as voluntary pensions, even when most workers take part in them.
   key_several_programs: &key_several_programs |-
     A country can have several types of programs at once. For example, many countries pair a pension financed by contributions with a means-tested pension for older people with low incomes.
   key_reference_dates: &key_reference_dates |-
@@ -47,6 +47,8 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  # The origin's title names the whole ISSA Country Profiles, which have other tables too.
+  title: Types of old-age pension programs (ISSA Country Profiles)
   update_period_days: 730
   owners:
     - Pablo Arriagada
@@ -57,36 +59,38 @@ tables:
       type_of_public_pension:
         title: Type of public old-age pension
         description_short: |-
-          Whether the main public old-age pension is paid for by contributions from workers and employers, or by the government from taxes. In some countries, the only mandatory programs are savings schemes, and the government pays no pension.
+          Whether today’s workers can get a public old-age pension paid for by contributions from workers and employers, or only one paid for by the government from taxes. In some countries, the law sets no public pension, and the only mandatory programs are savings schemes.
         description_key:
           - *key_mandatory
           - |-
-            “Contributory pension” means the country has a pension paid for by contributions from workers, employers, or both. Many of these countries also have a tax-funded pension, or require workers to save for retirement.
+            “Contributory public pension” means the country has a pension paid for by contributions from workers, employers, or both, that new workers can join. Many of these countries also have a tax-funded pension, or require workers to save for retirement.
           - |-
-            “Tax-funded pension only” means the country has no contributory pension that new workers can join, but pays a means-tested or universal pension from taxes. Many of these countries also require workers to save in individual accounts or a provident fund.
+            “Tax-funded public pension only” means the country has no contributory pension that new workers can join, but pays a means-tested or universal pension from taxes. Most of these countries also require workers to save for retirement, in individual accounts, a provident fund, or a mandatory occupational pension. These savings can be the main source of retirement income.
           - |-
-            “Mandatory savings only” means the only mandatory programs are savings schemes: a provident fund, a mandatory occupational pension, or individual pension accounts. The government pays no regular pension.
+            “No public pension, mandatory savings only” means the only mandatory programs are savings schemes: a provident fund, a mandatory occupational pension, or individual pension accounts. The ISSA lists no public pension set in law, although some of these countries pay cash benefits to older people through other programs.
+          - |-
+            The classification describes the system that new workers join. Some countries still pay most of today’s retirees from a contributory scheme that is closed to new entrants, such as Chile, Mexico, and Panama. These countries show as “Tax-funded public pension only”.
           - *key_reference_dates
         processing_level: major
         description_processing: *processing_classification
         sort:
-          - Contributory pension
-          - Tax-funded pension only
-          - Mandatory savings only
+          - Contributory public pension
+          - Tax-funded public pension only
+          - No public pension, mandatory savings only
         presentation:
           grapher_config:
-            title: What type of public pension do older people get?
+            title: What type of public pension do countries offer today’s workers?
             subtitle: >-
-              Whether the main public old-age pension is paid for by contributions from workers and employers, or by the government from taxes. In some countries, the government pays no pension, and the only mandatory programs are savings schemes.
+              Whether countries have a public old-age pension paid for by contributions from workers and employers, or only one paid for by the government from taxes. In some countries, the law sets no public pension, and the only mandatory programs are savings schemes.
             note: >-
               Programs closed to new workers are not counted. Information as of 2023 to 2025, depending on the region.
             map:
               colorScale:
                 customNumericColorsActive: true
                 customCategoryColors:
-                  Contributory pension: "#2c6fa5"
-                  Tax-funded pension only: "#58ac8c"
-                  Mandatory savings only: "#e09f46"
+                  Contributory public pension: "#2c6fa5"
+                  Tax-funded public pension only: "#58ac8c"
+                  No public pension, mandatory savings only: "#e09f46"
 
       pension_system_mix:
         title: Mix of mandatory old-age pension programs
@@ -231,7 +235,7 @@ tables:
           grapher_config:
             title: Which countries have a means-tested pension for older people?
             subtitle: >-
-              A pension for older people whose income, assets, or other means are below a set level. The government pays for it, without contributions from workers or employers.
+              A pension for older people whose income, assets, or other means are below a set level. The government usually pays for it, without contributions from workers or employers.
             note: >-
               Information as of 2023 to 2025, depending on the region.
             map:
@@ -245,7 +249,7 @@ tables:
       non_contributory_universal:
         title: Universal pension
         description_short: |-
-          Whether the country has a pension paid to older people mainly based on residence, not on their earnings or their means, which the government pays for from taxes.
+          Whether the country has a pension paid to older people mainly based on residence, not on their earnings or their means, which the government pays for from taxes. Some countries reduce it at higher incomes.
         description_key:
           - *key_mandatory
           - |-
@@ -262,7 +266,7 @@ tables:
           grapher_config:
             title: Which countries have a universal pension for older people?
             subtitle: >-
-              A pension paid to older people mainly based on residence, not on their earnings or their means. The government pays for it from taxes.
+              A pension paid to older people mainly based on residence, not on their earnings or their means. The government pays for it from taxes, and some countries reduce it at higher incomes.
             note: >-
               Information as of 2023 to 2025, depending on the region.
             map:

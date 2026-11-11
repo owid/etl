@@ -50,10 +50,13 @@ FOOTNOTE_G_LABELS = {
 }
 
 # Labels of the overall classifications.
+# NOTE: Chile's 2025 pension reform adds an employer contribution to a new social insurance scheme from August 2025,
+#  after this release's reference date. If the ISSA now lists it, Chile moves to "Contributory public pension": check
+#  the description_key that names Chile, Mexico and Panama as examples.
 MAIN_TYPE_LABELS = {
-    "contributory": "Contributory pension",
-    "tax_funded": "Tax-funded pension only",
-    "savings": "Mandatory savings only",
+    "contributory": "Contributory public pension",
+    "tax_funded": "Tax-funded public pension only",
+    "savings": "No public pension, mandatory savings only",
 }
 MIX_LABELS = {
     (True, False, False): "Contributory pension only",
