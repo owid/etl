@@ -18,7 +18,8 @@ plausible, and the problem only shows up once a designer opens the SVG:
   tell such marks apart
 - axes that differ from grapher's own download, which is what the design team's templates are
   balanced for: tick labels not at 15px on a 540-wide template (14px on an 850-wide one), y-axis tick
-  labels not right-aligned against the plot, or a year axis with no tick marks. Judged on the
+  labels not right-aligned against the plot, or a year axis with no tick marks (each axes judged on
+  its own, so one panel's count axis cannot hide another's bare year axis). Judged on the
   ``<subject>__<axis>-tick-label-<value>`` and ``<subject>__x-tick-<value>`` gids
   ``etl.viz.static.name_furniture`` gives every axis
 - a frame that no longer matches the template it targets, because something reintroduced
@@ -312,17 +313,21 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             f"y-axis tick labels are anchored {', '.join(off)}, not right-aligned against the plot. Grapher "
             "right-aligns them; leave matplotlib's default (ha='right') or set it back."
         )
-    x_values = [value for _, axis, value, _ in labels if axis == "x"]
-    if x_values and all(re.fullmatch(r"\d{4}", v) for v in x_values):
-        marks = {
-            m.group(2): m.group(3) == "/"
-            for m in TICK_MARK.finditer(svg)
-            if not m.group(2).startswith(("label", "tick2", "minor"))
-        }
-        if marks and all(marks.values()):
+    # Each axes is judged on its own, so a year axis next to a non-year one is still checked.
+    x_values: dict[str, list[str]] = {}
+    for subject, axis, value, _ in labels:
+        if axis == "x":
+            x_values.setdefault(subject, []).append(value)
+    empty_marks: dict[str, list[bool]] = {}
+    for m in TICK_MARK.finditer(svg):
+        if not m.group(2).startswith("label"):
+            empty_marks.setdefault(m.group(1), []).append(m.group(3) == "/")
+    for subject in sorted(x_values):
+        marks = empty_marks.get(subject, [])
+        if is_year_axis(x_values[subject]) and marks and all(marks):
             failures.append(
-                "the year axis has no tick marks (every x-tick group is empty). Grapher draws them 5px long, "
-                '1px, #999, below the axis: ax.tick_params(axis="x", length=5, width=1).'
+                f"the year axis of {subject} has no tick marks (every x-tick group is empty). Grapher draws "
+                'them 5px long, 1px, #999, below the axis: ax.tick_params(axis="x", length=5, width=1).'
             )
     if target is not None and labels:
         width = target[1][0]
@@ -342,6 +347,22 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
                     "the template's type with the design team."
                 )
     return failures
+
+
+# A tick value as name_furniture writes it: an integer, plus the `-2`, `-3`, … it adds to a repeated name.
+TICK_INTEGER = re.compile(r"(-?\d+)(?:-\d+)?")
+
+
+def is_year_axis(values: list[str]) -> bool:
+    """Whether an axis' tick values read as calendar years: all integers, the latest from 1000 to 2100.
+
+    Admits long-run axes that start at 0, at 500 or before year 0, and rules out axes of counts or
+    shares, whose integer ticks rarely top out inside that window.
+    """
+    years = [TICK_INTEGER.fullmatch(v) for v in values]
+    if not years or not all(years):
+        return False
+    return 1000 <= max(int(m.group(1)) for m in years if m) <= 2100
 
 
 def scale_failures(svg: str, target: tuple[str, tuple[int, int]]) -> list[str]:

@@ -619,8 +619,19 @@ def test_finalize_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sket
 # --- verify_static_viz.py: grapher's axes ------------------------------------------------------------
 
 
-def write_axes_frame(tmp_path: Path, *, label_px: float = 15, y_anchor: str = "end", tick_marks: bool = True) -> Path:
-    """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture."""
+def write_axes_frame(
+    tmp_path: Path,
+    *,
+    label_px: float = 15,
+    y_anchor: str = "end",
+    tick_marks: bool = True,
+    x_values: tuple[int, ...] = (2000, 2010, 2020),
+    second_axes: bool = False,
+) -> Path:
+    """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture.
+
+    `second_axes` adds an `axes2` panel whose x axis counts (0, 50, 100) with tick marks drawn.
+    """
     from PIL import Image
 
     stem = tmp_path / "frame_square"
@@ -632,8 +643,14 @@ def write_axes_frame(tmp_path: Path, *, label_px: float = 15, y_anchor: str = "e
     )
     xs = "".join(
         f'<g id="xtick_{i}">{mark.format(v=v)}<g id="axes__x-tick-label-{v}"><text style="{style}">{v}</text></g></g>'
-        for i, v in enumerate((2000, 2010, 2020))
+        for i, v in enumerate(x_values)
     )
+    if second_axes:
+        xs += "".join(
+            f'<g id="xtick_{i + 10}"><g id="axes2__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
+            f'<g id="axes2__x-tick-label-{v}"><text style="{style}">{v}</text></g></g>'
+            for i, v in enumerate((0, 50, 100))
+        )
     ystyle = style.replace("text-anchor: middle", f"text-anchor: {y_anchor}")
     ys = "".join(
         f'<g id="ytick_{i}"><g id="axes__y-tick-{v}"/>'
@@ -660,9 +677,18 @@ def test_grapher_axes_pass(tmp_path):
     [
         ({"label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),
         ({"y_anchor": "start"}, "y-axis tick labels are anchored start"),
-        ({"tick_marks": False}, "the year axis has no tick marks"),
+        ({"tick_marks": False}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": False, "second_axes": True}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": False, "x_values": (-500, 0, 500, 1000, 1500, 2000)}, "the year axis of axes has no tick"),
     ],
 )
 def test_axes_that_differ_from_grapher_fail(tmp_path, kwargs, message):
     result = run(VERIFY, write_axes_frame(tmp_path, **kwargs), "--template", "mobile-square")
     assert result.returncode == 1 and message in result.stdout, result.stdout
+
+
+def test_a_count_axis_needs_no_tick_marks(tmp_path):
+    """An x axis of counts or shares is not a year axis, so drawing it without tick marks passes."""
+    frame = write_axes_frame(tmp_path, tick_marks=False, x_values=(0, 25, 50, 75, 100))
+    result = run(VERIFY, frame, "--template", "mobile-square")
+    assert result.returncode == 0, result.stdout
