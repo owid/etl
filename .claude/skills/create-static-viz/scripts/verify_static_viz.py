@@ -323,7 +323,8 @@ class TickLabel(NamedTuple):
     extent: float | None = None
     # That last glyph's font size, to estimate how far past its x the label ends.
     last_size: float | None = None
-    # A MathText label placed by more than a translate (rotated), so where it sits says nothing of its alignment.
+    # Drawn at an angle, plain or MathText; a MathText label placed by more than a translate counts too,
+    # since where it sits then says nothing of its alignment.
     rotated: bool = False
     # Drawn on the axis' second side (`labelright=True`, `labeltop=True`): matplotlib's `tick-label2`.
     second: bool = False
@@ -368,7 +369,7 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
                         glyph_sizes.append(max((float(f) for f in FONT_SIZE.findall(style)), default=None))
                 parts.append(node.text.strip())
         left = extent = last_size = None
-        rotated = False
+        rotated = _rotated(group)
         if anchor is None and glyph_xs:
             offset = _translate_x(group)
             if offset is None:
@@ -392,6 +393,20 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
             )
         )
     return labels
+
+
+def _rotated(group: ET.Element) -> bool:
+    """Whether any transform in a label group turns it: a `rotate()` by anything but zero.
+
+    matplotlib writes a horizontal plain label with `rotate(-0 x y)` on its `<text>`, a no-op, and a
+    rotated one with `translate(x y) rotate(-45)` there or on a MathText label's group.
+    """
+    for node in group.iter():
+        for name, args in TRANSFORM_STEP.findall(node.get("transform") or ""):
+            numbers = [float(n) for n in NUMBER.findall(args)]
+            if name == "rotate" and numbers and numbers[0] != 0:
+                return True
+    return False
 
 
 def _translate_x(group: ET.Element) -> float | None:
@@ -553,8 +568,8 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     rotated = sorted({label.subject for label in labels if label.axis == "y" and label.rotated})
     if rotated:
         failures.append(
-            f"the y-axis tick labels of {', '.join(rotated)} are rotated MathText, whose alignment cannot be read "
-            "from the SVG. Grapher sets y-axis tick labels horizontal and right-aligned; drop the rotation."
+            f"the y-axis tick labels of {', '.join(rotated)} are rotated, so they no longer form a column against "
+            "the plot. Grapher sets y-axis tick labels horizontal and right-aligned; drop the rotation."
         )
     right = sorted({label.subject for label in labels if label.axis == "y" and label.second})
     if right:

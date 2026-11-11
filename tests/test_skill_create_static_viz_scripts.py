@@ -731,7 +731,7 @@ def test_grapher_axes_pass(tmp_path, kwargs):
         ("right", 13 * 0.72, 0, 1, "tick labels are 13px"),
         ("left", 15 * 0.72, 0, 1, "y-axis tick labels are anchored start"),
         ("center", 15 * 0.72, 0, 1, "y-axis tick labels are anchored middle"),
-        ("left", 15 * 0.72, 45, 1, "the y-axis tick labels of axes are rotated MathText"),
+        ("left", 15 * 0.72, 45, 1, "the y-axis tick labels of axes are rotated"),
         ("right", 15 * 0.72, 0, 0, "the year axis of axes has no tick marks"),
     ],
 )
@@ -876,14 +876,19 @@ def test_a_non_year_axis_needs_no_tick_marks(tmp_path, kwargs):
 
 
 @pytest.mark.parametrize(
-    "x_width, right_labels, message",
+    "x_width, right_labels, y_rotation, y_ha, message",
     [
-        (0, False, "the year axis of axes has no tick marks"),
-        (0.72, True, "the y-axis tick labels of axes are drawn on the right"),
+        (0, False, 0, None, "the year axis of axes has no tick marks"),
+        (0.72, True, 0, None, "the y-axis tick labels of axes are drawn on the right"),
+        # Rotated plain labels pass the anchor check, so only their transform shows the turn.
+        (0.72, False, 45, "right", "the y-axis tick labels of axes are rotated"),
+        (0.72, False, 45, None, "the y-axis tick labels of axes are rotated"),
     ],
 )
-def test_hidden_marks_and_right_side_labels_from_matplotlib_fail(tmp_path, x_width, right_labels, message):
-    """Two ways a real step loses grapher's axes: x ticks at width 0 (a strokeless <use>), and y labels on the right."""
+def test_hidden_marks_and_right_side_labels_from_matplotlib_fail(
+    tmp_path, x_width, right_labels, y_rotation, y_ha, message
+):
+    """Ways a real step loses grapher's axes: x ticks at width 0 (a strokeless <use>), y labels on the right or rotated."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -899,6 +904,10 @@ def test_hidden_marks_and_right_side_labels_from_matplotlib_fail(tmp_path, x_wid
     ax.tick_params(axis="x", length=5 * 0.72, width=x_width)
     if right_labels:
         ax.tick_params(axis="y", labelright=True, labelleft=False)
+    ax.tick_params(axis="y", rotation=y_rotation)
+    if y_ha:
+        for tick_label in ax.get_yticklabels():
+            tick_label.set_horizontalalignment(y_ha)
     export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
     plt.close(fig)
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
