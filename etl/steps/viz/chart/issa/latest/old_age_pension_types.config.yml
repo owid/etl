@@ -11,6 +11,13 @@ default_dimensions:
   program: type_of_public_pension
 
 # Titles, subtitles, notes and map colors come from each indicator's metadata in the garden step.
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: []
+
 dimensions:
   - slug: program
     name: Program
