@@ -374,17 +374,27 @@ COMMODITY_MAPPING = {
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
     ("Sulfur", "Production, all forms, sulfur content"): ("Sulfur", "Processing"),
     ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Processing"),
-    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): None,
-    # NOTE: Talc production is larger than crude talk production.
-    ("Talc and pyrophyllite", "Mine production, crude talc"): None,
-    ("Talc and pyrophyllite", "Mine production, talc"): None,
-    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): None,
+    # NOTE: Each country's row says what it covers (e.g. crude talc). All of them add up to the World total.
+    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): (
+        "Talc and pyrophyllite",
+        "Mine",
+    ),
+    ("Talc and pyrophyllite", "Mine production, crude talc"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, talc"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): ("Talc and pyrophyllite", "Mine"),
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): None,
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): (
+        "Talc and pyrophyllite",
+        "Mine",
+    ),
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
+    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): (
+        "Talc and pyrophyllite",
+        "Mine",
+    ),
     ("Talc and pyrophyllite", "Mine production, estimated"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc, crude", "Mine production, estimated"): None,
+    # NOTE: In the 2025 release, all rows except the US (including the World total) are labelled "Talc, crude".
+    ("Talc, crude", "Mine production, estimated"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
     # NOTE: The following could be mapped to ("Tellurium", "Mine"). However, we decided to discard Tellurium.
