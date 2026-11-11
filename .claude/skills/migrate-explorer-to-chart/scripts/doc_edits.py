@@ -24,6 +24,10 @@ COMPONENT_LABELS = {
 
 def main(references: Path) -> None:
     refs = pd.read_csv(references).fillna("")
+    # An audit run after the swaps finds nothing; keep the doc_edits.md the user worked from.
+    if refs.empty:
+        print(f"No references in {references}; nothing to swap, doc_edits.md left as is.")
+        return
     lines = [
         "# Doc edits",
         "",
@@ -42,8 +46,10 @@ def main(references: Path) -> None:
         for i, r in enumerate(group.to_dict("records"), start=1):
             label = COMPONENT_LABELS.get(r["component"], r["component"])
             lines += [f"### {i}. {label}", ""]
-            if r["find_in_doc"]:
-                lines += [f"Find in doc: `{r['find_in_doc']}`", ""]
+            # The audit gives embeds only the explorer slug as search text; the URL is what's findable.
+            find = f"explorers/{r['explorer']}" if r["component"] == "chart" else r["find_in_doc"]
+            if find:
+                lines += [f"Find in doc: `{find}`", ""]
             lines += ["Old:", "```", r["old_url"], "```", "New:", "```", r["replacement_url"], "```", ""]
     out = references.with_name("doc_edits.md")
     out.write_text("\n".join(lines))
