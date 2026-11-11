@@ -235,7 +235,8 @@ Each assumption starts with a line on its scale: how much it changes the results
     Micronesia, and 10% in Vanuatu).
 
     The stage "data_adjustments" holds everything that makes the chain end exactly on food:
-    a. FAO's own "residuals".
+    a. FAO's own "residuals" (and the gap that FAO closed with negative exports for Iraq's wheat in 2010; see the
+       corrections file).
     b. Rounding. Food keeps FAO's reported nutrients (assumption 2), while the other stages use FAO's rounded tonnes
        times the item's density. This matters most for fish, whose tonnes FBS rounds to the nearest 1,000 tonnes
        (assumption 9).
@@ -644,6 +645,14 @@ def sanity_check_inputs(tb: Table, roles: pd.Series, manual: dict) -> None:
         for code in codes:
             assert code in elements.index, f"Element {code} ({ELEMENTS[code]}) not found in SCL table."
             assert elements[code] == unit, f"Element {code} has unit {elements[code]!r}, expected {unit!r}."
+
+    # No negative values, item by item, except in net figures: stock variation, residuals and tourist consumption (which
+    # FAO reports slightly negative in some countries).
+    signed = ["stock_variation", "residuals", "tourist_consumption"]
+    codes = [code for code, name in ELEMENTS.items() if name not in signed]
+    rows = tb[tb["element_code"].astype(str).isin(codes)]
+    negative = rows[rows["value"] < 0][["country", "year", "item_code", "element_code", "value"]]
+    assert negative.empty, f"Negative values in SCL: {negative.head(10).to_dict('records')}"
 
     table_items = tb[["item_code", "fao_item"]].drop_duplicates().set_index("item_code")["fao_item"].astype(str)
     assert table_items.get(POPULATION_ITEM_CODE) == "Total population", "Population item not found in SCL."
@@ -1153,8 +1162,8 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     if nutrient == "mass":
         signed.append("processing_net")
     for stage in [s for s in STAGES if s not in signed]:
-        # FAO occasionally reports a negative element (Iraq 2010 wheat exports, for one); small negatives are tolerated.
-        assert (tb[stage].fillna(0) >= -0.01 * tb["food"].abs()).all(), (
+        # The tolerance only absorbs floating-point noise.
+        assert (tb[stage].fillna(0) >= -1e-6 * tb["food"].abs()).all(), (
             f"Negative values in stage {stage!r} ({nutrient})."
         )
     chain_end = tb["crop_production"]

@@ -70,3 +70,25 @@
   reason: Molasses feed estimated to absorb the imputed production (2,247,863 t); set to close the balance with the corrected production (75,000 + 81,177 imports - 21,453 exports - 67,406 processing).
   producer: FAOSTAT
   status: open
+
+# Iraq, wheat (item 15), 2010. FAOSTAT reports estimated exports of -62,426 t, the only negative export in SCL and FBS.
+# It closes the wheat balance: production plus imports is 62,426 t short of the uses, while stock variation and
+# residuals are both zero. Exports are set to zero and the gap is moved to FAO's residuals, so that it ends up in
+# "data_adjustments" and the balance still closes. The guards fail the step if FAO revises the figures.
+- indicator: value
+  match: {country: Iraq, year: 2010, item_code: "00000015", element_code: "005910"}
+  action: override
+  value: 0
+  expect: {eq: -62426}
+  reason: Negative exports (-62,426 t), which are impossible; the figure equals the gap that closes the wheat balance.
+  producer: FAOSTAT
+  status: open
+
+- indicator: value
+  match: {country: Iraq, year: 2010, item_code: "00000015", element_code: "005166"}
+  action: override
+  value: -62426
+  expect: {eq: 0}
+  reason: Residuals take over the gap that FAOSTAT closed with negative exports (-62,426 t).
+  producer: FAOSTAT
+  status: open

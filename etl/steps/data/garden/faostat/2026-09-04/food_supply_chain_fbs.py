@@ -183,7 +183,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    FAO publishes FBS tonnages rounded, mostly in units of 1,000 tonnes, so the two sides of the balance identity
    do not close exactly. Food nutrients are retained at their reported precision where the direct density is
    accepted; the other stages still use the rounded tonnages. The gap between those stages and food is included
-   in "data_adjustments", together with FAO's own "residuals", so that the chain ends exactly on "food".
+   in "data_adjustments", together with FAO's own "residuals" (and the gap that FAO closed with negative exports
+   for Iraq's wheat in 2010; see the corrections file), so that the chain ends exactly on "food".
    Keeping the more precise food total changes this adjustment without changing the other flows. The size of
    the gap is kept in the column "balancing_difference" for quality control.
 
@@ -500,6 +501,15 @@ def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], group
         for code in codes:
             assert code in elements.index, f"Element {code} ({ELEMENTS[code]}) not found in FBS table."
             assert elements[code] == unit, f"Element {code} has unit {elements[code]!r}, expected {unit!r}."
+
+    # No negative values, item by item, except in net figures: stock variation, residuals and domestic supply. Processing
+    # is also allowed, because FAO's balances before 2010 report small negative processing for a few items (mostly
+    # beef), and it only feeds "processing_net", which can be negative anyway (assumption 8).
+    signed = ["domestic_supply", "stock_variation_reported", "residuals", "processing"]
+    codes = [code for code, name in ELEMENTS.items() if name not in signed and code not in PER_CAPITA_ELEMENTS]
+    rows = tb[tb["item_code"].astype(str).isin(items.index) & tb["element_code"].astype(str).isin(codes)]
+    negative = rows[rows["value"] < 0][["country", "year", "item_code", "element_code", "value"]]
+    assert negative.empty, f"Negative values in FBS: {negative.head(10).to_dict('records')}"
 
     table_items = tb[["item_code", "fao_item"]].drop_duplicates().set_index("item_code")["fao_item"].astype(str)
     expected_names = {**items["name"].to_dict(), **excluded, **groups}
@@ -865,8 +875,8 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     for stage in [
         s for s in STAGES if s not in ["stock_variation", "data_adjustments", "processing_net", "balancing_difference"]
     ]:
-        # FAO occasionally reports a negative element (Iraq 2010 wheat exports, for one); small negatives are tolerated.
-        assert (tb[stage].fillna(0) >= -0.01 * tb["food"].abs()).all(), (
+        # The tolerance only absorbs floating-point noise.
+        assert (tb[stage].fillna(0) >= -1e-6 * tb["food"].abs()).all(), (
             f"Negative values in stage {stage!r} ({nutrient})."
         )
 
@@ -921,6 +931,8 @@ def run() -> None:
     #
     # Assumption 11: FAO's own regional aggregates are dropped (OWID regions are built later from countries).
     tb_fbsc = tb_fbsc[~tb_fbsc["country"].astype(str).str.contains("(FAO)", regex=False)].reset_index(drop=True)
+    # Known FAOSTAT errors, patched on the input rows so that the regions built below inherit the fix.
+    tb_fbsc = paths.apply_corrections(tb_fbsc)
     sanity_check_inputs(tb_fbsc, items=items, excluded=excluded, groups=groups)
     sanity_check_partition(tb_fbsc, items=items)
 
