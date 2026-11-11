@@ -492,17 +492,24 @@ def plot_left_edges(root: ET.Element) -> dict[str, float]:
     """The x of each axes' left plot edge, where its y gridlines, y tick marks or left spine start.
 
     matplotlib writes a gridline or spine as a path in SVG units (`M 48.6 332.4 L 349.9 332.4`) and a
-    tick mark as a `<use x=...>` of a mark in `<defs>`, all starting at the plot's left edge. A hidden
-    one is not written and a zero-length tick is an empty group, so each subject takes the leftmost x
-    of what is there.
+    tick mark as a `<use x=...>` of a mark in `<defs>`, all starting at the plot's left edge. The
+    first tick group holds that `<defs>` itself, whose mark sits at its own origin (`M 0 0`), so
+    `<defs>` are skipped. A hidden one is not written and a zero-length tick is an empty group, so
+    each subject takes the leftmost x of what is there.
     """
+
+    def drawn(node: ET.Element) -> list[ET.Element]:
+        if node.tag.rsplit("}", 1)[-1] == "defs":
+            return []
+        return [node, *(found for child in node for found in drawn(child))]
+
     edges: dict[str, float] = {}
     for group in root.iter():
         match = Y_EDGE_GID.match(group.get("id") or "")
         if match is None:
             continue
         xs = []
-        for node in group.iter():
+        for node in drawn(group):
             tag = node.tag.rsplit("}", 1)[-1]
             start = re.match(rf"\s*M\s*({NUMBER.pattern})", node.get("d") or "") if tag == "path" else None
             if start:

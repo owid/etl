@@ -777,6 +777,9 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, rot
     [
         ("right", "grid", None),
         ("right", "spine", None),
+        # Drawn y ticks carry their mark's <defs>, at its own origin, which is not the plot edge.
+        ("right", "ticks", None),
+        ("left", "ticks", "the y-axis tick labels of axes run past the plot's left edge"),
         ("left", "grid", "the y-axis tick labels of axes run past the plot's left edge"),
         ("center", "grid", "the y-axis tick labels of axes run past the plot's left edge"),
         ("left", "spine", "the y-axis tick labels of axes run past the plot's left edge"),
@@ -787,7 +790,7 @@ def test_mathtext_labels_of_one_width_are_judged_against_the_plot_edge(tmp_path,
     """A log axis of 10^1, 10^2, 10^3: labels of one width line up on every edge, so where they end is what is read.
 
     `edge` is what marks the plot's left edge in the SVG: grapher's horizontal gridlines, the left
-    spine, or nothing, when the alignment cannot be read at all.
+    spine, drawn y tick marks, or nothing, when the alignment cannot be read at all.
     """
     import matplotlib
 
@@ -804,8 +807,8 @@ def test_mathtext_labels_of_one_width_are_judged_against_the_plot_edge(tmp_path,
     ax.minorticks_off()
     ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
     ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
-    # As the scaffold draws a y axis: no tick marks, and the left spine only when `edge` asks for it.
-    ax.tick_params(axis="y", labelsize=15 * 0.72, length=0)
+    # As the scaffold draws a y axis: no tick marks, and the left spine only, when `edge` asks for them.
+    ax.tick_params(axis="y", labelsize=15 * 0.72, length=5 * 0.72 if edge == "ticks" else 0)
     ax.yaxis.grid(edge == "grid")
     ax.spines["left"].set_visible(edge == "spine")
     for tick_label in ax.get_yticklabels():
