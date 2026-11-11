@@ -49,9 +49,9 @@ LAYOUTS_KEY = re.compile(r'^\s+"([A-Za-z0-9_]+)":\s*\{', re.MULTILINE)
 
 # Per-template slot positions in template px from the top edge, transcribed from TEMPLATES.md for the
 # templates' placeholder two-line subtitle. `note_y` is the desktop `Note:` row; mobile has none.
-# The header rows (title 16, subtitle 80, band top 118) and the 16 px margin are the same on all four.
+# The header rows (title 12, subtitle 74, band top 112) and the 16 px margin are the same on all four.
 SLOTS: dict[str, dict[str, float | bool | None]] = {
-    "horizontal": {"chart_bottom_y": 559, "note_y": 559, "source_y": 591, "footer_y": 609, "full_footer": True},
+    "horizontal": {"chart_bottom_y": 558, "note_y": 558, "source_y": 590, "footer_y": 608, "full_footer": True},
     "vertical": {
         "chart_bottom_y": 1015.81,
         "note_y": 1015.81,
@@ -520,9 +520,9 @@ def layouts_block(slug: str, templates: list[str]) -> str:
             f'    "{name}": {{\n'
             f'        "template": "{template}",\n'
             f'        "margin": 16,\n'
-            f'        "title_y": 16,\n'
-            f'        "subtitle_y": 80,\n'
-            f'        "chart_top_y": 118,\n'
+            f'        "title_y": 12,\n'
+            f'        "subtitle_y": 74,\n'
+            f'        "chart_top_y": 112,\n'
             f'        "chart_bottom_y": {slots["chart_bottom_y"]},\n'
             f'        "note_y": {slots["note_y"]},\n'
             f'        "source_y": {slots["source_y"]},\n'
