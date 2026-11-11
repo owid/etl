@@ -12,7 +12,7 @@ meta:
     attribution_short: NOAA/GML
     url_main: https://gml.noaa.gov/ccgg/trends/gl_data.html
     url_download: https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_gl.csv
-    date_accessed: '2026-10-12'
+    date_accessed: '2026-11-11'
     date_published: '2026-10-09'
     license:
       name: CC BY 4.0
