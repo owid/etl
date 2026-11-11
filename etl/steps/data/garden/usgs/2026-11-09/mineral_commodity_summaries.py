@@ -1107,7 +1107,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
             elif unit_reserves == "thousand carats":
                 d["Reserves_t"] *= THOUSAND_CARATS_TO_TONNES
             elif unit_reserves == "thousand metric dry tons":
-                # TODO: Check this.
+                # NOTE: Dry tons are tonnes of material excluding moisture.
                 d["Reserves_t"] *= 1e3
             elif unit_reserves == "thousand metric tons":
                 d["Reserves_t"] *= 1e3
@@ -1131,7 +1131,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
                 d["Reserves_ore_K2O_equiv_kt"] *= 1e3
                 d = d.rename(columns={"Reserves_ore_K2O_equiv_kt": "Reserves_t"}, errors="raise")
             elif unit_reserves in ["Mt", "mt"]:
-                # TODO: Double-check that "mt" means million tonnes.
+                # NOTE: Some releases write million tonnes as "mt" (e.g. iron ore reserves in the 2024 release).
                 d[f"Reserves_{unit_reserves}"] *= 1e6
                 d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
             elif (unit_reserves == "mcm") & (d["Mineral"].drop_duplicates().item() == "Helium"):  # ty: ignore
@@ -1243,7 +1243,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.Dat
             elif unit_production == "thousand carats":
                 df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
             elif unit_production == "thousand metric dry tons":
-                # TODO: confirm this.
+                # NOTE: Dry tons are tonnes of material excluding moisture.
                 df_production["Production_t"] *= 1e3
             elif unit_production == "thousand metric tons":
                 df_production["Production_t"] *= 1e3
