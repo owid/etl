@@ -640,7 +640,7 @@ def write_axes_frame(
     *,
     label_px: float = 15,
     y_anchor: str = "end",
-    tick_marks: bool | None = True,
+    tick_marks: bool | str | None = True,
     x_values: tuple[int, ...] = (2000, 2010, 2020),
     x_format: str = "{}",
     x_labels: tuple[str, ...] | None = None,
@@ -649,7 +649,8 @@ def write_axes_frame(
 ) -> Path:
     """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture.
 
-    `tick_marks=None` omits the x-tick groups, as matplotlib does for a hidden mark (`bottom=False`).
+    `tick_marks=None` omits the x-tick groups, as matplotlib does for a hidden mark (`bottom=False`), and
+    `"transparent"` writes them at zero opacity, as it does for `tick1line.set_alpha(0)`.
     `x_format` turns each x tick value into its label text, or `x_labels` gives the texts outright.
     `math` writes every label in matplotlib's MathText shape (see `math_label`), the y labels as
     powers of ten. `second_axes` adds an `axes2` panel whose x axis counts (0, 50, 100) with tick marks
@@ -665,7 +666,10 @@ def write_axes_frame(
         return math_label(text, label_px, anchor) if math else f'<text style="{anchor_style}">{text}</text>'
 
     mark = (
-        '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
+        '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" '
+        'style="fill-opacity: 0; stroke: #000000; stroke-opacity: 0; stroke-width: 0.8"/></g></g>'
+        if tick_marks == "transparent"
+        else '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
         if tick_marks
         else '<g id="axes__x-tick-{v}"/>'
         if tick_marks is False
@@ -722,15 +726,20 @@ def test_grapher_axes_pass(tmp_path, kwargs):
 
 
 @pytest.mark.parametrize(
-    "ha, label_pt, message",
+    "ha, label_pt, rotation, tick_alpha, message",
     [
-        ("right", 13 * 0.72, "tick labels are 13px"),
-        ("left", 15 * 0.72, "y-axis tick labels are anchored start"),
-        ("center", 15 * 0.72, "y-axis tick labels are anchored middle"),
+        ("right", 13 * 0.72, 0, 1, "tick labels are 13px"),
+        ("left", 15 * 0.72, 0, 1, "y-axis tick labels are anchored start"),
+        ("center", 15 * 0.72, 0, 1, "y-axis tick labels are anchored middle"),
+        ("left", 15 * 0.72, 45, 1, "the y-axis tick labels of axes are rotated MathText"),
+        ("right", 15 * 0.72, 0, 0, "the year axis of axes has no tick marks"),
     ],
 )
-def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, message):
-    """A real log axis, whose labels matplotlib writes as MathText, is held to the size and alignment."""
+def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, rotation, tick_alpha, message):
+    """A real log axis, whose labels matplotlib writes as MathText, is held to the size and alignment.
+
+    The last case hides the year axis' marks with an alpha of 0, which leaves them in the SVG unpainted.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
@@ -745,11 +754,16 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, mes
     # Exponents of one and two digits, so the labels differ in width and their alignment shows.
     ax.set_yticks([1, 1e5, 1e12])
     ax.minorticks_off()
+    # Year labels written as grapher writes them, so the x axis reads as a year axis.
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
     # Only the MathText labels are off, so only reading them can fail the frame.
     ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
     ax.tick_params(axis="y", labelsize=label_pt)
     for tick_label in ax.get_yticklabels():
         tick_label.set_horizontalalignment(ha)
+        tick_label.set_rotation(rotation)
+    for tick in ax.xaxis.get_major_ticks():
+        tick.tick1line.set_alpha(tick_alpha)
     export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
     plt.close(fig)
     assert "<!-- $" in (tmp_path / "frame_square.svg").read_text(), "matplotlib no longer writes MathText labels"
@@ -765,6 +779,7 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, mes
         ({"y_anchor": "start"}, "y-axis tick labels are anchored start"),
         ({"tick_marks": False}, "the year axis of axes has no tick marks"),
         ({"tick_marks": None}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": "transparent"}, "the year axis of axes has no tick marks"),
         ({"tick_marks": False, "second_axes": True}, "the year axis of axes has no tick marks"),
         ({"tick_marks": False, "x_values": (-500, 0, 500, 1000, 1500, 2000)}, "the year axis of axes has no tick"),
         ({"tick_marks": False, "x_values": (2000, 2100, 2200, 2300)}, "the year axis of axes has no tick"),

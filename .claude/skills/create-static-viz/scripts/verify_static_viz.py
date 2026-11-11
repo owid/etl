@@ -303,12 +303,10 @@ TICK_LABEL_PX = {540: 15.0, 850: 14.0}
 LABEL_TOLERANCE = 0.3
 # Groups: subject, axis. Matched on a whole id, so `-tick-label2-` (the opposite side) is left out.
 TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-tick-label-.+$")
-TICK_MARK = re.compile(r'<g id="([^"]+)__x-tick-([^"]+?)"(/?)>')
+TICK_MARK_GID = re.compile(r"^(.+)__x-tick-(?!label)")
 FONT_SIZE = re.compile(r"font-size:\s*([0-9.]+)px")
 TEXT_ANCHOR = re.compile(r"text-anchor:\s*(\w+)")
-
-
-TRANSLATE = re.compile(r"^\s*translate\(\s*([-+0-9.eE]+)[\s,)]")
+TRANSFORM_STEP = re.compile(r"(\w+)\(([^)]*)\)")
 
 
 class TickLabel(NamedTuple):
@@ -320,9 +318,11 @@ class TickLabel(NamedTuple):
     # A MathText label's left edge and the x of its last glyph from there, in SVG units; None otherwise.
     left: float | None = None
     extent: float | None = None
+    # A MathText label placed by more than a translate (rotated), so where it sits says nothing of its alignment.
+    rotated: bool = False
 
 
-def tick_labels(svg: str) -> list[TickLabel]:
+def tick_labels(root: ET.Element) -> list[TickLabel]:
     """Every `<subject>__<axis>-tick-label-<value>` group, read from its text however deeply it is nested.
 
     A plain label is one `<text>` straight under the group. A MathText label (`$10^5$`) is a comment,
@@ -332,7 +332,7 @@ def tick_labels(svg: str) -> list[TickLabel]:
     carries where it sits (`left`, `extent`), the only trace its alignment leaves (`mathtext_anchor`).
     """
     labels = []
-    for group in ET.fromstring(svg).iter():
+    for group in root.iter():
         match = TICK_LABEL_GID.match(group.get("id") or "")
         if match is None or group.tag.rsplit("}", 1)[-1] != "g":
             continue
@@ -357,28 +357,47 @@ def tick_labels(svg: str) -> list[TickLabel]:
                     glyph_xs += [float(x) for x in [node.get("x")] if x and re.fullmatch(r"[-+0-9.eE]+", x)]
                 parts.append(node.text.strip())
         left = extent = None
+        rotated = False
         if anchor is None and glyph_xs:
             offset = _translate_x(group)
-            if offset is not None:
+            if offset is None:
+                rotated = True
+            else:
                 left, extent = offset + min(glyph_xs), max(glyph_xs) - min(glyph_xs)
-        labels.append(
-            TickLabel(match.group(1), match.group(2), anchor, max(sizes, default=None), "".join(parts), left, extent)
-        )
+        size = max(sizes, default=None)
+        labels.append(TickLabel(match.group(1), match.group(2), anchor, size, "".join(parts), left, extent, rotated))
     return labels
 
 
 def _translate_x(group: ET.Element) -> float | None:
-    """The x offset the transforms under a label group add up to, or None if any is not a plain translate."""
+    """The x offset the transforms under a label group add up to, or None if any does more than translate.
+
+    matplotlib writes a MathText label's transform as `translate(x y)`, followed by `rotate(-45)` when
+    the label is rotated; a rotation of zero is a no-op and is ignored.
+    """
     total = 0.0
     for node in group.iter():
         transform = node.get("transform")
         if node is group or transform is None or node.tag.rsplit("}", 1)[-1] != "g":
             continue
-        m = TRANSLATE.match(transform)
-        if m is None or transform.count("(") > 1:
-            return None
-        total += float(m.group(1))
+        for name, args in TRANSFORM_STEP.findall(transform):
+            numbers = [float(n) for n in re.findall(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?", args)]
+            if name == "translate" and numbers:
+                total += numbers[0]
+            elif not (name == "rotate" and numbers and numbers[0] == 0):
+                return None
     return total
+
+
+def _draws(node: ET.Element, inherited: dict[str, str] | None = None) -> bool:
+    """Whether anything under a node puts a pixel down, after paint inheritance; `<defs>` are skipped."""
+    tag = node.tag.rsplit("}", 1)[-1]
+    if tag == "defs":
+        return False
+    paint = _paint(node, inherited or {})
+    if tag in PAINTABLE and _paints(paint):
+        return True
+    return any(_draws(child, paint) for child in node)
 
 
 def mathtext_anchor(labels: list[TickLabel]) -> str | None:
@@ -414,9 +433,16 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     """Return failures where the axes differ from grapher's own download (module docstring)."""
     failures = []
     try:
-        labels = tick_labels(svg)
+        root = ET.fromstring(svg)
     except ET.ParseError as error:
         return [f"the SVG does not parse as XML ({error}), so its axes could not be checked"]
+    labels = tick_labels(root)
+    rotated = sorted({label.subject for label in labels if label.axis == "y" and label.rotated})
+    if rotated:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(rotated)} are rotated MathText, whose alignment cannot be read "
+            "from the SVG. Grapher sets y-axis tick labels horizontal and right-aligned; drop the rotation."
+        )
     anchors = {label.anchor for label in labels if label.axis == "y" and label.anchor is not None}
     # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit.
     for subject in sorted({label.subject for label in labels if label.axis == "y"}):
@@ -432,16 +458,18 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     for label in labels:
         if label.axis == "x":
             x_texts.setdefault(label.subject, []).append(label.text)
-    empty_marks: dict[str, list[bool]] = {}
-    for m in TICK_MARK.finditer(svg):
-        if not m.group(2).startswith("label"):
-            empty_marks.setdefault(m.group(1), []).append(m.group(3) == "/")
+    drawn_marks: dict[str, list[bool]] = {}
+    for group in root.iter():
+        m = TICK_MARK_GID.match(group.get("id") or "")
+        if m and group.tag.rsplit("}", 1)[-1] == "g":
+            drawn_marks.setdefault(m.group(1), []).append(_draws(group))
     for subject in sorted(x_texts):
-        # matplotlib leaves an empty group for a zero-length mark and none at all for a hidden one
-        # (`bottom=False`, an invisible tick1line); either way nothing is drawn.
-        if is_year_axis(x_texts[subject]) and all(empty_marks.get(subject, [])):
+        # matplotlib leaves an empty group for a zero-length mark, none at all for a hidden one
+        # (`bottom=False`, an invisible tick1line) and a fully transparent one for an alpha of 0;
+        # in each case nothing is drawn.
+        if is_year_axis(x_texts[subject]) and not any(drawn_marks.get(subject, [])):
             failures.append(
-                f"the year axis of {subject} has no tick marks (no x-tick group draws one). Grapher draws "
+                f"the year axis of {subject} has no tick marks (no x-tick group draws a visible one). Grapher draws "
                 "them 5px long, 1px, #999, below the axis, which matplotlib takes in points: "
                 'ax.tick_params(axis="x", length=5 * 0.72, width=0.72). '
                 "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
