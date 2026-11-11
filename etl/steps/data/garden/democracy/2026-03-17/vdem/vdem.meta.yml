@@ -88,7 +88,12 @@ definitions:
     gconfig_c1: &gconfig_c1
       hasMapTab: true
       tab: map
-      chartTypes: *chart_types
+      # Scores centered on zero: no Marimekko, which can't draw negative values.
+      chartTypes:
+        - LineChart
+        - SlopeChart
+        - DiscreteBar
+        - Dumbbell
       yAxis:
         max: 4
         min: -4

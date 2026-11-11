@@ -47,11 +47,11 @@ tables:
         presentation:
           grapher_config:
             title: Democracy Index
+            # The index runs from -10 to 10: no Marimekko, which can't draw negative values.
             chartTypes:
               - LineChart
               - SlopeChart
               - DiscreteBar
-              - Marimekko
               - Dumbbell
             subtitle: |-
               {definitions.subtitle_main}. Expert estimates of the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. The index ranges from -10 to 10 (fully democratic).
