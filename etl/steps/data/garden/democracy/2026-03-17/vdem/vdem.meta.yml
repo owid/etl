@@ -33,6 +33,7 @@ definitions:
       - SlopeChart
       - DiscreteBar
       - Marimekko
+      - Dumbbell
     # 0-1 (10 bins), YlGnBu
     gconfig_a1: &gconfig_a1
       <<: *gconfig_base
@@ -87,6 +88,7 @@ definitions:
     gconfig_c1: &gconfig_c1
       hasMapTab: true
       tab: map
+      chartTypes: *chart_types
       yAxis:
         max: 4
         min: -4

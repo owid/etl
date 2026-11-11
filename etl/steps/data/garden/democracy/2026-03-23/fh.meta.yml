@@ -50,6 +50,8 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -95,6 +97,8 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -186,6 +190,8 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -222,6 +228,7 @@ tables:
               - SlopeChart
               - DiscreteBar
               - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -259,6 +266,7 @@ tables:
               - SlopeChart
               - DiscreteBar
               - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
