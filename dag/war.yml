@@ -65,7 +65,13 @@ steps:
         - data://garden/demography/2024-07-15/population
         - data://garden/countries/2024-08-27/gleditsch
         - data://meadow/war/latest/ucdp_ced:
-          - snapshot://war/latest/ucdp_ced_v26_01_26_06.csv
+          - snapshot://war/latest/ucdp_ced_v26_01_26_09.csv
+
+  # UCDP preview — standalone charts authored in ETL.
+  viz://chart/war/latest/deaths_in_armed_conflicts_by_region:
+    - data://grapher/war/latest/ucdp_preview
+  viz://chart/war/latest/deaths_in_armed_conflicts_by_country:
+    - data://grapher/war/latest/ucdp_preview
 
   # PRIO v3.1
   data://garden/war/2023-09-21/prio_v31:
