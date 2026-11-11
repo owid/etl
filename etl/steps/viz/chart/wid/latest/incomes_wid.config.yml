@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Income shares of the richest
   title_variant: World Inequality Database
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore World Inequality Database data on the distribution of incomes.
 topic_tags:
   - Economic Inequality
 

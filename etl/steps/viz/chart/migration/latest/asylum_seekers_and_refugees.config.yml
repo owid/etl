@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Asylum seekers and refugees
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on refugees and asylum seekers, by country of origin and country of asylum.
 topic_tags:
   - Migration
   - War & Peace

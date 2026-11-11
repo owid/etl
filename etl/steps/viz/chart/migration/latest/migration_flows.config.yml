@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Migration
   title_variant: to and from each country
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore global migration data, country-by-country.
 topic_tags:
   - Migration
 
