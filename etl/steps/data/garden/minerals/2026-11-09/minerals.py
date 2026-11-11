@@ -396,7 +396,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             footnotes_additional.append("This data is adjusted for inflation.")
         if column in COMBINE_BGS_AND_USGS_COLUMNS:
             footnotes_additional.append(
-                "The sum of all countries may exceed World data on certain years (by up to 10%), due to discrepancies between data sources."
+                "The sum of all countries may exceed World data on certain years, due to discrepancies between data sources."
             )
 
         # Add footnotes to metadata.

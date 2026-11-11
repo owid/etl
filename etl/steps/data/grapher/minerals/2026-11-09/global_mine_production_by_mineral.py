@@ -106,7 +106,7 @@ def run() -> None:
     for column in tb.drop(columns=["year"]).columns:
         grapher_config = tb[column].m.presentation.grapher_config
         if grapher_config:
-            # NOTE: Ignore the frequent footnote saying that "The sum of all countries may exceed World data on certain years (by up to 10%), due to discrepancies between data sources."
+            # NOTE: Ignore the frequent footnote saying that "The sum of all countries may exceed World data on certain years, due to discrepancies between data sources."
             if "The sum of all countries" not in grapher_config["note"]:
                 footnotes.append(f"{column} - {grapher_config['note']}")
         # description_key.append(tb[column].metadata.description_short)
