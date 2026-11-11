@@ -89,8 +89,9 @@ name to the user; don't request the review or tag them yourself (see above).
 Create `etl/steps/viz/chart/<ns>/latest/<short>.config.yml` from the explorer step, and a
 `viz://chart/<ns>/latest/<short>` DAG entry with the same direct dependencies. Add a `.py` only if
 the explorer's script does more than load the config and save (a config-only chart step needs
-none). Pin `grapher_schema: "012"` (quoted) at the top: the build fails without it. Leave the `viz://explorer` step and its DAG entry in place: the explorer stays live
-until the redirects exist.
+none). Pin `grapher_schema: "012"` (quoted) at the top: the build fails without it. Leave the
+`viz://explorer` step and its DAG entry in place: the explorer stays live until the redirects
+exist.
 
 Translation of the explorer's `config:` block:
 
@@ -99,19 +100,21 @@ Translation of the explorer's `config:` block:
 | `explorerTitle` | `title.title` (+ `title.title_variant` if needed) |
 | `explorerSubtitle` | `presentation.explorer_subtitle`, with `presentation.page_type: data-explorer` |
 | `selection` | `default_selection` |
-| explorer slug | `slug` (keep the explorer slug, unless it collides with a chart slug) |
+| explorer slug | `slug` (keep the explorer slug; check on production that no `chart_configs.slug`, `chart_slug_redirects.slug` or `multi_dim_data_pages.slug` has it) |
 | `entityType`, `entityTypePlural`, `hasMapTab`, … | the same key in per-view `config` (shared values in `definitions.common_views`) |
 | `hideAnnotationFieldsInTitle: true` | `hideAnnotationFieldsInTitle: {entity: true, time: true, changeInPrefix: true}` |
 | `isPublished`, `subNavId`, `subNavCurrentId`, `thumbnail`, `googleSheet`, `hideAlertBanner`, `yScaleToggle: false` | drop (not grapher keys; `yScaleToggle: true` is `yAxis.canChangeScaleType`) |
 | `pickerColumnSlugs`, `wpBlockId`, `downloadDataLink` | see the flags in step 0 |
 
-In view configs: `type: X` becomes `chartTypes: [X]`, and `relatedQuestionUrl` +
-`relatedQuestionText` become `relatedQuestions: [{url, text}]`. Check any other view key against
+In view configs: `type: X` becomes `chartTypes: [X]`, `yAxisMin: N` becomes `yAxis: {min: N}`,
+and `relatedQuestionUrl` + `relatedQuestionText` become `relatedQuestions: [{url, text}]`. Check any other view key against
 the grapher schema (`https://files.ourworldindata.org/schemas/grapher-schema.012.json`).
 
 Dimensions: `presentation.type: radio` and `checkbox` become `toggle-buttons` (drop
 `choice_slug_true`); `dropdown` stays, or `dropdown-with-search` for long choice lists. Keep the
 dimension and choice slugs unchanged — the view mapping in step 4 is then close to the identity.
+A choice can carry a `description`: a dropdown shows it under the option, and toggle buttons show
+all of them in an info tooltip on the dimension label. Use it for choices whose name is jargon.
 
 In the Python step, `paths.create_explorer(...)` becomes `paths.create_chart(...)`, and
 `c.save(tolerate_extra_indicators=True)` becomes `c.save()`. Add `topic_tags` from the
@@ -135,6 +138,13 @@ baked again (the next push rebuilds staging). Publish it on staging with `PATCH
 <admin_api>/multi-dims/<id>` `{"published": true}` (assert the host is a staging one first), and
 meanwhile review it at the admin preview URL that `etlr` prints.
 
+To preview the gdoc swaps from step 6 on staging, edit the staging DB copy of each doc: `GET
+<admin_api>/gdocs/<id>` (no `contentSource`, so it reads the DB, not Google), replace the URLs from
+`references.csv` in the JSON, `PUT` it back. Saving a published doc re-bakes its page on staging.
+Never edit the Google Doc for a staging preview: it is shared with production. To try a grapher
+branch there, `ssh owid@<staging host>`, check the branch out in `~/owid-grapher`, and `pm2 restart
+admin deploy-queue`; the server stays on that branch afterwards.
+
 Check the default view and a sample of views (every dimension's first and last choice) against
 `https://ourworldindata.org/explorers/<slug>`: same indicators, titles, subtitles, selected
 entities, chart types, tabs. `/check-chart-preview` takes the screenshots.
@@ -144,7 +154,13 @@ entities, chart types, tabs. `/check-chart-preview` takes the screenshots.
 Run `/map-explorer-to-mdim` with the explorer slug and the new multidim's catalogPath, using the
 staging DB (the multidim exists only there). Follow it through `mapping_rules.py`, the build, the
 review HTML and `audit_references.py`. Stop before its preflight and apply steps: those run in
-step 6, on production.
+step 6, on production, after re-extracting there (the multidim's id and config differ).
+
+- Write the `*_MAP` dicts from the explorer config's choice names and slugs; the scaffold's
+  slugified guesses miss any slug that isn't the slugified name.
+- Tell the user to open the review HTML in a regular browser: embedded previewers block its
+  iframes and show empty panes.
+- Run `scripts/doc_edits.py` right after the audit (see step 6) so the user can review the swaps.
 
 ## 5. Announce and get sign-off
 
@@ -163,7 +179,9 @@ from CLAUDE.md and cover:
 - the planned cut-over date.
 
 Put the same summary, without internal links, in the PR body (keep it terse; the repo is public).
-Request the review only once the user says so. Merge once the reviewer signs off. Merging publishes the multidim on production.
+Request the review only once the user says so. Merge once the reviewer signs off. Merging creates
+the multidim on production **unpublished**: the user publishes it in the admin. `/grapher/<slug>`
+then takes a few minutes to go live; poll until it returns 200.
 
 ## 6. Cut over on production
 
@@ -173,17 +191,37 @@ In this order, because creating the redirects darkens the explorer at once:
    gdocs for the multidim. Always hand the user the swaps as a file: run
    `scripts/doc_edits.py --references ai/<slug>-redirects/references.csv`, which writes
    `doc_edits.md` (per doc: where to find each reference, old URL, new URL), and point them to it.
-   The gdoc edits are the user's (or the author's); never edit a Google Doc yourself.
+   The gdoc edits are the user's (or the author's); never edit a Google Doc yourself. An embed
+   can only be repointed once the multidim is published. After the user republishes, check the
+   live page (not only the DB) has no `/explorers/<slug>` left: the page re-bakes a few minutes
+   after the DB changes.
 2. Repoint the site redirects that end on `/explorers/<slug>` (admin `/redirects`) to the
    multidim, so they don't chain.
 3. Re-run `/map-explorer-to-mdim` steps 1–3 and 5–7 against production: extraction, build,
-   reference audit, preflight, apply the bulk payload, `curl -sI` a few views.
+   reference audit, preflight, apply the bulk payload. Preflight checks the DB, not the site, so
+   confirm `/grapher/<slug>` returns 200 before the user pastes the payload. The redirects go live
+   a few minutes after they are created (bake, then a 2-minute edge TTL): poll a few views with
+   `curl -s -o /dev/null -w '%{http_code} %{redirect_url}'` until they return 302, including one
+   with a `country=` param to check it is carried over.
 
 ## 7. Retire the explorer
 
-In a follow-up PR, following CLAUDE.md's archive rule: unpublish the explorer in the admin, remove
-its `viz://explorer` DAG entry → commit → `etl archive-dag` → commit → delete the step files. Then
-tick the explorer in owid/etl#6014.
+The user unpublishes the explorer in the admin (unpublish, don't delete: a deleted explorer row
+breaks chart blocks that still name it). Then, in a follow-up PR (`etl pr "Retire <slug> explorer"
+data`), following CLAUDE.md's archive rule:
+
+1. Remove the `viz://explorer` DAG entry. It often holds the full snapshot → grapher chain of its
+   dataset; move that chain under the `viz://chart` entry so the dataset stays in the DAG.
+   Commit.
+2. `etl archive-dag`. It also sweeps in steps others left un-archived; `git checkout` those files
+   and commit only the explorer's archive entry.
+3. Delete the explorer's `.py` and `.config.yml`. Commit.
+
+Then tick the explorer in owid/etl#6014, pointing the line at `/grapher/<slug>` and both PRs.
+
+Check `snapshots/backport/latest/` for a mirror of the grapher dataset the explorer used before it
+moved into ETL. If that dataset is archived in the DB and none of its variables is used by a chart
+(`chart_dimensions`), delete the mirror files in a separate cleanup PR.
 
 ## Report
 
