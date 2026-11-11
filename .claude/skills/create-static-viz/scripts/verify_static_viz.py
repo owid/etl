@@ -302,7 +302,7 @@ def check_svg(
 TICK_LABEL_PX = {540: 15.0, 850: 14.0}
 LABEL_TOLERANCE = 0.3
 # Groups: subject, axis. Matched on a whole id, so `-tick-label2-` (the opposite side) is left out.
-TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-tick-label-.+$")
+TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-tick-label(2?)-.+$")  # label2: the right (or top) side
 TICK_MARK_GID = re.compile(r"^(.+)__x-tick-(?!label)")
 FONT_SIZE = re.compile(r"font-size:\s*([0-9.]+)px")
 TEXT_ANCHOR = re.compile(r"text-anchor:\s*(\w+)")
@@ -320,6 +320,8 @@ class TickLabel(NamedTuple):
     extent: float | None = None
     # A MathText label placed by more than a translate (rotated), so where it sits says nothing of its alignment.
     rotated: bool = False
+    # Drawn on the axis' second side (`labelright=True`, `labeltop=True`): matplotlib's `tick-label2`.
+    second: bool = False
 
 
 def tick_labels(root: ET.Element) -> list[TickLabel]:
@@ -365,7 +367,19 @@ def tick_labels(root: ET.Element) -> list[TickLabel]:
             else:
                 left, extent = offset + min(glyph_xs), max(glyph_xs) - min(glyph_xs)
         size = max(sizes, default=None)
-        labels.append(TickLabel(match.group(1), match.group(2), anchor, size, "".join(parts), left, extent, rotated))
+        labels.append(
+            TickLabel(
+                match.group(1),
+                match.group(2),
+                anchor,
+                size,
+                "".join(parts),
+                left,
+                extent,
+                rotated,
+                second=match.group(3) == "2",
+            )
+        )
     return labels
 
 
@@ -398,6 +412,40 @@ def _draws(node: ET.Element, inherited: dict[str, str] | None = None) -> bool:
     if tag in PAINTABLE and _paints(paint):
         return True
     return any(_draws(child, paint) for child in node)
+
+
+def _tick_draws(group: ET.Element, defs: dict[str, ET.Element], inherited: dict[str, str] | None = None) -> bool:
+    """Whether a tick-mark group draws a visible mark.
+
+    matplotlib draws a tick as a `<use>` of a line path in `<defs>`. A line has no area, so only its
+    stroke can show: the mark is drawn when the stroke, after inheritance from the group and the
+    `<use>`, is not none, is not transparent, and is wider than 0. `tick_params(width=0)` leaves the
+    `<use>` in place with a strokeless path, which `_draws` would count as a default black fill.
+    """
+    paint = _paint(group, inherited or {})
+    for child in group:
+        tag = child.tag.rsplit("}", 1)[-1]
+        if tag == "use":
+            ref = (child.get("{http://www.w3.org/1999/xlink}href") or child.get("href") or "").lstrip("#")
+            target = defs.get(ref)
+            mark = _paint(target, _paint(child, paint)) if target is not None else _paint(child, paint)
+            if target is not None:
+                for prop, value in STYLE_DECL.findall(target.get("style") or ""):
+                    mark[prop] = value.strip()
+            width = mark.get("stroke-width", "1").replace("px", "")
+            try:
+                wide = float(width) > 0
+            except ValueError:
+                wide = True
+            stroke = mark.get("stroke", "none") != "none" and mark.get("stroke-opacity", "1") not in ("0", "0.0")
+            if stroke and wide and mark.get("opacity", "1") not in ("0", "0.0"):
+                return True
+        elif tag == "g":
+            if _tick_draws(child, defs, paint):
+                return True
+        elif tag in PAINTABLE and _draws(child, paint):
+            return True
+    return False
 
 
 def mathtext_anchor(labels: list[TickLabel]) -> str | None:
@@ -443,10 +491,17 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             f"the y-axis tick labels of {', '.join(rotated)} are rotated MathText, whose alignment cannot be read "
             "from the SVG. Grapher sets y-axis tick labels horizontal and right-aligned; drop the rotation."
         )
-    anchors = {label.anchor for label in labels if label.axis == "y" and label.anchor is not None}
+    right = sorted({label.subject for label in labels if label.axis == "y" and label.second})
+    if right:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(right)} are drawn on the right (labelright). Grapher puts them on the "
+            "left, right-aligned against the plot; draw them there (labelleft=True, labelright=False)."
+        )
+    labels_left = [label for label in labels if not (label.axis == "y" and label.second)]
+    anchors = {label.anchor for label in labels_left if label.axis == "y" and label.anchor is not None}
     # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit.
-    for subject in sorted({label.subject for label in labels if label.axis == "y"}):
-        anchors.add(mathtext_anchor([label for label in labels if label.axis == "y" and label.subject == subject]))
+    for subject in sorted({label.subject for label in labels_left if label.axis == "y"}):
+        anchors.add(mathtext_anchor([label for label in labels_left if label.axis == "y" and label.subject == subject]))
     off = sorted(a for a in anchors if a not in (None, "end"))
     if off:
         failures.append(
@@ -458,11 +513,12 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     for label in labels:
         if label.axis == "x":
             x_texts.setdefault(label.subject, []).append(label.text)
+    defs = {node.get("id"): node for node in root.iter() if node.get("id")}
     drawn_marks: dict[str, list[bool]] = {}
     for group in root.iter():
         m = TICK_MARK_GID.match(group.get("id") or "")
         if m and group.tag.rsplit("}", 1)[-1] == "g":
-            drawn_marks.setdefault(m.group(1), []).append(_draws(group))
+            drawn_marks.setdefault(m.group(1), []).append(_tick_draws(group, defs))
     for subject in sorted(x_texts):
         # matplotlib leaves an empty group for a zero-length mark, none at all for a hidden one
         # (`bottom=False`, an invisible tick1line) and a fully transparent one for an alpha of 0;

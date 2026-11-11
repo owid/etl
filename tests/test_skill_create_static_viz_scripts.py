@@ -669,7 +669,7 @@ def write_axes_frame(
         '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" '
         'style="fill-opacity: 0; stroke: #000000; stroke-opacity: 0; stroke-width: 0.8"/></g></g>'
         if tick_marks == "transparent"
-        else '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
+        else '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" style="stroke: #999999"/></g></g>'
         if tick_marks
         else '<g id="axes__x-tick-{v}"/>'
         if tick_marks is False
@@ -822,3 +822,34 @@ def test_a_non_year_axis_needs_no_tick_marks(tmp_path, kwargs):
     """Shares, small counts and counts labelled with a thousands separator are not years."""
     result = run(VERIFY, write_axes_frame(tmp_path, tick_marks=False, **kwargs), "--template", "mobile-square")
     assert result.returncode == 0, result.stdout
+
+
+@pytest.mark.parametrize(
+    "x_width, right_labels, message",
+    [
+        (0, False, "the year axis of axes has no tick marks"),
+        (0.72, True, "the y-axis tick labels of axes are drawn on the right"),
+    ],
+)
+def test_hidden_marks_and_right_side_labels_from_matplotlib_fail(tmp_path, x_width, right_labels, message):
+    """Two ways a real step loses grapher's axes: x ticks at width 0 (a strokeless <use>), and y labels on the right."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=x_width)
+    if right_labels:
+        ax.tick_params(axis="y", labelright=True, labelleft=False)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+    assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
