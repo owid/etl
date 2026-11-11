@@ -155,8 +155,8 @@ the review page below.
 
 ## 5. Review page (the user signs off here)
 
-Every migration gets one review page, published as an artifact and updated at each later stage.
-Build it as soon as the multidim is on staging:
+Every migration gets one review page, served by a local app and updated at each later stage. Build
+it as soon as the multidim is on staging:
 
 ```bash
 S=.claude/skills/migrate-explorer-to-chart/scripts
@@ -181,13 +181,21 @@ R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
   (history and analytics tables skipped and listed), plus `git grep` of ETL and owid-grapher. It
   finds what the gdoc link index misses (unpublished drafts, chart notes, indicator metadata,
   site code). Each hit gets its new URL from the redirect rules and an edit link.
-- Publish `<review>/index.html` with the Artifact tool, passing the screenshots as `files`
-  (`{"shots/<name>": "<review>/shots/<name>"}`). Republish the same file path at every later
-  stage, so the link stays the same.
+- Serve it with the local app, in the background, and give the user the link:
+
+  ```bash
+  .venv/bin/python $S/review_app.py   # http://localhost:8771/ lists every ai/*-review folder
+  ```
+
+  It embeds the production explorer and the staging multidim as live iframes (an artifact
+  can't: it blocks iframes, and an https page can't frame the http staging server), with a switch
+  to the screenshots. It rebuilds the page on every request, so re-running a script shows on
+  reload. `build_review_page.py` also writes a static `index.html` with screenshots, for sharing
+  with someone who can't reach staging. Rebuild with the new `--stage` at every later stage.
 
 The page has: the checks summary, the explorer and multidim side by side with one set of
 dimension controls, a matrix of every view, the links to replace, the dimension-by-dimension
-mapping, and the redirect JSON. Hand the link to the user; they review it and merge the PR.
+mapping, and the redirect JSON. The user reviews it and merges the PR.
 
 ## 6. Announce and merge
 
@@ -204,7 +212,7 @@ Merging creates the multidim on production **unpublished**: the user publishes i
 
 In this order, because creating the redirects darkens the explorer at once:
 
-1. **Links.** Rebuild the page with `--stage links`, republish. The user (or the doc's author)
+1. **Links.** Rebuild the page with `--stage links`. The user (or the doc's author)
    swaps the links from its "Links to replace" section and republishes each doc; never edit a
    Google Doc yourself. Featured metrics go through `/map-explorer-to-mdim` step 5b with the
    topic owner. Then re-run `scan_references.py`: no reference that breaks on redirect may remain,
@@ -213,8 +221,8 @@ In this order, because creating the redirects darkens the explorer at once:
    multidim, so they don't chain.
 3. **Redirect JSON.** Re-run `/map-explorer-to-mdim` steps 1–3 against production (the payload
    carries each view's config id, which differs from staging), then its `audit_references.py` and
-   `preflight.py`. Rebuild the page with `--payload-env production --stage redirects` and
-   republish: only that version of the JSON is pasteable. Confirm `/grapher/<slug>` returns 200
+   `preflight.py`. Rebuild the page with `--payload-env production --stage redirects`: only that
+   version of the JSON is pasteable. Confirm `/grapher/<slug>` returns 200
    (preflight reads the DB, not the site). After the user pastes it, poll a few views with
    `curl -s -o /dev/null -w '%{http_code} %{redirect_url}'` until they return 302, including one
    with a `country=` param to check it is carried over.

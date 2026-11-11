@@ -61,7 +61,11 @@ def classify(pairs: list[dict], notes: dict) -> None:
         p["verdict"] = "differs" if visible else ("config" if other else "match")
 
 
-def main(review: Path, mapping_dir: Path, payload_env: str, notes_path: Path | None, stage: str) -> None:
+def render_page(review: Path, live: bool = False) -> str:
+    """The page for one review folder, from the inputs recorded in its `review.json`."""
+    cfg = json.loads((review / "review.json").read_text())
+    mapping_dir, payload_env, stage = Path(cfg["mapping_dir"]), cfg["payload_env"], cfg["stage"]
+    notes_path = Path(cfg["notes"]) if cfg.get("notes") else None
     ev = json.loads((review / "eval.json").read_text())
     refs = json.loads((review / "references_full.json").read_text())
     mapping = json.loads((mapping_dir / "mapping.json").read_text())
@@ -76,14 +80,25 @@ def main(review: Path, mapping_dir: Path, payload_env: str, notes_path: Path | N
         "payloadEnv": payload_env,
         "stage": stage,
         "catchAll": mapping["catchAll"],
+        "live": live,
     }
     title = f"{ev['explorer']['slug']} migration"
-    html = TEMPLATE.replace("__TITLE__", title).replace("__DATA__", json.dumps(data).replace("</", "<\\/"))
-    (review / "index.html").write_text(html)
-    verdicts = defaultdict(int)
-    for p in ev["pairs"]:
-        verdicts[p["verdict"]] += 1
-    print(f"{dict(verdicts)} -> {review / 'index.html'}")
+    return TEMPLATE.replace("__TITLE__", title).replace("__DATA__", json.dumps(data).replace("</", "<\\/"))
+
+
+def main(review: Path, mapping_dir: Path, payload_env: str, notes_path: Path | None, stage: str) -> None:
+    cfg = {
+        "mapping_dir": str(mapping_dir),
+        "payload_env": payload_env,
+        "stage": stage,
+        "notes": str(notes_path) if notes_path else None,
+    }
+    (review / "review.json").write_text(json.dumps(cfg, indent=1))
+    # Static copy with screenshots, for sharing with someone who can't reach staging.
+    (review / "index.html").write_text(render_page(review, live=False))
+    ev = json.loads((review / "eval.json").read_text())
+    print(f"{len(ev['pairs'])} views -> {review / 'review.json'}, {review / 'index.html'}")
+    print("Live side by side: .venv/bin/python .claude/skills/migrate-explorer-to-chart/scripts/review_app.py")
 
 
 TEMPLATE = r"""<title>__TITLE__</title>
@@ -145,6 +160,7 @@ button:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(
 .pane-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:.85rem}
 .pane-head b{font-family:var(--display);font-size:.95rem}
 .pane img{display:block;width:100%;height:auto;background:#fff}
+.pane iframe{display:block;width:100%;height:min(78vh,760px);border:0;background:#fff}
 .pane .empty{padding:40px 16px;color:var(--muted);text-align:center}
 .pane-url{padding:6px 12px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
 .difflist{display:flex;flex-direction:column;gap:8px}
@@ -190,7 +206,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="compare">
-    <div class="sec-head"><h2>Side by side</h2><p>Production explorer on the left, staging multidim on the right. The controls pick the explorer view; the right side shows the multidim view it redirects to. Screenshots are from a headless browser at 1280px; open either side live with the links.</p></div>
+    <div class="sec-head"><h2>Side by side</h2><p>Production explorer on the left, staging multidim on the right. The controls pick the explorer view; the right side shows the multidim view it redirects to. Live pages need the staging server reachable (Tailscale); screenshots are from a headless browser at 1280px.</p></div>
     <div class="nav" id="nav"></div>
     <div class="twoup" id="panes"></div>
     <div class="difflist" id="vdiffs"></div>
@@ -262,6 +278,7 @@ let cur = P[0].id, tab = "default";
 const choicesOf = d => [...new Set(P.map(p=>p.explorer_dims[d] ?? ""))];
 $("nav").innerHTML = dimNames.map((d,i)=>`<div class="field"><label for="d${i}">${esc(d)}</label><select id="d${i}" data-d="${esc(d)}">${choicesOf(d).map(v=>`<option value="${esc(v)}">${v===""?"(blank)":esc(v)}</option>`).join("")}</select></div>`).join("")
  + `<div class="field"><label>Tab</label><div class="seg" role="group"><button id="tabDefault" aria-pressed="true">Default tab</button><button id="tabOther" aria-pressed="false">Other tab</button></div></div>`
+ + (D.live ? `<div class="field"><label>Show</label><div class="seg" role="group"><button id="modeLive" aria-pressed="true">Live</button><button id="modeShot" aria-pressed="false">Screenshots</button></div></div>` : "")
  + `<div class="viewbar"><button id="prev" aria-label="Previous view">←</button><span id="vlabel" class="small"></span><button id="nextBtn" aria-label="Next view">→</button></div>`;
 const selects = [...document.querySelectorAll("#nav select")];
 function pickFrom(changed){
@@ -277,14 +294,21 @@ function pickFrom(changed){
 selects.forEach(s => s.addEventListener("change", () => pickFrom(s.dataset.d)));
 $("tabDefault").onclick = () => { tab="default"; render(); };
 $("tabOther").onclick = () => { tab="other"; render(); };
+if (D.live) { $("modeLive").onclick = () => { mode="live"; render(); }; $("modeShot").onclick = () => { mode="shot"; render(); }; }
 const idx = () => P.findIndex(p=>p.id===cur);
 $("prev").onclick = () => go(P[(idx()-1+P.length)%P.length].id);
 $("nextBtn").onclick = () => go(P[(idx()+1)%P.length].id);
 document.addEventListener("keydown", e => { if (e.target.tagName==="SELECT") return; if (e.key==="ArrowLeft") $("prev").click(); if (e.key==="ArrowRight") $("nextBtn").click(); });
 function go(id){ cur = id; try{ localStorage.setItem("view", id) }catch(e){} render(); }
 
+let mode = D.live ? "live" : "shot";
 function pane(side, r, url, label){
-  const live = `<a href="${esc(url)}" target="_blank" rel="noopener">Open live ↗</a>`;
+  const live = `<a href="${esc(r?r.url:url)}" target="_blank" rel="noopener">Open live ↗</a>`;
+  if (mode === "live") {
+    const src = r ? r.url : (tab === "other" ? null : url);
+    const body = src ? `<iframe src="${esc(src)}" title="${esc(label)}" loading="lazy"></iframe>` : `<div class="empty">This view has no second tab.</div>`;
+    return `<div class="pane"><div class="pane-head"><b>${label}</b>${live}</div>${body}<div class="pane-url">${esc(src||url)}</div></div>`;
+  }
   const body = !r ? `<div class="empty">Not rendered for this view${tab==="other"?" (no second tab)":""}.</div>`
     : r.error ? `<div class="empty">Page failed to render: ${esc(r.error)}</div>`
     : `<img src="${esc(r.shot)}" alt="${esc(label)}, ${esc(r.facts.activeTab||"")} tab" loading="lazy">`;
@@ -294,6 +318,7 @@ function render(){
   const p = P.find(x=>x.id===cur);
   selects.forEach(s => { s.value = p.explorer_dims[s.dataset.d] ?? ""; });
   $("tabDefault").setAttribute("aria-pressed", tab==="default"); $("tabOther").setAttribute("aria-pressed", tab==="other");
+  if (D.live) { $("modeLive").setAttribute("aria-pressed", mode==="live"); $("modeShot").setAttribute("aria-pressed", mode==="shot"); }
   const rr = (p.rendered||{})[tab] || null;
   const verdict = {match:'<span class="pill ok">Match</span>', config:'<span class="pill warn">Config differs</span>', differs:'<span class="pill bad">Differs</span>'}[p.verdict];
   $("vlabel").innerHTML = `View ${idx()+1} of ${P.length} · ${verdict}`;
