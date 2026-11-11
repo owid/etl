@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Internal displacement
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on people displaced within their own country by conflict or disasters.
 topic_tags:
   - Migration
   - War & Peace

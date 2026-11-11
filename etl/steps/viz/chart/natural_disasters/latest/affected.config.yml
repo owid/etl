@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: People affected by natural disasters
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on people affected, injured, or left homeless by natural disasters.
 default_selection:
   - World
 topic_tags:

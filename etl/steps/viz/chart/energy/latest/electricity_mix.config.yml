@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: "Electricity mix"
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: "Explore data on electricity generation and sources."
 default_selection:
   - "World"
 default_dimensions:

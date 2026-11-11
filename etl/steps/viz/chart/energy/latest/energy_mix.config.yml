@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: "Energy mix"
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: "Explore data on energy production and sources."
 default_selection:
   - "World"
 default_dimensions:
