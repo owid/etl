@@ -913,3 +913,29 @@ def test_hidden_marks_and_right_side_labels_from_matplotlib_fail(
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
     assert result.returncode == 1 and message in result.stdout, result.stdout
     assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+def test_an_axis_labelled_on_its_minor_ticks_is_checked(tmp_path):
+    """Years written on minor ticks (FixedLocator/FixedFormatter), with the marks hidden, still fail."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FixedFormatter, FixedLocator, NullFormatter, NullLocator
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.xaxis.set_major_locator(NullLocator())
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.xaxis.set_minor_locator(FixedLocator([2000, 2010, 2020]))
+    ax.xaxis.set_minor_formatter(FixedFormatter(["2000", "2010", "2020"]))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", which="minor", labelsize=15 * 0.72, length=0)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    assert "x-minor-tick-label-" in (tmp_path / "frame_square.svg").read_text()
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and "the year axis of axes has no tick marks" in result.stdout, result.stdout

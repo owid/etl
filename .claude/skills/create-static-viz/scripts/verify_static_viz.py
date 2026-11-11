@@ -301,9 +301,10 @@ def check_svg(
 # the 540-wide templates, 14 on the 850-wide ones. A label within LABEL_TOLERANCE of it passes.
 TICK_LABEL_PX = {540: 15.0, 850: 14.0}
 LABEL_TOLERANCE = 0.3
-# Groups: subject, axis. Matched on a whole id, so `-tick-label2-` (the opposite side) is left out.
-TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-tick-label(2?)-.+$")  # label2: the right (or top) side
-TICK_MARK_GID = re.compile(r"^(.+)__x-tick-(?!label)")
+# Groups: subject, axis, side. Major and minor ticks alike (`name_furniture` names both), since an axis
+# can be labelled on its minor ticks alone.
+TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-(?:minor-)?tick-label(2?)-.+$")  # label2: the right (or top) side
+TICK_MARK_GID = re.compile(r"^(.+)__x-(?:minor-)?tick-(?!label)")
 # What marks a y axis' plot edge: its gridlines, tick marks and left spine. Groups: subject.
 Y_EDGE_GID = re.compile(r"^(.+)__(?:y-(?:minor-)?(?:grid|tick)-(?!label)|spine-left$)")
 NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
