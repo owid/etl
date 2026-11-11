@@ -53,10 +53,13 @@ dimensions:
     choices:
       - slug: relative_to_max_sustainable_yield
         name: Relative to Max Sustainable Yield
+        description: Compared with the level at the maximum sustainable yield, the most fish that can be caught each year without the population shrinking. A value of one means the stock is at that level.
       - slug: relative_to_management_target
         name: Relative to management target
+        description: Compared with the target level set by the stock's fishery managers. A value of one means the stock is at its target.
       - slug: total
         name: Total
+        description: The total amount, not compared with any reference level.
 
 views:
   # ---- Fish stocks (biomass) ----
