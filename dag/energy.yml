@@ -45,12 +45,8 @@ steps:
             - data://meadow/eurostat/2025-02-03/producer_prices_in_industry:
               - snapshot://eurostat/2025-02-03/producer_prices_in_industry.gz
 
-  # Impacts of energy production, as a multidim shown as a data explorer (replaces the explorer below).
+  # Impacts of energy production, as a multidim shown as a data explorer.
   viz://chart/energy/latest/impacts_of_energy_sources:
-    - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity
-
-  # Impacts of energy production explorer.
-  viz://explorer/energy/latest/impacts_of_energy_sources:
     # UNECE - Life Cycle Assessment of Electricity Generation Options.
     - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity:
       - data://garden/unece/2026-05-04/life_cycle_assessment_of_electricity:
