@@ -13,7 +13,6 @@ import time
 import zipfile
 from pathlib import Path
 
-import click
 import requests
 from structlog import get_logger
 from tqdm.auto import tqdm
@@ -29,9 +28,9 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Base url for the OGC API-Features endpoint.
 API_BASE_URL = "https://ogcapi.bgs.ac.uk/collections/world-mineral-statistics/items"
 
-# Maximum number of items to request per page (API limit).
-# Testing shows the API can handle larger requests
-PAGE_LIMIT = 20000
+# Maximum number of items to request per page.
+# NOTE: Pages of 20000 records (about 28MB) are cut off by the server before they finish; pages of 5000 work.
+PAGE_LIMIT = 5000
 
 # Seconds to wait between consecutive queries.
 # Reduced to speed up fetching while still being respectful
@@ -83,13 +82,16 @@ def fetch_all_data():
             # Wait before sending next query to be respectful to the server
             time.sleep(TIME_BETWEEN_QUERIES)
 
+    # Fail instead of saving an incomplete snapshot, if the server stopped returning records early.
+    assert len(all_features) == total_records, (
+        f"Fetched {len(all_features):,} records, but the API reports {total_records:,}."
+    )
+
     log.info(f"Successfully fetched {len(all_features):,} records")
     return all_features
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def run(upload: bool) -> None:
+def run(upload: bool = True) -> None:
     """
     Main function to fetch BGS World Mineral Statistics and create a snapshot.
     """
@@ -125,7 +127,3 @@ def run(upload: bool) -> None:
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload, filename=snap.path)
-
-
-if __name__ == "__main__":
-    run()

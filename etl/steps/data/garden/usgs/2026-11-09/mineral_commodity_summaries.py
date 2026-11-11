@@ -21,10 +21,28 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # List years for which snapshots are available.
-YEARS_TO_PROCESS = [2022, 2023, 2024, 2025]
+YEARS_TO_PROCESS = [2022, 2023, 2024, 2025, 2026]
 
 # List all spurious values that appear in the data (after being stripped of empty spaces) and should be replaced by nan.
-NA_VALUES = ["", "NA", "XX", "Large", 'Categorized as "large"', "Very small", "W", "—"]
+# NOTE: In the 2026 release, "s" stands for a note (e.g. "Less than ½ unit" or "Included in World total"), and ranges
+#  (like "190 - 290") appear only for commodities that are not used.
+NA_VALUES = [
+    "",
+    "NA",
+    "XX",
+    "Large",
+    'Categorized as "large"',
+    "Very small",
+    "W",
+    "—",
+    "Moderate",
+    "Moderate to large",
+    "Small",
+    "s",
+    "10,000 - 15,000",
+    "190 - 290",
+    "330 - 390",
+]
 
 # Define common columns.
 # NOTE: Column "Mineral" will be added in processing. It corresponds to the name of the commodity (and it will often be similar to "Type", but less specific).
@@ -36,6 +54,20 @@ MILLION_CARATS_TO_TONNES = 0.2
 THOUSAND_CARATS_TO_TONNES = 0.2e-3
 # Convert million cubic meters of helium to metric tonnes.
 MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
+
+# Units used in the 2026 release, and factors to convert them to tonnes.
+UNITS_TO_TONNES_2026 = {
+    "kilograms": 1e-3,
+    "metric tons": 1,
+    "tons": 1,
+    "thousand metric tons": 1e3,
+    # NOTE: Dry tons are tonnes of material excluding moisture.
+    "thousand metric dry tons": 1e3,
+    "million metric tons": 1e6,
+    "thousands of carats": THOUSAND_CARATS_TO_TONNES,
+    "million carats": MILLION_CARATS_TO_TONNES,
+    "million cubic meters": MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES,
+}
 
 
 # Harmonize commodity-subcommodity names.
@@ -152,7 +184,7 @@ COMMODITY_MAPPING = {
     ("Fluorspar", "Mine production, estimated"): ("Fluorspar", "Mine"),
     ("Gallium", "Primary production"): ("Gallium", "Processing"),
     ("Garnet", "Mine production"): ("Garnet", "Mine"),
-    ("Garnet (industrial)", "Mine production, estimated"): None,
+    ("Garnet (industrial)", "Mine production, estimated"): ("Garnet", "Mine"),
     ("Gemstones", "Mine production, thousand carats of gem diamond"): ("Gemstones", "Mine"),
     ("Gemstones", "Mine production, thousand carats of gem-quality diamond"): ("Gemstones", "Mine"),
     ("Germanium", "Primary and secondary refinery production"): ("Germanium", "Refinery"),
@@ -166,7 +198,7 @@ COMMODITY_MAPPING = {
     ("Gypsum", "Mine production, estimated"): ("Gypsum", "Mine"),
     ("Helium", "Mine production"): ("Helium", "Mine"),
     ("Helium", "Mine production, helium"): ("Helium", "Mine"),
-    ("Helium", "Production, helium gas content"): None,
+    ("Helium", "Production, helium gas content"): ("Helium", "Mine"),
     ("Indium", "Refinery production"): ("Indium", "Refinery"),
     ("Indium", "Refinery production, indium"): ("Indium", "Refinery"),
     ("Iodine", "Mine production"): ("Iodine", "Mine"),
@@ -243,7 +275,7 @@ COMMODITY_MAPPING = {
     ("Mica (natural)", "Mine production, mica sheet"): ("Mica", "Mine, sheet"),
     ("Molybdenum", "Mine production, contained molybdenum"): ("Molybdenum", "Mine"),
     ("Molybdenum", "Molybdenum mine production, contained molybdenum"): ("Molybdenum", "Mine"),
-    ("Molybdenum", "Mine production, molybdenum content"): ("Molybdenum", "Mine production"),
+    ("Molybdenum", "Mine production, molybdenum content"): ("Molybdenum", "Mine"),
     ("Nickel", "Mine production"): ("Nickel", "Mine"),
     ("Nickel", "Mine production - nickel, metric tons contained"): ("Nickel", "Mine"),
     ("Nickel", "Mine production, nickel content"): ("Nickel", "Mine"),
@@ -262,7 +294,7 @@ COMMODITY_MAPPING = {
     ("Perlite", "Mine production, estimated"): ("Perlite", "Mine"),
     ("Phosphate rock", "Mine production"): ("Phosphate rock", "Mine"),
     ("Phosphate rock", "Mine production, phosphate rock ore"): ("Phosphate rock", "Mine"),
-    ("Phosphate rock", "Mine production, marketable phosphate rock"): None,
+    ("Phosphate rock", "Mine production, marketable phosphate rock"): ("Phosphate rock", "Mine"),
     ("Platinum-group metals", "Mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
     ("Platinum-group metals", "World mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
     ("Platinum-group metals", "Mine production, Platinum content"): ("Platinum group metals", "Mine, platinum"),
@@ -342,17 +374,27 @@ COMMODITY_MAPPING = {
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
     ("Sulfur", "Production, all forms, sulfur content"): ("Sulfur", "Processing"),
     ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Processing"),
-    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): None,
-    # NOTE: Talc production is larger than crude talk production.
-    ("Talc and pyrophyllite", "Mine production, crude talc"): None,
-    ("Talc and pyrophyllite", "Mine production, talc"): None,
-    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): None,
+    # NOTE: Each country's row says what it covers (e.g. crude talc). All of them add up to the World total.
+    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): (
+        "Talc and pyrophyllite",
+        "Mine",
+    ),
+    ("Talc and pyrophyllite", "Mine production, crude talc"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, talc"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): ("Talc and pyrophyllite", "Mine"),
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): None,
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): (
+        "Talc and pyrophyllite",
+        "Mine",
+    ),
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
+    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): (
+        "Talc and pyrophyllite",
+        "Mine",
+    ),
     ("Talc and pyrophyllite", "Mine production, estimated"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc, crude", "Mine production, estimated"): None,
+    # NOTE: In the 2025 release, all rows except the US (including the World total) are labelled "Talc, crude".
+    ("Talc, crude", "Mine production, estimated"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
     # NOTE: The following could be mapped to ("Tellurium", "Mine"). However, we decided to discard Tellurium.
@@ -436,6 +478,193 @@ COMMODITY_MAPPING = {
         "Zirconium ores and zircon concentrates, mine production, thousand metric tons, gross weight",
     ): ("Zirconium and hafnium", "Mine"),
     ("Zirconium and hafnium", "Mine production, zirconium, gross weight"): ("Zirconium and hafnium", "Mine"),
+    ####################################################################################################################
+    # Pairs that first appear in the 2026 release.
+    # NOTE: In this release, reserves have their own rows, so they need their own pairs.
+    #  And notes that used to be part of the country name (e.g. "Japan (quicklime only)") are now part of the type.
+    ("Aluminum", "Smelter production"): ("Aluminum", "Smelter"),
+    ("Antimony", "Reserves"): ("Antimony", "Mine"),
+    ("Arsenic", "Production (arsenic trioxide, gross weight)"): ("Arsenic", "Processing"),
+    ("Asbestos", "Reserves"): ("Asbestos", "Mine"),
+    ("Barite", "Reserves"): ("Barite", "Mine"),
+    ("Bauxite and alumina", "Alumina, refinery production"): ("Alumina", "Refinery"),
+    ("Bauxite and alumina", "Bauxite reserves"): ("Bauxite", "Mine"),
+    ("Boron", "Production—All forms"): None,
+    ("Boron", "Production—boric oxide equivalent"): None,
+    ("Boron", "Production—compounds"): None,
+    ("Boron", "Production—crude borates"): None,
+    ("Boron", "Production—crude ore"): None,
+    ("Boron", "Production—datolite ore"): None,
+    ("Boron", "Production—refined borates"): None,
+    ("Boron", "Production—ulexite"): None,
+    ("Boron", "Reserves"): None,
+    ("Boron", "Reserves—boric oxide equivalent"): None,
+    ("Boron", "Reserves—compounds"): None,
+    ("Boron", "Reserves—crude borates"): None,
+    ("Boron", "Reserves—crude ore"): None,
+    ("Boron", "Reserves—datolite ore"): None,
+    ("Boron", "Reserves—refined borates"): None,
+    ("Boron", "Reserves—ulexite"): None,
+    ("Bromine", "Reserves"): ("Bromine", "Processing"),
+    ("Cement", "Cement production"): ("Cement", "Processing"),
+    (
+        "Cesium",
+        "Australia, Canada, China, and Namibia were estimated to have reserves totaling less than 200,000 tons",
+    ): None,
+    ("Chromium", "Mine production"): ("Chromium", "Mine, gross weight"),
+    # NOTE: As in the 2025 release, reserves refer to (gross weight of) ore, not chromium oxide content.
+    ("Chromium", "Reserves: Ore"): ("Chromium", "Mine, gross weight"),
+    ("Chromium", "Reserves: Cr2O3 content"): None,
+    ("Clays", "Mine production: Bentonite"): None,
+    ("Clays", "Mine production: Fuller’s earth"): None,
+    ("Clays", "Mine production: Kaolin"): None,
+    ("Cobalt", "Mine production"): ("Cobalt", "Mine"),
+    ("Cobalt", "Reserves"): ("Cobalt", "Mine"),
+    ("Copper", "Mine production"): ("Copper", "Mine"),
+    ("Copper", "Reserves"): ("Copper", "Mine"),
+    ("Diamond (industrial)", "Reserves"): ("Diamond", "Mine, industrial"),
+    ("Diatomite", "Mine production: processed"): ("Diatomite", "Mine"),
+    ("Diatomite", "Reserves"): ("Diatomite", "Mine"),
+    ("Diatomite", "Reserves: processed"): ("Diatomite", "Mine"),
+    ("Feldspar and nepheline syenite", "Mine production: beneficiated, marketable"): ("Feldspar", "Mine"),
+    ("Feldspar and nepheline syenite", "Mine production: includes pegmatites"): ("Feldspar", "Mine"),
+    ("Feldspar and nepheline syenite", "Reserves"): ("Feldspar", "Mine"),
+    ("Feldspar and nepheline syenite", "Reserves: beneficiated, marketable"): ("Feldspar", "Mine"),
+    ("Feldspar and nepheline syenite", "Reserves: includes pegmatites"): ("Feldspar", "Mine"),
+    ("Fluorspar", "Reserves"): ("Fluorspar", "Mine"),
+    ("Garnet (industrial)", "Mine production"): ("Garnet", "Mine"),
+    ("Garnet (industrial)", "Reserves"): ("Garnet", "Mine"),
+    ("Gemstones", "Mine production"): ("Gemstones", "Mine"),
+    ("Gemstones", "Reserves"): ("Gemstones", "Mine"),
+    ("Gold", "Reserves"): ("Gold", "Mine"),
+    ("Graphite (natural)", "Reserves"): ("Graphite", "Mine"),
+    ("Gypsum", "Reserves"): ("Gypsum", "Mine"),
+    ("Helium and rare gases", "Helium Production"): ("Helium", "Mine"),
+    ("Helium and rare gases", "Helium Reserves"): ("Helium", "Mine"),
+    ("Iodine", "Reserves"): ("Iodine", "Mine"),
+    ("Iron and steel slag", "steel slag production was estimated to be between 190 million and 290 million tons"): None,
+    (
+        "Iron and steel slag",
+        "world iron slag production was estimated to be between 330 million and 390 million tons,",
+    ): None,
+    ("Iron ore", "Mine production: Iron content"): ("Iron ore", "Mine, iron content"),
+    ("Iron ore", "Mine production: Usable ore"): ("Iron ore", "Mine, crude ore"),
+    ("Iron ore", "Reserves (million metric tons): Crude ore"): ("Iron ore", "Mine, crude ore"),
+    ("Iron ore", "Reserves (million metric tons): Iron content"): ("Iron ore", "Mine, iron content"),
+    ("Iron oxide pigments", "Mine production: ocher"): None,
+    ("Iron oxide pigments", "Mine production: ocher and red iron oxide"): None,
+    ("Iron oxide pigments", "Reserves"): None,
+    ("Iron oxide pigments", "Reserves: ocher"): None,
+    ("Iron oxide pigments", "Reserves: ocher and red iron oxide"): None,
+    ("Kyanite and related minerals", "Mine production: andalusite"): None,
+    ("Kyanite and related minerals", "Mine production: andalusite, crude ore"): None,
+    ("Kyanite and related minerals", "Mine production: kyanite"): None,
+    ("Kyanite and related minerals", "Mine production: kyanite and sillimanite"): None,
+    ("Kyanite and related minerals", "Reserves"): None,
+    ("Kyanite and related minerals", "Reserves: andalusite"): None,
+    ("Kyanite and related minerals", "Reserves: andalusite, crude ore"): None,
+    ("Kyanite and related minerals", "Reserves: kyanite"): None,
+    ("Kyanite and related minerals", "Reserves: kyanite and sillimanite"): None,
+    ("Lead", "Reserves"): ("Lead", "Mine"),
+    ("Lime", "Production"): ("Lime", "Processing"),
+    ("Lime", "Production: hydrated and quicklime"): ("Lime", "Processing"),
+    ("Lime", "Production: industrial and construction"): ("Lime", "Processing"),
+    ("Lime", "Production: quicklime only"): ("Lime", "Processing"),
+    ("Lithium", "Mine production"): ("Lithium", "Mine"),
+    ("Lithium", "Reserves"): ("Lithium", "Mine"),
+    ("Magnesium compounds", "Reserves"): ("Magnesium compounds", "Mine"),
+    ("Manganese", "Mine production"): ("Manganese", "Mine"),
+    ("Manganese", "Reserves"): ("Manganese", "Mine"),
+    ("Mercury", "Mine production: exports"): ("Mercury", "Mine"),
+    ("Mica (natural)", "Mica (Scrap and flake): production"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural)", "Mica (Scrap and flake): Reserves"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural)", "Mica (Sheet): Mine production"): ("Mica", "Mine, sheet"),
+    ("Mica (natural)", "Mica (Sheet): Reserves"): ("Mica", "Mine, sheet"),
+    ("Molybdenum", "Mine production"): ("Molybdenum", "Mine"),
+    ("Molybdenum", "Reserves (thousand metric tons)"): ("Molybdenum", "Mine"),
+    ("Nickel", "Reserves"): ("Nickel", "Mine"),
+    ("Niobium (columbium)", "Reserves"): ("Niobium", "Mine"),
+    ("Nitrogen (fixed)—ammonia", "Plant production"): ("Nitrogen", "Fixed ammonia"),
+    ("Peat", "Reserves"): None,
+    ("Perlite", "Production"): ("Perlite", "Mine"),
+    ("Perlite", "Reserves"): ("Perlite", "Mine"),
+    ("Phosphate rock", "Reserves"): ("Phosphate rock", "Mine"),
+    ("Platinum-group metals", "PGM reserves"): ("Platinum group metals", "Mine, platinum"),
+    # NOTE: As in the 2025 release, reserves are given in potassium oxide (K2O) equivalent, not as recoverable ore.
+    ("Potash", "Reserves: K2O equivalent"): ("Potash", "Mine"),
+    ("Potash", "Reserves, Recoverable ore"): None,
+    ("Rare earths", "Mine production"): ("Rare earths", "Mine"),
+    ("Rare earths", "Reserves"): ("Rare earths", "Mine"),
+    ("Rhenium", "Reserves"): ("Rhenium", "Mine"),
+    (
+        "Rubidium",
+        "Australia, Canada, China, and Namibia were estimated to have reserves totaling less than 200,000 tons of recoverable rubidium materials",
+    ): None,
+    # NOTE: Construction sand and gravel, crushed stone, and scandium were not included in earlier releases.
+    ("Sand and gravel (construction)", "Mine production"): None,
+    ("Scandium", "Australia’s reserves (accessible Economic Demonstrated Resources)"): None,
+    ("Selenium", "Refinery production: crude and anode slimes"): ("Selenium", "Refinery"),
+    ("Silicon", "Ferrosilicon"): None,
+    ("Silicon", "Silicon metal"): None,
+    ("Silver", "Reserves"): ("Silver", "Mine"),
+    ("Soda ash", "Mine production: Natural"): ("Soda ash", "Natural"),
+    ("Soda ash", "Mine production: natural"): ("Soda ash", "Natural"),
+    ("Soda ash", "Mine production: natural and synthetic"): ("Soda ash", "Natural and synthetic"),
+    ("Soda ash", "Mine production: synthetic"): ("Soda ash", "Synthetic"),
+    ("Soda ash", "Reserves: Natural"): ("Soda ash", "Natural"),
+    ("Soda ash", "Reserves: natural"): ("Soda ash", "Natural"),
+    ("Soda ash", "Reserves: natural and synthetic"): ("Soda ash", "Natural and synthetic"),
+    ("Soda ash", "Reserves: synthetic"): ("Soda ash", "Synthetic"),
+    ("Stone (crushed)", "Mine production"): None,
+    ("Stone (dimension)", "Mine production"): None,
+    ("Strontium", "Reserves"): ("Strontium", "Mine"),
+    ("Sulfur", "Production, all forms"): ("Sulfur", "Processing"),
+    # NOTE: The talc types (crude, steatite, etc.) are notes on what each country's figure covers (one type per country),
+    #  and all countries add up to the world total. So they are all included.
+    ("Talc and pyrophyllite", "Mine production"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: crude and beneficiated"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: includes crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: includes steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production: unspecified minerals"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: crude and beneficiated"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: includes crude"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: includes steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: steatite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Reserves: unspecified minerals"): ("Talc and pyrophyllite", "Mine"),
+    ("Tantalum", "Reserves"): ("Tantalum", "Mine"),
+    ("Tellurium", "Refinery production"): None,
+    ("Tellurium", "Refinery production: concentrate"): None,
+    ("Tellurium", "Refinery production: copper telluride"): None,
+    ("Tin", "Mine production"): ("Tin", "Mine"),
+    ("Tin", "Reserves"): ("Tin", "Mine"),
+    ("Titanium and titanium dioxide", "Titanium sponge metal production"): None,
+    ("Titanium mineral concentrates", "Mine production: Rutile"): ("Titanium", "Mine, rutile"),
+    ("Titanium mineral concentrates", "Mine production: ilmenite"): ("Titanium", "Mine, ilmenite"),
+    ("Titanium mineral concentrates", "Mine production: ilmenite and rutile"): None,
+    ("Titanium mineral concentrates", "Reserves: Ilmenite"): ("Titanium", "Mine, ilmenite"),
+    ("Titanium mineral concentrates", "Reserves: Rutile"): ("Titanium", "Mine, rutile"),
+    ("Titanium mineral concentrates", "Reserves: ilmenite"): ("Titanium", "Mine, ilmenite"),
+    ("Titanium mineral concentrates", "Reserves: rutile"): ("Titanium", "Mine, rutile"),
+    ("Titanium mineral concentrates", "Reserves: ilmenite and rutile"): None,
+    ("Tungsten", "Mine production"): ("Tungsten", "Mine"),
+    ("Tungsten", "Reserves"): ("Tungsten", "Mine"),
+    ("Vanadium", "Reserves"): ("Vanadium", "Mine"),
+    ("Vermiculite", "Reserves"): None,
+    ("Yttrium", "mine production of Y2O3 equivalent contained in rare-earth mineral concentrates"): None,
+    ("Zinc", "Mine production"): ("Zinc", "Mine"),
+    ("Zinc", "Reserves"): ("Zinc", "Mine"),
+    (
+        "Zirconium and hafnium",
+        "Zirconium mineral concentrates, mine production (thousand metric tons, gross weight)",
+    ): ("Zirconium and hafnium", "Mine"),
+    ("Zirconium and hafnium", "Zirconium reserves(thousand metric tons, ZrO2 content)"): (
+        "Zirconium and hafnium",
+        "Mine",
+    ),
 }
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
@@ -558,6 +787,76 @@ def extract_data_and_metadata_from_compressed_file(zip_file_path: Path):
     return data_for_year
 
 
+def extract_data_from_2026_file(file_path: Path) -> dict[str, dict[str, Any]]:
+    # Since the 2026 release, all commodities are in a single file, with one row per value.
+    # Reshape it into one table per commodity, with the same columns as the world data file of the 2025 release.
+    df = pd.read_csv(file_path, encoding="cp1252", dtype=str)
+
+    # Keep world production and reserves (capacity is ignored, as for earlier releases).
+    df = df[df["Section"].str.startswith("World") & df["Statistics"].isin(["Production", "Reserves"])].reset_index(
+        drop=True
+    )
+
+    # World totals have their own type (e.g. "Mine production: rounded"); use the same type as for countries.
+    df["Type"] = (
+        df["Statistics_detail"].str.replace("\xa0", " ").str.strip().str.replace(r"[:,] rounded$", "", regex=True)
+    )
+
+    # Rare gases are reported in million liters, which cannot be converted to tonnes (and they are not used).
+    df["Unit"] = df["Unit"].str.strip()
+    df = df[df["Unit"] != "million liters"].reset_index(drop=True)
+
+    # Vanadium reserves are labeled "metric tons", but the commodity chapter (mcs2026-vanadium.pdf) gives them in
+    # thousand metric tons (world reserves are 21 million tons). This also happened in the 2025 release.
+    is_vanadium_reserves = (df["MCS chapter"] == "VANADIUM") & (df["Statistics"] == "Reserves")
+    assert set(df.loc[is_vanadium_reserves, "Unit"]) == {"metric tons"}
+    df.loc[is_vanadium_reserves, "Unit"] = "thousand metric tons"
+
+    # Convert all values to tonnes, since units can differ between rows of the same commodity.
+    assert set(df["Unit"]) <= set(UNITS_TO_TONNES_2026), f"Unknown units: {set(df['Unit']) - set(UNITS_TO_TONNES_2026)}"
+    assert set(df[df["Unit"] == "million cubic meters"]["MCS chapter"]) == {"HELIUM AND RARE GASES"}
+    df["Value"] = clean_spurious_values(df["Value"]) * df["Unit"].map(UNITS_TO_TONNES_2026)
+    df = df.dropna(subset=["Value"]).reset_index(drop=True)
+
+    # Production is given for the year before the release, and estimated for the year of the release.
+    assert set(df[df["Statistics"] == "Production"]["Year"]) == {"2024", "2025"}
+    # Reserves are assigned to the year of the release later on (see prepare_reserves_data), so their year is not used.
+    # NOTE: All reserves are for 2025, except chromium ore (labeled 2024) and Australia's scandium (2023, not used).
+    assert set(df[(df["Statistics"] == "Reserves") & (df["Year"] != "2025")]["MCS chapter"]) == {
+        "CHROMIUM",
+        "SCANDIUM",
+    }
+
+    data_for_year = {}
+    for commodity, df_commodity in df.groupby("MCS chapter"):
+        # Create one column of production for each year, and one column of reserves.
+        # NOTE: Reserves have their own rows (with their own type), whereas in earlier releases they shared rows with production.
+        df_production = df_commodity[df_commodity["Statistics"] == "Production"]
+        df_reserves = df_commodity[df_commodity["Statistics"] == "Reserves"]
+        tables = []
+        if len(df_production) > 0:
+            production = df_production.pivot(index=["Country", "Type"], columns="Year", values="Value")
+            production = production.reindex(columns=["2024", "2025"]).rename(
+                columns={"2024": "Prod_2024", "2025": "Prod_est_2025"}
+            )
+            production["Prod_notes"] = df_production.groupby(["Country", "Type"])["Notes"].agg(
+                lambda notes: " -- ".join(notes.dropna().unique()) or pd.NA
+            )
+            tables.append(production)
+        if len(df_reserves) > 0:
+            reserves = df_reserves.set_index(["Country", "Type"])[["Value", "Notes"]].rename(
+                columns={"Value": "Reserves_2025", "Notes": "Reserves_notes"}, errors="raise"
+            )
+            tables.append(reserves)
+        data = pd.concat(tables).reset_index()
+        data["Source"] = "MCS2026"
+        data["Unit_meas"] = "metric tons"
+
+        data_for_year[commodity] = {"data": data, "metadata": {"Commodity": commodity}}
+
+    return data_for_year
+
+
 def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int, mineral: str) -> pd.DataFrame:
     d = data[year][mineral]["data"].copy()
     # Remove empty rows and columns.
@@ -598,9 +897,10 @@ def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int,
         d = d.rename(columns={"Reserves_kt_2023": "Reserves_kt"}, errors="raise")
     if mineral == "POTASH":
         # Reserves are given as "Reserves_ore_kt" and "Reserves_ore_K2O_equiv_kt".
-        # For consistency with other minerals, keep only the former.
+        # Keep only the latter, which is given for all countries (and for the world), in the same unit as production,
+        # and is the one given in the 2025 and 2026 releases.
         # NOTE: This happens for 2023 and 2024, not 2022.
-        d = d.drop(columns=["Reserves_ore_K2O_equiv_kt"], errors="ignore")
+        d = d.drop(columns=["Reserves_ore_kt"], errors="ignore")
     if (year == 2023) & (mineral == "PEAT"):
         # There are spurious notes in "Reserves_kt", and no column for "Reserves_notes".
         # Fix this.
@@ -673,6 +973,25 @@ def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int,
         # So I will fix the unit.
         assert (d["Unit_meas"] == "metric tons").all()
         d["Unit_meas"] = "thousand metric tons"
+    if (year == 2025) & (mineral == "PLATINUM-GROUP METALS"):
+        # Reserves of all platinum-group metals are given in the palladium rows, whereas in other releases they are
+        # given for platinum (see FOOTNOTES). Move them to the platinum rows.
+        is_palladium = d["Type"].str.strip() == "Mine production, Palladium content"
+        is_platinum = d["Type"].str.strip() == "Mine production, Platinum content"
+        assert d.loc[is_platinum, "Reserves_2024"].isnull().all()
+        assert set(d.loc[is_palladium, "Country"]) == set(d.loc[is_platinum, "Country"])
+        for column in [column for column in ["Reserves_2024", "Reserves_notes"] if column in d.columns]:
+            values = d.loc[is_palladium].set_index("Country")[column]
+            d.loc[is_platinum, column] = d.loc[is_platinum, "Country"].map(values)
+            d.loc[is_palladium, column] = pd.NA
+    if (year == 2025) & (mineral in ["INDIUM", "MAGNESIUM METAL"]):
+        # The reserves column contains refinery (indium) and smelter (magnesium) capacity, not reserves.
+        # See the capacity tables in the report, and the note "Moved to capacity column not a reserve". Remove it.
+        assert d["Reserves_2024"].notnull().any()
+        d = d.drop(columns=["Reserves_2024", "Reserves_notes"], errors="ignore")
+    if (year == 2026) & (mineral == "SCANDIUM"):
+        # The only production value is a rough world estimate for 2025 (and scandium is not used). Remove it.
+        d = d.drop(columns=["Prod_est_2025"])
     ############################################################################################################
 
     # Check that all columns are either source, country, type, production, reserves, or capacity.
@@ -702,6 +1021,9 @@ def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int,
 
 
 def clean_spurious_values(series: pd.Series) -> pd.Series:
+    # Values of the 2026 release are already clean (see extract_data_from_2026_file).
+    if pd.api.types.is_numeric_dtype(series):
+        return series.astype("Float64")
     series = series.copy()
     # Remove spurious spaces like "   NA".
     series = series.fillna("").astype(str).str.strip()
@@ -752,7 +1074,11 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
         d[column_reserves] = clean_spurious_values(series=d[column_reserves])
 
         # Fix units.
-        if d["Source"].iloc[0] == "MCS2025":
+        if d["Source"].iloc[0] == "MCS2026":
+            # Values were already converted to tonnes when reading the file.
+            assert _column_reserves == ["Reserves_2025"]
+            d = d.rename(columns={"Reserves_2025": "Reserves_t"}, errors="raise")
+        elif d["Source"].iloc[0] == "MCS2025":
             assert len(d["Unit_meas"].unique()) == 1
             unit_reserves = d["Unit_meas"].unique()[0]
             assert unit_reserves in [
@@ -796,7 +1122,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
             elif unit_reserves == "thousand carats":
                 d["Reserves_t"] *= THOUSAND_CARATS_TO_TONNES
             elif unit_reserves == "thousand metric dry tons":
-                # TODO: Check this.
+                # NOTE: Dry tons are tonnes of material excluding moisture.
                 d["Reserves_t"] *= 1e3
             elif unit_reserves == "thousand metric tons":
                 d["Reserves_t"] *= 1e3
@@ -805,7 +1131,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
 
         else:
             unit_reserves = "_".join(column_reserves.split("_")[1:])
-            assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
+            assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt", "ore_K2O_equiv_kt"]
             if unit_reserves in ["mct", "million carats"]:
                 d["Reserves_mct"] *= MILLION_CARATS_TO_TONNES
                 d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
@@ -816,8 +1142,11 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
                 d["Reserves_ore_kt"] *= 1e3
                 d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
                 # A footnote will mention that reserves refer to ore (see FOOTNOTES).
+            elif unit_reserves == "ore_K2O_equiv_kt":
+                d["Reserves_ore_K2O_equiv_kt"] *= 1e3
+                d = d.rename(columns={"Reserves_ore_K2O_equiv_kt": "Reserves_t"}, errors="raise")
             elif unit_reserves in ["Mt", "mt"]:
-                # TODO: Double-check that "mt" means million tonnes.
+                # NOTE: Some releases write million tonnes as "mt" (e.g. iron ore reserves in the 2024 release).
                 d[f"Reserves_{unit_reserves}"] *= 1e6
                 d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
             elif (unit_reserves == "mcm") & (d["Mineral"].drop_duplicates().item() == "Helium"):  # ty: ignore
@@ -899,7 +1228,10 @@ def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.Dat
             df_production = pd.concat([df_production, _df_for_year], ignore_index=True)
 
         # Fix units.
-        if d["Source"].iloc[0] == "MCS2025":
+        if d["Source"].iloc[0] == "MCS2026":
+            # Values were already converted to tonnes when reading the file.
+            pass
+        elif d["Source"].iloc[0] == "MCS2025":
             assert len(d["Unit_meas"].unique()) == 1
             unit_production = d["Unit_meas"].iloc[0]
             assert unit_production in [
@@ -926,7 +1258,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.Dat
             elif unit_production == "thousand carats":
                 df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
             elif unit_production == "thousand metric dry tons":
-                # TODO: confirm this.
+                # NOTE: Dry tons are tonnes of material excluding moisture.
                 df_production["Production_t"] *= 1e3
             elif unit_production == "thousand metric tons":
                 df_production["Production_t"] *= 1e3
@@ -1199,6 +1531,15 @@ def clean_notes(notes):
         return notes_clean
 
     for note in notes:
+        # Remove references to an appendix of the USGS report, which readers of our charts don't have.
+        note = note.replace(
+            " Additional information is available in Appendix C of the Mineral Commodity Summaries, included in this data release, for resource and reserve definitions and information concerning data sources.",
+            "",
+        )
+        appendix_note = "See Appendix C for resource and reserve definitions and information concerning data sources"
+        if appendix_note in note:
+            parts = note.replace(appendix_note, "").split(" -- ")
+            note = " -- ".join(part.strip() for part in parts if part.strip() not in ["", "."])
         if len(note) > 1:
             if "ms excel" in note.lower():
                 # Skip unnecessary notes about how to download the data.
@@ -1252,8 +1593,12 @@ def run() -> None:
     # Retrieve snapshots and gather all their contents.
     data = {}
     for year in YEARS_TO_PROCESS:
-        snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
-        data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
+        if year >= 2026:
+            snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.csv")
+            data[year] = extract_data_from_2026_file(file_path=snap.path)
+        else:
+            snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
+            data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
 
     #
     # Process data.
@@ -1337,7 +1682,7 @@ def run() -> None:
 
     ####################################################################################################################
     # Corrections to USGS current data: known upstream data errors, declared in
-    # mineral_commodity_summaries.corrections.yml (Australia zinc reserves 2022, Kazakhstan asbestos 2020).
+    # mineral_commodity_summaries.corrections.yml.
     tb_flat = paths.apply_corrections(tb_flat)
 
     # As explained above (in the mapping) Chromium production is in gross weight, but reserves are not.

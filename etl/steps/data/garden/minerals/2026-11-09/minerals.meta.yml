@@ -7,6 +7,10 @@ definitions:
       - Due to the inherent uncertainties in the data for certain minerals and countries, we allowed a maximum deviation of 10% between the global totals reported by USGS and the calculated ones for BGS. If the deviation exceeded this threshold, we excluded the BGS data.
       - The calculated global total from BGS data was used only on exceptional occasions, after ensuring that the resulting aggregate was sufficiently complete.
       - Both BGS and USGS datasets include numerous notes and footnotes. We have retained most of these, making only minor edits or deletions where necessary to maintain clarity.
+    # Show the previous year's value in maps and bar charts when a country has no value in the latest year.
+    # NOTE: USGS names only the largest producers in its latest year, and BGS data ends one year earlier.
+    display:
+      tolerance: 1
     presentation:
       topic_tags:
         - Metals & Minerals

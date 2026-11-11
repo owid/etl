@@ -202,6 +202,7 @@ COMMODITY_MAPPING = {
     ("Ferro-alloys", "Fe-Ti, Fe-W, Fe-Mo, Fe-V"): None,
     ("Ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,
     ("Ferro-alloys", "Ferro-Alloys (Ferro-silicon & silicon metal)"): None,
+    ("Ferro-alloys", "Ferro-Alloys (Silico-manganese)"): None,
     ("Ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): None,
     ("Ferro-alloys", "Ferro-alloys"): None,
     ("Ferro-alloys", "Ferro-aluminium"): None,
