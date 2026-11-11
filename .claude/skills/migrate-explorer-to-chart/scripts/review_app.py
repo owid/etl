@@ -14,6 +14,7 @@ Usage:
 
 import argparse
 import html
+import importlib
 import json
 import mimetypes
 import sys
@@ -22,7 +23,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).parent))
-from build_review_page import render_page  # noqa: E402
+import build_review_page  # noqa: E402
 
 
 def reviews(root: Path) -> dict[str, Path]:
@@ -77,7 +78,10 @@ def make_handler(root: Path):
                         self.send_header("Location", f"/{parts[0]}/")
                         return self.end_headers()
                     page = "<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
-                    return self.send(200, (page + render_page(d, live=True)).encode(), "text/html; charset=utf-8")
+                    # Reload the builder too, so edits to its template show without a restart.
+                    importlib.reload(build_review_page)
+                    body = page + build_review_page.render_page(d, live=True)
+                    return self.send(200, body.encode(), "text/html; charset=utf-8")
                 f = (d / "/".join(parts[1:])).resolve()
                 if d.resolve() not in f.parents or not f.is_file():
                     return self.send(404, b"Not found", "text/plain")
