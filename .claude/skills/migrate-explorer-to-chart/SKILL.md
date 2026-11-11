@@ -128,6 +128,11 @@ git push
 STAGING=1 .venv/bin/etlr viz://chart/<ns>/latest/<short> --grapher
 ```
 
+A new multidim lands unpublished, and `/grapher/<slug>` on staging stays 404 until the site is
+baked again (the next push rebuilds staging). Publish it on staging with `PATCH
+<admin_api>/multi-dims/<id>` `{"published": true}` (assert the host is a staging one first), and
+meanwhile review it at the admin preview URL that `etlr` prints.
+
 Check the default view and a sample of views (every dimension's first and last choice) against
 `https://ourworldindata.org/explorers/<slug>`: same indicators, titles, subtitles, selected
 entities, chart types, tabs. `/check-chart-preview` takes the screenshots.
