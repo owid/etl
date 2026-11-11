@@ -170,7 +170,10 @@ Request the review only once the user says so. Merge once the reviewer signs off
 In this order, because creating the redirects darkens the explorer at once:
 
 1. Repoint featured metrics (`/map-explorer-to-mdim` step 5b) and swap embedded explorers in
-   gdocs for the multidim.
+   gdocs for the multidim. Always hand the user the swaps as a file: run
+   `scripts/doc_edits.py --references ai/<slug>-redirects/references.csv`, which writes
+   `doc_edits.md` (per doc: where to find each reference, old URL, new URL), and point them to it.
+   The gdoc edits are the user's (or the author's); never edit a Google Doc yourself.
 2. Repoint the site redirects that end on `/explorers/<slug>` (admin `/redirects`) to the
    multidim, so they don't chain.
 3. Re-run `/map-explorer-to-mdim` steps 1–3 and 5–7 against production: extraction, build,

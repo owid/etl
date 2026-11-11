@@ -77,12 +77,8 @@ steps:
       - data://meadow/iucn/2026-01-05/iucn_number_each_status:
         - snapshot://iucn/2026-01-05/iucn_number_each_status.csv
 
-  # Fish stocks, as a multidim shown as a data explorer (replaces the explorer below).
+  # Fish stocks, as a multidim shown as a data explorer.
   viz://chart/biodiversity/latest/fish_stocks:
-    - data://grapher/biodiversity/2024-10-30/fish_stocks
-
-  # Fish stocks explorer.
-  viz://explorer/biodiversity/latest/fish_stocks:
     # Fish stocks (RAM Legacy).
     - data://grapher/biodiversity/2024-10-30/fish_stocks:
       - data://garden/biodiversity/2024-10-30/fish_stocks:
