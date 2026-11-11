@@ -242,8 +242,10 @@ single row can be re-checked without opening all four.
 |---|---|---|
 | Gridlines | **dashed** `4,4`, `#ddd` | `GRID_LINE_DASH_PATTERN`, `TICK_COLOR` |
 | Tick labels | `#5b5b5b` | `GRAPHER_DARK_TEXT` = `GRAY_80` |
+| Tick label size | **15px** on the 540-wide templates, **14px** on the 850-wide ones: grapher's own download once placed (16px on its 540 square, 13.5 on its 850 default) | measured on grapher's SVG downloads |
+| y-axis tick labels | **right-aligned** against the plot (`text-anchor: end`), a column whose right edge is the plot's left; never left-aligned at the margin | `VerticalAxisComponent` |
 | Axis label | **bold** (`fontWeight: 700`) | `Axis.ts` |
-| x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
+| x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis — **draw them on every year axis** (`ax.tick_params(axis="x", length=5 * 0.72, width=0.72)`, in points like every stroke); `verify_static_viz.py` fails a year axis without them | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
 | Outermost tick labels | anchored **inwards** — `text-anchor` `start` on the first, `end` on the last | `HorizontalAxisComponent` |
 | y-axis line | **none** — the gridlines carry the reading | no component exists |
 | y domain | `[lowest tick, highest tick]` — the extreme gridlines land **on** the plot's edges | verified on a rendered SVG |
