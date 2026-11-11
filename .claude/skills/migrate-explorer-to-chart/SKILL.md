@@ -115,8 +115,10 @@ dimension and choice slugs unchanged — the view mapping in step 4 is then clos
 
 In the Python step, `paths.create_explorer(...)` becomes `paths.create_chart(...)`, and
 `c.save(tolerate_extra_indicators=True)` becomes `c.save()`. Add `topic_tags` from the
-explorer's tag (`explorer_tags` in the DB). The default view is the first view in `views`, or
-`default_dimensions` if set; make it match the explorer's default view.
+explorer's tag (`explorer_tags` in the DB). The build sorts views by choice order, and the
+default view is the first view after sorting (or `default_dimensions`, if set). Make it match the
+explorer's default, which is the first `graphers` row of `explorers.tsv` in the DB (the explorer
+sorts too), not the first view in its YAML.
 
 Build locally (no DB write) and read the output in `viz/chart/<ns>/latest/<short>/`:
 view count, dimensions, and one view's config.
