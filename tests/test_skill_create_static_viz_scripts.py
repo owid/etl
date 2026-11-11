@@ -624,13 +624,14 @@ def write_axes_frame(
     *,
     label_px: float = 15,
     y_anchor: str = "end",
-    tick_marks: bool = True,
+    tick_marks: bool | None = True,
     x_values: tuple[int, ...] = (2000, 2010, 2020),
     x_format: str = "{}",
     second_axes: bool = False,
 ) -> Path:
     """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture.
 
+    `tick_marks=None` omits the x-tick groups, as matplotlib does for a hidden mark (`bottom=False`).
     `x_format` turns each x tick value into its label text. `second_axes` adds an `axes2` panel whose x
     axis counts (0, 50, 100) with tick marks drawn.
     """
@@ -642,6 +643,8 @@ def write_axes_frame(
         '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
         if tick_marks
         else '<g id="axes__x-tick-{v}"/>'
+        if tick_marks is False
+        else ""
     )
     xs = "".join(
         f'<g id="xtick_{i}">{mark.format(v=v)}<g id="axes__x-tick-label-{v}"><text style="{style}">{x_format.format(v)}</text></g></g>'
@@ -680,6 +683,7 @@ def test_grapher_axes_pass(tmp_path):
         ({"label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),
         ({"y_anchor": "start"}, "y-axis tick labels are anchored start"),
         ({"tick_marks": False}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": None}, "the year axis of axes has no tick marks"),
         ({"tick_marks": False, "second_axes": True}, "the year axis of axes has no tick marks"),
         ({"tick_marks": False, "x_values": (-500, 0, 500, 1000, 1500, 2000)}, "the year axis of axes has no tick"),
         ({"tick_marks": False, "x_values": (2000, 2100, 2200, 2300)}, "the year axis of axes has no tick"),

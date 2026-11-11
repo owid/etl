@@ -325,10 +325,11 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         if not m.group(2).startswith("label"):
             empty_marks.setdefault(m.group(1), []).append(m.group(3) == "/")
     for subject in sorted(x_texts):
-        marks = empty_marks.get(subject, [])
-        if is_year_axis(x_texts[subject]) and marks and all(marks):
+        # matplotlib leaves an empty group for a zero-length mark and none at all for a hidden one
+        # (`bottom=False`, an invisible tick1line); either way nothing is drawn.
+        if is_year_axis(x_texts[subject]) and all(empty_marks.get(subject, [])):
             failures.append(
-                f"the year axis of {subject} has no tick marks (every x-tick group is empty). Grapher draws "
+                f"the year axis of {subject} has no tick marks (no x-tick group draws one). Grapher draws "
                 'them 5px long, 1px, #999, below the axis: ax.tick_params(axis="x", length=5, width=1). '
                 "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
                 "(2,000), and this check leaves it alone."
