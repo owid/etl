@@ -61,7 +61,7 @@ UNITS_TO_TONNES_2026 = {
     "metric tons": 1,
     "tons": 1,
     "thousand metric tons": 1e3,
-    # NOTE: As for earlier releases, dry tons are treated as tonnes.
+    # NOTE: Dry tons are tonnes of material excluding moisture.
     "thousand metric dry tons": 1e3,
     "million metric tons": 1e6,
     "thousands of carats": THOUSAND_CARATS_TO_TONNES,
