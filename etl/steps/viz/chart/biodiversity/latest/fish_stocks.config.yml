@@ -34,7 +34,7 @@ dimensions:
   - slug: metric
     name: Metric
     presentation:
-      type: toggle-buttons
+      type: dropdown
     choices:
       - slug: fish_stocks_biomass
         name: Fish stocks (biomass)
