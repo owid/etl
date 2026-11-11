@@ -579,6 +579,12 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             f"the y-axis tick labels of {', '.join(right)} are drawn on the right (labelright). Grapher puts them on the "
             "left, right-aligned against the plot; draw them there (labelleft=True, labelright=False)."
         )
+    top = sorted({label.subject for label in labels if label.axis == "x" and label.second})
+    if top:
+        failures.append(
+            f"the x-axis tick labels of {', '.join(top)} are drawn at the top (labeltop). Grapher puts them below the "
+            "plot, over its tick marks; draw them there (labelbottom=True, labeltop=False)."
+        )
     labels_left = [label for label in labels if not (label.axis == "y" and label.second)]
     anchors = {label.anchor for label in labels_left if label.axis == "y" and label.anchor is not None}
     # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit,

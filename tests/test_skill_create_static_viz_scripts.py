@@ -961,3 +961,24 @@ def test_a_year_axis_missing_one_of_its_marks_fails(tmp_path):
     plt.close(fig)
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
     assert result.returncode == 1 and "has no tick mark at 2010" in result.stdout, result.stdout
+
+
+def test_x_labels_drawn_at_the_top_fail(tmp_path):
+    """`labeltop=True, labelbottom=False` writes `x-tick-label2-*` groups: grapher's x labels sit below the plot."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", labeltop=True, labelbottom=False, length=0)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and "are drawn at the top (labeltop)" in result.stdout, result.stdout
