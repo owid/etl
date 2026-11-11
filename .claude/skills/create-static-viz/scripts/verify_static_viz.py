@@ -304,7 +304,8 @@ LABEL_TOLERANCE = 0.3
 # Groups: subject, axis, side. Major and minor ticks alike (`name_furniture` names both), since an axis
 # can be labelled on its minor ticks alone.
 TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-(?:minor-)?tick-label(2?)-.+$")  # label2: the right (or top) side
-TICK_MARK_GID = re.compile(r"^(.+)__x-(?:minor-)?tick-(?!label)")
+X_LABEL_VALUE = re.compile(r"^(.+)__x-(?:minor-)?tick-label-(.+)$")
+X_MARK_VALUE = re.compile(r"^(.+)__x-(?:minor-)?tick-(?!label)(?!2-)(.+)$")
 # What marks a y axis' plot edge: its gridlines, tick marks and left spine. Groups: subject.
 Y_EDGE_GID = re.compile(r"^(.+)__(?:y-(?:minor-)?(?:grid|tick)-(?!label)|spine-left$)")
 NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
@@ -617,18 +618,35 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         if label.axis == "x":
             x_texts.setdefault(label.subject, []).append(label.text)
     defs = {node.get("id"): node for node in root.iter() if node.get("id")}
-    drawn_marks: dict[str, list[bool]] = {}
+    # Each labelled year needs its own drawn mark, matched by tick value: `name_furniture` gives the
+    # label `<subject>__x[-minor]-tick-label-<v>` and its mark `<subject>__x[-minor]-tick-<v>`.
+    drawn: dict[tuple[str, str], bool] = {}
+    labelled: dict[str, list[str]] = {}
     for group in root.iter():
-        m = TICK_MARK_GID.match(group.get("id") or "")
-        if m and group.tag.rsplit("}", 1)[-1] == "g":
-            drawn_marks.setdefault(m.group(1), []).append(_tick_draws(group, defs))
+        gid = group.get("id") or ""
+        if group.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        lab = X_LABEL_VALUE.match(gid)
+        if lab:
+            if "".join(group.itertext()).strip():
+                labelled.setdefault(lab.group(1), []).append(lab.group(2))
+            continue
+        mark = X_MARK_VALUE.match(gid)
+        if mark:
+            key = (mark.group(1), mark.group(2))
+            drawn[key] = drawn.get(key, False) or _tick_draws(group, defs)
     for subject in sorted(x_texts):
+        if not is_year_axis(x_texts[subject]):
+            continue
         # matplotlib leaves an empty group for a zero-length mark, none at all for a hidden one
         # (`bottom=False`, an invisible tick1line) and a fully transparent one for an alpha of 0;
         # in each case nothing is drawn.
-        if is_year_axis(x_texts[subject]) and not any(drawn_marks.get(subject, [])):
+        values = labelled.get(subject, [])
+        missing = [v for v in values if not drawn.get((subject, v), False)]
+        if missing:
+            which = "no tick marks" if len(missing) == len(values) else f"no tick mark at {', '.join(missing[:6])}"
             failures.append(
-                f"the year axis of {subject} has no tick marks (no x-tick group draws a visible one). Grapher draws "
+                f"the year axis of {subject} has {which} (each labelled year needs a visible x-tick mark). Grapher draws "
                 "them 5px long, 1px, #999, below the axis, which matplotlib takes in points: "
                 'ax.tick_params(axis="x", length=5 * 0.72, width=0.72). '
                 "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
