@@ -5,7 +5,7 @@ title:
   title_variant: ""
 presentation:
   page_type: data-explorer
-  explorer_subtitle: "Explore reserves, production, trade, and consumption of fossil fuels."
+  explorer_subtitle: "Explore production, consumption, trade, and reserves of fossil fuels."
 default_selection:
   - "World"
 # Default to an individual fuel (coal) rather than the "Total" aggregate: several metrics (imports,
