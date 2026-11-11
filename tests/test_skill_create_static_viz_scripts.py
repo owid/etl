@@ -614,3 +614,55 @@ def test_finalize_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sket
     assert result.returncode == 2 and "slug is 'demo'" in result.stderr and "'other'" in result.stderr
     assert not list((repo / "etl/steps/viz/static").iterdir()), "nothing may be written on a refusal"
     assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG
+
+
+# --- verify_static_viz.py: grapher's axes ------------------------------------------------------------
+
+
+def write_axes_frame(tmp_path: Path, *, label_px: float = 15, y_anchor: str = "end", tick_marks: bool = True) -> Path:
+    """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture."""
+    from PIL import Image
+
+    stem = tmp_path / "frame_square"
+    style = f"font-size: {label_px * 0.72:.2f}px; font-family: 'Lato'; text-anchor: middle"
+    mark = (
+        '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
+        if tick_marks
+        else '<g id="axes__x-tick-{v}"/>'
+    )
+    xs = "".join(
+        f'<g id="xtick_{i}">{mark.format(v=v)}<g id="axes__x-tick-label-{v}"><text style="{style}">{v}</text></g></g>'
+        for i, v in enumerate((2000, 2010, 2020))
+    )
+    ystyle = style.replace("text-anchor: middle", f"text-anchor: {y_anchor}")
+    ys = "".join(
+        f'<g id="ytick_{i}"><g id="axes__y-tick-{v}"/>'
+        f'<g id="axes__y-tick-label-{v}"><text style="{ystyle}">{v}</text></g></g>'
+        for i, v in enumerate((0, 10, 20))
+    )
+    head = (
+        '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+        'width="388.8pt" height="388.8pt">'
+    )
+    defs = '<defs><path id="m1" d="M 0 0 L 0 5"/></defs>'
+    stem.with_suffix(".svg").write_text(f'{head}{defs}<g id="title"><text>Title</text></g>{xs}{ys}</svg>')
+    Image.new("RGB", (1620, 1620), "white").save(stem.with_suffix(".png"))
+    return stem
+
+
+def test_grapher_axes_pass(tmp_path):
+    result = run(VERIFY, write_axes_frame(tmp_path), "--template", "mobile-square")
+    assert result.returncode == 0, result.stdout
+
+
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        ({"label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),
+        ({"y_anchor": "start"}, "y-axis tick labels are anchored start"),
+        ({"tick_marks": False}, "the year axis has no tick marks"),
+    ],
+)
+def test_axes_that_differ_from_grapher_fail(tmp_path, kwargs, message):
+    result = run(VERIFY, write_axes_frame(tmp_path, **kwargs), "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout

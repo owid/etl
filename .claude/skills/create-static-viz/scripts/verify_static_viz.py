@@ -16,6 +16,11 @@ plausible, and the problem only shows up once a designer opens the SVG:
   ``--require-named-marks`` to make it a failure, which a new or refreshed step should. That flag
   also fails on a ``<subject>__<role>`` gid used by more than one node, since the re-import cannot
   tell such marks apart
+- axes that differ from grapher's own download, which is what the design team's templates are
+  balanced for: tick labels not at 15px on a 540-wide template (14px on an 850-wide one), y-axis tick
+  labels not right-aligned against the plot, or a year axis with no tick marks. Judged on the
+  ``<subject>__<axis>-tick-label-<value>`` and ``<subject>__x-tick-<value>`` gids
+  ``etl.viz.static.name_furniture`` gives every axis
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -283,7 +288,59 @@ def check_svg(
         else:
             failures += frame_failures("SVG", size[0], size[1], target)
         failures += scale_failures(svg, target)
+    failures += axis_failures(svg, target)
 
+    return failures
+
+
+# Tick-label size, in template px, by template width (WRITING-THE-STEP.md -> grapher's axis): 15 on
+# the 540-wide templates, 14 on the 850-wide ones. A label within LABEL_TOLERANCE of it passes.
+TICK_LABEL_PX = {540: 15.0, 850: 14.0}
+LABEL_TOLERANCE = 0.3
+TICK_LABEL = re.compile(r'<g id="([^"]+)__([xy])-tick-label-([^"]+)">\s*<text style="([^"]*)"')
+TICK_MARK = re.compile(r'<g id="([^"]+)__x-tick-([^"]+?)"(/?)>')
+
+
+def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[str]:
+    """Return failures where the axes differ from grapher's own download (module docstring)."""
+    failures = []
+    labels = TICK_LABEL.findall(svg)
+    y_anchors = [re.search(r"text-anchor:\s*(\w+)", style) for _, axis, _, style in labels if axis == "y"]
+    off = sorted({m.group(1) for m in y_anchors if m and m.group(1) != "end"})
+    if off:
+        failures.append(
+            f"y-axis tick labels are anchored {', '.join(off)}, not right-aligned against the plot. Grapher "
+            "right-aligns them; leave matplotlib's default (ha='right') or set it back."
+        )
+    x_values = [value for _, axis, value, _ in labels if axis == "x"]
+    if x_values and all(re.fullmatch(r"\d{4}", v) for v in x_values):
+        marks = {
+            m.group(2): m.group(3) == "/"
+            for m in TICK_MARK.finditer(svg)
+            if not m.group(2).startswith(("label", "tick2", "minor"))
+        }
+        if marks and all(marks.values()):
+            failures.append(
+                "the year axis has no tick marks (every x-tick group is empty). Grapher draws them 5px long, "
+                '1px, #999, below the axis: ax.tick_params(axis="x", length=5, width=1).'
+            )
+    if target is not None and labels:
+        width = target[1][0]
+        want = TICK_LABEL_PX.get(width)
+        root = SVG_ROOT.search(svg)
+        in_pt = bool(root and re.search(r'\bwidth="[0-9.]+pt"', root.group()))
+        sizes = {
+            float(m.group(1)) for _, _, _, style in labels for m in [re.search(r"font-size:\s*([0-9.]+)px", style)] if m
+        }
+        if want and sizes:
+            px = {round(s / 0.72 if in_pt else s, 2) for s in sizes}
+            wrong = sorted(p for p in px if abs(p - want) > LABEL_TOLERANCE)
+            if wrong:
+                failures.append(
+                    f"tick labels are {', '.join(f'{p:g}' for p in wrong)}px; on a {width}-wide template they are "
+                    f"{want:g}px, grapher's own download size (WRITING-THE-STEP.md). Changing it means rebalancing "
+                    "the template's type with the design team."
+                )
     return failures
 
 
