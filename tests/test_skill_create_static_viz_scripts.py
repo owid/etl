@@ -107,14 +107,19 @@ def test_scaffold_names_every_mark(sketch):
 
 
 def test_scaffold_draws_tick_marks_at_grapher_size(sketch):
-    """matplotlib takes tick length and width in points, so grapher's 5px x 1px mark is 3.6pt x 0.72pt."""
+    """Grapher's mark is 5px x 1px in #999: 3.6pt x 0.72pt, as matplotlib takes both in points."""
     if not (sketch / "demo.svg").is_file():
         assert run(sketch / "sketch.py").returncode == 0
     svg = (sketch / "demo.svg").read_text()
     mark = re.search(r'<g id="axes__x-tick-\d+">\s*<defs>\s*<path [^>]*d="M 0 0\s+L 0 ([0-9.]+)\s*"[^>]*>', svg)
     assert mark, "no x tick mark found in the scaffold's SVG"
     width = re.search(r"stroke-width: ([0-9.]+)", mark.group())
-    assert (float(mark.group(1)), float(width.group(1)) if width else None) == (3.6, 0.72), mark.group()
+    stroke = re.search(r"stroke: (#[0-9a-f]+)", mark.group())
+    got = (float(mark.group(1)), float(width.group(1)) if width else None, stroke.group(1) if stroke else None)
+    assert got == (3.6, 0.72, "#999999"), mark.group()
+    assert re.search(r'id="axes__x-tick-label-\d+">\s*<text style="[^"]*fill: #5b5b5b', svg), (
+        "labels keep the text color"
+    )
 
 
 # --- verify_static_viz.py: named marks --------------------------------------------------------------
@@ -656,8 +661,8 @@ def write_axes_frame(
     style = f"font-size: {label_px * 0.72:.2f}px; font-family: 'Lato'; text-anchor: middle"
     texts = x_labels or tuple(x_format.format(v) for v in x_values)
 
-    def label(text: str, anchor_style: str) -> str:
-        return math_label(text, label_px) if math else f'<text style="{anchor_style}">{text}</text>'
+    def label(text: str, anchor_style: str, anchor: str = "middle") -> str:
+        return math_label(text, label_px, anchor) if math else f'<text style="{anchor_style}">{text}</text>'
 
     mark = (
         '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
@@ -679,7 +684,7 @@ def write_axes_frame(
     ystyle = style.replace("text-anchor: middle", f"text-anchor: {y_anchor}")
     ys = "".join(
         f'<g id="ytick_{i}"><g id="axes__y-tick-{v}"/>'
-        f'<g id="axes__y-tick-label-{v}">{label(f"10^{v}" if math else str(v), ystyle)}</g></g>'
+        f'<g id="axes__y-tick-label-{v}">{label(f"10^{v}" if math else str(v), ystyle, y_anchor)}</g></g>'
         for i, v in enumerate((0, 10, 20))
     )
     head = (
@@ -692,11 +697,12 @@ def write_axes_frame(
     return stem
 
 
-def math_label(text: str, label_px: float) -> str:
+def math_label(text: str, label_px: float, anchor: str = "middle") -> str:
     """A tick label as matplotlib writes MathText: a comment, a transform group, one tspan per glyph.
 
-    It carries no text-anchor, since matplotlib places it by the transform. A `^` raises the rest of
-    the text to a superscript, on its own baseline and at 70% of the size.
+    It carries no text-anchor: matplotlib aligns it by moving the transform, so that its `anchor` edge
+    (start, middle or end) lands on x=40, one shared x for every label of an axis. A `^` raises the
+    rest of the text to a superscript, on its own baseline and at 70% of the size.
     """
     base, _, sup = text.partition("^")
     glyphs = [(c, label_px, "-0.06") for c in base] + [(c, label_px * 0.7, "-4.8") for c in sup]
@@ -704,7 +710,9 @@ def math_label(text: str, label_px: float) -> str:
         f'<tspan x="{6 * i}" y="{y}" style="font-size: {px * 0.72:.2f}px; font-family: \'Lato\'">{c}</tspan>'
         for i, (c, px, y) in enumerate(glyphs)
     )
-    return f'<!-- ${text}$ --><g transform="translate(10 300)"><text>{tspans}</text></g>'
+    extent = 6 * (len(glyphs) - 1)
+    left = 40 - {"start": 0, "middle": extent / 2, "end": extent}[anchor]
+    return f'<!-- ${text}$ --><g transform="translate({left:g} 300)"><text>{tspans}</text></g>'
 
 
 @pytest.mark.parametrize("kwargs", [{}, {"math": True}])
@@ -713,8 +721,16 @@ def test_grapher_axes_pass(tmp_path, kwargs):
     assert result.returncode == 0, result.stdout
 
 
-def test_mathtext_labels_from_matplotlib_are_checked(tmp_path):
-    """A real log axis, whose labels matplotlib writes as MathText, is held to the tick-label size."""
+@pytest.mark.parametrize(
+    "ha, label_pt, message",
+    [
+        ("right", 13 * 0.72, "tick labels are 13px"),
+        ("left", 15 * 0.72, "y-axis tick labels are anchored start"),
+        ("center", 15 * 0.72, "y-axis tick labels are anchored middle"),
+    ],
+)
+def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, message):
+    """A real log axis, whose labels matplotlib writes as MathText, is held to the size and alignment."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -724,16 +740,22 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path):
 
     apply_svg_rcparams()
     fig, ax = plt.subplots(figsize=(5.4, 5.4))
-    ax.plot([2000, 2010, 2020], [1e3, 1e4, 1e5], gid="line__value")
+    ax.plot([2000, 2010, 2020], [1, 1e5, 1e12], gid="line__value")
     ax.set_yscale("log")
-    # Only the MathText labels are off-size, so only reading them can fail the frame.
+    # Exponents of one and two digits, so the labels differ in width and their alignment shows.
+    ax.set_yticks([1, 1e5, 1e12])
+    ax.minorticks_off()
+    # Only the MathText labels are off, so only reading them can fail the frame.
     ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
-    ax.tick_params(axis="y", which="both", labelsize=13 * 0.72)
+    ax.tick_params(axis="y", labelsize=label_pt)
+    for tick_label in ax.get_yticklabels():
+        tick_label.set_horizontalalignment(ha)
     export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
     plt.close(fig)
     assert "<!-- $" in (tmp_path / "frame_square.svg").read_text(), "matplotlib no longer writes MathText labels"
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
-    assert result.returncode == 1 and "tick labels are 13px" in result.stdout, result.stdout
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+    assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
 
 
 @pytest.mark.parametrize(
@@ -760,6 +782,8 @@ def test_mathtext_labels_from_matplotlib_are_checked(tmp_path):
         # MathText labels nest their text, and still get every axis check.
         ({"math": True, "label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),
         ({"math": True, "tick_marks": False}, "the year axis of axes has no tick marks"),
+        ({"math": True, "y_anchor": "start"}, "y-axis tick labels are anchored start"),
+        ({"math": True, "y_anchor": "middle"}, "y-axis tick labels are anchored middle"),
     ],
 )
 def test_axes_that_differ_from_grapher_fail(tmp_path, kwargs, message):

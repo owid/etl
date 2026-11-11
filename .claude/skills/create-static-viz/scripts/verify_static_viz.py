@@ -308,12 +308,18 @@ FONT_SIZE = re.compile(r"font-size:\s*([0-9.]+)px")
 TEXT_ANCHOR = re.compile(r"text-anchor:\s*(\w+)")
 
 
+TRANSLATE = re.compile(r"^\s*translate\(\s*([-+0-9.eE]+)[\s,)]")
+
+
 class TickLabel(NamedTuple):
     subject: str
     axis: str
     anchor: str | None  # None when no text node declares one, as for a MathText label
     size: float | None  # the largest font size in the label: a superscript is smaller on purpose
     text: str
+    # A MathText label's left edge and the x of its last glyph from there, in SVG units; None otherwise.
+    left: float | None = None
+    extent: float | None = None
 
 
 def tick_labels(svg: str) -> list[TickLabel]:
@@ -322,7 +328,8 @@ def tick_labels(svg: str) -> list[TickLabel]:
     A plain label is one `<text>` straight under the group. A MathText label (`$10^5$`) is a comment,
     a transform group, and a `<text>` holding one `<tspan>` per glyph, with no text-anchor (matplotlib
     places it by the transform). Glyphs on another baseline (a superscript or subscript) are joined
-    with a space, so `10^5` reads `10 5` and never passes for the year `105`.
+    with a space, so `10^5` reads `10 5` and never passes for the year `105`. A MathText label also
+    carries where it sits (`left`, `extent`), the only trace its alignment leaves (`mathtext_anchor`).
     """
     labels = []
     for group in ET.fromstring(svg).iter():
@@ -331,6 +338,7 @@ def tick_labels(svg: str) -> list[TickLabel]:
             continue
         parts: list[str] = []
         sizes: list[float] = []
+        glyph_xs: list[float] = []
         anchor = None
         baseline = None
         for node in group.iter():
@@ -346,9 +354,60 @@ def tick_labels(svg: str) -> list[TickLabel]:
                     if parts and node.get("y") != baseline:
                         parts.append(" ")
                     baseline = node.get("y")
+                    glyph_xs += [float(x) for x in [node.get("x")] if x and re.fullmatch(r"[-+0-9.eE]+", x)]
                 parts.append(node.text.strip())
-        labels.append(TickLabel(match.group(1), match.group(2), anchor, max(sizes, default=None), "".join(parts)))
+        left = extent = None
+        if anchor is None and glyph_xs:
+            offset = _translate_x(group)
+            if offset is not None:
+                left, extent = offset + min(glyph_xs), max(glyph_xs) - min(glyph_xs)
+        labels.append(
+            TickLabel(match.group(1), match.group(2), anchor, max(sizes, default=None), "".join(parts), left, extent)
+        )
     return labels
+
+
+def _translate_x(group: ET.Element) -> float | None:
+    """The x offset the transforms under a label group add up to, or None if any is not a plain translate."""
+    total = 0.0
+    for node in group.iter():
+        transform = node.get("transform")
+        if node is group or transform is None or node.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        m = TRANSLATE.match(transform)
+        if m is None or transform.count("(") > 1:
+            return None
+        total += float(m.group(1))
+    return total
+
+
+def mathtext_anchor(labels: list[TickLabel]) -> str | None:
+    """The alignment one axis' MathText labels were drawn with, read off where they sit, or None.
+
+    matplotlib places each label so that its left edge (start), middle or right edge (end) lands on
+    one x shared by the whole axis, so the alignment is the edge that lines up best. The right edge is
+    approximated by the last glyph's x, which only differs by that glyph's own advance. It can only be
+    told when the labels differ in width, by at least 0.3 of their font size; labels of one width
+    line up on every edge, and return None.
+    """
+    placed = [label for label in labels if label.left is not None and label.extent is not None]
+    if len(placed) < 2:
+        return None
+    lefts = [label.left for label in placed]
+    extents = [label.extent for label in placed]
+    size = max((label.size for label in placed if label.size is not None), default=0.0)
+    if max(extents) - min(extents) < 0.3 * size or size == 0:
+        return None
+
+    def spread(edges: list[float]) -> float:
+        return max(edges) - min(edges)
+
+    edges = {
+        "start": lefts,
+        "middle": [lo + e / 2 for lo, e in zip(lefts, extents)],
+        "end": [lo + e for lo, e in zip(lefts, extents)],
+    }
+    return min(edges, key=lambda name: spread(edges[name]))
 
 
 def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[str]:
@@ -358,7 +417,11 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
         labels = tick_labels(svg)
     except ET.ParseError as error:
         return [f"the SVG does not parse as XML ({error}), so its axes could not be checked"]
-    off = sorted({label.anchor for label in labels if label.axis == "y" and label.anchor not in (None, "end")})
+    anchors = {label.anchor for label in labels if label.axis == "y" and label.anchor is not None}
+    # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit.
+    for subject in sorted({label.subject for label in labels if label.axis == "y"}):
+        anchors.add(mathtext_anchor([label for label in labels if label.axis == "y" and label.subject == subject]))
+    off = sorted(a for a in anchors if a not in (None, "end"))
     if off:
         failures.append(
             f"y-axis tick labels are anchored {', '.join(off)}, not right-aligned against the plot. Grapher "
