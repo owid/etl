@@ -28,7 +28,7 @@ repeat what other skills already cover:
 | Need | Skill |
 |---|---|
 | Multidim YAML, `common_views`, publishing | `/create-chart` |
-| View mapping, review HTML, reference audit, featured metrics, preflight, bulk redirects, applying them | `/map-explorer-to-mdim` |
+| View mapping, reference audit, featured metrics, preflight, bulk redirects, applying them | `/map-explorer-to-mdim` |
 | Every surface referencing the explorer | `/find-chart-references` |
 | Screenshots on staging | `/check-chart-preview` |
 
@@ -102,7 +102,7 @@ Translation of the explorer's `config:` block:
 | `selection` | `default_selection` |
 | explorer slug | `slug` (keep the explorer slug; check on production that no `chart_configs.slug`, `chart_slug_redirects.slug` or `multi_dim_data_pages.slug` has it) |
 | `entityType`, `entityTypePlural`, `hasMapTab`, … | the same key in per-view `config` (shared values in `definitions.common_views`) |
-| `hideAnnotationFieldsInTitle: true` | `hideAnnotationFieldsInTitle: {entity: true, time: true, changeInPrefix: true}` |
+| `hideAnnotationFieldsInTitle` | drop: explorers don't apply it (their titles show the time span and entity), so setting it on the multidim hides annotations readers had |
 | `isPublished`, `subNavId`, `subNavCurrentId`, `thumbnail`, `googleSheet`, `hideAlertBanner`, `yScaleToggle: false` | drop (not grapher keys; `yScaleToggle: true` is `yAxis.canChangeScaleType`) |
 | `pickerColumnSlugs`, `wpBlockId`, `downloadDataLink` | see the flags in step 0 |
 
@@ -126,7 +126,7 @@ sorts too), not the first view in its YAML.
 Build locally (no DB write) and read the output in `viz/chart/<ns>/latest/<short>/`:
 view count, dimensions, and one view's config.
 
-## 3. Compare on staging
+## 3. Publish on staging
 
 ```bash
 git push
@@ -138,90 +138,113 @@ baked again (the next push rebuilds staging). Publish it on staging with `PATCH
 <admin_api>/multi-dims/<id>` `{"published": true}` (assert the host is a staging one first), and
 meanwhile review it at the admin preview URL that `etlr` prints.
 
-To preview the gdoc swaps from step 6 on staging, edit the staging DB copy of each doc: `GET
-<admin_api>/gdocs/<id>` (no `contentSource`, so it reads the DB, not Google), replace the URLs from
-`references.csv` in the JSON, `PUT` it back. Saving a published doc re-bakes its page on staging.
-Never edit the Google Doc for a staging preview: it is shared with production. To try a grapher
-branch there, `ssh owid@<staging host>`, check the branch out in `~/owid-grapher`, and `pm2 restart
-admin deploy-queue`; the server stays on that branch afterwards.
+To preview the gdoc swaps on staging, edit the staging DB copy of each doc: `GET
+<admin_api>/gdocs/<id>` (no `contentSource`, so it reads the DB, not Google), replace the URLs in
+the JSON, `PUT` it back. Saving a published doc re-bakes its page on staging. Never edit the
+Google Doc for a staging preview: it is shared with production. To try a grapher branch there,
+`ssh owid@<staging host>`, check the branch out in `~/owid-grapher`, and `pm2 restart admin
+deploy-queue`; the server stays on that branch afterwards.
 
-Check the default view and a sample of views (every dimension's first and last choice) against
-`https://ourworldindata.org/explorers/<slug>`: same indicators, titles, subtitles, selected
-entities, chart types, tabs. `/check-chart-preview` takes the screenshots.
+## 4. Map views
 
-## 4. Map views and audit references
+Run `/map-explorer-to-mdim` steps 1–3 (extraction, `mapping_rules.py`, build) with the explorer
+slug and the new multidim's catalogPath, against the staging DB (the multidim exists only there).
+Write the `*_MAP` dicts from the explorer config's choice names and slugs; the scaffold's
+slugified guesses miss any slug that isn't the slugified name. Its review HTML is superseded by
+the review page below.
 
-Run `/map-explorer-to-mdim` with the explorer slug and the new multidim's catalogPath, using the
-staging DB (the multidim exists only there). Follow it through `mapping_rules.py`, the build, the
-review HTML and `audit_references.py`. Stop before its preflight and apply steps: those run in
-step 6, on production, after re-extracting there (the multidim's id and config differ).
+## 5. Review page (the user signs off here)
 
-- Write the `*_MAP` dicts from the explorer config's choice names and slugs; the scaffold's
-  slugified guesses miss any slug that isn't the slugified name.
-- Tell the user to open the review HTML in a regular browser: embedded previewers block its
-  iframes and show empty panes.
-- Run `scripts/doc_edits.py` right after the audit (see step 6) so the user can review the swaps.
+Every migration gets one review page, served by a local app and updated at each later stage. Build
+it as soon as the multidim is on staging:
 
-## 5. Announce and get sign-off
+```bash
+S=.claude/skills/migrate-explorer-to-chart/scripts
+R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
+.venv/bin/python $S/compare_views.py --mapping-dir $M --staging <branch> --prod-env-file $P --out $R
+.venv/bin/python $S/scan_references.py --mapping-dir $M --prod-env-file $P --out $R --grapher-repo <owid-grapher clone>
+.venv/bin/python $S/build_review_page.py --review $R --mapping-dir $M --payload-env staging --stage review [--notes $R/notes.json]
+```
 
-Draft a Slack post asking for permission and hand it to the user, who posts it (never post it
-yourself). It must carry the attribution line
-from CLAUDE.md and cover:
+- `compare_views.py` checks every view pair: indicators and display names (TSV vs multidim
+  config), `dataChecksum` and `metadataChecksum` (production vs staging), the full grapher config
+  (production `/explorers/<slug>.config.json` vs the staging view's full config, schema defaults
+  dropped), and what readers see (header, footer, tabs, active tab, map legend labels and colors)
+  on both pages rendered headlessly, on the default tab and the other main tab, with screenshots.
+- **The rendered pages are the ground truth.** The explorer's served config (and its
+  `explorer_views` configs) are lossy: they drop or invent settings the page doesn't show (color
+  schemes, stray bins, `hideAnnotationFieldsInTitle`). A config difference whose rendered check
+  passes can be explained in `notes.json` (`{"config:<field>": "why"}`); a rendered, indicator,
+  data or metadata difference gets fixed in the multidim, never explained away. Re-run until every
+  view is "Match".
+- `scan_references.py` is the exhaustive link list: every text/JSON column of the production DB
+  (history and analytics tables skipped and listed), plus `git grep` of ETL and owid-grapher. It
+  finds what the gdoc link index misses (unpublished drafts, chart notes, indicator metadata,
+  site code). Each hit gets its new URL from the redirect rules and an edit link.
+- Serve it with the local app, in the background, and give the user the link:
 
-- what readers see change: `/explorers/<slug>` → `/grapher/<slug>`, every view redirected to its
-  equivalent, controls in the multidim design, still listed on `/explorers`;
-- where the explorer shows up, from `inventory.json` and `references.md`: pages that embed it
-  (swapped before the cut-over), pages that link to it (fixed by the redirect), featured metrics
-  (repointed with the topic owner), site redirects ending on it (repointed to avoid chains),
-  pageviews;
-- anything that goes away (flags from step 0);
-- links: staging preview, review HTML, PR;
-- the planned cut-over date.
+  ```bash
+  .venv/bin/python $S/review_app.py   # http://localhost:8771/ lists every ai/*-review folder
+  ```
 
-Put the same summary, without internal links, in the PR body (keep it terse; the repo is public).
-Request the review only once the user says so. Merge once the reviewer signs off. Merging creates
-the multidim on production **unpublished**: the user publishes it in the admin. `/grapher/<slug>`
-then takes a few minutes to go live; poll until it returns 200.
+  It embeds the production explorer and the staging multidim as live iframes (an artifact
+  can't: it blocks iframes, and an https page can't frame the http staging server), with a switch
+  to the screenshots. It rebuilds the page on every request, so re-running a script shows on
+  reload. `build_review_page.py` also writes a static `index.html` with screenshots, for sharing
+  with someone who can't reach staging. Rebuild with the new `--stage` at every later stage.
 
-## 6. Cut over on production
+The page has: the checks summary, the explorer and multidim side by side with one set of
+dimension controls, a matrix of every view, the links to replace, the dimension-by-dimension
+mapping, and the redirect JSON. The user reviews it and merges the PR.
+
+## 6. Announce and merge
+
+If the user wants a Slack sign-off, draft it and hand it to the user, who posts it (never post it
+yourself). It carries the attribution line from CLAUDE.md, what readers see change, where the
+explorer shows up (from the review page), what goes away (flags from step 0), and the review page
+link. Put a terse summary, without internal links, in the PR body (the repo is public). Request a
+review only once the user says so.
+
+Merging creates the multidim on production **unpublished**: the user publishes it in the admin.
+`/grapher/<slug>` then takes a few minutes to go live; poll until it returns 200.
+
+## 7. Cut over on production
 
 In this order, because creating the redirects darkens the explorer at once:
 
-1. Repoint featured metrics (`/map-explorer-to-mdim` step 5b) and swap embedded explorers in
-   gdocs for the multidim. Always hand the user the swaps as a file: run
-   `scripts/doc_edits.py --references ai/<slug>-redirects/references.csv`, which writes
-   `doc_edits.md` (per doc: where to find each reference, old URL, new URL), and point them to it.
-   The gdoc edits are the user's (or the author's); never edit a Google Doc yourself. An embed
-   can only be repointed once the multidim is published. After the user republishes, check the
-   live page (not only the DB) has no `/explorers/<slug>` left: the page re-bakes a few minutes
-   after the DB changes.
-2. Repoint the site redirects that end on `/explorers/<slug>` (admin `/redirects`) to the
+1. **Links.** Rebuild the page with `--stage links`. The user (or the doc's author)
+   swaps the links from its "Links to replace" section and republishes each doc; never edit a
+   Google Doc yourself. Featured metrics go through `/map-explorer-to-mdim` step 5b with the
+   topic owner. Then re-run `scan_references.py`: no reference that breaks on redirect may remain,
+   and check the live pages (they re-bake a few minutes after the DB changes).
+2. **Site redirects** that end on `/explorers/<slug>` (admin `/redirects`): repoint them to the
    multidim, so they don't chain.
-3. Re-run `/map-explorer-to-mdim` steps 1–3 and 5–7 against production: extraction, build,
-   reference audit, preflight, apply the bulk payload. Preflight checks the DB, not the site, so
-   confirm `/grapher/<slug>` returns 200 before the user pastes the payload. The redirects go live
-   a few minutes after they are created (bake, then a 2-minute edge TTL): poll a few views with
+3. **Redirect JSON.** Re-run `/map-explorer-to-mdim` steps 1–3 against production (the payload
+   carries each view's config id, which differs from staging), then its `audit_references.py` and
+   `preflight.py`. Rebuild the page with `--payload-env production --stage redirects`: only that
+   version of the JSON is pasteable. Confirm `/grapher/<slug>` returns 200
+   (preflight reads the DB, not the site). After the user pastes it, poll a few views with
    `curl -s -o /dev/null -w '%{http_code} %{redirect_url}'` until they return 302, including one
    with a `country=` param to check it is carried over.
 
-## 7. Retire the explorer
+## 8. Retire the explorer and its orphaned data
 
 The user unpublishes the explorer in the admin (unpublish, don't delete: a deleted explorer row
-breaks chart blocks that still name it). Then, in a follow-up PR (`etl pr "Retire <slug> explorer"
-data`), following CLAUDE.md's archive rule:
+breaks chart blocks that still name it). Then one PR (`etl pr "Retire <slug> explorer" data`)
+archives the explorer and any data only it used, following CLAUDE.md's archive rule:
 
 1. Remove the `viz://explorer` DAG entry. It often holds the full snapshot → grapher chain of its
-   dataset; move that chain under the `viz://chart` entry so the dataset stays in the DAG.
-   Commit.
+   dataset; move that chain under the `viz://chart` entry so the dataset stays in the DAG. Remove
+   the DAG entries of datasets nothing else uses any more. Commit.
 2. `etl archive-dag`. It also sweeps in steps others left un-archived; `git checkout` those files
-   and commit only the explorer's archive entry.
-3. Delete the explorer's `.py` and `.config.yml`. Commit.
+   and commit only this PR's archive entries.
+3. Delete the explorer's `.py` and `.config.yml`, and the files of the archived datasets. Commit.
+4. Delete orphaned backport mirrors in `snapshots/backport/latest/` of the grapher dataset the
+   explorer used before it moved into ETL, if that dataset is archived in the DB and no chart uses
+   its variables (`chart_dimensions`). Commit.
 
-Then tick the explorer in owid/etl#6014, pointing the line at `/grapher/<slug>` and both PRs.
-
-Check `snapshots/backport/latest/` for a mirror of the grapher dataset the explorer used before it
-moved into ETL. If that dataset is archived in the DB and none of its variables is used by a chart
-(`chart_dimensions`), delete the mirror files in a separate cleanup PR.
+Then tick the explorer in owid/etl#6014, pointing the line at `/grapher/<slug>` and the PRs, and
+rebuild the review page with `--stage retire`.
 
 ## Report
 
