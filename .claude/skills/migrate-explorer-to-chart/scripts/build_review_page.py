@@ -71,11 +71,12 @@ def render_page(review: Path, live: bool = False) -> str:
     # The first scan is the to-do list; a later scan that no longer finds a link means it was swapped.
     base_path = review / "references_baseline.json"
     if base_path.exists():
-        key = lambda r: (r["surface"], r["where"], r["old_url"], r.get("link_text"))  # noqa: E731
-        now = {key(r) for r in refs["references"]}
+        # Keyed without the surface label, so relabelling a row in the scanner doesn't read as a swap.
+        key = lambda r: (r["where"], r["old_url"], r.get("link_text"))  # noqa: E731
+        now = {key(r): r for r in refs["references"]}
         base = json.loads(base_path.read_text())["references"]
-        for r in base:
-            r["status"] = "pending" if key(r) in now else "done"
+        for i, r in enumerate(base):
+            base[i] = dict(now[key(r)], status="pending") if key(r) in now else dict(r, status="done")
         extra = [dict(r, status="new") for r in refs["references"] if key(r) not in {key(b) for b in base}]
         refs = dict(refs, references=base + extra)
     preflight = (review / "preflight.txt").read_text() if (review / "preflight.txt").exists() else None
@@ -189,6 +190,9 @@ tr.pick{cursor:pointer} tr.pick:hover td{background:var(--soft)} tr.sel td{backg
 td.c{text-align:center;font-variant-numeric:tabular-nums}
 .y{color:var(--ok);font-weight:600} .n{color:var(--bad);font-weight:600} .e{color:var(--warn);font-weight:600} .na{color:var(--muted)}
 .url{font-family:var(--mono);font-size:.74rem;overflow-wrap:anywhere;max-width:40ch}
+.url a{color:inherit}
+details.info{border:1px solid var(--line);border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:10px}
+details.info summary{cursor:pointer;font-weight:700}
 .find{min-width:16ch;max-width:34ch} .find b{font-weight:600}
 button.mini{font-size:.72rem;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .group{display:flex;flex-direction:column;gap:8px}
@@ -357,10 +361,15 @@ $("mtable").innerHTML = `<thead><tr><th>#</th>${dimNames.map(d=>`<th>${esc(d)}</
 document.querySelectorAll("#mtable tr.pick").forEach(tr => { tr.onclick = () => { go(+tr.dataset.id); $("compare").scrollIntoView({behavior:"smooth"}); }; tr.onkeydown = e => { if (e.key==="Enter") tr.click(); }; });
 
 // Links to replace.
-const R = D.refs.references;
+// WordPress rows need no edit: legacy posts and unused blocks reach no reader, and a block still
+// shown on another explorer only holds plain links, which the redirect covers.
+const isInfo = r => r.how==="legacy copy" || r.surface.startsWith("WordPress");
+const RA = D.refs.references, R = RA.filter(r=>!isInfo(r)), RI = RA.filter(isInfo);
 const breaks = R.filter(r=>r.breaks_on_redirect).length;
 const nDone = R.filter(r=>r.status==="done").length, pendBreak = R.filter(r=>r.status!=="done" && r.breaks_on_redirect).length;
-$("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"}${R.some(r=>r.status)?`: <b>${nDone} swapped</b>, ${R.length-nDone} still to do${pendBreak?`, of which <b>${pendBreak} break the moment the redirects exist</b>`:""}`:`, ${breaks} of them break the moment the redirects exist (swap those first)`}. Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.`;
+$("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"}${R.some(r=>r.status)?`: <b>${nDone} swapped</b>, ${R.length-nDone} still to do${pendBreak?`, of which <b>${pendBreak} break the moment the redirects exist</b>`:""}`:`, ${breaks} of them break the moment the redirects exist (swap those first)`}. Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.${RI.length?` ${RI.length} more in WordPress need nothing from you (listed at the bottom).`:""}`;
+// Links open in a new tab, so old and new can be compared side by side. Relative links are on the site.
+const urlLink = u => { const h = /^https?:/.test(u) ? u : u.startsWith("/") ? "https://ourworldindata.org" + u.replace(/`$/,"") : ""; return h ? `<a href="${esc(h)}" target="_blank" rel="noopener">${esc(u)}</a>` : esc(u); };
 // What to search for in the doc: the linked words (or card title), and the text just before them.
 const findCell = r => {
   if (!r.link_text && !r.context) return '<span class="small">—</span>';
@@ -369,15 +378,19 @@ const findCell = r => {
 };
 const statusLabel = r => r.status==="done" ? '<span class="pill ok">✓ swapped</span> ' : r.status==="pending" ? '<span class="pill warn">to do</span> ' : r.status==="new" ? '<span class="pill bad">new since first scan</span> ' : "";
 const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : r.how==="legacy copy" ? `<span class="pill neutral">legacy copy · no reader sees it</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
+const renderGroups = (rows, empty) => {
 const groups = {};
-R.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
+rows.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
 const order = Object.entries(groups).sort((a,b) => (b[1].some(r=>r.breaks_on_redirect)-a[1].some(r=>r.breaks_on_redirect)) || (a[0].startsWith("Repo")-b[0].startsWith("Repo")));
-$("linkgroups").innerHTML = order.length ? order.map(([k, rs]) => {
+return order.length ? order.map(([k, rs]) => {
   const [surface, where] = k.split("|"), r0 = rs[0];
   const links = [r0.edit_url&&`<a href="${esc(r0.edit_url)}" target="_blank" rel="noopener">Edit ↗</a>`, r0.preview_url&&`<a href="${esc(r0.preview_url)}" target="_blank" rel="noopener">Admin preview ↗</a>`, r0.page_url&&`<a href="${esc(r0.page_url)}" target="_blank" rel="noopener">Live page ↗</a>`].filter(Boolean).join(" · ");
   return `<div class="group"><div class="group-head"><h3>${esc(where)}</h3><span class="small">${esc(surface)} · ${rs.length} link${rs.length===1?"":"s"}</span><span class="small">${links}</span></div>
-    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${statusLabel(r)}${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${esc(r.old_url)}</td><td class="url">${esc(r.new_url)}</td><td>${esc(r.match)}${(r.repairs||[]).length?`<div class="small">${r.repairs.map(esc).join("; ")}</div>`:""}${Object.keys(r.stale_params||{}).length&&!(r.repairs||[]).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
-}).join("") : `<div class="okline">✓ Nothing references this explorer.</div>`;
+    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${statusLabel(r)}${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${urlLink(r.old_url)}</td><td class="url">${urlLink(r.new_url)}</td><td>${esc(r.match)}${(r.repairs||[]).length?`<div class="small">${r.repairs.map(esc).join("; ")}</div>`:""}${Object.keys(r.stale_params||{}).length&&!(r.repairs||[]).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
+}).join("") : empty;
+};
+$("linkgroups").innerHTML = renderGroups(R, `<div class="okline">✓ Nothing to replace.</div>`)
+  + (RI.length ? `<details class="info"><summary>WordPress: ${RI.length} link${RI.length===1?"":"s"}, nothing to do</summary><p class="small">Legacy WordPress posts are private copies of pages now served from Google Docs, and unused reusable blocks render nowhere, so no reader sees these. A block still shown on another explorer holds only plain links, which the redirect covers.</p>${renderGroups(RI, "")}</details>` : "");
 document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
 
 // Dimension mapping.
