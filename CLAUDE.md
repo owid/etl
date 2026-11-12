@@ -346,7 +346,7 @@ Use the `query-grapher-db` skill — it covers the local dev DB, a branch's stag
 
 ## GitHub Actions
 
-When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+When editing `.github/workflows/**` or `.github/actions/**`, follow the lockfile rule imported below:
 
 @.github/instructions/github-actions.instructions.md
 

@@ -1,0 +1,34 @@
+chart_config_id: 0191b6c7-5591-76c2-bf99-25148bff9dac
+grapher_schema: "012"
+slug: share-of-global-consumption-based-co-emissions-and-population
+topic_tags:
+  - CO2 & Greenhouse Gas Emissions
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "global_carbon_budget#consumption_emissions_as_share_of_global"
+          display:
+            name: "Share of emissions"
+            color: "#ae7f4f"
+            includeInTable: true
+            numDecimalPlaces: 1
+        - catalogPath: "population#world_pop_share"
+          display:
+            name: "Share of population"
+            color: "#4c6a9c"
+            includeInTable: true
+            numDecimalPlaces: 1
+    config:
+      title: "Share of global consumption-based CO₂ emissions and population"
+      subtitle: "[Consumption-based emissions](#dod:consumptionbasedemissions) include those from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included. Data is not available for some low-income countries due to poor data availability."
+      originUrl: "/co2-and-greenhouse-gas-emissions"
+      chartTypes:
+        - "DiscreteBar"
+      hideTimeline: true
+      selectedEntityNames:
+        - "High-income countries"
+        - "Upper-middle-income countries"
+        - "Lower-middle-income countries"
+        - "Low-income countries"

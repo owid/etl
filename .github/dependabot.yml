@@ -2,10 +2,10 @@
 #
 # Deliberately scoped to GitHub Actions only.
 #
-# Actions must be pinned to immutable commit SHAs (see
-# .github/instructions/github-actions.instructions.md). Pinning is a
-# supply-chain control we want to keep, but it freezes each action until
-# somebody bumps it by hand — and actions almost never receive security
+# Actions are locked to immutable commit SHAs in .github/workflows/actions.lock
+# (see .github/instructions/github-actions.instructions.md); Dependabot
+# regenerates the lockfile in its own PRs. Locking is a supply-chain control we
+# want to keep, but it freezes each action until somebody bumps it by hand — and actions almost never receive security
 # advisories, so Dependabot's *security* updates (which run without any config)
 # never touch them. Without the version updates below, a pin is never updated
 # at all, and eventually a stale one breaks a workflow: hatchling 1.32.0 began

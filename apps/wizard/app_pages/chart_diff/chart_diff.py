@@ -184,15 +184,15 @@ def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) ->
     )
 
 
-def _target_updated_at_for_review(source_chart: gm.Chart, target_chart: gm.Chart | None) -> dt.datetime | None:
-    """Timestamp key used for approvals/conflicts.
+def _target_version_for_review(source_chart: gm.Chart, target_chart: gm.Chart | None) -> gm.TargetVersion | None:
+    """Target version that approvals/conflicts are checked against (see `gm.review_still_holds`).
 
     Cross-environment twins did not exist in production when the staging chart
     was reviewed, so their approvals were recorded with targetUpdatedAt=NULL.
     """
     if target_chart is None or _is_cross_env_twin(source_chart, target_chart):
         return None
-    return target_chart.updatedAt
+    return gm.TargetVersion(updated_at=target_chart.updatedAt, edited_at=target_chart.lastEditedAt)
 
 
 class ChartDiff:
@@ -360,7 +360,8 @@ class ChartDiff:
                 # Fallback for ChartDiff objects created outside of `from_charts_df`.
                 with Session(OWID_ENV.engine) as session:
                     staging_created_at = get_staging_creation_time(session)
-            chart_edited_in_prod = self.target_chart.updatedAt > staging_created_at
+            # `lastEditedAt`, not `updatedAt`: rebuilding the config from its indicators isn't an edit
+            chart_edited_in_prod = self.target_chart.lastEditedAt > staging_created_at
             if _is_cross_env_twin(self.source_chart, self.target_chart):
                 chart_edited_in_prod = False
 
@@ -611,13 +612,14 @@ class ChartDiff:
             assert self.chart_id
             if self.is_modified:
                 assert self.target_chart
+            # Must match the lookup in `_get_approvals`: catalog-path twins
+            # key on a NULL target timestamp (prod minted its own row), so
+            # record the same NULL here rather than the twin's timestamp.
+            target = _target_version_for_review(self.source_chart, self.target_chart)
             approval = gm.ChartDiffApprovals(
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
-                # Must match the lookup in `_get_approvals`: catalog-path twins
-                # key on a NULL target timestamp (prod minted its own row), so
-                # record the same NULL here rather than the twin's updatedAt.
-                targetUpdatedAt=_target_updated_at_for_review(self.source_chart, self.target_chart),  # ty: ignore
+                targetUpdatedAt=target.edited_at if target else None,  # ty: ignore
                 status=status,  # ty: ignore
             )
             session.add(approval)
@@ -637,7 +639,7 @@ class ChartDiff:
             assert self.target_chart
         conflict = gm.ChartDiffConflicts(
             chartId=self.chart_id,
-            targetUpdatedAt=self.target_chart.updatedAt,  # ty: ignore
+            targetUpdatedAt=self.target_chart.lastEditedAt,  # ty: ignore
             conflict="resolved",
         )
         session.add(conflict)
@@ -761,17 +763,11 @@ class ChartDiff:
             ]
         else:
             # Normal timestamp-based lookup
-            target_updated_ats = []
-            for chart_id in chart_ids:
-                target_updated_ats.append(
-                    _target_updated_at_for_review(source_charts[chart_id], target_charts.get(chart_id))
-                )
-
             approvals = gm.ChartDiffApprovals.latest_chart_approval_batch(
                 source_session,
                 chart_ids,
                 [source_charts[chart_id].updatedAt for chart_id in chart_ids],
-                target_updated_ats,
+                [_target_version_for_review(source_charts[i], target_charts.get(i)) for i in chart_ids],
             )
 
         approvals = dict(zip(chart_ids, approvals))
@@ -781,15 +777,10 @@ class ChartDiff:
     def _get_conflicts(
         source_session, chart_ids, source_charts, target_charts
     ) -> dict[int, gm.ChartDiffConflicts | None]:
-        target_updated_ats = []
-        for chart_id in chart_ids:
-            target_updated_ats.append(
-                _target_updated_at_for_review(source_charts[chart_id], target_charts.get(chart_id))
-            )
         conflicts = gm.ChartDiffConflicts.get_conflict_batch(
             source_session,
             chart_ids,
-            target_updated_ats,
+            [_target_version_for_review(source_charts[i], target_charts.get(i)) for i in chart_ids],
         )
         conflicts = dict(zip(chart_ids, conflicts))
         return conflicts

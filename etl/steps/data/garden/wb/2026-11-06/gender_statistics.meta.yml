@@ -224,7 +224,7 @@ tables:
           grapher_config:
             title: Is there a law specifically on domestic violence?
             subtitle: |-
-              This map shows countries where a law specifically on domestic violence sets criminal penalties for it or lets victims get protection orders.
+              “Yes” means a law specifically on domestic violence sets criminal penalties for it or lets victims get protection orders.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -250,7 +250,7 @@ tables:
         unit: (1=yes; 0=no)
         short_unit: ''
         description_short: |-
-          Countries score 1 if the law has no provision requiring a married woman to obey her husband. They score 0 if any provision says she must obey him, or if disobeying him has legal consequences for her, such as losing her right to financial support from him.
+          Countries score “yes” if the law has no provision requiring a married woman to obey her husband. They score “no” if any provision says she must obey him, or if disobeying him has legal consequences for her, such as losing her right to financial support from him.
         description_processing: |-
           {definitions.wbl_description_processing}
         description_from_producer: |-
@@ -263,7 +263,7 @@ tables:
           grapher_config:
             title: Are married women required by law to obey their husbands?
             subtitle: |-
-              This map shows countries where the law requires married women to obey their husbands, or punishes them for disobeying, for example by taking away their right to financial support from their husband.
+              In some countries, the law requires married women to obey their husbands, or punishes them for disobeying, for example by taking away their right to financial support from their husband.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -308,7 +308,7 @@ tables:
           grapher_config:
             title: Does the law ban gender discrimination in employment?
             subtitle: |-
-              This map shows countries where the law bans employers from discriminating against workers based on their sex or gender, or requires them to treat women and men equally.
+              “Yes” means the law bans employers from discriminating against workers based on their sex or gender, or requires them to treat women and men equally.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -332,7 +332,7 @@ tables:
           grapher_config:
             title: Can women get a job in the same way as men?
             subtitle: |-
-              This map shows countries where a husband can’t stop his wife from working, and where women don’t need any permission or documents to get a job that men don’t need.
+              “Yes” means a husband can’t stop his wife from working, and women don’t need any permission or documents to get a job that men don’t need.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -356,7 +356,7 @@ tables:
           grapher_config:
             title: Is there a law against sexual harassment at work?
             subtitle: |-
-              This map shows countries where the law specifically protects workers against sexual harassment at work, including unwanted sexual remarks or physical contact.
+              “Yes” means the law specifically protects workers against sexual harassment at work, including unwanted sexual remarks or physical contact.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -394,7 +394,7 @@ tables:
           grapher_config:
             title: Do women and men have the same rights to own property?
             subtitle: |-
-              This map shows countries where women and men have the same rights to own and manage land and buildings, and where husbands have no extra control over the couple’s property.
+              “Yes” means women and men have the same rights to own and manage land and buildings, and husbands have no extra control over the couple’s property.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -446,7 +446,7 @@ tables:
           grapher_config:
             title: Does the law punish sexual harassment at work, or let victims claim compensation?
             subtitle: |-
-              This map shows countries where sexual harassment at work can be punished with fines or prison, or where victims can claim compensation, even if they have lost their job.
+              “Yes” means sexual harassment at work can be punished with fines or prison, or victims can claim compensation, even if they have lost their job.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -470,7 +470,7 @@ tables:
           grapher_config:
             title: Do sons and daughters have equal rights to inherit from their parents?
             subtitle: |-
-              This map shows countries where sons and daughters have the same rights to inherit from their parents when no will is left.
+              “Yes” means sons and daughters have the same rights to inherit from their parents when no will is left.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -494,7 +494,7 @@ tables:
           grapher_config:
             title: Can women open a bank account in the same way as men?
             subtitle: |-
-              This map shows countries where women can open a bank account without any permission or documents that men don’t need.
+              “Yes” means women can open a bank account without any permission or documents that men don’t need.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -518,7 +518,7 @@ tables:
           grapher_config:
             title: Can women apply for a passport in the same way as men?
             subtitle: |-
-              This map shows countries where women can apply for a passport without permission from a husband, father, other relative, or guardian, and without details or documents that men don’t need.
+              “Yes” means women can apply for a passport without permission from a husband, father, other relative, or guardian, and without details or documents that men don’t need.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -542,7 +542,7 @@ tables:
           grapher_config:
             title: Does the law ban gender discrimination in access to credit?
             subtitle: |-
-              This map shows countries where the law bans lenders from discriminating based on gender, or guarantees women and men equal access to financial services.
+              “Yes” means the law bans lenders from discriminating based on gender, or guarantees women and men equal access to financial services.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -566,7 +566,7 @@ tables:
           grapher_config:
             title: Can women register a business in the same way as men?
             subtitle: |-
-              This map shows countries where women can register a business without their husband’s or guardian’s permission, and without giving information or documents that men don’t need to give.
+              “Yes” means women can register a business without their husband’s or guardian’s permission, and without giving information or documents that men don’t need to give.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -590,7 +590,7 @@ tables:
           grapher_config:
             title: Can women get a divorce in the same way as men?
             subtitle: |-
-              This map shows countries where the process to get a divorce is the same for women and men, or gives women extra protections, such as stopping a husband from filing for divorce while his wife is pregnant.
+              “Yes” means the process to get a divorce is the same for women and men, or gives women extra protections, such as stopping a husband from filing for divorce while his wife is pregnant.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -614,7 +614,7 @@ tables:
           grapher_config:
             title: Do women have the same rights to remarry as men?
             subtitle: |-
-              This map shows countries where women have the same right to remarry as men, without restrictions such as a waiting period that men don’t face.
+              “Yes” means women have the same right to remarry as men, without restrictions such as a waiting period that men don’t face.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -650,7 +650,7 @@ tables:
           grapher_config:
             title: Can women sign a contract in the same way as men?
             subtitle: |-
-              This map shows countries where adult women can sign legally binding contracts on their own, without needing their husband’s or guardian’s permission, consent, or signature.
+              “Yes” means adult women can sign legally binding contracts on their own, without needing their husband’s or guardian’s permission, consent, or signature.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -674,7 +674,7 @@ tables:
           grapher_config:
             title: Can women choose where to live in the same way as men?
             subtitle: |-
-              This map shows countries where the law doesn’t restrict where women can live, or give husbands more say over where the family lives.
+              “Yes” means the law doesn’t restrict where women can live, or give husbands more say over where the family lives.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0
@@ -698,7 +698,7 @@ tables:
           grapher_config:
             title: Do husbands and wives have equal control over assets during marriage?
             subtitle: |-
-              This map shows countries where husbands and wives have equal rights to manage property during marriage.
+              “Yes” means husbands and wives have equal rights to manage property during marriage.
             note: '{definitions.note_wbl_maps}'
         display:
           numDecimalPlaces: 0

@@ -1,0 +1,187 @@
+grapher_schema: "012"
+
+title:
+  title: Fish Stocks
+  title_variant: ""
+slug: fish-stocks
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore available data on the world's fish stocks.
+topic_tags:
+  - Fish & Overfishing
+default_selection:
+  - Albacore tuna North Pacific Ocean
+  - Albacore tuna South Atlantic
+  - Atlantic bluefin tuna Western Atlantic
+
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - LineChart
+        hasMapTab: false
+        originUrl: https://ourworldindata.org/
+        entityType: fish stock
+        entityTypePlural: fish stocks
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        yAxis:
+          min: 0
+
+dimensions:
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: fish_stocks_biomass
+        name: Fish stocks (biomass)
+      - slug: fishing_intensity
+        name: Fishing Intensity
+      - slug: catch
+        name: Catch
+      - slug: abundance
+        name: Abundance
+      - slug: spawning_population
+        name: Spawning population
+  - slug: total_or_relative
+    name: Total or Relative
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: relative_to_max_sustainable_yield
+        name: Relative to Max Sustainable Yield
+        description: Compared with the level at the maximum sustainable yield, the most fish that can be caught each year without the population shrinking. A value of one means the stock is at that level.
+      - slug: relative_to_management_target
+        name: Relative to management target
+        description: Compared with the target level set by the stock's fishery managers. A value of one means the stock is at its target.
+      - slug: total
+        name: Total
+        description: The total amount, not compared with any reference level.
+
+views:
+  # ---- Fish stocks (biomass) ----
+  - dimensions:
+      metric: fish_stocks_biomass
+      total_or_relative: total
+    indicators:
+      y:
+        - catalogPath: fish_stocks#total_biomass
+    config:
+      title: Total fish stocks
+      subtitle: "Fish stocks are measured by their biomass: the number of individuals multiplied by their mass."
+
+  - dimensions:
+      metric: fish_stocks_biomass
+      total_or_relative: relative_to_max_sustainable_yield
+    indicators:
+      y:
+        - catalogPath: fish_stocks#total_biomass_relative_to_msy
+    config:
+      title: Fish stocks relative to the maximum sustainable yield
+      subtitle: |-
+        Fish stocks are measured by their biomass: the number of individuals multiplied by their mass.
+        Here it's measured as the biomass of a fish stock divided by the biomass at its maximum sustainable yield – the level at which we can catch the maximum amount of fish without a decline in fish populations. A value of one maximizes fish catch without decreasing fish populations.
+
+  - dimensions:
+      metric: fish_stocks_biomass
+      total_or_relative: relative_to_management_target
+    indicators:
+      y:
+        - catalogPath: fish_stocks#total_biomass_relative_to_management_target
+    config:
+      title: Fish stocks relative to the management target
+      subtitle: |-
+        Fish stocks are measured by their biomass: the number of individuals multiplied by their mass.
+        Here it's measured as the biomass of a fish stock divided by the biomass at the management target level. A value of one means fish catch is optimal to achieve the intended level fo fish stocks.
+
+  # ---- Fishing Intensity ----
+  - dimensions:
+      metric: fishing_intensity
+      total_or_relative: total
+    indicators:
+      y:
+        - catalogPath: fish_stocks#exploitation_rate
+    config:
+      title: Fishing intensity
+      subtitle: "Fishing intensity measured the extent to which a stock is being exploited. This is the fraction of the fish population that is caught in a given year."
+
+  - dimensions:
+      metric: fishing_intensity
+      total_or_relative: relative_to_max_sustainable_yield
+    indicators:
+      y:
+        - catalogPath: fish_stocks#exploitation_rate_relative_to_msy
+    config:
+      title: Fishing intensity relative to the maximum sustainable yield
+      subtitle: |-
+        Fishing intensity measured the extent to which a stock is being exploited. This is the fraction of the fish population that is caught in a given year.
+        Here it's measured as the intensity divided by the intensity at the maximum sustainable yield – the level at which we can catch the maximum amount of fish without a decline in fish populations. A value of one is the optimal level to maximize fish catch without declining populations. Greater than one suggests overfishing.
+
+  # ---- Catch ----
+  - dimensions:
+      metric: catch
+      total_or_relative: total
+    indicators:
+      y:
+        - catalogPath: fish_stocks#total_catch
+    config:
+      title: Total fish catch
+
+  - dimensions:
+      metric: catch
+      total_or_relative: relative_to_max_sustainable_yield
+    indicators:
+      y:
+        - catalogPath: fish_stocks#catch_relative_to_msy
+    config:
+      title: Fish catch relative to catch at maximum sustainable yield
+
+  # ---- Abundance ----
+  - dimensions:
+      metric: abundance
+      total_or_relative: total
+    indicators:
+      y:
+        - catalogPath: fish_stocks#total_number
+    config:
+      title: Abundance of fish
+
+  - dimensions:
+      metric: abundance
+      total_or_relative: relative_to_max_sustainable_yield
+    indicators:
+      y:
+        - catalogPath: fish_stocks#number_relative_to_msy
+    config:
+      title: Abundance of fish relative to abundance at maximum sustainable yield
+
+  # ---- Spawning population ----
+  - dimensions:
+      metric: spawning_population
+      total_or_relative: total
+    indicators:
+      y:
+        - catalogPath: fish_stocks#spawning_stock_biomass
+    config:
+      title: Spawning stock biomass
+
+  - dimensions:
+      metric: spawning_population
+      total_or_relative: relative_to_max_sustainable_yield
+    indicators:
+      y:
+        - catalogPath: fish_stocks#spawning_stock_relative_to_msy
+    config:
+      title: Spawning stock biomass relative to biomass at maximum sustainable yield
+
+  - dimensions:
+      metric: spawning_population
+      total_or_relative: relative_to_management_target
+    indicators:
+      y:
+        - catalogPath: fish_stocks#spawning_stock_relative_to_management_target
+    config:
+      title: Spawning stock biomass relative to biomass at management target
