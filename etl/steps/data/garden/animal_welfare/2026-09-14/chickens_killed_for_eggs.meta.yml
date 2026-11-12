@@ -37,8 +37,6 @@ tables:
       hens_killed:
         title: Estimated number of hens killed in egg production
         description_processing: *description_processing_killed
-        presentation:
-          attribution: Food and Agriculture Organization of the United Nations (2025); calculations by Our World in Data following methodology by Faunalytics
         unit: hens
         short_unit: ""
         display:
@@ -46,8 +44,6 @@ tables:
       male_chickens_killed:
         title: Estimated number of male chickens killed in egg production
         description_processing: *description_processing_killed
-        presentation:
-          attribution: Food and Agriculture Organization of the United Nations (2025); calculations by Our World in Data following methodology by Faunalytics
         unit: chickens
         short_unit: ""
         display:
@@ -56,8 +52,6 @@ tables:
         title: Estimated number of chickens killed in egg production
         description_short: Around half of the estimated total are laying hens, killed when their productivity declines. The other half are male chickens, most of which are killed within a day of hatching.
         description_processing: *description_processing_killed
-        presentation:
-          attribution: Food and Agriculture Organization of the United Nations (2025); calculations by Our World in Data following methodology by Faunalytics
         unit: chickens
         short_unit: ""
         display:
@@ -65,8 +59,6 @@ tables:
       hens_killed_per_capita:
         title: Estimated number of hens killed in egg production per person
         description_processing: *description_processing_killed
-        presentation:
-          attribution: Food and Agriculture Organization of the United Nations (2025); calculations by Our World in Data following methodology by Faunalytics
         unit: hens per person
         short_unit: ""
         display:
@@ -74,8 +66,6 @@ tables:
       male_chickens_killed_per_capita:
         title: Estimated number of male chickens killed in egg production per person
         description_processing: *description_processing_killed
-        presentation:
-          attribution: Food and Agriculture Organization of the United Nations (2025); calculations by Our World in Data following methodology by Faunalytics
         unit: chickens per person
         short_unit: ""
         display:
@@ -84,8 +74,6 @@ tables:
         title: Estimated number of chickens killed in egg production per person
         description_short: Around half of the estimated total are laying hens, killed when their productivity declines. The other half are male chickens, most of which are killed within a day of hatching.
         description_processing: *description_processing_killed
-        presentation:
-          attribution: Food and Agriculture Organization of the United Nations (2025); calculations by Our World in Data following methodology by Faunalytics
         unit: chickens per person
         short_unit: ""
         display:
