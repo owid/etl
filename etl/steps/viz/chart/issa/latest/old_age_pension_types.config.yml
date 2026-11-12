@@ -27,7 +27,7 @@ dimensions:
         description: Four groups, by whether a country has a contributory pension, a tax-funded pension, both, or neither
       - slug: type_of_tax_funded_pension
         name: Type of tax-funded pension
-        description: Universal, means-tested, both, or none
+        description: Universal, targeted, both, or none
       - slug: pension_system_mix
         name: Mix of programs
         description: Seven groups, which also show whether workers must save for retirement

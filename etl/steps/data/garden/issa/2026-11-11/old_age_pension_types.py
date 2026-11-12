@@ -59,8 +59,8 @@ INCLUDE_CLOSED_PROGRAMS = True
 # (in the mix) mandatory savings. The labels describe financing only: the ISSA table doesn't say who runs or pays out
 # each program.
 # NOTE: Chile's 2025 pension reform adds an employer contribution to a new social insurance scheme from August 2025,
-#  after this release's reference date. If the ISSA now lists it, check the description_key that names Chile, Mexico
-#  and Panama as countries whose contributory scheme is closed to new entrants.
+#  after this release's reference date. If the ISSA now lists it, Chile may count as having an open contributory
+#  pension, so check its classification.
 CONTRIBUTORY_AND_TAX_FUNDED_LABELS = {
     (True, False): "Contributory pension, no tax-funded pension",
     (True, True): "Contributory and tax-funded pensions",
@@ -68,19 +68,20 @@ CONTRIBUTORY_AND_TAX_FUNDED_LABELS = {
     (False, False): "Mandatory savings only",
 }
 MIX_LABELS = {
-    (True, False, False): "Contributory pension only",
-    (True, True, False): "Contributory and tax-funded pensions",
-    (True, False, True): "Contributory pension and mandatory savings",
-    (True, True, True): "Contributory and tax-funded pensions, and mandatory savings",
-    (False, True, False): "Tax-funded pension only",
-    (False, True, True): "Tax-funded pension and mandatory savings",
-    (False, False, True): "Mandatory savings only",
+    (True, False, False): "Contributory only",
+    (True, True, False): "Contributory and tax-funded",
+    (True, False, True): "Contributory and savings",
+    (True, True, True): "Contributory, tax-funded, and savings",
+    (False, True, False): "Tax-funded only",
+    (False, True, True): "Tax-funded and savings",
+    (False, False, True): "Savings only",
 }
-# Labels of the type of tax-funded pension, by whether a country has a universal pension and a means-tested pension.
+# Labels of the type of tax-funded pension, by whether a country has a universal pension and a targeted (means-tested)
+# pension.
 TAX_FUNDED_LABELS = {
     (True, False): "Universal pension",
-    (False, True): "Means-tested pension",
-    (True, True): "Universal and means-tested pensions",
+    (False, True): "Targeted pension",
+    (True, True): "Universal and targeted pensions",
     (False, False): "No tax-funded pension",
 }
 
@@ -124,7 +125,7 @@ def run() -> None:
     has_tax_funded = has[TAX_FUNDED[0]] | has[TAX_FUNDED[1]]
     has_savings = has[SAVINGS[0]] | has[SAVINGS[1]] | has[SAVINGS[2]]
 
-    # Type of tax-funded pension: universal, means-tested, both, or none.
+    # Type of tax-funded pension: universal, targeted, both, or none.
     tb["type_of_tax_funded_pension"] = tb["non_contributory_universal"].copy()
     for (universal, means_tested), label in TAX_FUNDED_LABELS.items():
         mask = (has["non_contributory_universal"] == universal) & (has["non_contributory_means_tested"] == means_tested)

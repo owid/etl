@@ -27,9 +27,9 @@ definitions:
 
   # Text shared by several indicators.
   description_key_mandatory: |-
-    This data covers the mandatory old-age programs that each country sets in law, as described by the International Social Security Association (ISSA). It doesn’t include programs that aren’t required by law, such as voluntary pensions, even when most workers take part in them. It shows which programs exist, not how many older people get a pension from them or how much they pay.
+    This data covers the old-age programs that each country requires by law, as described by the International Social Security Association (ISSA), so it leaves out voluntary pensions. It shows which programs exist, not how important each one is.
   description_key_several_programs: |-
-    A country can have several types of programs at once. For example, many countries pair a pension financed by contributions with a means-tested pension for older people with low incomes.
+    A country can have several types of programs at once. For example, many countries pair a pension financed by contributions with a targeted pension for older people with low incomes.
   description_key_reference_dates: |-
     The ISSA updates its information region by region. This data is up to date as of July 2023 for most of Europe, January 2024 for Asia and the Pacific and for Eurasia, July 2024 for Africa, and July 2025 for the Americas. We show all countries in 2025, the year of the most recent information.
   description_key_closed: |-
@@ -44,62 +44,54 @@ definitions:
     We classify each country by the programs the ISSA lists for it. This includes programs the ISSA marks as closed to new entrants and being phased out, because they still pay pensions to many of today’s retirees.
 
     - A country has a contributory pension if it has a contributory flat-rate or earnings-related pension.
-    - It has a tax-funded pension if it has a means-tested or universal pension, which the government pays for without contributions from workers or employers.
+    - It has a tax-funded pension if it has a universal or targeted pension, which the government pays for without contributions from workers or employers.
     - It has mandatory savings if it has a provident fund, a mandatory occupational pension, or individual pension accounts.
   description_key_closed_classification: |-
-    This classification counts programs that are closed to new entrants and being phased out, because they still pay pensions to many of today’s retirees. For example, Chile, Mexico, and Panama count as having a contributory pension, although new workers can no longer join it.
+    This classification counts programs that are closed to new entrants, because they still pay pensions to many of today’s retirees.
   # Based on the ISSA country profiles: France's mandatory occupational pension is a "DB Points scheme" and Iceland's
   # uses "Wage replacement" (both policies as of 1 July 2023); the others pay a "Defined-contribution (DC) benefit".
   description_key_occupational: |-
     Most mandatory occupational pensions pay out what has built up in each worker’s savings, and private or independent pension funds run them. In France and Iceland, the ISSA’s country profiles describe a pension worked out with a formula instead: based on points earned over the career in France, and on past earnings in Iceland.
   description_key_occupational_classification: |-
-    We count mandatory occupational pensions as mandatory savings because most of them pay out what has built up in each worker’s savings. In France and Iceland, the ISSA’s country profiles describe a pension worked out with a formula instead: based on points earned over the career in France, and on past earnings in Iceland.
+    We count pensions that employers must provide as mandatory savings, although in France and Iceland they follow a formula instead of paying out savings.
   note_classification: |-
     Includes programs closed to new workers. Information as of 2023 to 2025, depending on the region.
+  # Based on the "Benefit calculation rules" and "Administrative organization" of social insurance pensions in the
+  # ISSA country profiles.
+  description_key_classification_contributory: |-
+    In this data, a “contributory pension” is social insurance: workers, employers, or both pay contributions, and the pension follows a formula set by law, usually based on past earnings. It usually goes to people who paid in, and a public body runs it in almost every country.
+  description_key_classification_tax_funded: |-
+    A “tax-funded pension” is paid for by the government, without contributions from workers or employers. It goes either to everyone above a certain age who meets residence rules (a universal pension), or only to people with low incomes or few assets (a targeted pension, also called means-tested).
+  description_key_classification_savings: |-
+    “Mandatory savings” are schemes that pay out what has built up in each worker’s account: a provident fund (a national fund that usually pays the savings back all at once), a pension that employers must provide, or individual pension accounts (each worker’s own account, usually run by a private fund manager).
 
   # Contributory and tax-funded pensions.
   description_short_contributory_and_tax_funded: |-
     Whether the country has an old-age pension paid for by contributions (from workers, employers, or both), one paid for by the government from taxes, both, or neither. Countries with neither only require workers to save for retirement.
-  # Based on the "Benefit calculation rules" and "Administrative organization" of social insurance pensions in the
-  # ISSA country profiles.
-  description_key_contributory_and_tax_funded_contributory: |-
-    In this data, a “contributory pension” is a social insurance pension: workers, employers, or both pay contributions, and the pension is worked out with a formula set by law. Most formulas replace a share of the worker’s past earnings; others pay a flat amount or turn points earned over the working life into a pension. It usually goes only to people who paid contributions, and a public body runs it in almost every country. Some contributory pensions are worked out from each worker’s own contributions plus interest, in what are called notional accounts.
-  description_key_contributory_and_tax_funded_tax_funded: |-
-    A “tax-funded pension” is a pension the government pays for, usually in full, without contributions from workers or employers. It can go to everyone above a certain age who meets residence rules (a universal pension), or only to people with low incomes or few assets (a means-tested pension). It can reach older people who never paid contributions.
   description_key_contributory_and_tax_funded_savings_only: |-
-    “Mandatory savings only” means the only mandatory programs are savings schemes: a provident fund, a pension that employers must provide, or individual pension accounts. These schemes generally pay out what has built up in each worker’s account, so the pension depends on how much was paid in and on investment returns. The ISSA lists no contributory or tax-funded pension in these countries, although some of them pay cash benefits to older people through other programs.
-  description_key_contributory_and_tax_funded_savings_elsewhere: |-
-    Countries in the other three groups can also require workers to save for retirement. Most countries with a tax-funded pension but no contributory pension do.
+    “Mandatory savings only” means these schemes are the country’s only mandatory programs. Countries in the other three groups can have them too.
   subtitle_contributory_and_tax_funded: |-
-    Contributory pensions are social insurance: workers, employers, or both pay contributions, and the pension follows a formula set by law. Tax-funded pensions are generally paid for by the government, for everyone above a certain age or only for people with low incomes or few assets.
+    Contributory pensions are social insurance: workers, employers, or both pay contributions, and the pension follows a formula set by law. Tax-funded pensions are paid for by the government, for everyone above a certain age or only for people with low incomes or few assets.
   note_contributory_and_tax_funded: |-
     Countries with a contributory or tax-funded pension may also require workers to save for retirement. Includes programs closed to new workers. Information as of 2023 to 2025, depending on the region.
 
   # Type of tax-funded pension.
   description_short_type_of_tax_funded: |-
-    Whether the country has a tax-funded old-age pension, and whether it goes to older people mainly based on residence (a universal pension), only to those with low incomes or few assets (a means-tested pension), or both.
+    Whether the country has a tax-funded old-age pension, and whether it goes to older people mainly based on residence (a universal pension), only to those with low incomes or few assets (a targeted pension), or both.
   description_key_type_of_tax_funded_tax_funded: |-
     A “tax-funded pension” is a pension the government pays for, usually in full, without contributions from workers or employers. It can reach older people who never paid contributions.
   description_key_type_of_tax_funded_universal: |-
-    The ISSA defines a universal pension as a pension paid to people based mainly on residence, not on earnings or financial means. Its amount can vary, and some countries reduce it or stop paying it when a person’s income from work or other pensions is above a certain level.
+    A “universal pension” goes to older people mainly based on residence, not on their earnings or means. Some countries reduce it or stop paying it at higher incomes.
   description_key_type_of_tax_funded_means_tested: |-
-    The ISSA defines a means-tested pension as a pension paid to people whose own or family income, assets, or other means are below a set level.
+    A “targeted pension”, also called means-tested, goes only to older people whose own or family income, assets, or other means are below a set level.
   description_key_type_of_tax_funded_none: |-
     “No tax-funded pension” means the country’s mandatory programs are contributory pensions, savings schemes, or both.
   subtitle_type_of_tax_funded: |-
-    A universal pension goes to older people mainly based on residence, although some countries reduce it at higher incomes. A means-tested pension goes only to those with low incomes or few assets. People usually don’t need to have paid contributions to get either.
+    A universal pension goes to older people mainly based on residence, although some countries reduce it at higher incomes. A targeted pension goes only to those with low incomes or few assets. People usually don’t need to have paid contributions to get either.
 
   # Mix of programs.
   description_short_mix: |-
     Which kinds of mandatory programs each country uses to provide income in old age: a pension paid for by contributions, a pension paid for by the government from taxes, and mandatory savings schemes.
-  description_key_mix_contributory: |-
-    A “contributory pension” is a social insurance pension: workers, employers, or both pay contributions, and the pension is worked out with a formula set by law, as a flat amount or one based on past earnings.
-  description_key_mix_tax_funded: |-
-    A “tax-funded pension” is paid for by the government, without contributions from workers or employers. It can go to everyone above a certain age who meets residence rules (a universal pension), or only to those with low incomes or few assets (a means-tested pension).
-  description_key_mix_savings: |-
-    “Mandatory savings” are schemes in which workers or employers must save for retirement: a provident fund, a pension that employers must provide, or individual pension accounts. They generally pay out what has built up in each worker’s account.
-  description_key_savings_types: |-
-    A provident fund is a national fund that keeps each worker’s savings and usually pays them back as a lump sum. A pension that employers must provide, or mandatory occupational pension, is a scheme they set up and pay for. Individual pension accounts are each worker’s own accounts, run by a fund manager, usually private, and they usually pay a regular income in retirement.
   subtitle_mix: |-
     Countries can pay older people a pension financed by contributions (from workers, employers, or both), a pension financed by the government from taxes, or require workers to save for retirement. Many combine them.
 
@@ -125,11 +117,11 @@ definitions:
   subtitle_earnings_related: |-
     A pension paid for by contributions from workers, employers, or both, whose amount depends on past earnings.
 
-  # Means-tested pension.
+  # Targeted (means-tested) pension.
   description_short_means_tested: |-
     Whether the country has a pension for older people with low incomes or few assets, which the government pays for without contributions from workers or employers.
   description_key_means_tested: |-
-    The ISSA defines a means-tested pension as a pension paid to people whose own or family income, assets, or other means are below a set level. The government usually pays for it, without contributions from workers or employers. It usually pays a flat amount, or an amount that falls as the person’s other income rises.
+    In this data, a “targeted pension” is what the ISSA calls a means-tested pension: a pension paid to people whose own or family income, assets, or other means are below a set level. The government usually pays for it, without contributions from workers or employers. It usually pays a flat amount, or an amount that falls as the person’s other income rises.
   subtitle_means_tested: |-
     A pension for older people whose income, assets, or other means are below a set level. The government usually pays for it, without contributions from workers or employers.
 
@@ -145,19 +137,19 @@ definitions:
 
   # Provident fund.
   description_short_provident_fund: |-
-    Whether workers and employers must pay into a national savings fund that keeps an account for each worker and pays it back at retirement, usually as a lump sum.
+    Whether workers and employers must pay into a national savings fund that keeps an account for each worker and pays it back at retirement, usually all at once.
   # Based on the ISSA definition and the country profiles: every provident fund pays back contributions plus interest,
-  # most only as a lump sum, and public bodies run all of them except Hong Kong's.
+  # most only in a single payment, and public bodies run all of them except Hong Kong's.
   description_key_provident_fund: |-
-    In this data, a “provident fund” is a single national savings fund that keeps an account for each worker. Workers and employers pay part of the worker’s earnings into it, and the fund adds interest. At retirement, the worker gets back what has built up, usually as one lump sum rather than a regular pension; some funds also let workers take it as monthly payments. A public body runs the fund in every country except Hong Kong, where private trustees run the schemes under a public authority.
+    In this data, a “provident fund” is a single national savings fund that keeps an account for each worker. Workers and employers pay part of the worker’s earnings into it, and the fund adds interest. At retirement, the worker gets back what has built up, usually in a single payment rather than as a regular pension; some funds also let workers take it as monthly payments. A public body runs the fund in every country except Hong Kong, where private trustees run the schemes under a public authority.
   subtitle_provident_fund: |-
-    Workers and employers must pay into a national savings fund that keeps an account for each worker and pays it back at retirement, usually as a lump sum.
+    Workers and employers must pay into a national savings fund that keeps an account for each worker and pays it back at retirement, usually all at once.
 
   # Mandatory occupational pension.
   description_short_occupational: |-
     Whether employers must provide and pay for a pension scheme for their workers.
   description_key_occupational_definition: |-
-    The ISSA defines a mandatory occupational pension as a pension scheme that employers provide and pay for, in some cases with contributions from workers. It pays out a lump sum, an annuity, or a pension.
+    The ISSA defines a mandatory occupational pension as a pension scheme that employers provide and pay for, in some cases with contributions from workers. It pays out either all at once or as regular payments.
   subtitle_occupational: |-
     Employers must provide and pay for a pension scheme for their workers, in some cases with contributions from the workers themselves.
 
@@ -167,7 +159,7 @@ definitions:
   # Based on the ISSA country profiles' "Administrative organization" tables: private fund managers run the accounts
   # in 20 of the 34 countries, a public body in 13, and both in Sweden.
   description_key_individual_accounts: |-
-    The ISSA defines individual accounts as accounts into which workers, and in some cases employers, must pay a set share of earnings or a fixed amount. A public or private fund manager the worker chooses runs the account. The savings pay for an annuity, regular withdrawals, or a mix of the two, and may be paid out as a lump sum. Private fund managers run these accounts in most countries that have them, and a public body in more than a third.
+    The ISSA defines individual accounts as accounts into which workers, and in some cases employers, must pay a set share of earnings or a fixed amount. A public or private fund manager the worker chooses runs the account. The savings pay for an annuity, regular withdrawals, or a mix of the two, and in some countries can be taken all at once. Private fund managers run these accounts in most countries that have them, and a public body in more than a third.
   description_key_individual_accounts_guaranteed_minimum: |-
     “Yes, with a guaranteed minimum pension” means the government guarantees a minimum pension to the people in these accounts.
   description_key_individual_accounts_choice: |-
@@ -211,21 +203,17 @@ tables:
         description_key: |-
           {definitions.description_key_mandatory}
 
-          {definitions.description_key_contributory_and_tax_funded_contributory}
+          {definitions.description_key_classification_contributory}
 
-          {definitions.description_key_contributory_and_tax_funded_tax_funded}
+          {definitions.description_key_classification_tax_funded}
+
+          {definitions.description_key_classification_savings}
 
           {definitions.description_key_contributory_and_tax_funded_savings_only}
-
-          {definitions.description_key_savings_types}
-
-          {definitions.description_key_contributory_and_tax_funded_savings_elsewhere}
 
           {definitions.description_key_occupational_classification}
 
           {definitions.description_key_closed_classification}
-
-          {definitions.description_key_reference_dates}
         processing_level: major
         description_processing: "{definitions.description_processing_classification}"
         sort:
@@ -262,18 +250,16 @@ tables:
           {definitions.description_key_type_of_tax_funded_none}
 
           {definitions.description_key_closed_classification}
-
-          {definitions.description_key_reference_dates}
         processing_level: major
         description_processing: "{definitions.description_processing_classification}"
         sort:
           - Universal pension
-          - Universal and means-tested pensions
-          - Means-tested pension
+          - Universal and targeted pensions
+          - Targeted pension
           - No tax-funded pension
         presentation:
           grapher_config:
-            title: Which countries have a universal or means-tested pension for older people?
+            title: Which countries have a universal or targeted pension for older people?
             subtitle: "{definitions.subtitle_type_of_tax_funded}"
             note: "{definitions.note_classification}"
             map:
@@ -281,8 +267,8 @@ tables:
                 customNumericColorsActive: true
                 customCategoryColors:
                   Universal pension: *color_universal
-                  Universal and means-tested pensions: *color_universal_means_tested
-                  Means-tested pension: *color_means_tested
+                  Universal and targeted pensions: *color_universal_means_tested
+                  Targeted pension: *color_means_tested
                   No tax-funded pension: *color_no
 
       pension_system_mix:
@@ -291,29 +277,25 @@ tables:
         description_key: |-
           {definitions.description_key_mandatory}
 
-          {definitions.description_key_mix_contributory}
+          {definitions.description_key_classification_contributory}
 
-          {definitions.description_key_mix_tax_funded}
+          {definitions.description_key_classification_tax_funded}
 
-          {definitions.description_key_mix_savings}
-
-          {definitions.description_key_savings_types}
+          {definitions.description_key_classification_savings}
 
           {definitions.description_key_occupational_classification}
 
           {definitions.description_key_closed_classification}
-
-          {definitions.description_key_reference_dates}
         processing_level: major
         description_processing: "{definitions.description_processing_classification}"
         sort:
-          - Contributory pension only
-          - Contributory pension and mandatory savings
-          - Contributory and tax-funded pensions
-          - Contributory and tax-funded pensions, and mandatory savings
-          - Tax-funded pension only
-          - Tax-funded pension and mandatory savings
-          - Mandatory savings only
+          - Contributory only
+          - Contributory and savings
+          - Contributory and tax-funded
+          - Contributory, tax-funded, and savings
+          - Tax-funded only
+          - Tax-funded and savings
+          - Savings only
         presentation:
           grapher_config:
             title: Which mandatory pension programs do countries use?
@@ -323,13 +305,13 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 customCategoryColors:
-                  Contributory pension only: *color_contributory
-                  Contributory pension and mandatory savings: *color_contributory_savings
-                  Contributory and tax-funded pensions: *color_both
-                  Contributory and tax-funded pensions, and mandatory savings: *color_both_savings
-                  Tax-funded pension only: *color_tax_funded
-                  Tax-funded pension and mandatory savings: *color_tax_funded_savings
-                  Mandatory savings only: *color_savings
+                  Contributory only: *color_contributory
+                  Contributory and savings: *color_contributory_savings
+                  Contributory and tax-funded: *color_both
+                  Contributory, tax-funded, and savings: *color_both_savings
+                  Tax-funded only: *color_tax_funded
+                  Tax-funded and savings: *color_tax_funded_savings
+                  Savings only: *color_savings
 
       contributory_flat_rate:
         title: Contributory flat-rate pension
@@ -414,7 +396,7 @@ tables:
                   Yes, closed to new entrants: *color_yes_closed
 
       non_contributory_means_tested:
-        title: Means-tested pension
+        title: Targeted pension
         description_short: "{definitions.description_short_means_tested}"
         description_key: |-
           {definitions.description_key_mandatory}
@@ -432,7 +414,7 @@ tables:
           - Yes, closed to new entrants
         presentation:
           grapher_config:
-            title: Which countries have a means-tested pension for older people?
+            title: Which countries have a targeted pension for older people?
             subtitle: "{definitions.subtitle_means_tested}"
             note: "{definitions.note_program}"
             map:
