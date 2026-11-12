@@ -1,22 +1,29 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  # Map colors.
-  color_no: &color_no "#e3a38b"
-  color_yes: &color_yes "#2c6fa5"
-  color_yes_detail_1: &color_yes_detail_1 "#6a9fcb"
-  color_yes_detail_2: &color_yes_detail_2 "#a5c6e4"
-  color_yes_detail_3: &color_yes_detail_3 "#1c4870"
-  color_yes_closed: &color_yes_closed "#b8b0c9"
-  # Classifications: one hue per group, and a lighter shade of it in the mix when the country also has mandatory savings.
-  color_contributory: &color_contributory "#2c6fa5"
-  color_contributory_savings: &color_contributory_savings "#8fb6dc"
-  color_both: &color_both "#7b5ea7"
-  color_both_savings: &color_both_savings "#bba9d8"
-  color_tax_funded: &color_tax_funded "#3a8c6e"
-  color_tax_funded_savings: &color_tax_funded_savings "#8fcbb0"
-  color_savings: &color_savings "#e09f46"
-  color_universal_means_tested: &color_universal_means_tested "#1f5a45"
-  color_means_tested: &color_means_tested "#a2d4b9"
+  # Map colors, from the OWID Categorical Map palette (OwidMapColors in owid-grapher's CustomSchemes.ts).
+  # Program views: "No" in neutral Taupe, "Yes" in MutedDenim, each footnote's detail in another cool color, and
+  # closed programs in SoftOrange so they stand out.
+  color_no: &color_no "#B9B2A6" # Taupe
+  color_yes: &color_yes "#526F9B" # MutedDenim
+  color_yes_detail_1: &color_yes_detail_1 "#5FB8C8" # SkyTurquoise
+  color_yes_detail_2: &color_yes_detail_2 "#8E97C7" # Lavendar
+  color_yes_detail_3: &color_yes_detail_3 "#238A84" # MutedTeal
+  color_yes_closed: &color_yes_closed "#CC7641" # SoftOrange
+  # Contributory and tax-funded pensions: the largest groups get the most contrasting pair (dark MutedDenim, light
+  # Sand), and the smallest one, mandatory savings only, the most salient color (MutedCherry).
+  color_both: &color_both "#526F9B" # MutedDenim
+  color_contributory: &color_contributory "#C3A27C" # Sand
+  color_tax_funded: &color_tax_funded "#238A84" # MutedTeal
+  color_savings: &color_savings "#B04E74" # MutedCherry
+  # Mix: each group keeps its color from the view above, and its "and mandatory savings" variant takes a nearby
+  # palette color that is easy to tell apart.
+  color_both_savings: &color_both_savings "#92D3DE" # LightDenim
+  color_contributory_savings: &color_contributory_savings "#CC7641" # SoftOrange
+  color_tax_funded_savings: &color_tax_funded_savings "#4FB2AC" # LightTeal
+  # Type of tax-funded pension: "No tax-funded pension" in neutral Taupe, the three types in distinct colors.
+  color_means_tested: &color_means_tested "#526F9B" # MutedDenim
+  color_universal: &color_universal "#CC7641" # SoftOrange
+  color_universal_means_tested: &color_universal_means_tested "#B04E74" # MutedCherry
 
   # Text shared by several indicators.
   key_mandatory: &key_mandatory |-
@@ -141,7 +148,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 customCategoryColors:
-                  Universal pension: *color_tax_funded
+                  Universal pension: *color_universal
                   Universal and means-tested pensions: *color_universal_means_tested
                   Means-tested pension: *color_means_tested
                   No tax-funded pension: *color_no
