@@ -455,6 +455,14 @@ Key fields for `config` in views or `common_views`:
 
 For the authoritative list, see the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
+### Chart colors
+
+Use OWID's own color schemes wherever one fits, following OWID's decision tree in [`CHART_COLORS.md`](CHART_COLORS.md). In short: a semantic scheme first (binary data, world regions, income groups, energy sources), then a sequential or diverging scale for ordered numbers, one OWID color for a bar chart or scatter plot without subgroups, and otherwise an `OwidCategorical*` scheme picked by the number of categories. A map of categories with no order uses `OwidCategoricalMap`. The admin's color dropdown lists the schemes Grapher prefers for the chart type first; `CHART_COLORS.md` has that list for each chart type.
+
+### Color groups for Marimekkos and scatter plots
+
+When a chart or view offers a `Marimekko` or `ScatterPlot`, color it by continent: add `color: regions#owid_region` next to `y` in the view's `indicators`, and `data://grapher/regions/2023-01-01/regions` to the viz step's dependencies in the dag. Also set `matchingEntitiesOnly: true` by default, so entities that belong to no group (regions, the world, income groups and other aggregates) drop out instead of appearing uncolored. It only affects the Marimekko and scatter plot; bar, line, slope and dumbbell tabs keep their selected regions. Offer the user income groups as an alternative coloring: `income_groups#classification`, with the latest `data://grapher/wb/<version>/income_groups` as the dependency. Both get their colors from Grapher's `continents` scheme, which colors continents and the four income groups by name.
+
 ### Map palettes
 
 Common practice in OWID charts, not a hard rule:
