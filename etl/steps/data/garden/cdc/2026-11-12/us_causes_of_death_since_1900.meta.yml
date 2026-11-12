@@ -19,6 +19,13 @@ definitions:
 
   key_sources: |-
     This data combines two sources from the US National Center for Health Statistics (NCHS), both based on death certificates: its historical mortality tables for 1900 to 1998, and the CDC WONDER database from 1999 onward.
+  # Causes that are only available from CDC WONDER (1999 onward), for which the bullets on 1900–1998 don't apply.
+  key_sources_cause: |-
+    <% if cause in ["Alzheimer’s disease", "COVID-19"] %>This data comes from CDC WONDER, the mortality database of the US National Center for Health Statistics (NCHS), based on death certificates.<% else %>{definitions.key_sources}<% endif %>
+  key_registration_area_cause: |-
+    <% if cause not in ["Alzheimer’s disease", "COVID-19"] %>{definitions.key_registration_area}<% endif %>
+  key_classification_cause: |-
+    <% if cause not in ["Alzheimer’s disease", "COVID-19"] %>{definitions.key_classification}<% endif %>
   key_registration_area: |-
     Before 1933, the data covers only the “death-registration states”: the states that recorded deaths reliably enough to be counted. They grew from ten states and the District of Columbia in 1900 to the whole country in 1933. So the number of deaths before 1933 is lower than for the whole country, and death rates are calculated on the population of those states.
   key_classification: |-
@@ -28,19 +35,19 @@ definitions:
 
   key_cause: |-
     <% if cause == "Pneumonia and influenza" %>
-    The largest jump from a change in classification is for pneumonia and influenza in 1999: NCHS estimates that the 10th revision of the ICD counts about 30% fewer deaths as pneumonia and influenza than the 9th revision did.
+    The drop in 1999 comes from a change in classification: NCHS estimates that the 10th revision of the ICD counts about 30% fewer deaths as pneumonia and influenza than the 9th revision did.
+    <% elif cause == "Diabetes" %>
+    The drop in 1949 comes from a change in classification: NCHS estimates that the revision used from that year counts about 45% fewer deaths as diabetes than the one before.
     <% elif cause == "COPD" %>
     NCHS’s data on chronic obstructive pulmonary disease (COPD) starts in 1960. Before then, these deaths were recorded as bronchitis, emphysema, or asthma, and NCHS’s historical tables don’t give a total for them. From 1999, CDC WONDER calls the group “chronic lower respiratory diseases”, which includes chronic bronchitis, emphysema, and asthma.
     <% elif cause == "Alzheimer’s disease" %>
-    This data starts in 1999, the first year CDC WONDER covers. NCHS’s historical tables don’t report Alzheimer’s disease as a separate cause.
-    <% elif cause == "COVID-19" %>
-    COVID-19 was first recorded as a cause of death in 2020.
+    This data starts in 1999. The classification used before then counted far fewer deaths as Alzheimer’s disease, so earlier figures aren’t comparable.
     <% elif cause == "Accidents" %>
     Accidents include all unintentional injuries, such as falls, drownings, road accidents, and accidental poisonings. Accidental poisonings, which are mostly drug overdoses, account for most of the rise in accident deaths since 1999.
     <% elif cause == "Road accidents" %>
     Road accidents are deaths from motor-vehicle accidents, which NCHS reports separately from 1906.
     <% elif cause == "Diarrheal diseases" %>
-    Until 1967, this data counts deaths from gastritis, duodenitis, enteritis, and colitis, which includes some inflammations of the digestive tract that are not infections. From 1968, it counts only intestinal infections, so the death rate drops that year. From 1999, it includes infections with the bacterium *Clostridioides difficile*, which account for most of its rise in the 2000s.
+    Until 1967, this data also counts some inflammations of the digestive tract that are not infections. Changes in how these deaths are classified make the death rate drop sharply in 1968 and again in 1979.
     <% endif %>
 
   processing_causes: |-
@@ -68,9 +75,9 @@ tables:
         description_short: |-
           Annual number of deaths from {definitions.cause_in_sentence} in the United States.
         description_key:
-          - "{definitions.key_sources}"
-          - "{definitions.key_registration_area}"
-          - "{definitions.key_classification}"
+          - "{definitions.key_sources_cause}"
+          - "{definitions.key_registration_area_cause}"
+          - "{definitions.key_classification_cause}"
           - "{definitions.key_cause}"
         description_processing: "{definitions.processing_causes}"
         display:
@@ -88,15 +95,16 @@ tables:
         description_short: |-
           Annual number of deaths from {definitions.cause_in_sentence} per 100,000 people in the United States. This is not adjusted for changes in the population’s age.
         description_key:
-          - "{definitions.key_sources}"
+          - "{definitions.key_sources_cause}"
           - "{definitions.key_crude_rates}"
-          - "{definitions.key_registration_area}"
-          - "{definitions.key_classification}"
+          - "{definitions.key_registration_area_cause}"
+          - "{definitions.key_classification_cause}"
           - "{definitions.key_cause}"
         description_processing: "{definitions.processing_causes}"
         display:
           name: << cause >>
-          numDecimalPlaces: 1
+          roundingMode: significantFigures
+          numSignificantFigures: 3
 
   broad_cause_groups:
     variables:
@@ -112,7 +120,7 @@ tables:
           - "{definitions.key_sources}"
           - "{definitions.key_registration_area}"
           - |-
-            We group causes of death into four groups that add up to all deaths. We chose the first three because each can be followed since 1900: NCHS’s tables for 1900 to 1939 list only 17 causes. “All other causes” includes everything else, including other infectious diseases, such as diphtheria and measles, and COVID-19, which explains its rise in 2020 and 2021.
+            We group causes of death into four groups that add up to all deaths. We chose the first three because each can be followed since 1900: NCHS’s tables for 1900 to 1939 list only a few causes. “All other causes” includes everything else, including other infectious diseases, such as diphtheria and measles, and COVID-19, which explains its rise in 2020 and 2021.
           - "{definitions.key_classification}"
         description_processing: "{definitions.processing_groups}"
         display:

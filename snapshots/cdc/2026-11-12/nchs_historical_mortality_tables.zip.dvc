@@ -9,7 +9,7 @@ meta:
 
       Before 1933, the figures cover only the “death-registration states”: the states that recorded deaths reliably enough to be included. These grew from ten states and the District of Columbia in 1900 to the whole country in 1933.
 
-      Causes of death are classified with the International Classification of Diseases (ICD), which was revised several times over the century. NCHS publishes one table per revision period, and the list of causes grows from 17 in 1900–1939 to 72 in 1979–1998. The names and definitions of some causes change between periods, so a cause’s trend can jump when a new revision comes into use.
+      Causes of death are classified with the International Classification of Diseases (ICD), which was revised several times over the century. NCHS publishes one table per revision period, and the list of causes grows from 16 in 1900–1939 to 72 in 1979–1998. The names and definitions of some causes change between periods, so a cause’s trend can jump when a new revision comes into use.
     # NOTE: The tables were produced between the 1970s and 2000. This is the "last reviewed" date of the NCHS page
     # that links them (the files' own timestamps date from a 2024 website migration).
     date_published: "2015-11-06"

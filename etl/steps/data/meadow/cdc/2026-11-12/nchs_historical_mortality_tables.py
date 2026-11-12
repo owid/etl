@@ -23,7 +23,7 @@ BLOCK_OTHER = re.compile(
     r"^(ALL RACES, |TOTAL, )?(WHITE|ALL OTHER|BLACK|NONWHITE|MALE|FEMALE)\b|^(ALL RACES|TOTAL), (MALE|FEMALE)"
 )
 # A data row: year (with dot leaders in the 1979–98 files), then the all-ages total.
-YEAR_ROW = re.compile(r"^(19\d\d)[\s\.]*\s+([\d,]+\.\d|[\d,]+)(\s|$)")
+YEAR_ROW = re.compile(r"^(19\d\d)[\s\.]*\s+(\d{1,3}(?:,\d{3})*(?:\.\d)?)(\s|$)")
 # Lines that are never cause names: page and column headers, notes, ICD revision tables.
 NOT_A_CAUSE = re.compile(
     r"CAUSE OF DEATH|RACE, SEX|STATISTICAL WORKSHEET|TABLE|^\[|^\(|HIST290|PAGE|YEARS|ICD REVISION|"
@@ -89,9 +89,7 @@ def parse_pdf(path: Path) -> list[dict]:
     with pdfplumber.open(path) as pdf:
         expected_pages = EXPECTED_PAGES[path.name]
         assert len(pdf.pages) == expected_pages, f"{path.name}: {len(pdf.pages)} pages, expected {expected_pages}."
-        # Some rows are printed in bold as overlapping copies of each character ("1939" reads "11993399"), so
-        # remove the duplicate characters first.
-        lines = [line.strip() for page in pdf.pages for line in (page.dedupe_chars().extract_text() or "").splitlines()]
+        lines = [line.strip() for page in pdf.pages for line in (clean_page(page).extract_text() or "").splitlines()]
 
     records = []
     cause, in_block, candidate, previous_year = None, False, None, None
@@ -136,6 +134,17 @@ def parse_pdf(path: Path) -> list[dict]:
             seen.add(key)
             unique.append(r)
     return unique
+
+
+def clean_page(page):
+    """Remove the characters that garble the text of some rows.
+
+    Some rows are printed in bold as two overlapping copies of each character, less than 0.1 points apart ("1939"
+    reads "11993399"). Real neighboring characters are more than 1 point apart, so a tight tolerance removes only the
+    copies. Pages also hold tiny invisible spaces above and below the text, which can split a row into two lines.
+    """
+    page = page.filter(lambda obj: not (obj.get("object_type") == "char" and obj.get("size", 5) < 2))
+    return page.dedupe_chars(tolerance=0.2)
 
 
 def sanity_check_outputs(tb) -> None:

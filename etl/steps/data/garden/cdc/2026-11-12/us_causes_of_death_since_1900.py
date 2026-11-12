@@ -294,9 +294,9 @@ def sanity_check_outputs(tb: Table, tb_groups: Table) -> None:
     assert (parts.le(wide["All causes"], axis=0) | parts.isna()).all().all(), "A cause's rate exceeds all causes."
 
     # Deaths and rates agree: the population implied by each cause's deaths and rate matches the one implied by all
-    # causes, within the rounding of the rates (one decimal), for causes with enough deaths for that to be precise.
+    # causes, within the rounding of the rates (one decimal), for every cause and year with at least 20 deaths.
     population = 1e5 * tb[tb["cause"] == "All causes"].set_index("year")["deaths"] / wide["All causes"]
-    tb_check = tb[(tb["deaths"] >= 5000) & (tb["cause"] != "All causes")].copy()
+    tb_check = tb[(tb["deaths"] >= 20) & (tb["cause"] != "All causes")].copy()
     tb_check["implied_rate"] = 1e5 * tb_check["deaths"] / tb_check["year"].map(population)
     error = (tb_check["implied_rate"] - tb_check["death_rate"]).abs()
     tolerance = 0.06 + 0.002 * tb_check["death_rate"]
