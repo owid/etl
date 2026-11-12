@@ -46,10 +46,10 @@ dimensions:
         name: Number that cannot afford
         group: Affordability
       - slug: dollars_per_day
-        name: $ per day
+        name: Daily cost per person
         group: Cost
       - slug: share_food_expenditure
-        name: "% of average food expenditure"
+        name: "Cost as % of average food spending"
         group: Cost
 
 views:
