@@ -73,7 +73,7 @@ tables:
       contributory_and_tax_funded_pensions:
         title: Contributory and tax-funded old-age pensions
         description_short: |-
-          Whether the country has an old-age pension paid for by contributions from workers and employers, one paid for by the government from taxes, both, or neither. Countries with neither only require workers to save for retirement.
+          Whether the country has an old-age pension paid for by contributions (from workers, employers, or both), one paid for by the government from taxes, both, or neither. Countries with neither only require workers to save for retirement.
         description_key:
           - *key_mandatory
           - |-
@@ -97,7 +97,7 @@ tables:
           grapher_config:
             title: Which countries have contributory and tax-funded old-age pensions?
             subtitle: >-
-              Contributory pensions are paid for by contributions from workers and employers, and usually go to people who paid into them. Tax-funded pensions are generally paid for by the government, for everyone above a certain age or only for people with low incomes or few assets.
+              Contributory pensions are paid for by contributions from workers, employers, or both, and usually go to people who paid into them. Tax-funded pensions are generally paid for by the government, for everyone above a certain age or only for people with low incomes or few assets.
             note: *note_classification
             map:
               colorScale:
@@ -135,7 +135,7 @@ tables:
           grapher_config:
             title: Which countries have a universal or means-tested pension for older people?
             subtitle: >-
-              A universal pension goes to older people mainly based on residence, whatever their income. A means-tested pension goes only to those with low incomes or few assets. The government generally pays for both from taxes.
+              A universal pension goes to older people mainly based on residence, although some countries reduce it at higher incomes. A means-tested pension goes only to those with low incomes or few assets. The government generally pays for both from taxes.
             note: *note_classification
             map:
               colorScale:
@@ -173,7 +173,7 @@ tables:
           grapher_config:
             title: Which mandatory pension programs do countries use?
             subtitle: >-
-              Countries can pay older people a pension financed by contributions from workers and employers, a pension financed by the government from taxes, or require workers to save for retirement. Many combine them.
+              Countries can pay older people a pension financed by contributions (from workers, employers, or both), a pension financed by the government from taxes, or require workers to save for retirement. Many combine them.
             note: *note_classification
             map:
               colorScale:
