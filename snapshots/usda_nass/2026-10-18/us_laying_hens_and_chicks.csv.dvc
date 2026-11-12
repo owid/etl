@@ -2,10 +2,11 @@ meta:
   origin:
     producer: USDA National Agricultural Statistics Service (NASS)
     title: Quick Stats
+    title_snapshot: Quick Stats – Laying hens and chicks
     description: |-
       Quick Stats is the online database of the agricultural statistics published by the National Agricultural Statistics Service of the US Department of Agriculture, which can be queried by commodity, location and time period.
-
-      For chickens, it includes the monthly series of the "Chickens and Eggs" and "Hatchery Production" reports: the number of layers on hand, layers sold for slaughter, layers rendered, died, destroyed, composted, or disappeared for any reason, and egg-type chicks hatched. Annual estimates for layers cover December of the previous year through November. It also includes the series of the "Poultry Slaughter" reports: young and mature chickens slaughtered in federally inspected plants.
+    description_snapshot: |-
+      This snapshot includes the monthly series of the "Chickens and Eggs" and "Hatchery Production" reports: the number of layers on hand, layers sold for slaughter, layers rendered, died, destroyed, composted, or disappeared for any reason, and egg-type chicks hatched. Annual estimates for layers cover December of the previous year through November. It also includes the series of the "Poultry Slaughter" reports: young and mature chickens slaughtered in federally inspected plants.
     citation_full: |-
       USDA National Agricultural Statistics Service (2026). Quick Stats. https://quickstats.nass.usda.gov/
 
