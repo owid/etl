@@ -11,6 +11,10 @@ tables:
         title: Global Hunger Index
         unit: ""
         description_processing: |-
-          The source shows scores below 5 as "<5". We show them as 2.5, the middle of the range from 0 to 5.
+          Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5.
+        presentation:
+          grapher_config:
+            note: |-
+              Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5.
         display:
           numDecimalPlaces: 1
