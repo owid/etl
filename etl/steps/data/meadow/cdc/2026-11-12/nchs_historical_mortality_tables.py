@@ -17,17 +17,17 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Header of the block that holds the totals for all races and both sexes.
-BLOCK_ALL = re.compile(r"^(ALL RACES, |TOTAL, )?BOTH SEXES\b")
+# NOTE: One bold header in the 1979–98 deaths table reads "TOTALTOTAL, BOTH SEXES".
+BLOCK_ALL = re.compile(r"^(ALL RACES, |(TOTAL)+, )?BOTH SEXES\b")
 # Header of any other race or sex block.
-BLOCK_OTHER = re.compile(
-    r"^(ALL RACES, |TOTAL, )?(WHITE|ALL OTHER|BLACK|NONWHITE|MALE|FEMALE)\b|^(ALL RACES|TOTAL), (MALE|FEMALE)"
-)
+# A race prefix must be followed by a sex, so that causes named "ALL OTHER ..." are not taken for a race header.
+BLOCK_OTHER = re.compile(r"^((ALL RACES|TOTAL|WHITE|ALL OTHER|BLACK|NONWHITE), )?(BOTH SEXES|MALE|FEMALE)\b")
 # A data row: year (with dot leaders in the 1979–98 files), then the all-ages total.
 YEAR_ROW = re.compile(r"^(19\d\d)[\s\.]*\s+(\d{1,3}(?:,\d{3})*(?:\.\d)?)(\s|$)")
 # Lines that are never cause names: page and column headers, notes, ICD revision tables.
 NOT_A_CAUSE = re.compile(
     r"CAUSE OF DEATH|RACE, SEX|STATISTICAL WORKSHEET|TABLE|^\[|^\(|HIST290|PAGE|YEARS|ICD REVISION|"
-    r"^(FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH)\s|^SOURCE|PERSON WITH|^NOTE|^\*",
+    r"^(FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH)\s|^SOURCE|PERSON WITH|^NOTE|^\*|^[-\u2010]\s",
     re.I,
 )
 
@@ -157,6 +157,9 @@ def sanity_check_outputs(tb) -> None:
         totals = group[group["cause"] == "ALL CAUSES"]
         assert set(totals["year"]) == set(range(start, end + 1)), f"{measure} {period}: missing all-causes years."
     assert set(tb["period"]) == {"1900-1939", "1940-1949", "1950-1959", "1960-1967", "1968-1978", "1979-1998"}
+    # Cause names are never footnotes (which start with a dash).
+    footnotes = [cause for cause in set(tb["cause"].astype(str)) if cause.startswith(("-", "\u2010"))]
+    assert not footnotes, f"Footnotes read as cause names: {footnotes}"
     # Values are positive, and no cause exceeds the all-causes total in the same year.
     assert (tb["value"] >= 0).all(), "Negative values parsed."
     total = tb[tb["cause"] == "ALL CAUSES"].set_index(["measure", "year"])["value"]
