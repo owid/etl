@@ -102,6 +102,23 @@ def publish_cli(
     )
 
 
+@click.command(name="publish-dataset-pages")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Build the pages without publishing them.",
+)
+def publish_dataset_pages_cli(dry_run: bool) -> None:
+    """Publish the dataset pages of the steps that this branch changed, into the staging server's own folder.
+
+    For staging servers only: production pages are published by `etl d publish --jsonld`.
+    """
+    from etl.catalog_pages.publish import publish_staging_dataset_pages
+
+    publish_staging_dataset_pages(dry_run=dry_run)
+
+
 def publish(
     dry_run: bool = False,
     private: bool = False,
@@ -123,19 +140,20 @@ def publish(
         sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, private_bucket=config.R2_BUCKET_PRIVATE)
 
     if jsonld:
-        from etl.catalog_pages.publish import build_and_publish_catalog_pages
+        from etl.catalog_pages.publish import PAGE_CHANNELS, build_and_publish_catalog_pages
 
         jsonld_allowlist = set(jsonld_only) or None
-        for c in channel:
-            if c == "garden":
-                build_and_publish_catalog_pages(
-                    bucket=bucket,
-                    catalog_dir=catalog,
-                    channel=c,
-                    dry_run=dry_run,
-                    base_url=jsonld_base_url,
-                    only=jsonld_allowlist,
-                )
+        # All the channels that can have pages go through one build, which decides which step owns each page.
+        page_channels = tuple(c for c in PAGE_CHANNELS if c in channel)
+        if page_channels:
+            build_and_publish_catalog_pages(
+                bucket=bucket,
+                catalog_dir=catalog,
+                channel=page_channels,
+                dry_run=dry_run,
+                base_url=jsonld_base_url,
+                only=jsonld_allowlist,
+            )
 
 
 def sanity_checks(catalog: Path, channel: CHANNEL) -> None:

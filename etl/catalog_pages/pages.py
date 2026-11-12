@@ -127,6 +127,7 @@ def write_page_files(
     jsonld: dict[str, Any] | None = None,
     topics: list[str] | None = None,
     build_checksum: str | None = None,
+    indicator_links: dict[str, dict[str, list[str]]] | None = None,
 ) -> PageFiles:
     """Write the data files, documentation, README, manifest and JSON-LD of a dataset into ``output_dir / short_key``.
 
@@ -139,6 +140,8 @@ def write_page_files(
 
     ``topics`` are the dataset's topic tags, most-tagged first; the first one is the dataset's primary topic
     and gives the page its link back to the charts on ourworldindata.org.
+
+    ``indicator_links`` are the extra grapher indicators of each column (see :mod:`etl.catalog_pages.links`).
     """
     target_dir = output_dir / short_key
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -168,7 +171,8 @@ def write_page_files(
     # is the table name, which says what the file is once detached from our folders.
     table_entries: list[dict[str, Any]] = []
     for name in ordered_table_names(ds):
-        table = ds[name].reset_index(drop=not ds[name].primary_key)
+        primary_key = list(ds[name].primary_key)
+        table = ds[name].reset_index(drop=not primary_key)
         flat = pd.DataFrame(table)
         flat.to_csv(target_dir / f"{name}.csv", index=False)
         register(f"{name}.csv", "csv", ROLE_DATA, table=name)
@@ -188,6 +192,11 @@ def write_page_files(
         citation = table_citation(table)
         if citation:
             entry["citation"] = citation
+        # The columns that identify a row, so the page can tell them apart from the indicators.
+        if primary_key:
+            entry["primary_key"] = primary_key
+        if indicator_links and indicator_links.get(name):
+            entry["indicator_links"] = indicator_links[name]
         if not fits_in_excel(table):
             reason = f"{len(flat):,} rows plus the header exceed Excel's limit of {docs.EXCEL_MAX_ROWS:,}"
             result.xlsx_skipped[name] = entry["xlsx_skipped"] = reason
@@ -248,6 +257,9 @@ def write_page_files(
     if topics:
         manifest["topics"] = topics
         manifest["explore_url"] = explore_url(topics[0])
+    # How often the dataset is expected to be updated, so the page can say when the next update is due.
+    if ds.metadata.update_period_days is not None:
+        manifest["update_period_days"] = ds.metadata.update_period_days
     if build_checksum:
         manifest["build_checksum"] = build_checksum
     with open(target_dir / MANIFEST_FILENAME, "w") as ostream:

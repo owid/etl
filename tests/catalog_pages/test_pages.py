@@ -32,12 +32,15 @@ def _add_dataset(
     version: str = "2026-09-10",
     description: str | None = "Dataset description.",
     tables: int = 1,
+    channel: str = "garden",
+    jsonld: bool = True,
+    update_period_days: int | None = None,
 ) -> str:
-    dataset_dir = data_dir / "garden" / namespace / version / dataset
+    dataset_dir = data_dir / channel / namespace / version / dataset
     ds = Dataset.create_empty(
         dataset_dir,
         DatasetMeta(
-            channel="garden",
+            channel=channel,  # ty: ignore[invalid-argument-type]
             namespace=namespace,
             version=version,
             short_name=dataset,
@@ -45,7 +48,8 @@ def _add_dataset(
             description=description,
             changelog=[{"date": version, "changes": ["First release."]}],
             licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
-            jsonld=True,
+            jsonld=jsonld,
+            update_period_days=update_period_days,
             owners=["Pablo Rosado", "Mojmír Vinkler"],
         ),
     )
@@ -66,8 +70,8 @@ def _add_dataset(
         )
         ds.add(tb)
     ds.save()
-    LocalCatalog(data_dir, channels=("garden",)).reindex()
-    return f"garden/{namespace}/{version}/{dataset}"
+    LocalCatalog(data_dir, channels=(channel,)).reindex()  # ty: ignore[invalid-argument-type]
+    return f"{channel}/{namespace}/{version}/{dataset}"
 
 
 def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
@@ -147,6 +151,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
             "codebook": "owid_energy.codebook.csv",
             "sources": "owid_energy.sources.csv",
             "citation": "Example Producer (2025) – with minor processing by Our World in Data",
+            "primary_key": ["country", "year"],
         }
     ]
     files = {entry["name"]: entry for entry in manifest["files"] if not entry.get("versioned")}
@@ -328,3 +333,188 @@ def test_non_redistributable_dataset_gets_no_page_and_its_published_files_are_de
     assert not (tmp_path / "pages" / "energy").exists()
     delete_keys = _page_keys(result, data_dir)[1]
     assert {"energy/owid_energy/manifest.json", "energy/owid_energy/owid_energy.csv"} <= set(delete_keys)
+
+
+def _write_step_file(steps_dir: Path, catalog_path: str, suffix: str, content: str) -> None:
+    path = steps_dir / f"{catalog_path}{suffix}"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content)
+
+
+def test_manifest_has_the_update_period_only_when_the_dataset_declares_one(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    catalog_path = _add_dataset(data_dir, update_period_days=365)
+    other_path = _add_dataset(data_dir, dataset="other", update_period_days=None)
+
+    build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(catalog_path), _step_uri(other_path)},
+    )
+
+    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
+    assert manifest["update_period_days"] == 365
+    other_manifest = json.loads((tmp_path / "pages" / "energy" / "other" / "manifest.json").read_text())
+    assert "update_period_days" not in other_manifest
+
+
+def test_links_file_is_copied_into_the_manifest_and_its_problems_are_reported(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    steps_dir = tmp_path / "steps"
+    catalog_path = _add_dataset(data_dir)
+    _write_step_file(
+        steps_dir,
+        catalog_path,
+        ".indicator_links.yml",
+        """
+owid_energy:
+  hydro_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_twh
+    - grapher/energy/2020-01-01/energy_mix/energy_mix#hydro_twh
+    - energy_mix#hydro_twh
+  not_a_column:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_twh
+not_a_table:
+  hydro_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_twh
+""",
+    )
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(catalog_path), "data://grapher/energy/2026-06-30/energy_mix"},
+        steps_dir=steps_dir,
+    )
+
+    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
+    # A path with a version that no active step has is kept as written; a path that is not a catalog path is not.
+    assert manifest["tables"][0]["indicator_links"] == {
+        "hydro_energy_twh": [
+            "grapher/energy/*/energy_mix/energy_mix#hydro_twh",
+            "grapher/energy/2020-01-01/energy_mix/energy_mix#hydro_twh",
+        ]
+    }
+    assert [item.warnings for item in result.warnings] == [
+        [
+            "indicator_links: no active grapher step for 'grapher/energy/2020-01-01/energy_mix/energy_mix#hydro_twh'",
+            "indicator_links: not a grapher catalog path 'energy_mix#hydro_twh'",
+            "indicator_links: unknown column 'owid_energy#not_a_column'",
+            "indicator_links: unknown table 'not_a_table'",
+        ]
+    ]
+
+
+def test_dataset_without_a_links_file_has_no_links_in_the_manifest(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    catalog_path = _add_dataset(data_dir)
+
+    build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(catalog_path)},
+        steps_dir=tmp_path / "steps",
+    )
+
+    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
+    assert "indicator_links" not in manifest["tables"][0]
+
+
+def test_links_file_that_is_not_a_mapping_keeps_the_published_page(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    steps_dir = tmp_path / "steps"
+    catalog_path = _add_dataset(data_dir)
+    _write_step_file(steps_dir, catalog_path, ".indicator_links.yml", "- just\n- a list\n")
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(catalog_path)},
+        steps_dir=steps_dir,
+    )
+
+    assert list(result.page_failures) == [catalog_path]
+    assert result.pages == []
+    assert not (tmp_path / "pages" / "energy").exists()
+    # Nothing is deleted either: the page that was published before stays.
+    assert not [key for key in _page_keys(result, data_dir)[1] if key.startswith("energy/")]
+
+
+def test_grapher_step_gets_a_page_when_its_own_metadata_file_opts_in(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    steps_dir = tmp_path / "steps"
+    catalog_path = _add_dataset(data_dir, channel="grapher")
+    _write_step_file(steps_dir, catalog_path, ".meta.yml", "dataset:\n  jsonld: true\n")
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel=("garden", "grapher"),
+        active_steps={_step_uri(catalog_path)},
+        steps_dir=steps_dir,
+    )
+
+    assert result.pages == [catalog_path]
+    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
+    assert manifest["catalog_path"] == "grapher/energy/2026-09-10/owid_energy"
+
+
+def test_flag_copied_from_the_garden_step_does_not_give_the_grapher_step_a_page(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    garden_path = _add_dataset(data_dir)
+    # The grapher dataset carries the flag in its metadata, as copied from garden, but its step has no file that sets it.
+    grapher_path = _add_dataset(data_dir, channel="grapher")
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel=("garden", "grapher"),
+        active_steps={_step_uri(garden_path), _step_uri(grapher_path)},
+        steps_dir=tmp_path / "steps",
+    )
+
+    assert result.pages == [garden_path]
+    assert result.skipped == []
+
+
+def test_garden_and_grapher_steps_that_both_opt_in_get_no_page(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    steps_dir = tmp_path / "steps"
+    garden_path = _add_dataset(data_dir)
+    grapher_path = _add_dataset(data_dir, channel="grapher")
+    _write_step_file(steps_dir, grapher_path, ".meta.yml", "dataset:\n  jsonld: true\n")
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel=("garden", "grapher"),
+        active_steps={_step_uri(garden_path), _step_uri(grapher_path)},
+        steps_dir=steps_dir,
+    )
+
+    assert result.pages == []
+    assert {item.catalog_path: item.blockers for item in result.skipped} == {
+        garden_path: ["duplicate_short_key"],
+        grapher_path: ["duplicate_short_key"],
+    }
+
+
+def test_restrict_to_keeps_only_the_listed_datasets_and_does_not_override_the_opt_in(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    changed_path = _add_dataset(data_dir)
+    unchanged_path = _add_dataset(data_dir, dataset="unchanged")
+    not_opted_in_path = _add_dataset(data_dir, dataset="not_opted_in", jsonld=False)
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(changed_path), _step_uri(unchanged_path), _step_uri(not_opted_in_path)},
+        restrict_to={"energy/owid_energy", "energy/not_opted_in"},
+    )
+
+    assert result.pages == [changed_path]

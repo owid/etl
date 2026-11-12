@@ -71,6 +71,7 @@ SUBGROUPS = {
         "commands": {
             "version-tracker": "etl.version_tracker.run_version_tracker_checks",
             "publish": "etl.publish.publish_cli",
+            "publish-dataset-pages": "etl.publish.publish_dataset_pages_cli",
             "reindex": "etl.reindex.reindex_cli",
             "run-python-step": "etl.run_python_step.main",
             "map-datasets": "apps.utils.map_datasets.cli",

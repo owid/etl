@@ -409,7 +409,7 @@
         "jsonld": {
           "type": "boolean",
           "title": "Publish catalog landing page / JSON-LD",
-          "description": "Opt this dataset into a public catalog page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD (`etl d publish --jsonld`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand."
+          "description": "Opt this dataset into a public catalog page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD (`etl d publish --jsonld`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand. A garden step or a grapher step can opt in. A grapher step copies this flag from its garden step, so for a grapher step it only counts when the step's own `.meta.yml` sets it; when the garden and the grapher step at the same `<namespace>/<short_name>` both set it, neither gets a page. The page shows the charts that use the dataset's indicators. To also link a column to indicators of other grapher datasets that hold the same data, list them in a `<short_name>.indicator_links.yml` file next to the step (format in `etl/catalog_pages/links.py`)."
         },
         "changelog": {
           "type": "array",
