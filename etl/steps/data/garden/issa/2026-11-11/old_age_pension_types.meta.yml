@@ -44,6 +44,12 @@ definitions:
     - It has mandatory savings if it has a provident fund, a mandatory occupational pension, or individual pension accounts.
   key_closed_classification: &key_closed_classification |-
     This classification counts programs that are closed to new entrants and being phased out, because they still pay pensions to many of today’s retirees. For example, Chile, Mexico, and Panama count as having a contributory pension, although new workers can no longer join it.
+  # Based on the ISSA country profile of France (policies as of 1 July 2023), which describes its mandatory occupational
+  # pension as a "DB Points scheme".
+  key_occupational: &key_occupational |-
+    Some mandatory occupational pensions don’t work like savings. In France, for example, the ISSA’s country profile describes the mandatory occupational pension as a points scheme run jointly by employers and workers: the pension equals the points a worker earned over their career multiplied by the value of a point, not what has built up in their savings.
+  key_occupational_classification: &key_occupational_classification |-
+    We count mandatory occupational pensions as mandatory savings, although some don’t work like savings. In France, for example, the ISSA’s country profile describes the mandatory occupational pension as a points scheme run jointly by employers and workers: the pension equals the points a worker earned over their career multiplied by the value of a point, not what has built up in their savings.
   note_classification: &note_classification >-
     Includes programs closed to new workers. Information as of 2023 to 2025, depending on the region.
 
@@ -88,9 +94,10 @@ tables:
           - |-
             A “tax-funded pension” is a pension the government generally pays for from taxes, without contributions from workers or employers. It can go to everyone above a certain age who meets residence rules (a universal pension), or only to people with low incomes or few assets (a means-tested pension). It can reach older people who never paid contributions.
           - |-
-            “Mandatory savings only” means the only mandatory programs are savings schemes: a provident fund, a pension that employers must provide, or individual pension accounts. They pay out what has built up in each worker’s savings. The ISSA lists no contributory or tax-funded pension in these countries, although some of them pay cash benefits to older people through other programs.
+            “Mandatory savings only” means the only mandatory programs are savings schemes: a provident fund, a pension that employers must provide, or individual pension accounts. These schemes generally pay out what has built up in each worker’s savings. The ISSA lists no contributory or tax-funded pension in these countries, although some of them pay cash benefits to older people through other programs.
           - |-
             Countries in the other three groups can also require workers to save for retirement. Most countries with a tax-funded pension but no contributory pension do.
+          - *key_occupational_classification
           - *key_closed_classification
           - *key_reference_dates
         processing_level: major
@@ -105,7 +112,8 @@ tables:
             title: Which countries have contributory and tax-funded old-age pensions?
             subtitle: >-
               Contributory pensions are paid for by contributions from workers, employers, or both, and usually go to people who paid into them. Tax-funded pensions are generally paid for by the government, for everyone above a certain age or only for people with low incomes or few assets.
-            note: *note_classification
+            note: >-
+              Countries with a contributory or tax-funded pension may also require workers to save for retirement. Includes programs closed to new workers. Information as of 2023 to 2025, depending on the region.
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -165,6 +173,8 @@ tables:
             A “tax-funded pension” is paid for by the government, without contributions from workers or employers. It can go to everyone above a certain age who meets residence rules (a universal pension), or only to those with low incomes or few assets (a means-tested pension).
           - |-
             “Mandatory savings” are schemes in which workers or employers must save for retirement: a provident fund, a pension that employers must provide, or individual pension accounts.
+          - *key_occupational_classification
+          - *key_closed_classification
           - *key_reference_dates
         processing_level: major
         description_processing: *processing_classification
@@ -372,6 +382,7 @@ tables:
           - *key_mandatory
           - |-
             The ISSA defines a mandatory occupational pension as a pension scheme that employers provide and pay for, in some cases with contributions from workers. It pays out a lump sum, an annuity, or a pension.
+          - *key_occupational
           - *key_several_programs
           - *key_reference_dates
         sort:
