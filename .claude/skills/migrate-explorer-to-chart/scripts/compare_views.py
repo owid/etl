@@ -248,8 +248,10 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
     mdim = sources["mdims"][0]
     if len(sources["mdims"]) > 1:
         raise SystemExit("compare_views.py handles one target multidim; run it per multidim.")
-    prod, stg = OWIDEnv.from_env_file(prod_env_file), OWIDEnv.from_staging(staging)
-    stg_site = stg.site.rstrip("/")
+    prod = OWIDEnv.from_env_file(prod_env_file)
+    # After the merge the multidim is on production too: `--staging production` checks it there.
+    stg = prod if staging == "production" else OWIDEnv.from_staging(staging)
+    stg_site = PROD_SITE if staging == "production" else stg.site.rstrip("/")
 
     # Explorer side (production): view rows, indicators and column display names from the TSV.
     tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %s", params=(slug,)).iloc[0, 0]
@@ -388,7 +390,7 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mapping-dir", type=Path, required=True)
-    ap.add_argument("--staging", required=True, help="Branch whose staging server holds the multidim.")
+    ap.add_argument("--staging", required=True, help="Branch whose staging server holds the multidim, or `production`.")
     ap.add_argument("--prod-env-file", required=True, help="Env file with production DB credentials (read-only use).")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--max-rendered", type=int, default=60)
