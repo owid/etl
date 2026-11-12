@@ -39,6 +39,8 @@ definitions:
     The ILO's regional and world values are averages of countries weighted by their population above the statutory retirement age. For countries without data, the ILO fills the gaps with estimates from statistical models.
   description_short_pension_coverage: |-
     Share of <<people>> above the statutory retirement age who receive an old-age pension, including both contributory and non-contributory pensions.
+  note_pension_coverage: |-
+    The statutory retirement age differs between countries.
   description_key_social_protection_poor: |-
     This indicator is calculated as the ratio of social assistance recipients to the population living below the national poverty line.
   description_key_social_protection_unemployed: |-
@@ -427,6 +429,7 @@ tables:
             - Poverty
           grapher_config:
             title: Share of people above retirement age who receive a pension
+            note: "{definitions.note_pension_coverage}"
             hasMapTab: true
             tab: map
 
@@ -452,6 +455,7 @@ tables:
             - Poverty
           grapher_config:
             title: Share of women above retirement age who receive a pension
+            note: "{definitions.note_pension_coverage}"
             hasMapTab: true
             tab: map
 
@@ -477,6 +481,7 @@ tables:
             - Poverty
           grapher_config:
             title: Share of men above retirement age who receive a pension
+            note: "{definitions.note_pension_coverage}"
             hasMapTab: true
             tab: map
 
