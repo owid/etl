@@ -150,7 +150,7 @@ tables:
           grapher_config:
             title: Which countries have a universal or means-tested pension for older people?
             subtitle: >-
-              A universal pension goes to older people mainly based on residence, although some countries reduce it at higher incomes. A means-tested pension goes only to those with low incomes or few assets. The government generally pays for both from taxes.
+              A universal pension goes to older people mainly based on residence, although some countries reduce it at higher incomes. A means-tested pension goes only to those with low incomes or few assets. People usually don’t need to have paid contributions to get either.
             note: *note_classification
             map:
               colorScale:
