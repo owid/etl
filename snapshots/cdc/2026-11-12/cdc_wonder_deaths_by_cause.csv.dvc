@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Underlying Cause of Death (CDC WONDER)
+    description: |-
+      CDC WONDER is the online database of the Centers for Disease Control and Prevention (CDC). Its "Underlying Cause of Death" data counts every death in the United States, based on death certificates, by the disease or injury that started the chain of events leading to death. The data comes from the National Center for Health Statistics (NCHS), which compiles the death records of all 50 states and the District of Columbia.
+
+      This snapshot covers the whole country from 1999 onward, for each cause in NCHS's list of 113 selected causes of death and for all causes together. For each year and cause, it gives the number of deaths, the population, and the crude death rate (deaths per 100,000 people). Causes are classified with the 10th revision of the International Classification of Diseases (ICD-10).
+
+      WONDER marks death rates based on fewer than 20 deaths as unreliable, and hides death counts between 1 and 9.
+    # NOTE: WONDER states only that the 2018–2024 data was released in 2026.
+    date_published: "2026"
+
+    # Citation
+    producer: National Center for Health Statistics
+    citation_full: |-
+      Centers for Disease Control and Prevention, National Center for Health Statistics. National Vital Statistics System, Mortality 1999–2020 on CDC WONDER Online Database, released in 2021, and Mortality 2018–2024 on CDC WONDER Online Database, released in 2026. Data are from the Multiple Cause of Death Files, as compiled from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative Program.
+    attribution_short: NCHS
+
+    # Files
+    url_main: https://wonder.cdc.gov/ucd-icd10-expanded.html
+    date_accessed: 2026-11-12
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.cdc.gov/other/agencymaterials.html
+outs:
+  - md5: 8c35c4499bd42e0e4d3db8237dad2a75
+    size: 312390
+    path: cdc_wonder_deaths_by_cause.csv
