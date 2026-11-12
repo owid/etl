@@ -11,29 +11,29 @@ views:
       # Title, subtitle and the map tab come from the indicator's metadata in the UN SDG step.
       y:
         - catalogPath: _1_3_1__si_cov_pensn__both_sexes#_1_3_1__si_cov_pensn__both_sexes
+      # Continent of each country, to color the Marimekko.
+      color: regions#owid_region
     config:
+      # The map opens first; the chart tabs show the UN regions and the world.
       chartTypes:
-        - LineChart
         - DiscreteBar
-      yAxis:
-        min: 0
-        max: 100
+        - Marimekko
+        - SlopeChart
+        - Dumbbell
+      tab: map
+      # The Marimekko only shows entities with a continent, which leaves out the regions and other aggregates.
+      matchingEntitiesOnly: true
       map:
         colorScale:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-      # The world and a few countries from each continent, from low to full coverage.
       selectedEntityNames:
         - World
-        - Nigeria
-        - South Africa
-        - India
-        - Indonesia
-        - China
-        - Poland
-        - United States
-        - Brazil
-        - Chile
-        - Australia
+        - Africa (UN)
+        - Asia (UN)
+        - Europe (UN)
+        - Latin America and the Caribbean (UN)
+        - Northern America (UN)
+        - Oceania (UN)
       addCountryMode: add-country
