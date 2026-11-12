@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       packages: ${{ steps.filter.outputs.packages }}
     steps:
