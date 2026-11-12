@@ -1,0 +1,127 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+      attribution_short: NCHS
+    processing_level: major
+
+  # Name of a cause in the middle of a sentence ("deaths from heart disease", "deaths from COPD").
+  cause_in_sentence: |-
+    <% if cause in ["COPD", "COVID-19", "Alzheimer's disease"] %><< cause >><% else %><< cause | lower >><% endif %>
+
+  key_sources: |-
+    This data combines two sources from the US National Center for Health Statistics (NCHS), both based on death certificates: its historical mortality tables for 1900 to 1998, and the CDC WONDER database from 1999 onward.
+  key_registration_area: |-
+    Before 1933, the data covers only the "death-registration states": the states that recorded deaths reliably enough to be counted. They grew from 10 states and the District of Columbia in 1900 to the whole country in 1933. So the number of deaths before 1933 is lower than for the whole country, and death rates are calculated on the population of those states.
+  key_classification: |-
+    Causes of death are classified with the International Classification of Diseases (ICD), which was revised several times over this period: in 1910, 1921, 1930, 1939, 1949, 1958, 1968, 1979 and 1999. A revision can change which deaths count toward a cause, so the data for a cause can jump in the year a new revision comes into use.
+  key_crude_rates: |-
+    These are crude death rates: deaths divided by the whole population, without adjusting for its age. The US population is much older today than in 1900, so diseases that mostly kill older people, like heart disease, cancer and stroke, kill a larger share of the population partly because more people live to old age.
+
+  key_cause: |-
+    <% if cause == "Pneumonia and influenza" %>
+    The largest jump from a change in classification is for pneumonia and influenza in 1999: NCHS estimates that the 10th revision of the ICD counts about 30% fewer deaths as pneumonia and influenza than the 9th revision did.
+    <% elif cause == "COPD" %>
+    NCHS's data on chronic obstructive pulmonary disease (COPD) starts in 1960. Before then, these deaths were recorded as bronchitis, emphysema or asthma, and NCHS's historical tables don't give a total for them. From 1999, CDC WONDER calls the group "chronic lower respiratory diseases", which includes chronic bronchitis, emphysema and asthma.
+    <% elif cause == "Alzheimer's disease" %>
+    This data starts in 1999, the first year CDC WONDER covers. NCHS's historical tables don't report Alzheimer's disease as a separate cause.
+    <% elif cause == "COVID-19" %>
+    COVID-19 was first recorded as a cause of death in 2020.
+    <% elif cause == "Accidents" %>
+    Accidents include all unintentional injuries, such as falls, drownings, road accidents and accidental poisonings. Accidental poisonings, which are mostly drug overdoses, account for most of the rise in accident deaths since 1999.
+    <% elif cause == "Road accidents" %>
+    Road accidents are deaths from motor-vehicle accidents, which NCHS reports separately from 1906.
+    <% elif cause == "Diarrheal diseases" %>
+    Until 1967, this data counts deaths from gastritis, duodenitis, enteritis and colitis, which includes some inflammations of the digestive tract that are not infections. From 1968, it counts only intestinal infections, so the death rate drops that year. From 1999, it includes infections with the bacterium *Clostridioides difficile*, which account for most of its rise in the 2000s.
+    <% endif %>
+
+dataset:
+  title: Causes of death in the United States since 1900
+  update_period_days: 365
+  owners:
+    - Edouard Mathieu
+
+tables:
+  causes_of_death:
+    variables:
+      deaths:
+        title: |-
+          Deaths from {definitions.cause_in_sentence}
+        presentation:
+          title_public: |-
+            Deaths from {definitions.cause_in_sentence}
+        unit: deaths
+        short_unit: ""
+        description_short: |-
+          Number of deaths from {definitions.cause_in_sentence} in the United States.
+        description_key:
+          - "{definitions.key_sources}"
+          - "{definitions.key_registration_area}"
+          - "{definitions.key_classification}"
+          - "{definitions.key_cause}"
+        description_processing: |-
+          We combine NCHS's historical tables, for 1900 to 1998, with CDC WONDER, from 1999 onward. The historical tables come as one table per period of the International Classification of Diseases, and each names its causes slightly differently, so we match each cause to its name in each table.
+        display:
+          name: << cause >>
+          numDecimalPlaces: 0
+
+      death_rate:
+        title: |-
+          Death rate from {definitions.cause_in_sentence}
+        presentation:
+          title_public: |-
+            Death rate from {definitions.cause_in_sentence}
+        unit: deaths per 100,000 people
+        short_unit: ""
+        description_short: |-
+          Number of deaths from {definitions.cause_in_sentence} per 100,000 people in the United States. This is not adjusted for changes in the population's age.
+        description_key:
+          - "{definitions.key_sources}"
+          - "{definitions.key_crude_rates}"
+          - "{definitions.key_registration_area}"
+          - "{definitions.key_classification}"
+          - "{definitions.key_cause}"
+        description_processing: |-
+          We combine NCHS's historical tables, for 1900 to 1998, with CDC WONDER, from 1999 onward. The historical tables come as one table per period of the International Classification of Diseases, and each names its causes slightly differently, so we match each cause to its name in each table.
+        display:
+          name: << cause >>
+          numDecimalPlaces: 1
+
+  broad_cause_groups:
+    variables:
+      deaths:
+        title: Deaths from << cause_group | lower >>
+        presentation:
+          title_public: Deaths from << cause_group | lower >>
+        unit: deaths
+        short_unit: ""
+        description_short: |-
+          Number of deaths in the United States from <% if cause_group == "All other causes" %>causes other than heart disease, cancer, stroke, diabetes, tuberculosis, pneumonia, influenza, diarrheal diseases and accidents<% else %><< cause_group | lower >><% endif %>.
+        description_key: &key_groups
+          - "{definitions.key_sources}"
+          - "{definitions.key_registration_area}"
+          - |-
+            We group causes of death into four groups that add up to all deaths. We chose the first three because each can be followed since 1900: NCHS's tables for 1900 to 1939 list only 17 causes. "All other causes" includes everything else, including other infectious diseases, such as diphtheria and measles, and COVID-19, which explains its rise in 2020 and 2021.
+          - "{definitions.key_classification}"
+        description_processing: &processing_groups |-
+          We combine NCHS's historical tables, for 1900 to 1998, with CDC WONDER, from 1999 onward, matching each cause to its name in each table. We then add up the deaths from heart disease, cancer, stroke and diabetes; from tuberculosis, pneumonia and influenza, and diarrheal diseases; and from accidents. "All other causes" is all deaths minus these three groups.
+        display:
+          name: << cause_group >>
+          numDecimalPlaces: 0
+
+      share_of_deaths:
+        title: Share of deaths from << cause_group | lower >>
+        presentation:
+          title_public: Share of deaths from << cause_group | lower >>
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of all deaths in the United States that are from <% if cause_group == "All other causes" %>causes other than heart disease, cancer, stroke, diabetes, tuberculosis, pneumonia, influenza, diarrheal diseases and accidents<% else %><< cause_group | lower >><% endif %>.
+        description_key: *key_groups
+        description_processing: |-
+          We combine NCHS's historical tables, for 1900 to 1998, with CDC WONDER, from 1999 onward, matching each cause to its name in each table. We then add up the deaths from heart disease, cancer, stroke and diabetes; from tuberculosis, pneumonia and influenza, and diarrheal diseases; and from accidents. "All other causes" is all deaths minus these three groups. We divide the deaths in each group by all deaths.
+        display:
+          name: << cause_group >>
+          numDecimalPlaces: 1
