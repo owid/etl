@@ -36,7 +36,7 @@ EXPECTED_FOOTNOTES = {
 
 # Words added to "Yes" for each footnote, in the program indicators.
 FOOTNOTE_LABELS = {
-    "a": "with flat-rate and earnings-related parts",
+    "a": "with a flat-rate part and a part based on earnings or years of contributions",
     "b": "the amount can vary or be reduced at higher incomes",
     "c": "with a guaranteed minimum pension",
     "d": "based on notional accounts",
@@ -49,14 +49,23 @@ FOOTNOTE_G_LABELS = {
     "individual_accounts": "workers can choose social insurance instead",
 }
 
-# Labels of the overall classifications.
+# Whether the classifications count programs that are closed to new entrants and being phased out (footnote "f").
+# They still pay pensions to many of today's retirees.
+# NOTE: This choice is still under discussion. If it changes, also change the metadata that describes it: the
+#  "processing_classification" and "note_classification" definitions, and the description_key about closed programs.
+INCLUDE_CLOSED_PROGRAMS = True
+
+# Labels of the overall classifications, by whether a country has a contributory pension, a tax-funded pension, and
+# (in the mix) mandatory savings. The labels describe financing only: the ISSA table doesn't say who runs or pays out
+# each program.
 # NOTE: Chile's 2025 pension reform adds an employer contribution to a new social insurance scheme from August 2025,
-#  after this release's reference date. If the ISSA now lists it, Chile moves to "Contributory public pension": check
-#  the description_key that names Chile, Mexico and Panama as examples.
-MAIN_TYPE_LABELS = {
-    "contributory": "Contributory public pension",
-    "tax_funded": "Tax-funded public pension only",
-    "savings": "No public pension, mandatory savings only",
+#  after this release's reference date. If the ISSA now lists it, check the description_key that names Chile, Mexico
+#  and Panama as countries whose contributory scheme is closed to new entrants.
+CONTRIBUTORY_AND_TAX_FUNDED_LABELS = {
+    (True, False): "Contributory pension, no tax-funded pension",
+    (True, True): "Contributory and tax-funded pensions",
+    (False, True): "Tax-funded pension, no contributory pension",
+    (False, False): "Mandatory savings only",
 }
 MIX_LABELS = {
     (True, False, False): "Contributory pension only",
@@ -66,6 +75,13 @@ MIX_LABELS = {
     (False, True, False): "Tax-funded pension only",
     (False, True, True): "Tax-funded pension and mandatory savings",
     (False, False, True): "Mandatory savings only",
+}
+# Labels of the type of tax-funded pension, by whether a country has a universal pension and a means-tested pension.
+TAX_FUNDED_LABELS = {
+    (True, False): "Universal pension",
+    (False, True): "Means-tested pension",
+    (True, True): "Universal and means-tested pensions",
+    (False, False): "No tax-funded pension",
 }
 
 # Pattern of a cell in the source table: empty, or "X" preceded by footnote letters (e.g. "X", "a X", "c, g X").
@@ -98,20 +114,29 @@ def run() -> None:
         tb[column] = tb[column].astype(str).apply(lambda cell, column=column: label_cell(cell=cell, column=column))
         tb[column] = tb[column].copy_metadata(tb_programs[column])
 
-    # Classify each country by the programs that are open to new workers (closed programs, footnote "f", are left out).
-    is_open = {
-        column: tb_programs[column].astype(str).str.contains("X") & ~tb_programs[column].astype(str).str.contains("f")
+    # Find the programs each country has, counting closed programs (footnote "f") or not.
+    has = {
+        column: tb_programs[column].astype(str).str.contains("X")
+        & (INCLUDE_CLOSED_PROGRAMS | ~tb_programs[column].astype(str).str.contains("f"))
         for column in PROGRAMS
     }
-    has_contributory = is_open[CONTRIBUTORY[0]] | is_open[CONTRIBUTORY[1]]
-    has_tax_funded = is_open[TAX_FUNDED[0]] | is_open[TAX_FUNDED[1]]
-    has_savings = is_open[SAVINGS[0]] | is_open[SAVINGS[1]] | is_open[SAVINGS[2]]
+    has_contributory = has[CONTRIBUTORY[0]] | has[CONTRIBUTORY[1]]
+    has_tax_funded = has[TAX_FUNDED[0]] | has[TAX_FUNDED[1]]
+    has_savings = has[SAVINGS[0]] | has[SAVINGS[1]] | has[SAVINGS[2]]
 
-    # Type of public pension: contributory, tax-funded only, or none (mandatory savings only).
-    tb["type_of_public_pension"] = tb["contributory_flat_rate"].copy()
-    tb.loc[has_contributory, "type_of_public_pension"] = MAIN_TYPE_LABELS["contributory"]
-    tb.loc[~has_contributory & has_tax_funded, "type_of_public_pension"] = MAIN_TYPE_LABELS["tax_funded"]
-    tb.loc[~has_contributory & ~has_tax_funded & has_savings, "type_of_public_pension"] = MAIN_TYPE_LABELS["savings"]
+    # Type of tax-funded pension: universal, means-tested, both, or none.
+    tb["type_of_tax_funded_pension"] = tb["non_contributory_universal"].copy()
+    for (universal, means_tested), label in TAX_FUNDED_LABELS.items():
+        mask = (has["non_contributory_universal"] == universal) & (has["non_contributory_means_tested"] == means_tested)
+        tb.loc[mask, "type_of_tax_funded_pension"] = label
+
+    # Contributory and tax-funded pensions: either, both, or neither (then only mandatory savings).
+    tb["contributory_and_tax_funded_pensions"] = tb["contributory_flat_rate"].copy()
+    for (contributory, tax_funded), label in CONTRIBUTORY_AND_TAX_FUNDED_LABELS.items():
+        mask = (has_contributory == contributory) & (has_tax_funded == tax_funded)
+        if not (contributory or tax_funded):
+            mask &= has_savings
+        tb.loc[mask, "contributory_and_tax_funded_pensions"] = label
 
     # Mix of contributory pensions, tax-funded pensions and mandatory savings.
     tb["pension_system_mix"] = tb["contributory_flat_rate"].copy()
@@ -178,7 +203,10 @@ def sanity_check_inputs(tb: Table, tb_footnotes: Table) -> None:
 def sanity_check_outputs(tb: Table) -> None:
     # No missing values, and every country got a classification.
     assert not tb.isna().any().any(), "Missing values in the output."
-    assert set(tb["type_of_public_pension"]) <= set(MAIN_TYPE_LABELS.values()), (
-        "A country has no type of public pension."
+    assert set(tb["contributory_and_tax_funded_pensions"]) <= set(CONTRIBUTORY_AND_TAX_FUNDED_LABELS.values()), (
+        "A country has no open program."
     )
     assert set(tb["pension_system_mix"]) <= set(MIX_LABELS.values()), "A country has no pension system mix."
+    assert set(tb["type_of_tax_funded_pension"]) <= set(TAX_FUNDED_LABELS.values()), (
+        "A country has no type of tax-funded pension."
+    )

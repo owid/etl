@@ -8,7 +8,7 @@ topic_tags:
   - Poverty
 
 default_dimensions:
-  program: type_of_public_pension
+  classification: contributory_and_tax_funded_pensions
 
 # Titles, subtitles, notes and map colors come from each indicator's metadata in the garden step.
 definitions:
@@ -19,73 +19,32 @@ definitions:
         chartTypes: []
 
 dimensions:
-  - slug: program
-    name: Program
+  - slug: classification
+    name: Classification
     choices:
-      - slug: type_of_public_pension
-        name: Type of public pension
-        description: Contributory, tax-funded only, or mandatory savings only
+      - slug: contributory_and_tax_funded_pensions
+        name: Contributory and tax-funded pensions
+        description: Four groups, by whether a country has a contributory pension, a tax-funded pension, both, or neither
+      - slug: type_of_tax_funded_pension
+        name: Type of tax-funded pension
+        description: Universal, means-tested, both, or none
       - slug: pension_system_mix
         name: Mix of programs
-        description: Contributory and tax-funded pensions, and mandatory savings
-      - slug: contributory_earnings_related
-        name: Contributory earnings-related pension
-      - slug: contributory_flat_rate
-        name: Contributory flat-rate pension
-      - slug: non_contributory_means_tested
-        name: Means-tested pension
-      - slug: non_contributory_universal
-        name: Universal pension
-      - slug: individual_accounts
-        name: Individual pension accounts
-      - slug: provident_fund
-        name: Provident fund
-      - slug: mandatory_occupational_pension
-        name: Mandatory occupational pension
+        description: Seven groups, which also show whether workers must save for retirement
 
 views:
   - dimensions:
-      program: type_of_public_pension
+      classification: contributory_and_tax_funded_pensions
     indicators:
       y:
-        - catalogPath: old_age_pension_types#type_of_public_pension
+        - catalogPath: old_age_pension_types#contributory_and_tax_funded_pensions
   - dimensions:
-      program: pension_system_mix
+      classification: type_of_tax_funded_pension
+    indicators:
+      y:
+        - catalogPath: old_age_pension_types#type_of_tax_funded_pension
+  - dimensions:
+      classification: pension_system_mix
     indicators:
       y:
         - catalogPath: old_age_pension_types#pension_system_mix
-  - dimensions:
-      program: contributory_earnings_related
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#contributory_earnings_related
-  - dimensions:
-      program: contributory_flat_rate
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#contributory_flat_rate
-  - dimensions:
-      program: non_contributory_means_tested
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#non_contributory_means_tested
-  - dimensions:
-      program: non_contributory_universal
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#non_contributory_universal
-  - dimensions:
-      program: individual_accounts
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#individual_accounts
-  - dimensions:
-      program: provident_fund
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#provident_fund
-  - dimensions:
-      program: mandatory_occupational_pension
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#mandatory_occupational_pension
