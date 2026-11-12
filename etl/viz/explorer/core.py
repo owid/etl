@@ -66,6 +66,13 @@ class Explorer(Chart):
                 "`slug` is only supported for multidim charts, not explorers: their URL is the short name."
             )
 
+        # The page presentation turns a multidim into a data explorer; an explorer already is one.
+        if self.presentation is not None:
+            raise ValueError(
+                "`presentation` is only supported for multidim charts, not explorers: "
+                "set the explorer's title and subtitle in its `config` instead."
+            )
+
     @property
     def local_config_path(self) -> Path:
         # who/latest/influenza#influenza -> viz/explorer/who/latest/influenza/influenza.config.json

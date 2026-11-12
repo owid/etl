@@ -49,9 +49,9 @@ LAYOUTS_KEY = re.compile(r'^\s+"([A-Za-z0-9_]+)":\s*\{', re.MULTILINE)
 
 # Per-template slot positions in template px from the top edge, transcribed from TEMPLATES.md for the
 # templates' placeholder two-line subtitle. `note_y` is the desktop `Note:` row; mobile has none.
-# The header rows (title 16, subtitle 80, band top 118) and the 16 px margin are the same on all four.
+# The header rows (title 12, subtitle 74, band top 112) and the 16 px margin are the same on all four.
 SLOTS: dict[str, dict[str, float | bool | None]] = {
-    "horizontal": {"chart_bottom_y": 559, "note_y": 559, "source_y": 591, "footer_y": 609, "full_footer": True},
+    "horizontal": {"chart_bottom_y": 558, "note_y": 558, "source_y": 590, "footer_y": 608, "full_footer": True},
     "vertical": {
         "chart_bottom_y": 1015.81,
         "note_y": 1015.81,
@@ -171,7 +171,8 @@ GUIDE_COLOR = "#bbbbbb"
 POINTS_PER_PIXEL = 72 / PIXELS_PER_INCH
 
 # Template type sizes in px (TEMPLATES.md -> Slot positions): title 25, subtitle 16; footer rows 12/11
-# on the 850-wide pair and 14 on mobile; the in-plot body rank is 14.
+# on the 850-wide pair and 14 on mobile. The in-plot body rank (tick labels, labels) is grapher's own
+# download size: 15 on the 540-wide templates, 14 on the 850-wide ones (body_px).
 SLOT_PX = {
     "title": 25,
     "subtitle": 16,
@@ -180,7 +181,13 @@ SLOT_PX = {
     "footer_desktop": 11,
     "footer_mobile": 14,
     "body": 14,
+    "body_mobile": 15,
 }
+
+
+def body_px(width_px: float) -> int:
+    """The tick-label and label size for a template width: 15 on the 540-wide ones, 14 on the 850-wide."""
+    return SLOT_PX["body_mobile"] if width_px < 600 else SLOT_PX["body"]
 
 # The band is the room between the header's bottom and the footer's top, inset 14 px at each end.
 BAND_INSET = 14
@@ -292,7 +299,13 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
     ax.spines["bottom"].set_color(TICK_COLOR)
     ax.yaxis.grid(True, linestyle=GRID_DASHES, color=GRID_COLOR, linewidth=1.0)
     ax.set_axisbelow(True)
-    ax.tick_params(colors=TEXT_COLOR, labelsize=px_to_pt(SLOT_PX["body"]), length=5, width=1)
+    ax.tick_params(
+        color=TICK_COLOR,
+        labelcolor=TEXT_COLOR,
+        labelsize=px_to_pt(body_px(width_px)),
+        length=px_to_pt(5),
+        width=px_to_pt(1),
+    )
     ax.tick_params(axis="y", length=0)
     x, y = placeholder_series(tb)
     ax.plot(x, y, color="C0", linewidth=2, gid="line__placeholder")
@@ -323,7 +336,7 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
         f"chart band {content_w}×{band_h:g} px — replace build()",
         ha="center",
         va="center",
-        fontsize=px_to_pt(SLOT_PX["body"]),
+        fontsize=px_to_pt(body_px(width_px)),
         color=GUIDE_COLOR,
         gid="guide__label",
     )
@@ -520,9 +533,9 @@ def layouts_block(slug: str, templates: list[str]) -> str:
             f'    "{name}": {{\n'
             f'        "template": "{template}",\n'
             f'        "margin": 16,\n'
-            f'        "title_y": 16,\n'
-            f'        "subtitle_y": 80,\n'
-            f'        "chart_top_y": 118,\n'
+            f'        "title_y": 12,\n'
+            f'        "subtitle_y": 74,\n'
+            f'        "chart_top_y": 112,\n'
             f'        "chart_bottom_y": {slots["chart_bottom_y"]},\n'
             f'        "note_y": {slots["note_y"]},\n'
             f'        "source_y": {slots["source_y"]},\n'

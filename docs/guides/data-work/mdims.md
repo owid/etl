@@ -146,6 +146,17 @@ In this example, we note that we can group together indicators from any dataset.
 
     Proper documentation of all available options will be available soon.
 
+!!! info "Showing an MDIM as a data explorer"
+    A top-level `presentation` block makes the MDIM a data explorer page, listed on [ourworldindata.org/explorers](https://ourworldindata.org/explorers). `explorer_subtitle` is the text on its card there. Without the block, the MDIM is a plain data page.
+
+    ```yaml
+    presentation:
+      page_type: data-explorer
+      explorer_subtitle: Explore data on the population of every country.
+    ```
+
+    It only applies to MDIMs: single charts and explorers reject it.
+
 ### Automated MDIMs
 MDIMs are very suitable for those datasets that have a lot of dimensions in them. For these, one can leverage functions like `etl.viz.expand_config`, which programmatically generates all possible views from an indicator (or multiple ones) in a table.
 
@@ -329,4 +340,4 @@ For better reference, read [:fontawesome-brands-github: this issue](https://gith
 
 - MDIMs are not yet public.
 - MDIMs are not yet embeddable.
-- MDIMs only support dropdowns (explorers support other UI elements: radio buttons, checkboxes)
+- MDIMs support dropdowns, dropdowns with search, and toggle buttons (set with a dimension's `presentation.type`; see the schema), but not checkboxes like explorers.
