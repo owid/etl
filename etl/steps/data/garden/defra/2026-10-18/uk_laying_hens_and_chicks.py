@@ -16,7 +16,6 @@ COLUMNS = {
     "chicks_placed": {"commercial_layers_uk": "layer_chicks_placed"},
     "poultry_slaughtered": {"boiling_fowl_uk": "boiling_fowl_slaughtered"},
 }
-MILLION = 1e6
 # Columns to take from the June survey (numbers of birds at 1 June).
 JUNE_SURVEY_COLUMNS = ["total_breeding_and_laying_fowl", "hens_and_pullets_laying_eggs_for_eating", "breeding_flock"]
 # NOTE: The UK number of boiling fowl slaughtered looks incomplete from 2024 onwards (in 2024 it equals the number for
@@ -39,7 +38,7 @@ def run() -> None:
     for table_name, columns in COLUMNS.items():
         tb_table = ds_meadow.read(table_name)[["year"] + list(columns)].rename(columns=columns, errors="raise")
         for column in columns.values():
-            tb_table[column] = tb_table[column] * MILLION
+            tb_table[column] = tb_table[column] * 1e6
         tb = tb_table if tb is None else pr.merge(tb, tb_table, on="year", how="outer")
     tb = pr.merge(tb, tb_june[["year"] + JUNE_SURVEY_COLUMNS], on="year", how="outer")
     tb["country"] = "United Kingdom"

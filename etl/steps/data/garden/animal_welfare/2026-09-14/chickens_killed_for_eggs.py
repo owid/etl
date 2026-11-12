@@ -19,10 +19,11 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# FAOSTAT item and element codes for the number of laying hens and the number of eggs produced ("Eggs from hens").
-FAOSTAT_ITEM_CODE_HEN_EGGS = "00001062"
-FAOSTAT_ELEMENT_CODE_LAYING = "005313"
-FAOSTAT_ELEMENT_CODE_EGGS_PRODUCED = "005513"
+# Columns to select from the flat table of FAOSTAT QCL, and how to rename them.
+COLUMNS = {
+    "eggs_from_hens__00001062__laying__005313__animals": "laying_hens",
+    "eggs_from_hens__00001062__eggs_produced__005513__eggs": "eggs_produced",
+}
 
 # Average number of weeks a hen spends in the laying flock before being replaced. A compromise between the commercial
 # flocks of the United States (where USDA's figures imply 64 to 75 weeks in recent years) and of China (54 to 59 weeks,
@@ -35,9 +36,6 @@ WEEKS_IN_LAY = 65
 # kept for much longer than WEEKS_IN_LAY, as explained in the notebook docs/analyses/chickens_killed_in_egg_production.
 FIRST_YEAR = 1990
 
-# Name of the EU aggregate in the FAOSTAT data.
-EU = "European Union (27)"
-
 # Regions for which we compute aggregates (as the sum of their member countries).
 REGIONS = [
     "World",
@@ -47,14 +45,12 @@ REGIONS = [
     "North America",
     "Oceania",
     "South America",
-    EU,
+    "European Union (27)",
     "High-income countries",
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "Low-income countries",
 ]
-# Suffix of FAOSTAT's own regions (which are dropped, like the OWID regions already included in the FAOSTAT dataset).
-FAOSTAT_AGGREGATE_SUFFIX = "(FAO)"
 # Gaps of at most this many years in a country's series are filled with its latest reported value; longer gaps are left
 # empty. Many countries (in the latest year, 14 EU countries) have no data for some years, and a few have not reported
 # since 2020.
@@ -70,27 +66,27 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load FAOSTAT QCL dataset and read its main (long) table.
+    # Load FAOSTAT QCL dataset and read its flat table. Keep only the origins of its indicators, so that our estimates
+    # do not inherit the rest of FAOSTAT's metadata (e.g. the public title "Number of laying hens").
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
+    tb_qcl = ds_qcl.read("faostat_qcl_flat", safe_types=False, reset_metadata="keep_origins")
 
     #
     # Process data.
     #
-    # Select the number of laying hens and the number of eggs produced.
-    tb = select_faostat_data(tb_qcl=tb_qcl)
+    # Select the number of laying hens and the number of eggs produced, in the years that have at least one of them.
+    tb_qcl = tb_qcl[["country", "year"] + list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    tb_qcl = tb_qcl.dropna(subset=list(COLUMNS.values()), how="all").astype({"country": str}).reset_index(drop=True)
 
     # Fill gaps in country series with the latest reported value.
-    tb = fill_gaps(tb=tb)
+    tb = fill_gaps(tb=tb_qcl)
 
     # Keep only years from FIRST_YEAR on (after filling gaps, so that gaps in the first years are filled too).
     tb = tb[tb["year"] >= FIRST_YEAR].reset_index(drop=True)
 
-    # Keep only countries (drop FAOSTAT's regions, and the OWID regions included in the FAOSTAT dataset, which are
-    # recomputed below).
-    tb = tb[~(tb["country"].str.endswith(FAOSTAT_AGGREGATE_SUFFIX) | tb["country"].isin(REGIONS))].reset_index(
-        drop=True
-    )
+    # Keep only countries: drop FAOSTAT's regions (whose names end in "(FAO)") and the OWID regions included in the
+    # FAOSTAT dataset, which are recomputed below.
+    tb = tb[~(tb["country"].str.endswith("(FAO)") | tb["country"].isin(REGIONS))].reset_index(drop=True)
 
     # Estimate the number of hens and male chickens killed each year.
     tb = estimate_chickens_killed(tb=tb)
@@ -121,22 +117,6 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def select_faostat_data(tb_qcl: Table) -> Table:
-    """Extract the number of laying hens and the number of eggs produced from the FAOSTAT QCL table."""
-    tb_qcl = tb_qcl[tb_qcl["item_code"] == FAOSTAT_ITEM_CODE_HEN_EGGS]
-    error = "Unexpected units in FAOSTAT data."
-    assert set(tb_qcl[tb_qcl["element_code"] == FAOSTAT_ELEMENT_CODE_LAYING]["unit"]) == {"animals"}, error
-    assert set(tb_qcl[tb_qcl["element_code"] == FAOSTAT_ELEMENT_CODE_EGGS_PRODUCED]["unit"]) == {"eggs"}, error
-
-    columns = {FAOSTAT_ELEMENT_CODE_LAYING: "laying_hens", FAOSTAT_ELEMENT_CODE_EGGS_PRODUCED: "eggs_produced"}
-    tb = tb_qcl[tb_qcl["element_code"].isin(columns)][["country", "year", "element_code", "value"]]
-    tb = tb.pivot(index=["country", "year"], columns="element_code", values="value", join_column_levels_with="_")
-    tb = tb.rename(columns=columns, errors="raise")
-    tb = tb.astype({"country": str}).reset_index(drop=True)
-
-    return tb
 
 
 def fill_gaps(tb: Table) -> Table:
@@ -179,8 +159,10 @@ def estimate_chickens_killed(tb: Table) -> Table:
     """Estimate the number of hens and male chickens killed each year from the number of laying hens."""
     # Hens killed each year: all hens in the flock are replaced (and killed) every WEEKS_IN_LAY weeks.
     tb["hens_killed"] = tb["laying_hens"] * 52 / WEEKS_IN_LAY
-    # Male chickens killed: the male chicks hatched alongside the female chicks that replace those hens (assuming one
-    # male hatches per female), killed either as day-old chicks, or later on if they were raised for meat.
+    # Male chickens killed: one for each hen killed, since as many males hatch as females. They are killed either as
+    # day-old chicks, or later on if they are raised for meat.
+    # NOTE: For now, this ignores in-ovo sexing, which removes male embryos before they hatch. Once we have data on
+    # its use in each country, subtract the male chicks that never hatched.
     tb["male_chickens_killed"] = tb["hens_killed"]
     # All chickens killed to produce eggs.
     tb["chickens_killed"] = tb["hens_killed"] + tb["male_chickens_killed"]
@@ -217,12 +199,8 @@ def sanity_check_outputs(tb: Table, tb_qcl: Table) -> None:
         )
 
     # Our World and EU aggregates should be close to FAOSTAT's own figures (which include missing countries).
-    for region in ["World", EU]:
-        fao = tb_qcl[
-            (tb_qcl["country"] == region)
-            & (tb_qcl["item_code"] == FAOSTAT_ITEM_CODE_HEN_EGGS)
-            & (tb_qcl["element_code"] == FAOSTAT_ELEMENT_CODE_LAYING)
-        ].set_index("year")["value"]
+    for region in ["World", "European Union (27)"]:
+        fao = tb_qcl[tb_qcl["country"] == region].set_index("year")["laying_hens"]
         owid = tb[tb["country"] == region].set_index("year")["laying_hens"]
         ratio = (owid / fao).dropna()
         error = f"Our {region} total of laying hens deviates by more than 5% from FAOSTAT's:\n{ratio[(ratio - 1).abs() > 0.05]}"

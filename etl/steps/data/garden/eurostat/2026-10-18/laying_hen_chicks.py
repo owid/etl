@@ -28,8 +28,6 @@ INDICATORS = [
     "laying_hen_chicks_exported",
     "cockerels_from_sexing_hatched",
 ]
-# Eurostat publishes numbers of chicks in thousands.
-THOUSAND = 1000
 # Countries whose chicks hatched already exclude the chicks exported, so these are not subtracted again.
 # NOTE: Eurostat's metadata (SIMS 13.3.4): "The number of chicks hatched is expected to include the chicks that will then
 # be exported. For all the countries but BE, this is the case."
@@ -58,9 +56,9 @@ def run() -> None:
     # Harmonize country names (EU aggregates are excluded).
     tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
-    # Convert thousands of chicks into chicks.
+    # Eurostat publishes numbers of chicks in thousands. Convert them into chicks.
     for column in INDICATORS:
-        tb[column] *= THOUSAND
+        tb[column] *= 1000
 
     # Chicks of laying hen breeds placed in the country: hatched, minus exported, plus imported (only in years where
     # the three are reported).
