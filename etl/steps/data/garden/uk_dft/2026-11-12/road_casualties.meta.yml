@@ -1,0 +1,72 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: deaths
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Causes of Death
+    description_key:
+      - The Department for Transport counts a person as killed in a road collision if they died within 30 days of it, as a result of their injuries.
+      - The data only includes collisions on public roads in which someone was injured and that were reported to the police. Some collisions are never reported to the police, but almost all deaths are.
+      - The data covers Great Britain (England, Scotland and Wales). Northern Ireland publishes its road casualty statistics separately.
+      - The series starts in 1926. The current definitions and level of detail apply from 1979, so the earlier years are on older definitions.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Tuna Acisu
+
+tables:
+  road_casualties:
+    variables:
+      road_deaths:
+        title: Road deaths
+        presentation:
+          title_public: Road deaths in Great Britain
+        description_short: Number of people killed in reported road collisions.
+        display:
+          name: All road users
+      pedestrian_deaths:
+        title: Pedestrian road deaths
+        presentation:
+          title_public: Pedestrian road deaths in Great Britain
+        description_short: Number of pedestrians killed in reported road collisions.
+        display:
+          name: Pedestrians
+      pedal_cyclist_deaths:
+        title: Cyclist road deaths
+        presentation:
+          title_public: Cyclist road deaths in Great Britain
+        description_short: Number of pedal cyclists, including their passengers, killed in reported road collisions.
+        display:
+          name: Cyclists
+      motorcyclist_deaths:
+        title: Motorcyclist road deaths
+        presentation:
+          title_public: Motorcyclist road deaths in Great Britain
+        description_short: Number of motorcyclists, including their passengers, killed in reported road collisions.
+        display:
+          name: Motorcyclists
+      car_occupant_deaths:
+        title: Car occupant road deaths
+        presentation:
+          title_public: Car occupant road deaths in Great Britain
+        description_short: Number of car drivers and passengers killed in reported road collisions.
+        display:
+          name: Car occupants
+      vehicle_occupant_deaths:
+        title: Driver and passenger road deaths
+        presentation:
+          title_public: Driver and passenger road deaths in Great Britain
+        description_short: Number of drivers and passengers of cars and other vehicles (except motorcycles and pedal cycles) killed in reported road collisions, plus a small number of other road users.
+        processing_level: major
+        description_processing: |-
+          We calculate this as total road deaths minus deaths of pedestrians, pedal cyclists and motorcyclists. It includes the occupants of cars, buses, coaches, vans, trucks and other vehicles, and other road users such as horse riders. This way, the four groups (pedestrians, cyclists, motorcyclists, and drivers and passengers) add up to the total.
+        display:
+          name: Drivers and passengers

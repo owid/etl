@@ -1045,3 +1045,9 @@ steps:
     - data://garden/who/2026-10-07/polio_vaccine_schedule:
       - data://meadow/who/2026-10-07/polio_vaccine_schedule:
         - snapshot://who/2026-10-07/polio_vaccine_schedule.xlsx
+
+  # Road casualties in Great Britain - Department for Transport
+  data://grapher/uk_dft/2026-11-12/road_casualties:
+    - data://garden/uk_dft/2026-11-12/road_casualties:
+      - data://meadow/uk_dft/2026-11-12/road_casualties:
+        - snapshot://uk_dft/2026-11-12/road_casualties.ods
