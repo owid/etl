@@ -27,7 +27,7 @@ definitions:
 
   # Text shared by several indicators.
   key_mandatory: &key_mandatory |-
-    This data covers the mandatory old-age programs that each country sets in law, as described by the International Social Security Association (ISSA). It doesn’t include programs that aren’t required by law, such as voluntary pensions, even when most workers take part in them.
+    This data covers the mandatory old-age programs that each country sets in law, as described by the International Social Security Association (ISSA). It doesn’t include programs that aren’t required by law, such as voluntary pensions, even when most workers take part in them. It shows which programs exist, not how many older people get a pension from them or how much they pay.
   key_several_programs: &key_several_programs |-
     A country can have several types of programs at once. For example, many countries pair a pension financed by contributions with a means-tested pension for older people with low incomes.
   key_reference_dates: &key_reference_dates |-
