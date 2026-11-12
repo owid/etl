@@ -8,7 +8,7 @@ metadata:
 
 # Creating an Explorer
 
-Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/food-prices`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
+Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/crop-yields`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
 
 This skill is the explorer-flavored sibling of `/create-chart`. They use the same engine (`paths.create_chart` for charts and multidims, `paths.create_explorer` for explorers) and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
 
@@ -294,7 +294,7 @@ When a dimension is only meaningful for some rows (e.g. `cost_metric` matters on
 
 - Tag the columns/views that don't use it with `<dim>: "na"`.
 - Declare the `na` choice with `name: ""` so the widget renders as empty when applicable.
-- Model: `agriculture/latest/food_prices.{py,config.yml}`.
+- Model: `war/latest/conflict_data.{py,config.yml}`.
 
 ```yaml
 - slug: cost_metric
@@ -440,7 +440,6 @@ Hand the user the exact `etlr` command — don't run it yourself.
 Full-YAML (each view hand-listed):
 
 - `etl/steps/viz/explorer/agriculture/latest/crop_yields.{py,config.yml}` — large indicator-based explorer with many dimensions.
-- `etl/steps/viz/explorer/agriculture/latest/food_prices.{py,config.yml}` — small grapher-chart-based migration (12 chart IDs unwrapped to 12 single-indicator views) with conditional dimensions ("na" pattern).
 - `etl/steps/viz/explorer/agriculture/latest/fertilizers.{py,config.yml}` — checkbox dimension with `choice_slug_true`; multi-namespace dependencies.
 - `etl/steps/viz/explorer/food/latest/food_footprints.{py,config.yml}` — hybrid (16 grapher-chart views + 29 CSV-backed views) showing dimension-filtered `common_views` for differing `sourceDesc` per view-type.
 - `etl/steps/viz/explorer/war/latest/conflict_data.{py,config.yml}` — uses `na`-named choices to model conditional dimensions.
