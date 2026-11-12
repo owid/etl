@@ -8,8 +8,7 @@ Go through the questions in order and stop at the first that applies.
 
 1. **Is the data one of these?**
    - Binary (yes / no): `BinaryMapPaletteA` to `BinaryMapPaletteE`.
-   - World regions: `continents`. It colors each region by name, so the same region gets the same color in every chart.
-   - Income groups: `continents` too; it also colors the four World Bank income groups by name.
+   - World regions and income groups: `continents` on charts, `OwidCategoricalMap` on maps. Both color each region and the four World Bank income groups by name, so the same group gets the same color everywhere: the strong chart colors on charts, the muted map colors on maps. Never put a map on `continents`.
    - Energy sources: `OwidEnergy` (`OwidEnergyLines` for line charts).
    - Gender: the guide calls for a gender palette, but Grapher has no scheme for it. Set the colors with `customCategoryColors` or per-series colors, and ask the design team which ones.
 2. **Are the values ordered?**
@@ -29,7 +28,7 @@ Go through the questions in order and stop at the first that applies.
    | 14 to 24 | `OwidCategoricalC` |
    | 25 or more | Reconsider the chart: small multiples or fewer, aggregated categories. If it has to stay, `OwidCategoricalC` |
 
-**Maps of categories with no order** use `OwidCategoricalMap`, the muted palette designed for map fills. It colors known regions by name and the other categories in order. When you set colors one by one with `customCategoryColors`, take them from the same palette (`OwidMapColors` in owid-grapher's `CustomSchemes.ts`).
+**Maps of categories with no order** use `OwidCategoricalMap`, the muted palette designed for map fills, regions and income groups included. It colors known regions and income groups by name and the other categories in order. When you set colors one by one with `customCategoryColors`, take them from the same palette (`OwidMapColors` in owid-grapher's `CustomSchemes.ts`).
 
 ## What the admin shows first
 
