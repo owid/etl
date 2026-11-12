@@ -32,13 +32,13 @@ definitions:
   description_key_social_protection_retired: |-
     The International Labour Organization (ILO) calculates this indicator as the number of people above the statutory retirement age who receive an old-age pension, divided by the number of people above that age. The statutory retirement age is set by each country, so the age group differs between countries.
   description_key_pension_types: |-
-    It counts both contributory pensions, from social insurance that people pay into while they work, and non-contributory pensions. Non-contributory pensions include universal pensions, paid to all residents above a certain age, and means-tested pensions, paid only to older people with low incomes or few assets.
+    It counts both contributory pensions, from social insurance that people pay into while they work, and non-contributory pensions. Non-contributory pensions include universal pensions, paid to all residents above a certain age, and targeted pensions, also called means-tested, paid only to older people with low incomes or few assets.
   description_key_pension_coverage_source: |-
     The data comes from the ILO's Social Security Inquiry, which collects administrative data from national ministries and social security institutions, complemented with other international databases. Together they form the ILO's World Social Protection Database.
   description_key_pension_coverage_regions: |-
     The ILO's regional and world values are averages of countries weighted by their population above the statutory retirement age. For countries without data, the ILO fills the gaps with estimates from statistical models.
   description_short_pension_coverage: |-
-    Share of <<people>> above the statutory retirement age who receive an old-age pension, including both contributory and non-contributory pensions.
+    Includes pensions that people paid into while working and pensions the government pays for without contributions, such as universal and targeted pensions.
   note_pension_coverage: |-
     The statutory retirement age differs between countries.
   description_key_social_protection_poor: |-
@@ -410,9 +410,7 @@ tables:
   _1_3_1__si_cov_pensn__both_sexes:
     variables:
       _1_3_1__si_cov_pensn__both_sexes:
-        description_short: |-
-          <%- set people = "people" %>
-          {definitions.description_short_pension_coverage}
+        description_short: "{definitions.description_short_pension_coverage}"
         description_key:
           - "{definitions.description_key_social_protection_retired}"
           - "{definitions.description_key_pension_types}"
@@ -436,9 +434,7 @@ tables:
   _1_3_1__si_cov_pensn__female:
     variables:
       _1_3_1__si_cov_pensn__female:
-        description_short: |-
-          <%- set people = "women" %>
-          {definitions.description_short_pension_coverage}
+        description_short: "{definitions.description_short_pension_coverage}"
         description_key:
           - "{definitions.description_key_social_protection_retired}"
           - "{definitions.description_key_pension_types}"
@@ -462,9 +458,7 @@ tables:
   _1_3_1__si_cov_pensn__male:
     variables:
       _1_3_1__si_cov_pensn__male:
-        description_short: |-
-          <%- set people = "men" %>
-          {definitions.description_short_pension_coverage}
+        description_short: "{definitions.description_short_pension_coverage}"
         description_key:
           - "{definitions.description_key_social_protection_retired}"
           - "{definitions.description_key_pension_types}"
