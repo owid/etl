@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from owid.catalog.tables import concat
 
 from etl.helpers import PathFinder
@@ -38,6 +39,12 @@ COLUMNS_CATEGORIES = ["elect_freefair_eiu", "funct_gov_eiu", "pol_part_eiu", "de
 NUM_COUNTRIES_MIN = 167
 # Tolerance when comparing the overall score with the average of the category scores (both are rounded to 2 decimals).
 TOLERANCE_AVERAGE = 0.01
+# Tolerance when comparing the overall score in EIU's spreadsheet with the one in the yearly reports.
+TOLERANCE_SOURCES = 0.005
+# Country-years where the yearly reports' overall score differs from EIU's spreadsheet, which we use.
+# Moldova 2011: rounding only (the category scores average 6.326; the 2011 report says 6.33, the spreadsheet 6.32).
+# Spain 2019: the 2019 report's main table says 8.29, but its other tables, all later reports and the spreadsheet say 8.18.
+SCORE_DIFFERENCES_EXPECTED = {("Moldova", 2011), ("Spain", 2019)}
 # Labels of the regime classification, in order. It is stored as text, so the Swimlane chart can show it.
 # NOTE: On each update, check that the codes from `add_regime_identifier` still mean the regimes labeled here.
 LABELS = {
@@ -59,25 +66,32 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
     ds_population = paths.load_dataset("population")
 
-    # Read table from meadow dataset.
+    # Read tables from meadow dataset: overall score, rank and regime type from EIU's spreadsheet, and category scores
+    # from the yearly reports.
     tb = ds_meadow.read("eiu")
+    tb_reports = ds_meadow.read("eiu_reports")
 
     #
     # Process data.
     #
     tb = paths.regions.harmonize_names(tb)
+    tb_reports = paths.regions.harmonize_names(tb_reports)
+
+    # Remove years with interpolated data (2007 and 2009 are interpolated by Gapminder)
+    tb_reports = tb_reports.loc[~tb_reports["year"].isin(YEAR_INTERPOLATED)]
+
+    # Add the category scores to the spreadsheet data. The overall score comes from the spreadsheet.
+    sanity_check_sources(tb, tb_reports)
+    tb = pr.merge(tb, tb_reports[["country", "year"] + COLUMNS_CATEGORIES], on=["country", "year"], how="left")
 
     # Fix known errors in the source (see eiu.corrections.yml).
     tb = paths.apply_corrections(tb)
     sanity_check_inputs(tb)
 
-    # Remove years with interpolated data (2007 and 2009 are interpolated by Gapminder)
-    tb = tb.loc[~tb["year"].isin(YEAR_INTERPOLATED)]
-
     # Drop rank column
     tb = tb.drop(columns=["rank_eiu"])
 
-    # Add regime identifier, check it against EIU's own labels (only shared for recent years), and drop those.
+    # Add regime identifier, check it against EIU's own labels, and drop those.
     tb = add_regime_identifier(tb)
     sanity_check_regimes(tb)
     tb = tb.drop(columns=["regime_type_eiu"])
@@ -119,6 +133,27 @@ def run() -> None:
     ds_garden.save()
 
 
+def sanity_check_sources(tb: Table, tb_reports: Table) -> None:
+    """Check that EIU's spreadsheet and the yearly reports cover the same country-years, with the same overall score."""
+    tb_check = pr.merge(
+        tb[["country", "year", "democracy_eiu"]],
+        tb_reports[["country", "year", "democracy_eiu"]],
+        on=["country", "year"],
+        how="outer",
+        suffixes=("", "_reports"),
+    )
+    tb_check = tb_check[tb_check["year"] <= tb_reports["year"].max()]
+    missing = tb_check.loc[
+        tb_check["democracy_eiu"].isna() | tb_check["democracy_eiu_reports"].isna(), ["country", "year"]
+    ]
+    assert missing.empty, f"Country-years in only one of the two sources: {missing.values.tolist()}"
+    diff = (tb_check["democracy_eiu"] - tb_check["democracy_eiu_reports"]).abs() > TOLERANCE_SOURCES
+    differences = set(map(tuple, tb_check.loc[diff, ["country", "year"]].values.tolist()))
+    assert differences == SCORE_DIFFERENCES_EXPECTED, (
+        f"Overall score differs between the spreadsheet and the yearly reports for: {sorted(differences)}"
+    )
+
+
 def sanity_check_inputs(tb: Table) -> None:
     """Check the combined yearly data before any processing."""
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate country-year rows."
@@ -138,17 +173,21 @@ def sanity_check_inputs(tb: Table) -> None:
     diff = (tb_cat[COLUMNS_CATEGORIES].mean(axis=1) - tb_cat["democracy_eiu"]).abs()
     bad = tb_cat.loc[diff > TOLERANCE_AVERAGE, ["country", "year"]]
     assert bad.empty, f"Overall score is not the average of the category scores for: {bad.values.tolist()}"
-    # Ranks follow the overall score in the editions from the EIU spreadsheet.
-    tb_xlsx = tb[tb["regime_type_eiu"].notna()]
-    for year, tb_year in tb_xlsx.groupby("year"):
-        rank_from_score = tb_year["democracy_eiu"].rank(ascending=False, method="min")
-        assert (rank_from_score == tb_year["rank_eiu"]).all(), f"Ranks don't follow scores in {year}."
+    # Ranks follow the overall score. EIU numbers some tied countries one after another, so a tied country's rank can be
+    # anywhere within the ranks its tie spans.
+    for year, tb_year in tb.groupby("year"):
+        rank_min = tb_year["democracy_eiu"].rank(ascending=False, method="min")
+        rank_max = tb_year["democracy_eiu"].rank(ascending=False, method="max")
+        assert tb_year["rank_eiu"].between(rank_min, rank_max).all(), f"Ranks don't follow scores in {year}."
 
 
 def sanity_check_regimes(tb: Table) -> None:
-    """Check our regime classification against EIU's labels, where we have them."""
+    """Check our regime classification against EIU's labels in the latest edition."""
+    # NOTE: EIU's labels for earlier editions contradict its own scores in many country-years (mostly 2011-2016, as of
+    # the spreadsheet EIU sent in November 2026), which is why we derive the regime type from the score. Check them again
+    # at every update.
     labels = {0: "Authoritarian", 1: "Hybrid regime", 2: "Flawed democracy", 3: "Full democracy"}
-    tb_check = tb[tb["regime_type_eiu"].notna()]
+    tb_check = tb[tb["year"] == tb["year"].max()]
     mismatch = tb_check[tb_check["regime_eiu"].astype(int).map(labels) != tb_check["regime_type_eiu"].astype(str)]
     assert mismatch.empty, f"Regime differs from EIU's label for: {mismatch[['country', 'year']].values.tolist()}"
 

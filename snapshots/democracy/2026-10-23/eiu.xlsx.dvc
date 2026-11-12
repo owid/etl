@@ -16,13 +16,13 @@ meta:
 
     # Files
     url_main: https://www.eiu.com/n/campaigns/democracy-index-2025/
-    date_accessed: "2026-10-23"
+    date_accessed: "2026-11-12"
 
     # License
     license:
       name: The Economist Intelligence Unit Limited
       url: https://www.eiu.com/n/terms/
 outs:
-  - md5: 062fd637ebf6a9702e5376309549058a
-    size: 60750
+  - md5: 5f0a56ee7eaee153c5b31058320f883b
+    size: 60921
     path: eiu.xlsx

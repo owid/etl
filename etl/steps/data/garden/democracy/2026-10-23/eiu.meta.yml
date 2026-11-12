@@ -51,10 +51,9 @@ dataset:
   description: |-
     The Economist Intelligence Unit's (EIU) Democracy Index provides a snapshot of the state of democracy in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). Scored on a 0-10 scale, the Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime".
 
-    This dataset was constructed using data collected from various EIU yearly reports, a multi-year compilation by Gapminder, and a spreadsheet EIU provided to us. For 2025, the data includes only the overall score and the regime type, not the scores for the five categories.
+    This dataset was constructed using a spreadsheet EIU provided to us, for the overall score, and EIU's yearly reports and a multi-year compilation of them by Gapminder, for the scores of the five categories. For 2025, the data includes only the overall score and the regime type, not the scores for the five categories.
 
   owners:
-    - Lucas Rodés-Guirao
     - Pablo Arriagada
 tables:
   eiu:
@@ -69,7 +68,7 @@ tables:
             - DiscreteBar
             - Marimekko
       description_processing: |-
-        We source the data from Gapminder for the years 2006 to 2020, and directly from the Economist Intelligence Unit for more recent years: from its yearly reports for 2021 to 2024, and from a spreadsheet it provided to us for 2025. EIU didn't publish the index for 2007 and 2009, so these years are not included.
+        We take the overall score for every year from a spreadsheet the Economist Intelligence Unit provided to us. We take the scores of the five categories from Gapminder's compilation of EIU's yearly reports for 2006 to 2020, and from the yearly reports themselves for 2021 to 2024. EIU didn't publish the index for 2007 and 2009, so these years are not included.
 
         For the world as a whole and for each region (as [defined by us](https://ourworldindata.org/grapher/continents-according-to-our-world-in-data)), we calculate both simple country averages and [population-weighted](https://ourworldindata.org/explorers/democracy?country=OWID_WRL~OWID_AFR~OWID_ASI~OWID_EUR~OWID_NAM~OWID_OCE~OWID_SAM&Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=%C2%AD%C2%AD%C2%AD%C2%AD%C2%AD%C2%AD%C2%ADMain+index+weighted+by+population) averages. A population-weighted average assigns more weight to countries with larger populations, so that the results better reflect the experiences of the average person.
 

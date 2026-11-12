@@ -4,7 +4,7 @@ EIU sent this spreadsheet to OWID directly; it is not a public download. It cont
 
     etls democracy/<version>/eiu --path-to-file EIU_Democracy_Index.xlsx
 
-NOTE: Checked against EIU's own reports, the history in this spreadsheet has errors (Ireland and Italy swapped in 2018-2021, Sweden and Switzerland in 2021, a 2008 column that repeats the 2011 values, scrambled ranks and regime labels). That's why the meadow step takes only the latest years from it, and keeps the older years from the snapshots transcribed from EIU's yearly reports. Re-check this at every update.
+NOTE: Check the whole history against EIU's yearly reports at every update. In the file EIU sent in November 2026 (a corrected version of an earlier one), the overall scores match the reports and the ranks follow the scores, but many regime labels contradict the scores, mostly in 2011-2016. That's why the garden step derives the regime type from the score.
 """
 
 from etl.helpers import PathFinder
