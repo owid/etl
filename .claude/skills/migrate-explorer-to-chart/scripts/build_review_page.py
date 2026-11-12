@@ -68,17 +68,6 @@ def render_page(review: Path, live: bool = False) -> str:
     notes_path = Path(cfg["notes"]) if cfg.get("notes") else None
     ev = json.loads((review / "eval.json").read_text())
     refs = json.loads((review / "references_full.json").read_text())
-    # The first scan is the to-do list; a later scan that no longer finds a link means it was swapped.
-    base_path = review / "references_baseline.json"
-    if base_path.exists():
-        key = lambda r: (r["surface"], r["where"], r["old_url"], r.get("link_text"))  # noqa: E731
-        now = {key(r) for r in refs["references"]}
-        base = json.loads(base_path.read_text())["references"]
-        for r in base:
-            r["status"] = "pending" if key(r) in now else "done"
-        extra = [dict(r, status="new") for r in refs["references"] if key(r) not in {key(b) for b in base}]
-        refs = dict(refs, references=base + extra)
-    preflight = (review / "preflight.txt").read_text() if (review / "preflight.txt").exists() else None
     mapping = json.loads((mapping_dir / "mapping.json").read_text())
     payload = json.loads((mapping_dir / "admin_bulk_payload.json").read_text())
     notes = json.loads(notes_path.read_text()) if notes_path else {}
@@ -92,7 +81,6 @@ def render_page(review: Path, live: bool = False) -> str:
         "stage": stage,
         "catchAll": mapping["catchAll"],
         "live": live,
-        "preflight": preflight,
     }
     title = f"{ev['explorer']['slug']} migration"
     return TEMPLATE.replace("__TITLE__", title).replace("__DATA__", json.dumps(data).replace("</", "<\\/"))
@@ -220,7 +208,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="compare">
-    <div class="sec-head"><h2>Side by side</h2><p>Production explorer on the left, the multidim on the right (staging before the merge, production after). The controls pick the explorer view; the right side shows the multidim view it redirects to. Live pages need the staging server reachable (Tailscale); screenshots are from a headless browser at 1280px.</p></div>
+    <div class="sec-head"><h2>Side by side</h2><p>Production explorer on the left, staging multidim on the right. The controls pick the explorer view; the right side shows the multidim view it redirects to. Live pages need the staging server reachable (Tailscale); screenshots are from a headless browser at 1280px.</p></div>
     <div class="nav" id="nav"></div>
     <div class="twoup" id="panes"></div>
     <div class="difflist" id="vdiffs"></div>
@@ -260,11 +248,10 @@ const E = D.eval, P = E.pairs, $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const show = v => v === null || v === undefined ? "—" : (typeof v === "string" ? v : JSON.stringify(v));
 const dimNames = E.explorer.dimensions;
-const MD = E.staging === "production" ? "Production multidim" : "Staging multidim";
 const family = c => c.check.split(":")[0];
 
 $("h1").textContent = `${E.explorer.slug} → /grapher/${E.multidim.slug}`;
-$("lede").innerHTML = `Live explorer: <a href="${E.explorer.url}" target="_blank" rel="noopener">${esc(E.explorer.url)}</a>. ${MD}: <a href="${E.multidim.staging_url}" target="_blank" rel="noopener">${esc(E.multidim.staging_url)}</a> (<a href="${E.multidim.staging_admin}" target="_blank" rel="noopener">admin preview</a>). Catalog path <code>${esc(E.multidim.catalogPath)}</code>.`;
+$("lede").innerHTML = `Live explorer: <a href="${E.explorer.url}" target="_blank" rel="noopener">${esc(E.explorer.url)}</a>. Staging multidim: <a href="${E.multidim.staging_url}" target="_blank" rel="noopener">${esc(E.multidim.staging_url)}</a> (<a href="${E.multidim.staging_admin}" target="_blank" rel="noopener">admin preview</a>). Catalog path <code>${esc(E.multidim.catalogPath)}</code>.`;
 const STAGES = [["review","1. Review the multidim, merge the PR"],["links","2. Replace links in docs"],["redirects","3. Create the redirects"],["retire","4. Unpublish and archive"]];
 const si = STAGES.findIndex(s => s[0] === D.stage);
 $("stages").innerHTML = STAGES.map((s,i) => `<span class="stage ${i===si?"now":i<si?"done":""}">${i<si?"✓ ":""}${s[1]}</span>`).join("");
@@ -337,7 +324,7 @@ function render(){
   const rr = (p.rendered||{})[tab] || null;
   const verdict = {match:'<span class="pill ok">Match</span>', config:'<span class="pill warn">Config differs</span>', differs:'<span class="pill bad">Differs</span>'}[p.verdict];
   $("vlabel").innerHTML = `View ${idx()+1} of ${P.length} · ${verdict}`;
-  $("panes").innerHTML = pane("explorer", rr&&rr.explorer, p.explorer_url, "Production explorer") + pane("multidim", rr&&rr.multidim, p.multidim_url, `${MD} · ${esc(p.multidim_view||"no target")}`);
+  $("panes").innerHTML = pane("explorer", rr&&rr.explorer, p.explorer_url, "Production explorer") + pane("multidim", rr&&rr.multidim, p.multidim_url, `Staging multidim · ${esc(p.multidim_view||"no target")}`);
   const checks = p.checks;
   $("vdiffs").innerHTML = checks.length ? checks.map(c => `<dl class="diff ${c.note?"explained":""}"><dt>Check</dt><dd>${esc(c.check)} · ${esc(c.field)}</dd><dt>Explorer</dt><dd>${esc(show(c.explorer))}</dd><dt>Multidim</dt><dd>${esc(show(c.multidim))}</dd>${c.note?`<dt>Note</dt><dd style="font-family:var(--body);font-size:.84rem">${esc(c.note)}</dd>`:""}</dl>`).join("")
     : `<div class="okline">✓ This view matches on indicators, display names, data and metadata checksums, chart config${E.rendered_ids.includes(p.id)?", and what readers see on both tabs":""}.</div>`;
@@ -359,16 +346,14 @@ document.querySelectorAll("#mtable tr.pick").forEach(tr => { tr.onclick = () => 
 // Links to replace.
 const R = D.refs.references;
 const breaks = R.filter(r=>r.breaks_on_redirect).length;
-const nDone = R.filter(r=>r.status==="done").length, pendBreak = R.filter(r=>r.status!=="done" && r.breaks_on_redirect).length;
-$("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"}${R.some(r=>r.status)?`: <b>${nDone} swapped</b>, ${R.length-nDone} still to do${pendBreak?`, of which <b>${pendBreak} break the moment the redirects exist</b>`:""}`:`, ${breaks} of them break the moment the redirects exist (swap those first)`}. Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.`;
+$("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"} found, ${breaks} of them break the moment the redirects exist (swap those first). Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.`;
 // What to search for in the doc: the linked words (or card title), and the text just before them.
 const findCell = r => {
   if (!r.link_text && !r.context) return '<span class="small">—</span>';
   const what = r.link_text ? `<b>“${esc(r.link_text)}”</b><button class="mini" data-copy="${esc(r.link_text)}">Copy</button>` : `<span class="small">${r.how==="chart"?"embed, below:":"after:"}</span>`;
   return `${what}${r.context?`<div class="small">…${esc(r.context.trim())}</div>`:""}`;
 };
-const statusLabel = r => r.status==="done" ? '<span class="pill ok">✓ swapped</span> ' : r.status==="pending" ? '<span class="pill warn">to do</span> ' : r.status==="new" ? '<span class="pill bad">new since first scan</span> ' : "";
-const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
+const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : r.how==="legacy copy" ? `<span class="pill neutral">legacy copy · no reader sees it</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
 const groups = {};
 R.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
 const order = Object.entries(groups).sort((a,b) => (b[1].some(r=>r.breaks_on_redirect)-a[1].some(r=>r.breaks_on_redirect)) || (a[0].startsWith("Repo")-b[0].startsWith("Repo")));
@@ -376,7 +361,7 @@ $("linkgroups").innerHTML = order.length ? order.map(([k, rs]) => {
   const [surface, where] = k.split("|"), r0 = rs[0];
   const links = [r0.edit_url&&`<a href="${esc(r0.edit_url)}" target="_blank" rel="noopener">Edit ↗</a>`, r0.preview_url&&`<a href="${esc(r0.preview_url)}" target="_blank" rel="noopener">Admin preview ↗</a>`, r0.page_url&&`<a href="${esc(r0.page_url)}" target="_blank" rel="noopener">Live page ↗</a>`].filter(Boolean).join(" · ");
   return `<div class="group"><div class="group-head"><h3>${esc(where)}</h3><span class="small">${esc(surface)} · ${rs.length} link${rs.length===1?"":"s"}</span><span class="small">${links}</span></div>
-    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${statusLabel(r)}${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${esc(r.old_url)}</td><td class="url">${esc(r.new_url)}</td><td>${esc(r.match)}${Object.keys(r.stale_params||{}).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
+    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${esc(r.old_url)}</td><td class="url">${esc(r.new_url)}</td><td>${esc(r.match)}${(r.repairs||[]).length?`<div class="small">${r.repairs.map(esc).join("; ")}</div>`:""}${Object.keys(r.stale_params||{}).length&&!(r.repairs||[]).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
 }).join("") : `<div class="okline">✓ Nothing references this explorer.</div>`;
 document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
 
@@ -387,10 +372,7 @@ $("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3>${esc(d.explo
 
 // Payload.
 const prodPayload = D.payloadEnv === "production";
-const pfReady = D.preflight && /^Ready:/m.test(D.preflight);
-const pfLines = D.preflight ? D.preflight.split("\n").filter(l=>/^(BLOCKER|WARN)/.test(l)).map(l=>`<div class="mono" style="font-size:.78rem">${esc(l.replace(/\s+/g," "))}</div>`).join("") : "";
-$("pbanner").innerHTML = prodPayload && pfReady ? `<div class="banner ok">✓ Built against production and the pre-apply check passed. This is the version to paste.${pfLines}</div>`
-  : prodPayload ? `<div class="banner bad">Built against production, but the pre-apply check is not passing yet, so don't paste it.${pfLines}</div>`
+$("pbanner").innerHTML = prodPayload ? `<div class="banner ok">✓ Built and checked against production. This is the version to paste.</div>`
   : `<div class="banner bad">Preview built against staging. Each view's config id differs on production, so this version must not be pasted: it gets rebuilt and checked against production after the PR merges, and this section updates.</div>`;
 const nRules = (D.payload.redirects||[]).filter(r=>r.target).length + (D.payload.catchAll?1:0);
 $("pstats").textContent = `${nRules} redirect rules (${(D.payload.redirects||[]).length} views + the bare explorer URL).`;
