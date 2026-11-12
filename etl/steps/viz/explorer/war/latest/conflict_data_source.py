@@ -181,6 +181,8 @@ HIGH_DISPLAY = {"name": "High estimate", "color": "#C3AEA6"}
 DEATHS_MAP_BINS = "0.99, #E8F4EA, 0;10;100;1000;10000;100000"
 RATE_MAP_BINS = "0.1;0.3;1;3;10;30;100"
 BOOL_MAP_BINS = "0,#92C5DE,No;1,#F4A582,Yes"
+# Country-level conflict flags are stored as No/Yes text, so they take category colors.
+FLAG_MAP_BINS = "No,#92C5DE;Yes,#F4A582"
 
 # Shared view-config blocks.
 STACKED_CONFIG = {
@@ -190,6 +192,8 @@ STACKED_CONFIG = {
     "selectedFacetStrategy": "entity",
 }
 MAP_CONFIG = {"hasMapTab": True, "tab": "map", "selectedFacetStrategy": "entity"}
+# Country-level No/Yes views: a map, plus a Swimlane showing each country's status over time.
+FLAG_MAP_CONFIG = {"hasMapTab": True, "tab": "map", "type": "Swimlane"}
 
 # Note shown on country-level map views for sources with historical states.
 MISSING_STATES_NOTE = "Some states are not shown in the map because they do not exist anymore."
@@ -1098,7 +1102,7 @@ def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_me
             f"of at least one instance of {spec.dod[ctype]} that year."
         )
         if country_level:
-            cfg.update(MAP_CONFIG)
+            cfg.update(FLAG_MAP_CONFIG)
             if spec.map_note_missing_states:
                 cfg["note"] = MISSING_STATES_NOTE
         return
@@ -1122,7 +1126,7 @@ def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_me
             f"in at least one {dod_sing} that year."
         )
     if country_level:
-        cfg.update(MAP_CONFIG)
+        cfg.update(FLAG_MAP_CONFIG)
         if spec.map_note_missing_states:
             cfg["note"] = MISSING_STATES_NOTE
 
@@ -1170,7 +1174,7 @@ def _locations_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measu
         )
         cfg["subtitle"] = f"Included are {spec.dod[ctype]} that {spec.locations_verb}."
     if country_level:
-        cfg.update(MAP_CONFIG)
+        cfg.update(FLAG_MAP_CONFIG)
         if spec.map_note_missing_states:
             cfg["note"] = MISSING_STATES_NOTE
 
@@ -1297,7 +1301,7 @@ def _mic_participants_text(cfg: dict[str, Any], spec: SourceSpec, sub_measure: s
     )
     if country_level:
         cfg["note"] = MISSING_STATES_NOTE
-        cfg.update(MAP_CONFIG)
+        cfg.update(FLAG_MAP_CONFIG)
 
 
 def _set_view_displays(view, spec: SourceSpec) -> None:
@@ -1381,7 +1385,7 @@ def _set_view_displays_mic(
                 ys[0].display = {"name": "Wars"}
     elif measure == M.PARTICIPANTS and sub_measure == "country_level_data":
         for ind in ys:
-            ind.display = {"colorScaleNumericBins": BOOL_MAP_BINS}
+            ind.display = {"colorScaleCategoricalBins": FLAG_MAP_BINS}
 
 
 def _set_mie_low_high(ys: list[Indicator], per_capita: bool) -> None:
@@ -1464,12 +1468,13 @@ def _set_count_display(ys: list[Indicator], spec: SourceSpec, ctype: str) -> Non
 
 
 def _set_locations_or_participants_displays(ys: list[Indicator], measure: str, sub_measure: str) -> None:
-    """Locations always use the boolean colorScale; participants only at country level."""
-    needs_cs = measure == M.LOCATIONS or sub_measure == "country_level_data"
-    if not needs_cs:
-        return
-    for ind in ys:
-        ind.display = {"colorScaleNumericBins": BOOL_MAP_BINS}
+    """Country-level flags (No/Yes text) use category colors; regional location counts keep the boolean bins."""
+    if sub_measure == "country_level_data":
+        for ind in ys:
+            ind.display = {"colorScaleCategoricalBins": FLAG_MAP_BINS}
+    elif measure == M.LOCATIONS:
+        for ind in ys:
+            ind.display = {"colorScaleNumericBins": BOOL_MAP_BINS}
 
 
 # ===========================================================================

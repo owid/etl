@@ -104,11 +104,11 @@ steps:
       - data://garden/wid/2026-06-18/world_inequality_database
 
   # Global Multidimensional Poverty Index
-  data://grapher/ophi/2025-12-23/multidimensional_poverty_index:
-    - data://garden/ophi/2025-12-23/multidimensional_poverty_index:
-      - data://meadow/ophi/2025-12-23/multidimensional_poverty_index:
-        - snapshot://ophi/2025-12-23/multidimensional_poverty_index_hot.csv
-        - snapshot://ophi/2025-12-23/multidimensional_poverty_index_cme.csv
+  data://grapher/ophi/2026-11-04/multidimensional_poverty_index:
+    - data://garden/ophi/2026-11-04/multidimensional_poverty_index:
+      - data://meadow/ophi/2026-11-04/multidimensional_poverty_index:
+        - snapshot://ophi/2026-11-04/multidimensional_poverty_index_hot.csv
+        - snapshot://ophi/2026-11-04/multidimensional_poverty_index_cme.csv
 
   # # OECD Income Distribution Database
   data://grapher/oecd/2026-04-23/income_distribution_database:

@@ -267,7 +267,8 @@ The PIP income footnote, used below as "[PIP footnote]": Depending on the countr
 
 - Title: Multidimensional Poverty Index (MPI) / Share of population in multidimensional poverty / Intensity of multidimensional poverty
 - Subtitle: Multidimensional poverty is defined as being deprived in a range of health, education and living standards indicators. Then, for the index: The MPI is a measure that reflects both the prevalence and the intensity of multidimensional poverty. For intensity: The intensity is the share of indicators in which the multidimensionally poor are deprived on average.
-- Footnote ("current margin estimates"): Estimates based on the most recent household survey data (between [year] and [year]). A [separate dataset](link) is produced to monitor trends over time.
+- Subtitle addition ("current margin estimates"): Estimates based on the most recent household survey data.
+- Footnote ("current margin estimates"): A [separate dataset](link) is produced to monitor trends over time.
 - Footnote ("harmonized over time"): This data aims to provide estimates that are comparable over time within individual countries. A [separate dataset](link) provides more complete data to be used for comparisons across countries at a point in time.
 
 ## Inequality and incomes across the distribution

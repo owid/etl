@@ -48,11 +48,11 @@ def run() -> None:
 
 def add_categories_to_counters(tb: Table) -> Table:
     tb["num_years_in_electdem_consecutive"] = tb["num_years_in_electdem_consecutive"].astype("str")
-    tb.loc[tb["regime_row_owid"] == 0, "num_years_in_electdem_consecutive"] = "closed autocracy"
-    tb.loc[tb["regime_row_owid"] == 1, "num_years_in_electdem_consecutive"] = "electoral autocracy"
+    tb.loc[tb["regime_row_owid_score"] == 0, "num_years_in_electdem_consecutive"] = "closed autocracy"
+    tb.loc[tb["regime_row_owid_score"] == 1, "num_years_in_electdem_consecutive"] = "electoral autocracy"
 
     tb["num_years_in_libdem_consecutive"] = tb["num_years_in_libdem_consecutive"].astype("str")
-    tb.loc[tb["regime_row_owid"] == 0, "num_years_in_libdem_consecutive"] = "closed autocracy"
-    tb.loc[tb["regime_row_owid"] == 1, "num_years_in_libdem_consecutive"] = "electoral autocracy"
-    tb.loc[tb["regime_row_owid"] == 2, "num_years_in_libdem_consecutive"] = "electoral democracy"
+    tb.loc[tb["regime_row_owid_score"] == 0, "num_years_in_libdem_consecutive"] = "closed autocracy"
+    tb.loc[tb["regime_row_owid_score"] == 1, "num_years_in_libdem_consecutive"] = "electoral autocracy"
+    tb.loc[tb["regime_row_owid_score"] == 2, "num_years_in_libdem_consecutive"] = "electoral democracy"
     return tb

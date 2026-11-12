@@ -169,8 +169,6 @@ dimensions:
       - slug: male
         name: Male
         description: null
-    presentation:
-      type: radio
 
   - slug: age
     name: Age
@@ -201,8 +199,6 @@ dimensions:
       - slug: high
         name: High
         description: Higher fertility than the medium variant
-    presentation:
-      type: radio
 
 views:
   # TODO: Below views present multiple indicators. I think we should come up with some tooling to do this programmatically.

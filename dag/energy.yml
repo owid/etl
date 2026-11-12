@@ -45,8 +45,8 @@ steps:
             - data://meadow/eurostat/2025-02-03/producer_prices_in_industry:
               - snapshot://eurostat/2025-02-03/producer_prices_in_industry.gz
 
-  # Impacts of energy production explorer.
-  viz://explorer/energy/latest/impacts_of_energy_sources:
+  # Impacts of energy production, as a multidim shown as a data explorer.
+  viz://chart/energy/latest/impacts_of_energy_sources:
     # UNECE - Life Cycle Assessment of Electricity Generation Options.
     - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity:
       - data://garden/unece/2026-05-04/life_cycle_assessment_of_electricity:
@@ -87,23 +87,16 @@ steps:
     - data://garden/eia/2026-05-05/international_energy
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
-    - data://garden/papers/2023-12-12/smil_2017
+    - data://garden/papers/2023-12-12/smil_2017:
+      - data://meadow/papers/2023-12-12/smil_2017:
+        - snapshot://papers/2023-12-12/smil_2017.csv
   data://grapher/energy/2026-06-30/energy_mix:
     - data://garden/energy/2026-06-30/energy_mix
 
-  # Carbon intensity of energy: fossil CO2 emissions (Global Carbon Budget) divided by total energy
-  # supply (energy_mix, TES). This is the TES-based successor to the Global Carbon Budget's own
-  # substitution-method emissions-per-energy indicator.
-  data://garden/energy/2026-06-30/carbon_intensity_of_energy:
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-    - data://garden/energy/2026-06-30/energy_mix
-  data://grapher/energy/2026-06-30/carbon_intensity_of_energy:
-    - data://garden/energy/2026-06-30/carbon_intensity_of_energy
   viz://chart/energy/latest/energy_mix:
     - data://grapher/energy/2026-06-30/energy_mix
-    # Carbon intensity view: sourced from the dedicated carbon_intensity_of_energy step (TES basis),
-    # so the energy_mix subtree stays on a single Statistical Review version.
-    - data://grapher/energy/2026-06-30/carbon_intensity_of_energy
+    # Carbon intensity view: CO2 emissions per unit of total energy supply, from the Global Carbon Budget.
+    - data://grapher/gcp/2026-11-10/global_carbon_budget
 
   # Energy - Fossil fuels (production, trade, consumption and reserves; 2026 Statistical Review + EIA).
   data://garden/energy/2026-06-30/fossil_fuels:
@@ -112,7 +105,9 @@ steps:
     # Smil - Global primary energy (2017), used to extend World coal production before 1900.
     - data://garden/papers/2023-12-12/smil_2017
     # NIC / Fouquet - UK historical energy data, used to extend UK coal production before 1900.
-    - data://garden/energy/2026-07-02/uk_historical_energy
+    - data://garden/energy/2026-07-02/uk_historical_energy:
+      - data://meadow/energy/2026-07-02/uk_historical_energy:
+        - snapshot://energy/2026-07-02/uk_historical_energy.xlsx
     - data://garden/demography/2024-07-15/population
     # Etemad & Luciani - historical fossil fuel production (1900-1979).
     - data://garden/papers/2026-06-30/etemad_luciani:
@@ -195,12 +190,6 @@ steps:
   # Energy innovation in the long run (Fouquet 2026)
   data://meadow/light/2025-12-29/energy_innovation_long_run:
     - snapshot://light/2025-12-29/energy_innovation_long_run.xlsx
-  data://grapher/light/2025-12-29/energy_innovation_long_run:
-    - data://garden/light/2025-12-29/energy_innovation_long_run:
-      - data://meadow/light/2025-12-29/energy_innovation_long_run
-      - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
-      - data://garden/ons/2025-12-31/cpi_uk
-      - data://garden/ons/2025-12-31/average_weekly_earnings_uk
   data://grapher/light/2026-01-21/energy_innovation_long_run:
     - data://garden/light/2026-01-21/energy_innovation_long_run:
       - data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data

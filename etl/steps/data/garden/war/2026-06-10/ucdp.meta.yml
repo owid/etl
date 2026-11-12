@@ -259,7 +259,7 @@ tables:
           <%- endif -%>
         description_key:
           - |-
-            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+            'Yes' indicates that the state participated in a conflict. 'No' indicates that the state did not participate in a conflict.
 
       number_participants:
         title: Number of states involved in conflicts
@@ -313,7 +313,7 @@ tables:
           <%- endif -%>
         description_key:
           - |-
-            '1' indicates that there was a conflict event in the given country. '0' indicates that there was no conflict event in the given country.
+            'Yes' indicates that there was a conflict event in the given country. 'No' indicates that there was no conflict event in the given country.
           - "{definitions.all.conflict_type}"
 
       number_locations:

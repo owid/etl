@@ -242,8 +242,10 @@ single row can be re-checked without opening all four.
 |---|---|---|
 | Gridlines | **dashed** `4,4`, `#ddd` | `GRID_LINE_DASH_PATTERN`, `TICK_COLOR` |
 | Tick labels | `#5b5b5b` | `GRAPHER_DARK_TEXT` = `GRAY_80` |
+| Tick label size | **15px** on the 540-wide templates, **14px** on the 850-wide ones: grapher's own download once placed (16px on its 540 square, 13.5 on its 850 default) | measured on grapher's SVG downloads |
+| y-axis tick labels | **right-aligned** against the plot (`text-anchor: end`), a column whose right edge is the plot's left; never left-aligned at the margin | `VerticalAxisComponent` |
 | Axis label | **bold** (`fontWeight: 700`) | `Axis.ts` |
-| x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
+| x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis — **draw them on every year axis** (`ax.tick_params(axis="x", length=5 * 0.72, width=0.72)`, in points like every stroke); `verify_static_viz.py` fails a year axis without them | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
 | Outermost tick labels | anchored **inwards** — `text-anchor` `start` on the first, `end` on the last | `HorizontalAxisComponent` |
 | y-axis line | **none** — the gridlines carry the reading | no component exists |
 | y domain | `[lowest tick, highest tick]` — the extreme gridlines land **on** the plot's edges | verified on a rendered SVG |
@@ -449,10 +451,12 @@ word or two — is worth removing at the same time, because it is both a copy de
 and the state one character away from adding a line: measure it by cloning the slot, setting
 `textAutoResize = "WIDTH_AND_HEIGHT"` to get the unwrapped width, and comparing against the slot's.
 
-**Break a wrapped subtitle into lines of about equal length, and give the frame the same breaks.** Wrap
-to the fewest lines the slot allows, then narrow the wrap width as far as that line count holds. A
-greedy fill leaves a long first line over a short last one; even lines read as one block and leave room
-beside them for a key to rise into. A sentence boundary outranks balance: when a subtitle holds two
+**Break a wrapped subtitle into full lines, fix a short last line, and give the frame the same
+breaks.** Wrap to the fewest lines the slot allows, each close to the slot's width. When the last line
+is under about 40% of the slot, move words down from the lines above, spreading the shortfall over
+them, until it isn't. Lines of about equal length are only for a key placed beside the subtitle's
+shorter lines (a stacked bar's category key); anywhere else nothing uses the space they free, and the
+subtitle just reads narrow. A sentence boundary outranks either: when a subtitle holds two
 sentences, start the second on a new line wherever that costs no extra line ("…according to the World
 Health Organization. / Children more than 2 standard deviations…", not "…Organization. Children / …").
 Set the frame's subtitle to the same text with explicit `\n`, so Figma's own wrap cannot move the breaks.
