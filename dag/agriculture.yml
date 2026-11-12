@@ -18,6 +18,10 @@ steps:
         - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
         - snapshot://usda_ers/2023-06-07/food_expenditure_since_2017.xlsx
 
+  # Food prices, as a multidim shown as a data explorer (replaces the food-prices explorer).
+  viz://chart/agriculture/latest/food_prices:
+    - data://grapher/wb/2025-08-04/food_prices_for_nutrition
+
   # Food prices for nutrition - World Bank based on FAO.
   data://grapher/wb/2025-08-04/food_prices_for_nutrition:
     - data://garden/wb/2025-08-04/food_prices_for_nutrition:
