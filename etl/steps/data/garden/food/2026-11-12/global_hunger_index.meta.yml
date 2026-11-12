@@ -1,0 +1,16 @@
+dataset:
+  update_period_days: 365
+  owners:
+    - Hannah Ritchie  # backport
+    - Pablo Rosado
+
+tables:
+  global_hunger_index:
+    variables:
+      global_hunger_index:
+        title: Global Hunger Index
+        unit: ""
+        description_processing: |-
+          The source shows scores below 5 as "<5". We show them as 2.5, the middle of the range from 0 to 5.
+        display:
+          numDecimalPlaces: 1

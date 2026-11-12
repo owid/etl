@@ -1,0 +1,43 @@
+# NOTE: A new report comes out every October at https://www.globalhungerindex.org/xlsx/<year>.xlsx; bump the year in
+#  url_download and citation_full. Besides the "GHI Scores <year>" sheet that we use, the file has a ranking sheet and a
+#  sheet with the values of the four component indicators, which we do not ingest.
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global Hunger Index"
+    description: |-
+      The Global Hunger Index (GHI) is a tool designed to comprehensively measure and track hunger at global, regional, and national levels, reflecting multiple dimensions of hunger over time.
+
+      Each country's GHI score is calculated based on a formula that combines four indicators that together capture the multidimensional nature of hunger:
+
+      - Undernourishment: the share of the population whose caloric intake is insufficient;
+      - Child stunting: the share of children under the age of five who have low height for their age, reflecting chronic undernutrition;
+      - Child wasting: the share of children under the age of five who have low weight for their height, reflecting acute undernutrition; and
+      - Child mortality: the share of children who die before their fifth birthday, reflecting in part the fatal mix of inadequate nutrition and unhealthy environments.
+
+      The calculation results in GHI scores on a 100-point scale, where 0 is the best score (no hunger) and 100 is the worst.
+    date_published: "2026-10-14"
+
+    # Citation
+    producer: "Welthungerhilfe et al."
+    citation_full: |-
+      Welthungerhilfe (WHH), Institute for International Law of Peace and Armed Conflict (IFHV), and Helvetas. 2026. 2026 Global Hunger Index: No Security Without Food Security. Bonn/Berlin: WHH; Zürich: Helvetas; Bochum: IFHV.
+
+    # Files
+    url_main: https://www.globalhungerindex.org/download/all.html
+    url_download: https://www.globalhungerindex.org/xlsx/2026.xlsx
+    date_accessed: 2026-11-12
+
+    # License
+    # NOTE: The site footer and the report name the "Creative Commons Attribution 4.0 International License", but link to
+    #  CC BY-NC-ND 4.0.
+    license:
+      name: "CC BY 4.0"
+      url: https://www.globalhungerindex.org/download/all.html
+
+outs:
+  - md5: d5946c4ce57d6b589e436575c4c5b48c
+    size: 64920
+    path: global_hunger_index.xlsx
