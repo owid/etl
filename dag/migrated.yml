@@ -61,9 +61,6 @@ steps:
   data-private://grapher/health/2021/lead_blood_concentrations_in_usa__us_cdc:
     - data-private://garden/health/2021/lead_blood_concentrations_in_usa__us_cdc:
       - snapshot-private://health/2021/lead_blood_concentrations_in_usa__us_cdc.feather
-  data://grapher/food/2021/global_hunger_index__2021:
-    - data://garden/food/2021/global_hunger_index__2021:
-      - snapshot://food/2021/global_hunger_index__2021.feather
   data://grapher/plastic_waste/2015/plastic_waste__jambeck_et_al__2015:
     - data://garden/plastic_waste/2015/plastic_waste__jambeck_et_al__2015:
       - snapshot://plastic_waste/2015/plastic_waste__jambeck_et_al__2015.feather
