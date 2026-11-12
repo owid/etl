@@ -1,0 +1,22 @@
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+    - Hannah Ritchie
+
+tables:
+  global_hunger_index:
+    variables:
+      global_hunger_index:
+        title: Global Hunger Index
+        unit: ""
+        description_short: |-
+          The Global Hunger Index combines undernourishment, child stunting, child wasting, and child mortality into a single score. It is measured on a 100-point scale where 0 is the best score (no hunger) and 100 is the worst.
+        description_processing: |-
+          Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5.
+        presentation:
+          grapher_config:
+            note: |-
+              Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5.
+        display:
+          numDecimalPlaces: 1

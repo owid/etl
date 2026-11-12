@@ -199,3 +199,9 @@ steps:
       - data://meadow/sea_around_us/2026-10-24/fish_catch:
         - snapshot://sea_around_us/2026-10-24/fish_catch.csv
       - data://garden/regions/2023-01-01/regions
+
+  # Global Hunger Index.
+  data://grapher/food/2026-11-12/global_hunger_index:
+    - data://garden/food/2026-11-12/global_hunger_index:
+      - data://meadow/food/2026-11-12/global_hunger_index:
+        - snapshot://food/2026-11-12/global_hunger_index.xlsx

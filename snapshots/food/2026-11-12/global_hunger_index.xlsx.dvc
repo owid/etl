@@ -1,0 +1,33 @@
+# NOTE: A new report comes out every October at https://www.globalhungerindex.org/xlsx/<year>.xlsx; bump the year in
+#  url_download and citation_full.
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global Hunger Index"
+    description: |-
+      The Global Hunger Index (GHI) combines four indicators: undernourishment, child stunting, child wasting, and child mortality. Scores are on a 100-point scale, where 0 is the best score (no hunger) and 100 is the worst.
+    date_published: "2026-10-14"
+
+    # Citation
+    producer: "Welthungerhilfe, IFHV, and Helvetas"
+    citation_full: |-
+      Welthungerhilfe (WHH), Institute for International Law of Peace and Armed Conflict (IFHV), and Helvetas. 2026. 2026 Global Hunger Index: No Security Without Food Security. Bonn/Berlin: WHH; Zürich: Helvetas; Bochum: IFHV.
+
+    # Files
+    url_main: https://www.globalhungerindex.org/download/all.html
+    url_download: https://www.globalhungerindex.org/xlsx/2026.xlsx
+    date_accessed: 2026-11-12
+
+    # License
+    # NOTE: The site footer and the report both say "Creative Commons Attribution 4.0 International License
+    #  (CC BY-NC-ND 4.0)" and link to CC BY-NC-ND 4.0.
+    license:
+      name: "CC BY-NC-ND 4.0"
+      url: https://www.globalhungerindex.org/download/all.html
+
+outs:
+  - md5: d5946c4ce57d6b589e436575c4c5b48c
+    size: 64920
+    path: global_hunger_index.xlsx
