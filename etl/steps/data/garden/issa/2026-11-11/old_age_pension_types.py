@@ -52,7 +52,7 @@ FOOTNOTE_G_LABELS = {
 # Whether the classifications count programs that are closed to new entrants and being phased out (footnote "f").
 # They still pay pensions to many of today's retirees.
 # NOTE: This choice is still under discussion. If it changes, also change the metadata that describes it: the
-#  "processing_classification" and "note_classification" definitions, and the description_key about closed programs.
+#  "description_processing_classification", "note_classification" and "description_key_closed_classification" definitions.
 INCLUDE_CLOSED_PROGRAMS = True
 
 # Labels of the overall classifications, by whether a country has a contributory pension, a tax-funded pension, and
