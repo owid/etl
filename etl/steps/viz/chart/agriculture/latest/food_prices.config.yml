@@ -20,6 +20,8 @@ default_selection:
   - United Kingdom
 
 # Chart text (titles, subtitles, notes, map colors) comes from each indicator's garden metadata.
+# The explorer's "Cost or Affordability" choice and its two conditional metric dimensions are one
+# grouped "Measure" dimension here, so every diet x measure pair is a view and no choice is blank.
 dimensions:
   - slug: diet
     name: Diet
@@ -32,132 +34,94 @@ dimensions:
         name: Nutrient adequate diet
       - slug: calorie_sufficient
         name: Calorie sufficient diet
-  - slug: type
-    name: Cost or Affordability
+  - slug: measure
+    name: Measure
     presentation:
-      type: toggle-buttons
+      type: dropdown
     choices:
-      - slug: affordability
-        name: Affordability
-      - slug: cost
-        name: Cost
-  - slug: affordability_metric
-    name: Affordability metric
-    presentation:
-      type: toggle-buttons
-    choices:
-      - slug: na
-        name: ""
       - slug: share
         name: Share that cannot afford
+        group: Affordability
       - slug: number
         name: Number that cannot afford
-  - slug: cost_metric
-    name: Cost metric
-    presentation:
-      type: toggle-buttons
-    choices:
-      - slug: na
-        name: ""
+        group: Affordability
       - slug: dollars_per_day
         name: $ per day
+        group: Cost
       - slug: share_food_expenditure
         name: "% of average food expenditure"
+        group: Cost
 
 views:
   - dimensions:
       diet: healthy
-      type: affordability
-      affordability_metric: share
-      cost_metric: na
+      measure: share
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_a_healthy_diet
   - dimensions:
       diet: healthy
-      type: affordability
-      affordability_metric: number
-      cost_metric: na
+      measure: number
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_a_healthy_diet
   - dimensions:
       diet: healthy
-      type: cost
-      affordability_metric: na
-      cost_metric: dollars_per_day
+      measure: dollars_per_day
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#cost_of_a_healthy_diet_in_ppp_dollars
   - dimensions:
       diet: healthy
-      type: cost
-      affordability_metric: na
-      cost_metric: share_food_expenditure
+      measure: share_food_expenditure
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures
   - dimensions:
       diet: nutrient_adequate
-      type: affordability
-      affordability_metric: share
-      cost_metric: na
+      measure: share
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_nutrient_adequacy
   - dimensions:
       diet: nutrient_adequate
-      type: affordability
-      affordability_metric: number
-      cost_metric: na
+      measure: number
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_nutrient_adequacy
   - dimensions:
       diet: nutrient_adequate
-      type: cost
-      affordability_metric: na
-      cost_metric: dollars_per_day
+      measure: dollars_per_day
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#cost_of_a_nutrient_adequate_diet_in_ppp_dollars
   - dimensions:
       diet: nutrient_adequate
-      type: cost
-      affordability_metric: na
-      cost_metric: share_food_expenditure
+      measure: share_food_expenditure
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures
   - dimensions:
       diet: calorie_sufficient
-      type: affordability
-      affordability_metric: share
-      cost_metric: na
+      measure: share
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_sufficient_calories
   - dimensions:
       diet: calorie_sufficient
-      type: affordability
-      affordability_metric: number
-      cost_metric: na
+      measure: number
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_sufficient_calories
   - dimensions:
       diet: calorie_sufficient
-      type: cost
-      affordability_metric: na
-      cost_metric: dollars_per_day
+      measure: dollars_per_day
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#cost_of_an_energy_sufficient_diet_in_ppp_dollars
   - dimensions:
       diet: calorie_sufficient
-      type: cost
-      affordability_metric: na
-      cost_metric: share_food_expenditure
+      measure: share_food_expenditure
     indicators:
       y:
         - catalogPath: food_prices_for_nutrition#affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures
