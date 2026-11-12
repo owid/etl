@@ -242,7 +242,7 @@ committing the generated files to the user unless asked; `etl pr` already pushed
 
 - Tracking: #6513 (global-health, the last explorer outside ETL).
 - PRs to model the body on: #6029, #6031, #6032.
-- Example explorer steps built this way: `food_footprints`, `fertilizers`, `countries_in_conflict_data`, `democracy` (with soft-hyphen prefixes).
+- Example explorer steps built this way: `food_footprints`, `countries_in_conflict_data`, `democracy` (with soft-hyphen prefixes).
 - After the explorer is in ETL it is a candidate for the port to an MDIM (`viz://chart`), umbrella #6014.
 
 ## Retire when
