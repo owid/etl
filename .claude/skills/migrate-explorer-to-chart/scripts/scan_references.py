@@ -249,11 +249,20 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
             rows = prod.read_sql(
                 "SELECT id, slug, type, status, content FROM posts WHERE content LIKE %s", params=(like,)
             )
+            # A reusable block renders only on the published explorers whose `wpBlockId` names it.
+            shown_on: dict[int, list[str]] = {}
+            for e in prod.read_sql(
+                "SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.wpBlockId')) AS b FROM explorers "
+                "WHERE isPublished = 1 AND JSON_EXTRACT(config, '$.wpBlockId') IS NOT NULL"
+            ).to_dict("records"):
+                shown_on.setdefault(int(e["b"]), []).append(e["slug"])
             for r in rows.to_dict("records"):
-                # Legacy WordPress: posts are private copies of pages now served from gdocs, while
-                # published reusable blocks still render on explorer pages (`wpBlockId`).
-                if r["type"] == "wp_block":
-                    surface, how = "WordPress block (shown on an explorer page)", "link in block"
+                # Legacy WordPress: posts are private copies of pages now served from gdocs.
+                if r["type"] == "wp_block" and shown_on.get(r["id"]):
+                    pages = ", ".join(f"/explorers/{s}" for s in shown_on[r["id"]])
+                    surface, how = f"WordPress block (shown on {pages})", "link in block"
+                elif r["type"] == "wp_block":
+                    surface, how = "WordPress block (unused, not on the site)", "legacy copy"
                 else:
                     surface, how = f"Legacy WordPress {r['type']} ({r['status']}, not on the site)", "legacy copy"
                 for m in pat.finditer(r["content"] or ""):
@@ -342,11 +351,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 for m in pat.finditer(str(r["txt"])):
                     add(f"DB: {t}.{c}", f"{t} {r['k']}", None, m.group(0), "text")
 
-    # Repos: hardcoded links in ETL metadata or in the site's own code.
+    # Repos: hardcoded links in ETL metadata or in the site's own code. Both are read at
+    # `origin/master`, so a fix merged elsewhere shows as swapped whatever branch is checked out.
+    subprocess.run(["git", "-C", str(BASE_DIR), "fetch", "-q", "origin", "master"], check=False)
     repos = {
         "etl": (
             BASE_DIR,
-            ["git", "grep", "-n", "-I", f"/explorers/{slug}", "--", ".", ":!ai", ":!data", ":!dag/archive"],
+            ["git", "grep", "-n", "-I", f"/explorers/{slug}", "origin/master", "--", ".", ":!ai", ":!data", ":!dag/archive"],
         )
     }
     if grapher_repo:
