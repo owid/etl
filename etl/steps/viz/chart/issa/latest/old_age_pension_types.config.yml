@@ -8,7 +8,7 @@ topic_tags:
   - Poverty
 
 default_dimensions:
-  classification: contributory_and_tax_funded_pensions
+  classification: pension_system_mix
 
 # Titles, subtitles, notes and map colors come from each indicator's metadata in the garden step.
 definitions:
@@ -22,17 +22,22 @@ dimensions:
   - slug: classification
     name: Classification
     choices:
+      - slug: pension_system_mix
+        name: Contributory, tax-funded, and savings
+        description: Seven groups, by which of the three kinds of programs a country has
       - slug: contributory_and_tax_funded_pensions
         name: Contributory and tax-funded pensions
         description: Four groups, by whether a country has a contributory pension, a tax-funded pension, both, or neither
       - slug: type_of_tax_funded_pension
         name: Type of tax-funded pension
         description: Universal, targeted, both, or none
-      - slug: pension_system_mix
-        name: Mix of programs
-        description: Seven groups, which also show whether workers must save for retirement
 
 views:
+  - dimensions:
+      classification: pension_system_mix
+    indicators:
+      y:
+        - catalogPath: old_age_pension_types#pension_system_mix
   - dimensions:
       classification: contributory_and_tax_funded_pensions
     indicators:
@@ -43,8 +48,3 @@ views:
     indicators:
       y:
         - catalogPath: old_age_pension_types#type_of_tax_funded_pension
-  - dimensions:
-      classification: pension_system_mix
-    indicators:
-      y:
-        - catalogPath: old_age_pension_types#pension_system_mix
