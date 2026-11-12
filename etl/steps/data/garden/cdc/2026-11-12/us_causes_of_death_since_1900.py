@@ -131,17 +131,17 @@ CAUSES = {
         "wonder": r"^#Chronic lower respiratory diseases \(J40-J47\)$",
     },
     # Alzheimer's disease and COVID-19 are only available from CDC WONDER.
-    "Alzheimer's disease": {"wonder": r"^#Alzheimer disease \(G30\)$"},
+    "Alzheimer’s disease": {"wonder": r"^#Alzheimer disease \(G30\)$"},
     "COVID-19": {"wonder": r"^#COVID-19 \(U07\.1\)$"},
 }
 
 # First year of each cause that starts later than 1900 (COVID-19: WONDER reports zero deaths before 2020).
-FIRST_YEAR = {"COPD": 1960, "Alzheimer's disease": 1999, "COVID-19": 2020}
+FIRST_YEAR = {"COPD": 1960, "Alzheimer’s disease": 1999, "COVID-19": 2020}
 
 # Four groups that add up to all deaths: three sums of the causes above, and the rest.
 GROUPS = {
-    "Heart disease, cancer, stroke and diabetes": ["Heart disease", "Cancer", "Stroke", "Diabetes"],
-    "Tuberculosis, pneumonia, influenza and diarrheal diseases": [
+    "Heart disease, cancer, stroke, and diabetes": ["Heart disease", "Cancer", "Stroke", "Diabetes"],
+    "Tuberculosis, pneumonia, influenza, and diarrheal diseases": [
         "Tuberculosis",
         "Pneumonia and influenza",
         "Diarrheal diseases",

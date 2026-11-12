@@ -5,9 +5,9 @@ meta:
     # Data product / Snapshot
     title: Underlying Cause of Death (CDC WONDER)
     description: |-
-      CDC WONDER is the online database of the Centers for Disease Control and Prevention (CDC). Its "Underlying Cause of Death" data counts every death in the United States, based on death certificates, by the disease or injury that started the chain of events leading to death. The data comes from the National Center for Health Statistics (NCHS), which compiles the death records of all 50 states and the District of Columbia.
+      CDC WONDER is the online database of the Centers for Disease Control and Prevention (CDC). Its “Underlying Cause of Death” data counts every death in the United States, based on death certificates, by the disease or injury that started the chain of events leading to death. The data comes from the National Center for Health Statistics (NCHS), which compiles the death records of all 50 states and the District of Columbia.
 
-      This snapshot covers the whole country from 1999 onward, for each cause in NCHS's list of 113 selected causes of death and for all causes together. For each year and cause, it gives the number of deaths, the population, and the crude death rate (deaths per 100,000 people). Causes are classified with the 10th revision of the International Classification of Diseases (ICD-10).
+      This snapshot covers the whole country from 1999 onward, for each cause in NCHS’s list of 113 selected causes of death and for all causes together. For each year and cause, it gives the number of deaths, the population, and the crude death rate (deaths per 100,000 people). Causes are classified with the 10th revision of the International Classification of Diseases (ICD-10).
 
       WONDER marks death rates based on fewer than 20 deaths as unreliable, and hides death counts between 1 and 9.
     # NOTE: WONDER states only that the 2018–2024 data was released in 2026.
