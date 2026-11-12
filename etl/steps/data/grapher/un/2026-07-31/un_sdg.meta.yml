@@ -32,7 +32,7 @@ definitions:
   description_key_social_protection_retired: |-
     The International Labour Organization (ILO) calculates this indicator as the number of people above the statutory retirement age who receive an old-age pension, divided by the number of people above that age. The statutory retirement age is set by each country, so the age group differs between countries.
   description_key_pension_types: |-
-    It counts both contributory pensions, from social insurance that people pay into while they work, and non-contributory pensions. Non-contributory pensions include universal pensions, paid to all residents above a certain age, and targeted pensions, also called means-tested, paid only to older people with low incomes or few assets.
+    It counts both contributory pensions, which people pay into while they work, through social insurance or mandatory savings schemes, and non-contributory pensions. Non-contributory pensions include universal pensions, paid to all residents above a certain age, and targeted pensions, also called means-tested, paid only to older people with low incomes or few assets.
   description_key_pension_coverage_source: |-
     The data comes from the ILO's Social Security Inquiry, which collects administrative data from national ministries and social security institutions, complemented with other international databases. Together they form the ILO's World Social Protection Database.
   description_key_pension_coverage_regions: |-
