@@ -51,13 +51,6 @@ Find each indicator's full catalog path (`grapher/<namespace>/<version>/<dataset
 - **Indicator ID**: the `catalogPath` from the same metadata URL.
 - **Catalog path**: use it as it is. The build stops with a clear message if it doesn't exist.
 
-**Check whether an MDim on these indicators already exists,** before building the page. Search the chart
-configs in `etl/steps/viz/chart/` for each indicator's short name (the part after `#`). The public Datasette
-doesn't show this: it lists only published MDims, and an MDim can sit in ETL unpublished and with no web address.
-If one covers the same indicators, tell the person what it is called, who added it and how it differs from what
-they asked for, and ask whether to change that one, add a second, or stop. The page can't open an existing MDim,
-so a change to it starts from a setup you write from its config.
-
 Write the draft to `ai/mdim_simulator/<name>.setup.yml`, in the same format the page copies out. `<name>` is a
 short kebab-case name for the MDim, such as `internet-users`. A typical draft has one dropdown, with one option
 per indicator:
