@@ -8,7 +8,11 @@ definitions:
         - Global Education
 
   wbl_description_processing: |-
-    The World Bank’s Gender Statistics no longer includes this indicator, so we take it directly from the historical data on the Women, Business and the Law (WBL) website, which covers the report years 1971 to 2024. Each WBL report describes the laws in force in the year before it is published (on October 1, in recent reports), so we show each report’s data in that earlier year, as Gender Statistics did. For example, the 2024 report is shown as 2023.
+    The World Bank’s Gender Statistics no longer includes this indicator, so we take it directly from Women, Business and the Law (WBL). We combine two WBL files: the historical data for the reports from 1971 to 2024, and the 2026 report, which the World Bank recalculated using the same method. There was no 2025 report using this method, so there is no data for 2024.
+
+    In its 2026 report, the World Bank corrected some answers from earlier years, but it did not update its historical data to match. We asked the World Bank, and its WBL team sent us the first year each correction applies to. We used this to correct the historical data ourselves, and recalculated the scores for the years affected. So for these answers, our data differs from the historical file the World Bank publishes.
+
+    Each WBL report describes the laws in force in the year before it is published (on October 1, in recent reports), so we show each report’s data in that earlier year, as the World Bank recommends. For example, the 2026 report is shown as 2025.
   wbl_description_processing_averages: |-
     For the world, World Bank income groups, and five World Bank regions, we calculate the simple average of the scores of the countries in each group, as the World Bank does. We use each country’s latest classification for all years. In this data, the World Bank groups high-income members of the Organization for Economic Co-operation and Development (OECD) separately, so its regions do not include them.
   note_wbl_maps: |-

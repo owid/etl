@@ -1,13 +1,15 @@
 """Load the Women, Business and the Law (WBL 1.0) snapshots and create a meadow dataset.
 
 The World Bank's Gender Statistics stopped publishing the WBL 1.0 indicators (yes/no legal questions and scores) when
-WBL moved to its 2.0 framework. To keep those series going, we take them directly from the WBL website's 1971-2024
-historical panel.
+WBL moved to its 2.0 framework. To keep those series going, we take them directly from WBL: the 1971-2024 historical
+panel, and the 2026 report recalculated under the 1.0 methodology.
 
-NOTE: WBL also publishes its 2026 report recalculated under the 1.0 methodology, but we don't use it yet. In that
-report, the World Bank corrected some earlier answers ("revisions" in its "Data Changes" sheet) without correcting the
-1971-2024 panel, so appending it would show those corrections as changes in the law. On the next update, check whether
-the World Bank has published a corrected 1.0 history (we asked), and add the latest report year then.
+The 2026 file's "Data Changes" sheet lists every answer that changed since the 2024 report, either a reform (a change in
+the law) or a revision (a correction of an earlier answer). The World Bank never corrected the panel for the revisions,
+but shared, for each change, the first report year it applies to. We keep that sheet as a second table, and the garden
+step applies the revisions to the panel.
+
+NOTE: The World Bank plans to publish a new panel under the WBL 2.0 methodology in March 2027, which replaces both files.
 
 Columns are renamed to the World Bank indicator codes that Gender Statistics used for the same series, so that the
 garden step can slot them back into the gender_statistics table.
@@ -25,6 +27,18 @@ paths = PathFinder(__file__)
 # Sheet holding the full data in each snapshot.
 SHEETS = {
     "women_business_and_the_law_1_0_panel.xlsx": "WBL Panel 2024",
+    "women_business_and_the_law_1_0_scores.xlsx": "WBL 2026 1.0",
+}
+# Snapshot and sheet listing the changes since the 2024 report, and their new names.
+CHANGES_SNAPSHOT = "women_business_and_the_law_1_0_scores.xlsx"
+CHANGES_SHEET = "Data Changes"
+CHANGES_COLUMNS = {
+    "Economy": "country",
+    "Question": "indicator",
+    "Category": "category",
+    "Original Value": "original_value",
+    "New Value": "new_value",
+    "Back-calculate to WBL Report Year": "first_report_year",
 }
 
 # Identifier columns we keep, and their new names (region and income group are used for the World Bank's averages).
@@ -115,6 +129,9 @@ def run() -> None:
         )
         tables.append(tb)
 
+    # Load the list of changes since the 2024 report.
+    tb_changes = paths.load_snapshot(CHANGES_SNAPSHOT).read_excel(sheet_name=CHANGES_SHEET)
+
     #
     # Process data.
     #
@@ -123,13 +140,26 @@ def run() -> None:
     for column in ["country", "region", "income_group"]:
         tb[column] = tb[column].astype("category")
 
+    # Name each change's question by its indicator code, and its first report year as a number (e.g. "WBL2022" -> 2022).
+    tb_changes = tb_changes[list(CHANGES_COLUMNS)].rename(columns=CHANGES_COLUMNS, errors="raise")
+    tb_changes["indicator"] = tb_changes["indicator"].map(
+        lambda question: HEADER_TO_CODE.get(normalize_header(question))
+    )
+    assert tb_changes["indicator"].notna().all(), "Unknown question in the list of changes."
+    first_year = tb_changes["first_report_year"].astype(str).str.fullmatch(r"WBL(\d{4})")
+    assert first_year.all(), "Unexpected format of the first report year of a change."
+    tb_changes["first_report_year"] = tb_changes["first_report_year"].astype(str).str[3:].astype(int)
+    for column in ["country", "indicator", "category"]:
+        tb_changes[column] = tb_changes[column].astype("category")
+
     # Improve table format.
     tb = tb.format(["country", "report_year"], short_name=paths.short_name)
+    tb_changes = tb_changes.format(["country", "indicator"], short_name=f"{paths.short_name}_changes")
 
     #
     # Save outputs.
     #
-    ds_meadow = paths.create_dataset(tables=[tb])
+    ds_meadow = paths.create_dataset(tables=[tb, tb_changes])
     ds_meadow.save()
 
 
