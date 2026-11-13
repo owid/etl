@@ -115,12 +115,14 @@ def _is_grapher_step(step: str) -> bool:
 
 def _table_names_in_db(dataset_uri: str) -> list[str]:
     """Names of the tables of a grapher dataset, read off the catalog paths of its indicators in the DB."""
+    # `datasets.catalogPath` is the dataset URI without its `grapher/` channel.
     q = """
-    select distinct substring_index(substring_index(catalogPath, '#', 1), '/', -1) as table_name
-    from variables
-    where catalogPath like %(prefix)s
+    select distinct substring_index(substring_index(v.catalogPath, '#', 1), '/', -1) as table_name
+    from variables v
+    join datasets d on d.id = v.datasetId
+    where d.catalogPath = %(dataset_path)s and v.catalogPath is not null
     """
-    df = read_sql(q, OWID_ENV.engine, params={"prefix": f"{dataset_uri}/%"})
+    df = read_sql(q, OWID_ENV.engine, params={"dataset_path": dataset_uri.removeprefix("grapher/")})
     return sorted(df["table_name"])
 
 
