@@ -210,8 +210,8 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
    verdict is a review with findings, a "Didn't find any major issues" comment, a 👍 from the Codex bot, or its
    "Codex Review Summary" comment showing `✅ Completed` with no review or inline comments. That summary comment
    appears within seconds showing `🔄 Running`, which is not a verdict. Don't hold step 5d for it.
-5. **Let the staging server write the MDim.** Don't run the step from the laptop, even with `STAGING=1`: chart
-   steps read their upstream datasets from local disk, and private ones can't be downloaded. Each push starts
+5. **Let the staging server write the MDim the first time.** A new staging server has to load the indicators
+   before an MDim can point at them, so don't run the step from the laptop for this. Each push starts
    `buildkite/etl-automated-staging-environment`, which writes the MDim partway through, in its "Build ETL
    catalog" step, well before the build as a whole reports a result. So don't wait for the build to finish, and
    don't tell the person how long it will take. Poll the staging database (`query-grapher-db` skill) for the
@@ -241,8 +241,21 @@ container name from `etl.config.get_container_name(<branch>)`. Then send somethi
 > map, check the countries it opens with, and read the titles and "What you should know". Tell me what to
 > change, or say it looks right.
 
-Send it as soon as every view returns 200, without waiting for Codex. If they ask for changes, make them, push,
-and repeat items 5 and 6 of step 5c. **Show them every change as soon as it is on staging,** without being
+Send it as soon as every view returns 200, without waiting for Codex. **If they ask for changes, send them to staging from the laptop,** which takes a few seconds per change where
+a push takes about half a minute. Once the MDim is on staging, start the watcher in the background:
+
+```bash
+STAGING=<branch> .venv/bin/etlr viz://chart/<namespace>/latest/<name> --grapher --only --watch
+```
+
+It re-runs the step each time the config file is saved and writes the MDim to the branch's staging server,
+with no upstream data on the laptop (see `/create-chart`). So for each change: edit the file, wait for the
+change in `multi_dim_data_pages.config`, check the views as in item 6 of step 5c, and show them. If the branch
+was created before the watcher could run without local data, merge `origin/master` into it first. Commit and
+push when they have no more changes, or before any pause: the staging build rewrites the MDim from the
+committed file on every push, so an uncommitted change is lost at the next one. Stop the watcher before merging.
+
+**Show them every change as soon as it is on staging,** without being
 asked: they can't tell from the page they have open when it has landed. If the session has Claude Desktop's
 built-in browser (`mcp__Claude_Browser__*` tools), open the preview there, or reload it if it is already open.
 Otherwise send the link again, to the view they changed, and tell them to reload. **Don't merge until they say
