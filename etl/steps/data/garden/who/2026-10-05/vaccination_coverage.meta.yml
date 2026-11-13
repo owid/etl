@@ -14,7 +14,7 @@ definitions:
   description_key_standard_one: |-
     This chart shows official estimates of national immunization coverage published by the WHO and UNICEF. The estimates include all WHO member states, even those that did not report 2025 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
   description_key_standard_two: |-
-    Global and regional vaccination coverage is calculated using population-weighted averages. In 2025, approximately 5% of countries did not report data, requiring extrapolation from previous years to maintain complete global estimates.
+    Global and regional vaccination coverage are population-weighted averages, calculated using our [definition of regions](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and population data from the [UN World Population prospects](https://population.un.org/wpp/). In 2025, approximately 5% of countries did not report data, requiring extrapolation from previous years to maintain complete global estimates.
   description_key_standard_three: |-
     These estimates combine several sources: official administrative data from health facilities, coverage surveys that meet WHO quality standards, and other relevant information like vaccine supply issues or schedule changes. The accuracy of these estimates depends on how complete and reliable each country’s reporting systems are.
   antigen_age_group: |-
@@ -304,6 +304,7 @@ tables:
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
           - "{definitions.antigen_description_key}"
+          - We calculate the number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year by using coverage estimates from the WUENIC dataset and population data from the UN World Population Prospects. From 2024 onwards, we use the medium variant projections released by the UN.
         description_from_producer: |-
           {definitions.antigen_description_from_producer}
         display:
@@ -340,6 +341,7 @@ tables:
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
           - "{definitions.antigen_description_key}"
+          - We calculate the number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year by using coverage estimates from the WUENIC dataset and population data from the UN World Population Prospects. From 2024 onwards, we use the medium variant projections released by the UN.
         description_from_producer: |-
           {definitions.antigen_description_from_producer}
         display:
