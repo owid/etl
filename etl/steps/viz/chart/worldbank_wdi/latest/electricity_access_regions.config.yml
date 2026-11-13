@@ -8,6 +8,7 @@ topic_tags:
 default_selection:
   - "World"
   - "India"
+  - "Kenya"
   - "Sub-Saharan Africa (WB)"
   - "South Asia (WB)"
   - "East Asia and Pacific (WB)"
@@ -38,6 +39,7 @@ views:
         - catalogPath: "wdi#eg_elc_accs_zs"
     config:
       title: "Share of people with access to electricity"
+      note: "Data for some countries is estimated."
       yAxis:
         min: 0
         max: 100
@@ -54,7 +56,7 @@ views:
       y:
         - catalogPath: "wdi#eg_elc_accs_zs_without_number"
     config:
-      title: "Number of people without access to electricity"
+      title: "People without access to electricity"
       subtitle: "Having access to electricity is defined in international statistics as having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day."
       map:
         colorScale:
