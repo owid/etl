@@ -2,7 +2,7 @@ grapher_schema: "011"
 slug: labor-market-exit-age
 
 title:
-  title: "Leaving the labor market: age and years of life afterward"
+  title: Age at which people leave the labor market
   title_variant: ""
 topic_tags:
   - Work & Employment
@@ -17,13 +17,12 @@ default_selection:
   - Mexico
 
 default_dimensions:
-  metric: exit_age
   sex: men
 
 definitions:
   common_views:
     - config:
-        originUrl: ourworldindata.org/working-hours
+        originUrl: ourworldindata.org/work-employment
         hasMapTab: true
         tab: chart
         chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
@@ -31,18 +30,9 @@ definitions:
         matchingEntitiesOnly: true
         yAxis:
           min: auto
-    - dimensions:
-        metric: exit_age
-      config:
         map:
           colorScale:
             baseColorScheme: BuPu
-    - dimensions:
-        metric: years_after_exit
-      config:
-        map:
-          colorScale:
-            baseColorScheme: YlGnBu
     - dimensions:
         sex: both
       config:
@@ -51,20 +41,11 @@ definitions:
         chartTypes: ["LineChart", "Dumbbell"]
         dumbbell:
           connectorStyle: line
-        # Sort countries by men's value (the first indicator), highest first; the years-after-exit view sorts by women's.
+        # Sort countries by men's value (the first indicator), highest first.
         sortBy: startValue
         sortOrder: desc
 
 dimensions:
-  - slug: metric
-    name: Indicator
-    choices:
-      - slug: exit_age
-        name: Age of leaving the labor market
-        description: Average age at which people aged 40 and older stop working or looking for work
-      - slug: years_after_exit
-        name: Years of life after leaving the labor market
-        description: Remaining life expectancy at the age of leaving the labor market
   - slug: sex
     name: Sex
     choices:
@@ -77,7 +58,6 @@ dimensions:
 
 views:
   - dimensions:
-      metric: exit_age
       sex: men
     indicators:
       y:
@@ -85,7 +65,6 @@ views:
       color: regions#owid_region
 
   - dimensions:
-      metric: exit_age
       sex: women
     indicators:
       y:
@@ -93,7 +72,6 @@ views:
       color: regions#owid_region
 
   - dimensions:
-      metric: exit_age
       sex: both
     indicators:
       y:
@@ -101,34 +79,5 @@ views:
         - catalogPath: retirement#effective_labor_market_exit_age__sex_women
     config:
       title: Average age at which men and women leave the labor market
-      subtitle: Estimated average age at which people aged 40 and older stop working or looking for work. This includes people who leave for reasons other than retirement, such as disability.
-      note: The value for each year is based on changes over the five years leading up to it.
-
-  - dimensions:
-      metric: years_after_exit
-      sex: men
-    indicators:
-      y:
-        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
-      color: regions#owid_region
-
-  - dimensions:
-      metric: years_after_exit
-      sex: women
-    indicators:
-      y:
-        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
-      color: regions#owid_region
-
-  - dimensions:
-      metric: years_after_exit
-      sex: both
-    indicators:
-      y:
-        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
-        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
-    config:
-      sortBy: endValue
-      title: Years that men and women can expect to live after leaving the labor market
-      subtitle: Remaining life expectancy at the average age at which people aged 40 and older stop working or looking for work. This includes people who leave for reasons other than retirement, such as disability.
-      note: The age of leaving the labor market for each year is based on changes over the five years leading up to it.
+      subtitle: Estimated average age at which people aged 40 and older stop working or looking for work. People leave for different reasons, including retirement, illness, or disability.
+      note: For each year, the age of leaving the labor market is estimated from how the share of people working or looking for work changed over the previous five years.

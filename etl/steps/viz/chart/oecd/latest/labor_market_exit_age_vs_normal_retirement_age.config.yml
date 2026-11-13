@@ -1,0 +1,71 @@
+grapher_schema: "011"
+slug: labor-market-exit-age-vs-normal-retirement-age
+
+title:
+  title: Age of leaving the labor market vs. normal retirement age
+  title_variant: ""
+topic_tags:
+  - Work & Employment
+  - Age Structure
+
+default_dimensions:
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/work-employment
+        hasMapTab: false
+        tab: chart
+        chartTypes: ["ScatterPlot"]
+        # Only countries with a continent, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
+        # Countries above the line leave the labor market later than the normal retirement age.
+        comparisonLines:
+          - yEquals: x
+            label: Same age
+        # The same range on both axes, so the line where both ages are equal runs from corner to corner.
+        xAxis:
+          label: Normal retirement age (years)
+          min: 48
+          max: 70
+        yAxis:
+          label: Age of leaving the labor market (years)
+          min: 48
+          max: 70
+
+dimensions:
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+
+views:
+  - dimensions:
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#effective_labor_market_exit_age__sex_men
+      x:
+        catalogPath: retirement#current_normal_retirement_age__sex_men
+      color: regions#owid_region
+    config:
+      title: Age at which men leave the labor market vs. normal retirement age
+      subtitle: Estimated average age at which men aged 40 and older stop working or looking for work, compared with the age at which they can get a full pension after a career that started at age 22.
+      note: Normal retirement age for people retiring in 2024. Countries above the line leave the labor market later than the normal retirement age.
+
+  - dimensions:
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#effective_labor_market_exit_age__sex_women
+      x:
+        catalogPath: retirement#current_normal_retirement_age__sex_women
+      color: regions#owid_region
+    config:
+      title: Age at which women leave the labor market vs. normal retirement age
+      subtitle: Estimated average age at which women aged 40 and older stop working or looking for work, compared with the age at which they can get a full pension after a career that started at age 22.
+      note: Normal retirement age for people retiring in 2024. Countries above the line leave the labor market later than the normal retirement age.

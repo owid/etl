@@ -194,6 +194,14 @@ definitions:
     The OECD includes all changes that are already legislated, such as gradual increases in the retirement age. This includes the links between the retirement age and life expectancy in countries that have them, such as Denmark, Estonia, Italy, the Netherlands, and Sweden.
   description_short_effective_labor_market_exit_age: |-
     Average age at which <<sex.lower()>> aged 40 and older stop working or looking for work.
+  description_key_exit_age_overview: |-
+    This indicator shows the average age at which workers aged 40 and older leave the labor force, that is, stop working or looking for work. This isn’t the same as the age at which people normally retire or start receiving a pension. Here, it includes everyone who leaves the labor force for any reason, including retirement, illness, or disability.
+  description_key_exit_age_estimates: |-
+    These ages are estimates, not records of when people leave the labor force. The OECD takes the share of each age group that is working or looking for work, then looks at the same group five years later. The drop between the two is treated as the share of people who left.
+  description_key_exit_age_weights_caution: |-
+    Each age group gets the same weight in every country, based on its average share of the population across OECD countries. This reduces the influence of differences between countries in how old their populations are, and of populations getting older over time. The OECD advises caution when reading the exact age for a single country, but considers comparisons between countries and over time to be reliable.
+  subtitle_exit_reasons_any: |-
+    People leave for different reasons, including retirement, illness, or disability.
   description_key_exit_age_definition: |-
     The OECD calls this the effective age of labor market exit. It is the average age at which workers aged 40 and older leave the labor force, meaning that they stop working or looking for work.
   description_key_exit_age_not_retirement: |-
@@ -203,17 +211,14 @@ definitions:
   description_key_exit_age_revision_and_caution: |-
     The OECD introduced this method in 2021, replacing its earlier estimates of the “average effective age of retirement”. It notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
   description_key_exit_age_sources: |-
-    The data comes from national labor force surveys, the EU Labour Force Survey and, for early years, population censuses.
-  # NOTE: Re-check which countries' values drop (2023 or 2024, by 5 to 15 years) in the new data, or drop this text.
-  description_key_exit_age_breaks: |-
-    For some countries outside the OECD, the values drop sharply in 2023 or 2024, by 5 to 15 years: Argentina (women), Brazil, India, Russia (women), and South Africa. This likely reflects a change in the OECD’s data sources or methods rather than a real change, so comparisons across these years should be made with caution.
+    This data comes from the OECD and is based on national labor force surveys and, in some countries, national censuses for the early years.
   # NOTE: Check that Croatia's 1990 and 1992 values for women are still published as 0; keep in sync with the .corrections.yml.
   description_processing_effective_labor_market_exit_age: |-
     We remove Croatia’s values for women in 1990 and 1992, which the OECD publishes as 0 although the data is missing.
   subtitle_effective_labor_market_exit_age: |-
-    Estimated average age at which <<sex.lower()>> aged 40 and older stop working or looking for work. {definitions.subtitle_exit_reasons}
+    Estimated average age at which <<sex.lower()>> aged 40 and older stop working or looking for work. {definitions.subtitle_exit_reasons_any}
   note_effective_labor_market_exit_age: |-
-    The value for each year is based on changes over the five years leading up to it.
+    For each year, the age of leaving the labor market is estimated from how the share of people working or looking for work changed over the previous five years.
   description_short_expected_years_after_labor_market_exit: |-
     Number of years that <<sex.lower()>> can expect to live after they leave the labor market.
   description_key_years_after_exit_definition: |-
@@ -449,17 +454,13 @@ tables:
         description_short: |-
           {definitions.description_short_effective_labor_market_exit_age}
         description_key: |-
-          {definitions.description_key_exit_age_definition}
-
-          {definitions.description_key_exit_age_not_retirement}
-
-          {definitions.description_key_exit_age_method}
-
-          {definitions.description_key_exit_age_revision_and_caution}
+          {definitions.description_key_exit_age_overview}
 
           {definitions.description_key_exit_age_sources}
 
-          {definitions.description_key_exit_age_breaks}
+          {definitions.description_key_exit_age_estimates}
+
+          {definitions.description_key_exit_age_weights_caution}
         description_processing: |-
           {definitions.description_processing_effective_labor_market_exit_age}
         display:

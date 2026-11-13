@@ -1,0 +1,83 @@
+grapher_schema: "011"
+slug: years-after-labor-market-exit
+
+title:
+  title: Years of life after leaving the labor market
+  title_variant: ""
+topic_tags:
+  - Work & Employment
+  - Age Structure
+
+default_selection:
+  - OECD countries
+  - United States
+  - Japan
+  - France
+  - Germany
+  - Mexico
+
+default_dimensions:
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/work-employment
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: auto
+        map:
+          colorScale:
+            baseColorScheme: YlGnBu
+    - dimensions:
+        sex: both
+      config:
+        hasMapTab: false
+        selectedFacetStrategy: entity
+        chartTypes: ["LineChart", "Dumbbell"]
+        dumbbell:
+          connectorStyle: line
+        # Sort countries by women's value (the second indicator), highest first.
+        sortBy: endValue
+        sortOrder: desc
+
+dimensions:
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+      - slug: both
+        name: Men and women
+
+views:
+  - dimensions:
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
+      color: regions#owid_region
+
+  - dimensions:
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
+      color: regions#owid_region
+
+  - dimensions:
+      sex: both
+    indicators:
+      y:
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
+    config:
+      title: Years that men and women can expect to live after leaving the labor market
+      subtitle: Remaining life expectancy at the average age at which people aged 40 and older stop working or looking for work. This includes people who leave for reasons other than retirement, such as disability.
+      note: The age of leaving the labor market for each year is based on changes over the five years leading up to it.
