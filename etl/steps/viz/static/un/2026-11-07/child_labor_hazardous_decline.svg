@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="365.76pt" height="213.84pt" viewBox="0 0 365.76 213.84" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="365.76pt" height="201.6pt" viewBox="0 0 365.76 201.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -15,222 +15,214 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 213.84 
-L 365.76 213.84 
+   <path d="M 0 201.6 
+L 365.76 201.6 
 L 365.76 0 
 L 0 0 
-L 0 213.84 
+L 0 201.6 
 z
 " style="fill: none"/>
   </g>
   <g id="axes_1">
    <g id="bar__other-child-labor">
-    <path d="M 0 200.376 
-L 31.076407 200.376 
-L 31.076407 143.494534 
-L 0 143.494534 
+    <path d="M 0 188.136 
+L 37.233054 188.136 
+L 37.233054 134.993841 
+L 0 134.993841 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
-    <path d="M 45.700599 200.376 
-L 76.777006 200.376 
-L 76.777006 129.160404 
-L 45.700599 129.160404 
+    <path d="M 54.754491 188.136 
+L 91.987545 188.136 
+L 91.987545 121.602017 
+L 54.754491 121.602017 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
-    <path d="M 91.401198 200.376 
-L 122.477605 200.376 
-L 122.477605 124.609887 
-L 91.401198 124.609887 
+    <path d="M 109.508982 188.136 
+L 146.742036 188.136 
+L 146.742036 117.350644 
+L 109.508982 117.350644 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
-    <path d="M 137.101796 200.376 
-L 168.178204 200.376 
-L 168.178204 137.654703 
-L 137.101796 137.654703 
+    <path d="M 164.263473 188.136 
+L 201.496527 188.136 
+L 201.496527 129.537913 
+L 164.263473 129.537913 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
-    <path d="M 182.802395 200.376 
-L 213.878802 200.376 
-L 213.878802 140.385013 
-L 182.802395 140.385013 
+    <path d="M 219.017964 188.136 
+L 256.251018 188.136 
+L 256.251018 132.088736 
+L 219.017964 132.088736 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
-    <path d="M 228.502994 200.376 
-L 259.579401 200.376 
-L 259.579401 138.944016 
-L 228.502994 138.944016 
+    <path d="M 273.772455 188.136 
+L 311.005509 188.136 
+L 311.005509 130.742468 
+L 273.772455 130.742468 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
-    <path d="M 274.203593 200.376 
-L 305.28 200.376 
-L 305.28 136.981985 
-L 274.203593 136.981985 
+    <path d="M 328.526946 188.136 
+L 365.76 188.136 
+L 365.76 128.909418 
+L 328.526946 128.909418 
 z
 " style="fill: #38aaba; fill-opacity: 0.9"/>
    </g>
    <g id="bar__hazardous-child-labor">
-    <path d="M 0 143.494534 
-L 31.076407 143.494534 
-L 31.076407 14.184 
+    <path d="M 0 134.993841 
+L 37.233054 134.993841 
+L 37.233054 14.184 
 L 0 14.184 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
-    <path d="M 45.700599 129.160404 
-L 76.777006 129.160404 
-L 76.777006 31.779334 
-L 45.700599 31.779334 
+    <path d="M 54.754491 121.602017 
+L 91.987545 121.602017 
+L 91.987545 30.622641 
+L 54.754491 30.622641 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
-    <path d="M 91.401198 124.609887 
-L 122.477605 124.609887 
-L 122.477605 37.164112 
-L 91.401198 37.164112 
+    <path d="M 109.508982 117.350644 
+L 146.742036 117.350644 
+L 146.742036 35.653432 
+L 109.508982 35.653432 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
-    <path d="M 137.101796 137.654703 
-L 168.178204 137.654703 
-L 168.178204 72.961515 
-L 137.101796 72.961515 
+    <path d="M 164.263473 129.537913 
+L 201.496527 129.537913 
+L 201.496527 69.097564 
+L 164.263473 69.097564 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
-    <path d="M 182.802395 140.385013 
-L 213.878802 140.385013 
-L 213.878802 85.399596 
-L 182.802395 85.399596 
+    <path d="M 219.017964 132.088736 
+L 256.251018 132.088736 
+L 256.251018 80.717983 
+L 219.017964 80.717983 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
-    <path d="M 228.502994 138.944016 
-L 259.579401 138.944016 
-L 259.579401 79.028872 
-L 228.502994 79.028872 
+    <path d="M 273.772455 130.742468 
+L 311.005509 130.742468 
+L 311.005509 74.766061 
+L 273.772455 74.766061 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
-    <path d="M 274.203593 136.981985 
-L 305.28 136.981985 
-L 305.28 96.04629 
-L 274.203593 96.04629 
+    <path d="M 328.526946 128.909418 
+L 365.76 128.909418 
+L 365.76 90.664778 
+L 328.526946 90.664778 
 z
 " style="fill: #9a5129; fill-opacity: 0.9"/>
    </g>
    <g id="horizontal-axis__zero-line">
-    <path d="M 0 200.376 
-L 305.28 200.376 
+    <path d="M 0 188.136 
+L 365.76 188.136 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
    </g>
    <g id="horizontal-axis__ticks">
-    <path d="M 15.538204 200.376 
-L 15.538204 203.976 
+    <path d="M 18.616527 188.136 
+L 18.616527 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
-    <path d="M 61.238802 200.376 
-L 61.238802 203.976 
+    <path d="M 73.371018 188.136 
+L 73.371018 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
-    <path d="M 106.939401 200.376 
-L 106.939401 203.976 
+    <path d="M 128.125509 188.136 
+L 128.125509 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
-    <path d="M 152.64 200.376 
-L 152.64 203.976 
+    <path d="M 182.88 188.136 
+L 182.88 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
-    <path d="M 198.340599 200.376 
-L 198.340599 203.976 
+    <path d="M 237.634491 188.136 
+L 237.634491 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
-    <path d="M 244.041198 200.376 
-L 244.041198 203.976 
+    <path d="M 292.388982 188.136 
+L 292.388982 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
-    <path d="M 289.741796 200.376 
-L 289.741796 203.976 
+    <path d="M 347.143473 188.136 
+L 347.143473 191.736 
 " style="fill: none; stroke: #999999; stroke-width: 0.72"/>
    </g>
    <g id="value__total-2000">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="15.538204" y="9.3618" transform="rotate(-0 15.538204 9.3618)">246</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="0" y="9.3618" transform="rotate(-0 0 9.3618)">246 million</text>
    </g>
    <g id="horizontal-axis__2000">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="15.538204" y="212.3973" transform="rotate(-0 15.538204 212.3973)">2000</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="18.616527" y="200.1573" transform="rotate(-0 18.616527 200.1573)">2000</text>
    </g>
    <g id="value__other-2000">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="15.538204" y="174.355704" transform="rotate(-0 15.538204 174.355704)">75</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="18.616527" y="163.985358" transform="rotate(-0 18.616527 163.985358)">75M</text>
    </g>
    <g id="value__hazardous-2000">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="15.538204" y="81.259704" transform="rotate(-0 15.538204 81.259704)">171</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="18.616527" y="77.009358" transform="rotate(-0 18.616527 77.009358)">171M</text>
    </g>
    <g id="value__total-2004">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="61.238802" y="26.957134" transform="rotate(-0 61.238802 26.957134)">222</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="73.371018" y="25.800441" transform="rotate(-0 73.371018 25.800441)">222</text>
    </g>
    <g id="horizontal-axis__2004">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="61.238802" y="212.3973" transform="rotate(-0 61.238802 212.3973)">2004</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="73.371018" y="200.1573" transform="rotate(-0 73.371018 200.1573)">2004</text>
    </g>
    <g id="value__other-2004">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="61.238802" y="167.18864" transform="rotate(-0 61.238802 167.18864)">94</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="73.371018" y="157.289446" transform="rotate(-0 73.371018 157.289446)">94</text>
    </g>
    <g id="value__hazardous-2004">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="61.238802" y="82.890306" transform="rotate(-0 61.238802 82.890306)">128</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="73.371018" y="78.532767" transform="rotate(-0 73.371018 78.532767)">128</text>
    </g>
    <g id="value__total-2008">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.939401" y="32.341912" transform="rotate(-0 106.939401 32.341912)">215</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.125509" y="30.831232" transform="rotate(-0 128.125509 30.831232)">215</text>
    </g>
    <g id="horizontal-axis__2008">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="106.939401" y="212.3973" transform="rotate(-0 106.939401 212.3973)">2008</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="128.125509" y="200.1573" transform="rotate(-0 128.125509 200.1573)">2008</text>
    </g>
    <g id="value__other-2008">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.939401" y="164.913381" transform="rotate(-0 106.939401 164.913381)">100</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.125509" y="155.16376" transform="rotate(-0 128.125509 155.16376)">100</text>
    </g>
    <g id="value__hazardous-2008">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="106.939401" y="83.307437" transform="rotate(-0 106.939401 83.307437)">115</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="128.125509" y="78.922476" transform="rotate(-0 128.125509 78.922476)">115</text>
    </g>
    <g id="value__total-2012">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="152.64" y="68.139315" transform="rotate(-0 152.64 68.139315)">168</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="182.88" y="64.275364" transform="rotate(-0 182.88 64.275364)">168</text>
    </g>
    <g id="horizontal-axis__2012">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="152.64" y="212.3973" transform="rotate(-0 152.64 212.3973)">2012</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="182.88" y="200.1573" transform="rotate(-0 182.88 200.1573)">2012</text>
    </g>
    <g id="value__other-2012">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="152.64" y="171.435789" transform="rotate(-0 152.64 171.435789)">83</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="182.88" y="161.257394" transform="rotate(-0 182.88 161.257394)">83</text>
    </g>
    <g id="value__hazardous-2012">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="152.64" y="107.728547" transform="rotate(-0 152.64 107.728547)">85</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="182.88" y="101.738176" transform="rotate(-0 182.88 101.738176)">85</text>
    </g>
    <g id="value__total-2016">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="198.340599" y="80.577396" transform="rotate(-0 198.340599 80.577396)">152</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="237.634491" y="75.895783" transform="rotate(-0 237.634491 75.895783)">152</text>
    </g>
    <g id="horizontal-axis__2016">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="198.340599" y="212.3973" transform="rotate(-0 198.340599 212.3973)">2016</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="237.634491" y="200.1573" transform="rotate(-0 237.634491 200.1573)">2016</text>
    </g>
    <g id="value__other-2016">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="198.340599" y="172.800944" transform="rotate(-0 198.340599 172.800944)">79</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="237.634491" y="162.532806" transform="rotate(-0 237.634491 162.532806)">79</text>
    </g>
    <g id="value__hazardous-2016">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="198.340599" y="115.312742" transform="rotate(-0 198.340599 115.312742)">73</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="237.634491" y="108.823797" transform="rotate(-0 237.634491 108.823797)">73</text>
    </g>
    <g id="value__total-2020">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="244.041198" y="74.206672" transform="rotate(-0 244.041198 74.206672)">160</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.388982" y="69.943861" transform="rotate(-0 292.388982 69.943861)">160</text>
    </g>
    <g id="horizontal-axis__2020">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="244.041198" y="212.3973" transform="rotate(-0 244.041198 212.3973)">2020</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="292.388982" y="200.1573" transform="rotate(-0 292.388982 200.1573)">2020</text>
    </g>
    <g id="value__other-2020">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="244.041198" y="172.080446" transform="rotate(-0 244.041198 172.080446)">81</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.388982" y="161.859672" transform="rotate(-0 292.388982 161.859672)">81</text>
    </g>
    <g id="value__hazardous-2020">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="244.041198" y="111.406881" transform="rotate(-0 244.041198 111.406881)">79</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="292.388982" y="105.174702" transform="rotate(-0 292.388982 105.174702)">79</text>
    </g>
    <g id="value__total-2024">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="289.741796" y="91.22409" transform="rotate(-0 289.741796 91.22409)">138</text>
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="347.143473" y="85.842578" transform="rotate(-0 347.143473 85.842578)">138</text>
    </g>
    <g id="horizontal-axis__2024">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="289.741796" y="212.3973" transform="rotate(-0 289.741796 212.3973)">2024</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="347.143473" y="200.1573" transform="rotate(-0 347.143473 200.1573)">2024</text>
    </g>
    <g id="value__other-2024">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="289.741796" y="171.09943" transform="rotate(-0 289.741796 171.09943)">84</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="347.143473" y="160.943147" transform="rotate(-0 347.143473 160.943147)">84</text>
    </g>
    <g id="value__hazardous-2024">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="289.741796" y="118.934575" transform="rotate(-0 289.741796 118.934575)">54</text>
-   </g>
-   <g id="label__hazardous-child-labor">
-    <text style="font-weight: 600; font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; fill: #9a5129" transform="translate(311.04 113.288897)">Hazardous</text>
-    <text style="font-weight: 600; font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; fill: #9a5129" transform="translate(311.04 125.697377)">child labor</text>
-   </g>
-   <g id="label__other-child-labor">
-    <text style="font-weight: 600; font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; fill: #008291" transform="translate(311.04 165.453752)">Other</text>
-    <text style="font-weight: 600; font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; fill: #008291" transform="translate(311.04 177.862232)">child labor</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="347.143473" y="112.207536" transform="rotate(-0 347.143473 112.207536)">54</text>
    </g>
   </g>
  </g>
