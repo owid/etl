@@ -182,6 +182,11 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
 - **The comments at the end:** use the text changes against each indicator's original in the PR description.
   Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
   using that indicator first.
+- **Check the default countries against the data.** The page lets them tick any country or region, but a chart
+  only draws the ones its indicators have data for, and drops the rest without a message. Compare
+  `default_selection` with each indicator's entities (`dimensions.entities` in its metadata JSON). World Bank
+  data, for example, has "Sub-Saharan Africa (WB)" but no "Africa". If a view would lose some, ask them which
+  countries or regions to show instead, in step 5a.
 - **Don't build it locally.** That pulls in the whole upstream chain, often with private datasets the laptop
   can't download. The staging build in step 5c checks the config against the real indicators instead.
 - **To show the setup in the page again,** for example if they want to adjust it there, save it as
@@ -198,19 +203,23 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
    verdict is a review with findings, a "Didn't find any major issues" comment, a 👍 from the Codex bot, or its
    "Codex Review Summary" comment showing `✅ Completed` with no review or inline comments. That summary comment
    appears within seconds showing `🔄 Running`, which is not a verdict. Don't hold step 5d for it.
-5. **Let the staging server write the MDim.** Don't run the step from the laptop, even with `STAGING=1`: chart
-   steps read their upstream datasets from local disk, and private ones can't be downloaded. After each push,
-   wait for `buildkite/etl-automated-staging-environment` to succeed on the head commit
-   (`gh api repos/owid/etl/commits/<sha>/status`). That build writes the MDim to staging, and is the check that
-   the step builds: if it fails, read its log and fix the step.
-6. **Re-upload the views, then check they draw,** after every successful staging build. The preview loads each
-   view's config from `http://<container>/grapher/by-uuid/<id>.config.json`, which is served from R2, not the
-   database, and the build's own upload often doesn't reach it. So always take the MDim's config from
-   `multi_dim_data_pages.config` in the staging database (`query-grapher-db` skill), drop `fullConfigId` from
-   every view, and send it back unchanged with
-   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`. Then
-   check that each view's new `fullConfigId` returns 200 at that URL; retry a 502 once, since it can show briefly
-   before the real answer. Do this silently, and bring it up only if views still fail after the re-upload.
+5. **Let the staging server write the MDim the first time.** A new staging server has to load the indicators
+   before an MDim can point at them, so don't run the step from the laptop for this. Each push starts
+   `buildkite/etl-automated-staging-environment`, which writes the MDim partway through, in its "Build ETL
+   catalog" step, well before the build as a whole reports a result. So don't wait for the build to finish, and
+   don't tell the person how long it will take. Poll the staging database (`query-grapher-db` skill) for the
+   MDim's row in `multi_dim_data_pages`, and after a later push for the change in its `config`, then go on to
+   item 6. The build's status on the head commit (`gh api repos/owid/etl/commits/<sha>/status`) is still the
+   check that the step builds: if it fails, read its log and fix the step.
+6. **Check that the views draw, and re-upload them if they don't.** The preview loads each view's config from
+   `http://<container>/grapher/by-uuid/<id>.config.json`, with `<id>` the view's `fullConfigId` in
+   `multi_dim_data_pages.config`. It is served from R2, not the database, and the build's own upload doesn't
+   always reach it. Check that every view returns 200 at that URL; retry a 502 once, since it can show briefly
+   before the real answer. If a view fails, take the MDim's config from the staging database, drop
+   `fullConfigId` from every view, and send it back unchanged with
+   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`, then
+   check the new `fullConfigId`s. Check again once the build has finished, since a later step can rewrite the
+   MDim. Do this silently, and bring it up only if views still fail after the re-upload.
 
 When Codex's verdict comes in, fix what's valid, push, repeat items 5 and 6, and reply to and resolve each
 thread. Don't start a second round. Tell the person about the review only if it changed something they'll see.
@@ -225,8 +234,25 @@ container name from `etl.config.get_container_name(<branch>)`. Then send somethi
 > map, check the countries it opens with, and read the titles and "What you should know". Tell me what to
 > change, or say it looks right.
 
-Send it as soon as every view returns 200, without waiting for Codex. If they ask for changes, make them, push,
-repeat items 5 and 6 of step 5c, and send the link again. **Don't merge until they say it looks right.**
+Send it as soon as every view returns 200, without waiting for Codex. **If they ask for changes, send them to staging from the laptop,** which takes a few seconds per change where
+a push takes about half a minute. Once the MDim is on staging, start the watcher in the background:
+
+```bash
+STAGING=<branch> .venv/bin/etlr viz://chart/<namespace>/latest/<name> --grapher --only --watch
+```
+
+It re-runs the step each time the config file is saved and writes the MDim to the branch's staging server,
+with no upstream data on the laptop (see `/create-chart`). So for each change: edit the file, wait for the
+change in `multi_dim_data_pages.config`, check the views as in item 6 of step 5c, and show them. If the branch
+was created before the watcher could run without local data, merge `origin/master` into it first. Commit and
+push when they have no more changes, or before any pause: the staging build rewrites the MDim from the
+committed file on every push, so an uncommitted change is lost at the next one. Stop the watcher before merging.
+
+**Show them every change as soon as it is on staging,** without being
+asked: they can't tell from the page they have open when it has landed. If the session has Claude Desktop's
+built-in browser (`mcp__Claude_Browser__*` tools), open the preview there, or reload it if it is already open.
+Otherwise send the link again, to the view they changed, and tell them to reload. **Don't merge until they say
+it looks right.**
 
 ### 5e. Merge, once they say it looks right
 
