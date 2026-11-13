@@ -200,8 +200,21 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 ```
 
 Editing the YAML is enough to trigger a re-run — ETL's change detection picks it up, so no extra flags are
-needed. Reserve `--force --only` for re-pushing when *nothing* changed, and note that `--only` skips
-dependency resolution, so it fails unless the upstream datasets are already built locally.
+needed. Reserve `--force --only` for re-pushing when *nothing* changed.
+
+`--only` skips the upstream steps. A chart defined only by its `.config.yml` then needs no dataset on disk:
+when the grapher dataset isn't there, the step reads the names of its tables from the grapher DB it writes
+to. A chart with a `.py` that loads tables still needs them built or downloaded.
+
+**Preview edits in seconds with `--watch`.** This re-runs the step each time the file is saved, and pushes
+the chart to the branch's staging server without a commit:
+
+```bash
+STAGING=1 .venv/bin/etlr viz://chart/{namespace}/latest/{short_name} --grapher --only --watch
+```
+
+The staging server must already have the indicators, so push the branch once first. Its build rewrites the
+chart from the committed file on every push, so commit what you want to keep.
 
 On success the step prints where to look:
 
