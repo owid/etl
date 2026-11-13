@@ -85,6 +85,30 @@ def test_data_step_edited_while_running_stays_dirty():
         assert not step.is_dirty()
 
 
+def test_static_viz_step_writing_its_image_comes_out_clean():
+    # A static step saves its image next to its recipe, where the image counts as one of its inputs.
+    # A changed image must not leave the step dirty, or every redraw costs a second run.
+    from etl.steps import VizStep
+
+    namespace = "".join(random.choice(string.ascii_lowercase) for i in range(10))
+    step_dir = paths.STEP_DIR / "viz" / "static" / namespace / "latest"
+    step = VizStep(f"static/{namespace}/latest/chart", dependencies=[])
+    try:
+        step_dir.mkdir(parents=True)
+        (step_dir / "chart.py").write_text(
+            "import uuid\nfrom pathlib import Path\n\n"
+            "def run() -> None:\n"
+            "    (Path(__file__).parent / 'chart.svg').write_text(uuid.uuid4().hex)\n"
+        )
+        with patch("etl.config.DEBUG", False):
+            step.run()
+        assert (step_dir / "chart.svg").exists()
+        assert not step.is_dirty()
+    finally:
+        shutil.rmtree(paths.STEP_DIR / "viz" / "static" / namespace, ignore_errors=True)
+        shutil.rmtree(paths.VIZ_DIR / "static" / namespace, ignore_errors=True)
+
+
 def test_data_step_recovers_from_partial_output():
     # Simulate a previously interrupted run that left dest_dir without index.json
     # (e.g. shutil.rmtree partially failed mid-write). The next run should

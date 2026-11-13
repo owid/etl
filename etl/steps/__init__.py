@@ -497,7 +497,7 @@ class DataStep(Step):
 
         # if INSTANT flag is set, just update the metadata
         if config.INSTANT and self.channel == "garden":
-            self._run_instant_metadata()
+            self._run_instant_metadata(checksum)
             return
 
         sp = self._search_path
@@ -641,7 +641,7 @@ class DataStep(Step):
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
 
-    def _run_instant_metadata(self) -> None:
+    def _run_instant_metadata(self, checksum: str) -> None:
         """If INSTANT flag is set, instead of running the whole garden step, just load
         the existing dataset and update its metadata. This is useful for fast-tracking
         metadata changes without having to rerun the whole step.
@@ -665,7 +665,7 @@ class DataStep(Step):
         if meta_override_path.exists():
             ds.update_metadata(meta_override_path)
 
-        ds.metadata.source_checksum = self.checksum_input() + "_instant"
+        ds.metadata.source_checksum = checksum + "_instant"
         ds.save()
 
         # Read metadata after
@@ -1233,6 +1233,11 @@ class ExportStep(DataStep):
 
         self._run_recipe()
 
+        if self._writes_own_inputs:
+            # The recipe rewrote files that count as its own inputs; a checksum taken before it ran
+            # would leave the step dirty after every change to them.
+            checksum = self.checksum_input()
+
         if not self.publishes:
             # Leave the checksum unrecorded, so that the next run with the flag rebuilds and publishes.
             log.warning(
@@ -1251,6 +1256,11 @@ class ExportStep(DataStep):
 
     # The etlr flag that grants this step's write.
     permission_flag = "--export"
+
+    @property
+    def _writes_own_inputs(self) -> bool:
+        """Whether the recipe writes files next to itself, where `_step_files` counts them as inputs."""
+        return False
 
     @property
     def publishes(self) -> bool:
@@ -1308,6 +1318,11 @@ class VizStep(ExportStep):
     @property
     def publishes(self) -> bool:
         return config.GRAPHER_ENABLED or self.channel == "static"
+
+    @property
+    def _writes_own_inputs(self) -> bool:
+        # Static steps save their images next to the recipe (`PathFinder.export_fig`).
+        return self.channel == "static"
 
     def _publish(self) -> None:
         """Sync a bespoke feed to the environment's R2 path.
