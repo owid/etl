@@ -69,7 +69,7 @@ Something like this, in plain words:
 
 ## 5. From the pasted setup to a live MDim
 
-If the setup's MDim already has an open PR from an earlier session, carry on in that PR instead of opening another; its own web address then doesn't count as taken.
+If the setup's MDim already has an open PR from an earlier session, carry on in that PR, on its branch, instead of opening another; its own web address then doesn't count as taken. The committed config is then the MDim: apply what they ask for to it from step 5d, and ask before dropping anything a pasted setup merely lacks.
 
 ### 5a. Check the setup, then ask everything in one go
 
@@ -78,6 +78,7 @@ First compare `default_selection` with each indicator's entities (`dimensions.en
 - **Does the MDim replace existing charts?** Name them if the draft came from chart links. If yes, step 5g handles them.
 - **Its web address,** if the setup has no `slug:`, as in step 2. If it has one, check it's still free, since they may have changed it, and ask only if it isn't.
 - **Which countries to show instead,** for any view that would lose some.
+- **Whether to keep the old charts' map colours,** for views that came from a chart whose map has its own bins or flipped colours: the page can't show those, so the sketch's map looks different from the chart's. If yes, copy the chart's `map.colorScale` as it is, odd-looking values included.
 - **Anything the setup leaves open:** combinations with no indicator yet, and specific map bins if they asked for them (the page offers only automatic ones).
 
 ### 5b. Build the step
@@ -108,7 +109,7 @@ As soon as every view returns 200, without waiting for Codex, send the admin pre
 STAGING=<branch> .venv/bin/etlr viz://chart/<namespace>/latest/<short_name> --grapher --only --watch
 ```
 
-For each change, edit the config, wait for it in `multi_dim_data_pages.config`, check the views as in 5c item 4, and **show them right away, without being asked**: they can't tell from the page they have open when it has landed. If the session has Claude Desktop's built-in browser (`mcp__Claude_Browser__*`), open or reload the preview there; otherwise send the link again and tell them to reload. Commit and push when they have no more changes, or before leaving the work for later: every push rewrites the MDim from the committed file, so an uncommitted change is lost at the next one. Stop the watcher before merging. **Don't merge until they say it looks right.**
+A change to the default countries gets the same check against the indicators' entities as in 5a. For each change, edit the config, wait for it in `multi_dim_data_pages.config` (compare the content: `updatedAt` doesn't move), check the views as in 5c item 4, and **show them right away, without being asked**: they can't tell from the page they have open when it has landed. The watcher can miss the second of two saves made within a second or so: if a change doesn't arrive, run the same command once with `--force` and without `--watch`. If the session has Claude Desktop's built-in browser (`mcp__Claude_Browser__*`), open or reload the preview there; otherwise send the link again and tell them to reload. Commit and push when they have no more changes, or before leaving the work for later: every push rewrites the MDim from the committed file, so an uncommitted change is lost at the next one. Stop the watcher before merging. **Don't merge until they say it looks right.**
 
 ### 5e. Merge
 
