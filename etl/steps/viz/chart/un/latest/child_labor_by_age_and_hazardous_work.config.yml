@@ -25,7 +25,7 @@ views:
     config:
       title: Children in child labor, by age and type of work
       subtitle: "[Child labor](#dod:child-labor) is either hazardous, meaning work that by its nature or conditions is likely to harm children's health, safety, or morals, or non-hazardous, meaning children working at an age too young for employment."
-      note: Work by children aged 15 to 17 only counts as child labor if it's hazardous, so this age group has no non-hazardous part. Household chores aren't counted as work. The way hazardous work is identified has changed slightly over time.
+      note: Work by children aged 15 to 17 only counts as child labor if it's hazardous, so this age group has no non-hazardous part. Household chores aren't counted as work.
       originUrl: /child-labor
       chartTypes:
         - StackedBar
