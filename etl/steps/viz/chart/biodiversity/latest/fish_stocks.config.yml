@@ -23,10 +23,6 @@ definitions:
         originUrl: https://ourworldindata.org/
         entityType: fish stock
         entityTypePlural: fish stocks
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
         yAxis:
           min: 0
 

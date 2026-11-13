@@ -1,24 +1,35 @@
-config:
-  explorerTitle: Fertilizers
-  explorerSubtitle: Explore the use and impact of fertilizers across the world.
-  originUrl: https://ourworldindata.org/fertilizers
-  isPublished: true
-  entityType: country
-  selection:
-    - United States
-    - China
-    - Egypt
-    - India
-    - France
-    - Brazil
-  subNavId: explorers
-  subNavCurrentId: fertilizers
+grapher_schema: "012"
 
+title:
+  title: Fertilizers
+  title_variant: ""
+slug: fertilizers
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore the use and impact of fertilizers across the world.
+topic_tags:
+  - Fertilizers
+default_selection:
+  - United States
+  - China
+  - Egypt
+  - India
+  - France
+  - Brazil
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/fertilizers
+
+# Chart text (titles, subtitles, notes, map colors) comes from each indicator's garden metadata.
+# The explorer's "Share of world total" checkbox only applied to excess totals, so it is a Metric
+# choice here and no choice is blank.
 dimensions:
   - slug: input
     name: Input
     presentation:
-      type: radio
+      type: toggle-buttons
     choices:
       - slug: synthetic
         name: Synthetic fertilizer
@@ -27,7 +38,7 @@ dimensions:
   - slug: nutrient
     name: Nutrient
     presentation:
-      type: radio
+      type: toggle-buttons
     choices:
       - slug: nitrogen
         name: Nitrogen
@@ -48,156 +59,117 @@ dimensions:
         name: Applied (total)
       - slug: excess_total
         name: Excess (total)
+      - slug: excess_share
+        name: Excess (share of world total)
       - slug: excess_per_ha
         name: Excess (per hectare)
       - slug: nue
         name: Nutrient use efficiency
-  - slug: share_world
-    name: Share of world total
-    presentation:
-      type: checkbox
-      choice_slug_true: share
-    choices:
-      - slug: absolute
-        name: ""
-      - slug: share
-        name: Share of world total
+        description: The share of nitrogen inputs that ends up in harvested crops.
 
 views:
-  # ===== Synthetic fertilizer (Applied per hectare) =====
   - dimensions:
       input: synthetic
       nutrient: nitrogen
       metric: applied_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare
-
   - dimensions:
       input: synthetic
       nutrient: phosphorous
       metric: applied_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare
-
   - dimensions:
       input: synthetic
       nutrient: potassium
       metric: applied_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: faostat_rfn_flat#nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare
-
   - dimensions:
       input: synthetic
       nutrient: all_nutrients
       metric: applied_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: fertilizers#all_fertilizers_per_cropland
-
-  # ===== Total nutrients — Nitrogen =====
   - dimensions:
       input: total
       nutrient: nitrogen
       metric: applied_total
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#total_applied_nitrogen
-
   - dimensions:
       input: total
       nutrient: nitrogen
       metric: applied_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#nitrogen_applied_per_ha
-
   - dimensions:
       input: total
       nutrient: nitrogen
       metric: excess_total
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#excess_nitrogen_total
-
   - dimensions:
       input: total
       nutrient: nitrogen
       metric: excess_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#excess_nitrogen_per_ha
-
   - dimensions:
       input: total
       nutrient: nitrogen
-      metric: excess_total
-      share_world: share
+      metric: excess_share
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#share_global_excess_nitrogen
-
   - dimensions:
       input: total
       nutrient: nitrogen
       metric: nue
-      share_world: absolute
     indicators:
       y:
         - catalogPath: nitrogen_efficiency__lassaletta_et_al__2014#nitrogen_efficiency
-
-  # ===== Total nutrients — Phosphorous =====
   - dimensions:
       input: total
       nutrient: phosphorous
       metric: applied_total
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#total_applied_phosphorous
-
   - dimensions:
       input: total
       nutrient: phosphorous
       metric: applied_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#phosphorous_applied_rate
-
   - dimensions:
       input: total
       nutrient: phosphorous
       metric: excess_total
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#excess_phosphorous_total
-
   - dimensions:
       input: total
       nutrient: phosphorous
       metric: excess_per_ha
-      share_world: absolute
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#excess_phosphorous_per_ha
-
   - dimensions:
       input: total
       nutrient: phosphorous
-      metric: excess_total
-      share_world: share
+      metric: excess_share
     indicators:
       y:
         - catalogPath: excess_fertilizers__west_et_al__2014#share_global_excess_phosphorous

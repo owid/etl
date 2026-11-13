@@ -677,6 +677,14 @@ steps:
       - data://meadow/cdc/2025-05-19/tuberculosis:
         - snapshot://cdc/2025-05-19/tuberculosis.csv
 
+  # Causes of death in the United States since 1900 - NCHS historical tables and CDC WONDER
+  data://grapher/cdc/2026-11-12/us_causes_of_death_since_1900:
+    - data://garden/cdc/2026-11-12/us_causes_of_death_since_1900:
+      - data://meadow/cdc/2026-11-12/nchs_historical_mortality_tables:
+        - snapshot://cdc/2026-11-12/nchs_historical_mortality_tables.zip
+      - data://meadow/cdc/2026-11-12/cdc_wonder_deaths_by_cause:
+        - snapshot://cdc/2026-11-12/cdc_wonder_deaths_by_cause.csv
+
   # Global Health Observatory (GHO) from WHO
   data://garden/who/2026-05-22/gho:
     - data://garden/regions/2023-01-01/regions

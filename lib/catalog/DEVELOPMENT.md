@@ -134,9 +134,6 @@ make .venv          # uv sync --all-extras --group dev
   `LIBS` (`lib/catalog lib/datautils lib/owl lib/repack`) after doing the root itself.
 - `lib/catalog/.pre-commit-config.yaml` wires the same three checks for anyone running
   `pre-commit` inside this directory.
-- `lib/catalog/.github/workflows/python-package.yml` is a leftover from when the library
-  had its own repository. GitHub only reads workflows from the repo root, so **it never
-  runs here**, even though action-pinning PRs keep updating it.
 - Unit tests are run by the Buildkite pipeline behind the badge at the top of
   `README.md` (`owid-catalog-unit-tests`); that pipeline's configuration lives outside
   this repo, so its run history is the place to check what it did.

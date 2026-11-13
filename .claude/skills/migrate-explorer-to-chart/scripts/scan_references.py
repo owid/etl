@@ -16,6 +16,7 @@ Usage:
 """
 
 import argparse
+import html
 import json
 import re
 import subprocess
@@ -123,9 +124,57 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     dim_names, choices = choice_values(mapping_dir)
     prod = OWIDEnv.from_env_file(prod_env_file)
 
+    def repair(q: dict) -> tuple[dict, list[str]]:
+        """Fix the usual damage in old explorer links, so they can land on the view they meant.
+
+        A value glued to the next param by a missing `&` ("…affordhideControls=false") is cut back
+        to the choice it starts with; a param named after a renamed dimension ("Metric") is moved to
+        the one dimension that offers its value.
+        """
+        out, notes = {}, []
+        for k, v in q.items():
+            if k in choices and v not in choices[k]:
+                head = next((c for c in sorted(choices[k], key=len, reverse=True) if c and v.startswith(c)), None)
+                if head:
+                    out[k] = head
+                    rest = v[len(head) :]
+                    if "=" in rest:
+                        rk, rv = rest.split("=", 1)
+                        out[rk] = rv
+                    notes.append(f"cut “{v}” to “{head}”")
+                    continue
+            if k not in choices and k not in {
+                "country",
+                "time",
+                "tab",
+                "facet",
+                "hideControls",
+                "region",
+                "yScale",
+                "stackMode",
+            }:
+                owners = [d for d, cs in choices.items() if v in cs and d not in q]
+                if len(owners) == 1:
+                    out[owners[0]] = v
+                    notes.append(f"renamed “{k}” to “{owners[0]}”")
+                    continue
+            out.setdefault(k, v)
+        return out, notes
+
     def new_url(old: str) -> dict:
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
         r = resolve_explorer_url(rules, q, SITE, choices, dim_names)
+        if r.match != "view" and q:
+            fixed, notes = repair(q)
+            r2 = resolve_explorer_url(rules, fixed, SITE, choices, dim_names) if notes else None
+            if r2 and r2.match == "view":
+                # The redirect still sends the broken link to the default view; the doc edit fixes it.
+                return {
+                    "new_url": r2.url,
+                    "match": "view, after repairing the old link",
+                    "repairs": notes,
+                    "stale_params": r.stale_params,
+                }
         return {"new_url": r.url, "match": r.match, "stale_params": r.stale_params}
 
     cols = prod.read_sql(
@@ -192,8 +241,32 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         context=use["context"],
                         preview_url=f"{ADMIN}/gdocs/{r['id']}/preview",
                     )
-        elif t in {"posts_gdocs", "posts_gdocs_components", "posts_gdocs_links"}:
-            continue  # same docs as `posts_gdocs.content` (markdown copy and derived indexes)
+        elif t in {"posts_gdocs", "posts_gdocs_components", "posts_gdocs_links", "posts_links"}:
+            continue  # same docs as `posts_gdocs.content` / `posts.content` (copies and derived indexes)
+        elif t == "posts":
+            if c != "content":
+                continue  # archieml, markdown and the API snapshot are copies of `content`
+            rows = prod.read_sql(
+                "SELECT id, slug, type, status, content FROM posts WHERE content LIKE %s", params=(like,)
+            )
+            # A reusable block renders only on the published explorers whose `wpBlockId` names it.
+            shown_on: dict[int, list[str]] = {}
+            for e in prod.read_sql(
+                "SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.wpBlockId')) AS b FROM explorers "
+                "WHERE isPublished = 1 AND JSON_EXTRACT(config, '$.wpBlockId') IS NOT NULL"
+            ).to_dict("records"):
+                shown_on.setdefault(int(e["b"]), []).append(e["slug"])
+            for r in rows.to_dict("records"):
+                # Legacy WordPress: posts are private copies of pages now served from gdocs.
+                if r["type"] == "wp_block" and shown_on.get(r["id"]):
+                    pages = ", ".join(f"/explorers/{s}" for s in shown_on[r["id"]])
+                    surface, how = f"WordPress block (shown on {pages})", "link in block"
+                elif r["type"] == "wp_block":
+                    surface, how = "WordPress block (unused, not on the site)", "legacy copy"
+                else:
+                    surface, how = f"Legacy WordPress {r['type']} ({r['status']}, not on the site)", "legacy copy"
+                for m in pat.finditer(r["content"] or ""):
+                    add(surface, f"{r['slug']} (wp {r['id']})", None, html.unescape(m.group(0)), how)
         elif t == "chart_configs":
             rows = prod.read_sql(
                 f"""SELECT cc.id, cc.slug, ch.id AS chart_id, nc.id AS narrative_id, nc.name AS narrative_name,
@@ -278,11 +351,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 for m in pat.finditer(str(r["txt"])):
                     add(f"DB: {t}.{c}", f"{t} {r['k']}", None, m.group(0), "text")
 
-    # Repos: hardcoded links in ETL metadata or in the site's own code.
+    # Repos: hardcoded links in ETL metadata or in the site's own code. Both are read at
+    # `origin/master`, so a fix merged elsewhere shows as swapped whatever branch is checked out.
+    subprocess.run(["git", "-C", str(BASE_DIR), "fetch", "-q", "origin", "master"], check=False)
     repos = {
         "etl": (
             BASE_DIR,
-            ["git", "grep", "-n", "-I", f"/explorers/{slug}", "--", ".", ":!ai", ":!data", ":!dag/archive"],
+            ["git", "grep", "-n", "-I", f"/explorers/{slug}", "origin/master", "--", ".", ":!ai", ":!data", ":!dag/archive"],
         )
     }
     if grapher_repo:
@@ -294,12 +369,14 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
             path, lineno, text = line.removeprefix("origin/master:").split(":", 2)
             if name == "etl" and path.startswith("etl/steps/viz/explorer/"):
                 continue  # the explorer step itself, retired after the redirects
-            # Grapher's ArchieML component docs use real explorers as examples; no reader sees them.
-            how = (
-                "docs example"
-                if "/gdocTypes/archieMLComponents/" in path or path.endswith(".generated.json")
-                else "code"
+            # Grapher's ArchieML component docs and our own skills use real explorers as examples;
+            # no reader sees them.
+            docs = (
+                "/gdocTypes/archieMLComponents/" in path
+                or path.endswith(".generated.json")
+                or path.startswith(".claude/")
             )
+            how = "docs example" if docs else "code"
             for m in pat.finditer(text):
                 add(f"Repo: {name}", f"{path}:{lineno}", None, m.group(0), how)
 
