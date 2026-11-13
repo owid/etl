@@ -35,6 +35,8 @@ They don't work in the ETL, and that holds from the first message to the last, a
 
 Start from any chart links, catalog paths or indicator IDs they gave; otherwise build an empty page. Indicators described only in words are not looked up: ask for a chart link. The page only knows indicators that are already live.
 
+**Look for an MDim that already uses these indicators** before building the page: search `etl/steps/viz/chart/` for each one's `<table>#<indicator>`. An MDim that was merged but never published shows up nowhere else, since the public Datasette and the live site only know published ones. If there is one, tell the person what it contains and who made it, and ask whether to build on it, which the page can't open, or to make a separate MDim.
+
 Write the draft to `ai/mdim_simulator/<name>.setup.yml` (`<name>` a short kebab-case name) in the format the page copies out: the multidim config of `/create-chart`, but with full catalog paths (`grapher/<namespace>/<version>/<dataset>/<table>#<indicator>`) and a `slug:`. `state_from_setup` in `build.py` shows what the page reads, and the build stops with a clear message on anything it can't use.
 
 - **From a chart link:** the indicator is the `variableId` of the `y` dimension in `https://ourworldindata.org/grapher/<slug>.config.json`, and its `catalogPath` is in `https://api.ourworldindata.org/v1/indicators/<id>.metadata.json`. A chart with several `y` indicators has no single indicator, and neither has an MDim (its `.config.json` is a 404) or an explorer: ask which indicator they mean. Copy each chart's title, subtitle and note into its view and the first chart's selected countries into `default_selection`, so the views start out looking like the charts.
