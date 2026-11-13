@@ -19,7 +19,6 @@ import re
 from pathlib import Path
 
 import yaml
-from owid.catalog.schema_org import ENTITY_TIME_DIMENSIONS
 
 from etl.paths import DATA_DIR, STEP_DIR
 
@@ -138,11 +137,11 @@ def _missing_in_built_datasets(
         return f"table '{match['table']}' in the grapher dataset"
     column = match["column"]
     for table in tables:
-        columns = list(table.get("fields", {}))
-        if column in columns:
+        fields = table.get("fields", {})
+        if column in fields:
             return None
-        # An indicator of a table with dimensions is named after its column, followed by its dimension values.
-        has_dimensions = bool(set(table.get("primary_key") or []) - ENTITY_TIME_DIMENSIONS)
-        if has_dimensions and any(column.startswith(f"{name}__") for name in columns):
+        # A grapher table with dimensions is saved with one column per combination of their values, and each of
+        # these columns records the column it was made from. A path can name that original column.
+        if any(meta.get("original_short_name") == column for meta in fields.values()):
             return None
     return f"column '{column}' in the grapher table"

@@ -447,22 +447,22 @@ owid_energy:
     ]
 
 
-def test_link_to_one_indicator_of_a_grapher_table_with_dimensions_is_not_reported(tmp_path: Path) -> None:
+def test_link_to_the_original_column_of_a_grapher_table_with_dimensions_is_not_reported(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     steps_dir = tmp_path / "steps"
     catalog_path = _add_dataset(data_dir)
-    # A built grapher table with a dimension: its column "deaths" becomes the indicators "deaths__sex_male", etc.
+    # A built grapher table with a dimension has one column per combination, which records the column it came from.
     ds = Dataset.create_empty(
         data_dir / "grapher" / "health" / "2026-01-01" / "deaths",
         DatasetMeta(channel="grapher", namespace="health", version="2026-01-01", short_name="deaths"),
     )
     tb = Table(
-        pd.DataFrame(
-            {"country": ["Spain", "Spain"], "year": [2020, 2020], "sex": ["male", "female"], "deaths": [1, 2]}
-        ),
+        pd.DataFrame({"country": ["Spain"], "year": [2020], "deaths__sex_male": [1], "deaths__sex_female": [2]}),
         short_name="deaths",
-    )
-    ds.add(tb.set_index(["country", "year", "sex"]))
+    ).set_index(["country", "year"])
+    for column in ["deaths__sex_male", "deaths__sex_female"]:
+        tb._fields[column] = VariableMeta(original_short_name="deaths")
+    ds.add(tb)
     ds.save()
     _write_step_file(
         steps_dir,
@@ -473,7 +473,7 @@ owid_energy:
   hydro_energy_twh:
     - grapher/health/*/deaths/deaths#deaths
     - grapher/health/*/deaths/deaths#deaths__sex_male
-    - grapher/health/*/deaths/deaths#births__sex_male
+    - grapher/health/*/deaths/deaths#births
 """,
     )
 
@@ -487,8 +487,7 @@ owid_energy:
 
     assert [item.warnings for item in result.warnings] == [
         [
-            "indicator_links: no column 'births__sex_male' in the grapher table for "
-            "'grapher/health/*/deaths/deaths#births__sex_male'",
+            "indicator_links: no column 'births' in the grapher table for 'grapher/health/*/deaths/deaths#births'",
         ]
     ]
 
