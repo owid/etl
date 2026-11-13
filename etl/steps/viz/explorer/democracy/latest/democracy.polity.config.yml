@@ -73,7 +73,7 @@ views:
       y:
         - catalogPath: polity#exec_reccomp_polity
     config:
-      colorVariableId: polity#exec_reccomp_polity
+      type: Swimlane
   - dimensions:
       metric: democracy
       sub_metric: openness_of_executive_recruitment_score
@@ -81,13 +81,15 @@ views:
       y:
         - catalogPath: polity#exec_recopen_polity
     config:
-      colorVariableId: polity#exec_recopen_polity
+      type: Swimlane
   - dimensions:
       metric: democracy
       sub_metric: constraints_on_the_executive_score
     indicators:
       y:
         - catalogPath: polity#exec_constr_polity
+    config:
+      type: Swimlane
   - dimensions:
       metric: democracy
       sub_metric: regulation_of_political_participation_score
@@ -95,7 +97,7 @@ views:
       y:
         - catalogPath: polity#polpart_reg_polity
     config:
-      colorVariableId: polity#polpart_reg_polity
+      type: Swimlane
   - dimensions:
       metric: democracy
       sub_metric: competitiveness_of_political_participation_score
@@ -103,7 +105,7 @@ views:
       y:
         - catalogPath: polity#polpart_comp_polity
     config:
-      colorVariableId: polity#polpart_comp_polity
+      type: Swimlane
   - dimensions:
       metric: democracy
       sub_metric: main_index_distribution
@@ -119,8 +121,7 @@ views:
       y:
         - catalogPath: polity#regime_polity
     config:
-      type: "LineChart"
-      colorVariableId: polity#regime_polity
+      type: "Swimlane"
   - dimensions:
       metric: political_regime
       sub_metric: number_and_share_of_democracies

@@ -1,0 +1,45 @@
+chart_config_id: 0191b6c7-42d1-71c2-a93d-a866d2dd6a8a
+grapher_schema: "012"
+slug: per-capita-co2-vs-average
+topic_tags:
+  - CO2 & Greenhouse Gas Emissions
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "global_carbon_budget#emissions_total_per_capita"
+          display:
+            name: "Annual CO₂ emissions (per capita)"
+            includeInTable: true
+    config:
+      map:
+        colorScale:
+          baseColorScheme: "BinaryMapPaletteE"
+          binningStrategy: "manual"
+          colorSchemeInvert: true
+          customNumericColors:
+            - "#4c6a9c"
+            - "#b35052"
+          customNumericLabels:
+            - "Below global equity"
+            - "Above global equity"
+        columnSlug: "global_carbon_budget#emissions_total_per_capita"
+        hideTimeline: true
+      tab: "map"
+      title: "Per capita CO₂ emissions relative to the global average"
+      yAxis:
+        min: 0
+      subtitle: "This map denotes whether a country's average per capita emissions are above or below the value of global per capita emissions. This is based on territorial emissions, which don't adjust for trade."
+      hasMapTab: true
+      originUrl: "/co2-and-greenhouse-gas-emissions"
+      chartTypes: []
+      hideTimeline: true
+      internalNotes: "ETL calculates the map year from country data and uses the World value from that same year as the threshold."
+      selectedEntityNames:
+        - "Dominica"
+        - "Paraguay"
+        - "Costa Rica"
+      hideAnnotationFieldsInTitle:
+        entity: true
+        changeInPrefix: true

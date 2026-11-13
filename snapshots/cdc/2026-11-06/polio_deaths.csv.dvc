@@ -1,0 +1,53 @@
+meta:
+  origin:
+    producer: Centers for Disease Control and Prevention
+    title: Historical polio deaths in the United States – Centers for Disease Control and Prevention
+    description: |-
+      Data on historical polio deaths in the United States, compiled from a selection of sources from the US CDC.
+
+      From 1950, these are deaths with acute poliomyelitis as the underlying cause on the death certificate, from the National Center for Health Statistics' death records (ICD-7 code 080 until 1967; ICD-8, ICD-9 and ICD-10 codes after that). In the years checked (1950-1967 and 1999-2025), deaths from the late effects of polio are not included.
+
+      Sources for each year are as follows:
+
+      * 1950-1959: [Morbidity and Mortality Weekly Report Vol. 9, No. 53, Annual Supplement: Reported Incidence of Notifiable Diseases in the United States, 1960 (1961), Table 3A](https://www.globalhealthchronicles.org/items/show/6303)
+
+      * 1960-1967: [Morbidity and Mortality Weekly Report Vol. 19, No. 53, Annual Supplement: Summary 1970 (1971), Table 3A](https://stacks.cdc.gov/view/cdc/951)
+
+      * 1968-1978: [Compressed Mortality, 1968-1978 - CDC WONDER (ICD-8)](https://wonder.cdc.gov/cmf-icd8.html)
+
+      * 1979-1998: [Compressed Mortality, 1979-1998 - CDC WONDER (ICD-9)](https://wonder.cdc.gov/cmf-icd9.html)
+
+      * 1999-2020: [Underlying Cause of Death, 1999-2020 - CDC WONDER (ICD-10)](https://wonder.cdc.gov/ucd-icd10.html)
+
+      * 2018-2023: [Underlying Cause of Death by Single-Race Categories - CDC WONDER (ICD-10)](https://wonder.cdc.gov/deaths-by-underlying-cause.html)
+
+      * 2024: [Underlying Cause of Death, 2018-2024, Single Race - CDC WONDER (ICD-10)](https://wonder.cdc.gov/ucd-icd10-expanded.html)
+
+      * 2025: [Provisional Mortality Statistics, 2018 through Last Week - CDC WONDER (ICD-10)](https://wonder.cdc.gov/mcd-icd10-provisional.html). This count is provisional and can still be revised.
+
+      From 1999, deaths are those with acute poliomyelitis (ICD-10 code A80) as the underlying cause of death.
+    citation_full: |-
+      Morbidity and Mortality Weekly Report Vol. 9, No. 53, Annual Supplement: Reported Incidence of Notifiable Diseases in the United States, 1960 (1961), Communicable Disease Center, Public Health Service, U.S. Department of Health, Education, and Welfare.
+
+      Morbidity and Mortality Weekly Report Vol. 19, No. 53, Annual Supplement: Summary 1970 (1971)
+
+      Compressed Mortality, 1968-1978 – CDC WONDER (ICD-8)
+
+      Compressed Mortality, 1979-1998 – CDC WONDER (ICD-9)
+
+      Underlying Cause of Death, 1999-2020 – CDC WONDER (ICD-10)
+
+      Underlying Cause of Death by Single-Race Categories – CDC WONDER (ICD-10)
+
+      Underlying Cause of Death, 2018-2024, Single Race – CDC WONDER (ICD-10)
+
+      Provisional Mortality Statistics, 2018 through Last Week – CDC WONDER (ICD-10)
+    url_main: https://wonder.cdc.gov/deaths-by-underlying-cause.html
+    date_accessed: '2026-11-06'
+    date_published: '2026-11-06'
+    license:
+      name: Public domain
+outs:
+  - md5: 29eef3f7b53d59df71379dfe7faec384
+    size: 5121
+    path: polio_deaths.csv

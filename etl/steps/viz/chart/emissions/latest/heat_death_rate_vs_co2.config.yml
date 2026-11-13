@@ -1,0 +1,28 @@
+chart_config_id: 0191b6c7-5962-75c5-8071-f6351647700e
+grapher_schema: "012"
+slug: heat-death-rate-vs-co2
+topic_tags:
+  - CO2 & Greenhouse Gas Emissions
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "heat_deaths_undp_climate_horizons#heat_death_rate"
+          display:
+            name: "Change in heat-related death rate"
+      x:
+        catalogPath: "global_carbon_budget#emissions_total_per_capita"
+        display: {}
+      color:
+        catalogPath: "regions#owid_region"
+    config:
+      title: "Change in heat-related death rates vs. Per capita CO₂ emissions"
+      xAxis:
+        canChangeScaleType: true
+      yAxis:
+        max: 80
+      subtitle: "Includes premature deaths due to hot and cold temperatures, measured per 100,000 people. Positive figures show an increase in deaths, negative figures show a decrease. Based on the Representative Concentration Pathway, RCP4.5 which reaches around 2°C of warming by mid-century, and 2.5°C by 2100."
+      originUrl: "/climate-change"
+      chartTypes:
+        - "ScatterPlot"

@@ -102,10 +102,9 @@ class NotionClient:
         """Parse a Notion property based on its type."""
         prop_type = prop_data["type"]
 
-        if prop_type == "title":
-            return prop_data["title"][0]["plain_text"] if prop_data["title"] else ""
-        elif prop_type == "rich_text":
-            return prop_data["rich_text"][0]["plain_text"] if prop_data["rich_text"] else ""
+        if prop_type in ("title", "rich_text"):
+            # Notion splits text into several parts wherever a link, mention or formatting starts; join them all.
+            return "".join(part["plain_text"] for part in prop_data[prop_type])
         elif prop_type == "number":
             return prop_data["number"]
         elif prop_type == "select":
@@ -114,6 +113,8 @@ class NotionClient:
             return [item["name"] for item in prop_data["multi_select"]]
         elif prop_type == "date":
             return prop_data["date"]["start"] if prop_data["date"] else ""
+        elif prop_type in ("created_time", "last_edited_time"):
+            return prop_data[prop_type]
         elif prop_type == "checkbox":
             return prop_data["checkbox"]
         elif prop_type == "url":
@@ -220,6 +221,9 @@ def get_notion_table_period(
         max_rows=max_rows,
     )
 
+    # Keep only reviewed highlights (the table also holds drafts awaiting review, and rejected ones).
+    df = df[df["Status"] == "Approved"].reset_index(drop=True)
+
     # Filter by date.
     df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
     df = df[(df[date_col] >= pd.to_datetime(min_date)) & (df[date_col] <= pd.to_datetime(max_date))].reset_index(
@@ -239,7 +243,7 @@ def get_impact_highlights(
     df: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     # Name of column of related data producers.
-    producer_col = "Data producer(s) related"
+    producer_col = "Data producers"
     # Name of column containing the date.
     if df is None:
         df = get_notion_table_period(min_date=min_date, max_date=max_date, max_rows=max_rows)

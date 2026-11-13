@@ -65,7 +65,13 @@ steps:
         - data://garden/demography/2024-07-15/population
         - data://garden/countries/2024-08-27/gleditsch
         - data://meadow/war/latest/ucdp_ced:
-          - snapshot://war/latest/ucdp_ced_v26_01_26_06.csv
+          - snapshot://war/latest/ucdp_ced_v26_01_26_09.csv
+
+  # UCDP preview — standalone charts authored in ETL.
+  viz://chart/war/latest/deaths_in_armed_conflicts_by_region:
+    - data://grapher/war/latest/ucdp_preview
+  viz://chart/war/latest/deaths_in_armed_conflicts_by_country:
+    - data://grapher/war/latest/ucdp_preview
 
   # PRIO v3.1
   data://garden/war/2023-09-21/prio_v31:
@@ -196,8 +202,8 @@ steps:
       - data://meadow/war/2026-05-13/nuclear_weapons_inventories:
         - snapshot://war/2026-05-13/nuclear_weapons_inventories.csv
 
-  # Countries in Conflict explorer.
-  viz://explorer/war/latest/countries_in_conflict_data:
+  # Countries in Conflict, as a multidim shown as a data explorer.
+  viz://chart/war/latest/countries_in_conflict_data:
     - data://grapher/war/2026-06-10/ucdp
 
   # Conflict Data Source explorer — single config covering all seven data sources

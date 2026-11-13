@@ -606,11 +606,11 @@ steps:
       - data://garden/demography/2024-07-15/population
 
   # Polio cases - combined
-  data://grapher/health/2025-03-12/polio_cases:
-    - data://garden/health/2025-03-12/polio_cases:
+  data://grapher/health/2026-11-06/polio_cases:
+    - data://garden/health/2026-11-06/polio_cases:
       # Polio cases - CDC
-      - data://meadow/cdc/2025-03-12/polio_cases:
-        - snapshot://cdc/2025-03-12/polio_cases.csv
+      - data://meadow/cdc/2026-11-06/polio_cases:
+        - snapshot://cdc/2026-11-06/polio_cases.csv
       # Polio cases - US Census Bureau
       - data://meadow/us_census_bureau/2025-03-12/polio_cases:
         - snapshot://us_census_bureau/2025-03-12/polio_cases.csv
@@ -620,11 +620,11 @@ steps:
       - data://garden/demography/2024-07-15/population
 
   # Polio deaths - combined
-  data://grapher/health/2025-03-14/polio_deaths:
-    - data://garden/health/2025-03-14/polio_deaths:
+  data://grapher/health/2026-11-06/polio_deaths:
+    - data://garden/health/2026-11-06/polio_deaths:
       # Polio deaths - CDC
-      - data://meadow/cdc/2025-03-14/polio_deaths:
-        - snapshot://cdc/2025-03-14/polio_deaths.csv
+      - data://meadow/cdc/2026-11-06/polio_deaths:
+        - snapshot://cdc/2026-11-06/polio_deaths.csv
       # Polio deaths - Public Health Reports
       - data://meadow/public_health_reports/2025-03-14/polio_deaths:
         - snapshot://public_health_reports/2025-03-14/polio_deaths.csv
@@ -677,6 +677,14 @@ steps:
     - data://garden/cdc/2025-05-19/tuberculosis:
       - data://meadow/cdc/2025-05-19/tuberculosis:
         - snapshot://cdc/2025-05-19/tuberculosis.csv
+
+  # Causes of death in the United States since 1900 - NCHS historical tables and CDC WONDER
+  data://grapher/cdc/2026-11-12/us_causes_of_death_since_1900:
+    - data://garden/cdc/2026-11-12/us_causes_of_death_since_1900:
+      - data://meadow/cdc/2026-11-12/nchs_historical_mortality_tables:
+        - snapshot://cdc/2026-11-12/nchs_historical_mortality_tables.zip
+      - data://meadow/cdc/2026-11-12/cdc_wonder_deaths_by_cause:
+        - snapshot://cdc/2026-11-12/cdc_wonder_deaths_by_cause.csv
 
   # Global Health Observatory (GHO) from WHO
   data://garden/who/2026-05-22/gho:

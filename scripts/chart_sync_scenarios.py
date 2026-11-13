@@ -12,7 +12,9 @@ decide whether an edit survives:
     S1  the chart is edited in production only                 -> not listed on other branches
     S2  the branch rebuilds the chart                          -> listed; conflict iff production also changed
     S3  the chart is edited in the staging admin               -> listed
-    S4  approved, then production is edited                    -> approval expires, sync refuses
+    S4  approved, then production's ETL rebuilds the chart     -> approval holds, sync writes
+        from its indicators
+        approved, then production is edited                    -> approval expires, sync refuses
     S5  a chart the branch created, then edited in production  -> sync refuses
     S6  corner case normal work never reaches: see the note under S6 below
     S7  the same indicator's numbers change (a `latest` dataset)  -> listed for review, never synced
@@ -283,6 +285,15 @@ class Scenarios:
                  "UPDATE charts SET updatedAt = NOW(), lastEditedAt = NOW(), lastEditedByUserId = :u WHERE id = :id",
                  u=self.user_id, id=chart_id)
 
+    def rebuild_in_production(self, chart_id: int | None = None) -> None:
+        """Production's ETL changes an indicator's metadata, and grapher rewrites the inheriting chart's
+        config (`updateAllChartsThatInheritFromIndicator`): `updatedAt` moves, `lastEditedAt` doesn't."""
+        self.sql(self.production,
+                 "UPDATE chart_configs cc JOIN charts c ON c.configId = cc.id "
+                 "SET cc.config = JSON_SET(cc.config, '$.originUrl', 'rebuilt-from-indicator'), "
+                 "cc.updatedAt = NOW(), c.updatedAt = NOW() WHERE c.id = :id",
+                 id=chart_id or self.chart_id)
+
     def revert_production(self, subtitle: str, when) -> None:
         self.sql(self.production,
                  "UPDATE chart_configs cc JOIN charts c ON cc.id IN (c.configId, c.patchConfigId) "
@@ -470,6 +481,13 @@ class Scenarios:
             took, log = self.chart_sync()
             self.check("S4: control — while the approval holds, chart-sync would write to production",
                        took["update"], log)
+            time.sleep(1.5)
+            self.rebuild_in_production()
+            d = self.diff()
+            self.check("S4: production's ETL rebuilding the chart from its indicators is not an edit",
+                       d is not None and d.is_approved and not d.in_conflict, self.describe(d))
+            took, log = self.chart_sync()
+            self.check("S4: so chart-sync still writes to production", took["update"], log)
             time.sleep(1.5)
             self.edit_in_production("Edited in the production admin after approval (S4).")
             d = self.diff()

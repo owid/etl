@@ -132,6 +132,10 @@ def run() -> None:
     empty = sorted(column for column in tb.columns if tb[column].isna().all())
     assert empty == EMPTY_SERIES, f"Series with no data changed. Now empty: {empty}"
     tb = tb.drop(columns=empty)
+
+    # Remove known errors in the source data (see the .corrections.yml file).
+    tb = paths.apply_corrections(tb)
+
     # Combine maternity and paternity leave indicators (time only available TO each parent)
     tb["total_maternity_leave_to"] = tb["sh_mmr_leve"] + tb["sh_par_leve_fe"]
     tb["total_paternity_leave_to"] = tb["sh_par_leve_ma"] + tb["sh_ptr_leve"]
