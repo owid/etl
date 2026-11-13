@@ -17,6 +17,9 @@ paths = PathFinder(__file__)
 # take them from WBL directly (see the women_business_and_the_law meadow step): the 1971-2024 historical panel, corrected
 # with the revisions the World Bank listed in its 2026 report, plus that report. On the next update, check whether the
 # World Bank has published its WBL 2.0 panel, which replaces both.
+# NOTE: WBL data is processed inside this Gender Statistics dataset only so that its indicators keep their IDs, and the
+# WBL charts don't need remapping. When moving to the WBL 2.0 panel, which needs remapping anyway, give WBL its own
+# dataset instead, and remove it from this step.
 WBL_TOPICS = {
     "sg_law_indx_mo": ["sg_loc_live_eq", "sg_hme_trvl_eq", "sg_apl_pspt_eq", "sg_ctr_trvl_eq"],
     "sg_law_indx_wp": ["sg_get_jobs_eq", "sg_law_nodc_hr", "sg_leg_sxhr_em", "sg_pen_sxhr_em"],
