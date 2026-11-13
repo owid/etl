@@ -19,8 +19,6 @@ definitions:
   # NOTE: Update the year people start working (2024) to the new edition's.
   description_short_future_normal_retirement_age: |-
     Age at which <<sex.lower()>> who start working in 2024 will be able to receive a pension without an early-retirement penalty, under the laws already passed, assuming they have a full-time, uninterrupted career that starts at age 22.
-  subtitle_exit_reasons: |-
-    This includes people who leave for reasons other than retirement, such as disability.
 
   #
   # Reusable bullets for the modeled pension entitlements (replacement rates and pension wealth).
@@ -204,12 +202,6 @@ definitions:
     People leave for different reasons, including retirement, illness, or disability.
   description_key_exit_age_definition: |-
     The OECD calls this the effective age of labor market exit. It is the average age at which workers aged 40 and older leave the labor force, meaning that they stop working or looking for work.
-  description_key_exit_age_not_retirement: |-
-    The age of leaving the labor market isn’t the same as the age at which people retire or start receiving a pension. It counts everyone who leaves the labor force, whatever the reason: retirement, but also, for example, disability.
-  description_key_exit_age_method: |-
-    The OECD estimates the age of leaving the labor market without tracking individual people. Instead, it compares the same generation at two points in time: for example, the share of people aged 55 to 59 who were working or looking for work five years ago, and the share of people aged 60 to 64 who are doing so today. A drop in that share means that some of them left the labor market during those five years. The OECD does this for each five-year age group from age 40 onward and averages the ages at which people left, so the value for each year reflects the five years leading up to it. Because it compares shares rather than numbers of people, people who die or migrate don’t count as leaving the labor market. It also uses the same age structure of the population for every country, so that countries with older or younger populations can be compared fairly.
-  description_key_exit_age_revision_and_caution: |-
-    The OECD introduced this method in 2021, replacing its earlier estimates of the “average effective age of retirement”. It notes that the values for a single country should be read with caution, but that comparisons between countries, and over time within a country, are reliable.
   description_key_exit_age_sources: |-
     This data comes from the OECD and is based on national labor force surveys and, in some countries, national censuses for the early years.
   # NOTE: Check that Croatia's 1990 and 1992 values for women are still published as 0; keep in sync with the .corrections.yml.
@@ -220,16 +212,17 @@ definitions:
   note_effective_labor_market_exit_age: |-
     For each year, the age of leaving the labor market is estimated from how the share of people working or looking for work changed over the previous five years.
   description_short_expected_years_after_labor_market_exit: |-
-    Number of years that <<sex.lower()>> can expect to live after they leave the labor market.
-  description_key_years_after_exit_definition: |-
-    The OECD measures this as the remaining life expectancy at the average age at which people aged 40 and older leave the labor force (the effective age of labor market exit).
-  # NOTE: Update the World Population Prospects edition (2024) to the one the new report uses.
-  description_key_years_after_exit_life_expectancy: |-
-    Remaining life expectancy comes from the UN World Population Prospects 2024. It assumes that people experience the death rates of that year for the rest of their lives.
+    Number of years <<sex.lower()>> can expect to live after the average age at which they stop working or looking for work.
+  description_key_years_after_exit_overview: |-
+    This indicator shows how many more years <<sex.lower()>> can expect to live after the average age at which they leave the labor market, meaning they stop working or looking for work. It is often used as a rough measure of how long people spend in retirement.
+  description_key_years_after_exit_estimates: |-
+    These numbers are estimates and combine information on when people stop working and how long they might be expected to live afterward. The number of years can rise because people leave work earlier or because they live longer.
+  description_key_years_after_exit_scope: |-
+    The age of leaving includes people (aged 40 and older) who have left the labor force for any reason, for example, retirement, illness, or disability. The life expectancy figures are based on death rates in the year shown ([period life expectancy](#dod:period-life-expectancy)), so they don’t account for future improvements in how long people live.
+  description_key_years_after_exit_sources: |-
+    {definitions.description_key_exit_age_sources} The OECD advises caution when reading the exact age for a single country, but considers comparisons between countries and over time to be reliable.
   subtitle_expected_years_after_labor_market_exit: |-
-    Remaining life expectancy at the average age at which <<sex.lower()>> aged 40 and older stop working or looking for work. {definitions.subtitle_exit_reasons}
-  note_expected_years_after_labor_market_exit: |-
-    The age of leaving the labor market for each year is based on changes over the five years leading up to it.
+    {definitions.description_short_expected_years_after_labor_market_exit} Only people aged 40 and older are included. People leave for different reasons, such as retirement, illness, or disability.
 
   #
   # Text for the indicators in the replacement_rates table.
@@ -484,15 +477,13 @@ tables:
         description_short: |-
           {definitions.description_short_expected_years_after_labor_market_exit}
         description_key: |-
-          {definitions.description_key_years_after_exit_definition}
+          {definitions.description_key_years_after_exit_overview}
 
-          {definitions.description_key_exit_age_not_retirement}
+          {definitions.description_key_years_after_exit_estimates}
 
-          {definitions.description_key_exit_age_method}
+          {definitions.description_key_years_after_exit_scope}
 
-          {definitions.description_key_exit_age_revision_and_caution}
-
-          {definitions.description_key_years_after_exit_life_expectancy}
+          {definitions.description_key_years_after_exit_sources}
         display:
           name: <<sex>>
           numDecimalPlaces: 1
@@ -502,7 +493,7 @@ tables:
           grapher_config:
             title: Years that <<sex.lower()>> can expect to live after leaving the labor market
             subtitle: '{definitions.subtitle_expected_years_after_labor_market_exit}'
-            note: '{definitions.note_expected_years_after_labor_market_exit}'
+            note: '{definitions.note_effective_labor_market_exit_age}'
 
   replacement_rates:
     common:
