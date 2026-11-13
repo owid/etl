@@ -39,6 +39,7 @@ views:
         - catalogPath: "wdi#eg_elc_accs_zs"
     config:
       title: "Share of people with access to electricity"
+      subtitle: "Share of people who have electricity at home."
       note: "Data for some countries is estimated."
       yAxis:
         min: 0
