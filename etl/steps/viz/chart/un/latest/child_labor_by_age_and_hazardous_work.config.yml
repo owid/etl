@@ -1,0 +1,41 @@
+chart_config_id: 01a1d119-8ff1-7375-aa30-51813910dd1a
+grapher_schema: "012"
+slug: child-labor-by-age-and-hazardous-work
+topic_tags:
+  - Child Labor
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        # Grapher stacks the last indicator at the bottom: non-hazardous child labor goes last, so its trend reads against the baseline.
+        # Colors from OwidCategoricalE: its two warm shades (dark copper, peach) for the hazardous parts, blue for the rest.
+        - catalogPath: "child_labor#number_hazardous_work__sex_total__age_15_17"
+          display:
+            name: Ages 15–17, hazardous work
+            color: "#9a5129"
+        - catalogPath: "child_labor#number_hazardous_work__sex_total__age_5_14"
+          display:
+            name: Ages 5–14, hazardous work
+            color: "#e56e5a"
+        - catalogPath: "child_labor#number_non_hazardous_child_labor__sex_total__age_5_14"
+          display:
+            name: Ages 5–14, non-hazardous child labor
+            color: "#286bbb"
+    config:
+      title: Children in child labor, by age and type of work
+      subtitle: "[Child labor](#dod:child-labor) is either hazardous, meaning work that by its nature or conditions is likely to harm children's health, safety, or morals, or non-hazardous, meaning children working at an age too young for employment."
+      note: Work by children aged 15 to 17 only counts as child labor if it's hazardous, so this age group has no non-hazardous part. Household chores aren't counted as work. The way hazardous work is identified has changed slightly over time.
+      originUrl: /child-labor
+      chartTypes:
+        - StackedBar
+        - StackedArea
+      baseColorScheme: OwidCategoricalE
+      # Show the relative toggle, so readers can see each part's share of all child labor.
+      hideRelativeToggle: false
+      hasMapTab: false
+      # Open on the bars; with several chart types, `tab: chart` opens on the area chart instead.
+      tab: stacked-bar
+      selectedEntityNames:
+        - World
+      addCountryMode: disabled
