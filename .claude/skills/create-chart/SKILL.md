@@ -447,6 +447,17 @@ read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_co
 
 Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): show the user its links before you write, check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
 
+### Data page of a view that combines different indicators
+
+A multidim view's data page shows the metadata of its **first y indicator only**, with the view's
+`metadata:` merged on top. So a view that combines different indicators (a scatter's y and x; a dumbbell or
+line chart of gross vs. net rates or past vs. projected spending; a stacked bar of several components) needs
+its own `metadata:` block (not `config:`) whose text covers all of them. Set at least
+`presentation.title_public`, `description_short` and `description_key`, and check `description_processing`,
+`description_from_producer`, the unit and the origins on the rendered page. A view comparing one indicator
+across a dimension (men vs. women) needs none, unless the indicator's text names the split value. How to
+write the text and keep it in sync: [`COMBINED_VIEW_METADATA.md`](COMBINED_VIEW_METADATA.md).
+
 ## Chart config options
 
 Key fields for `config` in views or `common_views`:
