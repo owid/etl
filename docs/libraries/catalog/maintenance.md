@@ -19,7 +19,7 @@ After working on your changes in the library, publishing to PyPI is automated:
 
 1. **Bump the version** in [:fontawesome-brands-github: `lib/catalog/pyproject.toml`](https://github.com/owid/etl/blob/master/lib/catalog/pyproject.toml)
 2. **Update the changelog** in [:fontawesome-brands-github: `lib/catalog/README.md`](https://github.com/owid/etl/blob/master/lib/catalog/README.md#changelog)
-3. **Refresh both lockfiles** — the version is recorded in `lib/catalog/uv.lock` *and* in the repo-root `uv.lock`; run `make .venv` in `lib/catalog/` and at the repo root
+3. **Refresh both lockfiles** — the version is recorded in `lib/catalog/uv.lock` *and* in the repo-root `uv.lock`; run `uv lock` in `lib/catalog/` and at the repo root (`make .venv` installs from the lockfile without refreshing it)
 4. **Commit and push to `master`** - the package will be automatically published to PyPI via [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-packages.yml)
 
 The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on the master branch. It includes a safety check to ensure the version was actually bumped before publishing.
