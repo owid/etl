@@ -567,14 +567,14 @@ def install_worktree_venv(worktree_path: Path) -> bool:
     """Run `uv sync` in the new worktree to set up its `.venv/`. Returns True on success.
 
     This matches what the project's Makefile does for the `.venv` target — see
-    `default.mk` (`uv sync --all-extras --group dev`). Doing this automatically lets
+    `default.mk` (`uv sync --frozen --all-extras --group dev`). Doing this automatically lets
     the user just `cd` into the new worktree afterwards (with a chpwd hook the venv
     activates automatically; without one, only `source .venv/bin/activate` is needed).
     """
-    log.info(f"Installing dependencies in '{worktree_path}' (one-time, ~1 min)...")
+    log.info(f"Installing dependencies in '{worktree_path}' (one-time, a few seconds with a warm uv cache)...")
     try:
         subprocess.run(
-            ["uv", "sync", "--all-extras", "--group", "dev"],
+            ["uv", "sync", "--frozen", "--all-extras", "--group", "dev"],
             cwd=worktree_path,
             check=True,
         )

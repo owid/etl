@@ -4,7 +4,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 
 ## Critical Rules
 
-- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`). If it isn't there — `.venv/bin/etlr: no such file or directory`, most likely in a fresh worktree — run `make .venv` to build it (~17s), then retry. Never bare `uv sync`; see Package Management.
+- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`). If it isn't there — `.venv/bin/etlr: no such file or directory`, most likely in a fresh worktree — run `make .venv` to build it (~3s), then retry. Never bare `uv sync`; see Package Management.
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
@@ -342,7 +342,7 @@ Use the `query-grapher-db` skill — it covers the local dev DB, a branch's stag
 
 ## Package Management
 
-**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
+**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --frozen --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
 
 ## GitHub Actions
 
