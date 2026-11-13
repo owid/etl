@@ -1,0 +1,281 @@
+# Grapher indicators that hold the same data as the columns of the energy dataset. The dataset page shows the
+# charts that use these indicators. Some columns also list the copies of an indicator that the electricity mix
+# grapher step makes for one chart each.
+owid_energy:
+  bioenergy_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_bioenergy_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_bioenergy_generation__kwh_chart_per_capita_electricity_source_stacked
+  bioenergy_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#bioenergy_share_of_electricity__pct
+  bioenergy_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#bioenergy_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#bioenergy_generation__twh_chart_electricity_prod_source_stacked
+  biofuels_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#biofuels_annual_change_pct
+  biofuels_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#biofuels_annual_change_twh
+  biofuels_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#biofuels_per_capita_kwh
+  biofuels_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#biofuels_share_pct
+  biofuels_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#biofuels_twh
+  coal_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_coal_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_coal_generation__kwh_chart_per_capita_electricity_source_stacked
+  coal_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#coal_share_of_electricity__pct
+  coal_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#coal_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#coal_generation__twh_chart_electricity_prod_source_stacked
+  coal_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#coal_annual_change_pct
+  coal_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#coal_annual_change_twh
+  coal_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#coal_per_capita_kwh
+  coal_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#coal_share_pct
+  coal_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#coal_twh
+  coal_production_annual_change_pct:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#coal_production_annual_change_pct
+  coal_production_annual_change_twh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#coal_production_annual_change_twh
+  coal_production_per_capita_kwh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#coal_production_per_capita_kwh
+  coal_production_twh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#coal_production_twh
+  electricity_carbon_intensity_gco2eq_per_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#co2_intensity__gco2_kwh
+  electricity_demand_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_total_demand__kwh
+  electricity_demand_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#total_demand__twh
+  electricity_emissions_mtco2eq:
+    - grapher/energy/*/electricity_mix/electricity_mix#total_emissions__mtco2
+  electricity_generation_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_total_generation__kwh
+  electricity_generation_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#total_generation__twh
+  electricity_net_imports_share_of_demand_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#net_imports_share_of_demand__pct
+  electricity_net_imports_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#total_net_imports__twh
+  electricity_share_of_total_energy_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#total_electricity_share_of_primary_energy__pct
+  fossil_fuels_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_fossil_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_fossil_generation__kwh_chart_per_capita_electricity_fossil_nuclear_renewables
+  fossil_fuels_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#fossil_share_of_electricity__pct
+  fossil_fuels_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#fossil_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#fossil_generation__twh_chart_elec_fossil_nuclear_renewables
+    - grapher/energy/*/electricity_mix/electricity_mix#fossil_generation__twh_chart_elec_mix_bar
+  fossil_fuels_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#fossil_fuels_annual_change_pct
+  fossil_fuels_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#fossil_fuels_annual_change_twh
+  fossil_fuels_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#fossil_fuels_per_capita_kwh
+  fossil_fuels_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#fossil_fuels_share_pct
+  fossil_fuels_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#fossil_fuels_twh
+  gas_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_gas_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_gas_generation__kwh_chart_per_capita_electricity_source_stacked
+  gas_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#gas_share_of_electricity__pct
+  gas_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#gas_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#gas_generation__twh_chart_electricity_prod_source_stacked
+  gas_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#gas_annual_change_pct
+  gas_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#gas_annual_change_twh
+  gas_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#gas_per_capita_kwh
+  gas_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#gas_share_pct
+  gas_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#gas_twh
+  gas_production_annual_change_pct:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#gas_production_annual_change_pct
+  gas_production_annual_change_twh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#gas_production_annual_change_twh
+  gas_production_per_capita_kwh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#gas_production_per_capita_kwh
+  gas_production_twh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#gas_production_twh
+  hydro_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_hydro_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_hydro_generation__kwh_chart_per_capita_electricity_source_stacked
+  hydro_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#hydro_share_of_electricity__pct
+  hydro_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#hydro_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#hydro_generation__twh_chart_electricity_prod_source_stacked
+  hydro_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_annual_change_pct
+  hydro_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_annual_change_twh
+  hydro_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_per_capita_kwh
+  hydro_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_share_pct
+  hydro_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_twh
+  low_carbon_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_low_carbon_generation__kwh
+  low_carbon_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#low_carbon_share_of_electricity__pct
+  low_carbon_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#low_carbon_generation__twh
+  low_carbon_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#low_carbon_energy_annual_change_pct
+  low_carbon_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#low_carbon_energy_annual_change_twh
+  low_carbon_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#low_carbon_energy_per_capita_kwh
+  low_carbon_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#low_carbon_energy_share_pct
+  low_carbon_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#low_carbon_energy_twh
+  nuclear_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_nuclear_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_nuclear_generation__kwh_chart_per_capita_electricity_source_stacked
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_nuclear_generation__kwh_chart_per_capita_electricity_fossil_nuclear_renewables
+  nuclear_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#nuclear_share_of_electricity__pct
+  nuclear_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#nuclear_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#nuclear_generation__twh_chart_electricity_prod_source_stacked
+    - grapher/energy/*/electricity_mix/electricity_mix#nuclear_generation__twh_chart_elec_fossil_nuclear_renewables
+    - grapher/energy/*/electricity_mix/electricity_mix#nuclear_generation__twh_chart_elec_mix_bar
+  nuclear_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#nuclear_annual_change_pct
+  nuclear_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#nuclear_annual_change_twh
+  nuclear_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#nuclear_per_capita_kwh
+  nuclear_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#nuclear_share_pct
+  nuclear_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#nuclear_twh
+  oil_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_oil_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_oil_generation__kwh_chart_per_capita_electricity_source_stacked
+  oil_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#oil_share_of_electricity__pct
+  oil_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#oil_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#oil_generation__twh_chart_electricity_prod_source_stacked
+  oil_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#oil_annual_change_pct
+  oil_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#oil_annual_change_twh
+  oil_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#oil_per_capita_kwh
+  oil_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#oil_share_pct
+  oil_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#oil_twh
+  oil_production_annual_change_pct:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#oil_production_annual_change_pct
+  oil_production_annual_change_twh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#oil_production_annual_change_twh
+  oil_production_per_capita_kwh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#oil_production_per_capita_kwh
+  oil_production_twh:
+    - grapher/energy/*/fossil_fuels/fossil_fuels#oil_production_twh
+  other_renewables_excluding_bioenergy_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_other_renewables_excluding_bioenergy_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_other_renewables_excluding_bioenergy_generation__kwh_chart_per_capita_electricity_source_stacked
+  other_renewables_excluding_bioenergy_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#other_renewables_excluding_bioenergy_share_of_electricity__pct
+  other_renewables_excluding_bioenergy_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#other_renewables_excluding_bioenergy_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#other_renewables_excluding_bioenergy_generation__twh_chart_electricity_prod_source_stacked
+  other_renewables_including_bioenergy_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_other_renewables_including_bioenergy_generation__kwh
+  other_renewables_including_bioenergy_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#other_renewables_including_bioenergy_share_of_electricity__pct
+  other_renewables_including_bioenergy_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#other_renewables_including_bioenergy_generation__twh
+  other_renewables_including_bioenergy_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#other_renewables_annual_change_pct
+  other_renewables_including_bioenergy_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#other_renewables_annual_change_twh
+  other_renewables_including_bioenergy_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#other_renewables_per_capita_kwh
+  other_renewables_including_bioenergy_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#other_renewables_share_pct
+  other_renewables_including_bioenergy_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#other_renewables_twh
+  renewables_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_renewable_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_renewable_generation__kwh_chart_per_capita_electricity_fossil_nuclear_renewables
+  renewables_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#renewable_share_of_electricity__pct
+  renewables_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#renewable_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#renewable_generation__twh_chart_elec_fossil_nuclear_renewables
+    - grapher/energy/*/electricity_mix/electricity_mix#renewable_generation__twh_chart_elec_mix_bar
+  renewables_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#renewables_annual_change_pct
+  renewables_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#renewables_annual_change_twh
+  renewables_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#renewables_per_capita_kwh
+  renewables_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#renewables_share_pct
+  renewables_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#renewables_twh
+  solar_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_solar_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_solar_generation__kwh_chart_per_capita_electricity_source_stacked
+  solar_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#solar_share_of_electricity__pct
+  solar_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#solar_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#solar_generation__twh_chart_electricity_prod_source_stacked
+  solar_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#solar_annual_change_pct
+  solar_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#solar_annual_change_twh
+  solar_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#solar_per_capita_kwh
+  solar_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#solar_share_pct
+  solar_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#solar_twh
+  total_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#total_energy_supply_annual_change_pct
+  total_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#total_energy_supply_annual_change_twh
+  total_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#total_energy_supply_per_capita_kwh
+  total_energy_per_gdp_kwh_per_dollar:
+    - grapher/energy/*/energy_mix/energy_mix#total_energy_supply_per_gdp_kwh_per_dollar
+  total_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#total_energy_supply_twh
+  wind_electricity_per_capita_kwh:
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_wind_generation__kwh
+    - grapher/energy/*/electricity_mix/electricity_mix#per_capita_wind_generation__kwh_chart_per_capita_electricity_source_stacked
+  wind_electricity_share_pct:
+    - grapher/energy/*/electricity_mix/electricity_mix#wind_share_of_electricity__pct
+  wind_electricity_twh:
+    - grapher/energy/*/electricity_mix/electricity_mix#wind_generation__twh
+    - grapher/energy/*/electricity_mix/electricity_mix#wind_generation__twh_chart_electricity_prod_source_stacked
+  wind_energy_annual_change_pct:
+    - grapher/energy/*/energy_mix/energy_mix#wind_annual_change_pct
+  wind_energy_annual_change_twh:
+    - grapher/energy/*/energy_mix/energy_mix#wind_annual_change_twh
+  wind_energy_per_capita_kwh:
+    - grapher/energy/*/energy_mix/energy_mix#wind_per_capita_kwh
+  wind_energy_share_pct:
+    - grapher/energy/*/energy_mix/energy_mix#wind_share_pct
+  wind_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#wind_twh

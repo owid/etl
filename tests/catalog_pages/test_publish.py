@@ -10,7 +10,7 @@ from owid.catalog.api.legacy import LocalCatalog
 
 from etl import files
 from etl.catalog_pages.artifacts import DATASET_JSONLD_FILENAME, QUALITY_REPORT_FILENAME, SITEMAP_FILENAME
-from etl.catalog_pages.publish import build_and_publish_catalog_pages, sync_page_files
+from etl.catalog_pages.publish import build_and_publish_catalog_pages, published_build_checksum, sync_page_files
 
 
 def _step_uri(catalog_path: str) -> str:
@@ -129,7 +129,7 @@ def test_build_and_publish_catalog_pages_uses_short_keys_and_deletes_old_dated_p
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, key_prefix=""):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
@@ -159,7 +159,7 @@ def test_build_and_publish_catalog_pages_deletes_short_key_for_skipped_dataset(t
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, key_prefix=""):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
@@ -187,7 +187,7 @@ def test_build_and_publish_catalog_pages_deletes_both_locations_for_archived_dat
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, key_prefix=""):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
@@ -213,7 +213,7 @@ def test_build_and_publish_catalog_pages_deletes_dated_path_for_superseded_versi
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, key_prefix=""):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
@@ -285,3 +285,20 @@ def test_sync_page_files_uploads_manifest_only_after_the_other_files(tmp_path: P
     with pytest.raises(OSError):
         sync_page_files(failing, "test-bucket", tmp_path, keys)
     assert failing.uploaded == []
+
+
+def test_sync_page_files_puts_the_files_inside_the_key_prefix(tmp_path: Path) -> None:
+    key = "energy/owid_energy/manifest.json"
+    (tmp_path / "energy" / "owid_energy").mkdir(parents=True)
+    (tmp_path / "energy" / "owid_energy" / "manifest.json").write_text('{"build_checksum": "abc"}')
+    stale_key = "energy/owid_energy/old.csv"
+    prefix = "staging-site-my-branch/v1/dataset-pages"
+    s3 = FakeS3(remote_md5={f"{prefix}/{stale_key}": "deadbeefdeadbeefdeadbeefdeadbeef"})
+
+    sync_page_files(s3, "test-bucket", tmp_path, [key], delete_keys=[stale_key], key_prefix=prefix)
+
+    assert s3.uploaded == [f"{prefix}/{key}"]
+    assert s3.deleted == [f"{prefix}/{stale_key}"]
+    assert published_build_checksum(s3, "test-bucket", "energy/owid_energy", key_prefix=prefix) == "abc"
+    # The same page at the top level of the bucket is another page, and it is not there.
+    assert published_build_checksum(s3, "test-bucket", "energy/owid_energy") is None

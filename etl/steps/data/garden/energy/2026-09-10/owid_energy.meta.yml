@@ -122,7 +122,7 @@ tables:
   owid_energy:
     title: Energy dataset
     description: |-
-      Population and GDP are included so that per capita and per GDP indicators can be recomputed.
+      Our World in Data's complete energy dataset: one wide table with, for each country and year, total energy supply and the energy mix (by source, in energy units, per capita, as shares and as annual changes), the electricity mix (generation by source, demand, trade, emissions and carbon intensity), and fossil fuel production. Population and GDP are included so that per capita and per GDP indicators can be recomputed.
 
       It is compiled from the Energy Institute's [Statistical Review of World Energy](https://www.energyinst.org/statistical-review/), [Ember's electricity data](https://ember-energy.org/data/yearly-electricity-data/), the [U.S. Energy Information Administration](https://www.eia.gov/international/data/world) and several historical reconstructions, with population from [Our World in Data's population dataset](https://ourworldindata.org/population-sources) and GDP from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/).
 
