@@ -407,6 +407,92 @@ not_a_table:
     ]
 
 
+def test_link_to_a_table_or_column_that_the_built_grapher_dataset_lacks_is_reported(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    steps_dir = tmp_path / "steps"
+    catalog_path = _add_dataset(data_dir)
+    # The linked grapher dataset is built: its table "energy_mix" has the column "hydro_energy_twh".
+    grapher_path = _add_dataset(data_dir, dataset="energy_mix", version="2026-06-30", channel="grapher", jsonld=False)
+    _write_step_file(
+        steps_dir,
+        catalog_path,
+        ".indicator_links.yml",
+        """
+owid_energy:
+  hydro_energy_twh:
+    - grapher/energy/*/energy_mix/energy_mix#hydro_energy_twh
+    - grapher/energy/*/energy_mix/energy_mix#not_a_column
+    - grapher/energy/*/energy_mix/not_a_table#hydro_energy_twh
+""",
+    )
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(catalog_path), _step_uri(grapher_path)},
+        steps_dir=steps_dir,
+    )
+
+    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
+    # The three paths are kept as written.
+    assert len(manifest["tables"][0]["indicator_links"]["hydro_energy_twh"]) == 3
+    assert [item.warnings for item in result.warnings] == [
+        [
+            "indicator_links: no column 'not_a_column' in the grapher table for "
+            "'grapher/energy/*/energy_mix/energy_mix#not_a_column'",
+            "indicator_links: no table 'not_a_table' in the grapher dataset for "
+            "'grapher/energy/*/energy_mix/not_a_table#hydro_energy_twh'",
+        ]
+    ]
+
+
+def test_link_to_one_indicator_of_a_grapher_table_with_dimensions_is_not_reported(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    steps_dir = tmp_path / "steps"
+    catalog_path = _add_dataset(data_dir)
+    # A built grapher table with a dimension: its column "deaths" becomes the indicators "deaths__sex_male", etc.
+    ds = Dataset.create_empty(
+        data_dir / "grapher" / "health" / "2026-01-01" / "deaths",
+        DatasetMeta(channel="grapher", namespace="health", version="2026-01-01", short_name="deaths"),
+    )
+    tb = Table(
+        pd.DataFrame(
+            {"country": ["Spain", "Spain"], "year": [2020, 2020], "sex": ["male", "female"], "deaths": [1, 2]}
+        ),
+        short_name="deaths",
+    )
+    ds.add(tb.set_index(["country", "year", "sex"]))
+    ds.save()
+    _write_step_file(
+        steps_dir,
+        catalog_path,
+        ".indicator_links.yml",
+        """
+owid_energy:
+  hydro_energy_twh:
+    - grapher/health/*/deaths/deaths#deaths
+    - grapher/health/*/deaths/deaths#deaths__sex_male
+    - grapher/health/*/deaths/deaths#births__sex_male
+""",
+    )
+
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "pages",
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(catalog_path), "data://grapher/health/2026-01-01/deaths"},
+        steps_dir=steps_dir,
+    )
+
+    assert [item.warnings for item in result.warnings] == [
+        [
+            "indicator_links: no column 'births__sex_male' in the grapher table for "
+            "'grapher/health/*/deaths/deaths#births__sex_male'",
+        ]
+    ]
+
+
 def test_dataset_without_a_links_file_has_no_links_in_the_manifest(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)

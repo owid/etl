@@ -216,12 +216,15 @@ def build_catalog_page_artifacts(
                 {table.short_name: list(table.variables) for table in tables},
                 active_steps,
                 steps_dir,
+                catalog_dir,
             )
         except (ValueError, yaml.YAMLError) as error:
             log.error("catalog_pages.indicator_links_invalid", dataset=catalog_path, error=str(error))
             result.page_failures[catalog_path] = str(error)
             continue
         quality.warnings.extend(f"indicator_links: {problem}" for problem in link_problems)
+        for problem in link_problems:
+            log.warning("catalog_pages.indicator_links_problem", dataset=catalog_path, problem=problem)
 
         # The JSON-LD side product has stricter gates than the page: metadata must be complete, and no Jinja
         # template may leak into it. A dataset that fails them still gets its page.
