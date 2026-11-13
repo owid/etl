@@ -29,11 +29,13 @@ views:
       originUrl: /child-labor
       chartTypes:
         - StackedBar
+        - StackedArea
       baseColorScheme: OwidCategoricalE
       # Show the relative toggle, so readers can see each part's share of all child labor.
       hideRelativeToggle: false
       hasMapTab: false
-      tab: chart
+      # Open on the bars; with several chart types, `tab: chart` opens on the area chart instead.
+      tab: stacked-bar
       selectedEntityNames:
         - World
       addCountryMode: disabled
