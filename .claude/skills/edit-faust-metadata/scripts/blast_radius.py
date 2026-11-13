@@ -245,15 +245,16 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
     seen = {(v["mdim_catalog_path"], v["viewId"]) for v in views}
 
     # Client-side scan: mx.variableId only records one variable per view; multi-indicator views
-    # carrying an affected variable in other y slots are found by scanning the configs.
+    # carrying an affected variable in other y slots, or as a scatter's x, are found by scanning the configs.
     for row, config in parsed:
         for view in config.get("views", []):
-            y = view.get("indicators", {}).get("y", [])
-            if not isinstance(y, list):
-                y = [y]
-            y_paths = [i.get("catalogPath") if isinstance(i, dict) else i for i in y]
-            y_ids = [i.get("id") for i in y if isinstance(i, dict)]
-            if any(cp in y_paths for cp in catalog_paths) or any(vid in variable_ids for vid in y_ids):
+            slots = []
+            for axis in ("y", "x"):
+                indicators = view.get("indicators", {}).get(axis) or []
+                slots.extend(indicators if isinstance(indicators, list) else [indicators])
+            slot_paths = [i.get("catalogPath") if isinstance(i, dict) else i for i in slots]
+            slot_ids = [i.get("id") for i in slots if isinstance(i, dict)]
+            if any(cp in slot_paths for cp in catalog_paths) or any(vid in variable_ids for vid in slot_ids):
                 key = (row["catalogPath"], json.dumps(view.get("dimensions", {}), sort_keys=True))
                 if key not in seen and not any(
                     v["mdim_catalog_path"] == row["catalogPath"] and _dims_match(v["viewId"], view) for v in views
