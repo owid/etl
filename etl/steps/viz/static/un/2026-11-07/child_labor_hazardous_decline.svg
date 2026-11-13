@@ -147,10 +147,10 @@ L 347.143473 191.736
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="18.616527" y="200.1573" transform="rotate(-0 18.616527 200.1573)">2000</text>
    </g>
    <g id="value__other-2000">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="18.616527" y="163.985358" transform="rotate(-0 18.616527 163.985358)">75M</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="18.616527" y="163.985358" transform="rotate(-0 18.616527 163.985358)">75m</text>
    </g>
    <g id="value__hazardous-2000">
-    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="18.616527" y="77.009358" transform="rotate(-0 18.616527 77.009358)">171M</text>
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="18.616527" y="77.009358" transform="rotate(-0 18.616527 77.009358)">171m</text>
    </g>
    <g id="value__total-2004">
     <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="73.371018" y="25.800441" transform="rotate(-0 73.371018 25.800441)">222</text>
@@ -211,9 +211,6 @@ L 347.143473 191.736
    </g>
    <g id="value__hazardous-2020">
     <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="292.388982" y="105.174702" transform="rotate(-0 292.388982 105.174702)">79</text>
-   </g>
-   <g id="value__total-2024">
-    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="347.143473" y="85.842578" transform="rotate(-0 347.143473 85.842578)">138</text>
    </g>
    <g id="horizontal-axis__2024">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="347.143473" y="200.1573" transform="rotate(-0 347.143473 200.1573)">2024</text>

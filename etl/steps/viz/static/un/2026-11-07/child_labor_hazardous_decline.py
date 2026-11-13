@@ -1,11 +1,11 @@
 """Global number of children aged 5-17 in hazardous and non-hazardous child labor, 2000-2024.
 
-Chart for a data insight: "Child labor has nearly halved in a generation, with progress coming from hazardous work".
-Seven stacked columns (2000, 2004, ..., 2024): non-hazardous child labor at the bottom, hazardous child labor on top,
-the total above each column and both segment values inside every column. There is no legend: the subtitle names the two
-categories in their colors. Values are whole millions, rounded half up (170.5 -> 171), so a column's two segment values
-always add up to its total. Only the first column carries the unit ("246 million" above it, "171M" and "75M" inside);
-the others show bare numbers.
+Chart for a data insight: "Child labor nearly halved since 2000, and all of the decline comes from reducing hazardous
+work". Seven stacked columns (2000, 2004, ..., 2024): non-hazardous child labor at the bottom, hazardous child labor on
+top, both segment values inside every column and the total above every column but the last, whose total the frame's
+annotation states in words. There is no legend: the subtitle names the two categories in their colors. Values are whole
+millions, rounded half up (170.5 -> 171), so a column's two segment values always add up to its total. Only the first
+column carries the unit ("246 million" above it, "171m" and "75m" inside); the others show bare numbers.
 
 Data: table `child_labor` of `garden/un/2026-04-08/child_labor_report` (ILO-UNICEF Global Estimates of Child Labour
 2024), World, sex "total", age "5-17", columns `number_child_labor` and `number_hazardous_work`. Hazardous work is a
@@ -25,24 +25,25 @@ driven by a sharp reduction in hazardous work (Esteban)" (`31010:5`), placed rig
 exported PNG's filename), 540 x 540, cloned from `DI_Template` (`6799:1859`). On its left, a raster of the
 requester's first mockup (`31011:82`), kept as a reference.
 
-Texts (template slots; set `characters`, then restore the mixed weights and colors):
+Texts (template slots; set `characters`, then restore the mixed weights and colors). The author edited the title,
+subtitle and article line in the frame; this table records the frame as they left it:
 | Slot | Text | Weight and color |
 |---|---|---|
-| Title (`Instagram/Title`, 3 lines) | "Child labor has nearly halved in a generation, with progress coming from hazardous work" | "hazardous work" filled with `Default Palette/Dark Copper` |
-| Subtitle (`Instagram/Subtitle`, 3 lines) | "Number of children aged 5–17 in hazardous and non-hazardous\\nchild labor, in millions. Hazardous means work in dangerous\\nindustries or occupations, or for 43 or more hours a week." | the first "hazardous" filled with `Default Palette/Dark Copper`, "non-hazardous" with `Line and Slope Charts/Turquoise` (they replace the legend) |
+| Title (`Instagram/Title`, 3 lines) | "Child labor nearly halved \\nsince 2000, and all of the decline\\ncomes from reducing hazardous work" | "hazardous work" filled with `Default Palette/Dark Copper` |
+| Subtitle (Lato Regular 15, auto line height, `Instagram/Subtitle` fill; 15 rather than the template's 16 by the author's choice; 3 lines) | "Number of children aged 5–17 in hazardous and non-hazardous child labor. \\nHazardous means work in dangerous industries or occupations, or for 43 or more hours per week." | the first "hazardous" Lato Bold in `Default Palette/Dark Copper`, "non-hazardous" Lato Bold in `Line and Slope Charts/Turquoise` (they replace the legend) |
 | Data source (`Instagram/Source`, footer `Frame 37` at y 472) | "Data source: " + source_citation(...) = "International Labour Organization and UNICEF (2025)" | "Data source:" bold |
 | CC BY | unchanged | - |
-| Article line (node "Note": a clone of the source row inside the footer, `layoutPositioning` ABSOLUTE, x 0, y 20, width 508, 2 lines, Lato 12, fill `Data Insights/Source`) | "Read more about the definitions in our article:\\n138 million children are in child labor. What does this actually mean?" | first line bold (as on the causes-of-death IG frames that point to an article) |
+| Article line (node "Note": a clone of the source row inside the footer, `layoutPositioning` ABSOLUTE, x 0, y 20, width 508, 2 lines, Lato 12 on a 16 px line, fill `Data Insights/Source`) | "Read more about the definitions in our article:\\n“138 million children are in child labor. What does this actually mean?”" | first line Lato Bold, the quoted article title Lato Italic (bold lead-in as on the causes-of-death IG frames that point to an article) |
 
-Band: header bottom 166 (3-line title 87 + 6 + 3-line subtitle 57, from y 16). Footer: the source row at y 472, the
-article line 4 px below it, ending at 524 (footer y = 524 - 16 - 4 - 32). Band 306 px; the chart canvas is 508 x 280 =
-the band minus a 13 px gap on each side (280 rather than 278 because 2.78 in x 300 dpi does not land on a whole pixel,
-which the verifier reads as a cropped PNG). If any text above changes its line count, re-measure and change
+Band: header bottom 163 (header at y 16: 3-line title 87 + 6 + 3-line subtitle at 15 px, 54). Footer: the source row at
+y 472, the article line 4 px below it; the footer frame is 52 px tall (counter-axis FIXED, rows top-aligned) so it ends
+on 524. Band 309 px; the chart canvas is 508 x 280, centred in it (14.5 px gap on each side; 280 because 2.80 in x 300
+dpi lands on a whole pixel, which the verifier needs). If any text above changes its line count, re-measure and change
 CANVAS_H_PX.
 
 Import: `upload_assets` the SVG (never `createNodeFromSvg`). It arrives as a FRAME at 487.68 x 268.8 (matplotlib
 writes points, Figma reads them at 96 dpi: 508 x 0.96). `rescale(508 / frame.width)` (= 1.0417 = 100 / 96), then
-move its children into the clone at (16, 179) offset by their own x/y, delete the import frame and group them as
+move its children into the clone at (16, 177.5) offset by their own x/y, delete the import frame and group them as
 `chart`. Delete `patch_1` (transparent, but it sets the group's box). Then run `rebuild_native_marks.js` on the
 frame so the bars are native rectangles.
 
@@ -64,8 +65,18 @@ name carries "__":
 - `horizontal-axis__<year>`: Lato Regular 12, `Instagram/Subtitle` (#5b5b5b). Baseline and tick marks
   (`horizontal-axis__zero-line`, `horizontal-axis__ticks`): 1 px, #999999, unbound (as on Hannah's page).
 
-Expected after the fit: the `chart` group spans x 16 to 524 and y 179 to 459, i.e. the content box and a 13 px gap
-to the header (166) and to the footer (472). Expected audit numbers (`color_audit.py '#4cb2c1,#a4623e'`, the fills
+Annotation, drawn in Figma inside the `chart` group (it is not part of the SVG):
+- Text node `annotation__2024`, style `Data Insights/Annotation S` (Lato 13), fill `Data Insights/Annotations`
+  (#5b5b5b), no closing period: "In 2024, 138 million children were in\\nchild labor: 54 million in hazardous work\\nand
+  84 million in non-hazardous work". "hazardous" Lato Bold in `Default Palette/Dark Copper` and "non-hazardous" Lato
+  Bold in `Line and Slope Charts/Turquoise`, as in the subtitle. `textAutoResize` WIDTH_AND_HEIGHT; right edge on the
+  content edge (524), top 27 px under the header (190); it ends at y 238, 23.6 px above the 2020 total.
+- Arrow `annotation__2024-arrow` (curve + head): run `aim_house_arrow.js` with the house dart `6373:163` / curve
+  `6373:162`, parent the `chart` group, tail (482, 243), tip (498, 298), control null, bend 0.6, back 7. It arrives at
+  54 degrees and its tip sits 5.4 px above the 2024 column's top (303.4).
+
+Expected after the fit: the `chart` group spans x 16 to 524 and y 177.5 to 457.5, i.e. the content box and a 14.5 px
+gap to the header (163) and to the footer (472). Expected audit numbers (`color_audit.py '#4cb2c1,#a4623e'`, the fills
 composited at 0.9 on white): min ΔE 46.5 (protanopia), grayscale seam 1.92:1; #2d2e2d on the turquoise fill 5.48:1.
 """
 
@@ -116,8 +127,8 @@ VALUE_GAP_PX = 4  # between a column's top and its total
 # Type, in template px.
 SIZE_VALUE = 13
 SIZE_YEAR = 12
-# Unit on the first column's segment values ("171M"): grapher's own abbreviation for millions in chart labels.
-SEGMENT_UNIT = "M"
+# Unit on the first column's segment values ("171m"), as the author set it in the frame.
+SEGMENT_UNIT = "m"
 
 # Colors are placeholders the Figma pass binds to library styles (see the docstring); the hexes are those styles.
 OTHER_FILL = "#38aaba"  # Default Palette/Turquoise
@@ -234,20 +245,21 @@ def build(tb):
     for x, row in zip(xs, tb.itertuples()):
         year = int(row.year)
         # The first column carries the unit: "246 million" above it (left-aligned on the column, since it is wider
-        # than the column) and "171M" / "75M" inside it. The other columns show bare numbers.
+        # than the column) and "171m" / "75m" inside it. The other columns show bare numbers.
         first = year == EXPECTED_YEARS[0]
-        # Total above the column.
-        ax.text(
-            x - half if first else x,
-            row.total + VALUE_GAP_PX * px_y,
-            f"{row.total_label} million" if first else f"{row.total_label}",
-            ha="left" if first else "center",
-            va="bottom",
-            fontsize=SIZE_VALUE * PT,
-            fontweight="bold",
-            color=DARK_TEXT,
-            gid=f"value__total-{year}",
-        )
+        # Total above the column. The last column has none: the frame's annotation states it in words.
+        if year != EXPECTED_YEARS[-1]:
+            ax.text(
+                x - half if first else x,
+                row.total + VALUE_GAP_PX * px_y,
+                f"{row.total_label} million" if first else f"{row.total_label}",
+                ha="left" if first else "center",
+                va="bottom",
+                fontsize=SIZE_VALUE * PT,
+                fontweight="bold",
+                color=DARK_TEXT,
+                gid=f"value__total-{year}",
+            )
         # Year below the tick mark.
         ax.text(
             x,
