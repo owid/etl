@@ -27,6 +27,10 @@ gross vs. net view sees only the gross rate's title and key information.
 
 - **Needs it:** any view whose y (and x, for a scatter) are different indicators: a scatter, a dumbbell or
   line chart comparing two different measures, a stacked bar of several components.
+- **Size and color count only when they are content.** A `size` or `color` slot that holds regions
+  (`regions#owid_region`), income groups (`income_groups#classification`) or population only styles the
+  chart, so the view's text leaves it out. A size or color that is a measure of its own, such as GDP per
+  capita or a political regime, is covered like any other indicator in the view.
 - **Doesn't need it:** a view comparing one indicator across a dimension, such as men vs. women, when the
   indicator's text doesn't name the split value. If its text says "men", the women's line inherits that
   sentence too, so the view needs an override after all.

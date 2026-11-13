@@ -456,8 +456,9 @@ its own `metadata:` block (not `config:`) whose text covers all of them. Set at 
 `presentation.title_public`, `description_short` and `description_key`, and check `presentation.attribution_short`
 and `presentation.title_variant` (they render with the title), `description_processing`,
 `description_from_producer`, the unit and the origins on the rendered page. A view comparing one indicator
-across a dimension (men vs. women) needs none, unless the indicator's text names the split value. How to
-write the text and keep it in sync: [`COMBINED_VIEW_METADATA.md`](COMBINED_VIEW_METADATA.md).
+across a dimension (men vs. women) needs none, unless the indicator's text names the split value. A `size`
+or `color` slot that holds regions, income groups or population is left out of the text; one that is a
+measure of its own is covered. How to write the text and keep it in sync: [`COMBINED_VIEW_METADATA.md`](COMBINED_VIEW_METADATA.md).
 
 ## Chart config options
 

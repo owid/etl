@@ -245,13 +245,18 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
     seen = {(v["mdim_catalog_path"], v["viewId"]) for v in views}
 
     # Client-side scan: mx.variableId only records one variable per view; multi-indicator views
-    # carrying an affected variable in other y slots, or as a scatter's x, are found by scanning the configs.
+    # carrying an affected variable in another slot (other y, x, size, color) are found by scanning the configs.
+    # Size and color count only when they are content: regions, income groups and population just style
+    # the chart, and a combined view's text leaves them out.
     for row, config in parsed:
         for view in config.get("views", []):
             slots = []
-            for axis in ("y", "x"):
+            for axis in ("y", "x", "size", "color"):
                 indicators = view.get("indicators", {}).get(axis) or []
-                slots.extend(indicators if isinstance(indicators, list) else [indicators])
+                indicators = indicators if isinstance(indicators, list) else [indicators]
+                if axis in ("size", "color"):
+                    indicators = [i for i in indicators if not _is_decoration(i)]
+                slots.extend(indicators)
             slot_paths = [i.get("catalogPath") if isinstance(i, dict) else i for i in slots]
             slot_ids = [i.get("id") for i in slots if isinstance(i, dict)]
             if any(cp in slot_paths for cp in catalog_paths) or any(vid in variable_ids for vid in slot_ids):
@@ -272,6 +277,21 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
                         }
                     )
     return views
+
+
+# Indicators that only style a chart: population as bubble size or bar width, and region or income-group coloring.
+# End-anchored, so population density columns (content) don't match.
+DECORATION_PATTERN = re.compile(
+    r"/population/[^/#]+#population(_historical|_projection)?$"
+    r"|/regions/regions#\w+_region$"
+    r"|/income_groups/income_groups#classification$"
+)
+
+
+def _is_decoration(indicator) -> bool:
+    """Whether a size or color slot holds a region, income-group or population indicator."""
+    catalog_path = indicator.get("catalogPath") if isinstance(indicator, dict) else indicator
+    return bool(catalog_path) and bool(DECORATION_PATTERN.search(str(catalog_path)))
 
 
 def _dims_match(view_id: Any, view: dict) -> bool:
