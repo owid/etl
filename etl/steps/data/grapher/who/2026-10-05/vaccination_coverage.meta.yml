@@ -1,0 +1,3 @@
+dataset:
+  # TEMPORARY: staging test of a dataset page for a grapher step whose table has dimensions. Remove this file before merging.
+  jsonld: true
