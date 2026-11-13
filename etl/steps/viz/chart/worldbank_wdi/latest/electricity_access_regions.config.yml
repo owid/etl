@@ -62,4 +62,5 @@ views:
         colorScale:
           baseColorScheme: "YlOrBr"
           binningStrategy: "manual"
-          customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
+          # The trailing 1 is below the previous bound on purpose: Grapher makes the last bin open-ended, so it adds a separate "> 300 million" class.
+          customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
