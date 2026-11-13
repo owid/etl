@@ -1,0 +1,19 @@
+# Known errors in Gender Statistics, removed here until the producer fixes them.
+# NOTE: Each entry has an `expect` guard, so the step fails once the source fixes the value. On the next update, check
+# whether the error is still in the source (and remove the entry if not).
+# See etl/data_corrections.py for the format.
+- indicator: [sl_uem_neet_zs, sl_uem_neet_fe_zs, sl_uem_neet_ma_zs]
+  entity: Belarus
+  years: [2024]
+  action: override
+  value: null
+  expect: {gt: 50}
+  reason: >-
+    Share of youth (aged 15-24) not in education, employment or training.
+    Reason: the source gives about 65% for women, men and both sexes in 2024, up from about 5% in 2022.
+    That would be among the highest rates in the world, above Afghanistan and Niger.
+    The ILO's own count of young people in this situation jumps from 47,000 in 2022 to 627,000 in 2024, out of
+    about 950,000 people aged 15-24, so the error is in the ILO's survey data that the World Bank republishes.
+    The ILO's modeled estimates for Belarus in 2024 (sl_uem_neet_*_me_zs) are about 6%, in line with earlier years.
+  producer: International Labour Organization (via World Bank)
+  status: open

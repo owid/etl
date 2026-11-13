@@ -153,7 +153,7 @@ sections:
         maintainer:
           - "@bobbie"
           - "@lucas"
-        entrypoint: http://metabase.owid.io
+        entrypoint: https://metabase.owid.io
         icon: ":material/bar_chart:"
 
   - title: "Search"

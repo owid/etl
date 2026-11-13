@@ -1,11 +1,13 @@
 """Garden step for ILO-UNICEF 2024 Global Estimates of Child Labour.
 
-Combines three meadow tables (child_labor_by_region, hazardous_work_by_region,
-child_labor_trends) into two output tables:
+Combines four meadow tables (child_labor_by_region, hazardous_work_by_region,
+child_labor_trends, and child_labor_by_age_2013_report) into three output tables:
 
   - child_labor: Main table with child labor and hazardous work shares/numbers
     by country, year, sex, and age. Includes not-in-school rates, household chores,
-    and a computed 5-14 age bracket.
+    a computed 5-14 age bracket, and non-hazardous child labor (child labor minus
+    hazardous work). World estimates by age for 2000-2012 that the 2024 report
+    lacks are filled from Table 5 of the ILO's 2013 report.
   - sector: Distribution of child labor and hazardous work across economic sectors
     (agriculture, industry, services) by country, year, sex, and age.
   - child_labor_by_sex: World-level child labor shares excluding vs including household
@@ -35,6 +37,14 @@ _REGION_ACRONYMS = {"ILO regions": "ILO", "SDG regions": "SDG", "UNICEF regions"
 # Standard join columns used across table operations.
 _JOIN_COLS = ["country", "year", "sex", "age"]
 
+# Value columns taken from Table 5 of the 2013 report.
+_AGE_2013_VALUE_COLS = ["number_child_labor", "share_child_labor", "number_hazardous_work", "share_hazardous_work"]
+
+# Tolerance when comparing the 2013 report with the 2024 report: the 2024 report rounds its charts to 0.1 million
+# children and 0.1 percentage points, while the 2013 report gives thousands.
+_REL_TOL_NUMBERS = 0.005
+_ABS_TOL_SHARES = 0.1
+
 
 def run() -> None:
     #
@@ -44,6 +54,7 @@ def run() -> None:
     tb_cl = ds_meadow.read("child_labor_by_region")
     tb_hw = ds_meadow.read("hazardous_work_by_region")
     tb_trends = ds_meadow.read("child_labor_trends")
+    tb_age_2013 = ds_meadow.read("child_labor_by_age_2013_report")
 
     #
     # Process data.
@@ -52,9 +63,10 @@ def run() -> None:
     tb_cl = _to_long(tb_cl)
     tb_hw = _to_long(tb_hw)
     tb_trends = _trends_to_long(tb_trends)
+    tb_age_2013 = _age_2013_report_to_long(tb_age_2013)
 
     # Build output tables.
-    tb_main = _build_main_table(tb_cl, tb_hw, tb_trends)
+    tb_main = _build_main_table(tb_cl, tb_hw, tb_trends, tb_age_2013)
     tb_sector = _build_sector_table(tb_cl, tb_hw, tb_trends)
     tb_by_sex = _build_by_sex_table(tb_main)
 
@@ -146,6 +158,27 @@ def _trends_to_long(tb: Table) -> Table:
     tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
 
     return tb
+
+
+def _age_2013_report_to_long(tb: Table) -> Table:
+    """Map Table 5 of the 2013 report to the main table's dimensions and value columns (World, both sexes).
+
+    Numbers stay in thousands, like the other meadow tables. Children in employment are dropped, since the main
+    table doesn't carry them.
+    """
+    tb = tb.reset_index()
+    tb["country"] = "World"
+    tb["sex"] = "total"
+    tb["age"] = tb["age_group"].astype(str).str.replace(" years", "", regex=False)
+    tb = tb.rename(
+        columns={
+            "child_labour_no": "number_child_labor",
+            "child_labour_pct": "share_child_labor",
+            "hazardous_work_no": "number_hazardous_work",
+            "hazardous_work_pct": "share_hazardous_work",
+        }
+    )
+    return tb[_JOIN_COLS + _AGE_2013_VALUE_COLS]
 
 
 def _map_disaggregations(tb: Table) -> Table:
@@ -271,6 +304,90 @@ def _compute_age_5_14(tb: Table) -> Table:
     return tb_5_14
 
 
+def _fill_from_2013_report(tb: Table, tb_age_2013: Table) -> Table:
+    """Fill missing World estimates by age with Table 5 of the 2013 report.
+
+    The 2024 report gives World estimates by age for child labor from 2008 and for hazardous work from 2016 only.
+    Values it does publish are kept. Where both reports give a value, they must agree within rounding, and the
+    2013 report's age groups 5-14 and 15-17 must add up to the 2024 report's totals for ages 5-17.
+    """
+    # Check that the 2013 report's age groups add up to the 2024 report's World totals for ages 5-17.
+    num_cols = ["number_child_labor", "number_hazardous_work"]
+    tb_parts = tb_age_2013[tb_age_2013["age"].isin(["5-14", "15-17"])]
+    assert (tb_parts.groupby("year").size() == 2).all(), (
+        "Expected ages 5-14 and 15-17 for every year of the 2013 report."
+    )
+    tb_totals = tb[(tb["country"] == "World") & (tb["sex"] == "total") & (tb["age"] == "5-17")]
+    tb_check = pr.merge(
+        tb_parts.groupby("year", as_index=False)[num_cols].sum(),
+        tb_totals[["year"] + num_cols],
+        on="year",
+        how="left",
+        suffixes=("_2013", "_2024"),
+    )
+    for col in num_cols:
+        rel_diff = ((tb_check[f"{col}_2013"] - tb_check[f"{col}_2024"]) / tb_check[f"{col}_2024"]).abs()
+        assert (rel_diff <= _REL_TOL_NUMBERS).all(), (
+            f"2013 report ages 5-14 and 15-17 don't add up to the 2024 report's {col} for ages 5-17:\n{tb_check}"
+        )
+
+    # Line up the 2013 report with the main table; every one of its rows must find a match.
+    tb = pr.merge(tb, tb_age_2013, on=_JOIN_COLS, how="left", suffixes=("", "_2013"))
+    n_matched = tb["number_child_labor_2013"].notna().sum()
+    assert n_matched == len(tb_age_2013), f"Only {n_matched} of {len(tb_age_2013)} rows of the 2013 report matched."
+
+    # Check agreement where both reports have a value, then fill the gaps.
+    for col in _AGE_2013_VALUE_COLS:
+        col_2013 = f"{col}_2013"
+        both = tb[col].notna() & tb[col_2013].notna()
+        diff = (tb.loc[both, col] - tb.loc[both, col_2013]).abs()
+        if col.startswith("share_"):
+            tolerance = _ABS_TOL_SHARES
+        else:
+            tolerance = _REL_TOL_NUMBERS * tb.loc[both, col_2013]
+        disagree = tb.loc[both][diff > tolerance]
+        assert disagree.empty, f"The 2013 and 2024 reports disagree on {col}:\n{disagree[_JOIN_COLS + [col, col_2013]]}"
+        tb[col] = tb[col].fillna(tb[col_2013])
+
+    tb = tb.drop(columns=[f"{col}_2013" for col in _AGE_2013_VALUE_COLS])
+
+    # After the fill, the World has child labor and hazardous work for ages 5-14 and 15-17 in every year.
+    world = tb[(tb["country"] == "World") & (tb["sex"] == "total") & tb["age"].isin(["5-14", "15-17"])]
+    assert world[_AGE_2013_VALUE_COLS].notna().all().all(), "World ages 5-14 and 15-17 still have gaps after the fill."
+    assert len(world) == 2 * tb["year"].nunique(), "Expected one World row per year for ages 5-14 and 15-17."
+
+    return tb
+
+
+def _add_non_hazardous_child_labor(tb: Table) -> Table:
+    """Add child labor that isn't hazardous work, as a number and as a share of children.
+
+    Both the child labor and the hazardous work shares are percentages of all children in the same age group, so
+    their difference is too. Ages 15-17 come out as zero, since child labor at those ages is hazardous work by
+    definition.
+    """
+    tb["number_non_hazardous_child_labor"] = tb["number_child_labor"] - tb["number_hazardous_work"]
+    tb["share_non_hazardous_child_labor"] = tb["share_child_labor"] - tb["share_hazardous_work"]
+
+    # Hazardous work is part of child labor, so the differences can't be negative beyond rounding. Rounding gaps
+    # appear where the 2024 report's chart values (rounded to 0.1 million) meet the 2013 report's (in thousands).
+    tolerances = {
+        "number_non_hazardous_child_labor": _REL_TOL_NUMBERS * tb["number_child_labor"],
+        "share_non_hazardous_child_labor": _ABS_TOL_SHARES,
+    }
+    for col, tolerance in tolerances.items():
+        negative = tb[tb[col] < -tolerance]
+        assert negative.empty, f"Hazardous work exceeds child labor in {col}:\n{negative[_JOIN_COLS + [col]]}"
+        # Set rounding gaps to zero.
+        tb.loc[tb[col] < 0, col] = 0
+
+    # Ages 15-17 have no non-hazardous child labor.
+    tb_15_17 = tb[(tb["age"] == "15-17") & tb["number_non_hazardous_child_labor"].notna()]
+    assert (tb_15_17["number_non_hazardous_child_labor"] == 0).all(), "Non-hazardous child labor found for ages 15-17."
+
+    return tb
+
+
 def _left_join_extra(tb: Table, extra: Table, src_col: str, dst_col: str) -> Table:
     """Left-join a single column from extra onto tb, filling NaNs in existing dst_col if present.
 
@@ -289,13 +406,14 @@ def _left_join_extra(tb: Table, extra: Table, src_col: str, dst_col: str) -> Tab
 # ── Table builders ────────────────────────────────────────────────────────────
 
 
-def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
+def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table, tb_age_2013: Table) -> Table:
     """Build the main child_labor output table.
 
-    Combines three data sources:
+    Combines four data sources:
       - Region tables (tb_cl, tb_hw): 2024 cross-sectional data by region × sex × age.
       - Trends table (tb_trends): time-series data (2000–2024) at aggregate level,
         plus chart-derived data (not-in-school, household chores, exact 5-14 shares).
+      - Table 5 of the 2013 report (tb_age_2013): World estimates by age for 2000–2012.
 
     The pipeline:
       1. Extract not-in-school rows from annex — will become extra columns.
@@ -305,9 +423,11 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
       5. Concat region data with trends; deduplicate (region data takes priority).
       6. Left-join annex not-in-school columns (World/2024 only).
       7. Compute 5-14 age bracket (sum numbers, back-calculate shares).
-      8. Left-join chart not-in-school shares (pages 8/44).
-      9. Left-join household chores shares (page 8).
-      10. Harmonize country names.
+      8. Fill World by-age gaps for 2000–2012 from the 2013 report.
+      9. Compute non-hazardous child labor (child labor minus hazardous work).
+      10. Left-join chart not-in-school shares (pages 8/44).
+      11. Left-join household chores shares (page 8).
+      12. Harmonize country names.
     """
     tb_cl = tb_cl.copy()
     tb_hw = tb_hw.copy()
@@ -372,19 +492,25 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
         tb_5_14.loc[mask, "share_child_labor"] = row["share_child_labor"]
     tb = pr.concat([tb, tb_5_14], ignore_index=True)
 
-    # 8. Left-join not-in-school shares from chart data (pages 8 and 44).
+    # 8. Fill World by-age gaps for 2000-2012 from the 2013 report (the 2024 report has hazardous work by age only from 2016).
+    tb = _fill_from_2013_report(tb, tb_age_2013)
+
+    # 9. Compute non-hazardous child labor: child labor that isn't hazardous work.
+    tb = _add_non_hazardous_child_labor(tb)
+
+    # 10. Left-join not-in-school shares from chart data (pages 8 and 44).
     for src_col, dst_col in [
         ("share_child_labor", "share_child_labor_not_in_school"),
         ("share_hazardous_work", "share_hazardous_work_not_in_school"),
     ]:
         tb = _left_join_extra(tb, tb_nis_chart, src_col, dst_col)
 
-    # 9. Add household chores column from page 8 chart data.
+    # 11. Add household chores column from page 8 chart data.
     tb["share_child_labor_incl_household_chores"] = None
     tb["share_child_labor_incl_household_chores"].metadata = tb["share_child_labor"].metadata.copy()
     tb = _left_join_extra(tb, tb_hh, "share_child_labor", "share_child_labor_incl_household_chores")
 
-    # 10. Harmonize country names
+    # 12. Harmonize country names
     tb = paths.regions.harmonize_names(
         tb=tb,
         warn_on_unused_countries=False,

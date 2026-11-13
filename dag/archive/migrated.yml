@@ -427,6 +427,10 @@ steps:
   data-private://grapher/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
     - data-private://garden/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
       - snapshot-private://labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018.feather
+  # archived; last active in 936158970e3f on 2026-11-12
+  data://grapher/cdc/2018-02-01/_20th_century_deaths_in_us__cdc:
+    - data://garden/cdc/2018-02-01/_20th_century_deaths_in_us__cdc:
+      - snapshot://cdc/2018-02-01/_20th_century_deaths_in_us__cdc.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather
