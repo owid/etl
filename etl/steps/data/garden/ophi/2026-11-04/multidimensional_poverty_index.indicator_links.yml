@@ -1,0 +1,18 @@
+# TEMPORARY: staging test of a dataset page for a garden step whose table has dimensions. Remove before merging.
+# The grapher step makes one indicator for each combination of the table's dimension columns: a link to a grapher
+# column covers all the indicators made from it.
+multidimensional_poverty_index:
+  intensity:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#intensity
+  headcount_ratio:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#headcount_ratio
+  mpi:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#mpi
+  uncensored_headcount_ratio:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#uncensored_headcount_ratio
+  censored_headcount_ratio:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#censored_headcount_ratio
+  severe:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#severe
+  vulnerable:
+    - grapher/ophi/*/multidimensional_poverty_index/multidimensional_poverty_index#vulnerable

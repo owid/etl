@@ -159,6 +159,9 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  # TEMPORARY: staging test of a dataset page for a garden step whose table has dimensions. Remove before merging,
+  # together with the links file of this step.
+  jsonld: true
 
   owners:
     - Pablo Arriagada
