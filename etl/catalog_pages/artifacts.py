@@ -121,7 +121,8 @@ def build_catalog_page_artifacts(
     otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.
 
     ``channel`` is one channel or several. A garden step and a grapher step can both have a page; when the two
-    are at the same ``<namespace>/<dataset>`` they would claim the same page, so neither gets one. ``restrict_to``
+    are at the same ``<namespace>/<dataset>`` they claim the same page: the grapher step gets it, and a warning
+    is reported. ``restrict_to``
     keeps only the opted-in datasets whose ``"<namespace>/<dataset>"`` is in the set (unlike ``only``, it does
     not override the opt-in).
 
@@ -186,6 +187,16 @@ def build_catalog_page_artifacts(
         if opted_in and (restrict_to is None or entry.short_key in restrict_to):
             candidates.append((entry, ds))
 
+    # A garden step and a grapher step at the same `<namespace>/<dataset>` claim the same page. The grapher step
+    # only opts in through its own metadata file, so its flag is the deliberate one: it gets the page.
+    grapher_short_keys = {entry.short_key for entry, _ in candidates if entry.channel == "grapher"}
+    ignored_garden_paths = {
+        entry.short_key: entry.catalog_path
+        for entry, _ in candidates
+        if entry.channel == "garden" and entry.short_key in grapher_short_keys
+    }
+    candidates = [(entry, ds) for entry, ds in candidates if entry.catalog_path not in ignored_garden_paths.values()]
+
     duplicate_catalog_paths = find_duplicate_short_key_paths(
         (entry.catalog_path, entry.namespace, entry.dataset) for entry, _ in candidates
     )
@@ -200,6 +211,12 @@ def build_catalog_page_artifacts(
             tables=tables,
             duplicate_short_key=catalog_path in duplicate_catalog_paths,
         )
+        if entry.channel == "grapher" and entry.short_key in ignored_garden_paths:
+            garden_path = ignored_garden_paths[entry.short_key]
+            quality.warnings.append(
+                f"the garden step {garden_path} also opts in: the page is built from the grapher step"
+            )
+            log.warning("catalog_pages.garden_opt_in_ignored", dataset=catalog_path, garden=garden_path)
         if not quality.is_page_eligible:
             # The dataset must not be served at all: the publish step removes every page file from R2.
             result.skipped.append(quality)

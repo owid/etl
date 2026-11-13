@@ -567,7 +567,7 @@ def test_flag_copied_from_the_garden_step_does_not_give_the_grapher_step_a_page(
     assert result.skipped == []
 
 
-def test_garden_and_grapher_steps_that_both_opt_in_get_no_page(tmp_path: Path) -> None:
+def test_when_garden_and_grapher_steps_both_opt_in_the_grapher_step_gets_the_page(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     steps_dir = tmp_path / "steps"
     garden_path = _add_dataset(data_dir)
@@ -582,11 +582,14 @@ def test_garden_and_grapher_steps_that_both_opt_in_get_no_page(tmp_path: Path) -
         steps_dir=steps_dir,
     )
 
-    assert result.pages == []
-    assert {item.catalog_path: item.blockers for item in result.skipped} == {
-        garden_path: ["duplicate_short_key"],
-        grapher_path: ["duplicate_short_key"],
-    }
+    assert result.pages == [grapher_path]
+    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
+    assert manifest["catalog_path"] == grapher_path
+    assert [item.warnings for item in result.warnings] == [
+        [f"the garden step {garden_path} also opts in: the page is built from the grapher step"]
+    ]
+    # Nothing of the page is deleted.
+    assert not [key for key in _page_keys(result, data_dir)[1] if key.startswith("energy/owid_energy/")]
 
 
 def test_restrict_to_keeps_only_the_listed_datasets_and_does_not_override_the_opt_in(tmp_path: Path) -> None:
