@@ -162,6 +162,7 @@ tables:
         description_short: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_hazardous_work_definition_changes}"
           - "{definitions.description_key_household_chores_not_included}"
           - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
@@ -183,6 +184,7 @@ tables:
         description_short: Number of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_hazardous_work_definition_changes}"
           - "{definitions.description_key_household_chores_not_included}"
           - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
