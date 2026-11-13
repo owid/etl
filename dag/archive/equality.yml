@@ -109,3 +109,9 @@ steps:
       - data://garden/wb/2026-07-01/income_groups
       - data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
         - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
+  # archived; last active in 176c0d1a931a on 2026-11-06
+  data://grapher/wb/2025-09-08/gender_statistics_country_counts:
+    - data://garden/wb/2025-09-08/gender_statistics_country_counts:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2024-07-15/population
+      - data://garden/wb/2025-09-08/gender_statistics

@@ -1,0 +1,37 @@
+chart_config_id: 0191b6c7-42d3-75b8-8ef2-a086ff5770e5
+grapher_schema: "012"
+slug: consumption-co2-per-capita-equity
+topic_tags:
+  - CO2 & Greenhouse Gas Emissions
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "global_carbon_budget/global_carbon_budget#consumption_emissions_per_capita"
+    config:
+      map:
+        colorScale:
+          baseColorScheme: "BinaryMapPaletteE"
+          binningStrategy: "manual"
+          colorSchemeInvert: true
+          customNumericColors:
+            - "#4c6a9c"
+            - "#bb4e4e"
+          customNumericLabels:
+            - "Below global equity"
+            - "Above global equity"
+        hideTimeline: true
+      tab: "map"
+      title: "Are consumption-based CO₂ per capita emissions above or below the global average?"
+      yAxis:
+        min: 0
+      subtitle: "[Consumption-based emissions](#dod:consumptionbasedemissions) are national emissions that have been adjusted for trade. This map denotes whether a country's average per capita emissions are above or below the value of global per capita emissions."
+      hasMapTab: true
+      originUrl: "/co2-and-greenhouse-gas-emissions"
+      chartTypes: []
+      hideTimeline: true
+      internalNotes: "ETL calculates the map year from country data and uses the World value from that same year as the threshold."
+      addCountryMode: "disabled"
+      selectedEntityNames:
+        - "World"

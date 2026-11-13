@@ -765,7 +765,7 @@ METABASE_URL = os.environ.get("METABASE_URL")
 # Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
 # The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
-METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+METABASE_URL = os.environ.get("METABASE_URL", "https://metabase.owid.io")
 
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.

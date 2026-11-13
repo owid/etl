@@ -46,7 +46,7 @@ def run() -> None:
         ages = AGES_YOUNG | (AGES_OLD_EATING if disorder == "eating_disorders" else AGES_OLD)
         subtitle = (
             f"Estimated share of people in each age group who have {subtitle_name}, whether or not they are "
-            "diagnosed, based on representative surveys, medical data and statistical modelling."
+            "diagnosed, based on representative surveys, medical data, and statistical modeling."
             f" Prevalence is measured as the share experiencing {name} at a given point in time."
             " It does not measure lifetime prevalence."
         )
@@ -57,7 +57,14 @@ def run() -> None:
                     "y": [
                         {
                             "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_both__age_{age}",
-                            "display": {"name": label, "color": color},
+                            "display": {
+                                "name": label,
+                                "color": color,
+                                "roundingMode": "significantFigures",
+                                "numSignificantFigures": 2,
+                                # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 5 so shares down to 0.0001% keep 2 significant figures.
+                                "numDecimalPlaces": 5,
+                            },
                         }
                         for age, label in ages.items()
                     ]

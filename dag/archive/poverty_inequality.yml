@@ -640,3 +640,13 @@ steps:
   # archived; last active in 701c713aa830 on 2026-10-01
   data://garden/wb/2026-06-26/world_bank_pip:
     - data://meadow/wb/2026-06-26/world_bank_pip
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://garden/ophi/2025-12-23/multidimensional_poverty_index:
+    - data://meadow/ophi/2025-12-23/multidimensional_poverty_index
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://grapher/ophi/2025-12-23/multidimensional_poverty_index:
+    - data://garden/ophi/2025-12-23/multidimensional_poverty_index
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://meadow/ophi/2025-12-23/multidimensional_poverty_index:
+    - snapshot://ophi/2025-12-23/multidimensional_poverty_index_hot.csv
+    - snapshot://ophi/2025-12-23/multidimensional_poverty_index_cme.csv

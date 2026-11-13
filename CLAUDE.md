@@ -165,7 +165,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 **Important:**
 - **Snapshot scripts need no `__main__` guard and no `click` decorators** — the `etls` CLI imports the module and calls its `run()` function itself, so don't add `if __name__ == "__main__":` boilerplate or `@click.command()` / `@click.option(...)`. New scripts should match the shape the wizard's cookiecutter emits: a plain `def run(upload: bool = True) -> None:`. Most existing scripts still carry both — they keep working, because `etl/snapshot_command.py` also accepts a click command — but don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
-- **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
+- **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain. The exception is a `viz://chart` step defined only by its `.config.yml`: it reads the table names of a grapher dataset that isn't on disk from the grapher DB (see `/create-chart`).
 - **`PREFER_DOWNLOAD=1` — default it on any run that verifies your own edit**, so only the steps you touched rebuild and published upstream deps are fetched from the catalog. Steps missing from the catalog or whose checksum changed just build locally, so it is always safe to leave on.
 - For `grapher://` steps, always add `--grapher` flag
 - **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
@@ -346,7 +346,7 @@ Use the `query-grapher-db` skill — it covers the local dev DB, a branch's stag
 
 ## GitHub Actions
 
-When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+When editing `.github/workflows/**` or `.github/actions/**`, follow the lockfile rule imported below:
 
 @.github/instructions/github-actions.instructions.md
 

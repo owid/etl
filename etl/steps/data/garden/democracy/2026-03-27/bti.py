@@ -9,6 +9,7 @@ from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_population_in_dummies,
     add_regions_and_global_aggregates,
+    codes_to_categories,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -28,6 +29,21 @@ REGIONS = {
 # Year range
 YEAR_MIN = 2005
 YEAR_MAX = 2025
+
+
+# Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
+# NOTE: On each update, check in the source's codebook (or in this step, for codes we build) that every code still
+#   means the category labeled here, and that no codes were added or removed. The recoding fails on a code with no
+#   label, but not on a code whose meaning changed.
+LABELS = {
+    "regime_bti": {
+        1: "Hard-line autocracy",
+        2: "Moderate autocracy",
+        3: "Highly defective democracy",
+        4: "Defective democracy",
+        5: "Consolidating democracy",
+    },
+}
 
 
 def run() -> None:
@@ -71,6 +87,11 @@ def run() -> None:
 
     # Add regions to main table
     # tb = concat([tb, tb_avg_countries], ignore_index=True)
+
+    # Store categorical indicators as text. Done after the aggregates, which use the numeric codes. The numeric regime
+    # score is kept for the chart that compares the classifications of several sources.
+    tb["regime_bti_score"] = tb["regime_bti"].copy()
+    tb = codes_to_categories(tb, LABELS)
 
     #
     # Save outputs.

@@ -1,0 +1,36 @@
+chart_config_id: 01a1a729-76ac-78d6-8129-87766a46db3a
+grapher_schema: "012"
+slug: long-run-migration-flows-uk
+topic_tags:
+  - "Migration"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "uk_migration_flows#immigration"
+          display:
+            name: "Immigration"
+            color: "#6d3e91"
+        # Emigration is shown below zero, as a mirror of immigration.
+        - catalogPath: "uk_migration_flows#emigration"
+          display:
+            name: "Emigration"
+            color: "#00847e"
+            conversionFactor: -1
+    config:
+      title: "People migrating to and from the United Kingdom"
+      subtitle: "Number of people moving to the United Kingdom each year (above zero) and leaving it (below zero)."
+      note: "Migration was not recorded between 1939 and 1946, during and just after the Second World War."
+      originUrl: "/migration"
+      tab: "chart"
+      chartTypes:
+        - "StackedBar"
+      hasMapTab: false
+      addCountryMode: "disabled"
+      hideAnnotationFieldsInTitle:
+        entity: true
+      # Emigration counts start in 1853, but immigration counts only in 1855.
+      minTime: 1855
+      selectedEntityNames:
+        - "United Kingdom"
