@@ -144,7 +144,8 @@ def load_table_names_from_step(step: str) -> list[str]:
     if not table_names:
         raise FileNotFoundError(
             f"Dataset `{uri}` is neither on disk nor in the grapher DB at `{OWID_ENV.conf.DB_HOST}`. "
-            f"Build it first: `etlr {uri} --grapher`."
+            "If that is a staging server, push the branch and wait for its build to finish. "
+            f"Otherwise build the dataset: `etlr {uri} --grapher`."
         )
     return table_names
 
