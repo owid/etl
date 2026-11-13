@@ -491,6 +491,10 @@ class DataStep(Step):
 
         ds_idex_mtime = self._dataset_index_mtime()
 
+        # Taken before the step runs: a file saved while it runs must leave the step dirty, so the
+        # next run picks the edit up (`--watch` would otherwise report it as up to date).
+        checksum = self.checksum_input()
+
         # if INSTANT flag is set, just update the metadata
         if config.INSTANT and self.channel == "garden":
             self._run_instant_metadata()
@@ -517,7 +521,7 @@ class DataStep(Step):
 
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
-        dataset.metadata.source_checksum = self.checksum_input()
+        dataset.metadata.source_checksum = checksum
         dataset.save()
 
         self.after_run()
@@ -1224,6 +1228,9 @@ class ExportStep(DataStep):
         # Create folder for the dataset, the step can save files there
         ds = create_dataset(self._dest_dir, tables=[])
 
+        # Taken before the recipe runs, for the same reason as in DataStep.run.
+        checksum = self.checksum_input()
+
         self._run_recipe()
 
         if not self.publishes:
@@ -1239,7 +1246,7 @@ class ExportStep(DataStep):
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the step)
-        ds.metadata.source_checksum = self.checksum_input()
+        ds.metadata.source_checksum = checksum
         ds.metadata.save(ds._index_file)
 
     # The etlr flag that grants this step's write.

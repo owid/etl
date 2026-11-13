@@ -61,6 +61,30 @@ def test_data_step():
         Dataset((paths.DATA_DIR / step_name).as_posix())
 
 
+def test_data_step_edited_while_running_stays_dirty():
+    # The recorded checksum is of the inputs the step was built from. A file saved mid-run must
+    # leave the step dirty, or `etlr --watch` reports that edit as up to date and never builds it.
+    with temporary_step() as step_name:
+        _create_mock_py_file(step_name)
+        step = DataStep(step_name, [])
+        py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
+        run_py = DataStep._run_py
+
+        def run_then_edit(self: DataStep) -> None:
+            run_py(self)
+            with open(py_file, "a") as ostream:
+                ostream.write("# edited while the step was running\n")
+
+        # DEBUG off, so the step goes through _run_py whatever the local .env says.
+        with patch.object(DataStep, "_run_py", run_then_edit), patch("etl.config.DEBUG", False):
+            step.run()
+        assert step.is_dirty()
+
+        # The next run builds from the edited file and comes out clean.
+        step.run()
+        assert not step.is_dirty()
+
+
 def test_data_step_recovers_from_partial_output():
     # Simulate a previously interrupted run that left dest_dir without index.json
     # (e.g. shutil.rmtree partially failed mid-write). The next run should
