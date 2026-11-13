@@ -4,10 +4,11 @@ The counts are typed in by hand from CDC publications (see the `source` column a
 Each update adds the new years to the `cases` and `source` lists and moves the year range forward.
 
 Which count we take for each year:
-- 1950: all reported cases ("Poliomyelitis, total"), from Table 6 of the MMWR Summary of Notifiable Diseases,
-  United States, 1993; national data did not split cases by paralytic status yet.
-- 1951 onward: paralytic cases only ("Paralytic" / "Poliomyelitis, paralytic"). For 1951-1960 these come from Table 2
-  of the MMWR 1960 annual supplement (Vol. 9, No. 53), which lists total, paralytic, nonparalytic and unspecified cases.
+- 1944-1983: all reported cases ("Poliomyelitis, total"), from Table 6 of the MMWR Summary of Notifiable Diseases,
+  United States, 1993 (https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm). This keeps one definition from the
+  earliest years (Public Health Reports, all reported cases) until 1983.
+- 1984 onward: paralytic cases only ("Poliomyelitis, paralytic"); 1984-1993 from the same 1993 summary. By the early
+  1980s total and paralytic counts are almost identical (1983: 15 and 15), so the switch barely moves the series.
 
 - Finalized counts come from CDC's annual tables of nationally notifiable diseases ("Poliomyelitis, paralytic").
   Since 2025 these are on CDC Stacks (https://stacks.cdc.gov/cbrowse?pid=cdc%3A49375&parentId=cdc%3A49375),
@@ -31,45 +32,51 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 DATA_CDC = pd.DataFrame(
     {
-        "country": ["United States"] * 76,
-        "year": list(range(1950, 2026)),
+        "country": ["United States"] * 82,
+        "year": list(range(1944, 2026)),
         "cases": [
-            # 1950: all reported cases (paralytic and nonparalytic).
+            # 1944-1983: all reported cases (paralytic and nonparalytic).
+            19029,
+            13624,
+            25698,
+            10827,
+            27726,
+            42033,
             33300,
-            # 1951-1960: paralytic cases only (national data split cases by paralytic status from 1951).
-            10037,
-            21269,
-            15648,
-            18308,
-            13850,
-            7911,
-            2499,
-            3697,
-            6289,
-            2525,
-            988,
-            762,
-            396,
-            106,
-            61,
-            106,
-            40,
+            28386,
+            57879,
+            35592,
+            38476,
+            28985,
+            15140,
+            5485,
+            5787,
+            8425,
+            3190,
+            1312,
+            910,
+            449,
+            122,
+            72,
+            113,
+            41,
             53,
-            18,
+            20,
+            33,
+            21,
             31,
-            17,
-            29,
-            7,
+            8,
             7,
             8,
-            12,
-            17,
+            14,
+            18,
+            15,
+            34,
             9,
-            26,
-            8,
             6,
             8,
             15,
+            # 1984 onward: paralytic cases only.
             8,
             7,
             9,
@@ -115,9 +122,7 @@ DATA_CDC = pd.DataFrame(
             0,
         ],
         "source": [
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm",
-            *["https://www.globalhealthchronicles.org/items/show/6303"] * 10,
-            *["https://www.cdc.gov/mmwr/preview/index93.html"] * 33,
+            *["https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm"] * 50,
             *["https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm"] * 8,
             "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5153a1.htm",
             "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5254a1.htm",

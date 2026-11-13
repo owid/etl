@@ -11,11 +11,9 @@ definitions:
   description_key_reported: |-
     These are cases reported to public health authorities. Most poliovirus infections cause no symptoms or only mild ones, so they are not counted here.
   description_key_definition_change: |-
-    What counts as a case changes in 1951. Until 1950, these counts include all reported polio cases, both paralytic and nonparalytic, because national reporting did not yet record whether a case was paralytic. From 1951 onward, they include paralytic cases only. Part of the fall between 1950 and 1951 reflects this change, not fewer cases.
+    What counts as a case changes in 1984. Until 1983, these counts include all reported polio cases, both paralytic and nonparalytic. From 1984 onward, they include paralytic cases only. By then, almost all reported cases were paralytic, so the change makes little difference: in 1983, both counts were 15.
   description_key_nonparalytic_diagnosis: |-
-    Before the 1950s, nonparalytic polio could not be confirmed in a laboratory. Some of the cases counted until 1950 were probably other viral infections with similar symptoms.
-  description_key_unspecified: |-
-    In the early 1950s, many cases were reported without saying whether they were paralytic: 45% of reported cases in 1951, falling to 18% in 1954. The paralytic counts for these years are therefore likely too low.
+    Before the 1950s, nonparalytic polio could not be confirmed in a laboratory. Some of the cases counted in those years were probably other viral infections with similar symptoms.
   # NOTE: This text names the provisional years; keep it in sync with PROVISIONAL_YEARS in polio_cases.py.
   description_key_provisional: |-
     Counts for 2024 and 2025 are provisional. They come from the Centers for Disease Control and Prevention's (CDC) weekly surveillance data, which can still be revised before the CDC publishes its finalized annual tables.
@@ -32,8 +30,8 @@ dataset:
     - date: 2026-11-06
       changes:
         - Added 2023, and 2024–2025 as provisional counts.
-        - Counts for 1951–1960 now include paralytic cases only, as they already did from 1961.
-        - Corrected the 1950 count from 33,303 to 33,300, the value in CDC's 1993 summary of notifiable diseases.
+        - Counts for 1961–1983 now include all reported cases, as they already did until 1960. Counts are paralytic cases only from 1984.
+        - Counts for 1944–1950 now come from CDC's 1993 summary of notifiable diseases, which gives slightly different values than Public Health Reports for 1945–1948 and 1950.
 tables:
   polio_cases:
     variables:
@@ -46,7 +44,6 @@ tables:
           - "{definitions.description_key_reported}"
           - "{definitions.description_key_definition_change}"
           - "{definitions.description_key_nonparalytic_diagnosis}"
-          - "{definitions.description_key_unspecified}"
           - "{definitions.description_key_provisional}"
         unit: cases
         display:
@@ -61,7 +58,6 @@ tables:
           - "{definitions.description_key_reported}"
           - "{definitions.description_key_definition_change}"
           - "{definitions.description_key_nonparalytic_diagnosis}"
-          - "{definitions.description_key_unspecified}"
           - "{definitions.description_key_provisional}"
         description_processing: We divide the number of reported cases by the population of the United States in each year, and multiply by 100,000.
         processing_level: major

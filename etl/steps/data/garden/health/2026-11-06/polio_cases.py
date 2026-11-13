@@ -29,6 +29,10 @@ def run() -> None:
     #
     # Process data.
     #
+    # From 1944 we use CDC's counts, so that 1944-1983 all come from one table (the CDC's 1993 summary of notifiable
+    # diseases). Public Health Reports gives slightly different counts for some of the overlapping years 1944-1949.
+    tb_phr = tb_phr[tb_phr["year"] < tb_cdc["year"].min()].reset_index(drop=True)
+
     sanity_check_inputs(tb_phr=tb_phr, tb_census=tb_census, tb_cdc=tb_cdc)
 
     # Combine the three sources, which cover different years.
@@ -88,6 +92,6 @@ def sanity_check_outputs(tb: Table) -> None:
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
     assert tb["case_rate"].notna().sum() == tb["cases"].notna().sum(), "Case rate missing for some years with cases."
 
-    # The highest values are around 42,000 cases (1949, all reported cases), about 29 per 100,000 people.
+    # The highest values are around 58,000 cases (1952, all reported cases), about 37 per 100,000 people.
     assert tb["cases"].max() < 60_000, "Implausibly high case count."
     assert tb["case_rate"].max() < 50, "Implausibly high case rate."

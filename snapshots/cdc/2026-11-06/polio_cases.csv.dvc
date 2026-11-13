@@ -5,15 +5,11 @@ meta:
     description: |-
       Data on historical polio cases in the United States, compiled from a selection of sources from the US CDC.
 
-      From 1951, the counts are paralytic polio cases only: that year national reporting began to classify each case as paralytic, nonparalytic or unspecified. For 1950, the count includes all reported cases.
+      Until 1983, the counts include all reported polio cases, both paralytic and nonparalytic. From 1984, they are paralytic polio cases only.
 
       Sources for each year are as follows:
 
-      * 1950: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993, Table 6](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
-
-      * 1951-1960: [Morbidity and Mortality Weekly Report Annual Supplement Summary 1960 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.](https://www.globalhealthchronicles.org/items/show/6303)
-
-      * 1961-1993: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
+      * 1944-1983 (all reported cases) and 1984-1993 (paralytic cases): [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993, Table 6](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
 
       * 1994-2001: [PART 3: Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000](https://www.jstor.org/stable/23310295?seq=2)
 
@@ -51,8 +47,6 @@ meta:
 
       * 2024-2025: [National Notifiable Diseases Surveillance System (NNDSS) Weekly Data](https://data.cdc.gov/NNDSS/NNDSS-Weekly-Data/x9gk-5huc). These counts are provisional: the CDC has not yet published its finalized annual tables for these years.
     citation_full: |-
-      Morbidity and Mortality Weekly Report Annual Supplement Summary 1960 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.
-
       Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993
 
       Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000
@@ -70,6 +64,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: d2df61b38844f21f8f5caac812b91e91
-    size: 5501
+  - md5: 961410bace4ed3d8ab906afe77a3deb3
+    size: 6281
     path: polio_cases.csv
