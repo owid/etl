@@ -35,6 +35,8 @@ They don't work in the ETL, and that holds from the first message to the last, a
 
 Start from any chart links, catalog paths or indicator IDs they gave; otherwise build an empty page. Indicators described only in words are not looked up: ask for a chart link. The page only knows indicators that are already live.
 
+**Look for an MDim that already uses these indicators** before building the page: of the `viz://chart` steps in `dag/` that depend on each one's grapher dataset, check which have views on it; a step with a `.py` builds its views from table columns, so searching for `<table>#<indicator>` alone misses it. An MDim that was merged but never published shows up nowhere else, since the public Datasette and the live site only know published ones. If there is one, tell the person what it contains and who made it, and ask whether to build on it (change that step in a new PR, from step 5c on, since the page can't open it) or to make a separate MDim.
+
 Write the draft to `ai/mdim_simulator/<name>.setup.yml` (`<name>` a short kebab-case name) in the format the page copies out: the multidim config of `/create-chart`, but with full catalog paths (`grapher/<namespace>/<version>/<dataset>/<table>#<indicator>`) and a `slug:`. `state_from_setup` in `build.py` shows what the page reads, and the build stops with a clear message on anything it can't use.
 
 - **From a chart link:** the indicator is the `variableId` of the `y` dimension in `https://ourworldindata.org/grapher/<slug>.config.json`, and its `catalogPath` is in `https://api.ourworldindata.org/v1/indicators/<id>.metadata.json`. A chart with several `y` indicators has no single indicator, and neither has an MDim (its `.config.json` is a 404) or an explorer: ask which indicator they mean. Copy each chart's title, subtitle and note into its view and the first chart's selected countries into `default_selection`, so the views start out looking like the charts.
@@ -69,7 +71,7 @@ Something like this, in plain words:
 
 ## 5. From the pasted setup to a live MDim
 
-If the setup's MDim already has an open PR from an earlier session, carry on in that PR instead of opening another; its own web address then doesn't count as taken.
+If the setup's MDim already has an open PR from an earlier session, carry on in that PR, on its branch, instead of opening another; its own web address then doesn't count as taken. The committed config is then the MDim: apply what they ask for to it from step 5d, and ask before dropping anything a pasted setup merely lacks.
 
 ### 5a. Check the setup, then ask everything in one go
 
@@ -78,6 +80,7 @@ First compare `default_selection` with each indicator's entities (`dimensions.en
 - **Does the MDim replace existing charts?** Name them if the draft came from chart links. If yes, step 5g handles them.
 - **Its web address,** if the setup has no `slug:`, as in step 2. If it has one, check it's still free, since they may have changed it, and ask only if it isn't.
 - **Which countries to show instead,** for any view that would lose some.
+- **Whether to keep the old charts' map colours,** for views that came from a chart whose map has its own bins or flipped colours: the page can't show those, so the sketch's map looks different from the chart's. If yes, copy the chart's `map.colorScale` as it is: a last value in `customNumericValues` lower than the one before it is how Grapher leaves the last bin open-ended.
 - **Anything the setup leaves open:** combinations with no indicator yet, and specific map bins if they asked for them (the page offers only automatic ones).
 
 ### 5b. Build the step
@@ -108,7 +111,7 @@ As soon as every view returns 200, without waiting for Codex, send the admin pre
 STAGING=<branch> .venv/bin/etlr viz://chart/<namespace>/latest/<short_name> --grapher --only --watch
 ```
 
-For each change, edit the config, wait for it in `multi_dim_data_pages.config`, check the views as in 5c item 4, and **show them right away, without being asked**: they can't tell from the page they have open when it has landed. If the session has Claude Desktop's built-in browser (`mcp__Claude_Browser__*`), open or reload the preview there; otherwise send the link again and tell them to reload. Commit and push when they have no more changes, or before leaving the work for later: every push rewrites the MDim from the committed file, so an uncommitted change is lost at the next one. Stop the watcher before merging. **Don't merge until they say it looks right.**
+A change to the default countries gets the same check against the indicators' entities as in 5a. For each change, edit the config, wait for it in `multi_dim_data_pages.config`, check the views as in 5c item 4, and **show them right away, without being asked**: they can't tell from the page they have open when it has landed. The watcher can miss a save made while it is still writing the previous one: if a change doesn't arrive, run the same command once with `--force` and without `--watch`. If the session has Claude Desktop's built-in browser (`mcp__Claude_Browser__*`), open or reload the preview there; otherwise send the link again and tell them to reload. Commit and push when they have no more changes, or before leaving the work for later: every push rewrites the MDim from the committed file, so an uncommitted change is lost at the next one. Stop the watcher before merging. **Don't merge until they say it looks right.**
 
 ### 5e. Merge
 
