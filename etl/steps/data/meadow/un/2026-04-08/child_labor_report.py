@@ -17,6 +17,10 @@ SNAPSHOTS = {
     "child_labor_trends": {
         "index": ["disaggregation_type", "disaggregation_value"],
     },
+    # Breakdown by age for 2000-2012, from Table 5 of the ILO's 2013 report.
+    "child_labor_by_age_2013_report": {
+        "index": ["age_group", "year"],
+    },
 }
 
 

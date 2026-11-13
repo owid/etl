@@ -512,3 +512,61 @@ def test_resolve_grapher_schema_rejects_malformed_values():
     for value in ("latest", "0.11", "grapher-schema.011.json", "https://example.com/schema.json", ""):
         with pytest.raises(ValueError, match="Invalid `grapher_schema` value"):
             resolve_grapher_schema(value)
+
+
+def _write_dataset(data_dir, uri, table_names):
+    """Create a dataset on disk with empty tables of the given names."""
+    from owid.catalog import Dataset, DatasetMeta, Table
+
+    channel, namespace, version, short_name = uri.split("/")
+    ds = Dataset.create_empty(
+        data_dir / uri, DatasetMeta(channel=channel, namespace=namespace, version=version, short_name=short_name)
+    )
+    for table_name in table_names:
+        ds.add(
+            Table({"country": ["a"], "year": [2000], "x": [1]}, short_name=table_name).set_index(["country", "year"])
+        )
+    ds.save()
+
+
+def test_tables_by_name_mapping_reads_dataset_on_disk(tmp_path, monkeypatch):
+    """A grapher dataset on disk is resolved from disk, without asking the DB."""
+    from etl.viz.chart import utils
+
+    monkeypatch.setattr(utils, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(utils, "_table_names_in_db", lambda uri: pytest.fail("the DB should not be queried"))
+    _write_dataset(tmp_path, "grapher/ns/2024-01-01/ds", ["tb_a", "tb_b"])
+
+    mapping = utils.get_tables_by_name_mapping({"data://grapher/ns/2024-01-01/ds", "data://garden/ns/2024-01-01/ds"})
+
+    assert dict(mapping) == {
+        "tb_a": ["grapher/ns/2024-01-01/ds/tb_a"],
+        "ds/tb_a": ["grapher/ns/2024-01-01/ds/tb_a"],
+        "tb_b": ["grapher/ns/2024-01-01/ds/tb_b"],
+        "ds/tb_b": ["grapher/ns/2024-01-01/ds/tb_b"],
+    }
+
+
+def test_tables_by_name_mapping_falls_back_to_db(tmp_path, monkeypatch):
+    """A grapher dataset that isn't on disk is resolved from the table names in the grapher DB."""
+    from etl.viz.chart import utils
+
+    monkeypatch.setattr(utils, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(utils, "_table_names_in_db", lambda uri: {"grapher/ns/2024-01-01/ds": ["tb_a"]}[uri])
+
+    mapping = utils.get_tables_by_name_mapping({"data-private://grapher/ns/2024-01-01/ds"})
+
+    assert dict(mapping) == {"tb_a": ["grapher/ns/2024-01-01/ds/tb_a"], "ds/tb_a": ["grapher/ns/2024-01-01/ds/tb_a"]}
+
+
+def test_table_names_missing_everywhere_fail(tmp_path, monkeypatch):
+    """A dataset found neither on disk nor in the DB fails, as does a non-grapher dataset that isn't on disk."""
+    from etl.viz.chart import utils
+
+    monkeypatch.setattr(utils, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(utils, "_table_names_in_db", lambda uri: [])
+
+    with pytest.raises(FileNotFoundError, match="neither on disk nor in the grapher DB"):
+        utils.load_table_names_from_step("data://grapher/ns/2024-01-01/ds")
+    with pytest.raises(FileNotFoundError, match="is not on disk"):
+        utils.load_table_names_from_step("data://garden/ns/2024-01-01/ds")

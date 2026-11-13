@@ -1,0 +1,127 @@
+grapher_schema: "012"
+
+title:
+  title: Food Prices
+  title_variant: ""
+slug: food-prices
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore the cost and affordability of diets across the world.
+topic_tags:
+  - Food Prices
+default_selection:
+  - Nigeria
+  - Bangladesh
+  - India
+  - Ethiopia
+  - Mexico
+  - United States
+  - Brazil
+  - United Kingdom
+
+# Chart text (titles, subtitles, notes, map colors) comes from each indicator's garden metadata.
+# The explorer's "Cost or Affordability" choice and its two conditional metric dimensions are one
+# grouped "Measure" dimension here, so every diet x measure pair is a view and no choice is blank.
+dimensions:
+  - slug: diet
+    name: Diet
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: healthy
+        name: Healthy diet
+      - slug: nutrient_adequate
+        name: Nutrient adequate diet
+      - slug: calorie_sufficient
+        name: Calorie sufficient diet
+  - slug: measure
+    name: Measure
+    presentation:
+      type: dropdown
+    choices:
+      - slug: share
+        name: Share that cannot afford
+        group: Affordability
+      - slug: number
+        name: Number that cannot afford
+        group: Affordability
+      - slug: dollars_per_day
+        name: Daily cost per person
+        group: Cost
+      - slug: share_food_expenditure
+        name: "Cost as % of average food spending"
+        group: Cost
+
+views:
+  - dimensions:
+      diet: healthy
+      measure: share
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_a_healthy_diet
+  - dimensions:
+      diet: healthy
+      measure: number
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_a_healthy_diet
+  - dimensions:
+      diet: healthy
+      measure: dollars_per_day
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#cost_of_a_healthy_diet_in_ppp_dollars
+  - dimensions:
+      diet: healthy
+      measure: share_food_expenditure
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures
+  - dimensions:
+      diet: nutrient_adequate
+      measure: share
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_nutrient_adequacy
+  - dimensions:
+      diet: nutrient_adequate
+      measure: number
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_nutrient_adequacy
+  - dimensions:
+      diet: nutrient_adequate
+      measure: dollars_per_day
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#cost_of_a_nutrient_adequate_diet_in_ppp_dollars
+  - dimensions:
+      diet: nutrient_adequate
+      measure: share_food_expenditure
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures
+  - dimensions:
+      diet: calorie_sufficient
+      measure: share
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_sufficient_calories
+  - dimensions:
+      diet: calorie_sufficient
+      measure: number
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_sufficient_calories
+  - dimensions:
+      diet: calorie_sufficient
+      measure: dollars_per_day
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#cost_of_an_energy_sufficient_diet_in_ppp_dollars
+  - dimensions:
+      diet: calorie_sufficient
+      measure: share_food_expenditure
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures

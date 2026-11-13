@@ -177,10 +177,16 @@ R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
   passes can be explained in `notes.json` (`{"config:<field>": "why"}`); a rendered, indicator,
   data or metadata difference gets fixed in the multidim, never explained away. Re-run until every
   view is "Match".
+  It stops early if the multidim page or a view config isn't served yet: wait for the bake, or
+  (config 404 right after a fresh staging server came up) re-run the upload with `--force --only`.
+  After the merge, `--staging production` re-checks the multidim on production.
 - `scan_references.py` is the exhaustive link list: every text/JSON column of the production DB
   (history and analytics tables skipped and listed), plus `git grep` of ETL and owid-grapher. It
   finds what the gdoc link index misses (unpublished drafts, chart notes, indicator metadata,
-  site code). Each hit gets its new URL from the redirect rules and an edit link.
+  site code). Each hit gets its new URL from the redirect rules and an edit link. It repairs old links
+  that the live explorer already misreads (a value glued to the next param, a renamed dimension),
+  so the new URL lands on the view they meant. Copy `references_full.json` to
+  `references_baseline.json` before any swap: the page then marks each link swapped or still to do.
 - Serve it with the local app, in the background, and give the user the link:
 
   ```bash
