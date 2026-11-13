@@ -69,6 +69,10 @@ views:
     indicators:
       y:
         - catalogPath: "wdi#eg_elc_accs_zs_without"
+    config:
+      map:
+        colorScale:
+          baseColorScheme: "OrRd"
   - dimensions:
       access: without_access
       metric: number_of_people
