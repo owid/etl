@@ -110,3 +110,17 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/education/latest/completion_rates:
     - data://grapher/unesco/2026-05-12/education_sdgs
+  # archived; last active in 0d8f467c05ee on 2026-10-28
+  data://meadow/oecd/2023-12-06/pisa:
+    - snapshot://oecd/2023-12-06/pisa_reading_all.xls
+    - snapshot://oecd/2023-12-06/pisa_math_all.xls
+    - snapshot://oecd/2023-12-06/pisa_reading_boys_girls.xls
+    - snapshot://oecd/2023-12-06/pisa_science_boys_girls.xls
+    - snapshot://oecd/2023-12-06/pisa_science_all.xls
+    - snapshot://oecd/2023-12-06/pisa_math_boys_girls.xls
+  # archived; last active in 0d8f467c05ee on 2026-10-28
+  data://garden/oecd/2023-12-06/pisa:
+    - data://meadow/oecd/2023-12-06/pisa
+  # archived; last active in 0d8f467c05ee on 2026-10-28
+  data://grapher/oecd/2023-12-06/pisa:
+    - data://garden/oecd/2023-12-06/pisa

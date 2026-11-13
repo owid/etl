@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Programme for International Student Assessment (PISA)
+    title_snapshot: PISA 2025 Results (Volume I) – Mean performance by PISA cycle
+    description: |-
+      The Programme for International Student Assessment (PISA) is the OECD's test of 15-year-old students' knowledge and skills in reading, mathematics and science. It runs every few years: the first round was in 2000, and the latest, PISA 2025, covered more than 760,000 students in 91 countries and economies.
+
+      Each round focuses on one subject in more depth (science in 2025), while the other two are also tested. Scores are reported on scales built to be comparable across rounds, so results can be tracked over time: reading since 2000, mathematics since 2003 and science since 2006.
+    description_snapshot: |-
+      Annex B1.2a of the PISA 2025 Results (Volume I) report. Tables I.B1.2a.36 to I.B1.2a.38 give the mean score and its standard error in science (from 2006), reading (from 2000) and mathematics (from 2003), for every PISA cycle up to 2025. They cover the countries and economies that took part in PISA 2025, plus OECD averages.
+    date_published: '2026-09-08'
+    version_producer: PISA 2025
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2026), PISA 2025 Results (Volume I): Future-Ready Students, PISA, OECD Publishing, Paris, https://doi.org/10.1787/73451bc5-en.
+
+    # Files
+    url_main: https://www.oecd.org/en/publications/pisa-2025-results-volume-i_73451bc5-en.html
+    # NOTE: On each new PISA round, replace url_download with the StatLink of the same annex in the new report's
+    # Volume I (Annex B1.2a, which includes tables 'Mean science/reading/mathematics performance, 2000 through
+    # <year>'). StatLinks are printed under each table of the report. They download by script, even though oecd.org
+    # itself blocks scripts. Then check the sheet names and layout the meadow step expects.
+    url_download: https://stat.link/mrq53f
+    date_accessed: '2026-10-28'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 89bc558c0bdab7dc4da315c112704443
+    size: 1529722
+    path: pisa_mean_performance.xlsx
