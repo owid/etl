@@ -252,6 +252,11 @@ steps:
   # Access to electricity MDim from WDI (share and number of people with and without access).
   viz://chart/worldbank_wdi/latest/access_to_electricity:
     - data://grapher/worldbank_wdi/2026-07-27/wdi
+  #
+  # Access to electricity by World Bank region — chart authored in ETL.
+  #
+  viz://chart/worldbank_wdi/latest/electricity_access_regions:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
 
   # Energy: global historical electricity scaling.
   data://grapher/energy/2026-06-30/global_historical_electricity_scaling:

@@ -1,0 +1,63 @@
+grapher_schema: "012"
+title:
+  title: "Access to electricity"
+slug: electricity-access-regions
+topic_tags:
+  - "Access to Energy"
+  - "Energy"
+default_selection:
+  - "World"
+  - "India"
+  - "Sub-Saharan Africa (WB)"
+  - "South Asia (WB)"
+  - "East Asia and Pacific (WB)"
+  - "Europe and Central Asia (WB)"
+  - "Latin America and Caribbean (WB)"
+  - "Middle East, North Africa, Afghanistan and Pakistan (WB)"
+  - "North America (WB)"
+default_dimensions:
+  metric: share
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: "map"
+dimensions:
+  - slug: metric
+    name: "Metric"
+    choices:
+      - slug: share
+        name: "Share of the population with access"
+      - slug: number_without
+        name: "Number of people without access"
+views:
+  - dimensions:
+      metric: share
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs"
+    config:
+      title: "Share of people with access to electricity"
+      yAxis:
+        min: 0
+        max: 100
+      map:
+        colorScale:
+          baseColorScheme: "YlOrBr"
+          colorSchemeInvert: true
+          binningStrategy: "manual"
+          customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+          legendDescription: "Access to electricity (% of population)"
+  - dimensions:
+      metric: number_without
+    indicators:
+      y:
+        - catalogPath: "wdi#eg_elc_accs_zs_without_number"
+    config:
+      title: "Number of people without access to electricity"
+      subtitle: "Having access to electricity is defined in international statistics as having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day."
+      map:
+        colorScale:
+          baseColorScheme: "YlOrBr"
+          binningStrategy: "manual"
+          customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
