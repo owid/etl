@@ -38,7 +38,10 @@ gross vs. net view sees only the gross rate's title and key information.
   add claims that neither indicator's text makes.
 - **Say which indicator each paragraph is about,** for example by opening it with the indicator's name in
   bold.
-- **Title the whole view** in `presentation.title_public`, naming every measure it shows.
+- **Title the whole view** in `presentation.title_public`, naming every measure it shows. The title renders
+  with `presentation.attribution_short` and `presentation.title_variant`, which also come from the first y
+  indicator when the view leaves them out. Set both to text that describes the whole view, for example a
+  source shorthand that names every producer in it.
 - **Check the rest of the page:** `description_processing`, `description_from_producer`, the unit and the
   origins. Override any whose first-indicator value is wrong or incomplete for the view.
 - **Match the form of the indicators' text.** `description_key` can be a `|-` markdown string, which renders
