@@ -1,8 +1,8 @@
 grapher_schema: "011"
-slug: labor-market-exit-age-vs-normal-retirement-age
+slug: labor-market-exit-age-vs-full-pension-age
 
 title:
-  title: Age of leaving the labor market vs. normal retirement age
+  title: Age at which people leave the labor market vs. age at which they can receive a full pension
   title_variant: ""
 topic_tags:
   - Work & Employment
@@ -20,13 +20,13 @@ definitions:
         chartTypes: ["ScatterPlot"]
         # Only countries with a continent, which leaves out aggregates like OECD countries.
         matchingEntitiesOnly: true
-        # Countries above the line leave the labor market later than the normal retirement age.
+        # In countries above the line, people leave the labor market later than they can receive a full pension.
         comparisonLines:
           - yEquals: x
             label: Same age
         # The same range on both axes, so the line where both ages are equal runs from corner to corner.
         xAxis:
-          label: Normal retirement age (years)
+          label: Age eligible to receive a full pension (years)
           min: 48
           max: 70
         yAxis:
@@ -53,9 +53,9 @@ views:
         catalogPath: retirement#current_normal_retirement_age__sex_men
       color: regions#owid_region
     config:
-      title: Age at which men leave the labor market vs. normal retirement age
-      subtitle: Estimated average age at which men aged 40 and older stop working or looking for work, compared with the age at which they can get a full pension after a career that started at age 22.
-      note: Normal retirement age for people retiring in 2024. Countries above the line leave the labor market later than the normal retirement age.
+      title: Age at which men leave the labor market vs. age at which they can receive a full pension
+      subtitle: Estimated average age at which men aged 40 and older stop working or looking for work, compared with the age at which they can receive a full pension after a full-time, uninterrupted career that started at age 22.
+      note: The age at which people can receive a full pension is for people retiring in 2024. In countries above the line, people leave the labor market later than they can receive a full pension.
 
   - dimensions:
       sex: women
@@ -66,6 +66,6 @@ views:
         catalogPath: retirement#current_normal_retirement_age__sex_women
       color: regions#owid_region
     config:
-      title: Age at which women leave the labor market vs. normal retirement age
-      subtitle: Estimated average age at which women aged 40 and older stop working or looking for work, compared with the age at which they can get a full pension after a career that started at age 22.
-      note: Normal retirement age for people retiring in 2024. Countries above the line leave the labor market later than the normal retirement age.
+      title: Age at which women leave the labor market vs. age at which they can receive a full pension
+      subtitle: Estimated average age at which women aged 40 and older stop working or looking for work, compared with the age at which they can receive a full pension after a full-time, uninterrupted career that started at age 22.
+      note: The age at which people can receive a full pension is for people retiring in 2024. In countries above the line, people leave the labor market later than they can receive a full pension.

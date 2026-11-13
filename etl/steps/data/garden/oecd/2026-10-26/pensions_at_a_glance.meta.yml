@@ -15,12 +15,10 @@ definitions:
   #
   # NOTE: Update the year people retire (2024) to the new edition's.
   description_short_current_normal_retirement_age: |-
-    Age at which <<sex.lower()>> can start receiving a full pension, without penalty, in 2024, after a career that started at age 22.
+    Age at which <<sex.lower()>> retiring in 2024 could start receiving a pension without an early-retirement penalty, assuming they have had a full-time, uninterrupted career that started at age 22.
   # NOTE: Update the year people start working (2024) to the new edition's.
   description_short_future_normal_retirement_age: |-
-    Age at which <<sex.lower()>> who start working at age 22 in 2024 will be able to receive a full pension, without penalty, under the rules already legislated.
-  description_key_highest_across_schemes: |-
-    Where it differs across schemes, the OECD uses the highest one.
+    Age at which <<sex.lower()>> who start working in 2024 will be able to receive a pension without an early-retirement penalty, under the laws already passed, assuming they have a full-time, uninterrupted career that starts at age 22.
   subtitle_exit_reasons: |-
     This includes people who leave for reasons other than retirement, such as disability.
 
@@ -173,25 +171,27 @@ definitions:
   # Text for the indicators in the retirement table.
   #
   # Pieces of the current and future normal retirement age descriptions.
-  description_key_nra_definition: |-
-    The normal retirement age is the earliest age at which a person can receive their full pension in all schemes, after a full career that started at age 22. {definitions.description_key_highest_across_schemes}
-  description_key_nra_statutory_age: |-
-    In some countries, this isn't the statutory retirement age: a person who started working at 22 can retire without a penalty earlier, once they have contributed for long enough.
+  description_key_current_nra_overview: |-
+    This indicator shows the earliest age at which a person can receive a pension without a penalty for retiring early. This is also known as the "normal retirement age". It applies to someone who started working at 22 and worked without interruption. People with shorter or interrupted careers often have to wait longer.
+  description_key_future_nra_overview: |-
+    This indicator shows the earliest age at which a person who starts working today will be able to receive a pension without a penalty for retiring early. This is also known as the "normal retirement age". It applies to someone who starts working at 22 and works without interruption. People with shorter or interrupted careers often have to wait longer.
   description_key_nra_education: |-
-    Periods spent in education don’t count toward the career.
-  # NOTE: Update the year people retire (2024) to the new edition's.
-  description_key_nra_current_year: |-
-    The current normal retirement age applies to people retiring in 2024.
+    Some countries count years spent in education toward a person's pension record, but this data doesn't include them.
+  description_key_nra_schemes: |-
+    It covers all mandatory pension schemes in a country. Where the qualifying age differs across pension schemes, the highest one is used.
+  description_key_nra_statutory_age: |-
+    In some countries, this differs from the statutory retirement age, because some people who have contributed for long enough can retire earlier without penalty.
+  description_key_nra_higher_than_statutory_age: |-
+    In others, it is higher, because some mandatory schemes start paying later.
+  description_key_current_nra_rules: |-
+    This data shows what pension rules allow, not when people actually stop working. The ages are those applying to people retiring in the year shown. Many countries have already passed laws that raise the age for future generations.
+  description_key_future_nra_rules: |-
+    This data shows what the pension laws already passed set for the future, not when people will actually stop working. It includes all legislated changes, such as gradual increases in the retirement age. Where the retirement age is linked to life expectancy, the OECD assumes the link is applied, so the age also depends on how much life expectancy is projected to rise. These ages can change if countries pass new laws.
   # NOTE: Update the year of entry (2024) and the average retirement year (2068) to the new edition's.
-  description_key_nra_future_year: |-
-    This indicator is for a person who enters the labor market at age 22 in 2024. They would retire around 2068, on average across OECD countries. The year in this data, 2024, is the year they enter the labor market.
-  description_key_nra_decimals: |-
-    The OECD gives these ages in years, with one decimal, because many countries set them in years and months. Some raise the retirement age a few months at a time. In others, the age at which people can retire without a penalty depends on how many years they have contributed, which can also include months.
-  # NOTE: Check Luxembourg's early retirement rule (57, after 40 years of contributions) in the new edition.
-  description_key_nra_long_careers: |-
-    In some countries, people with long careers can retire earlier. In Luxembourg, for example, people can retire at 57 after 40 years of contributions.
-  description_key_nra_legislated: |-
-    The OECD includes all changes that are already legislated, such as gradual increases in the retirement age. This includes the links between the retirement age and life expectancy in countries that have them, such as Denmark, Estonia, Italy, the Netherlands, and Sweden.
+  description_key_future_nra_year: |-
+    The year shown, 2024, is the year people start working, not the year they retire. On average across OECD countries, they would retire around 2068.
+  description_key_nra_sources: |-
+    The data comes from the OECD's Pensions at a Glance and is based on information provided by national authorities about their pension systems. Ages are expressed in years with one decimal place because many countries set them in years and months.
   description_short_effective_labor_market_exit_age: |-
     Average age at which <<sex.lower()>> aged 40 and older stop working or looking for work.
   description_key_exit_age_overview: |-
@@ -406,15 +406,15 @@ tables:
         description_short: |-
           {definitions.description_short_current_normal_retirement_age}
         description_key: |-
-          {definitions.description_key_nra_definition}
+          {definitions.description_key_current_nra_overview} {definitions.description_key_nra_education}
 
-          {definitions.description_key_nra_statutory_age}
+          {definitions.description_key_nra_schemes}
 
-          {definitions.description_key_nra_current_year} {definitions.description_key_nra_education}
+          {definitions.description_key_nra_statutory_age} {definitions.description_key_nra_higher_than_statutory_age}
 
-          {definitions.description_key_nra_decimals}
+          {definitions.description_key_current_nra_rules}
 
-          {definitions.description_key_nra_long_careers}
+          {definitions.description_key_nra_sources}
         display:
           name: <<sex>>
           numDecimalPlaces: 1
@@ -422,7 +422,7 @@ tables:
         presentation:
           title_public: Current normal retirement age (<<sex.lower()>>)
           grapher_config:
-            title: Normal retirement age for <<sex.lower()>> today
+            title: Age at which <<sex.lower()>> are eligible to receive a full pension
             subtitle: "{definitions.description_short_current_normal_retirement_age}"
 
       future_normal_retirement_age:
@@ -431,13 +431,17 @@ tables:
         description_short: |-
           {definitions.description_short_future_normal_retirement_age}
         description_key: |-
-          {definitions.description_key_nra_definition}
+          {definitions.description_key_future_nra_overview} {definitions.description_key_nra_education}
 
-          {definitions.description_key_nra_statutory_age}
+          {definitions.description_key_nra_schemes}
 
-          {definitions.description_key_nra_future_year} {definitions.description_key_nra_education}
+          {definitions.description_key_nra_statutory_age} {definitions.description_key_nra_higher_than_statutory_age}
 
-          {definitions.description_key_nra_legislated}
+          {definitions.description_key_future_nra_rules}
+
+          {definitions.description_key_future_nra_year}
+
+          {definitions.description_key_nra_sources}
         display:
           name: <<sex>>
           numDecimalPlaces: 1
@@ -445,7 +449,7 @@ tables:
         presentation:
           title_public: Future normal retirement age (<<sex.lower()>>)
           grapher_config:
-            title: Future normal retirement age for <<sex.lower()>>
+            title: Age at which <<sex.lower()>> starting work today will be eligible to receive a full pension
             subtitle: "{definitions.description_short_future_normal_retirement_age}"
 
       effective_labor_market_exit_age:
