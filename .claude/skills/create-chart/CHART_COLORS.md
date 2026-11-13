@@ -19,16 +19,15 @@ Go through the questions in order and stop at the first that applies.
 
    | Categories | Scheme |
    |---|---|
-   | 8 or fewer | Any of `OwidCategoricalA` to `OwidCategoricalE` |
-   | 9 | `OwidCategoricalA` or `OwidCategoricalB` |
+   | 8 or fewer | Any of `OwidCategoricalB` to `OwidCategoricalE` |
+   | 9 | `OwidCategoricalB` |
    | 10 | `OwidCategoricalC` or `OwidCategoricalD` |
    | 11 | `OwidCategoricalE` |
-   | 12 | `OwidCategoricalA` |
-   | 13 | `OwidCategoricalB` |
+   | 12 or 13 | `OwidCategoricalB` |
    | 14 to 24 | `OwidCategoricalC` |
    | 25 or more | Reconsider the chart: small multiples or fewer, aggregated categories. If it has to stay, `OwidCategoricalC` |
 
-   Prefer `OwidCategoricalB` to `OwidCategoricalE` over `OwidCategoricalA`: A is the oldest palette and looks the most dated. Where the table gives A as an option, pick the other one; for 12 categories, `OwidCategoricalB` (13 colors) or `OwidCategoricalC` (24) fits too.
+   The table leaves out `OwidCategoricalA`: it is the oldest of the five palettes and looks the most dated.
 
    In a stacked bar chart, Grapher hands out the scheme's colors from the bottom series up, and the bottom series is the last y-indicator listed. To give related series a shared hue, such as two kinds of the same thing, take adjacent colors from one palette (the dark copper and peach that open `OwidCategoricalE`, for example) and set them per series with `display.color`. The hex values are in `OwidDistinctColors` in owid-grapher's `CustomSchemes.ts`.
 
