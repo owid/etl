@@ -382,6 +382,10 @@ Non-zero exit means **do not post anything**.
 > any `_redirects` entry, and fires while the explorer is still published. There is no staged
 > rollout and no bulk undo — removal is one row at a time.
 
+Preflight reads the DB, not the site: first confirm `curl -s -o /dev/null -w '%{http_code}'
+https://ourworldindata.org/grapher/<mdim slug>` returns 200. A multidim published moments ago can
+still 404 until the bake, and redirects created then send every explorer URL to a 404.
+
 Paste each `admin_bulk_payload.json` into *Bulk-create redirects from JSON* at
 `{admin}/multi-dim-redirects`, **one explorer at a time**. Read the response
 **positionally**: every `results[i].source` is the same `/explorers/<slug>` string, so index 0

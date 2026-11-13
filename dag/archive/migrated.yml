@@ -423,6 +423,10 @@ steps:
   data://grapher/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
     - data://garden/food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus:
       - snapshot://food/2019/global_fish_catch_by_end_use__fishstat_via_seaaroundus.feather
+  # archived; last active in 936158970e3f on 2026-11-12
+  data://grapher/cdc/2018-02-01/_20th_century_deaths_in_us__cdc:
+    - data://garden/cdc/2018-02-01/_20th_century_deaths_in_us__cdc:
+      - snapshot://cdc/2018-02-01/_20th_century_deaths_in_us__cdc.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather

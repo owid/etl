@@ -14,11 +14,15 @@ def run() -> None:
     #
     # Retrieve snapshot: current year (latest quarterly release).
     # NOTE: 2025 preliminary data is no longer needed — the stable 26.1 release covers it.
-    snap_curr = paths.load_snapshot(short_name="ucdp_ced_v26_01_26_06.csv")
+    snap_curr = paths.load_snapshot(short_name="ucdp_ced_v26_01_26_09.csv")
 
     # Read as table
     tb = snap_curr.read_csv()
     tb = tb.drop_duplicates()
+
+    # Cast dataset IDs to string: they mix numeric IDs, candidate codes (e.g. "2-XXX70") and many nulls, so their type can't be inferred.
+    for col in ["conflict_dset_id", "dyad_dset_id", "side_a_dset_id", "side_b_dset_id"]:
+        tb[col] = tb[col].astype("string")
 
     # Sanity check
     assert tb["id"].is_unique, "Event IDs should be unique in the CED snapshot!"

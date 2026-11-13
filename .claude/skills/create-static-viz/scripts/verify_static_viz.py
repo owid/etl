@@ -16,6 +16,14 @@ plausible, and the problem only shows up once a designer opens the SVG:
   ``--require-named-marks`` to make it a failure, which a new or refreshed step should. That flag
   also fails on a ``<subject>__<role>`` gid used by more than one node, since the re-import cannot
   tell such marks apart
+- axes that differ from grapher's own download, which is what the design team's templates are
+  balanced for: tick labels not at 15px on a 540-wide template (14px on an 850-wide one), y-axis tick
+  labels not right-aligned against the plot, or a year axis with no tick marks (each axes judged on
+  its own; an x axis is a year axis when its labels are bare integers, one of four digits, since
+  grapher writes any other number with a thousands separator, unless an era suffix makes it a year,
+  as in "12,000 BCE"). Judged on the ``<subject>__<axis>-tick-label-<value>`` and
+  ``<subject>__x-tick-<value>`` gids ``etl.viz.static.name_furniture`` gives every axis, reading a
+  label's text however deeply it is nested (MathText labels such as ``$10^5$`` are)
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -39,6 +47,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import NamedTuple
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -283,8 +292,410 @@ def check_svg(
         else:
             failures += frame_failures("SVG", size[0], size[1], target)
         failures += scale_failures(svg, target)
+    failures += axis_failures(svg, target)
 
     return failures
+
+
+# Tick-label size, in template px, by template width (WRITING-THE-STEP.md -> grapher's axis): 15 on
+# the 540-wide templates, 14 on the 850-wide ones. A label within LABEL_TOLERANCE of it passes.
+TICK_LABEL_PX = {540: 15.0, 850: 14.0}
+LABEL_TOLERANCE = 0.3
+# Groups: subject, axis, side. Major and minor ticks alike (`name_furniture` names both), since an axis
+# can be labelled on its minor ticks alone.
+TICK_LABEL_GID = re.compile(r"^(.+)__([xy])-(?:minor-)?tick-label(2?)-.+$")  # label2: the right (or top) side
+X_LABEL_VALUE = re.compile(r"^(.+)__x-(?:minor-)?tick-label-(.+)$")
+X_MARK_VALUE = re.compile(r"^(.+)__x-(?:minor-)?tick-(?!label)(?!2-)(.+)$")
+# What marks a y axis' plot edge: its gridlines, tick marks and left spine. Groups: subject.
+Y_EDGE_GID = re.compile(r"^(.+)__(?:y-(?:minor-)?(?:grid|tick)-(?!label)|spine-left$)")
+NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+FONT_SIZE = re.compile(r"font-size:\s*([0-9.]+)px")
+TEXT_ANCHOR = re.compile(r"text-anchor:\s*(\w+)")
+TRANSFORM_STEP = re.compile(r"(\w+)\(([^)]*)\)")
+
+
+class TickLabel(NamedTuple):
+    subject: str
+    axis: str
+    anchor: str | None  # None when no text node declares one, as for a MathText label
+    size: float | None  # the largest font size in the label: a superscript is smaller on purpose
+    text: str
+    # A MathText label's left edge and the x of its last glyph from there, in SVG units; None otherwise.
+    left: float | None = None
+    extent: float | None = None
+    # That last glyph's font size, to estimate how far past its x the label ends.
+    last_size: float | None = None
+    # Drawn at an angle, plain or MathText; a MathText label placed by more than a translate counts too,
+    # since where it sits then says nothing of its alignment.
+    rotated: bool = False
+    # Drawn on the axis' second side (`labelright=True`, `labeltop=True`): matplotlib's `tick-label2`.
+    second: bool = False
+
+
+def tick_labels(root: ET.Element) -> list[TickLabel]:
+    """Every `<subject>__<axis>-tick-label-<value>` group, read from its text however deeply it is nested.
+
+    A plain label is one `<text>` straight under the group. A MathText label (`$10^5$`) is a comment,
+    a transform group, and a `<text>` holding one `<tspan>` per glyph, with no text-anchor (matplotlib
+    places it by the transform). Glyphs on another baseline (a superscript or subscript) are joined
+    with a space, so `10^5` reads `10 5` and never passes for the year `105`. A MathText label also
+    carries where it sits (`left`, `extent`), the only trace its alignment leaves (`mathtext_anchor`).
+    """
+    labels = []
+    for group in root.iter():
+        match = TICK_LABEL_GID.match(group.get("id") or "")
+        if match is None or group.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        parts: list[str] = []
+        sizes: list[float] = []
+        glyph_xs: list[float] = []
+        glyph_sizes: list[float | None] = []
+        anchor = None
+        baseline = None
+        for node in group.iter():
+            tag = node.tag.rsplit("}", 1)[-1]
+            if tag not in ("text", "tspan"):
+                continue
+            style = node.get("style") or ""
+            sizes += [float(s) for s in FONT_SIZE.findall(style)]
+            if anchor is None and (m := TEXT_ANCHOR.search(style)):
+                anchor = m.group(1)
+            if node.text and node.text.strip():
+                if tag == "tspan":
+                    if parts and node.get("y") != baseline:
+                        parts.append(" ")
+                    baseline = node.get("y")
+                    x = node.get("x")
+                    if x and re.fullmatch(r"[-+0-9.eE]+", x):
+                        glyph_xs.append(float(x))
+                        glyph_sizes.append(max((float(f) for f in FONT_SIZE.findall(style)), default=None))
+                parts.append(node.text.strip())
+        left = extent = last_size = None
+        rotated = _rotated(group)
+        if anchor is None and glyph_xs:
+            offset = _translate_x(group)
+            if offset is None:
+                rotated = True
+            else:
+                left, extent = offset + min(glyph_xs), max(glyph_xs) - min(glyph_xs)
+                last_size = glyph_sizes[glyph_xs.index(max(glyph_xs))]
+        size = max(sizes, default=None)
+        labels.append(
+            TickLabel(
+                match.group(1),
+                match.group(2),
+                anchor,
+                size,
+                "".join(parts),
+                left,
+                extent,
+                last_size,
+                rotated,
+                second=match.group(3) == "2",
+            )
+        )
+    return labels
+
+
+def _rotated(group: ET.Element) -> bool:
+    """Whether any transform in a label group turns it: a `rotate()` by anything but zero.
+
+    matplotlib writes a horizontal plain label with `rotate(-0 x y)` on its `<text>`, a no-op, and a
+    rotated one with `translate(x y) rotate(-45)` there or on a MathText label's group.
+    """
+    for node in group.iter():
+        for name, args in TRANSFORM_STEP.findall(node.get("transform") or ""):
+            numbers = [float(n) for n in NUMBER.findall(args)]
+            if name == "rotate" and numbers and numbers[0] != 0:
+                return True
+    return False
+
+
+def _translate_x(group: ET.Element) -> float | None:
+    """The x offset the transforms under a label group add up to, or None if any does more than translate.
+
+    matplotlib writes a MathText label's transform as `translate(x y)`, followed by `rotate(-45)` when
+    the label is rotated; a rotation of zero is a no-op and is ignored.
+    """
+    total = 0.0
+    for node in group.iter():
+        transform = node.get("transform")
+        if node is group or transform is None or node.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        for name, args in TRANSFORM_STEP.findall(transform):
+            numbers = [float(n) for n in NUMBER.findall(args)]
+            if name == "translate" and numbers:
+                total += numbers[0]
+            elif not (name == "rotate" and numbers and numbers[0] == 0):
+                return None
+    return total
+
+
+def _draws(node: ET.Element, inherited: dict[str, str] | None = None) -> bool:
+    """Whether anything under a node puts a pixel down, after paint inheritance; `<defs>` are skipped."""
+    tag = node.tag.rsplit("}", 1)[-1]
+    if tag == "defs":
+        return False
+    paint = _paint(node, inherited or {})
+    if tag in PAINTABLE and _paints(paint):
+        return True
+    return any(_draws(child, paint) for child in node)
+
+
+def _tick_draws(group: ET.Element, defs: dict[str, ET.Element], inherited: dict[str, str] | None = None) -> bool:
+    """Whether a tick-mark group draws a visible mark.
+
+    matplotlib draws a tick as a `<use>` of a line path in `<defs>`. A line has no area, so only its
+    stroke can show: the mark is drawn when the stroke, after inheritance from the group and the
+    `<use>`, is not none, is not transparent, and is wider than 0. `tick_params(width=0)` leaves the
+    `<use>` in place with a strokeless path, which `_draws` would count as a default black fill.
+    """
+    paint = _paint(group, inherited or {})
+    for child in group:
+        tag = child.tag.rsplit("}", 1)[-1]
+        if tag == "use":
+            ref = (child.get("{http://www.w3.org/1999/xlink}href") or child.get("href") or "").lstrip("#")
+            target = defs.get(ref)
+            mark = _paint(target, _paint(child, paint)) if target is not None else _paint(child, paint)
+            if target is not None:
+                for prop, value in STYLE_DECL.findall(target.get("style") or ""):
+                    mark[prop] = value.strip()
+            width = mark.get("stroke-width", "1").replace("px", "")
+            try:
+                wide = float(width) > 0
+            except ValueError:
+                wide = True
+            stroke = mark.get("stroke", "none") != "none" and mark.get("stroke-opacity", "1") not in ("0", "0.0")
+            if stroke and wide and mark.get("opacity", "1") not in ("0", "0.0"):
+                return True
+        elif tag == "g":
+            if _tick_draws(child, defs, paint):
+                return True
+        elif tag in PAINTABLE and _draws(child, paint):
+            return True
+    return False
+
+
+def mathtext_anchor(labels: list[TickLabel]) -> str | None:
+    """The alignment one axis' MathText labels were drawn with, read off where they sit, or None.
+
+    matplotlib places each label so that its left edge (start), middle or right edge (end) lands on
+    one x shared by the whole axis, so the alignment is the edge that lines up best. The right edge is
+    approximated by the last glyph's x, which only differs by that glyph's own advance. It can only be
+    told when the labels differ in width, by at least 0.3 of their font size; labels of one width
+    line up on every edge, and return None (`mathtext_past_plot_edge` then judges them).
+    """
+    placed = [label for label in labels if label.left is not None and label.extent is not None]
+    if len(placed) < 2:
+        return None
+    lefts = [label.left for label in placed]
+    extents = [label.extent for label in placed]
+    size = max((label.size for label in placed if label.size is not None), default=0.0)
+    if max(extents) - min(extents) < 0.3 * size or size == 0:
+        return None
+
+    def spread(edges: list[float]) -> float:
+        return max(edges) - min(edges)
+
+    edges = {
+        "start": lefts,
+        "middle": [lo + e / 2 for lo, e in zip(lefts, extents)],
+        "end": [lo + e for lo, e in zip(lefts, extents)],
+    }
+    return min(edges, key=lambda name: spread(edges[name]))
+
+
+def plot_left_edges(root: ET.Element) -> dict[str, float]:
+    """The x of each axes' left plot edge, where its y gridlines, y tick marks or left spine start.
+
+    matplotlib writes a gridline or spine as a path in SVG units (`M 48.6 332.4 L 349.9 332.4`) and a
+    tick mark as a `<use x=...>` of a mark in `<defs>`, all starting at the plot's left edge. The
+    first tick group holds that `<defs>` itself, whose mark sits at its own origin (`M 0 0`), so
+    `<defs>` are skipped. A hidden one is not written and a zero-length tick is an empty group, so
+    each subject takes the leftmost x of what is there.
+    """
+
+    def drawn(node: ET.Element) -> list[ET.Element]:
+        if node.tag.rsplit("}", 1)[-1] == "defs":
+            return []
+        return [node, *(found for child in node for found in drawn(child))]
+
+    edges: dict[str, float] = {}
+    for group in root.iter():
+        match = Y_EDGE_GID.match(group.get("id") or "")
+        if match is None:
+            continue
+        xs = []
+        for node in drawn(group):
+            tag = node.tag.rsplit("}", 1)[-1]
+            start = re.match(rf"\s*M\s*({NUMBER.pattern})", node.get("d") or "") if tag == "path" else None
+            if start:
+                xs.append(float(start.group(1)))
+            elif tag == "use" and NUMBER.fullmatch(node.get("x") or ""):
+                xs.append(float(node.get("x") or 0))
+        if xs:
+            subject = match.group(1)
+            edges[subject] = min([*xs, edges.get(subject, min(xs))])
+    return edges
+
+
+def mathtext_past_plot_edge(labels: list[TickLabel], edge: float | None) -> bool | None:
+    """Whether one axis' MathText labels reach past the plot's left edge; None if there is no edge to judge by.
+
+    Labels of one width line up on every edge, so `mathtext_anchor` cannot tell their alignment; what
+    still shows is where they end. Right-aligned, matplotlib ends them a pad short of the plot's left
+    edge; left-aligned or centred, the same pad is where they start or centre, and they run into the
+    plot. A label's right edge is taken as its last glyph's x plus half that glyph's size, short of
+    any digit's advance, so a right-aligned label never reads as past the edge.
+    """
+    placed = [label for label in labels if label.left is not None and label.extent is not None]
+    if not placed:
+        return False
+    if edge is None:
+        return None
+    return any(
+        (label.left or 0) + (label.extent or 0) + 0.5 * (label.last_size or label.size or 0) > edge + 0.01
+        for label in placed
+    )
+
+
+def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[str]:
+    """Return failures where the axes differ from grapher's own download (module docstring)."""
+    failures = []
+    try:
+        root = ET.fromstring(svg)
+    except ET.ParseError as error:
+        return [f"the SVG does not parse as XML ({error}), so its axes could not be checked"]
+    labels = tick_labels(root)
+    rotated = sorted({label.subject for label in labels if label.axis == "y" and label.rotated})
+    if rotated:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(rotated)} are rotated, so they no longer form a column against "
+            "the plot. Grapher sets y-axis tick labels horizontal and right-aligned; drop the rotation."
+        )
+    right = sorted({label.subject for label in labels if label.axis == "y" and label.second})
+    if right:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(right)} are drawn on the right (labelright). Grapher puts them on the "
+            "left, right-aligned against the plot; draw them there (labelleft=True, labelright=False)."
+        )
+    top = sorted({label.subject for label in labels if label.axis == "x" and label.second})
+    if top:
+        failures.append(
+            f"the x-axis tick labels of {', '.join(top)} are drawn at the top (labeltop). Grapher puts them below the "
+            "plot, over its tick marks; draw them there (labelbottom=True, labeltop=False)."
+        )
+    labels_left = [label for label in labels if not (label.axis == "y" and label.second)]
+    anchors = {label.anchor for label in labels_left if label.axis == "y" and label.anchor is not None}
+    # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit,
+    # and for labels of one width, off where they end against the plot's left edge.
+    edges = plot_left_edges(root)
+    past, unread = [], []
+    for subject in sorted({label.subject for label in labels_left if label.axis == "y"}):
+        axis = [label for label in labels_left if label.axis == "y" and label.subject == subject]
+        anchor = mathtext_anchor(axis)
+        anchors.add(anchor)
+        reach = mathtext_past_plot_edge(axis, edges.get(subject)) if anchor is None else False
+        if reach:
+            past.append(subject)
+        elif reach is None:
+            unread.append(subject)
+    off = sorted(a for a in anchors if a not in (None, "end"))
+    if off:
+        failures.append(
+            f"y-axis tick labels are anchored {', '.join(off)}, not right-aligned against the plot. Grapher "
+            "right-aligns them; leave matplotlib's default (ha='right') or set it back."
+        )
+    if past:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(past)} run past the plot's left edge, so they are not "
+            "right-aligned against it. Grapher right-aligns them; leave matplotlib's default (ha='right') or set it back."
+        )
+    if unread:
+        failures.append(
+            f"the y-axis tick labels of {', '.join(unread)} are MathText of one width with no y gridline, y tick or "
+            "left spine to measure them against, so their alignment cannot be read from the SVG. Grapher writes a "
+            "log axis in plain numbers (10, 100, 1,000): format the ticks so (ax.yaxis.set_major_formatter), or draw "
+            "grapher's horizontal gridlines."
+        )
+    # Each axes is judged on its own, so a year axis next to a non-year one is still checked.
+    x_texts: dict[str, list[str]] = {}
+    for label in labels:
+        if label.axis == "x":
+            x_texts.setdefault(label.subject, []).append(label.text)
+    defs = {node.get("id"): node for node in root.iter() if node.get("id")}
+    # Each labelled year needs its own drawn mark, matched by tick value: `name_furniture` gives the
+    # label `<subject>__x[-minor]-tick-label-<v>` and its mark `<subject>__x[-minor]-tick-<v>`.
+    drawn: dict[tuple[str, str], bool] = {}
+    labelled: dict[str, list[str]] = {}
+    for group in root.iter():
+        gid = group.get("id") or ""
+        if group.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        lab = X_LABEL_VALUE.match(gid)
+        if lab:
+            if "".join(group.itertext()).strip():
+                labelled.setdefault(lab.group(1), []).append(lab.group(2))
+            continue
+        mark = X_MARK_VALUE.match(gid)
+        if mark:
+            key = (mark.group(1), mark.group(2))
+            drawn[key] = drawn.get(key, False) or _tick_draws(group, defs)
+    for subject in sorted(x_texts):
+        if not is_year_axis(x_texts[subject]):
+            continue
+        # matplotlib leaves an empty group for a zero-length mark, none at all for a hidden one
+        # (`bottom=False`, an invisible tick1line) and a fully transparent one for an alpha of 0;
+        # in each case nothing is drawn.
+        values = labelled.get(subject, [])
+        missing = [v for v in values if not drawn.get((subject, v), False)]
+        if missing:
+            which = "no tick marks" if len(missing) == len(values) else f"no tick mark at {', '.join(missing[:6])}"
+            failures.append(
+                f"the year axis of {subject} has {which} (each labelled year needs a visible x-tick mark). Grapher draws "
+                "them 5px long, 1px, #999, below the axis, which matplotlib takes in points: "
+                'ax.tick_params(axis="x", length=5 * 0.72, width=0.72). '
+                "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
+                "(2,000), and this check leaves it alone."
+            )
+    if target is not None and labels:
+        width = target[1][0]
+        want = TICK_LABEL_PX.get(width)
+        root = SVG_ROOT.search(svg)
+        in_pt = bool(root and re.search(r'\bwidth="[0-9.]+pt"', root.group()))
+        sizes = {label.size for label in labels if label.size is not None}
+        if want and sizes:
+            px = {round(s / 0.72 if in_pt else s, 2) for s in sizes}
+            wrong = sorted(p for p in px if abs(p - want) > LABEL_TOLERANCE)
+            if wrong:
+                failures.append(
+                    f"tick labels are {', '.join(f'{p:g}' for p in wrong)}px; on a {width}-wide template they are "
+                    f"{want:g}px, grapher's own download size (WRITING-THE-STEP.md). Changing it means rebalancing "
+                    "the template's type with the design team."
+                )
+    return failures
+
+
+# A tick label that reads as a year: a bare integer, maybe signed or marked BCE/CE. Grapher writes
+# years with no thousands separator and every other number with one (2,000), so a separator is a
+# count unless an era suffix makes it a year: long-run axes write "12,000 BCE".
+YEAR_LABEL = re.compile(r"[-\u2212]?(?:(\d+)(?: BCE| CE)?|(\d{1,3}(?:,\d{3})+) (?:BCE|CE))")
+
+
+def is_year_axis(texts: list[str]) -> bool:
+    """Whether an axis' tick labels, as drawn, read as years.
+
+    Judged on the label text rather than the tick values, which cannot tell years from a count axis
+    that also ends at 2000: grapher labels that count axis `2,000` and the year `2000`. Every drawn
+    label must be a bare integer (or a grouped one with an era suffix) and at least one must have
+    four digits, which admits long-run axes that start at 0 or before year 0 and projections that run
+    past 2100, and leaves out axes of shares, rates or small counts. Blank labels (a step thinning
+    the ticks) are skipped.
+    """
+    drawn = [t.strip() for t in texts if t.strip()]
+    years = [YEAR_LABEL.fullmatch(t) for t in drawn]
+    digits = [(m.group(1) or m.group(2)).replace(",", "") for m in years if m]
+    return bool(years) and all(years) and any(len(d) >= 4 for d in digits)
 
 
 def scale_failures(svg: str, target: tuple[str, tuple[int, int]]) -> list[str]:

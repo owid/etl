@@ -390,3 +390,6 @@ steps:
       - data://garden/war/2026-06-10/ucdp
       - data://garden/demography/2024-07-15/population
       - data://garden/countries/2024-08-27/gleditsch
+  # archived; last active in 1bfbb1b83add on 2026-11-12
+  viz://explorer/war/latest/countries_in_conflict_data:
+    - data://grapher/war/2026-06-10/ucdp
