@@ -29,10 +29,6 @@ steps:
   data://grapher/minerals/2026-11-09/global_mine_production_by_mineral:
     - data://garden/minerals/2026-11-09/minerals
 
-  # Minerals - Minerals explorer.
-  viz://explorer/minerals/latest/minerals:
-    - data://grapher/minerals/2026-11-09/minerals
-
-  # Minerals - Minerals explorer (multidim).
+  # Minerals - Minerals data explorer (multidim).
   viz://chart/minerals/latest/minerals:
     - data://grapher/minerals/2026-11-09/minerals
