@@ -57,20 +57,26 @@ definitions:
           - StackedArea
         hasMapTab: false
         selectedFacetStrategy: entity
-        facetYDomain: independent
+        yAxis:
+          min: 0
+          facetDomain: independent
     # Side-by-side comparisons: one facet per indicator, no map.
     - dimensions:
         surveillance_type: compare_types
       config:
         hasMapTab: false
         selectedFacetStrategy: metric
-        facetYDomain: independent
+        yAxis:
+          min: 0
+          facetDomain: independent
     - dimensions:
         metric: comparison_of_data_on_respiratory_infections
       config:
         hasMapTab: false
         selectedFacetStrategy: metric
-        facetYDomain: independent
+        yAxis:
+          min: 0
+          facetDomain: independent
 
 # The explorer's "Confirmed cases (by surveillance type)" metric had a blank surveillance type; it is
 # the "Compare surveillance types" choice of "All influenza strains" here. Data on symptoms (FluID)
