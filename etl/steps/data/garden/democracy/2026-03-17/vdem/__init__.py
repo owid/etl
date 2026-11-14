@@ -78,8 +78,6 @@ INDICATORS_NO_ORIGINS = [
     "regime_imputed",
     "num_years_in_electdem_consecutive",
     "num_years_in_libdem_consecutive",
-    "num_years_in_electdem",
-    "num_years_in_libdem",
     "num_years_in_electdem_consecutive_cat",
     "num_years_in_libdem_consecutive_cat",
 ]

@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import numpy as np
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder
@@ -26,9 +25,6 @@ REGIONS = {
     "Europe": {},
     "Oceania": {},
 }
-# Year range
-YEAR_MIN = 2005
-YEAR_MAX = 2025
 
 
 # Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
@@ -78,15 +74,13 @@ def run() -> None:
     ##################################################
     # AGGREGATES
 
-    # Get country-count-related data: country-averages, number of countries, ...
-    tb_num_countries, tb_avg_countries = get_country_data(tb, ds_regions)
+    # Number of countries in each regime
+    # NOTE: We don't publish regional or world averages of the BTI scores, because the BTI doesn't cover many rich countries.
+    tb_num_countries = get_country_data(tb, ds_regions)
 
-    # Get population-related data: population-weighed averages, people livin in ...
-    tb_num_people, tb_avg_w_countries = get_population_data(tb, ds_regions, ds_population)
+    # Number of people living in each regime
+    tb_num_people = get_population_data(tb, ds_regions, ds_population)
     ##################################################
-
-    # Add regions to main table
-    # tb = concat([tb, tb_avg_countries], ignore_index=True)
 
     # Store categorical indicators as text. Done after the aggregates, which use the numeric codes. The numeric regime
     # score is kept for the chart that compares the classifications of several sources.
@@ -100,7 +94,6 @@ def run() -> None:
         tb.format(["country", "year"]),
         tb_num_countries.format(["country", "year", "category"], short_name="num_countries"),
         tb_num_people.format(["country", "year", "category"], short_name="num_people"),
-        # tb_avg_w_countries.format(["country", "year"], short_name="avg_pop"),
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -172,22 +165,15 @@ def check_regime(tb: Table) -> Table:
     return tb
 
 
-def get_country_data(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
-    """Estimate number of countries in each regime, and country-average for some indicators.
+def get_country_data(tb: Table, ds_regions: Dataset) -> Table:
+    """Estimate the number of countries in each regime.
 
-    Returns two tables:
-
-    1) tb_num_countres: Counts countries in different regimes
-        regime_bti (counts)
-            - Number of hard-line autocracies
-            - Number of moderate autocracies
-            - Number of highly defective democracies
-            - Number of defective democracies
-            - Number of consolidating democracies
-
-    2) tb_avg_countries: Country-average for some indicators
-        - democracy_bti (country-average)
-
+    regime_bti (counts)
+        - Number of hard-line autocracies
+        - Number of moderate autocracies
+        - Number of highly defective democracies
+        - Number of defective democracies
+        - Number of consolidating democracies
     """
     # 1/ COUNT COUNTRIES
     # Keep only non-imputed data
@@ -224,41 +210,18 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     tb_num = add_regions_and_global_aggregates(tb_num, ds_regions)
     tb_num = from_wide_to_long(tb_num)
 
-    # 2/ COUNTRY-AVERAGE INDICATORS
-    tb_avg = tb.copy()
-    indicators_avg = ["democracy_bti"]
-
-    # Keep only relevant columns
-    tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
-
-    # Estimate region aggregates
-    tb_avg = add_regions_and_global_aggregates(
-        tb=tb_avg,
-        ds_regions=ds_regions,
-        aggregations={k: "mean" for k in indicators_avg},  # ty: ignore
-        aggregations_world={k: np.mean for k in indicators_avg},  # ty: ignore
-    )
-
-    # Keep only certain year range
-    # tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
-
-    return tb_num, tb_avg
+    return tb_num
 
 
-def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
-    """Estimate people living in each regime, and population-weighted averages for some indicators.
+def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Table:
+    """Estimate the number of people living in each regime.
 
-    1) tb_num_people: People living in different regimes
-        regime_bti
-            - Number of hard-line autocracies
-            - Number of moderate autocracies
-            - Number of highly defective democracies
-            - Number of defective democracies
-            - Number of consolidating democracies
-
-    2) tb_avg_w_countries: Population-weighted-average for some indicators
-        - democracy_bti
-
+    regime_bti
+        - Number of hard-line autocracies
+        - Number of moderate autocracies
+        - Number of highly defective democracies
+        - Number of defective democracies
+        - Number of consolidating democracies
     """
     # 1/ COUNT PEOPLE
     # Keep only non-imputed data
@@ -289,56 +252,16 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
 
     ## Get missing years (not to miss anyone!) -- Note that this can lead to country overlaps (e.g. USSR and Latvia)
     tb_ppl = expand_observations_without_duplicates(tb_ppl, ds_regions)
-    print(f"{tb.shape} -> {tb_ppl.shape}")
 
     # Column per indicator-dimension
     tb_ppl = make_table_with_dummies(tb_ppl, indicators)
-
-    # Replace USSR -> current states
-    # tb_ppl = replace_ussr(tb_ppl, ds_regions)
 
     ## Counts
     tb_ppl = add_population_in_dummies(tb_ppl, ds_population)
     tb_ppl = add_regions_and_global_aggregates(tb_ppl, ds_regions)
     tb_ppl = from_wide_to_long(tb_ppl)
 
-    # 2/ COUNTRY-AVERAGE INDICATORS
-    tb_avg = tb.copy()
-    indicators_avg = ["democracy_bti"]
-
-    # Keep only relevant columns
-    tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
-
-    # Add population in dummies (population value replaces 1, 0 otherwise)
-    tb_avg = add_population_in_dummies(
-        tb_avg,
-        ds_population,
-        drop_population=False,
-    )
-
-    # Get region aggregates
-    tb_avg = add_regions_and_global_aggregates(
-        tb=tb_avg,
-        ds_regions=ds_regions,
-        aggregations={k: "sum" for k in indicators_avg} | {"population": "sum"},  # ty: ignore
-        min_num_values_per_year=1,
-    )
-
-    # Normalize by region's population
-    columns_index = ["year", "country"]
-    columns_indicators = [col for col in tb_avg.columns if col not in columns_index + ["population"]]
-    tb_avg[columns_indicators] = tb_avg[columns_indicators].div(tb_avg["population"], axis=0)
-    tb_avg = tb_avg.drop(columns="population")
-
-    # Keep only certain year range
-    # tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
-
-    tb_avg = tb_avg.rename(
-        columns={
-            "democracy_bti": "democracy_bti_weighted",
-        }
-    )
-    return tb_ppl, tb_avg
+    return tb_ppl
 
 
 def expand_observations_without_duplicates(tb: Table, ds_regions: Dataset) -> Table:
@@ -350,7 +273,7 @@ def expand_observations_without_duplicates(tb: Table, ds_regions: Dataset) -> Ta
     # Full expansion
     tb_exp = expand_observations(tb, countries)
 
-    # Limit years
-    tb_exp = tb_exp.loc[tb_exp["year"].isin(range(YEAR_MIN, YEAR_MAX + 1, 2))]
+    # Keep only the BTI editions' years
+    tb_exp = tb_exp.loc[tb_exp["year"].isin(set(tb["year"]))]
 
     return tb_exp

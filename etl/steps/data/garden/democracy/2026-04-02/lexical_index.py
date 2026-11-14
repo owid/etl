@@ -1,9 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import ast
 from typing import cast
 
 import pandas as pd
+import yaml
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
 
@@ -168,8 +168,8 @@ def run() -> None:
     # Create variable distinguishing between democracies and autocracies:
     tb = add_is_democracy(tb)
 
-    # Create indicators with ages and experiences (electoral democracy and polyarchy)
-    tb = add_age_and_experience(tb)
+    # Create indicators with ages (electoral democracy and polyarchy)
+    tb = add_age(tb)
 
     # Create variable for universal suffrage
     tb = add_universal_suffrage(tb)
@@ -378,19 +378,18 @@ def add_is_democracy(tb: Table) -> Table:
     return tb
 
 
-def add_age_and_experience(tb: Table) -> Table:
-    """Add age and experience related indicators.
+def add_age(tb: Table) -> Table:
+    """Add age related indicators.
 
     This includes:
         - Number of consecutive years in electoral democracy and polyarchy (age)
-        - Number of total years in electoral democracy and polyarchy (experience)
         - Age groups for electoral democracy and polyarchy
     """
     columns = [
         ("regime_lied", "electdem_lied", 5),
         ("regime_lied", "polyarchy_lied", 6),
     ]
-    # Add age and experience counts
+    # Add age counts
     tb = add_count_years_in_regime(
         tb=tb,
         columns=columns,
@@ -668,17 +667,13 @@ def get_region_aggregates(
     tb_num = tb_num.rename(columns=dict(zip(indicator_names, [f"num_{i}" for i in indicator_names])))
 
     # 2) Get people
-    ## Get missing years (not to miss anyone!) -- Note that this can lead to country overlaps (e.g. USSR and Latvia)
-    tb_pop = expand_observations_without_duplicates(tb_)
-    print(f"{tb_.shape} -> {tb_pop.shape}")
+    ## Get missing years and countries (not to miss anyone!), without counting anyone twice
+    tb_pop = expand_observations_without_duplicates(tb_, ds_regions)
 
     ## Make dummies
     for ind in indicators:
         ind["has_na"] = True
     tb_pop = make_table_with_dummies(tb_pop, indicators)
-
-    # Replace USSR -> current states
-    tb_pop = replace_ussr(tb_pop, ds_regions)
 
     ## Counts
     tb_pop = add_population_in_dummies(tb_pop, ds_population)
@@ -695,8 +690,28 @@ def get_region_aggregates(
     return tb_regions
 
 
-def expand_observations_without_duplicates(tb: Table) -> Table:
-    tb_exp = expand_observations(tb)
+def expand_observations_without_duplicates(tb: Table, ds_regions: Dataset) -> Table:
+    """Have one row per country and year, so that everyone's population is counted once.
+
+    Countries without Lexical Index data (e.g. Hong Kong or Puerto Rico) are kept as "no data", as in the original Stata script, so that the world total matches the world population. Soviet republics get the USSR's values, and countries that were part of another state are dropped while it existed.
+    """
+    # Expand to all current countries, plus the (historical) countries in the data
+    tb_regions = ds_regions.read("regions")
+    countries = set(tb_regions.loc[(tb_regions["region_type"] == "country") & ~(tb_regions["is_historical"]), "name"])
+    countries |= set(tb["country"])
+    tb_exp = expand_observations(tb, countries)
+
+    # Soviet republics get the USSR's values in the years the imputation file assigns them to it (e.g. 1922-1990 for Russia, 1940-1990 for the Baltic states)
+    for impute in yaml.safe_load(PATH_IMPUTE.read_text()):
+        if impute["country_impute"] == "USSR":
+            successors = impute["country"] if isinstance(impute["country"], list) else [impute["country"]]
+            for successor in successors:
+                tb_exp = replace_with_predecessor(tb_exp, "USSR", successor, impute["year_min"], impute["year_max"])
+    tb_exp = tb_exp.loc[tb_exp["country"] != "USSR"]
+
+    # Serbia and Montenegro only appear in the data from 1992; in 1991 they get Yugoslavia's values (as Serbia, Montenegro and Kosovo do in the imputation file)
+    tb_exp = replace_with_predecessor(tb_exp, "Yugoslavia", "Serbia and Montenegro", 1991, 1991)
+
     tb_exp = tb_exp.loc[
         ~(
             # YUGOSLAVIA
@@ -717,52 +732,23 @@ def expand_observations_without_duplicates(tb: Table) -> Table:
             | ((tb_exp["country"] == "West Germany") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1945)))
             | ((tb_exp["country"] == "East Germany") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1945)))
             | ((tb_exp["country"] == "Germany") & (tb_exp["year"] >= 1945) & (tb_exp["year"] <= 1989))
-            # USSR
-            | ((tb_exp["country"] == "USSR") & ((tb_exp["year"] > 1990) | (tb_exp["year"] < 1941)))
-            | ((tb_exp["country"] == "Uzbekistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Kazakhstan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Turkmenistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Kyrgyzstan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Tajikistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Russia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Ukraine") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Belarus") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Moldova") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Latvia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Lithuania") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Estonia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Armenia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Georgia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
-            | ((tb_exp["country"] == "Azerbaijan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
             # CZECHOSLOVAKIA
             | ((tb_exp["country"] == "Czechoslovakia") & ((tb_exp["year"] > 1992) | (tb_exp["year"] < 1918)))
             | ((tb_exp["country"] == "Czechia") & ((tb_exp["year"] <= 1992) & (tb_exp["year"] >= 1918)))
             | ((tb_exp["country"] == "Slovakia") & ((tb_exp["year"] <= 1992) & (tb_exp["year"] >= 1918)))
         ),
     ]
+    assert not tb_exp.duplicated(subset=["country", "year"]).any(), "Some country-years are counted twice."
 
     return tb_exp
 
 
-def replace_ussr(tb: Table, ds_regions: Dataset) -> Table:
-    tb_regions = ds_regions["regions"]
-    codes = tb_regions.loc["OWID_USS", "successors"]
-    successors = set(tb_regions.loc[ast.literal_eval(codes), "name"])
-
-    # Create new rows
-    tb_succ = []
-    for successor in successors:
-        # Copy USSR data
-        tb_ = tb.loc[(tb["country"] == "USSR")].copy()
-        # Replace country name
-        tb_["country"] = successor
-        # Append
-        tb_succ.append(tb_)
-    tb_succ = concat(tb_succ, ignore_index=True)
-
-    # Concatenate tables
-    tb = concat([tb, tb_succ], ignore_index=True).sort_values(["country", "year"])
-
-    # Remove USSR
-    tb = tb.loc[~(tb["country"] == "USSR")]
-    return tb
+def replace_with_predecessor(tb: Table, predecessor: str, successor: str, year_min: int, year_max: int) -> Table:
+    """Replace a successor country's rows with its predecessor's values, for the years it was part of it."""
+    years = tb["year"].between(year_min, year_max)
+    tb_predecessor = tb.loc[(tb["country"] == predecessor) & years].copy()
+    assert tb_predecessor["regime_lied"].notna().all() and (len(tb_predecessor) == year_max - year_min + 1), (
+        f"{predecessor} has no data for some years in {year_min}-{year_max}, so {successor} would be left out."
+    )
+    tb_predecessor["country"] = successor
+    return concat([tb.loc[~((tb["country"] == successor) & years)], tb_predecessor], ignore_index=True)

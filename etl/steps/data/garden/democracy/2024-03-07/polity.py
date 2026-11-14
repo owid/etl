@@ -184,8 +184,8 @@ def run() -> None:
     # Recode
     tb["democracy_recod_polity"] = tb["democracy_polity"] + 10
 
-    # Age and experience of democracy
-    tb = add_age_and_experience(tb)
+    # Age of democracy
+    tb = add_age(tb)
 
     # Add imputes
     col_flag_imputed = "values_imputed"
@@ -278,19 +278,18 @@ def harmonize_country_names(tb: Table) -> Table:
     return tb
 
 
-def add_age_and_experience(tb: Table) -> Table:
-    """Add age and experience related indicators.
+def add_age(tb: Table) -> Table:
+    """Add age related indicators.
 
     This includes:
         - Number of consecutive years in electoral democracy and polyarchy (age)
-        - Number of total years in electoral democracy and polyarchy (experience)
         - Age groups for electoral democracy and polyarchy
     """
     columns = [
         ("regime_polity", "dem_polity", 1),
         # ("regime_lied", "polyarchy_lied", 6),
     ]
-    # Add age and experience counts
+    # Add age counts
     tb = add_count_years_in_regime(
         tb=tb,
         columns=columns,  # ty: ignore
