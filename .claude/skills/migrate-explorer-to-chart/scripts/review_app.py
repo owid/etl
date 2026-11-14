@@ -34,6 +34,15 @@ def reviews(root: Path) -> dict[str, Path]:
     }
 
 
+# What each review stage means for the explorer, in the order a migration goes through them.
+STATUS = {
+    "review": ("In review", "Multidim on staging; checking it against the explorer."),
+    "links": ("Cut-over: links", "Merged; swapping the links that break on redirect."),
+    "redirects": ("Cut-over: redirects", "Links swapped; redirect JSON ready to paste."),
+    "retire": ("Migrated", "Redirects live, explorer unpublished and retired."),
+}
+
+
 def hub(root: Path) -> str:
     rows = []
     for slug, d in reviews(root).items():
@@ -41,17 +50,30 @@ def hub(root: Path) -> str:
         cfg = json.loads((d / "review.json").read_text())
         pairs = ev["pairs"]
         same = sum(1 for p in pairs if not [c for c in p["checks"] if c["check"].split(":")[0] != "config"])
+        label, hint = STATUS.get(cfg["stage"], (cfg["stage"], ""))
         rows.append(
-            f"<tr><td><a href='/{html.escape(slug)}/'>{html.escape(slug)}</a></td><td>{len(pairs)}</td>"
-            f"<td>{same} / {len(pairs)}</td><td>{html.escape(cfg['stage'])}</td><td>{html.escape(cfg['payload_env'])}</td></tr>"
+            (
+                list(STATUS).index(cfg["stage"]) if cfg["stage"] in STATUS else -1,
+                slug,
+                f"<tr class='{html.escape(cfg['stage'])}'><td><a href='/{html.escape(slug)}/'>{html.escape(slug)}</a></td>"
+                f"<td><span class='badge' title='{html.escape(hint)}'>{html.escape(label)}</span></td><td>{len(pairs)}</td>"
+                f"<td>{same} / {len(pairs)}</td><td>{html.escape(cfg['payload_env'])}</td></tr>",
+            )
         )
-    body = "".join(rows) or "<tr><td colspan=5>No review folders yet: run build_review_page.py.</td></tr>"
+    # Work in progress first (earliest stage first), migrated explorers last.
+    body = "".join(r for _, _, r in sorted(rows)) or "<tr><td colspan=5>No review folders yet: run build_review_page.py.</td></tr>"
+    done = sum(1 for _, _, r in rows if "class='retire'" in r)
     return f"""<!doctype html><meta charset="utf-8"><title>Explorer migration reviews</title>
 <style>body{{font:15px system-ui,sans-serif;margin:32px;color:#18202b;background:#f5f6f8}}
 table{{border-collapse:collapse;background:#fff}}td,th{{padding:8px 14px;border-bottom:1px solid #dfe3e8;text-align:left}}
-th{{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#5d6775}}a{{color:#2457a6}}</style>
+th{{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#5d6775}}a{{color:#2457a6}}
+.badge{{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:#e6ebf2;color:#3a4656}}
+tr.links .badge,tr.redirects .badge{{background:#fdf0d5;color:#8a5a00}}
+tr.retire{{background:#eef8f0}}tr.retire .badge{{background:#2e7d4f;color:#fff}}tr.retire a{{color:#1f6b40}}
+p.sum{{color:#5d6775}}</style>
 <h1>Explorer migration reviews</h1>
-<table><tr><th>Explorer</th><th>Views</th><th>Match on what readers see</th><th>Stage</th><th>Redirect JSON built on</th></tr>{body}</table>"""
+<p class="sum">{done} of {len(rows)} migrated. Hover a status for what it means.</p>
+<table><tr><th>Explorer</th><th>Status</th><th>Views</th><th>Match on what readers see</th><th>Redirect JSON built on</th></tr>{body}</table>"""
 
 
 def make_handler(root: Path):
