@@ -1,7 +1,3 @@
----
-status: new
----
-
 # Tracking historical progress against slavery and forced labor: a long-run data view
 
 !!! info ""
