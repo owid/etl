@@ -24,11 +24,11 @@ definitions:
           - LineChart
           - DiscreteBar
         hasMapTab: true
-        timeTolerance: 10
         yAxis:
           min: 0
 # Titles and subtitles come from each indicator's garden metadata, and the map bins of
-# percentage views are set in water_and_sanitation.py, as the explorer did.
+# percentage views are set in water_and_sanitation.py, as the explorer did. The explorer's
+# timeTolerance of 10 years is the indicators' own display.tolerance, set in garden.
 dimensions:
   - slug: resource
     name: Resource
