@@ -93,7 +93,9 @@ exclude-newer = "3 days"
 # only keep forged certificates trusted for longer.
 # grpcio ignores certifi and ships its own root certificates (roots.pem), so the same applies.
 exclude-newer-package = { genai-prices = false, certifi = false, grpcio = false }
-link-mode = "hardlink"
+# Don't pin `link-mode`: uv's default is already the cheapest per platform. On macOS it
+# clones (APFS copy-on-write), so a worktree's venv shares the cache's disk blocks just
+# like a hardlink would, but builds in ~3s instead of ~40s; on Linux it hardlinks.
 
 # PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*
 # wheels). We run embeddings on CPU everywhere, so take the CPU build instead.

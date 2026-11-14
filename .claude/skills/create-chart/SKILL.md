@@ -200,8 +200,21 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 ```
 
 Editing the YAML is enough to trigger a re-run — ETL's change detection picks it up, so no extra flags are
-needed. Reserve `--force --only` for re-pushing when *nothing* changed, and note that `--only` skips
-dependency resolution, so it fails unless the upstream datasets are already built locally.
+needed. Reserve `--force --only` for re-pushing when *nothing* changed.
+
+`--only` skips the upstream steps. A chart defined only by its `.config.yml` then needs no dataset on disk:
+when the grapher dataset isn't there, the step reads the names of its tables from the grapher DB it writes
+to. A chart with a `.py` that loads tables still needs them built or downloaded.
+
+**Preview edits in seconds with `--watch`.** This re-runs the step each time the file is saved, and pushes
+the chart to the branch's staging server without a commit:
+
+```bash
+STAGING=1 .venv/bin/etlr viz://chart/{namespace}/latest/{short_name} --grapher --only --watch
+```
+
+The staging server must already have the indicators, so push the branch once first. Its build rewrites the
+chart from the committed file on every push, so commit what you want to keep.
 
 On success the step prints where to look:
 
@@ -433,6 +446,19 @@ template), rebuild the grapher step, and leave the view configs thin. To verify 
 read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
 Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): show the user its links before you write, check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
+
+### Data page of a view that combines different indicators
+
+A multidim view's data page shows the metadata of its **first y indicator only**, with the view's
+`metadata:` merged on top. So a view that combines different indicators (a scatter's y and x; a dumbbell or
+line chart of gross vs. net rates or past vs. projected spending; a stacked bar of several components) needs
+its own `metadata:` block (not `config:`) whose text covers all of them. Set at least
+`presentation.title_public`, `description_short` and `description_key`, and check `presentation.attribution_short`
+and `presentation.title_variant` (they render with the title), `description_processing`,
+`description_from_producer`, the unit and the origins on the rendered page. A view comparing one indicator
+across a dimension (men vs. women) needs none, unless the indicator's text names the split value. A `size`
+or `color` slot that holds regions, income groups or population is left out of the text; one that is a
+measure of its own is covered. How to write the text and keep it in sync: [`COMBINED_VIEW_METADATA.md`](COMBINED_VIEW_METADATA.md).
 
 ## Chart config options
 

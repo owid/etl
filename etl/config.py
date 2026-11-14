@@ -179,7 +179,13 @@ def load_STAGING() -> str | None:
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
-        branch_name = git.Repo(BASE_DIR).active_branch.name
+        repo = git.Repo(BASE_DIR)
+        if repo.head.is_detached:
+            # No branch, so no branch's staging server to target.
+            if not is_run_python_step:
+                log.warning("HEAD is detached, using local env instead of a staging server")
+            return None
+        branch_name = repo.active_branch.name
         if branch_name == "master":
             if not is_run_python_step:
                 log.warning("You're on master branch, using local env instead of STAGING=master")
@@ -765,7 +771,7 @@ METABASE_URL = os.environ.get("METABASE_URL")
 # Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
 # The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
-METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+METABASE_URL = os.environ.get("METABASE_URL", "https://metabase.owid.io")
 
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.

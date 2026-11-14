@@ -1280,3 +1280,18 @@ steps:
   data://grapher/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
       - data://garden/who/2026-10-13/mortality_database
+  # archived; last active in c152552c3996 on 2026-11-06
+  data://grapher/health/2025-03-12/polio_cases:
+    - data://garden/health/2025-03-12/polio_cases:
+      - data://meadow/us_census_bureau/2025-03-12/polio_cases
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/public_health_reports/2025-03-12/polio_cases
+      - data://meadow/cdc/2025-03-12/polio_cases:
+        - snapshot://cdc/2025-03-12/polio_cases.csv
+  # archived; last active in c152552c3996 on 2026-11-06
+  data://grapher/health/2025-03-14/polio_deaths:
+    - data://garden/health/2025-03-14/polio_deaths:
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/cdc/2025-03-14/polio_deaths:
+        - snapshot://cdc/2025-03-14/polio_deaths.csv
+      - data://meadow/public_health_reports/2025-03-14/polio_deaths

@@ -36,6 +36,10 @@ check-uv-default:
 		exit 1; \
 	fi
 
+# `--frozen` installs exactly what uv.lock pins. Without it, uv re-resolves whenever it
+# judges the lock stale (the relative `exclude-newer` window makes that happen
+# spuriously), which rewrites uv.lock and downloads newer versions of hundreds of
+# packages, torch included. Change dependencies with `uv add` / `uv lock` instead.
 .venv-default: check-uv .sanity-check
 	@if [ -d .venv ] && [ .venv -nt pyproject.toml ] && { [ ! -f uv.lock ] || [ .venv -nt uv.lock ]; }; then \
 		true; \
@@ -43,9 +47,9 @@ check-uv-default:
 		echo '==> Installing packages'; \
 		if [ -n "$(PYTHON_VERSION)" ]; then \
 			echo '==> Using Python version $(PYTHON_VERSION)'; \
-			UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras --group dev; \
+			UV_PYTHON=$(PYTHON_VERSION) uv sync --frozen --all-extras --group dev; \
 		else \
-			uv sync --all-extras --group dev; \
+			uv sync --frozen --all-extras --group dev; \
 		fi && \
 		touch .venv; \
 	fi
