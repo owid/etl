@@ -102,15 +102,20 @@ def run() -> None:
         if dimension["slug"] == "animal":
             dimension["choices"] = animal_choices
 
-    # The chick culling status embeds each country's effective year (e.g. "Banned (2023)"). Build one bin per value
-    # found in the data, labelled with its plain status, so the legend shows one entry per status.
-    bins = []
+    # The chick culling status embeds each country's effective year (e.g. "Banned (2023)"). Color each value found in
+    # the data by its plain status, and label it with that status, so the legend shows one entry per status.
+    colors = {}
+    labels = {}
     for value in sorted(set(tb_chick["status"])):
         plain = re.sub(r" \(\d{4}\)$", "", value)
-        bins.append(f"{value},{CHICK_CULLING_STATUS_COLORS[plain]},{plain if plain != value else ''}")
+        colors[value] = CHICK_CULLING_STATUS_COLORS[plain]
+        if plain != value:
+            labels[value] = plain
     for view in config["views"]:
         if view["dimensions"]["metric"] == "chick_culling_status":
-            view["indicators"]["y"][0]["display"]["colorScaleCategoricalBins"] = ";".join(bins) + ";No data,,"
+            color_scale = view["config"]["map"]["colorScale"]
+            color_scale["customCategoryColors"] = colors
+            color_scale["customCategoryLabels"] = labels
 
     # Animal count views go first, followed by those on laws and hens.
     config["views"] = views + config["views"]
