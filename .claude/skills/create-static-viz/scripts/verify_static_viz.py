@@ -24,6 +24,9 @@ plausible, and the problem only shows up once a designer opens the SVG:
   as in "12,000 BCE"). Judged on the ``<subject>__<axis>-tick-label-<value>`` and
   ``<subject>__x-tick-<value>`` gids ``etl.viz.static.name_furniture`` gives every axis, reading a
   label's text however deeply it is nested (MathText labels such as ``$10^5$`` are)
+- a year axis that stops short of the data: a ``line__<Entity>`` series running on past the axis' last
+  labelled tick. Grapher's time axis shows the data's first and last year as ticks, so the last tick
+  is the last year plotted, never a round year before it
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -658,6 +661,15 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
                 "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
                 "(2,000), and this check leaves it alone."
             )
+    # A year axis closes on the data's last year: no series line runs on past its last labelled tick.
+    year_axes = {subject for subject in x_texts if is_year_axis(x_texts[subject])}
+    for subject, last, lines, year in year_axis_overruns(root, year_axes):
+        failures.append(
+            f"the year axis of {subject} ends its labels at {last}, but {', '.join(lines[:4])} run on to about "
+            f"{year}. Grapher keeps its round ticks and adds the data's first and last year to them; add the last "
+            "year plotted as the final tick (etl.viz.static.year_axis_ticks) and set_xlim to the first and last "
+            "tick (WRITING-THE-STEP.md)."
+        )
     if target is not None and labels:
         width = target[1][0]
         want = TICK_LABEL_PX.get(width)
@@ -674,6 +686,101 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
                     "the template's type with the design team."
                 )
     return failures
+
+
+def _xs(node: ET.Element) -> list[float]:
+    """The x of every vertex a mark draws: each coordinate pair of its paths and each `<use>`, `<defs>` skipped.
+
+    matplotlib writes a line in absolute SVG units (`M 62.3 332.4 L 176.4 60.3`) and each of its markers
+    as a `<use x=... y=...>` of a mark in `<defs>`, so the even-placed numbers of a path are its x.
+    """
+    tag = node.tag.rsplit("}", 1)[-1]
+    if tag == "defs":
+        return []
+    xs: list[float] = []
+    if tag == "path":
+        xs = [float(n) for n in NUMBER.findall(node.get("d") or "")[0::2]]
+    elif tag == "use" and NUMBER.fullmatch(node.get("x") or ""):
+        xs = [float(node.get("x") or 0)]
+    return xs + [x for child in node for x in _xs(child)]
+
+
+def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, list[str], int]]:
+    """Each year axis whose series lines run past its last labelled tick: subject, that label, the lines, their end.
+
+    A series line is a `line__<Entity>` group, the name grapher gives one and the Figma restyle reads. It
+    belongs to the nearest axes group above it (the `<g>` holding a `matplotlib.axis_*` group), so an
+    inset's line is judged on the inset's axis. The axis' scale comes from where its tick marks sit
+    (`<use x=...>`) and the tick values in their gids; a line runs past when its last vertex lies more
+    than half a year beyond the last labelled tick. An axis with fewer than two placed marks is left
+    alone, since the tick-mark check already fails it.
+    """
+    parent = {child: node for node in root.iter() for child in node}
+
+    def is_axes(node: ET.Element) -> bool:
+        return any((child.get("id") or "").startswith("matplotlib.axis") for child in node)
+
+    def subject_of(axes: ET.Element) -> str | None:
+        for child in axes:
+            if (child.get("id") or "").startswith("matplotlib.axis"):
+                for node in child.iter():
+                    match = X_LABEL_VALUE.match(node.get("id") or "")
+                    if match:
+                        return match.group(1)
+        return None
+
+    def axes_of(node: ET.Element) -> ET.Element | None:
+        while node in parent:
+            node = parent[node]
+            if is_axes(node):
+                return node
+        return None
+
+    # Where each year tick's mark sits ({value: x}), and the value and text of the last labelled tick.
+    placed: dict[str, dict[float, float]] = {}
+    last_label: dict[str, tuple[float, str]] = {}
+    for group in root.iter():
+        gid = group.get("id") or ""
+        lab = X_LABEL_VALUE.match(gid)
+        if lab:
+            text = "".join(group.itertext()).strip()
+            subject, value = lab.group(1), lab.group(2)
+            if subject in year_axes and NUMBER.fullmatch(value) and text:
+                if float(value) >= last_label.get(subject, (float("-inf"), ""))[0]:
+                    last_label[subject] = (float(value), text)
+            continue
+        mark = X_MARK_VALUE.match(gid)
+        if mark and mark.group(1) in year_axes and NUMBER.fullmatch(mark.group(2)):
+            xs = [x for child in group for x in _xs(child)]
+            if xs:
+                placed.setdefault(mark.group(1), {})[float(mark.group(2))] = xs[0]
+
+    ends: dict[str, dict[str, float]] = {}
+    for group in root.iter():
+        gid = group.get("id") or ""
+        if not gid.startswith("line__") or group.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        axes = axes_of(group)
+        subject = subject_of(axes) if axes is not None else None
+        xs = _xs(group)
+        if subject in year_axes and xs:
+            ends.setdefault(subject, {})[gid] = max(xs)
+
+    overruns = []
+    for subject in sorted(ends):
+        ticks = placed.get(subject, {})
+        if len(ticks) < 2 or subject not in last_label:
+            continue
+        (v0, x0), (v1, x1) = min(ticks.items()), max(ticks.items())
+        if x1 == x0:
+            continue
+        per_year = (x1 - x0) / (v1 - v0)
+        last_value, last_text = last_label[subject]
+        last_x = x0 + (last_value - v0) * per_year
+        past = {gid: end for gid, end in ends[subject].items() if (end - last_x) / per_year > 0.5}
+        if past:
+            overruns.append((subject, last_text, sorted(past), round(v0 + (max(past.values()) - x0) / per_year)))
+    return overruns
 
 
 # A tick label that reads as a year: a bare integer, maybe signed or marked BCE/CE. Grapher writes

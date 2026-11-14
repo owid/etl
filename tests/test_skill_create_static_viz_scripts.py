@@ -982,3 +982,48 @@ def test_x_labels_drawn_at_the_top_fail(tmp_path):
     plt.close(fig)
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
     assert result.returncode == 1 and "are drawn at the top (labeltop)" in result.stdout, result.stdout
+
+
+@pytest.mark.parametrize(
+    "line_years, ticks, labels, message",
+    [
+        # The line runs to 2024 while the axis stops at a round 2020.
+        ([2000, 2010, 2024], [2000, 2010, 2020], None, "ends its labels at 2020, but line__value run on to about 2024"),
+        # A blank last label (a step thinning the ticks) does not count as closing the axis.
+        ([2000, 2010, 2020], [2000, 2010, 2020], ["2000", "2010", ""], "ends its labels at 2010"),
+        ([2000, 2010, 2024], [2000, 2010, 2024], None, None),
+        # Grapher's pattern: the round step kept, the last year added after it.
+        ([2000, 2010, 2024], [2000, 2005, 2010, 2015, 2020, 2024], None, None),
+        # Within half a year of the last tick, as a bar centred on it reaches: not past it.
+        ([2000, 2010, 2020.4], [2000, 2010, 2020], None, None),
+    ],
+)
+def test_a_year_axis_closes_on_the_last_year_plotted(tmp_path, line_years, ticks, labels, message):
+    """Grapher's time axis ends on the data's last year; a series line running past the last tick fails."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot(line_years, [0, 25, 20], gid="line__value")
+    ax.set_xticks(ticks, labels or [str(t) for t in ticks])
+    ax.set_xlim(min(ticks[0], line_years[0]), max(ticks[-1], line_years[-1]))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    # An inset on another scale, whose own line must not be judged against the main axis.
+    inset = ax.inset_axes([0.6, 0.6, 0.3, 0.3])
+    inset.plot([0, 1], [0, 1], gid="line__inset")
+    inset.set_xticks([0, 1], ["0", "1"])
+    inset.tick_params(labelsize=15 * 0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"

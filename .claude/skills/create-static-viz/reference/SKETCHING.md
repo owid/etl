@@ -95,6 +95,12 @@ What the scaffold carries, and why (each line is a `# FINALIZE` marker `finalize
 | `SOURCE = "<Producer> (<year>)"`, read once in `run()` as `source = SOURCE` | a CSV carries no origins | `source = source_citation(tb[...])` in `run()`, after `load_data()` — you swap it, then delete the constant |
 | `LAYOUTS`, font stacks, grapher greys, `BAND_INSET` | transcribed from TEMPLATES.md and WRITING-THE-STEP.md | unchanged; re-verify the band against the live template (TEMPLATES.md's own rule) |
 
+**The band is the chart's size; the frame keeps its template's.** In each `LAYOUTS` entry, `margin`
+sets the chart's width (the template's width less a margin on each side) and `chart_top_y` /
+`chart_bottom_y`, less `BAND_INSET` at each end, set its height. A render size the Figma hand-off
+reports (§5) goes there and nowhere else, and when the docstring's `Figma handoff` already records a
+`Render size` for a frame, lay that frame out at it from the first render.
+
 Then write `build()`. Everything in [WRITING-THE-STEP.md](WRITING-THE-STEP.md) about the handoff
 contract, grapher's axis treatment, `gid` naming and text measurement applies to a sketch exactly as to
 a step — the file *is* the step. Read [GOTCHAS.md](GOTCHAS.md) → Data before using a column: a CSV
@@ -134,24 +140,48 @@ spine's Step 6 rule: when a choice is open, measure the options and offer the nu
 
 ## 5 — Hand off to the Figma skill's sketch mode
 
-Give `/owid-staff:create-figma-chart` the SVG path(s) and say **sketch**: its sketch mode imports the
-file on the local-SVG route onto the matching static template, fills the template's slots, fits the
-import and delivers a frame link — no checkpoint, no labeling proposals, no verification gate. Hand
-over the `gid` scheme with the file, as the spine's Step 7 says. The page and frame carry that
-skill's sketch marker (`… [sketch]`, `<slug>--sketch`), so nothing on the page reads as finished.
+Give `/owid-staff:create-figma-chart` each frame's SVG and PNG and say **sketch**. It runs them through
+its driver's `local-svg` stage (`scripts/figma_step.py local-svg`; the flags and their order are in its
+`reference/SKETCH-AND-FINALIZE.md` §2.6), which clones the matching static template, fills the
+template's slots from the texts the SVG carries, takes the chart in and fits it to the band, and
+delivers a frame link (§2.7 there) — no checkpoint, no labeling proposals, no verification gate. Each
+SVG is a run of its own, on its own page, so a desktop/mobile pair is two. Hand over, with the files,
+what the stage cannot read off them:
 
-**Write the handoff into `sketch.py`'s docstring** — the `Figma handoff` section the scaffold left
-empty: file key, page name, each frame's name and node id, the template it was cloned from, the deep
-link. This is the spine's Step 8, done early: the sketch is the file that becomes the step, so the
-record travels with it, and the frame name is the durable join.
+- the template each SVG targets, and the creator and slug for the page;
+- **the data's last year**, which the stage takes as `--last-year` to check that the time axis closes
+  on it (WRITING-THE-STEP.md → A time axis ends at the data's last year);
+- the `gid` scheme, as the spine's Step 7 says.
+
+The page and frame carry that skill's sketch marker (`… [sketch]`, `<slug>--sketch`), so nothing on the
+page reads as finished.
+
+**Render at the frame's size when the hand-off reports one.** A chart of another shape than the band
+comes back with the size it should have been drawn at, `W×H px`: in the stage's warning, and as a
+`Render size` line in the record below. It is delivered as it is, with the band left short. Set
+`TITLE` and `SUBTITLE` to the frame's own texts, since they set the header the band hangs from, and
+lay the frame's `LAYOUTS` entry out at that size (§1): `W` is the template's width less `2 × margin`,
+and `chart_bottom_y − chart_top_y − 2 × BAND_INSET` is `H`, with the chart's ink filling it. Then
+re-render (§2), re-verify (§3), and run the `reimport --frame <name> --svg <new SVG>` the stage
+printed. A retitle that changes the header's height changes the size, and the next import reports the
+new one.
+
+**Write the handoff into `sketch.py`'s docstring.** The stage writes the record to `figma_handoff.md`
+in its run directory and completes it from the sketch call's result (its `--result` step): file key,
+page name, each frame's name and node id, the template it was cloned from, the deep links, and any
+`Render size`. Paste it into the `Figma handoff` section the scaffold left empty. This is the spine's
+Step 8, done early: the sketch is the file that becomes the step, so the record travels with it, and
+the frame name is the durable join.
 
 ## 6 — Iterate across both sides
 
 Two kinds of change, two homes:
 
-- **Data, geometry, proportions** — `sketch.py`. Re-render (§2), re-verify (§3), then replace the
-  frame's `chart` group: the Figma skill's sketch mode re-imports the SVG in one call. **Ask first if the
-  person has edited inside the chart in Figma** — a re-import replaces their work.
+- **Data, geometry, proportions** — `sketch.py`. Re-render (§2) at the frame's recorded `Render size`
+  if the docstring has one (§5), re-verify (§3), then replace the frame's `chart` group: the Figma
+  skill's `reimport --frame <name> --svg <new SVG>` stage takes the new SVG into the same frame and
+  refits it. **Ask first if the person has edited inside the chart in Figma** — a re-import replaces
+  their work.
 - **Type, palette, labels, annotations, finish** — Figma, by the person directly or by asking. That
   skill owns them; nothing here should try to reproduce them in matplotlib.
 
