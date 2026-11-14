@@ -32,3 +32,8 @@ steps:
   # How much bilateral development aid is spent on climate-related projects? (OECD RioMarkers and CRS)
   viz://static/oecd/2026-10-22/climate_related_bilateral_oda:
     - data://garden/oecd/2026-10-07/climate_related_official_development_assistance
+
+  # The long-run history of child mortality: hunter-gatherer and historical societies, against the
+  # global rate since 1950
+  viz://static/papers/2026-08-18/child_mortality_long_run:
+    - data://garden/papers/2026-08-18/child_mortality_in_the_past
