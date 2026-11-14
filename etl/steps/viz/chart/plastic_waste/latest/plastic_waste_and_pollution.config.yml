@@ -1,0 +1,567 @@
+grapher_schema: "012"
+
+title:
+  title: Plastic Waste and Pollution
+  title_variant: ""
+# The explorer slug "plastic-pollution" is already taken by the mismanaged_plastic_waste multidim.
+slug: plastic-waste-and-pollution
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore global data on plastic waste generation, pollution, and trade.
+topic_tags:
+  - Plastic Pollution
+default_selection:
+  - United States
+  - China
+  - India
+
+definitions:
+  subtitle_mismanaged_waste: |-
+    Mismanaged plastic waste includes materials burned in open pits, dumped into seas or open waters, or disposed of in unsanitary landfills and dumpsites.
+  subtitle_total_generation: |-
+    This measures total plastic waste generation prior to management and therefore does not represent the quantity of plastic at risk of polluting waterways, rivers and the ocean environment.
+  subtitle_emitted_to_ocean: |-
+    This is an annual estimate of plastic emissions. A country's total does not include waste that is exported overseas, which may be at higher risk of entering the ocean.
+  subtitle_emitted_to_ocean_no_period: |-
+    This is an annual estimate of plastic emissions.A country's total does not include waste that is exported overseas, which may be at higher risk of entering the ocean.
+  subtitle_probability: |-
+    Mismanaged plastic waste includes materials burned in open pits, dumped into seas or open waters, or disposed of in unsanitary landfills and dumpsites. A country's total does not include waste that is exported overseas, which may be at higher risk of entering the ocean.
+  note_oecd_aggregates: |-
+    Regional aggregates were calculated by Our World in Data and are based on those specified by the [OECD](#dod:oecd-regions).
+  note_net_exports: |-
+    Countries that are net exporters of plastic waste will have a positive value; those that are net importers will have a negative value.
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/plastic-pollution
+        yAxis:
+          canChangeScaleType: true
+    # Country-level estimates: bar chart, opening on the map.
+    - dimensions:
+        source: jambeck_2015
+      config:
+        chartTypes:
+          - DiscreteBar
+        hasMapTab: true
+        tab: map
+    - dimensions:
+        source: meijer_2021
+      config:
+        chartTypes:
+          - DiscreteBar
+        hasMapTab: true
+        tab: map
+    # OECD regional estimates: stacked area, no map.
+    - dimensions:
+        source: oecd
+      config:
+        chartTypes:
+          - StackedArea
+        note: "{definitions.note_oecd_aggregates}"
+    # Trade data: line chart, opening on the map.
+    - dimensions:
+        source: un_comtrade
+      config:
+        chartTypes:
+          - LineChart
+        hasMapTab: true
+        tab: map
+        yAxis:
+          min: 0
+
+# The explorer's "Sub-metric" dropdown only applied to waste trade, so its exports/imports/net
+# exports choices are Metric choices here. Its "Per capita" and "Share of world total" checkboxes
+# were never ticked together, so they are one "Measure" toggle. No choice is blank.
+dimensions:
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: plastic_waste_generation
+        name: Plastic waste generation
+        group: Waste and pollution
+      - slug: mismanaged_waste
+        name: Mismanaged plastic waste
+        group: Waste and pollution
+        description: Plastic waste burned in open pits, dumped into seas or open waters, or left in unsanitary landfills and dumpsites.
+      - slug: plastic_emitted_to_ocean
+        name: Plastic emitted to ocean
+        group: Waste and pollution
+      - slug: probability_of_ocean_pollution
+        name: Probability of ocean pollution
+        group: Waste and pollution
+        description: The chance that a country's mismanaged plastic waste ends up in the ocean.
+      - slug: waste_trade_exports
+        name: Plastic waste exports
+        group: Waste trade
+      - slug: waste_trade_imports
+        name: Plastic waste imports
+        group: Waste trade
+      - slug: waste_trade_net_exports
+        name: Net exports of plastic waste
+        group: Waste trade
+        description: Exports minus imports.
+  - slug: measure
+    name: Measure
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per capita
+      - slug: share
+        name: Share of world total
+  - slug: source
+    name: Source
+    presentation:
+      type: dropdown
+    choices:
+      - slug: jambeck_2015
+        name: Jambeck et al. (2015)
+      - slug: meijer_2021
+        name: Meijer et al. (2021)
+      - slug: oecd
+        name: OECD
+      - slug: un_comtrade
+        name: United Nations Comtrade Database
+
+views:
+  # Plastic waste generation.
+  - dimensions:
+      metric: plastic_waste_generation
+      measure: total
+      source: jambeck_2015
+    indicators:
+      y:
+        - catalogPath: plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank#plastic_waste_generation__tonnes__total
+    config:
+      title: Plastic waste generation
+      subtitle: "{definitions.subtitle_total_generation}"
+      selectedFacetStrategy: none
+      map:
+        colorScale:
+          baseColorScheme: Reds
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 1000000
+            - 2500000
+            - 5000000
+            - 7500000
+            - 10000000
+            - 10000000
+
+  - dimensions:
+      metric: plastic_waste_generation
+      measure: per_capita
+      source: jambeck_2015
+    indicators:
+      y:
+        - catalogPath: plastic_waste__jambeck_et_al__2015#per_capita_plastic_waste__kg_person_day
+    config:
+      title: Plastic waste generation per capita
+      subtitle: "Daily plastic waste generation per person, measured in kilograms per person per day. {definitions.subtitle_total_generation}"
+      selectedFacetStrategy: none
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.4
+
+  - dimensions:
+      metric: plastic_waste_generation
+      measure: total
+      source: oecd
+    indicators:
+      y:
+        - catalogPath: plastic_fate_regions#value_total
+    config:
+      title: Plastic waste generation
+      subtitle: "{definitions.subtitle_total_generation}"
+      selectedFacetStrategy: entity
+
+  # Mismanaged plastic waste.
+  - dimensions:
+      metric: mismanaged_waste
+      measure: total
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#mismanaged_plastic_waste__metric_tons_year_1
+    config:
+      title: Mismanaged plastic waste
+      subtitle: "{definitions.subtitle_mismanaged_waste}"
+      selectedFacetStrategy: none
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 50000
+            - 100000
+            - 500000
+            - 1000000
+            - 5000000
+            - 10000000
+            - 10000000
+
+  - dimensions:
+      metric: mismanaged_waste
+      measure: total
+      source: oecd
+    indicators:
+      y:
+        - catalogPath: plastic_fate_regions#value_mismanaged
+    config:
+      title: Mismanaged plastic waste
+      subtitle: "{definitions.subtitle_mismanaged_waste}"
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      metric: mismanaged_waste
+      measure: share
+      source: oecd
+    indicators:
+      y:
+        - catalogPath: plastic_fate_regions#share_mismanaged
+    config:
+      title: Share of global mismanaged plastic waste
+      subtitle: "{definitions.subtitle_mismanaged_waste}"
+      selectedFacetStrategy: none
+
+  - dimensions:
+      metric: mismanaged_waste
+      measure: share
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#share_of_global_mismanaged_plastic_waste
+    config:
+      title: Share of global mismanaged plastic waste
+      subtitle: "{definitions.subtitle_mismanaged_waste}"
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  - dimensions:
+      metric: mismanaged_waste
+      measure: per_capita
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#mismanaged_plastic_waste_per_capita__kg_per_year
+    config:
+      title: Mismanaged plastic waste per capita
+      subtitle: "{definitions.subtitle_mismanaged_waste}"
+      map:
+        colorScale:
+          baseColorScheme: Reds
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 20
+
+  # Plastic emitted to the ocean.
+  - dimensions:
+      metric: plastic_emitted_to_ocean
+      measure: total
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#mismanaged_waste_emitted_to_the_ocean__metric_tons_year_1
+    config:
+      title: Plastic waste emitted to the ocean
+      subtitle: "{definitions.subtitle_emitted_to_ocean}"
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 10
+            - 100
+            - 1000
+            - 10000
+            - 100000
+            - 100000
+
+  - dimensions:
+      metric: plastic_emitted_to_ocean
+      measure: per_capita
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#mismanaged_plastic_waste_to_ocean_per_capita__kg_per_year
+    config:
+      title: Plastic waste emitted to the ocean per capita
+      subtitle: "{definitions.subtitle_emitted_to_ocean}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.001
+            - 0.01
+            - 0.1
+            - 1
+            - 1
+
+  - dimensions:
+      metric: plastic_emitted_to_ocean
+      measure: share
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#share_of_global_plastics_emitted_to_ocean
+    config:
+      title: Share of global plastic waste emitted to the ocean, 2019
+      subtitle: "{definitions.subtitle_emitted_to_ocean_no_period}"
+      map:
+        colorScale:
+          baseColorScheme: PuBu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.001
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  # Probability of ocean pollution.
+  - dimensions:
+      metric: probability_of_ocean_pollution
+      measure: total
+      source: meijer_2021
+    indicators:
+      y:
+        - catalogPath: plastic_ocean_pollution__meijer_et_al__2021#probability_of_plastic_being_emitted_to_ocean
+    config:
+      title: Probability of mismanaged plastic waste being emitted to ocean
+      subtitle: "{definitions.subtitle_probability}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  # Plastic waste exports.
+  - dimensions:
+      metric: waste_trade_exports
+      measure: total
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#export_total_mot
+    config:
+      title: Plastic waste exports
+      subtitle: Plastic waste that is exported by all modes of transport in a given year.
+      map:
+        colorScale:
+          baseColorScheme: BuPu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 100
+            - 1000
+            - 10000
+            - 100000
+            - 1000000
+
+  - dimensions:
+      metric: waste_trade_exports
+      measure: per_capita
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#export_total_mot_per_capita
+    config:
+      title: Plastic waste exports per capita
+      subtitle: Plastic waste that is exported by all modes of transport in a given year. Per capita estimates are calculated by dividing by each country's population.
+      map:
+        colorScale:
+          baseColorScheme: BuPu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  - dimensions:
+      metric: waste_trade_exports
+      measure: share
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#export_share
+    config:
+      title: Share of global plastic waste exports
+      subtitle: Share of the world's plastic exports in a given year.
+      map:
+        colorScale:
+          baseColorScheme: RdPu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  # Plastic waste imports.
+  - dimensions:
+      metric: waste_trade_imports
+      measure: total
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#import_total_mot
+    config:
+      title: Plastic waste imports
+      subtitle: Plastic waste that is imported by all modes of transport in a given year.
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 500
+            - 5000
+            - 50000
+            - 500000
+            - 5000000
+
+  - dimensions:
+      metric: waste_trade_imports
+      measure: per_capita
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#import_total_mot_per_capita
+    config:
+      title: Plastic waste imports per capita
+      subtitle: Plastic waste that is imported by all modes of transport in a given year. Per capita estimates are calculated by dividing by each country's population.
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  - dimensions:
+      metric: waste_trade_imports
+      measure: share
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#import_share
+    config:
+      title: Share of global plastic waste imports
+      subtitle: Share of the world's plastic imports in a given year.
+      map:
+        colorScale:
+          baseColorScheme: RdPu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 0.01
+            - 0.1
+            - 1
+            - 10
+            - 10
+
+  # Net exports of plastic waste.
+  - dimensions:
+      metric: waste_trade_net_exports
+      measure: total
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#net_export
+    config:
+      title: Net exports of plastic waste
+      subtitle: Net exports of plastic waste are calculated as a country's plastic waste exports minus its imports.
+      note: "{definitions.note_net_exports}"
+      map:
+        colorScale:
+          baseColorScheme: RdBu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - -500000
+            - -100000
+            - -50000
+            - -10000
+            - 0
+            - 10000
+            - 50000
+            - 100000
+            - 500000
+            - 1000000
+
+  - dimensions:
+      metric: waste_trade_net_exports
+      measure: per_capita
+      source: un_comtrade
+    indicators:
+      y:
+        - catalogPath: plastic_waste_2023_2024#net_export_per_capita
+    config:
+      title: Net exports of plastic waste per capita
+      subtitle: Net exports of plastic waste are calculated as a country's plastic waste exports minus its imports.
+      note: "{definitions.note_net_exports}"
+      map:
+        colorScale:
+          baseColorScheme: RdBu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - -5
+            - -4
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 5
