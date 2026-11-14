@@ -1,8 +1,12 @@
-grapher_schema: "011"
+grapher_schema: "012"
 
 title:
   title: Minerals
-  title_variant: production, reserves, and value
+  title_variant: ""
+slug: minerals
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore the production, reserves and value of minerals.
 
 default_selection:
   - World
@@ -44,6 +48,8 @@ dimensions:
 
   - slug: measure
     name: Measure
+    presentation:
+      type: toggle-buttons
     choices:
       - slug: absolute
         name: Absolute
