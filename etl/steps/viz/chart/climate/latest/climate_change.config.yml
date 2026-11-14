@@ -151,6 +151,11 @@ views:
       subtitle: Mean seawater pH is shown based on in-situ measurements of pH from the Aloha station in Hawaii.
       yAxis:
         min: auto
+      # The only explorer view whose title showed the time span.
+      hideAnnotationFieldsInTitle:
+        entity: true
+        time: false
+        changeInPrefix: true
   - dimensions:
       metric: sea_level_rise
       long_run_series: short
