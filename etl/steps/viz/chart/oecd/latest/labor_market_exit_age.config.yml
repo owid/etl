@@ -1,0 +1,83 @@
+grapher_schema: "011"
+slug: labor-market-exit-age
+
+title:
+  title: Age at which people leave the labor market
+  title_variant: ""
+topic_tags:
+  - Work & Employment
+  - Age Structure
+
+default_selection:
+  - OECD countries
+  - United States
+  - Japan
+  - France
+  - Germany
+  - Mexico
+
+default_dimensions:
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/work-employment
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: auto
+        map:
+          colorScale:
+            baseColorScheme: BuPu
+    - dimensions:
+        sex: both
+      config:
+        hasMapTab: false
+        selectedFacetStrategy: entity
+        chartTypes: ["LineChart", "Dumbbell"]
+        dumbbell:
+          connectorStyle: line
+        # Sort countries by men's value (the first indicator), highest first.
+        sortBy: startValue
+        sortOrder: desc
+
+dimensions:
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+      - slug: both
+        name: Men and women
+
+views:
+  - dimensions:
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#effective_labor_market_exit_age__sex_men
+      color: regions#owid_region
+
+  - dimensions:
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#effective_labor_market_exit_age__sex_women
+      color: regions#owid_region
+
+  - dimensions:
+      sex: both
+    indicators:
+      y:
+        - catalogPath: retirement#effective_labor_market_exit_age__sex_men
+        - catalogPath: retirement#effective_labor_market_exit_age__sex_women
+    config:
+      title: Average age at which men and women leave the labor market
+      subtitle: Estimated average age at which people aged 40 and older stop working or looking for work. People leave for different reasons, including retirement, illness, or disability.
+      note: For each year, the age of leaving the labor market is estimated from how the share of people working or looking for work changed over the previous five years.

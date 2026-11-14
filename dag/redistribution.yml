@@ -33,6 +33,45 @@ steps:
   data://grapher/oecd/2025-12-11/social_expenditure:
     - data://garden/oecd/2025-12-11/social_expenditure
 
+  # OECD Pensions at a Glance
+  data://grapher/oecd/2026-10-26/pensions_at_a_glance:
+    - data://garden/oecd/2026-10-26/pensions_at_a_glance:
+      - data://meadow/oecd/2026-10-26/pensions_at_a_glance:
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance.csv
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance_tax_rates.xlsx
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance_replacement_rates_at_age_80.xlsx
+        - snapshot://oecd/2026-10-26/pensions_at_a_glance_replacement_rates_by_scheme.xlsx
+  # OECD Pensions at a Glance multidims, authored in ETL.
+  viz://chart/oecd/latest/labor_market_exit_age:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/years_after_labor_market_exit:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/labor_market_exit_age_vs_normal_retirement_age:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/normal_retirement_age:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/pension_replacement_rates:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/old_age_poverty_rate:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/old_age_relative_income:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/oecd/latest/income_sources_of_older_people:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+  viz://chart/oecd/latest/public_pension_spending_projections:
+    - data://grapher/oecd/2026-10-26/pensions_at_a_glance
+  # Pension coverage (SDG 1.3.1), from the UN SDG database.
+  viz://chart/un/latest/share_of_people_above_retirement_age_receiving_a_pension:
+    - data://grapher/un/2026-07-31/un_sdg
+    - data://grapher/regions/2023-01-01/regions
+
   # Social expenditure OMM
   data://grapher/social_expenditure/2025-03-07/social_expenditure_omm:
     - data://garden/social_expenditure/2025-03-07/social_expenditure_omm:

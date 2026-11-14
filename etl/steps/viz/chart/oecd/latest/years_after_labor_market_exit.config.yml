@@ -1,0 +1,83 @@
+grapher_schema: "011"
+slug: years-after-labor-market-exit
+
+title:
+  title: Years of life after leaving the labor market
+  title_variant: ""
+topic_tags:
+  - Work & Employment
+  - Age Structure
+
+default_selection:
+  - OECD countries
+  - United States
+  - Japan
+  - France
+  - Germany
+  - Mexico
+
+default_dimensions:
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/work-employment
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: auto
+        map:
+          colorScale:
+            baseColorScheme: YlGnBu
+    - dimensions:
+        sex: men_vs_women
+      config:
+        hasMapTab: false
+        selectedFacetStrategy: entity
+        chartTypes: ["LineChart", "Dumbbell"]
+        dumbbell:
+          connectorStyle: line
+        # Sort countries by women's value (the second indicator), highest first.
+        sortBy: endValue
+        sortOrder: desc
+
+dimensions:
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+      - slug: men_vs_women
+        name: Men vs. women
+
+views:
+  - dimensions:
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
+      color: regions#owid_region
+
+  - dimensions:
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
+      color: regions#owid_region
+
+  - dimensions:
+      sex: men_vs_women
+    indicators:
+      y:
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_men
+        - catalogPath: retirement#expected_years_after_labor_market_exit__sex_women
+    config:
+      title: Years that men and women can expect to live after leaving the labor market
+      subtitle: Number of years men and women can expect to live after the average age at which they stop working or looking for work. Only people aged 40 and older are included. People leave for different reasons, such as retirement, illness, or disability.
+      note: For each year, the age of leaving the labor market is estimated from how the share of people working or looking for work changed over the previous five years.

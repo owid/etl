@@ -1,0 +1,85 @@
+grapher_schema: "011"
+slug: full-pension-age
+
+title:
+  title: Age at which people can receive a full pension
+  title_variant: ""
+topic_tags:
+  - Work & Employment
+  - Government Spending
+
+default_selection:
+  - OECD countries
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Italy
+  - Denmark
+
+default_dimensions:
+  sex: men
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
+        map:
+          hideTimeline: true
+          colorScale:
+            baseColorScheme: Purples
+
+# NOTE: Update the year (2024) in the subtitle of the comparison view to the new edition's.
+dimensions:
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: men
+        name: Men
+      - slug: women
+        name: Women
+      - slug: men_vs_women
+        name: Men vs. women
+
+views:
+  - dimensions:
+      sex: men
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_men
+      color: regions#owid_region
+
+  - dimensions:
+      sex: women
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_women
+      color: regions#owid_region
+
+  # Comparison view: one dot per sex, joined by a line for each country.
+  - dimensions:
+      sex: men_vs_women
+    indicators:
+      y:
+        - catalogPath: retirement#current_normal_retirement_age__sex_men
+          display:
+            name: Men
+        - catalogPath: retirement#current_normal_retirement_age__sex_women
+          display:
+            name: Women
+    config:
+      hasMapTab: false
+      tab: chart
+      chartTypes: ["Dumbbell"]
+      dumbbell:
+        connectorStyle: line
+      # Sort countries by men's value (the first indicator), highest first.
+      sortBy: startValue
+      sortOrder: desc
+      title: Age at which men and women are eligible to receive a full pension
+      subtitle: Age at which men and women retiring in 2024 could start receiving a pension without an early-retirement penalty, assuming they have had a full-time, uninterrupted career that started at age 22.
