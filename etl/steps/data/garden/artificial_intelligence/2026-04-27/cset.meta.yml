@@ -60,7 +60,7 @@ definitions:
   processing_per_mil: &processing_per_mil
     processing_level: major
     description_processing: |-
-      We divided the source's country-level figures by population to calculate per-million-people values.
+      We divided the source's country-level figures by population to calculate per-million-people values, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

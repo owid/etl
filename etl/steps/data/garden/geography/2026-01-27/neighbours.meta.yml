@@ -58,10 +58,10 @@ tables:
         description_key:
           - Only non-zero for countries that share a land border.
           - Calculated as neighbor's population divided by total population of all neighbors.
-          - Uses 2024 population data.
+          - Uses 2024 population from our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
           - Scores sum to 1 for each country (among its actual neighbors).
         description_processing: |-
-          For each country, we sum the population of all its land neighbors (using 2024 population data). Each neighbor's score is then their population divided by this total.
+          For each country, we sum the population of all its land neighbors (using 2024 values from our [long-term population estimates](https://ourworldindata.org/population-sources)). Each neighbor's score is then their population divided by this total. Population estimates from 2024 onwards are projections released by the UN.
 
           Countries without land borders (islands) have a score of 0 for all other countries.
 

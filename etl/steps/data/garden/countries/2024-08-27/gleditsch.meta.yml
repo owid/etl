@@ -46,3 +46,7 @@ tables:
         description_short: |-
           Population in the region, using borders from 2022.
         unit: people
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          We calculate the population of each region by adding up the population of its countries, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.

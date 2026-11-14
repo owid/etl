@@ -4,6 +4,8 @@ dataset:
   title: CO₂ and greenhouse gas emissions dataset
   description: |-
     Our complete data on CO₂ and other greenhouse gas emissions in one table. For every country and year, it has emissions by source, per person, cumulative and adjusted for trade, and each country's contribution to global warming.
+
+    Population estimates from 2024 onwards are projections released by the UN.
   changelog:
     - date: 2026-11-10
       changes:

@@ -28,6 +28,13 @@ REGIONS = [
 # Define fraction of allowed NaNs per year
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
+# Processing note for the population-by-status columns, appended to the yml's common description_processing.
+POPULATION_PROCESSING = (
+    "- We calculate the population of countries with each legal status using our "
+    "[long-term population estimates](https://ourworldindata.org/population-sources). "
+    "Population estimates from 2024 onwards are projections released by the UN."
+)
+
 # Create a new list of id for each issue, ordered from more liberal to more restrictive (useful for grapher charts)
 CATEGORIES_RENAMING = {
     "homosexuality": {
@@ -244,6 +251,15 @@ def run() -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+
+    # Note the population source on the population-by-status columns. Done here because the yml's common
+    # description_processing overwrites anything set on these generated columns before create_dataset.
+    tb_garden = ds_garden[paths.short_name]
+    for col in tb_garden.columns:
+        if col.endswith("_pop"):
+            meta = tb_garden[col].metadata
+            meta.description_processing = f"{meta.description_processing}\n{POPULATION_PROCESSING}"
+    ds_garden.add(tb_garden)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

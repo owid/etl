@@ -3,7 +3,13 @@ dataset:
   jsonld: true
   title: Energy dataset
   description: |-
-    Our complete energy data in one table. For every country and year, it has total energy supply, the energy mix by source, electricity generation and trade, emissions and carbon intensity, and fossil fuel production.
+    Our World in Data's complete energy dataset: one wide table with, for each country and year, total energy supply and the energy mix (by source, in energy units, per capita, as shares and as annual changes), the electricity mix (generation by source, demand, trade, emissions and carbon intensity), and fossil fuel production. Population and GDP are included so that per capita and per GDP indicators can be recomputed.
+
+    It is compiled from the Energy Institute's [Statistical Review of World Energy](https://www.energyinst.org/statistical-review/), [Ember's electricity data](https://ember-energy.org/data/yearly-electricity-data/), the [U.S. Energy Information Administration](https://www.eia.gov/international/data/world) and several historical reconstructions, with population from [Our World in Data's population dataset](https://ourworldindata.org/population-sources) and GDP from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/). Population estimates from 2024 onwards are projections released by the UN.
+
+    Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the original sources are also included, with the source in brackets: for example, "Europe (EI)" is Europe as defined by the [Energy Institute](https://ourworldindata.org/world-region-map-definitions#energy-institute-ei), and "Europe (Ember)" as defined by [Ember](https://ourworldindata.org/world-region-map-definitions#ember).
+
+    Energy is now measured as total energy supply, in line with the methodology adopted by our sources. Previous releases of this dataset used the substitution method, so figures from the two releases are not directly comparable. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change). The previous release remains available in the [energy-data GitHub repository](https://github.com/owid/energy-data).
   changelog:
     - date: 2026-09-10
       changes:
