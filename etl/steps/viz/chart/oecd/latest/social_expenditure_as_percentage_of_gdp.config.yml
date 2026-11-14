@@ -1,0 +1,60 @@
+chart_config_id: 0191b6c7-3808-77e4-8a32-2ac68fba2cb4
+slug: social-expenditure-as-percentage-of-gdp
+grapher_schema: "011"
+topic_tags:
+  - Government Spending
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Public social spending by policy area. The first indicator is stacked on top.
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_other_social_policy__programme_type_total
+          display:
+            name: Other social policy areas
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_housing__programme_type_total
+          display:
+            name: Housing
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_unemployment__programme_type_total
+          display:
+            name: Unemployment
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_active_labor_market__programme_type_total
+          display:
+            name: Active labor market programs
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_family__programme_type_total
+          display:
+            name: Family
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_health__programme_type_total
+          display:
+            name: Health
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_incapacity_related__programme_type_total
+          display:
+            name: Incapacity related
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_survivors__programme_type_total
+          display:
+            name: Survivors
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_and_in_kind_spending__programme_type_category_old_age__programme_type_total
+          display:
+            name: Old age
+    # Same settings as the chart had in the admin before it moved to ETL.
+    config:
+      title: Social spending as share of GDP
+      subtitle: Public social spending covers financial flows controlled by the [general government](#dod:general-government), such as social insurance and social assistance payments.
+      note: Data for general government, which includes central, state, and local governments and social security funds.
+      originUrl: /government-spending
+      chartTypes:
+        - StackedArea
+      yAxis:
+        min: 0
+      map:
+        time: 1980
+        timeTolerance: 1
+        colorScale:
+          baseColorScheme: BuGn
+          legendDescription: ""
+          customNumericValues: [0]
+      entityType: country
+      addCountryMode: change-country
+      hideRelativeToggle: false
+      selectedEntityNames:
+        - OECD countries
