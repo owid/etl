@@ -1,0 +1,13 @@
+# Known upstream data errors in Eurostat's aggregate replacement ratio (ilc_pnp3), corrected locally until
+# fixed at the source. See etl/data_corrections.py for the format.
+- indicator: aggregate_replacement_ratio
+  entity: Turkey
+  years: all
+  match: {sex: women}
+  action: drop
+  reason: Turkey's ratio for women is 0.00 in every year from 2010 to 2020 and then jumps to 14.91 (2021)
+    and 16.46 (2022) before falling to about 2 (2023-2025). A median pension of zero for women who receive
+    a pension is impossible by Eurostat's definition, and ratios above 10 imply pensions over ten times
+    the earnings of working women, so the series looks broken rather than real.
+  producer: Eurostat
+  status: open

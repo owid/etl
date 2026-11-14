@@ -47,6 +47,19 @@ steps:
           - snapshot://social_expenditure/2025-03-07/lindert.csv
 
   ##########
+  # PENSIONS
+  ##########
+
+  # Eurostat aggregate replacement ratio for pensions (EU-SILC)
+  data://grapher/eurostat/2026-10-30/aggregate_replacement_ratio:
+    - data://garden/eurostat/2026-10-30/aggregate_replacement_ratio:
+      - data://meadow/eurostat/2026-10-30/aggregate_replacement_ratio:
+        - snapshot://eurostat/2026-10-30/aggregate_replacement_ratio.gz
+  viz://chart/eurostat/latest/aggregate_replacement_ratio:
+    - data://grapher/eurostat/2026-10-30/aggregate_replacement_ratio
+    - data://grapher/regions/2023-01-01/regions
+
+  ##########
   # HEALTH
   ##########
 
