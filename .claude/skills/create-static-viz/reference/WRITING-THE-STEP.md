@@ -246,6 +246,7 @@ single row can be re-checked without opening all four.
 | y-axis tick labels | **right-aligned** against the plot (`text-anchor: end`), a column whose right edge is the plot's left; never left-aligned at the margin | `VerticalAxisComponent` |
 | Axis label | **bold** (`fontWeight: 700`) | `Axis.ts` |
 | x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis — **draw them on every year axis** (`ax.tick_params(axis="x", length=5 * 0.72, width=0.72)`, in points like every stroke); `verify_static_viz.py` fails a year axis without them | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
+| Ticks on a year axis | round years on a **round step** (every 5 or 10 years), **plus the data's first and last year** as ticks of their own; a round year is dropped only where its label would collide with an end's (below) | `HorizontalAxis.baseTicks` adds the domain's start and end at top priority to the round ticks |
 | Outermost tick labels | anchored **inwards** — `text-anchor` `start` on the first, `end` on the last | `HorizontalAxisComponent` |
 | y-axis line | **none** — the gridlines carry the reading | no component exists |
 | y domain | `[lowest tick, highest tick]` — the extreme gridlines land **on** the plot's edges | verified on a rendered SVG |
@@ -261,6 +262,29 @@ like an axis closed off with elbows. On a chart whose y-axis does not reach zero
 y=0 to draw, so apply the same treatment to the **baseline** instead, and **pin the x range to the
 outermost ticks** (`set_xlim(first_tick, last_tick)`) so those two marks sit at the ends of the line
 and close it. Leave the y-axis lineless either way.
+
+**A time axis ends at the data's last year.** matplotlib's locator stops at a round year, so a line
+running to 2024 ends past an axis labelled to 2020, and the reader cannot tell which year the line
+closes on. Grapher keeps its round ticks and adds the first and last year to them, so do the same,
+then pin the range to the ends:
+
+```python
+from etl.viz.static import year_axis_ticks
+
+# 2000..2024 -> 2000, 2005, 2010, 2015, 2020, 2024; the plot's width in template px decides what collides.
+ticks = year_axis_ticks(int(tb["year"].min()), int(tb["year"].max()), plot_width_px=plot_w)
+ax.set_xticks(ticks, [str(t) for t in ticks])
+ax.set_xlim(ticks[0], ticks[-1])
+```
+
+**Keep the round step; don't re-space the ticks from the first year to the last.** Five even ticks
+over 2000..2024 come out 2000, 2006, 2012, 2018, 2024, years nobody reads a chart by. Drop the round
+tick before the last year only when the two labels would collide at the chart's width (2020 next to
+2023 over 73 years on an 850-wide frame), not because they are close in years: 2020 next to 2024 over
+24 years keeps both. `year_axis_ticks` does exactly this, at `min_gap_px=56` between tick positions
+for four-digit labels at 14–15px. On a frame with several panels, take the years over everything
+the axis plots, not one series. `verify_static_viz.py` fails a year axis whose `line__<Entity>` series
+runs on past its last labelled tick, and Figma's restyle warns about the same on import.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
 that doesn't exist is weak evidence about what the chart *looks like*: it suggests grapher draws no

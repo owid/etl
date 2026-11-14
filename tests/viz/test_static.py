@@ -28,6 +28,7 @@ from etl.viz.static import (
     save_fig,
     source_citation,
     unclip,
+    year_axis_ticks,
 )
 
 
@@ -440,3 +441,29 @@ def test_nice_year_ticks_never_exceeds_the_requested_limit(lo, hi, max_ticks):
 def test_nice_year_ticks_degenerate_range():
     assert nice_year_ticks(2000, 2000) == [2000]
     assert nice_year_ticks(2000, 1990) == [2000]
+
+
+@pytest.mark.parametrize(
+    "lo,hi,max_ticks",
+    [(1700, 2100, 8), (1950, 2023, 8), (1990, 2024, 8), (1990, 2024, 4), (-10000, 2100, 6), (2000, 2005, 8)],
+)
+def test_year_axis_ticks_open_and_close_on_the_data(lo, hi, max_ticks):
+    """Grapher's time axis shows the first and last year, whatever the round years between them."""
+    ticks = year_axis_ticks(lo, hi, max_ticks=max_ticks)
+    assert ticks[0] == lo and ticks[-1] == hi, ticks
+    assert ticks == sorted(set(ticks)), ticks
+    assert len(ticks) <= max_ticks, ticks
+
+
+def test_year_axis_ticks_keep_the_round_step_and_add_the_last_year():
+    """Round years stay on their step, never re-spaced from first to last (2000, 2006, 2012, 2018, 2024)."""
+    assert year_axis_ticks(2000, 2024) == [2000, 2005, 2010, 2015, 2020, 2024]
+    assert year_axis_ticks(1700, 2100) == [1700, 1800, 1900, 2000, 2100]
+    assert year_axis_ticks(2000, 2000) == [2000]
+
+
+def test_year_axis_ticks_drop_a_round_year_only_where_its_label_collides():
+    """2020 next to 2023 collides on an 850-wide plot over 73 years; next to 2022 over 22 years it does not."""
+    assert year_axis_ticks(1950, 2023, plot_width_px=770) == [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2023]
+    assert year_axis_ticks(2000, 2022, plot_width_px=770) == [2000, 2005, 2010, 2015, 2020, 2022]
+    assert year_axis_ticks(2000, 2022, plot_width_px=400) == [2000, 2005, 2010, 2015, 2022]

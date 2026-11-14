@@ -384,3 +384,38 @@ def nice_year_ticks(year_min: int, year_max: int, *, max_ticks: int = 8) -> list
             if 3 <= len(ticks) <= max_ticks:
                 return ticks
     return [year_min, year_max]
+
+
+def year_axis_ticks(
+    year_min: int,
+    year_max: int,
+    *,
+    plot_width_px: float = 470,
+    min_gap_px: float = 56,
+    max_ticks: int = 8,
+) -> list[int]:
+    """Ticks for a time axis as grapher draws one: round years on a round step, plus the data's first and last year.
+
+    The round years are `nice_year_ticks`'s (every 5 or 10 years, say), never re-spaced to fit the
+    ends: 2000..2024 gives 2000, 2005, 2010, 2015, 2020, 2024. The first and last year are added as
+    ticks of their own, and a round year is dropped only when its label would collide with an end's at
+    the plot's width: closer to it than `min_gap_px`, where `plot_width_px` spans the whole range.
+    56 px is the room a centred four-digit label at 14-15px needs beside the outermost one, anchored
+    inwards. Pass the plot's own width in template px (the default is the narrowest template's): on
+    the 850-wide templates 1950..2023 drops 2020 next to 2023, and 2000..2022 keeps it. Pair it with
+    `ax.set_xlim(ticks[0], ticks[-1])`, so the axis ends where the data does.
+    """
+    if year_max <= year_min:
+        return [year_min]
+    px_per_year = plot_width_px / (year_max - year_min)
+    for limit in range(max(max_ticks, 2), 1, -1):
+        round_years = nice_year_ticks(year_min, year_max, max_ticks=limit)
+        inner = [
+            t
+            for t in round_years
+            if (t - year_min) * px_per_year >= min_gap_px and (year_max - t) * px_per_year >= min_gap_px
+        ]
+        ticks = [year_min, *inner, year_max]
+        if len(ticks) <= max_ticks:
+            return ticks
+    return [year_min, year_max]
