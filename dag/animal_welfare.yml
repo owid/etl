@@ -99,6 +99,14 @@ steps:
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
 
+  # Animal welfare multidim, shown as a data explorer (replaces the animal-welfare explorer).
+  viz://chart/animal_welfare/latest/animal_welfare:
+    - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
+    - data://grapher/animal_welfare/2026-07-01/fur_laws
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/animal_welfare/2026-06-11/eggs_and_hens_statistics
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+
   # Banning of chick culling — chart authored in ETL.
   viz://chart/animal_welfare/latest/banning_of_chick_culling:
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
