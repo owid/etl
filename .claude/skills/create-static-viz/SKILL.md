@@ -43,7 +43,9 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > | Which text slots this step fills vs. leaves to the template | this skill | that skill's Step 6 |
 > | Type and palette — this step sets neither | that skill | this skill defers to it |
 > | The design vocabulary (per chart type, labeling, colors) | that skill's `GUIDELINES.md` | both |
-> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, local-SVG route |
+> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, its `local-svg` stage |
+> | A sketch frame's render size: the `W×H px` its band leaves, reported by the `local-svg` stage and recorded as `Render size` in the `Figma handoff` | that skill measures it (`SKETCH-AND-FINALIZE.md` §2.6) | this skill renders at it ([reference/SKETCHING.md](reference/SKETCHING.md) §5) |
+> | A time axis closes on the data's last year as a tick | this skill draws it ([reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md)) | that skill's restyle warns when it does not |
 > | The sketch marker — page `… [sketch]`, frame `<slug>--sketch`; no sketch carries the bare website slug | that skill | this skill reports it |
 > | Finalize mode as the re-entry point once a sketch has its `viz://static` step | that skill | this skill's Sketch mode, §8 (its own finalize hands off to it) |
 > | The finalize split for a sketch with no step: both halves, the ETL steps only, or the Figma checks only, asked by whichever skill the finalize starts in | the Figma-checks-only rules: that skill (`SKETCH-AND-FINALIZE.md` F1); the ETL half: this skill ([reference/SKETCHING.md](reference/SKETCHING.md) §7) | both |

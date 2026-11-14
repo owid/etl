@@ -86,12 +86,14 @@ Then read the PNG.
 
 Figma handoff
 -------------
-Filled in by /owid-staff:create-figma-chart's sketch mode when the SVG is imported. The step it becomes
-inherits it in its docstring, so record names, not just ids:
+Paste the figma_handoff.md that /owid-staff:create-figma-chart's `local-svg` stage writes when the SVG
+is imported. The step it becomes inherits it in its docstring, so record names, not just ids. A
+Render size line is the size to lay that frame's chart out at, from its first render on:
 - File: Charts (YYYY), key <fileKey>
 - Page: <YYYYMMDD Title (Creator) [sketch]>
 - Frames: <frame name> -> <node id>, cloned from <template name> <template node id>
 - Deep link: <url>
+- Render size: <frame name> at <W>x<H>px, when the chart did not fill the frame's band
 
 Scaffolded $DATE by new_sketch.py.
 """
@@ -107,7 +109,7 @@ from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.patches import Rectangle
 from owid.catalog import Table
 
-from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, SketchPaths, apply_svg_rcparams, export_frame, nice_year_ticks
+from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, SketchPaths, apply_svg_rcparams, export_frame, year_axis_ticks
 
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()
@@ -311,9 +313,10 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
     ax.plot(x, y, color="C0", linewidth=2, gid="line__placeholder")
     years = integer_years(x) if "year" in tb.columns else None
     if years:
-        ticks = nice_year_ticks(min(years), max(years))
+        # Round years plus the data's first and last, as grapher; the plot's width says what collides.
+        ticks = year_axis_ticks(min(years), max(years), plot_width_px=content_w - Y_TICK_COLUMN)
         ax.set_xticks(ticks)
-        ax.set_xlim(min(ticks[0], min(years)), max(ticks[-1], max(years)))
+        ax.set_xlim(ticks[0], ticks[-1])
 
     # Guides: the band's outline and a label saying what to replace. They leave with the placeholder.
     band_h = layout["chart_bottom_y"] - layout["chart_top_y"]
