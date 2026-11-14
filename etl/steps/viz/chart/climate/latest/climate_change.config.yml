@@ -34,6 +34,11 @@ definitions:
         relatedQuestions:
           - url: https://ourworldindata.org/explorers/climate-change
             text: "Data explorer: how is the Earth's climate changing?"
+        # The explorer hides the time span in its titles, so readers never saw it there.
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
 
 # The explorer's "Long-run series" checkbox is a toggle here. Only the three greenhouse gas
 # concentrations have a long-term series; every other metric has the short-term one only.
