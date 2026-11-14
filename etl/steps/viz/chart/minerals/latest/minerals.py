@@ -111,7 +111,6 @@ def run() -> None:
     common_view_config = {
         "hasMapTab": True,
         "yAxis": {"min": 0},
-        "originUrl": "https://ourworldindata.org/metals-minerals",
     }
 
     # Create chart

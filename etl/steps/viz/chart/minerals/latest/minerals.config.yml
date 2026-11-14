@@ -18,6 +18,11 @@ default_selection:
 topic_tags:
   - Metals & Minerals
 
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/metals-minerals
+
 default_dimensions:
   mineral: copper
   metric: production
