@@ -14,6 +14,8 @@ steps:
   viz://explorer/wash/latest/water_and_sanitation:
     - data://grapher/wash/2025-12-08/household:
       - data://garden/wash/2025-12-08/household
+  viz://chart/wash/latest/water_and_sanitation:
+    - data://grapher/wash/2025-12-08/household
 
   # European Bathing Water Quality - European Environment Agency
   data://grapher/wash/2026-07-02/bathing_water:
