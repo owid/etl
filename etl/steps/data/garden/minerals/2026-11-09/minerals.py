@@ -102,9 +102,11 @@ ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Tungsten|Mine|tonnes", [2020, 2021, 2022]),
     ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
     ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
-    ("World (BGS)", "production|Mercury|Mine|tonnes", [2022, 2023]),
+    ("World (BGS)", "production|Mercury|Mine|tonnes", [2022, 2023, 2024]),
     ("World (BGS)", "production|Barite|Mine|tonnes", [2021]),
+    ("World (BGS)", "production|Molybdenum|Mine|tonnes", [2023, 2024]),
     ("World (aggregated)", "production|Magnesium compounds|Mine|tonnes", [2021]),
+    ("World (aggregated)", "production|Mercury|Mine|tonnes", [2024]),
 ]
 
 # BGS does not provide any global data. But we created an aggregated World (which we will later on call "World (BGS)").
