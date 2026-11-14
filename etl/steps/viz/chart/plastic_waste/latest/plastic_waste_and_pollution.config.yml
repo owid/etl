@@ -522,6 +522,8 @@ views:
       map:
         colorScale:
           baseColorScheme: RdBu
+          # The indicator's own map config inverts the scheme; the explorer did not.
+          colorSchemeInvert: false
           binningStrategy: manual
           customNumericValues:
             - 0
@@ -550,6 +552,8 @@ views:
       map:
         colorScale:
           baseColorScheme: RdBu
+          # The indicator's own map config inverts the scheme; the explorer did not.
+          colorSchemeInvert: false
           binningStrategy: manual
           customNumericValues:
             - 0
