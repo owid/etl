@@ -32,6 +32,8 @@ steps:
         - data://meadow/who/latest/fluid:
           - snapshot://who/latest/fluid.csv
       - data://garden/who/latest/flunet
+  viz://chart/who/latest/influenza:
+    - data://grapher/who/latest/flu
 
   # Flu vaccine policy - https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
   data://grapher/who/2023-04-03/flu_vaccine_policy:
