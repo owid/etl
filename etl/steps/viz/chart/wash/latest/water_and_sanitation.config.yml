@@ -26,6 +26,11 @@ definitions:
         hasMapTab: true
         yAxis:
           min: 0
+        # The explorer hides the time span and entity in its titles; keep them hidden.
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
         map:
           colorScale:
             binningStrategy: manual
