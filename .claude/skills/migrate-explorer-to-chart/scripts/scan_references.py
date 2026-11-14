@@ -16,6 +16,7 @@ Usage:
 """
 
 import argparse
+import csv
 import html
 import json
 import re
@@ -161,11 +162,43 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
             out.setdefault(k, v)
         return out, notes
 
+    with open(mapping_dir / "explorer_views.csv") as f:
+        rows = list(csv.reader(f))
+    views = [dict(zip(dim_names, r[1:])) for r in rows[1:]]
+
+    def fall_back(q: dict) -> tuple[dict, list[str]]:
+        """Pick the view the explorer shows for a combination it doesn't have.
+
+        Like the explorer (and the multidim), keep the dimensions in order and, at the first one
+        whose value no view offers alongside the earlier ones, take the first view's value. A
+        dimension the link leaves out is filled only when the views left allow a single value.
+        """
+        out, notes, pool = dict(q), [], views
+        for d in dim_names:
+            if d not in out:
+                vals = {v[d] for v in pool}
+                if len(vals) != 1:
+                    return q, []
+                (val,) = vals
+                if val:
+                    out[d] = val
+                    notes.append(f"added the missing “{d}={val}” (the only value the explorer can show)")
+                continue
+            if not any(v[d] == out[d] for v in pool):
+                if not pool:
+                    return q, []
+                notes.append(f"“{d}={out[d]}” doesn't exist here; the explorer shows “{pool[0][d]}”")
+                out[d] = pool[0][d]
+            pool = [v for v in pool if v[d] == out[d]]
+        return out, notes
+
     def new_url(old: str) -> dict:
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
         r = resolve_explorer_url(rules, q, SITE, choices, dim_names)
         if r.match != "view" and q:
             fixed, notes = repair(q)
+            fixed, more = fall_back(fixed)
+            notes += more
             r2 = resolve_explorer_url(rules, fixed, SITE, choices, dim_names) if notes else None
             if r2 and r2.match == "view":
                 # The redirect still sends the broken link to the default view; the doc edit fixes it.

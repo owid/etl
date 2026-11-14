@@ -102,7 +102,7 @@ Translation of the explorer's `config:` block:
 | `selection` | `default_selection` |
 | explorer slug | `slug` (keep the explorer slug; check on production that no `chart_configs.slug`, `chart_slug_redirects.slug` or `multi_dim_data_pages.slug` has it) |
 | `entityType`, `entityTypePlural`, `hasMapTab`, … | the same key in per-view `config` (shared values in `definitions.common_views`) |
-| `hideAnnotationFieldsInTitle` | drop: explorers don't apply it (their titles show the time span and entity), so setting it on the multidim hides annotations readers had |
+| `hideAnnotationFieldsInTitle` | keep it only if the explorer's rendered titles hide the time span (some explorers apply it, some don't, and the served config can't tell): build without it, and add it back in `definitions.common_views` if the rendered headers gain a time span the explorer doesn't show |
 | `isPublished`, `subNavId`, `subNavCurrentId`, `thumbnail`, `googleSheet`, `hideAlertBanner`, `yScaleToggle: false` | drop (not grapher keys; `yScaleToggle: true` is `yAxis.canChangeScaleType`) |
 | `pickerColumnSlugs`, `wpBlockId`, `downloadDataLink` | see the flags in step 0 |
 
@@ -180,11 +180,15 @@ R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
   It stops early if the multidim page or a view config isn't served yet: wait for the bake, or
   (config 404 right after a fresh staging server came up) re-run the upload with `--force --only`.
   After the merge, `--staging production` re-checks the multidim on production.
+  When the multidim already existed on production (a twin), staging serves each view's config
+  from production's file store, so the rendered pages show the old twin: a rendered difference
+  whose config is right in the staging DB waits for that post-merge re-check.
 - `scan_references.py` is the exhaustive link list: every text/JSON column of the production DB
   (history and analytics tables skipped and listed), plus `git grep` of ETL and owid-grapher. It
   finds what the gdoc link index misses (unpublished drafts, chart notes, indicator metadata,
   site code). Each hit gets its new URL from the redirect rules and an edit link. It repairs old links
-  that the live explorer already misreads (a value glued to the next param, a renamed dimension),
+  that the live explorer already misreads (a value glued to the next param, a renamed dimension, a
+  combination the explorer doesn't have, a dimension the link leaves out),
   so the new URL lands on the view they meant. Copy `references_full.json` to
   `references_baseline.json` before any swap: the page then marks each link swapped or still to do.
 - Serve it with the local app, in the background, and give the user the link:
