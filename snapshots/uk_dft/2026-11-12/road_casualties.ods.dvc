@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Reported road casualties Great Britain"
+    description: |-
+      The Department for Transport publishes official statistics on road collisions in Great Britain in which someone was injured and which were reported to the police, together with the vehicles and the people (casualties) involved. The data comes from the STATS19 system, in which police record the collisions they attend or that are reported to them. Casualties are counted as killed (if they died within 30 days of the collision), seriously injured or slightly injured.
+      
+      The series goes back to 1926. The current definitions and level of detail apply from 1979 onwards, so earlier years are on older definitions. Final figures are published once a year, with provisional estimates in between.
+    # NOTE: date_published could not be read off the page (the host was unreachable when this snapshot was written). 2026-07-30 is the
+    # release of the final 2025 statistics, which this file (uploaded 2026-07-24) belongs to. Check it against the "Last updated" date on url_main.
+    date_published: "2026-07-30"
+    title_snapshot: "Collisions, casualties and vehicles involved by road user type since 1926 (RAS0101)"
+    description_snapshot: |-
+      This snapshot is table RAS0101 of the road safety data tables. It gives, for each year since 1926, the number of reported road collisions in Great Britain, the vehicles involved, and the casualties by road user type (such as pedestrians, pedal cyclists, motorcyclists and car occupants).
+
+    # Citation
+    producer: "Department for Transport"
+    # NOTE: the producer gives no recommended citation, so this one is built in a standard format.
+    citation_full: |-
+      Department for Transport (2026). Reported road casualties Great Britain. Table RAS0101: Collisions, casualties and vehicles involved by road user type since 1926. Road safety statistics: data tables. https://www.gov.uk/government/statistical-data-sets/road-safety-statistics-data-tables
+    attribution_short: "DfT"
+
+    # Files
+    url_main: https://www.gov.uk/government/statistical-data-sets/road-safety-statistics-data-tables
+    # NOTE: the page also lists many other RAS tables (e.g. RAS0102, casualties by road user type and age group since 1979) — not snapshotted (2026-11-12).
+    url_download: https://assets.publishing.service.gov.uk/media/6a6398df9a419980593b2bdf/ras0101.ods
+    date_accessed: 2026-11-12
+
+    # License
+    license:
+      name: "Open Government Licence v3.0"
+      url: https://www.gov.uk/government/statistical-data-sets/road-safety-statistics-data-tables
