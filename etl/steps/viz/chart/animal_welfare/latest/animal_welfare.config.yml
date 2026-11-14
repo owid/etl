@@ -1,0 +1,141 @@
+grapher_schema: "012"
+
+title:
+  title: Animal Welfare
+  title_variant: ""
+slug: animal-welfare
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore the number of animals slaughtered and welfare impacts.
+topic_tags:
+  - Animal Welfare
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+  - Spain
+default_dimensions:
+  metric: animals_killed
+  animal: all_land_animals
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/animal-welfare
+        entityType: country
+        hasMapTab: true
+
+# The explorer's "Per capita" checkbox only applied to animal counts, so per-person counts are
+# Metric choices here. Its "Estimate" dropdown only applied to fish and crustaceans, so the lower
+# and upper estimates are Animal choices. Views on laws and hens have an animal of their own.
+# The step fills the Animal choices and the animal-count views from the data.
+dimensions:
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: animals_killed
+        name: Animals slaughtered
+      - slug: animals_killed_per_capita
+        name: Animals slaughtered per person
+      - slug: animals_alive
+        name: Live animals
+      - slug: animals_alive_per_capita
+        name: Live animals per person
+      - slug: fur_farming_status
+        name: Bans on fur farming
+      - slug: fur_trading_status
+        name: Bans on fur trading
+      - slug: bullfighting_status
+        name: Bans on bullfighting
+      - slug: chick_culling_status
+        name: Bans on chick culling
+      - slug: caged_hens
+        name: Cage and cage-free hens
+  - slug: animal
+    name: Animal
+    presentation:
+      type: dropdown
+    choices: []
+
+views:
+  - dimensions:
+      metric: fur_farming_status
+      animal: fur_animals
+    indicators:
+      y:
+        - catalogPath: fur_laws#fur_farming_status
+          display:
+            colorScaleScheme: OwidCategoricalC
+            colorScaleCategoricalBins: Banned,#759AC8,;Banned but not yet in effect,#058580,;No active farms reported,#99D8C9,;Not banned,#AE2E3F,;Partially banned,#A46F49,;Phased out due to stricter regulation,#6D3E91,;No data,,
+    config:
+      title: Which countries have banned fur farming?
+      subtitle: Countries that have banned fur farming at a national level.
+      chartTypes: []
+  - dimensions:
+      metric: fur_trading_status
+      animal: fur_animals
+    indicators:
+      y:
+        - catalogPath: fur_laws#fur_trading_status
+          display:
+            colorScaleScheme: OwidCategoricalC
+            colorScaleCategoricalBins: Banned,#759AC8,;Not banned,#AE2E3F,;Partially banned,#A46F49,
+    config:
+      title: Which countries have banned fur trading?
+      subtitle: Countries that have banned fur trading at a national level.
+      chartTypes: []
+  - dimensions:
+      metric: bullfighting_status
+      animal: cattle
+    indicators:
+      y:
+        - catalogPath: bullfighting_laws#status
+          display:
+            colorScaleScheme: OwidCategoricalC
+            colorScaleCategoricalBins: Banned,#759AC8,;Not banned,#AE2E3F,;Partially banned,#A46F49,;No data,,
+    config:
+      title: Which countries have banned bullfighting?
+      subtitle: Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
+      chartTypes: []
+  # The step sets this view's color bins from the data (see animal_welfare.py).
+  - dimensions:
+      metric: chick_culling_status
+      animal: chickens
+    indicators:
+      y:
+        - catalogPath: chick_culling_laws#status
+          display:
+            colorScaleScheme: OwidCategoricalC
+    config:
+      title: Which countries have banned chick culling?
+      subtitle: Chick culling is the routine killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry.
+      chartTypes: []
+  - dimensions:
+      metric: caged_hens
+      animal: chickens
+    indicators:
+      y:
+        - catalogPath: eggs_and_hens_statistics#number_of_hens_in_cages
+          display:
+            name: In cages
+            color: "#883039"
+            tolerance: 5
+        - catalogPath: eggs_and_hens_statistics#number_of_hens_cage_free
+          display:
+            name: Cage-free
+            color: "#5D7395"
+            tolerance: 5
+    config:
+      title: Egg-laying hens in cages and cage-free systems
+      subtitle: Cage-free housing systems include barns and free-range (non-organic and organic) farms. Cages can be conventional (battery cages) or enriched.
+      note: Data may refer to different years for each country, due to limited data availability.
+      hasMapTab: false
+      chartTypes:
+        - StackedDiscreteBar
+      stackMode: absolute
+      hideRelativeToggle: false
