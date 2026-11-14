@@ -131,6 +131,11 @@ steps:
     - data://grapher/climate/2026-11-11/climate_change_impacts_monthly:
       - data://garden/climate/2026-11-11/climate_change_impacts
 
+  # Climate change impacts multidim (shown as a data explorer; replaces the explorer above).
+  viz://chart/climate/latest/climate_change:
+    - data://grapher/climate/2026-11-11/climate_change_impacts_annual
+    - data://grapher/climate/2026-11-11/climate_change_impacts_monthly
+
   # NASA Ozone Watch - Ozone hole area and concentration.
   data://grapher/climate/2026-11-11/nasa_ozone_hole:
     - data://garden/climate/2026-11-11/nasa_ozone_hole:
