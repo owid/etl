@@ -17,7 +17,7 @@ MDIMs and Explorer (simply referred t as "MDIMs" from now on) steps are [viz ste
 These have a similar structure to regular steps. They write to the grapher DB with the `--grapher` flag (without it, the step only writes the expanded config under `viz/`):
 
 ```bash
-etlr viz://explorer/minerals/latest/minerals --grapher
+etlr viz://chart/minerals/latest/minerals --grapher
 ```
 
 Instead of creating a `Dataset` object, these create `Chart` or `Explorer` objects and save them to the database. Both share the same data structure (class `Chart`, see [:fontawesome-brands-github: `etl.viz.chart.model`](https://github.com/owid/etl/blob/master/etl/viz/chart/model/core.py)); `Explorer` is a subclass with minor differences due to legacy reasons.

@@ -114,3 +114,6 @@ steps:
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2023.zip
     - snapshot://usgs/2025-12-15/mineral_commodity_summaries_2025.zip
+  # archived; last active in 69416db09537 on 2026-11-14
+  viz://explorer/minerals/latest/minerals:
+    - data://grapher/minerals/2026-11-09/minerals
