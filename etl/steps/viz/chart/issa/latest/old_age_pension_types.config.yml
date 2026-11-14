@@ -1,0 +1,50 @@
+grapher_schema: "012"
+
+title:
+  title: Types of old-age pension programs
+  title_variant: ""
+topic_tags:
+  - Government Spending
+  - Poverty
+
+default_dimensions:
+  classification: pension_system_mix
+
+# Titles, subtitles, notes and map colors come from each indicator's metadata in the garden step.
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: []
+
+dimensions:
+  - slug: classification
+    name: Classification
+    choices:
+      - slug: pension_system_mix
+        name: Contributory, tax-funded, and savings
+        description: Seven groups, by which of the three kinds of programs a country has
+      - slug: contributory_and_tax_funded_pensions
+        name: Contributory and tax-funded pensions
+        description: Four groups, by whether a country has a contributory pension, a tax-funded pension, both, or neither
+      - slug: type_of_tax_funded_pension
+        name: Type of tax-funded pension
+        description: Universal, targeted, both, or none
+
+views:
+  - dimensions:
+      classification: pension_system_mix
+    indicators:
+      y:
+        - catalogPath: old_age_pension_types#pension_system_mix
+  - dimensions:
+      classification: contributory_and_tax_funded_pensions
+    indicators:
+      y:
+        - catalogPath: old_age_pension_types#contributory_and_tax_funded_pensions
+  - dimensions:
+      classification: type_of_tax_funded_pension
+    indicators:
+      y:
+        - catalogPath: old_age_pension_types#type_of_tax_funded_pension
