@@ -59,7 +59,7 @@ dimensions:
   - slug: animal
     name: Animal
     presentation:
-      type: dropdown
+      type: dropdown-with-search
     choices: []
 
 views:
