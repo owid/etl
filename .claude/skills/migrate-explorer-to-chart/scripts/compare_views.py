@@ -39,12 +39,22 @@ CONFIG_IGNORE = {"$schema", "adminBaseUrl", "bakedGrapherURL", "dimensions", "is
 # Read the same parts of the grapher figure on both pages (they share the grapher component).
 FACTS_JS = """() => {
   const g = document.querySelector('.GrapherComponent');
-  const t = e => e ? e.innerText.replace(/\\s+/g, ' ').trim() : null;
+  // Read text the way it reads, not the way it wraps. Grapher breaks long text into one element per
+  // line and drops the space at each break, and it sets the time span after the title with a margin;
+  // so put a space back after every line and block, and before every margin-spaced element. Otherwise the same
+  // text wrapped one word apart (the two pages differ slightly in width) reads as a difference.
+  const t = e => {
+    if (!e) return null;
+    const c = e.cloneNode(true);
+    c.querySelectorAll('button, [role=button]').forEach(x => x.remove());
+    c.querySelectorAll('.markdown-text-wrap__line, p, div').forEach(x => x.append(' '));
+    c.querySelectorAll('[style*="inline-block"]').forEach(x => x.prepend(' '));
+    return c.textContent.replace(/\\s+/g, ' ').trim();
+  };
   return {
     header: t(g.querySelector('.HeaderHTML')),
     // Footer content without its action buttons, whose labels show only when the footer wraps.
-    footer: (() => { const f = g.querySelector('.SourcesFooterHTML'); if (!f) return null;
-      const c = f.cloneNode(true); c.querySelectorAll('button, [role=button]').forEach(x => x.remove()); return t(c); })(),
+    footer: t(g.querySelector('.SourcesFooterHTML')),
     tabs: Array.from(g.querySelectorAll('.Tabs__Tab')).map(x => x.innerText.trim()),
     activeTab: t(g.querySelector('.Tabs__Tab[aria-selected="true"]')),
     legend: Array.from(g.querySelectorAll('.numericColorLegend text, .categoricalColorLegend text'))
