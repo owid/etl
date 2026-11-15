@@ -13,13 +13,6 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Metric choice slug for each (metric, per capita) combination of the animal counts.
-METRIC_SLUGS = {
-    ("animals_killed", False): "animals_killed",
-    ("animals_killed", True): "animals_killed_per_capita",
-    ("animals_alive", False): "animals_alive",
-    ("animals_alive", True): "animals_alive_per_capita",
-}
 
 # Estimate choice slug for each estimate in the data (only fish and crustaceans are estimated as a range).
 ESTIMATES = {
@@ -79,9 +72,10 @@ def run() -> None:
         views.append(
             {
                 "dimensions": {
-                    "metric": METRIC_SLUGS[(dims["metric"], per_capita)],
+                    "metric": dims["metric"],
                     "animal": animal_slug,
                     "estimate": ESTIMATES[estimate] if estimate else ESTIMATE_NOT_APPLICABLE,
+                    "per_capita": "per_capita" if per_capita else "total",
                 },
                 "indicators": {"y": [{"catalogPath": f"animals_used_for_food#{column}"}]},
             }

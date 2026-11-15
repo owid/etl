@@ -21,6 +21,7 @@ default_dimensions:
   metric: animals_killed
   animal: all_land_animals
   estimate: not_applicable
+  per_capita: total
 
 definitions:
   common_views:
@@ -29,9 +30,9 @@ definitions:
         entityType: country
         hasMapTab: true
 
-# The explorer's "Per capita" checkbox only applied to animal counts, so per-person counts are
-# Metric choices here. Estimates only come as a range for fish and crustaceans: every other view
-# has "Not applicable" (a multidim shows every dimension, disabled when one choice is available).
+# Estimates only come as a range for fish and crustaceans, and only animal counts have a per-person
+# version: every other view has "Not applicable" and "Total" (a multidim shows every dimension,
+# disabled when one choice is available).
 # Views on laws and hens have an animal of their own.
 # The step fills the Animal choices and the animal-count views from the data.
 dimensions:
@@ -42,12 +43,8 @@ dimensions:
     choices:
       - slug: animals_killed
         name: Animals slaughtered
-      - slug: animals_killed_per_capita
-        name: Animals slaughtered per person
       - slug: animals_alive
         name: Live animals
-      - slug: animals_alive_per_capita
-        name: Live animals per person
       - slug: fur_farming_status
         name: Bans on fur farming
       - slug: fur_trading_status
@@ -80,12 +77,22 @@ dimensions:
       - slug: not_applicable
         name: Not applicable
         description: Only fish and crustaceans are estimated as a range.
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
 
 views:
   - dimensions:
       metric: fur_farming_status
       animal: fur_animals
       estimate: not_applicable
+      per_capita: total
     indicators:
       y:
         - catalogPath: fur_laws#fur_farming_status
@@ -108,6 +115,7 @@ views:
       metric: fur_trading_status
       animal: fur_animals
       estimate: not_applicable
+      per_capita: total
     indicators:
       y:
         - catalogPath: fur_laws#fur_trading_status
@@ -127,6 +135,7 @@ views:
       metric: bullfighting_status
       animal: cattle
       estimate: not_applicable
+      per_capita: total
     indicators:
       y:
         - catalogPath: bullfighting_laws#status
@@ -147,6 +156,7 @@ views:
       metric: chick_culling_status
       animal: chickens
       estimate: not_applicable
+      per_capita: total
     indicators:
       y:
         - catalogPath: chick_culling_laws#status
@@ -162,6 +172,7 @@ views:
       metric: caged_hens
       animal: chickens
       estimate: not_applicable
+      per_capita: total
     indicators:
       y:
         - catalogPath: eggs_and_hens_statistics#number_of_hens_in_cages
