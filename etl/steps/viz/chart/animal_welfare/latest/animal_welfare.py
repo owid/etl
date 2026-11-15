@@ -21,13 +21,13 @@ METRIC_SLUGS = {
     ("animals_alive", True): "animals_alive_per_capita",
 }
 
-# Animal choice suffix (slug, name) and description for each estimate of fish and crustaceans.
-# The midpoint gets the plain animal name, so it is what readers land on.
+# Estimate choice slug for each estimate in the data (only fish and crustaceans are estimated as a range).
 ESTIMATES = {
-    "midpoint": ("", "", "Midpoint of the estimated range."),
-    "lower limit": ("_lower_limit", " (lower estimate)", "Lower end of the estimated range."),
-    "upper limit": ("_upper_limit", " (upper estimate)", "Upper end of the estimated range."),
+    "midpoint": "midpoint",
+    "lower limit": "lower_limit",
+    "upper limit": "upper_limit",
 }
+ESTIMATE_NOT_APPLICABLE = "not_applicable"
 
 # Animal choices used only by the views on laws (defined in the config). Other laws and hens views reuse an animal
 # from the data (cattle for bullfighting, chickens for chick culling and caged hens).
@@ -74,16 +74,15 @@ def run() -> None:
         per_capita = str(dims["per_capita"]).lower() == "true"
         animal = dims["animal"]
         estimate = dims.get("estimate") or None
-        suffix_slug, suffix_name, description = ESTIMATES[estimate] if estimate else ("", "", None)
-        animal_slug = underscore(animal) + suffix_slug
-        animals[animal_slug] = {
-            "slug": animal_slug,
-            "name": animal.capitalize() + suffix_name,
-            "description": description,
-        }
+        animal_slug = underscore(animal)
+        animals[animal_slug] = {"slug": animal_slug, "name": animal.capitalize()}
         views.append(
             {
-                "dimensions": {"metric": METRIC_SLUGS[(dims["metric"], per_capita)], "animal": animal_slug},
+                "dimensions": {
+                    "metric": METRIC_SLUGS[(dims["metric"], per_capita)],
+                    "animal": animal_slug,
+                    "estimate": ESTIMATES[estimate] if estimate else ESTIMATE_NOT_APPLICABLE,
+                },
                 "indicators": {"y": [{"catalogPath": f"animals_used_for_food#{column}"}]},
             }
         )
@@ -93,11 +92,8 @@ def run() -> None:
         animal = view["dimensions"]["animal"]
         assert animal in animals or animal in {a["slug"] for a in EXTRA_ANIMALS}, f"Unknown animal: {animal}"
 
-    # Sort animals alphabetically (so each animal's lower and upper estimates follow it).
+    # Sort animals alphabetically.
     animal_choices = sorted([*animals.values(), *EXTRA_ANIMALS], key=lambda choice: choice["name"].lower())
-    for choice in animal_choices:
-        if choice["description"] is None:
-            choice.pop("description")
     for dimension in config["dimensions"]:
         if dimension["slug"] == "animal":
             dimension["choices"] = animal_choices

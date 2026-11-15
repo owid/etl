@@ -20,6 +20,7 @@ default_selection:
 default_dimensions:
   metric: animals_killed
   animal: all_land_animals
+  estimate: not_applicable
 
 definitions:
   common_views:
@@ -29,8 +30,9 @@ definitions:
         hasMapTab: true
 
 # The explorer's "Per capita" checkbox only applied to animal counts, so per-person counts are
-# Metric choices here. Its "Estimate" dropdown only applied to fish and crustaceans, so the lower
-# and upper estimates are Animal choices. Views on laws and hens have an animal of their own.
+# Metric choices here. Estimates only come as a range for fish and crustaceans: every other view
+# has "Not applicable" (a multidim shows every dimension, disabled when one choice is available).
+# Views on laws and hens have an animal of their own.
 # The step fills the Animal choices and the animal-count views from the data.
 dimensions:
   - slug: metric
@@ -61,11 +63,29 @@ dimensions:
     presentation:
       type: dropdown-with-search
     choices: []
+  - slug: estimate
+    name: Estimate
+    presentation:
+      type: dropdown
+    choices:
+      - slug: midpoint
+        name: Midpoint
+        description: Midpoint of the estimated range.
+      - slug: lower_limit
+        name: Lower limit
+        description: Lower end of the estimated range.
+      - slug: upper_limit
+        name: Upper limit
+        description: Upper end of the estimated range.
+      - slug: not_applicable
+        name: Not applicable
+        description: Only fish and crustaceans are estimated as a range.
 
 views:
   - dimensions:
       metric: fur_farming_status
       animal: fur_animals
+      estimate: not_applicable
     indicators:
       y:
         - catalogPath: fur_laws#fur_farming_status
@@ -87,6 +107,7 @@ views:
   - dimensions:
       metric: fur_trading_status
       animal: fur_animals
+      estimate: not_applicable
     indicators:
       y:
         - catalogPath: fur_laws#fur_trading_status
@@ -105,6 +126,7 @@ views:
   - dimensions:
       metric: bullfighting_status
       animal: cattle
+      estimate: not_applicable
     indicators:
       y:
         - catalogPath: bullfighting_laws#status
@@ -124,6 +146,7 @@ views:
   - dimensions:
       metric: chick_culling_status
       animal: chickens
+      estimate: not_applicable
     indicators:
       y:
         - catalogPath: chick_culling_laws#status
@@ -138,6 +161,7 @@ views:
   - dimensions:
       metric: caged_hens
       animal: chickens
+      estimate: not_applicable
     indicators:
       y:
         - catalogPath: eggs_and_hens_statistics#number_of_hens_in_cages
