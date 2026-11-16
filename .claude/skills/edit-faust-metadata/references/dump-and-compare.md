@@ -152,11 +152,11 @@ A recurring large-scale workflow: the user pastes an edited FAUST report as the 
 2. **Audit the target's legend↔views cross-references before editing.** Slugs referenced by views but missing from the legend usually map to an existing garden bullet — keep it unchanged. Legend bullets referenced by no view get skipped (confirm once with the user).
 3. **Fact-check target texts against each dataset's actual data** — hand-edited targets propagate copy-paste from the first dataset: "income or consumption" onto income-only datasets, "country or region" where no regional aggregates exist. Verify empirically (count non-null values for region entities per indicator family) rather than trusting either the target or the old metadata.
 4. **Bullets describing UI affordances must match the view's actual UI.** A bullet like "this chart gives the option to show breaks" is wrong on grouped views that exist only for one choice of that dimension — drop the bullet or strip the affordance sentence via a view-level override. Beware MDims that keep their own config-level `definitions.description_key_*` overrides — garden edits don't reach those views; align the config-local copies separately.
-5. **New `#dod:…` links in a target may not exist.** Check them as in "Metadata quality checks" above.
+5. **New `#dod:…` links in a target may not exist.** Check them as in SKILL.md, "Metadata quality checks".
 6. **Shared definitions serve more variants than the target shows.** Add Jinja branches so the target's wording doesn't leak onto other variants (poverty vs inequality, wealth vs income), and check the untouched-variant MDims in the regenerated reports.
-7. **Jinja dimension comparisons: match the value type used elsewhere in the same file** (see "Verifying on staging").
+7. **Jinja dimension comparisons: match the value type used elsewhere in the same file** (see SKILL.md, "Verifying on staging").
 8. **Bulk list edits with Edit/replace_all: order by containment.** Reorder the anchored/longer per-variable blocks first and the bare short-tail patterns last; then verify all lists at once with a small parser script over the meta.yml.
-9. **Mirror constants change in lockstep** (see the MDim routing above); the rebuild's assertion pass is the drift check.
+9. **Mirror constants change in lockstep** (see the MDim routing in SKILL.md); the rebuild's assertion pass is the drift check.
 10. **Tag placement is cosmetic in target comparisons**: a view the target marks `[inherited]` may only be implementable as `[override]` (and vice versa) — identical bullet content is what matters.
 
 ## Regression diff: prove a refactor didn't change user-facing text
