@@ -68,9 +68,10 @@ definitions:
         yAxis:
           min: 0
 
-# The explorer's "Sub-metric" dropdown only applied to waste trade, so its exports/imports/net
-# exports choices are Metric choices here. Its "Per capita" and "Share of world total" checkboxes
-# were never ticked together, so they are one "Measure" toggle. No choice is blank.
+# Only waste trade splits into exports, imports and net exports, so every other view has the
+# "Not applicable" sub-metric (a multidim shows every dimension, disabled when one choice is
+# available). The explorer's "Per capita" and "Share of world total" checkboxes were never ticked
+# together, so they are one "Measure" toggle.
 dimensions:
   - slug: metric
     name: Metric
@@ -79,28 +80,31 @@ dimensions:
     choices:
       - slug: plastic_waste_generation
         name: Plastic waste generation
-        group: Waste and pollution
       - slug: mismanaged_waste
         name: Mismanaged plastic waste
-        group: Waste and pollution
         description: Plastic waste burned in open pits, dumped into seas or open waters, or left in unsanitary landfills and dumpsites.
       - slug: plastic_emitted_to_ocean
         name: Plastic emitted to ocean
-        group: Waste and pollution
       - slug: probability_of_ocean_pollution
         name: Probability of ocean pollution
-        group: Waste and pollution
         description: The chance that a country's mismanaged plastic waste ends up in the ocean.
-      - slug: waste_trade_exports
-        name: Plastic waste exports
-        group: Waste trade
-      - slug: waste_trade_imports
-        name: Plastic waste imports
-        group: Waste trade
-      - slug: waste_trade_net_exports
-        name: Net exports of plastic waste
-        group: Waste trade
+      - slug: waste_trade
+        name: Plastic waste trade
+  - slug: sub_metric
+    name: Sub-metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: exports
+        name: Exports
+      - slug: imports
+        name: Imports
+      - slug: net_exports
+        name: Net exports
         description: Exports minus imports.
+      - slug: not_applicable
+        name: Not applicable
+        description: Only plastic waste trade is split into exports, imports and net exports.
   - slug: measure
     name: Measure
     presentation:
@@ -130,6 +134,7 @@ views:
   # Plastic waste generation.
   - dimensions:
       metric: plastic_waste_generation
+      sub_metric: not_applicable
       measure: total
       source: jambeck_2015
     indicators:
@@ -154,6 +159,7 @@ views:
 
   - dimensions:
       metric: plastic_waste_generation
+      sub_metric: not_applicable
       measure: per_capita
       source: jambeck_2015
     indicators:
@@ -177,6 +183,7 @@ views:
 
   - dimensions:
       metric: plastic_waste_generation
+      sub_metric: not_applicable
       measure: total
       source: oecd
     indicators:
@@ -190,6 +197,7 @@ views:
   # Mismanaged plastic waste.
   - dimensions:
       metric: mismanaged_waste
+      sub_metric: not_applicable
       measure: total
       source: meijer_2021
     indicators:
@@ -215,6 +223,7 @@ views:
 
   - dimensions:
       metric: mismanaged_waste
+      sub_metric: not_applicable
       measure: total
       source: oecd
     indicators:
@@ -227,6 +236,7 @@ views:
 
   - dimensions:
       metric: mismanaged_waste
+      sub_metric: not_applicable
       measure: share
       source: oecd
     indicators:
@@ -239,6 +249,7 @@ views:
 
   - dimensions:
       metric: mismanaged_waste
+      sub_metric: not_applicable
       measure: share
       source: meijer_2021
     indicators:
@@ -261,6 +272,7 @@ views:
 
   - dimensions:
       metric: mismanaged_waste
+      sub_metric: not_applicable
       measure: per_capita
       source: meijer_2021
     indicators:
@@ -284,6 +296,7 @@ views:
   # Plastic emitted to the ocean.
   - dimensions:
       metric: plastic_emitted_to_ocean
+      sub_metric: not_applicable
       measure: total
       source: meijer_2021
     indicators:
@@ -307,6 +320,7 @@ views:
 
   - dimensions:
       metric: plastic_emitted_to_ocean
+      sub_metric: not_applicable
       measure: per_capita
       source: meijer_2021
     indicators:
@@ -329,6 +343,7 @@ views:
 
   - dimensions:
       metric: plastic_emitted_to_ocean
+      sub_metric: not_applicable
       measure: share
       source: meijer_2021
     indicators:
@@ -353,6 +368,7 @@ views:
   # Probability of ocean pollution.
   - dimensions:
       metric: probability_of_ocean_pollution
+      sub_metric: not_applicable
       measure: total
       source: meijer_2021
     indicators:
@@ -375,7 +391,8 @@ views:
 
   # Plastic waste exports.
   - dimensions:
-      metric: waste_trade_exports
+      metric: waste_trade
+      sub_metric: exports
       measure: total
       source: un_comtrade
     indicators:
@@ -397,7 +414,8 @@ views:
             - 1000000
 
   - dimensions:
-      metric: waste_trade_exports
+      metric: waste_trade
+      sub_metric: exports
       measure: per_capita
       source: un_comtrade
     indicators:
@@ -419,7 +437,8 @@ views:
             - 10
 
   - dimensions:
-      metric: waste_trade_exports
+      metric: waste_trade
+      sub_metric: exports
       measure: share
       source: un_comtrade
     indicators:
@@ -442,7 +461,8 @@ views:
 
   # Plastic waste imports.
   - dimensions:
-      metric: waste_trade_imports
+      metric: waste_trade
+      sub_metric: imports
       measure: total
       source: un_comtrade
     indicators:
@@ -464,7 +484,8 @@ views:
             - 5000000
 
   - dimensions:
-      metric: waste_trade_imports
+      metric: waste_trade
+      sub_metric: imports
       measure: per_capita
       source: un_comtrade
     indicators:
@@ -486,7 +507,8 @@ views:
             - 10
 
   - dimensions:
-      metric: waste_trade_imports
+      metric: waste_trade
+      sub_metric: imports
       measure: share
       source: un_comtrade
     indicators:
@@ -509,7 +531,8 @@ views:
 
   # Net exports of plastic waste.
   - dimensions:
-      metric: waste_trade_net_exports
+      metric: waste_trade
+      sub_metric: net_exports
       measure: total
       source: un_comtrade
     indicators:
@@ -539,7 +562,8 @@ views:
             - 1000000
 
   - dimensions:
-      metric: waste_trade_net_exports
+      metric: waste_trade
+      sub_metric: net_exports
       measure: per_capita
       source: un_comtrade
     indicators:
