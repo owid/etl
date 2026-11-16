@@ -101,8 +101,8 @@ tables:
   owid_co2:
     title: CO₂ and greenhouse gas emissions dataset
     description: |-
-      CO₂ emissions come from the Global Carbon Project's [Global Carbon Budget](https://globalcarbonbudget.org/). Emissions of methane, nitrous oxide and all greenhouse gases, and each country's contribution to global warming, come from Jones et al.'s [national contributions to climate change](https://zenodo.org/records/7636699/latest).
+      Our World in Data's complete CO₂ and greenhouse gas emissions dataset: one wide table with, for each country and year, CO₂ emissions (in total, by source, per person, cumulative, as shares of the global total, and adjusted for trade), emissions of methane, nitrous oxide, and all greenhouse gases, and each country's contribution to global warming.
 
-      The table also includes total energy supply (from our [energy dataset](https://catalog.ourworldindata.org/energy/owid_energy/)), [population](https://ourworldindata.org/population-sources) and GDP, so that indicators per unit of energy, per person and per GDP can be recalculated.
+      It is compiled from the Global Carbon Project's [Global Carbon Budget](https://globalcarbonbudget.org/) (CO₂ emissions) and Jones et al.'s [national contributions to climate change](https://zenodo.org/records/7636699/latest) (methane, nitrous oxide, all greenhouse gases, and contributions to global warming), with total energy supply from our [energy dataset](https://catalog.ourworldindata.org/energy/owid_energy/), population from [Our World in Data's population dataset](https://ourworldindata.org/population-sources), and GDP from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/).
 
       Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the Global Carbon Project are also included, marked "(GCP)", for example "Africa (GCP)".
