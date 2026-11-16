@@ -33,13 +33,24 @@ For agent sessions running in a Claude Code cloud sandbox
     '<namespace>/latest/<short_name>#<short_name>'
   ```
 
-  To know when it's ready, poll the pushed commit's
-  `buildkite/etl-automated-staging-environment/etl-build` status in a background
-  command (`run_in_background`), which wakes you when it ends, instead of
-  promising to check back. It passes once the build has written the push's
-  charts and MDims to staging, a minute or more before the whole build's
-  `buildkite/etl-automated-staging-environment` status. Wait for that one
-  instead if the commit has no `etl-build` status.
+  Send the link only once it's ready, not with a guess at how long it will
+  take. Run this in the background (`run_in_background`), which wakes you when
+  it ends:
+
+  ```bash
+  sha=$(git rev-parse HEAD)
+  for i in $(seq 60); do
+    s=$(curl -s "https://api.github.com/repos/owid/etl/commits/$sha/statuses" | .venv/bin/python -c "import json, sys; d = {}; [d.setdefault(x['context'], x['state']) for x in json.load(sys.stdin)]; c = 'buildkite/etl-automated-staging-environment'; print(d.get(c + '/etl-build') or d.get(c) or 'none')")
+    case $s in success|failure|error) echo "$s"; break;; esac
+    sleep 20
+  done
+  ```
+
+  It reads the public API without auth, so it works when this session's `gh`
+  is limited, and it stays inside the unauthenticated rate limit. The
+  `etl-build` status passes once the build has written the push's charts and
+  MDims to staging, about a minute after the push; the whole build's status,
+  which it falls back to, comes later.
 
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
