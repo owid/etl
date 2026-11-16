@@ -20,9 +20,20 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **A branch gets a staging server only once it has an open PR.** A chart,
   MDim or metadata edit can only be seen there, so open a draft PR
-  (`gh pr create --draft`) with the first push, without being asked, and give
-  the preview link. Don't build `viz://` steps here; the staging build does it.
-  Tell the user the moment the preview is ready: poll the pushed commit's
+  (`gh pr create --draft`) with the first push, without being asked. Don't
+  build `viz://` steps here; the staging build does it.
+  Tell the user the moment the preview is ready, in one short message whose
+  first line is the full preview link, which works before the step is published:
+
+  ```bash
+  # MDim: pass its catalog path. Chart: pass "chart" and its slug.
+  .venv/bin/python -c "import sys, subprocess, urllib.parse as u; from etl.config import get_container_name as g; \
+    h = 'http://' + g(subprocess.check_output(['git','branch','--show-current'], text=True).strip()); \
+    print(h + ('/grapher/' + sys.argv[2] if sys.argv[1] == 'chart' else '/admin/grapher/' + u.quote(sys.argv[1], safe='')))" \
+    '<namespace>/latest/<short_name>#<short_name>'
+  ```
+
+  To know when it's ready, poll the pushed commit's
   `buildkite/etl-automated-staging-environment/etl-build` status in a background
   command (`run_in_background`), which wakes you when it ends, instead of
   promising to check back. It passes once the build has written the push's
@@ -124,11 +135,3 @@ For agent sessions running in a Claude Code cloud sandbox
   session's tool list rather than inferring it from the environment; where they
   are deferred, load the ones a run needs in a single `ToolSearch` instead of
   one per turn.
-
-- **After pushing, give the user a deep-linked staging URL** (it takes a while to
-  build, especially the first time):
-
-  ```bash
-  .venv/bin/python -c "from etl.config import get_container_name; import subprocess; \
-    print('http://' + get_container_name(subprocess.check_output(['git','branch','--show-current'], text=True).strip()))"
-  ```
