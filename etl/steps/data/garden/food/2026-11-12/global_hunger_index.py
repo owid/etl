@@ -8,8 +8,11 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Midpoint of the severity group that corresponds to each provisional range of scores in the source.
+PROVISIONAL_RANGE_MIDPOINTS = {"<= 9.9*": 5, "10-19.9*": 15, "20-34.9*": 27.5, "35-49.9*": 42.5}
 
-def sanity_check_inputs(tb: Table) -> None:
+
+def sanity_check_inputs(tb: Table, tb_provisional: Table) -> None:
     scores = tb["global_hunger_index"].astype(str)
     numeric = scores.str.fullmatch(r"\d+(\.\d+)?")
     assert set(scores[~numeric]) <= {"<5", "—"}, f"Unexpected non-numeric scores: {set(scores[~numeric])}"
@@ -17,6 +20,12 @@ def sanity_check_inputs(tb: Table) -> None:
     assert scores[numeric].astype(float).min() >= 5, (
         "Numeric score below 5 found; the source may have changed how it shows low scores."
     )
+    unknown_ranges = set(tb_provisional["provisional_range"]) - set(PROVISIONAL_RANGE_MIDPOINTS)
+    assert not unknown_ranges, f"Unexpected provisional ranges: {unknown_ranges}"
+    # Every country with a provisional range should be in the scores table, without a score in that year.
+    tb_check = pr.merge(tb, tb_provisional, on=["country", "year"], how="inner")
+    assert len(tb_check) == len(tb_provisional), "Some countries with a provisional range are missing in the scores."
+    assert (tb_check["global_hunger_index"] == "—").all(), "Some countries with a provisional range also have a score."
 
 
 def sanity_check_outputs(tb: Table) -> None:
@@ -34,13 +43,22 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("global_hunger_index")
 
-    # Read table from meadow dataset.
+    # Read tables from meadow dataset.
     tb = ds_meadow.read("global_hunger_index")
+    tb_provisional = ds_meadow.read("global_hunger_index_provisional")
 
     #
     # Process data.
     #
-    sanity_check_inputs(tb)
+    sanity_check_inputs(tb, tb_provisional)
+
+    # Give countries without a score the midpoint of their provisional range.
+    tb = pr.merge(tb, tb_provisional, on=["country", "year"], how="left")
+    provisional = tb["provisional_range"].notnull()
+    tb.loc[provisional, "global_hunger_index"] = (
+        tb.loc[provisional, "provisional_range"].map(PROVISIONAL_RANGE_MIDPOINTS).astype(str)
+    )
+    tb = tb.drop(columns=["provisional_range"])
 
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)

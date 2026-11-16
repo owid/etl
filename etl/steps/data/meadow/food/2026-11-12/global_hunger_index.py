@@ -18,6 +18,11 @@ def run() -> None:
     [sheet_name] = [sheet for sheet in excel.sheet_names if sheet.startswith("GHI Scores")]
     tb = excel.parse(sheet_name, header=2, dtype=str)
 
+    # Load the sheet of rankings (named "GHI Ranking <year>"), which also gives a provisional range of scores in the latest
+    # year for some countries without a score.
+    [ranking_sheet_name] = [sheet for sheet in excel.sheet_names if sheet.startswith("GHI Ranking")]
+    tb_ranking = excel.parse(ranking_sheet_name, header=2, dtype=str)
+
     #
     # Process data.
     #
@@ -35,11 +40,26 @@ def run() -> None:
     # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
+    # Keep the countries whose score in the latest year is a provisional range (marked with "*", e.g. "35-49.9*").
+    latest_year = max(year_columns.values())
+    tb_provisional = tb_ranking.rename(columns={"Country": "country", str(latest_year): "provisional_range"})
+    tb_provisional = tb_provisional[tb_provisional["provisional_range"].str.endswith("*", na=False)][
+        ["country", "provisional_range"]
+    ]
+
+    # Split rows that list several countries (e.g. "Burundi, South Sudan and Yemen") into one row per country.
+    tb_provisional["country"] = tb_provisional["country"].str.split(r", | and ", regex=True)
+    tb_provisional = tb_provisional.explode("country")
+    tb_provisional["year"] = latest_year
+
+    # Improve table format.
+    tb_provisional = tb_provisional.format(["country", "year"], short_name=f"{paths.short_name}_provisional")
+
     #
     # Save outputs.
     #
     # Initialize a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb, tb_provisional], default_metadata=snap.metadata)
 
     # Save meadow dataset.
     ds_meadow.save()
