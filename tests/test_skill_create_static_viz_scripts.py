@@ -996,10 +996,21 @@ def test_x_labels_drawn_at_the_top_fail(tmp_path):
         ([2000, 2010, 2024], [2000, 2005, 2010, 2015, 2020, 2024], None, None),
         # Within half a year of the last tick, as a bar centred on it reaches: not past it.
         ([2000, 2010, 2020.4], [2000, 2010, 2020], None, None),
+        # The line starts in 1995 while the axis starts at a round 2000.
+        (
+            [1995, 2010, 2020],
+            [2000, 2010, 2020],
+            None,
+            "starts its labels at 2000, but line__value start in about 1995",
+        ),
+        # Grapher's pattern at the start: the first year added before the round step.
+        ([1995, 2010, 2020], [1995, 2000, 2010, 2020], None, None),
+        # Within half a year of the first tick: not before it.
+        ([1999.6, 2010, 2020], [2000, 2010, 2020], None, None),
     ],
 )
-def test_a_year_axis_closes_on_the_last_year_plotted(tmp_path, line_years, ticks, labels, message):
-    """Grapher's time axis ends on the data's last year; a series line running past the last tick fails."""
+def test_a_year_axis_spans_the_years_plotted(tmp_path, line_years, ticks, labels, message):
+    """Grapher's time axis starts on the data's first year and ends on its last; a line past either end tick fails."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -1030,15 +1041,17 @@ def test_a_year_axis_closes_on_the_last_year_plotted(tmp_path, line_years, ticks
 
 
 @pytest.mark.parametrize(
-    "last_date, message",
+    "first_date, last_date, message",
     [
         # Later in the last labelled year: the label `2024` marks its first day, so this is not past it.
-        ("2024-09-30", None),
+        ("2020-01-01", "2024-09-30", None),
         # Into a year with no label, reported in years rather than matplotlib's day counts.
-        ("2026-06-01", "ends its labels at 2024, but line__value run on to about 2026"),
+        ("2020-01-01", "2026-06-01", "ends its labels at 2024, but line__value run on to about 2026"),
+        # Starting in 2019, before the day the first label `2020` marks.
+        ("2019-06-01", "2024-01-01", "starts its labels at 2020, but line__value start in about 2019"),
     ],
 )
-def test_a_date_axis_is_judged_in_years(tmp_path, last_date, message):
+def test_a_date_axis_is_judged_in_years(tmp_path, first_date, last_date, message):
     """On a datetime x-axis the tick values are day counts; the overrun check reads the years from the labels."""
     import datetime as dt
 
@@ -1051,7 +1064,7 @@ def test_a_date_axis_is_judged_in_years(tmp_path, last_date, message):
 
     apply_svg_rcparams()
     fig, ax = plt.subplots(figsize=(5.4, 5.4))
-    dates = [dt.date(2020, 1, 1), dt.date(2022, 6, 1), dt.date.fromisoformat(last_date)]
+    dates = [dt.date.fromisoformat(first_date), dt.date(2022, 6, 1), dt.date.fromisoformat(last_date)]
     ax.plot(dates, [0, 25, 20], gid="line__value")
     ticks = [dt.date(year, 1, 1) for year in (2020, 2022, 2024)]
     ax.set_xticks(ticks, [str(t.year) for t in ticks])

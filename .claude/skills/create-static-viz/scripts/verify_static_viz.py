@@ -662,14 +662,20 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
                 "If this axis is not years, label it as grapher labels numbers, with a thousands separator "
                 "(2,000), and this check leaves it alone."
             )
-    # A year axis closes on the data's last year: no series line runs on past its last labelled tick.
+    # A year axis opens on the data's first year and closes on its last: no series line starts before
+    # its first labelled tick or runs on past its last.
     year_axes = {subject for subject in x_texts if is_year_axis(x_texts[subject])}
-    for subject, last, lines, year in year_axis_overruns(root, year_axes):
+    for side, subject, label, lines, year in year_axis_overruns(root, year_axes):
+        if side == "start":
+            gap = f"starts its labels at {label}, but {', '.join(lines[:4])} start in about {year}"
+            fix = "add the first year plotted as the first tick"
+        else:
+            gap = f"ends its labels at {label}, but {', '.join(lines[:4])} run on to about {year}"
+            fix = "add the last year plotted as the final tick"
         failures.append(
-            f"the year axis of {subject} ends its labels at {last}, but {', '.join(lines[:4])} run on to about "
-            f"{year}. Grapher keeps its round ticks and adds the data's first and last year to them; add the last "
-            "year plotted as the final tick (etl.viz.static.year_axis_ticks) and set_xlim to the first and last "
-            "tick (WRITING-THE-STEP.md)."
+            f"the year axis of {subject} {gap}. Grapher keeps its round ticks and adds the data's first and last "
+            f"year to them; {fix} (etl.viz.static.year_axis_ticks) and set_xlim to the first and last tick "
+            "(WRITING-THE-STEP.md)."
         )
     if target is not None and labels:
         width = target[1][0]
@@ -706,17 +712,21 @@ def _xs(node: ET.Element) -> list[float]:
     return xs + [x for child in node for x in _xs(child)]
 
 
-def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, list[str], int]]:
-    """Each year axis whose series lines run past its last labelled tick: subject, that label, the lines, their end.
+def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, str, list[str], int]]:
+    """Each end of a year axis that a series line runs past: the side, subject, that end's label, the lines, their year.
+
+    The side is `start` when lines begin before the first labelled tick and `end` when they run on past
+    the last.
 
     A series line is a `line__<Entity>` group, the name grapher gives one and the Figma restyle reads. It
     belongs to the nearest axes group above it (the `<g>` holding a `matplotlib.axis_*` group), so an
     inset's line is judged on the inset's axis. The axis' scale comes from where its tick marks sit
     (`<use x=...>`) and the years their labels read, not the tick values in their gids: on a date
-    axis those are matplotlib's day counts. A line runs past when its last vertex lies more than half
-    a year beyond the last labelled tick, or on a date axis a full year, since there a year's label
-    marks its first day. An axis with fewer than two placed, labelled marks is left alone, since the
-    tick-mark check already fails it.
+    axis those are matplotlib's day counts. On a year axis a line runs past an end when a vertex lies
+    more than half a year beyond its labelled tick. On a date axis a year's label marks its first day,
+    so a line runs past the last tick once it reaches the next year, and past the first tick as soon
+    as it starts before that day. An axis with fewer than two placed, labelled marks is left alone,
+    since the tick-mark check already fails it.
     """
     parent = {child: node for node in root.iter() for child in node}
 
@@ -740,10 +750,10 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
         return None
 
     # Where each year tick's mark sits ({value: x}), the year each label reads ({value: year}), and the
-    # value and text of the last labelled tick.
+    # text each label draws ({value: text}).
     placed: dict[str, dict[float, float]] = {}
     label_years: dict[str, dict[float, float]] = {}
-    last_label: dict[str, tuple[float, str]] = {}
+    label_texts: dict[str, dict[float, str]] = {}
     for group in root.iter():
         gid = group.get("id") or ""
         lab = X_LABEL_VALUE.match(gid)
@@ -753,8 +763,7 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
             year = _label_year(text)
             if subject in year_axes and NUMBER.fullmatch(value) and year is not None:
                 label_years.setdefault(subject, {})[float(value)] = year
-                if float(value) >= last_label.get(subject, (float("-inf"), ""))[0]:
-                    last_label[subject] = (float(value), text)
+                label_texts.setdefault(subject, {})[float(value)] = text
             continue
         mark = X_MARK_VALUE.match(gid)
         if mark and mark.group(1) in year_axes and NUMBER.fullmatch(mark.group(2)):
@@ -762,7 +771,8 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
             if xs:
                 placed.setdefault(mark.group(1), {})[float(mark.group(2))] = xs[0]
 
-    ends: dict[str, dict[str, float]] = {}
+    # The first and last x each series line reaches.
+    spans: dict[str, dict[str, tuple[float, float]]] = {}
     for group in root.iter():
         gid = group.get("id") or ""
         if not gid.startswith("line__") or group.tag.rsplit("}", 1)[-1] != "g":
@@ -771,14 +781,14 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
         subject = subject_of(axes) if axes is not None else None
         xs = _xs(group)
         if subject in year_axes and xs:
-            ends.setdefault(subject, {})[gid] = max(xs)
+            spans.setdefault(subject, {})[gid] = (min(xs), max(xs))
 
     overruns = []
-    for subject in sorted(ends):
+    for subject in sorted(spans):
         marks = placed.get(subject, {})
         years = label_years.get(subject, {})
         pairs = sorted((year, marks[value]) for value, year in years.items() if value in marks)
-        if len(pairs) < 2 or subject not in last_label:
+        if len(pairs) < 2:
             continue
         (y0, x0), (y1, x1) = pairs[0], pairs[-1]
         if x1 == x0 or y1 == y0:
@@ -786,15 +796,29 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
         per_year = (x1 - x0) / (y1 - y0)
         # Tick values far from the years their labels read mean a date axis, valued in days.
         dated = any(abs(value - year) > 0.5 for value, year in years.items())
-        last_value, last_text = last_label[subject]
+
+        def year_at(x: float) -> int:
+            reached = y0 + (x - x0) / per_year
+            return math.floor(reached) if dated else round(reached)
+
+        texts = label_texts[subject]
+        first_value, last_value = min(years), max(years)
+        first_x = x0 + (years[first_value] - y0) * per_year
         last_x = x0 + (years[last_value] - y0) * per_year
-        beyond = {gid: (end - last_x) / per_year for gid, end in ends[subject].items()}
-        past = {
-            gid: ends[subject][gid] for gid, years_on in beyond.items() if (years_on >= 1 if dated else years_on > 0.5)
+        # A date line may start on its first label's day: allow half a day of rounding in the SVG.
+        early_limit = 0.5 / 366 if dated else 0.5
+        early = {
+            gid: start for gid, (start, _) in spans[subject].items() if (first_x - start) / per_year > early_limit
         }
-        if past:
-            reached = y0 + (max(past.values()) - x0) / per_year
-            overruns.append((subject, last_text, sorted(past), math.floor(reached) if dated else round(reached)))
+        late = {
+            gid: end
+            for gid, (_, end) in spans[subject].items()
+            if ((end - last_x) / per_year >= 1 if dated else (end - last_x) / per_year > 0.5)
+        }
+        if early:
+            overruns.append(("start", subject, texts[first_value], sorted(early), year_at(min(early.values()))))
+        if late:
+            overruns.append(("end", subject, texts[last_value], sorted(late), year_at(max(late.values()))))
     return overruns
 
 

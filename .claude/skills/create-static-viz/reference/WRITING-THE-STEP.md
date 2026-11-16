@@ -263,10 +263,11 @@ y=0 to draw, so apply the same treatment to the **baseline** instead, and **pin 
 outermost ticks** (`set_xlim(first_tick, last_tick)`) so those two marks sit at the ends of the line
 and close it. Leave the y-axis lineless either way.
 
-**A time axis ends at the data's last year.** matplotlib's locator stops at a round year, so a line
-running to 2024 ends past an axis labelled to 2020, and the reader cannot tell which year the line
-closes on. Grapher keeps its round ticks and adds the first and last year to them, so do the same,
-then pin the range to the ends:
+**A time axis starts at the data's first year and ends at its last.** matplotlib's locator stops at
+round years, so a line running from 1995 to 2024 starts before an axis labelled 2000 and ends past
+one labelled 2020, and the reader cannot tell which years the line opens and closes on. Grapher keeps
+its round ticks and adds the first and last year to them, so do the same, then pin the range to the
+ends:
 
 ```python
 from etl.viz.static import year_axis_ticks
@@ -286,7 +287,8 @@ tick before the last year only when the two labels would collide at the chart's 
 between every pair of neighbouring tick positions for four-digit labels at 14–15px. On a frame with
 several panels, pass one panel's width as `plot_width_px`, and take the years over everything the
 axis plots, not one series. `verify_static_viz.py` fails a year axis whose `line__<Entity>` series
-runs on past its last labelled tick, and Figma's restyle warns about the same on import.
+starts before its first labelled tick or runs on past its last, and Figma's restyle warns about the
+same on import.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
 that doesn't exist is weak evidence about what the chart *looks like*: it suggests grapher draws no
