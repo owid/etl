@@ -97,11 +97,13 @@ Turn the setup into the step with `/create-chart`, with these differences:
 ### 5c. Open the PR and put it on staging
 
 1. Open the PR with `etl pr "<MDim title>" feature`, then commit and push. The description says what the MDim shows, that it was sketched in the MDim simulator, and the text changes.
-2. **Request one Codex review now** (a bare `@codex review`), so it runs alongside the staging build, and don't hold step 5d for it. Read its verdict as `babysit-pr` describes; the summary comment's "Running" is not one. When it comes in, fix what's valid, push, repeat items 3 and 4, and reply to and resolve each thread. No second round. Tell the person only if it changed something they'll see.
+2. **Request one Codex review now** (a bare `@codex review`), so it runs alongside the staging build, and don't hold step 5d for it. Read its verdict as `babysit-pr` describes; the summary comment's "Running" is not one. When it comes in, fix what's valid, push, repeat items 3 and 4, and reply to and resolve each thread. No second round. Tell the person only if it changed something they'll see. If the Codex bot replies that the person's account isn't connected, no review will come, and a PR with no threads is not a reviewed one: run `/code-review` in a background subagent instead and handle its findings the same way.
 3. **Let the staging build write the MDim.** Each push starts `buildkite/etl-automated-staging-environment`, which writes the MDim in its "Build ETL catalog" step, well before the build reports a result. So poll the staging database (`query-grapher-db`) for the row in `multi_dim_data_pages` with `catalogPath` `<namespace>/latest/<short_name>#<short_name>`, or after a later push for the change in its `config`, instead of waiting for the build, and don't tell the person how long it will take. The `buildkite/etl-automated-staging-environment/etl-build` status on the head commit (`gh api repos/owid/etl/commits/<sha>/statuses`) still says whether the step builds, without waiting for the rest of the build: if it fails, stop polling, read its log and fix the step.
 4. **Check every view draws.** The preview loads each view's config from `http://<container>/grapher/by-uuid/<id>.config.json`, with `<container>` from `etl.config.get_container_name(<branch>)` and `<id>` the view's `fullConfigId` in `multi_dim_data_pages.config`. It is served from R2, which the build's own upload doesn't always reach. Every view must return 200; retry a 502 once, since it can show briefly. If one fails, take the MDim's config from the staging database, drop `fullConfigId` from every view, and send it back otherwise unchanged with `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<short_name>#<short_name>", config)`, then check the new IDs. Check again once the build has finished, since a later step can rewrite the MDim. Mention it only if views still fail after that.
 
 ### 5d. Let them check it on staging
+
+**Check the text against the style guide first** (`.claude/skills/check-metadata-style/STYLE_GUIDE.md`): every title, subtitle, footnote, "What you should know" point and short name in the config, also text copied from the old charts. `/check-metadata-style` reads grapher datasets, not MDim configs, so do this pass yourself and fix what it finds; the person only sees the result.
 
 As soon as every view returns 200, without waiting for Codex, send the admin preview link (the MDim isn't published on staging; the link needs Tailscale): `http://<container>/admin/grapher/<namespace>%2Flatest%2F<short_name>%23<short_name>/`. Ask them to try each option in each dropdown, look at the map, check the countries it opens with, read the titles and "What you should know", and tell you what to change. Say that once they tell you it looks right, you'll merge it.
 
@@ -115,7 +117,7 @@ A change to the default countries gets the same check against the indicators' en
 
 ### 5e. Merge
 
-Once they've said it looks right, Codex's threads are resolved and the PR's checks pass (fix failures from the MDim, retry unrelated flaky ones), mark the PR ready and squash-merge it. Tell them it takes about ten minutes to reach the live site's admin.
+Once they've said it looks right, the review's findings are handled and the PR's checks pass (fix failures from the MDim, retry unrelated flaky ones), bring the PR description up to date with what changed on staging, then mark the PR ready and squash-merge it. Tell them it takes about ten minutes to reach the live site's admin.
 
 ### 5f. Publish it
 
@@ -141,3 +143,5 @@ Only once the MDim is published (its address then returns 200): the admin won't 
 ## What the page can't do yet
 
 Tell them when they run into these: one indicator per view (no views with several lines, no stacked or scatter charts); only automatic map bins; one set of default countries for all views; it can't open an MDim that already exists in ETL.
+
+When the MDim they describe needs one of these, or has too many views to fill in by hand, skip the page: write the step with `/create-chart` (a `.py` if it generates the views) and carry on from 5a, with staging as the place they see it. Two things then differ. A step with a `.py` doesn't run under the watcher without upstream data, so changes in 5d go to staging by push. And nothing sets the views' number rounding for you as the page does: set it on every indicator, as `/create-chart` describes.

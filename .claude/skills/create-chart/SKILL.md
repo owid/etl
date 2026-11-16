@@ -343,6 +343,7 @@ dimensions:
         name: Females
       - slug: male
         name: Males
+# Quote a slug that YAML could read as a number (`"5_14"`, `"2020"`): unquoted it becomes an int, and the view no longer matches the choice.
 
 views:
   - dimensions:
@@ -413,6 +414,8 @@ views:
 
 Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`,
 `numSignificantFigures`, `tolerance`, `zeroDay`.
+
+**Rounding to significant figures takes all three rounding fields.** `numSignificantFigures` does nothing without `roundingMode: significantFigures`, and Grapher caps values below 1 at `numDecimalPlaces` decimals, which the indicator usually sets to 1 or 2. So a share that can go below 1% needs a higher `numDecimalPlaces` too (2 significant figures with 2 decimals shows 0.031% as 0.03%), and a count of people keeps 0.
 
 ### Dimension-specific common_views overrides
 
