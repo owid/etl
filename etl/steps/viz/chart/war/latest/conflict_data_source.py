@@ -34,6 +34,7 @@ step.
 """
 
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -2161,7 +2162,8 @@ def _color_scale_from_explorer(display: dict[str, Any]) -> dict[str, Any]:
 def to_multidim_views(chart) -> None:
     """Rewrite each view's explorer-style settings as grapher config.
 
-    - `type` (space-separated chart types) becomes `chartTypes`.
+    - `type` (space-separated chart types) becomes `chartTypes`, and `yScaleToggle` becomes
+      `yAxis.canChangeScaleType`.
     - The explorer-level settings in `SHARED_VIEW_CONFIG` are set on every view.
     - Indicator `colorScale*` display keys become the view's `map.colorScale`, taken from the
       map's indicator (`map.columnSlug`, or the only indicator).
@@ -2170,8 +2172,13 @@ def to_multidim_views(chart) -> None:
         cfg = view.config or {}
         if "type" in cfg:
             cfg["chartTypes"] = cfg.pop("type").split()
+        if cfg.pop("yScaleToggle", False):
+            cfg.setdefault("yAxis", {})["canChangeScaleType"] = True
         for key, value in SHARED_VIEW_CONFIG.items():
-            cfg.setdefault(key, value)
+            if isinstance(value, dict):
+                cfg[key] = {**deepcopy(value), **cfg.get(key, {})}
+            else:
+                cfg.setdefault(key, deepcopy(value))
 
         ys = (view.indicators.y if view.indicators else None) or []
         map_path = (cfg.get("map") or {}).get("columnSlug")
