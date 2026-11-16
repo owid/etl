@@ -20,7 +20,10 @@ tables:
           Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5.
 
           The source gives no score in the latest year for some countries, but assigns them a provisional severity group. We give these countries the midpoint of that group: 5 for low, 15 for moderate, 27.5 for serious, and 42.5 for alarming.
+        processing_level: major
         presentation:
+          topic_tags:
+            - Hunger & Undernourishment
           grapher_config:
             note: |-
               Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5. Countries without a score in the latest year show the midpoint of their provisional severity group.
