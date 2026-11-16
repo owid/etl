@@ -1097,3 +1097,38 @@ def test_a_date_axis_is_judged_in_years(tmp_path, first_date, last_date, tick_ye
     else:
         assert result.returncode == 1 and message in result.stdout, result.stdout
         assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "labelled, message",
+    [
+        # Every category labelled: the axis ends on the last year plotted.
+        (["2000", "2010", "2024"], None),
+        # The last category unlabelled: the line runs past the `2010` tick, though positions are not days.
+        (["2000", "2010"], "ends its labels at 2010, but line__value run on to about"),
+    ],
+)
+def test_a_categorical_year_axis_is_not_read_as_dates(tmp_path, labelled, message):
+    """Years plotted as strings sit at positions 0, 1, 2; the check reads them through the labels, not as days."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot(["2000", "2010", "2024"], [0, 25, 20], gid="line__value")
+    ax.set_xticks(range(len(labelled)), labelled)
+    ax.set_xlim(0, 2)
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"

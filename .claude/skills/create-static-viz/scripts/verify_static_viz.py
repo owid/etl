@@ -723,7 +723,9 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
     belongs to the nearest axes group above it (the `<g>` holding a `matplotlib.axis_*` group), so an
     inset's line is judged on the inset's axis. The axis' scale comes from where its tick marks sit
     (`<use x=...>`) and the years their labels read, not the tick values in their gids: on a date
-    axis those are matplotlib's day counts. On a year axis a line runs past an end when a vertex lies
+    axis those are matplotlib's day counts, and on a categorical one positions 0, 1, 2. An axis whose
+    values advance about 365 per labelled year is a date axis. On any other, a line runs past an end
+    when a vertex lies
     more than half a year beyond its labelled tick. On a date axis a year's label marks its first day,
     so the axis is measured in those days and the calendar: a line runs past the last tick once it
     reaches January 1 of the next year, however long that year is, and past the first tick as soon as
@@ -797,8 +799,10 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
             continue
         texts = label_texts[subject]
         first_value, last_value = min(years), max(years)
-        # Tick values far from the years their labels read mean a date axis, valued in days.
-        if any(abs(value - year) > 0.5 for value, year in years.items()):
+        # A date axis is valued in days: its tick values advance about 365 per labelled year. Any other
+        # values, such as a categorical axis' positions 0, 1, 2, are read through the label years.
+        days_per_year = (last_value - first_value) / (years[last_value] - years[first_value] or 1)
+        if 360 <= days_per_year <= 370:
             found = _date_axis_overruns(spans[subject], marks, years)
         else:
             per_year = (x1 - x0) / (y1 - y0)
