@@ -354,6 +354,13 @@ def test_daily_periods_are_shown_as_dates():
     assert any("(2000) → 2 (2001)" in line for line in yearly)
 
 
+def test_stated_years_are_checked_against_daily_data():
+    data = pd.DataFrame({"Entity": ["A", "A", "B"], "Day": ["2020-01-01", "2021-06-01", "2020-03-01"], "x": [1, 2, 3]})
+    lines = prepare.section_strings(["Cases rose from 2019 to 2021."], data)
+    assert any("`2019`: a year outside the displayed data (2020–2021)" in line for line in lines)
+    assert any("`2021`: NO data that year for B" in line for line in lines)
+
+
 def test_selection_survives_a_failed_ranking():
     rows, note = prepare.select_indicators(_indicators(2), prepare.Failed("TimeoutError: x"), [], 10, False, [])
     assert len(rows) == 2 and "FAILED" in note

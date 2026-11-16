@@ -968,9 +968,9 @@ def section_strings(strings: list[str], data: pd.DataFrame) -> list[str]:
     out = ["## Strings to check", ""]
     if not strings:
         return out + ["None found: pass --strings or --brief.", ""]
-    year_col = next((c for c in ("Year", "year") if c in data.columns), None)
+    years = _years(data)
     entity_col = next((c for c in ("Entity", "entity", "country") if c in data.columns), None)
-    first, last = (int(data[year_col].min()), int(data[year_col].max())) if year_col and len(data) else (None, None)
+    first, last = (int(years.min()), int(years.max())) if years is not None and years.notna().any() else (None, None)
     out += [
         "A number found in the data shows where it comes from; whether the sentence is true of it is still yours to judge.",
         "",
@@ -985,7 +985,7 @@ def section_strings(strings: list[str], data: pd.DataFrame) -> list[str]:
                         "a release year, an external fact, or a mistake"
                     ]
                 elif first is not None and entity_col:
-                    have = set(data.loc[data[year_col] == number["value"], entity_col])
+                    have = set(data.loc[years == number["value"], entity_col])
                     lacking = [str(e) for e in dict.fromkeys(data[entity_col]) if e not in have]
                     if lacking:
                         out += [f"  - `{number['text']}`: NO data that year for {', '.join(lacking[:8])}"]
@@ -1246,6 +1246,17 @@ def section_anomalies(findings: list[dict], notes: list[str], dossier: Path, sel
         if len(findings) > len(shown):
             out += [f"- … and {len(findings) - len(shown):,} more in the CSV (filter it by column or kind)"]
     return out + [""]
+
+
+def _years(data: pd.DataFrame) -> pd.Series | None:
+    """The year of each row of a chart's data: its year column, or the year of its day column."""
+    for column in ("Year", "year"):
+        if column in data.columns:
+            return pd.to_numeric(data[column], errors="coerce")
+    for column in ("Day", "date"):
+        if column in data.columns:
+            return pd.to_datetime(data[column], errors="coerce").dt.year
+    return None
 
 
 def _period(value) -> str:
