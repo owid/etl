@@ -367,3 +367,24 @@ tables:
                   - 300000
                   - 1000000
                   - 3000000
+  cohort_population:
+    common:
+      description_key:
+        - Figures come from the UN World Population Prospects. Up to 2023 they are the UN’s estimates; from 2024 onwards they are the UN’s medium-variant projections.
+      display:
+        numDecimalPlaces: 0
+      presentation:
+        attribution_short: UN WPP
+        topic_tags:
+          - Vaccination
+        grapher_config:
+          originUrl: https://ourworldindata.org/vaccination
+    variables:
+      newborns:
+        title: Number of newborns
+        description_short: Number of children under the age of one, which approximates the number of babies born in a given year.
+        unit: newborns
+      one_year_olds:
+        title: Number of one-year-olds
+        description_short: Number of children aged one, which approximates the number of babies who survive their first year of life.
+        unit: one-year-olds
