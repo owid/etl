@@ -9,6 +9,8 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **Rename the pre-created `claude/<slug>-<suffix>` branch before pushing** —
   `git branch -m <short-name>`, or let `etl pr` name it (see the root CLAUDE.md).
+  If the session may only push to its own branch, keep the name: it's cosmetic,
+  and not a reason to delay a PR.
 
 - **No MySQL here, and staging is on Tailscale**, so `--grapher`, `make query`
   and `OWID_ENV.read_sql` don't work. **This overrides the root CLAUDE.md's
@@ -16,9 +18,10 @@ For agent sessions running in a Claude Code cloud sandbox
   the grapher feather still build. Upserts, chart-diff and the admin happen on
   the PR's staging server after you push.
 
-- **A branch gets a staging server only once it has an open PR.** Open a draft
-  PR before pushing work meant for staging. Don't build `viz://` steps here;
-  the staging build does it.
+- **A branch gets a staging server only once it has an open PR.** A chart,
+  MDim or metadata edit can only be seen there, so open a draft PR
+  (`gh pr create --draft`) with the first push, without being asked, and give
+  the preview link. Don't build `viz://` steps here; the staging build does it.
 
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
