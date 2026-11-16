@@ -379,7 +379,9 @@ Then, in this order:
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
 3. **Check every reader-facing string before the Figma handoff**:
    `.venv/bin/codespell --ignore-words=.codespell-ignore.txt <step-dir>`,
-   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note.
+   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note
+   (the fact check's chart-texts context: its `prepare.py` takes the strings as a file). Start both
+   as background agents in one message and read the PNG meanwhile.
    Each wording fix after the import costs a re-import, the colour bindings again and a full Step 8c
    pass.
 
