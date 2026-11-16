@@ -181,10 +181,11 @@ tables:
         description_short: |-
           Political regime of a country. It distinguishes between authoritarian regimes, hybrid regimes, flawed democracies, and full democracies.
         description_key: &regime_eiu_key
-          - Full democracies have comprehensive democratic features, with a high extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf.
-          - Flawed democracies have some weaknesses in democratic institutions and culture.
-          - Hybrid regimes have serious weaknesses in democratic institutions and culture.
-          - Authoritarian regimes have few democratic institutions and little democratic culture.
+          - The Economist Intelligence Unit classifies each country by its overall score on the Democracy Index, which ranges from 0 to 10.
+          - Full democracies score 8 or higher. They have comprehensive democratic features, with a high extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf.
+          - Flawed democracies score from 6 to 7.99. They have some weaknesses in democratic institutions and culture.
+          - Hybrid regimes score from 4 to 5.99. They have serious weaknesses in democratic institutions and culture.
+          - Authoritarian regimes score below 4. They have few democratic institutions and little democratic culture.
         presentation:
           grapher_config:
             title: Democracy
@@ -227,6 +228,7 @@ tables:
           <%- else -%>
           Number of << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
           <%- endif -%>
+        description_key: *regime_eiu_key
         unit: "countries"
 
   num_people:
@@ -241,5 +243,11 @@ tables:
           <%- else -%>
           Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
           <%- endif -%>
-        description_short: "Number of countries with available data."
+        description_short: |-
+          <%- if category == '-1' -%>
+          Number of people living in countries that the Economist Intelligence Unit doesn’t cover.
+          <%- else -%>
+          Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>, as classified by the Economist Intelligence Unit.
+          <%- endif -%>
+        description_key: *regime_eiu_key
         unit: "people"

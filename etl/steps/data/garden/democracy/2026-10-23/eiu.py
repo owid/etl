@@ -194,21 +194,13 @@ def sanity_check_regimes(tb: Table) -> None:
 
 def add_regime_identifier(tb: Table) -> Table:
     """Create regime identifier."""
-    # `regime_eiu`: Categorise democracy_eiu into 4 groups
-    bins = [
-        -0.01,
-        4,
-        6,
-        8,
-        10,
-    ]
-    labels = [
-        0,
-        1,
-        2,
-        3,
-    ]
-    tb["regime_eiu"] = pd.cut(tb["democracy_eiu"], bins=bins, labels=labels)
+    # `regime_eiu`: Categorise democracy_eiu into 4 groups, with EIU's bands (as in the definitions in its spreadsheet):
+    # authoritarian 0-3.99, hybrid 4-5.99, flawed democracy 6-7.99, full democracy 8-10. A score on a band edge goes to
+    # the higher group.
+    bins = [0, 4, 6, 8, np.inf]
+    labels = [0, 1, 2, 3]
+    tb["regime_eiu"] = pd.cut(tb["democracy_eiu"].round(2), bins=bins, labels=labels, right=False)
+    assert tb.loc[tb["democracy_eiu"].notna(), "regime_eiu"].notna().all(), "Some scores fall outside the regime bands."
 
     # Add metadata
     tb["regime_eiu"] = tb["regime_eiu"].copy_metadata(tb["democracy_eiu"])
