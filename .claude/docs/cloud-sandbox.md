@@ -22,6 +22,10 @@ For agent sessions running in a Claude Code cloud sandbox
   MDim or metadata edit can only be seen there, so open a draft PR
   (`gh pr create --draft`) with the first push, without being asked, and give
   the preview link. Don't build `viz://` steps here; the staging build does it.
+  Tell the user the moment the preview is ready: poll the pushed commit's
+  `buildkite/etl-automated-staging-environment` status in a background command
+  (`run_in_background`), which wakes you when it ends, instead of promising to
+  check back. It is the earliest signal the sandbox can see.
 
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
