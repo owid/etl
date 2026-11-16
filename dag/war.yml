@@ -238,3 +238,15 @@ steps:
     - data://grapher/war/2023-09-21/prio_v31
     - data://grapher/war/2026-06-10/ucdp
     - data://grapher/war/2026-06-10/ucdp_prio
+
+  # Conflict multidim, shown as a data explorer (replaces the conflict-data explorer): the same views
+  # as conflict_data_source, with Conflict type as the first dropdown.
+  viz://chart/war/latest/conflict_data:
+    - viz://chart/war/latest/conflict_data_source
+    - data://grapher/war/2023-09-21/cow
+    - data://grapher/war/2023-09-21/cow_mid
+    - data://grapher/war/2023-09-21/mars
+    - data://grapher/war/2023-09-21/mie
+    - data://grapher/war/2023-09-21/prio_v31
+    - data://grapher/war/2026-06-10/ucdp
+    - data://grapher/war/2026-06-10/ucdp_prio
