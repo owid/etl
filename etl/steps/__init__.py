@@ -1187,6 +1187,10 @@ class GrapherStep(Step):
         return success
 
 
+# Key under an export/viz output's `additional_info` that records where it was last published.
+PUBLISHED_TO = "published_to"
+
+
 class ExportStep(DataStep):
     """
     A step which ships files to a shared, environment-less destination, e.g. committing to a
@@ -1252,10 +1256,30 @@ class ExportStep(DataStep):
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = checksum
+        if self._publish_target is not None:
+            ds.metadata.additional_info = {**(ds.metadata.additional_info or {}), PUBLISHED_TO: self._publish_target}
         ds.metadata.save(ds._index_file)
+
+    def is_dirty(self) -> bool:
+        if super().is_dirty():
+            return True
+        if not self.publishes or self._publish_target is None:
+            return False
+        # The checksum says the step is built, but a run aimed at another environment (STAGING=1 after a
+        # local publish, another branch's staging server) still has to write there.
+        recorded = (self._output_dataset.metadata.additional_info or {}).get(PUBLISHED_TO)
+        # An output recorded before targets were tracked counts as current: treating it as stale would
+        # republish every step on the first production build, overwriting admin edits made since.
+        return recorded is not None and recorded != self._publish_target
 
     # The etlr flag that grants this step's write.
     permission_flag = "--export"
+
+    @property
+    def _publish_target(self) -> str | None:
+        """The environment this run writes to, for steps whose destination depends on it; None when it
+        doesn't. `export://` destinations (GitHub, public R2) are the same from every environment."""
+        return None
 
     @property
     def _writes_own_inputs(self) -> bool:
@@ -1318,6 +1342,15 @@ class VizStep(ExportStep):
     @property
     def publishes(self) -> bool:
         return config.GRAPHER_ENABLED or self.channel == "static"
+
+    @property
+    def _publish_target(self) -> str | None:
+        if self.channel in ("chart", "explorer"):
+            return f"{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+        if self.channel == "bespoke":
+            # The feed's R2 folder, see `etl.viz.bespoke.feed_location`.
+            return config.DATA_API_ENV
+        return None
 
     @property
     def _writes_own_inputs(self) -> bool:
