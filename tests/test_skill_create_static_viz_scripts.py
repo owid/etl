@@ -87,6 +87,7 @@ def test_scaffold_renders_and_passes_the_verifier(sketch):
 
     verify = run(VERIFY, sketch, "--template", "horizontal", "--expect-gid", "line__placeholder")
     assert verify.returncode == 0, verify.stdout + verify.stderr
+    assert "warning" not in verify.stdout, "the scaffold's year axis ends as grapher's does"
     assert "frame matches horizontal" in verify.stdout
     assert "frame matches mobile" in verify.stdout, "the _mobile suffix must pick the mobile template"
     assert "font-family: 'Lato'" in (sketch / "demo.svg").read_text(), "Lato first, so Figma renders the template face"
@@ -578,7 +579,7 @@ def test_finalize_refuses_a_rewritten_paths_line(tmp_path, sketch):
 
 def test_finalize_refuses_an_import_without_sketchpaths(tmp_path, sketch):
     repo = make_repo(tmp_path, "feature")
-    mutant = mutated(sketch, tmp_path, "TEMPLATES, SketchPaths, apply_svg_rcparams", "TEMPLATES, apply_svg_rcparams")
+    mutant = mutated(sketch, tmp_path, "    TEMPLATES,\n    SketchPaths,\n", "    TEMPLATES,\n")
     result = finalize(mutant, repo)
     assert result.returncode == 2 and "not a scaffold" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
@@ -1163,3 +1164,71 @@ def test_a_year_axis_with_one_labelled_tick_still_spans_the_line(tmp_path, line_
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
     assert result.returncode == 1 and message in result.stdout, result.stdout
     assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "axis, warnings",
+    [
+        # style_year_axis: end labels on their ticks, a 1px butt-capped line stopping at the end ticks.
+        ("grapher", []),
+        # matplotlib's defaults: centered end labels, a 0.8pt line whose square cap overhangs both ends.
+        (
+            "default",
+            [
+                "its first label, 2000, is centered on its tick, not left-aligned",
+                "its last label, 2024, is centered on its tick, not right-aligned",
+                "its axis line runs 0.6px past the end ticks, from its square cap",
+                "its axis line is 1.1px wide, not 1px",
+            ],
+        ),
+        # Range padding past the end ticks, which a butt cap does not fix.
+        ("padded", ["runs 29.9px past the end ticks, from padding in the x range"]),
+        # The first label right-aligned, so it hangs past the start of the axis.
+        ("right-anchors", ["its first label, 2000, is right-aligned to its tick, not left-aligned"]),
+        # A date axis is judged on where its labels and marks sit, like any other.
+        ("date", []),
+        # One labelled tick cannot anchor both ends.
+        ("single", []),
+    ],
+)
+def test_a_year_axis_ends_as_grapher_draws_it(tmp_path, axis, warnings):
+    """Grapher insets the end labels to their ticks and stops a 1px butt-capped line on them; the verifier warns."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame, style_year_axis
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ticks: list = [2000, 2010, 2020, 2024]
+    if axis == "date":
+        ticks = [dt.date(year, 1, 1) for year in ticks]
+    elif axis == "single":
+        ticks = [2020]
+    ax.plot([ticks[0], ticks[-1]], [0, 20], gid="line__value")
+    ax.set_xticks(ticks, [str(getattr(t, "year", t)) for t in ticks])
+    ax.tick_params(labelsize=15 * 0.72)
+    if axis == "default":
+        ax.set_xlim(ticks[0], ticks[-1])
+        ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    elif axis == "single":
+        style_year_axis(ax, 2019, 2021)
+    else:
+        style_year_axis(ax, ticks[0], ticks[-1])
+    if axis == "padded":
+        ax.set_xlim(1998, 2026)
+    elif axis == "right-anchors":
+        ax.xaxis.get_major_ticks()[0].label1.set_horizontalalignment("right")
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 0, "the ends are a warning, never a failure: " + result.stdout
+    if not warnings:
+        assert "warning" not in result.stdout, result.stdout
+    for warning in warnings:
+        assert warning in result.stdout, result.stdout
+    assert result.stdout.count("! warning") == (1 if warnings else 0), result.stdout

@@ -109,7 +109,15 @@ from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.patches import Rectangle
 from owid.catalog import Table
 
-from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, SketchPaths, apply_svg_rcparams, export_frame, year_axis_ticks
+from etl.viz.static import (
+    PIXELS_PER_INCH,
+    TEMPLATES,
+    SketchPaths,
+    apply_svg_rcparams,
+    export_frame,
+    style_year_axis,
+    year_axis_ticks,
+)
 
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()
@@ -316,7 +324,8 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
         # Round years plus the data's first and last, as grapher; the plot's width says what collides.
         ticks = year_axis_ticks(min(years), max(years), plot_width_px=content_w - Y_TICK_COLUMN)
         ax.set_xticks(ticks)
-        ax.set_xlim(ticks[0], ticks[-1])
+        # From the first year to the last, end labels inside the ends, on a 1px butt-capped line.
+        style_year_axis(ax, ticks[0], ticks[-1])
 
     # Guides: the band's outline and a label saying what to replace. They leave with the placeholder.
     band_h = layout["chart_bottom_y"] - layout["chart_top_y"]

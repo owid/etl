@@ -27,6 +27,7 @@ from etl.viz.static import (
     nice_year_ticks,
     save_fig,
     source_citation,
+    style_year_axis,
     unclip,
     year_axis_ticks,
 )
@@ -490,3 +491,93 @@ def test_year_axis_ticks_keep_the_minimum_gap_between_every_pair_of_ticks(lo, hi
 def test_year_axis_ticks_coarsen_the_round_step_on_a_narrow_plot():
     assert year_axis_ticks(2000, 2014, plot_width_px=200) == [2000, 2005, 2010, 2014]
     assert year_axis_ticks(1950, 2023, plot_width_px=200) == [1950, 2000, 2023]
+
+
+def _year_axes(ticks, xs=None):
+    fig, ax = plt.subplots(figsize=(8.5, 6.38))
+    xs = xs if xs is not None else [ticks[0], ticks[-1]]
+    ax.plot(xs, [0, 1], gid="line__value")
+    ax.set_xticks(ticks, [str(getattr(t, "year", t)) for t in ticks])
+    return fig, ax
+
+
+def test_style_year_axis_closes_the_axis_as_grapher_draws_it():
+    """Range pinned to the ends, a 1px butt-capped spine, 5x1px marks, end labels inset to their ticks."""
+    fig, ax = _year_axes([2000, 2005, 2010, 2015, 2020, 2024])
+    style_year_axis(ax, 2000, 2024)
+    assert ax.get_xlim() == (2000, 2024)
+    spine = ax.spines["bottom"]
+    assert spine.get_capstyle() == "butt" and spine.get_linewidth() == pytest.approx(0.72)
+    # Drawing must keep the alignment: matplotlib reuses the ticks it zipped the locations with.
+    name_furniture(fig)
+    ticks = ax.xaxis.get_major_ticks()
+    assert [t.label1.get_horizontalalignment() for t in ticks] == [
+        "left",
+        "center",
+        "center",
+        "center",
+        "center",
+        "right",
+    ]
+    assert ticks[0].tick1line.get_markersize() == pytest.approx(3.6)
+    assert ticks[0].tick1line.get_markeredgewidth() == pytest.approx(0.72)
+    plt.close(fig)
+
+
+def test_style_year_axis_writes_end_labels_on_their_ticks_and_a_butt_spine(tmp_path):
+    """In the SVG, the end labels anchor start / end at their tick's x and the spine stops at the end ticks."""
+    import re
+
+    apply_svg_rcparams()
+    fig, ax = _year_axes([2000, 2010, 2020, 2024])
+    style_year_axis(ax, 2000, 2024)
+    ax.tick_params(labelsize=10)  # a later tick_params must not reset the alignment
+    name_furniture(fig)
+    unclip(fig)
+    path = tmp_path / "axis.svg"
+    fig.savefig(path, format="svg")
+    plt.close(fig)
+    svg = path.read_text()
+
+    def label(value):
+        match = re.search(
+            rf'id="axes__x-tick-label-{value}">\s*<text style="[^"]*text-anchor: (\w+)" x="([0-9.]+)"', svg
+        )
+        assert match, f"no label for {value}"
+        return match.group(1), float(match.group(2))
+
+    def mark(value):
+        match = re.search(rf'id="axes__x-tick-{value}">.*?<use [^>]*x="([0-9.]+)"', svg, re.S)
+        assert match, f"no tick mark for {value}"
+        return float(match.group(1))
+
+    assert label(2000) == ("start", mark(2000))
+    assert label(2024) == ("end", mark(2024))
+    assert label(2010)[0] == "middle"
+    spine = re.search(
+        r'id="axes__spine-bottom">\s*<path d="M ([0-9.]+) [0-9.]+\s+L ([0-9.]+) [0-9.]+\s*" style="([^"]*)"', svg
+    )
+    assert spine, "no bottom spine in the SVG"
+    assert (float(spine.group(1)), float(spine.group(2))) == (mark(2000), mark(2024))
+    assert "stroke-linecap: square" not in spine.group(3) and "stroke-width: 0.72" in spine.group(3)
+
+
+def test_style_year_axis_aligns_the_visible_end_ticks_on_a_date_axis():
+    """Dates are converted to the axis' units; a tick outside the range is not the one aligned."""
+    import datetime as dt
+
+    ticks = [dt.date(year, 1, 1) for year in (1995, 2000, 2010, 2020, 2030)]
+    fig, ax = _year_axes(ticks, xs=[dt.date(2000, 1, 1), dt.date(2020, 1, 1)])
+    style_year_axis(ax, dt.date(2000, 1, 1), dt.date(2020, 1, 1))
+    name_furniture(fig)
+    alignment = {t.get_loc(): t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()}
+    visible = [alignment[loc] for loc in sorted(alignment) if ax.get_xlim()[0] <= loc <= ax.get_xlim()[1]]
+    assert visible == ["left", "center", "right"]
+    plt.close(fig)
+
+
+def test_style_year_axis_centers_a_single_tick():
+    fig, ax = _year_axes([2020], xs=[2020, 2020])
+    style_year_axis(ax, 2019, 2021)
+    assert [t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()] == ["center"]
+    plt.close(fig)

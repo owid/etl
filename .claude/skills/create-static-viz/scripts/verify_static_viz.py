@@ -27,6 +27,10 @@ plausible, and the problem only shows up once a designer opens the SVG:
 - a year axis that stops short of the data: a ``line__<Entity>`` series running on past the axis' last
   labelled tick. Grapher's time axis shows the data's first and last year as ticks, so the last tick
   is the last year plotted, never a round year before it
+- a year axis whose ends differ from grapher's (a warning, not a failure, since a bar chart over
+  years rightly pads its range and centers its labels under the bars): the first tick label not left-aligned to its tick or the last not
+  right-aligned (within half a template px), or a bottom spine that runs past the end ticks, through
+  x-range padding or a projecting cap, or is not 1px wide
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -906,6 +910,120 @@ def is_year_axis(texts: list[str]) -> bool:
     return bool(years) and all(years) and any(len(d) >= 4 for d in digits)
 
 
+# How far, in template px, an end label's outer edge may sit from its tick, or the bottom spine run past
+# the end ticks, before it shows.
+END_TOLERANCE_PX = 0.5
+# Grapher's axis line, in template px.
+AXIS_LINE_PX = 1.0
+
+
+def year_axis_end_warnings(svg: str) -> list[str]:
+    """Return warnings where a year axis' ends differ from grapher's x axis.
+
+    Grapher left-aligns the first tick label to its tick, right-aligns the last, and ends a 1px,
+    butt-capped axis line on the two end ticks. In the SVG an end label is a `<text>` whose x is its
+    anchor, so a `start` (first) or `end` (last) anchor within END_TOLERANCE_PX of its tick's `<use x>`
+    puts its outer edge on the tick. The bottom spine (`<subject>__spine-bottom`) is a path whose stroke
+    reaches past its end points by half its width under a `square` or `round` cap, matplotlib's default
+    being `square`. Judged on each year axis with at least two placed, labelled ticks; a rotated or
+    MathText label, a hidden spine and an axis with a single tick are left alone.
+
+    Warnings rather than failures: a bar chart over years needs half a bar of range past each end tick
+    and its labels centered under the bars, and its labels read as years like any other.
+    """
+    try:
+        root = ET.fromstring(svg)
+    except ET.ParseError:
+        return []
+    head = SVG_ROOT.search(svg)
+    unit = 0.72 if head and re.search(r'\bwidth="[0-9.]+pt"', head.group()) else 1.0
+    tolerance = END_TOLERANCE_PX * unit
+
+    # Each axes' x labels ({value: (text, anchor, x, rotated)}), tick-mark x ({value: x}) and spine.
+    labels: dict[str, dict[float, tuple[str, str | None, float | None, bool]]] = {}
+    marks: dict[str, dict[float, float]] = {}
+    spines: dict[str, ET.Element] = {}
+    for group in root.iter():
+        gid = group.get("id") or ""
+        if group.tag.rsplit("}", 1)[-1] != "g":
+            continue
+        if gid.endswith("__spine-bottom"):
+            spines[gid.removesuffix("__spine-bottom")] = group
+            continue
+        lab = X_LABEL_VALUE.match(gid)
+        if lab:
+            text = "".join(group.itertext()).strip()
+            if not text or not NUMBER.fullmatch(lab.group(2)):
+                continue
+            node = next((n for n in group.iter() if n.tag.rsplit("}", 1)[-1] == "text"), None)
+            anchor = TEXT_ANCHOR.search(node.get("style") or "") if node is not None else None
+            x = node.get("x") if node is not None else None
+            labels.setdefault(lab.group(1), {})[float(lab.group(2))] = (
+                text,
+                anchor.group(1) if anchor else None,
+                float(x) if x and NUMBER.fullmatch(x) else None,
+                _rotated(group),
+            )
+            continue
+        mark = X_MARK_VALUE.match(gid)
+        if mark and NUMBER.fullmatch(mark.group(2)):
+            xs = [x for child in group for x in _xs(child)]
+            if xs:
+                marks.setdefault(mark.group(1), {})[float(mark.group(2))] = xs[0]
+
+    warnings = []
+    for subject in sorted(labels):
+        if not is_year_axis([text for text, *_ in labels[subject].values()]):
+            continue
+        ends = sorted((marks[subject][v], v) for v in labels[subject] if v in marks.get(subject, {}))
+        if len(ends) < 2:
+            continue
+        (first_x, first_v), (last_x, last_v) = ends[0], ends[-1]
+        problems = []
+        for side, tick_x, value, want, align in (
+            ("first", first_x, first_v, "start", "left"),
+            ("last", last_x, last_v, "end", "right"),
+        ):
+            text, anchor, x, rotated = labels[subject][value]
+            if rotated or anchor is None or x is None:
+                continue
+            if anchor != want:
+                how = {"middle": "centered on", "start": "left-aligned to", "end": "right-aligned to"}.get(
+                    anchor, f"anchored {anchor} at"
+                )
+                problems.append(f"its {side} label, {text}, is {how} its tick, not {align}-aligned")
+            elif abs(x - tick_x) > tolerance:
+                problems.append(f"its {side} label, {text}, sits {abs(x - tick_x) / unit:.1f}px off its tick")
+        spine = spines.get(subject)
+        paths = [n for n in spine.iter() if n.tag.rsplit("}", 1)[-1] == "path"] if spine is not None else []
+        if paths:
+            style = dict(STYLE_DECL.findall(paths[0].get("style") or ""))
+            try:
+                width = float(style.get("stroke-width", "1").strip().replace("px", ""))
+            except ValueError:
+                width = 1.0
+            cap = style.get("stroke-linecap", "butt").strip()
+            reach = width / 2 if cap in ("square", "round") else 0.0
+            xs = [x for path in paths for x in _xs(path)]
+            over = max(first_x - (min(xs) - reach), (max(xs) + reach) - last_x)
+            if over > tolerance:
+                if cap in ("square", "round") and over - reach <= tolerance:
+                    fix = f'its {cap} cap, which spines["bottom"].set_capstyle("butt") removes'
+                else:
+                    fix = "padding in the x range, which set_xlim(first, last) removes"
+                problems.append(f"its axis line runs {over / unit:.1f}px past the end ticks, from {fix}")
+            if abs(width / unit - AXIS_LINE_PX) > 0.05:
+                problems.append(f"its axis line is {width / unit:.2g}px wide, not {AXIS_LINE_PX:g}px")
+        if problems:
+            warnings.append(
+                f"the year axis of {subject} does not end as grapher's does: {'; '.join(problems)}. Grapher's axis "
+                "runs from the first year to the last, left-aligns the first label to its tick and right-aligns the "
+                "last, on a 1px butt-capped line; etl.viz.static.style_year_axis(ax, first, last) does all of it, "
+                "after set_xticks (WRITING-THE-STEP.md). A bar chart, whose bars need the padding, can leave it."
+            )
+    return warnings
+
+
 def scale_failures(svg: str, target: tuple[str, tuple[int, int]]) -> list[str]:
     """Return a failure if a matplotlib SVG's canvas is at the right ratio but the wrong scale.
 
@@ -1032,6 +1150,8 @@ def main() -> int:
             named = len({i for i in re.findall(r'\bid="([^"]+)"', text) if not GENERATED_ID.match(i)})
             unnamed = sum(unnamed_marks(text).values())
             print(f"OK   {svg.name} (0 clip paths, {named} named layers, {unnamed} unnamed marks{extra})")
+        for warning in year_axis_end_warnings(svg.read_text()):
+            print(f"  ! warning: {warning}")
 
     return 1 if failed else 0
 

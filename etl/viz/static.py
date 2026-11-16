@@ -413,7 +413,7 @@ def year_axis_ticks(
     56 px is the room a centred four-digit label at 14-15px needs beside the next one. Pass the plot's
     own width in template px (the default is the narrowest template's), and a panel's own width on a
     faceted frame: on the 850-wide templates 1950..2023 drops 2020 next to 2023, and 2000..2022 keeps
-    it. Pair it with `ax.set_xlim(ticks[0], ticks[-1])`, so the axis ends where the data does.
+    it. Pair it with `style_year_axis(ax, ticks[0], ticks[-1])`, so the axis ends where the data does.
     """
     if year_max <= year_min:
         return [year_min]
@@ -431,3 +431,45 @@ def year_axis_ticks(
         if len(ticks) <= max_ticks:
             return ticks
     return [year_min, year_max]
+
+
+# Grapher's axis line and tick marks are 1px wide and its marks 5px long. matplotlib takes strokes in
+# points, and a template pixel is 0.72pt at PIXELS_PER_INCH.
+AXIS_LINE_PT = 72 / PIXELS_PER_INCH
+TICK_LENGTH_PT = 5 * AXIS_LINE_PT
+
+
+def style_year_axis(ax: Any, first: Any, last: Any) -> None:
+    """Close a year axis as grapher draws one: it runs from `first` to `last`, and its end labels sit inside it.
+
+    The range is pinned to the first and last year, with no padding. The bottom spine is 1px and
+    butt-capped: matplotlib's default projecting cap runs it half its width past each end tick, so
+    the line overhangs the marks that should close it. The x tick marks are 5px long and 1px wide;
+    matplotlib draws them butt-capped already, since a tick is a marker. The first visible tick label
+    is left-aligned to its tick (`ha="left"`), the last right-aligned (`ha="right"`) and the rest
+    centered, so neither end label hangs past the axis.
+
+    Call it after `ax.set_xticks`: matplotlib creates any new tick by copying the first one's
+    properties, alignment included, so ticks set afterwards would all start left-aligned. `first` and
+    `last` are in the axis' own units (years, dates or category positions). Colors are left to the step.
+    """
+    ax.set_xlim(first, last)
+    spine = ax.spines["bottom"]
+    spine.set_capstyle("butt")
+    spine.set_linewidth(AXIS_LINE_PT)
+    ax.tick_params(axis="x", length=TICK_LENGTH_PT, width=AXIS_LINE_PT)
+    # Zip the locations with the ticks, as matplotlib does at draw time, so this holds before any draw.
+    lo, hi = sorted(ax.get_xlim())
+    locs = ax.xaxis.get_majorticklocs()
+    eps = 1e-9 * max(1.0, abs(hi - lo))
+    visible = sorted(
+        ((loc, tick) for loc, tick in zip(locs, ax.xaxis.get_major_ticks(len(locs))) if lo - eps <= loc <= hi + eps),
+        key=lambda pair: pair[0],
+    )
+    for i, (_, tick) in enumerate(visible):
+        ha = "center"
+        if len(visible) > 1 and i == 0:
+            ha = "left"
+        elif len(visible) > 1 and i == len(visible) - 1:
+            ha = "right"
+        tick.label1.set_horizontalalignment(ha)
