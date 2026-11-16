@@ -16,6 +16,12 @@ For agent sessions running in a Claude Code cloud sandbox
   the grapher feather still build. Upserts, chart-diff and the admin happen on
   the PR's staging server after you push.
 
+- **A branch gets a staging server only once it has an open PR**: the staging
+  pipeline builds PR branches, not bare pushes. Open a draft PR before pushing
+  work you or the user want to see there, then give the preview link. Don't
+  build `viz://` steps here to check a chart or MDim edit: the staging build
+  does that, and a local build pulls in the whole upstream chain.
+
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
   the step you're building — it isn't in the catalog yet.
