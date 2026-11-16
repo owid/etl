@@ -202,12 +202,8 @@ steps:
       - data://meadow/war/2026-05-13/nuclear_weapons_inventories:
         - snapshot://war/2026-05-13/nuclear_weapons_inventories.csv
 
-  # Countries in Conflict, as a multidim shown as a data explorer (replaces the explorer below).
+  # Countries in Conflict, as a multidim shown as a data explorer.
   viz://chart/war/latest/countries_in_conflict_data:
-    - data://grapher/war/2026-06-10/ucdp
-
-  # Countries in Conflict explorer.
-  viz://explorer/war/latest/countries_in_conflict_data:
     - data://grapher/war/2026-06-10/ucdp
 
   # Conflict Data Source explorer — single config covering all seven data sources

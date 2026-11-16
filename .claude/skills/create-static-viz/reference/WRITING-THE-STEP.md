@@ -451,10 +451,12 @@ word or two — is worth removing at the same time, because it is both a copy de
 and the state one character away from adding a line: measure it by cloning the slot, setting
 `textAutoResize = "WIDTH_AND_HEIGHT"` to get the unwrapped width, and comparing against the slot's.
 
-**Break a wrapped subtitle into lines of about equal length, and give the frame the same breaks.** Wrap
-to the fewest lines the slot allows, then narrow the wrap width as far as that line count holds. A
-greedy fill leaves a long first line over a short last one; even lines read as one block and leave room
-beside them for a key to rise into. A sentence boundary outranks balance: when a subtitle holds two
+**Break a wrapped subtitle into full lines, fix a short last line, and give the frame the same
+breaks.** Wrap to the fewest lines the slot allows, each close to the slot's width. When the last line
+is under about 40% of the slot, move words down from the lines above, spreading the shortfall over
+them, until it isn't. Lines of about equal length are only for a key placed beside the subtitle's
+shorter lines (a stacked bar's category key); anywhere else nothing uses the space they free, and the
+subtitle just reads narrow. A sentence boundary outranks either: when a subtitle holds two
 sentences, start the second on a new line wherever that costs no extra line ("…according to the World
 Health Organization. / Children more than 2 standard deviations…", not "…Organization. Children / …").
 Set the frame's subtitle to the same text with explicit `\n`, so Figma's own wrap cannot move the breaks.

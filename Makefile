@@ -312,9 +312,10 @@ install-hooks:
 # avoiding, so we require one filesystem and a copy-on-write one. GNU `cp` has no
 # `-c` at all, hence the `--reflink=always` branch, which does fail honestly.
 #
-# The venv is deliberately NOT built here. It is the one slow, network-dependent
-# step (~17s for 412 packages), most worktrees never need one, and building it from
-# a `post-checkout` hook makes `git worktree add` block on a network install. Any
+# The venv is deliberately NOT built here. It is the one network-dependent step
+# (~3s from a warm uv cache, much longer when packages must be downloaded), most
+# worktrees never need one, and building it from a `post-checkout` hook makes
+# `git worktree add` block on a network install. Any
 # make target depends on `.venv`, so it gets built the moment something actually
 # needs it — see the note in CLAUDE.md for what to do when `.venv/bin/...` is
 # missing. It also *can't* live here: this target is a prerequisite of `.venv`, so

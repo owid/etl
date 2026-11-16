@@ -61,6 +61,54 @@ def test_data_step():
         Dataset((paths.DATA_DIR / step_name).as_posix())
 
 
+def test_data_step_edited_while_running_stays_dirty():
+    # The recorded checksum is of the inputs the step was built from. A file saved mid-run must
+    # leave the step dirty, or `etlr --watch` reports that edit as up to date and never builds it.
+    with temporary_step() as step_name:
+        _create_mock_py_file(step_name)
+        step = DataStep(step_name, [])
+        py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
+        run_py = DataStep._run_py
+
+        def run_then_edit(self: DataStep) -> None:
+            run_py(self)
+            with open(py_file, "a") as ostream:
+                ostream.write("# edited while the step was running\n")
+
+        # DEBUG off, so the step goes through _run_py whatever the local .env says.
+        with patch.object(DataStep, "_run_py", run_then_edit), patch("etl.config.DEBUG", False):
+            step.run()
+        assert step.is_dirty()
+
+        # The next run builds from the edited file and comes out clean.
+        step.run()
+        assert not step.is_dirty()
+
+
+def test_static_viz_step_writing_its_image_comes_out_clean():
+    # A static step saves its image next to its recipe, where the image counts as one of its inputs.
+    # A changed image must not leave the step dirty, or every redraw costs a second run.
+    from etl.steps import VizStep
+
+    namespace = "".join(random.choice(string.ascii_lowercase) for i in range(10))
+    step_dir = paths.STEP_DIR / "viz" / "static" / namespace / "latest"
+    step = VizStep(f"static/{namespace}/latest/chart", dependencies=[])
+    try:
+        step_dir.mkdir(parents=True)
+        (step_dir / "chart.py").write_text(
+            "import uuid\nfrom pathlib import Path\n\n"
+            "def run() -> None:\n"
+            "    (Path(__file__).parent / 'chart.svg').write_text(uuid.uuid4().hex)\n"
+        )
+        with patch("etl.config.DEBUG", False):
+            step.run()
+        assert (step_dir / "chart.svg").exists()
+        assert not step.is_dirty()
+    finally:
+        shutil.rmtree(paths.STEP_DIR / "viz" / "static" / namespace, ignore_errors=True)
+        shutil.rmtree(paths.VIZ_DIR / "static" / namespace, ignore_errors=True)
+
+
 def test_data_step_recovers_from_partial_output():
     # Simulate a previously interrupted run that left dest_dir without index.json
     # (e.g. shutil.rmtree partially failed mid-write). The next run should

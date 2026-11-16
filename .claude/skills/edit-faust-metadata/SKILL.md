@@ -100,7 +100,7 @@ Three routes:
 **Target = MDim view, field F:**
 
 1. Overridden at view level (`config.*` for chart fields, `metadata.*` for indicator fields in the yaml, or programmatic writes in the `.py` — grep for `view.metadata[...]`, `_assert_and_replace`, `_replace_*`) → **route (b)**. Mind mirror constants: MDim `.py` files hard-copy garden bullet texts under `OLD_*`/`NEW_*` assertions — every garden text edit needs the matching constant edit; grep the repo for fragments of any text you change.
-2. Not overridden → inherited from the view's primary y indicator → **route (a)** (the grapher upsert refreshes the view; nothing extra needed on the MDim), or scope down to a new view-level override (**route b**) if the blast radius shows the indicator is shared.
+2. Not overridden → inherited from the view's primary y indicator → **route (a)** (the grapher upsert refreshes the view; nothing extra needed on the MDim), or scope down to a new view-level override (**route b**) if the blast radius shows the indicator is shared. A data-page field (`title_public`, `attribution_short`, `title_variant`, `description_short`, `description_key`, `description_processing`, `description_from_producer`, the unit or the origins) on a view that combines different indicators is the exception: the page shows only the first y indicator's text, so write a view-level `metadata` block that covers all of them (**route b**).
 3. Never write `multi_dim_x_chart_configs` or PUT MDim configs directly — they're rebuilt from the step files on every export.
 
 **Target = MDim (whole chart):** top-level `title`, `default_selection`, `common_view_config`, config-level `definitions` → **route (b)**.
@@ -172,6 +172,8 @@ Run it whenever:
 
 It sweeps: **charts** (with `--field`, charts shielded by their own patch override of that field are listed separately — they will NOT change; for the chart-text fields title/subtitle/note, charts with no inheritance path — variable not a y series, several y series, or inheritance disabled — are also listed separately and excluded from the beyond-target count, since grapher only inherits chart config from a single-y, inheritance-enabled parent), **MDim views**, **explorer views** (legacy CSV explorers are invisible to these tables — caveat is printed), **narrative charts**, and **article references** (informational: embeds don't break, but the displayed text changes).
 
+An MDim view that combines different indicators (a scatter, a gross vs. net dumbbell, a stacked bar) keeps a copy of their public text in its own view-level `metadata`, because its data page otherwise shows only the first y indicator's (`create-chart`, "Data page of a view that combines different indicators"). So when an edit changes any public field of an indicator that such a view may have copied (`title_public`, `attribution_short`, `title_variant`, `description_short`, `description_key`, `description_processing`, `description_from_producer`, the unit), search the MDim configs under `etl/steps/viz/` for a distinctive fragment of the old text, and update every view copy it finds in the same PR (route b): the script lists those views as affected (it scans every indicator slot, skipping a size or color that only shows regions, income groups or population), but they don't change on their own.
+
 **Report it specifically, never as counts alone.** "13 charts, 3 MDim views" tells the user nothing they can check: they can't see whether the affected surfaces are the ones where the new wording actually fits. Pass on what the script prints, for **every** surface — not just charts:
 
 - the **indicators** carrying the edit, with how many charts each feeds, so a lopsided distribution is visible;
@@ -209,6 +211,8 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 
 **The single checkpoint rule: nothing is committed or pushed before the user's explicit go-ahead.** Everything up to the checkpoint happens on the branch + staging server only.
 
+**In a cloud session** (`CLAUDE_CODE_REMOTE=true`) staging is unreachable, so edits reach it only by push, and only on a branch with an open PR. Open the draft PR (step 2), then in step 7 commit and push instead of writing to staging; the go-ahead gates marking the PR ready. Don't build the step in the sandbox. After each push, give the preview link (host from `get_container_name`) and say when `buildkite/etl-automated-staging-environment` passes on that commit. Steps that read the staging DB fall back to the public Datasette; list what went unchecked. Route (c) isn't possible from the sandbox.
+
 1. Parse the request; run `resolve_target.py --no-db` for instant identification feedback to the user.
 2. Create the branch + draft PR: `.venv/bin/etl pr "<title, no emoji>" data` (never manual branching). This spins up the staging server the whole workflow depends on. Name the title after the field that actually changes, using the team's own shorthand where one exists — when the edit is only about `description_key`, write **WYSK**, not the full "What you should know about this indicator" (e.g. `Add WYSK to the ILO gender wage gap indicator`). The shorthand is in CLAUDE.md's glossary, so every colleague reads it, and it leaves room in the title for the indicator being edited.
 3. Wait for staging readiness: retry `OWIDEnv.from_staging(branch).read_sql("SELECT 1")` (builds take a few minutes).
@@ -221,7 +225,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
    - route (c): `update_chart_config.py --branch <b> --chart-id <id> --set ... [--dry-run first]`.
 7. Reflect on staging **without committing**:
    - route (a): `.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds>` then `STAGING=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (the MySQL upsert takes ~50 s+/dataset — warn the user; the automatic rebuild after the eventual push re-does it harmlessly). Needed because the staging auto-rebuild only sees *pushed* code.
-   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`.
+   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`. For a step that is only a `.config.yml`, add `--only --watch` in the background and show the user each change as it lands (see `/create-chart`).
    - route (c): already live on staging.
 8. Run the metadata quality checks scoped to the edit (next section); fix findings and re-run the affected steps.
 9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.

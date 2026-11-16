@@ -39,16 +39,31 @@ CONFIG_IGNORE = {"$schema", "adminBaseUrl", "bakedGrapherURL", "dimensions", "is
 # Read the same parts of the grapher figure on both pages (they share the grapher component).
 FACTS_JS = """() => {
   const g = document.querySelector('.GrapherComponent');
-  const t = e => e ? e.innerText.replace(/\\s+/g, ' ').trim() : null;
+  // Read text the way it reads, not the way it wraps. Grapher breaks long text into one element per
+  // line and drops the space at each break, and it sets the time span after the title with a margin;
+  // so put a space back after every line and block, and before every margin-spaced element. Otherwise the same
+  // text wrapped one word apart (the two pages differ slightly in width) reads as a difference.
+  const t = e => {
+    if (!e) return null;
+    const c = e.cloneNode(true);
+    c.querySelectorAll('button, [role=button]').forEach(x => x.remove());
+    c.querySelectorAll('.markdown-text-wrap__line, p, div').forEach(x => x.append(' '));
+    c.querySelectorAll('[style*="inline-block"]').forEach(x => x.prepend(' '));
+    return c.textContent.replace(/\\s+/g, ' ').trim();
+  };
   return {
     header: t(g.querySelector('.HeaderHTML')),
+    // Footer content without its action buttons, whose labels show only when the footer wraps.
     footer: t(g.querySelector('.SourcesFooterHTML')),
     tabs: Array.from(g.querySelectorAll('.Tabs__Tab')).map(x => x.innerText.trim()),
     activeTab: t(g.querySelector('.Tabs__Tab[aria-selected="true"]')),
     legend: Array.from(g.querySelectorAll('.numericColorLegend text, .categoricalColorLegend text'))
       .map(x => x.textContent.trim()).filter(Boolean),
+    // Swatches carry their color in `style` (categorical) or the `fill` attribute (numeric); the
+    // transparent hover areas (opacity 0, fill #fff) are not swatches.
     legendColors: Array.from(g.querySelectorAll('.numericColorLegend rect, .categoricalColorLegend rect'))
-      .map(x => (x.getAttribute('fill') || '').toLowerCase().replace(/nodatapattern-\\d+/, 'nodatapattern'))
+      .filter(x => x.getAttribute('opacity') !== '0')
+      .map(x => (x.style.fill || x.getAttribute('fill') || '').toLowerCase().replace(/nodatapattern-\\d+/, 'nodatapattern'))
       .filter(c => c && c !== 'none'),
   };
 }"""
@@ -246,8 +261,10 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
     mdim = sources["mdims"][0]
     if len(sources["mdims"]) > 1:
         raise SystemExit("compare_views.py handles one target multidim; run it per multidim.")
-    prod, stg = OWIDEnv.from_env_file(prod_env_file), OWIDEnv.from_staging(staging)
-    stg_site = stg.site.rstrip("/")
+    prod = OWIDEnv.from_env_file(prod_env_file)
+    # After the merge the multidim is on production too: `--staging production` checks it there.
+    stg = prod if staging == "production" else OWIDEnv.from_staging(staging)
+    stg_site = PROD_SITE if staging == "production" else stg.site.rstrip("/")
 
     # Explorer side (production): view rows, indicators and column display names from the TSV.
     tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %s", params=(slug,)).iloc[0, 0]
@@ -305,6 +322,16 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
     ck_prod = prod.read_sql(q, params=(tuple(paths),)).set_index("catalogPath").to_dict("index")
     ck_stg = stg.read_sql(q, params=(tuple(paths),)).set_index("catalogPath").to_dict("index")
 
+    # A multidim published moments ago 404s until the site is baked; every capture would then
+    # wait out its timeout. Stop early instead.
+    code = session.get(pairs[0]["multidim_url"], timeout=60).status_code
+    if code != 200:
+        raise SystemExit(f"{pairs[0]['multidim_url']} returns {code}: wait for the bake (or publish it), then re-run.")
+    # The page also fetches each view's config by id; an upload made while a fresh staging server
+    # was still starting leaves them missing, and every chart then times out.
+    cfg_url = f"{stg_site}/grapher/by-uuid/{mcfg['views'][0]['fullConfigId']}.config.json"
+    if session.get(cfg_url, timeout=60).status_code != 200:
+        raise SystemExit(f"{cfg_url} is missing: re-run the upload with `--force --only`, then re-run this.")
     ids = sample_views(pairs, dims, max_rendered)
     print(f"rendering {len(ids)} of {len(pairs)} views (2 tabs each, both pages)")
     render(pairs, ids, out / "shots")
@@ -376,7 +403,7 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mapping-dir", type=Path, required=True)
-    ap.add_argument("--staging", required=True, help="Branch whose staging server holds the multidim.")
+    ap.add_argument("--staging", required=True, help="Branch whose staging server holds the multidim, or `production`.")
     ap.add_argument("--prod-env-file", required=True, help="Env file with production DB credentials (read-only use).")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--max-rendered", type=int, default=60)
