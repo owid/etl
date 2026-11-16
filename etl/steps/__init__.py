@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import uuid
@@ -1191,6 +1192,18 @@ class GrapherStep(Step):
 PUBLISHED_TO = "published_to"
 
 
+def _this_machine_or(name: str) -> str:
+    """`name` as a publish target, with every name of this machine's own environment written the same way.
+
+    A staging server is cloned from staging-site-master, build outputs and database included, and then
+    targets itself by its own hostname. Recording that hostname would make every output inherited from
+    master look unpublished on the clone, although the cloned database holds what master published.
+    """
+    if name in ("localhost", "127.0.0.1", socket.gethostname()):
+        return "this-machine"
+    return name
+
+
 class ExportStep(DataStep):
     """
     A step which ships files to a shared, environment-less destination, e.g. committing to a
@@ -1346,10 +1359,10 @@ class VizStep(ExportStep):
     @property
     def _publish_target(self) -> str | None:
         if self.channel in ("chart", "explorer"):
-            return f"{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+            return f"{_this_machine_or(config.DB_HOST)}:{config.DB_PORT}/{config.DB_NAME}"
         if self.channel == "bespoke":
             # The feed's R2 folder, see `etl.viz.bespoke.feed_location`.
-            return config.DATA_API_ENV
+            return _this_machine_or(config.DATA_API_ENV)
         return None
 
     @property

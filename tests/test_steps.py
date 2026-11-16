@@ -9,6 +9,7 @@ Test that the different step types work as expected.
 import json
 import random
 import shutil
+import socket
 import string
 import sys
 import tempfile
@@ -135,6 +136,17 @@ def test_viz_step_publishes_again_to_a_new_target(monkeypatch):
         monkeypatch.setattr(config, "GRAPHER_ENABLED", True)
 
         step.run()
+        assert not step.is_dirty()
+
+        # staging-site-master publishes to its own DB; a server cloned from it, output and DB included,
+        # targets its own DB under its own name and must see the inherited output as published.
+        monkeypatch.setattr(socket, "gethostname", lambda: "staging-site-master")
+        monkeypatch.setattr(config, "DB_HOST", "staging-site-master")
+        step.run()
+        monkeypatch.setattr(socket, "gethostname", lambda: "staging-site-clone")
+        monkeypatch.setattr(config, "DB_HOST", "staging-site-clone")
+        assert not step.is_dirty()
+        monkeypatch.setattr(config, "DB_HOST", "127.0.0.1")
         assert not step.is_dirty()
 
         # An output recorded before targets were tracked counts as current, so deploying this
