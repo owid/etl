@@ -227,7 +227,7 @@ Whoever asks from the web usually wants to see the change, not the process, so k
    - route (c): `update_chart_config.py --branch <b> --chart-id <id> --set ... [--dry-run first]`.
 7. Reflect on staging **without committing**:
    - route (a): `.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds>` then `STAGING=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (the MySQL upsert takes ~50 s+/dataset — warn the user; the automatic rebuild after the eventual push re-does it harmlessly). Needed because the staging auto-rebuild only sees *pushed* code.
-   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`. For a step that is only a `.config.yml`, add `--only --watch` in the background and show the user each change as it lands (see `/create-chart`).
+   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`, with no local build first: it builds and writes in one run. For a step that is only a `.config.yml`, add `--only --watch` in the background: `--only` needs nothing on disk, since such a step reads its indicators from the staging DB, so it lands in seconds. Then send the preview link (Verifying on staging, "MDim views") and show the user each change as it lands (see `/create-chart`).
    - route (c): already live on staging.
 8. Run the metadata quality checks scoped to the edit (next section); fix findings and re-run the affected steps.
 9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.
@@ -263,7 +263,7 @@ Scoping rules specific to this skill:
 - **Chart text without a browser**: `curl -s http://staging-site-<branch>/grapher/<slug>.svg | grep -o '<new text fragment>'` — the server-side render carries title/subtitle/note.
 - **Indicator fields**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.metadata.json` (path prefix is the full container name, not the bare branch — a wrong prefix silently serves another environment).
 - **MDim views**: the resolver's per-view chart-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
-- **Visual QA**: hand off to the `check-chart-preview` skill for a screenshot.
+- **Visual QA** is the user's, through the preview link: don't open a browser on staging yourself unless they ask. Each branch's server is a new host, so the desktop app's browser stops for a site approval every time, and the link reaches them later. Check with the reads above instead; for a screenshot on request, use `check-chart-preview`.
 - **Big text changes**: Metadata Diff (first bullet) covers this once the branch is on staging. Without a staging server, re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
 - **Jinja-templated definitions**: after editing shared `definitions`, rebuild garden AND grapher before reading anything — the report scripts and ad-hoc reads use the grapher channel, and a stale channel shows pre-edit metadata. Spot-check several rendered variants; dimension comparisons are type-sensitive (`decile == 5` vs `decile == "5"`): dimension values can be int in one dataset and str in another, and a wrong-type comparison silently renders the else-branch — copy the comparison form from a working definition in the same file and spot-check the affected view.
 
