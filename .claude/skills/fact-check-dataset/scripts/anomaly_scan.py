@@ -128,13 +128,25 @@ def scan_table(
             name = ", ".join(map(str, series)) if isinstance(series, tuple) else str(series)
             add(column, "CONSTANT", f"{name}: >50% of series identical to previous period")
 
-        if countries and _is_additive(unit) and not dims and (s["country"] == "World").any():
-            latest = s.loc[s["country"] == "World", year_col].max()
-            at_latest = s[s[year_col] == latest]
-            world = at_latest.loc[at_latest["country"] == "World", column].iloc[0]
-            total = at_latest.loc[at_latest["country"].isin(countries), column].sum()
-            if world and abs(world - total) / abs(world) > 0.05:
-                add(column, "WORLD_SUM", f"{latest}: World={world:.4g} vs sum of countries={total:.4g}", latest)
+        if countries and _is_additive(unit) and (s["country"] == "World").any():
+            # Within each dimension slice (sex, age, ...): World against the sum of that slice's countries.
+            slices = s.groupby(dims, observed=True) if dims else [((), s)]
+            for slice_key, part in slices:
+                world_rows = part[part["country"] == "World"]
+                if world_rows.empty:
+                    continue
+                latest = world_rows[year_col].max()
+                at_latest = part[part[year_col] == latest]
+                members = at_latest["country"].isin(countries)
+                if not members.any():
+                    continue  # a table of aggregates only (World and regions) has nothing to add up
+                world = at_latest.loc[at_latest["country"] == "World", column].iloc[0]
+                total = at_latest.loc[members, column].sum()
+                if world and abs(world - total) / abs(world) > 0.05:
+                    values = slice_key if isinstance(slice_key, tuple) else (slice_key,)
+                    where = "".join(f"{d}={v}, " for d, v in zip(dims, values))
+                    detail = f"{where}{latest}: World={world:.4g} vs sum of countries={total:.4g}"
+                    add(column, "WORLD_SUM", detail, latest)
     return findings
 
 

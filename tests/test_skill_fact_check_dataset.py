@@ -651,6 +651,7 @@ def test_refetched_dataset_page_drops_documents_it_no_longer_links(tmp_path, mon
         {
             "url": "https://x.org/old-method.pdf",
             "role": "linked-from-main",
+            "parent": "https://x.org/",
             "status": "ok",
             "file": "02.txt",
             "fetched_at": "2026-11-15 09:00",
@@ -721,3 +722,144 @@ def test_chart_on_an_inactive_version_keeps_its_own_origins(tmp_path, monkeypatc
     assert [(o["title"], o["file"]) for o in result["origins"]] == [
         ("Release 2025", "(the chart's indicators, version 2025-01-01)")
     ]
+
+
+def test_linked_documents_are_reused_per_cached_page(tmp_path, monkeypatch):
+    """One dataset page cached and another fetched again: the cached page's documents stay."""
+    now = dt.datetime(2026, 11, 16, 12, 0)
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
+    saved = [
+        {
+            "url": "https://a.org/",
+            "role": "url_main",
+            "status": "ok",
+            "file": "01.txt",
+            "fetched_at": "2026-11-15 09:00",
+        },
+        {
+            "url": "https://b.org/",
+            "role": "url_main",
+            "status": "ok",
+            "file": "02.txt",
+            "fetched_at": "2026-11-01 09:00",
+        },
+        {
+            "url": "https://a.org/codebook.pdf",
+            "role": "linked-from-main",
+            "parent": "https://a.org/",
+            "status": "ok",
+            "file": "03.txt",
+            "fetched_at": "2026-11-15 09:00",
+        },
+        {
+            "url": "https://b.org/gone.pdf",
+            "role": "linked-from-main",
+            "parent": "https://b.org/",
+            "status": "ok",
+            "file": "04.txt",
+            "fetched_at": "2026-11-15 09:00",
+        },
+    ]
+    for entry in saved:
+        (docs_dir / entry["file"]).write_text("text")
+    (docs_dir / "index.json").write_text(json.dumps(saved))
+
+    def fake_fetch(doc, docs_dir, number, now):
+        doc.status, doc.via, doc.links = "ok", "direct", []
+        return doc
+
+    monkeypatch.setattr(fetch_docs, "fetch_one", fake_fetch)
+    links = [("https://a.org/", "url_main"), ("https://b.org/", "url_main")]
+    urls = {d.url for d in fetch_docs.fetch_all(links, tmp_path, now=now)}
+    assert "https://a.org/codebook.pdf" in urls and "https://b.org/gone.pdf" not in urls
+
+
+def test_world_sum_is_checked_within_each_slice():
+    rows = []
+    for sex, world in (("female", 100), ("male", 61)):
+        rows += [
+            {"country": "World", "year": 2020, "sex": sex, "x": world},
+            {"country": "A", "year": 2020, "sex": sex, "x": 30},
+            {"country": "B", "year": 2020, "sex": sex, "x": 30},
+        ]
+    findings = anomaly_scan.scan_table(pd.DataFrame(rows), "t", {"x": "deaths"}, {"A", "B"}, dims=["sex"])
+    assert [(f["kind"], f["detail"].split(":")[0]) for f in findings] == [("WORLD_SUM", "sex=female, 2020")]
+    # A table of aggregates only (World and regions, no country rows) has nothing to compare.
+    aggregates = pd.DataFrame(
+        [{"country": "World", "year": 2020, "x": 100}, {"country": "Asia", "year": 2020, "x": 60}]
+    )
+    assert anomaly_scan.scan_table(aggregates, "t", {"x": "deaths"}, {"A", "B"}) == []
+
+
+class _FakeEnv:
+    def __init__(self, frames):
+        self.frames, self.queries = frames, []
+
+    def read_sql(self, sql, params=None):
+        self.queries.append(sql)
+        for marker, frame in self.frames.items():
+            if marker in sql:
+                return frame
+        raise AssertionError(f"unexpected query: {sql}")
+
+
+def test_staging_chart_reads_the_rendered_config_through_its_chart(monkeypatch):
+    import etl.config
+
+    env = _FakeEnv({"chart_configs": pd.DataFrame({"config": [json.dumps({"slug": "x", "title": "T"})]})})
+    monkeypatch.setattr(etl.config.OWIDEnv, "from_staging", staticmethod(lambda branch: env))
+    config, texts = prepare.load_chart("x", "my-branch")
+    assert texts["title"] == "T"
+    assert "JOIN chart_configs cc ON cc.id = c.configId" in env.queries[0] and "cc.config" in env.queries[0]
+
+
+def test_staging_indicator_carries_its_origins(monkeypatch):
+    import etl.config
+
+    variables = pd.DataFrame(
+        [
+            {
+                "id": 7,
+                "name": "GDP",
+                "unit": "$",
+                "shortUnit": "$",
+                "catalogPath": "grapher/ns/2025-01-01/d/t#gdp",
+                "titlePublic": None,
+                "descriptionShort": "s",
+                "descriptionKey": None,
+                "descriptionProcessing": None,
+                "descriptionFromProducer": None,
+            }
+        ]
+    )
+    origins = pd.DataFrame(
+        [
+            {
+                "producer": "World Bank",
+                "title": "WDI",
+                "urlMain": "https://wb.org",
+                "urlDownload": None,
+                "datePublished": "2025-07-01",
+                "dateAccessed": None,
+                "versionProducer": None,
+                "citationFull": None,
+            }
+        ]
+    )
+    env = _FakeEnv({"FROM variables": variables, "FROM origins": origins})
+    monkeypatch.setattr(etl.config.OWIDEnv, "from_staging", staticmethod(lambda branch: env))
+    indicator = prepare.load_indicator(7, "my-branch")
+    assert indicator["dataset"] == ("ns", "2025-01-01", "d")
+    assert indicator["origins"] == [
+        {"producer": "World Bank", "title": "WDI", "urlMain": "https://wb.org", "datePublished": "2025-07-01"}
+    ]
+
+
+def test_indicator_that_cannot_be_loaded_is_an_error(monkeypatch):
+    class Response:
+        status_code = 503
+
+    monkeypatch.setattr(prepare.session, "get", lambda *a, **k: Response())
+    with pytest.raises(LookupError, match="HTTP 503"):
+        prepare.load_indicator(7, None)

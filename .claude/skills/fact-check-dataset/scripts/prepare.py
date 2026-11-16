@@ -667,7 +667,12 @@ def prepare_chart(args: argparse.Namespace) -> str:
     variable_ids = [d["variableId"] for d in config.get("dimensions") or [] if d.get("variableId")]
     roles = {d["variableId"]: d.get("property", "") for d in config.get("dimensions") or []}
     with ThreadPoolExecutor(max_workers=8) as pool:
-        indicators = list(pool.map(lambda v: load_indicator(v, args.staging), variable_ids))
+        loaded = {v: pool.submit(load_indicator, v, args.staging) for v in variable_ids}
+    indicators = []
+    for variable_id, job in loaded.items():
+        result = outcome(job)
+        # A failed load is said in its own section, never shown as an indicator with no metadata.
+        indicators.append(result if ok(result) else {"id": variable_id, "failed": str(result), "role": ""})
     for indicator in indicators:
         indicator["role"] = roles.get(indicator["id"], "")
     # The values the chart plots are what the strings talk about; colour and size carriers come along unchecked.
@@ -708,6 +713,14 @@ def prepare_chart(args: argparse.Namespace) -> str:
     out += [f"- {name}: {json.dumps(text, ensure_ascii=False)}" for name, text in chart_texts.items() if text]
     out += ["", "## Indicators", ""]
     for indicator in indicators:
+        if indicator.get("failed"):
+            out += [
+                f"### indicator {indicator['id']} ({indicator['role'] or 'dimension'})",
+                "",
+                f"FAILED to load ({indicator['failed']}): read its metadata, origins and steps by hand.",
+                "",
+            ]
+            continue
         checked = "" if indicator in main else " (carrier of color or size: not part of the check)"
         out += [
             f"### `{indicator.get('catalog_path') or indicator['id']}` ({indicator['role'] or 'dimension'}){checked}",
@@ -798,13 +811,15 @@ def load_chart(slug: str, staging: str | None) -> tuple[dict, dict]:
     if staging:
         from etl.config import OWIDEnv
 
+        # The config that renders is the one `charts.configId` names (chart_configs also holds patch layers).
         frame = OWIDEnv.from_staging(staging).read_sql(
-            "SELECT cc.full FROM chart_configs cc WHERE cc.slug = %(slug)s ORDER BY cc.updatedAt DESC LIMIT 1",
+            "SELECT cc.config FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE cc.slug = %(slug)s",
             params={"slug": slug},
         )
         if frame.empty:
             sys.exit(f"No chart `{slug}` on staging server `{staging}`.")
-        config = json.loads(frame["full"].iloc[0])
+        value = frame["config"].iloc[0]
+        config = json.loads(value) if isinstance(value, (str, bytes)) else value
         citation = ""
     else:
         response = session.get(f"{SITE}/{slug}.config.json", timeout=20)
@@ -830,16 +845,28 @@ def load_indicator(variable_id: int, staging: str | None) -> dict:
     if staging:
         from etl.config import OWIDEnv
 
-        frame = OWIDEnv.from_staging(staging).read_sql(
+        env = OWIDEnv.from_staging(staging)
+        frame = env.read_sql(
             "SELECT id, name, unit, shortUnit, catalogPath, titlePublic, descriptionShort, descriptionKey, "
             "descriptionProcessing, descriptionFromProducer FROM variables WHERE id = %(id)s",
             params={"id": variable_id},
         )
-        raw = frame.to_dict("records")[0] if not frame.empty else {}
+        if frame.empty:
+            raise LookupError(f"indicator {variable_id} is not in staging server `{staging}`'s variables table")
+        raw = frame.to_dict("records")[0]
         raw["presentation"] = {"titlePublic": raw.get("titlePublic")}
+        origins = env.read_sql(
+            "SELECT o.producer, o.title, o.urlMain, o.urlDownload, o.datePublished, o.dateAccessed, "
+            "o.versionProducer, o.citationFull FROM origins o JOIN origins_variables ov ON ov.originId = o.id "
+            "WHERE ov.variableId = %(id)s",
+            params={"id": variable_id},
+        )
+        raw["origins"] = [{k: v for k, v in row.items() if v is not None} for row in origins.to_dict("records")]
     else:
         response = session.get(f"{INDICATOR_API}/{variable_id}.metadata.json", timeout=20)
-        raw = response.json() if response.status_code == 200 else {}
+        if response.status_code != 200:
+            raise LookupError(f"indicator {variable_id}: HTTP {response.status_code} from the indicator API")
+        raw = response.json()
     catalog_path = raw.get("catalogPath") or ""
     parts = catalog_path.split("#")[0].split("/")
     dataset = tuple(parts[1:4]) if len(parts) >= 5 else None

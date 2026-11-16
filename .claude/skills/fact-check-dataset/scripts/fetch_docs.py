@@ -73,6 +73,7 @@ class Doc:
     file: str = ""
     title: str = ""
     note: str = ""
+    parent: str = ""  # for a document linked from a dataset page: that page's URL
     links: list = field(default_factory=list, repr=False)
 
 
@@ -260,7 +261,14 @@ def linked_documents(doc: Doc, known: set[str]) -> list[Doc]:
         if is_data_url(url) or not DOC_HINTS.search(f"{text} {urlsplit(url).path}"):
             continue
         known.add(url)
-        out.append(Doc(url=url, role="linked-from-main", note=f"linked from the dataset page as “{text[:60]}”"))
+        out.append(
+            Doc(
+                url=url,
+                role="linked-from-main",
+                note=f"linked from the dataset page as “{text[:60]}”",
+                parent=doc.url,
+            )
+        )
         if len(out) == MAX_LINKED:
             break
     return out
@@ -308,16 +316,14 @@ def fetch_all(
     for doc in docs:
         if doc.role == "url_main" and doc.via != "cache":
             second += linked_documents(doc, known)
-    # A dataset page served from the cache has no parsed links: reuse the documents it led to last time. Once any
-    # dataset page is fetched again, its current links are the list: a document the producer took down or
-    # replaced is not carried over.
-    pages = [doc for doc in docs if doc.role == "url_main"]
-    if pages and all(doc.via == "cache" for doc in pages):
-        second += [
-            Doc(url=url, role="linked-from-main", note=entry.get("note", ""))
-            for url, entry in saved.items()
-            if entry.get("role") == "linked-from-main" and url not in known
-        ]
+    # A dataset page served from the cache has no parsed links: reuse the documents it led to last time. A page
+    # fetched again has its current links as the list, so a document the producer took down is not carried over.
+    cached_pages = {doc.url for doc in docs if doc.role == "url_main" and doc.via == "cache"}
+    second += [
+        Doc(url=url, role="linked-from-main", note=entry.get("note", ""), parent=entry.get("parent", ""))
+        for url, entry in saved.items()
+        if entry.get("role") == "linked-from-main" and url not in known and entry.get("parent") in cached_pages
+    ]
     run(second)
 
     index_path.write_text(json.dumps([{k: v for k, v in asdict(d).items() if k != "links"} for d in docs], indent=1))
