@@ -1,0 +1,117 @@
+# Throwaway test: how toggle buttons show a "Not applicable" choice. Not for merge.
+grapher_schema: "012"
+title:
+  title: Test toggles with Not applicable
+  title_variant: ""
+slug: test-toggles-not-applicable
+default_selection:
+  - World
+  - United States
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+dimensions:
+  - slug: animal
+    name: Animal
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_land_animals
+        name: All land animals
+      - slug: farmed_fish
+        name: Farmed fish
+      - slug: fur_animals
+        name: Fur animals (laws)
+  - slug: estimate
+    name: Estimate
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: midpoint
+        name: Midpoint
+      - slug: lower_limit
+        name: Lower limit
+      - slug: upper_limit
+        name: Upper limit
+      - slug: not_applicable
+        name: Not applicable
+        description: Only fish are estimated as a range.
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+      - slug: not_applicable
+        name: Not applicable
+        description: Only animal counts have a per-person version.
+views:
+  - dimensions:
+      animal: all_land_animals
+      estimate: not_applicable
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_animals_killed__metric_animals_killed__animal_all_land_animals__per_capita_false__estimate
+  - dimensions:
+      animal: all_land_animals
+      estimate: not_applicable
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_all_land_animals__per_capita_true__estimate
+  - dimensions:
+      animal: farmed_fish
+      estimate: midpoint
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_farmed_fish__metric_animals_killed__animal_farmed_fish__per_capita_false__estimate_midpoint
+  - dimensions:
+      animal: farmed_fish
+      estimate: midpoint
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_farmed_fish_per_capita__metric_animals_killed__animal_farmed_fish__per_capita_true__estimate_midpoint
+  - dimensions:
+      animal: farmed_fish
+      estimate: lower_limit
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_farmed_fish_low__metric_animals_killed__animal_farmed_fish__per_capita_false__estimate_lower_limit
+  - dimensions:
+      animal: farmed_fish
+      estimate: lower_limit
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_farmed_fish_low_per_capita__metric_animals_killed__animal_farmed_fish__per_capita_true__estimate_lower_limit
+  - dimensions:
+      animal: farmed_fish
+      estimate: upper_limit
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_farmed_fish_high__metric_animals_killed__animal_farmed_fish__per_capita_false__estimate_upper_limit
+  - dimensions:
+      animal: farmed_fish
+      estimate: upper_limit
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: animals_used_for_food#n_farmed_fish_high_per_capita__metric_animals_killed__animal_farmed_fish__per_capita_true__estimate_upper_limit
+  - dimensions:
+      animal: fur_animals
+      estimate: not_applicable
+      per_capita: not_applicable
+    indicators:
+      y:
+        - catalogPath: fur_laws#fur_trading_status
+    config:
+      chartTypes: []
