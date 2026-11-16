@@ -298,8 +298,9 @@ between every pair of neighbouring tick positions for four-digit labels at 14–
 several panels, pass one panel's width as `plot_width_px`, and take the years over everything the
 axis plots, not one series. `verify_static_viz.py` fails a year axis whose `line__<Entity>` series
 starts before its first labelled tick or runs on past its last, and Figma's restyle warns about the
-same on import. It also warns, without failing, when an end label's outer edge sits more than half a
-pixel off its tick, or the axis line runs past the end ticks or is not 1px wide.
+same on import. It also warns, without failing, when the axis is labelled past the data (no line
+reaches its first or last labelled year), when an end label's outer edge sits more than half a pixel
+off its tick, or when the axis line runs past the end ticks or is not 1px wide.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
 that doesn't exist is weak evidence about what the chart *looks like*: it suggests grapher draws no

@@ -1232,3 +1232,54 @@ def test_a_year_axis_ends_as_grapher_draws_it(tmp_path, axis, warnings):
     for warning in warnings:
         assert warning in result.stdout, result.stdout
     assert result.stdout.count("! warning") == (1 if warnings else 0), result.stdout
+
+
+@pytest.mark.parametrize(
+    "ticks, line, warning",
+    [
+        # Labelled on to 2030 while the data ends in 2024.
+        ((2000, 2010, 2020, 2030), (2000, 2024), "it ends its labels at 2030, but its lines end in about 2024"),
+        # Labelled from 1990 while the data starts in 2000.
+        ((1990, 2000, 2010, 2024), (2000, 2024), "it starts its labels at 1990, but its lines start in about 2000"),
+        # Within half a year of each end: the axis ends on the data.
+        ((2000, 2010, 2024), (2000.4, 2023.6), None),
+        # A date axis whose data stops in 2023 under a last label of 2024.
+        (
+            (2020, 2022, 2024),
+            ("2020-01-01", "2023-06-01"),
+            "it ends its labels at 2024, but its lines end in about 2023",
+        ),
+        # Data reaching any day of the last labelled year reaches it.
+        ((2020, 2022, 2024), ("2020-03-01", "2024-03-01"), None),
+    ],
+)
+def test_a_year_axis_labelled_past_the_data_warns(tmp_path, ticks, line, warning):
+    """The axis ends on the data's first and last year, so labels beyond every line are flagged, as a warning."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame, style_year_axis
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    if isinstance(line[0], str):
+        xs: list = [dt.date.fromisoformat(d) for d in line]
+        positions: list = [dt.date(year, 1, 1) for year in ticks]
+    else:
+        xs, positions = list(line), list(ticks)
+    ax.plot(xs, [0, 20], gid="line__value")
+    ax.set_xticks(positions, [str(t) for t in ticks])
+    ax.tick_params(labelsize=15 * 0.72)
+    style_year_axis(ax, positions[0], positions[-1])
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 0, "labels past the data are a warning, never a failure: " + result.stdout
+    if warning is None:
+        assert "warning" not in result.stdout, result.stdout
+    else:
+        assert warning in result.stdout and result.stdout.count("! warning") == 1, result.stdout

@@ -28,7 +28,9 @@ plausible, and the problem only shows up once a designer opens the SVG:
   labelled tick. Grapher's time axis shows the data's first and last year as ticks, so the last tick
   is the last year plotted, never a round year before it
 - a year axis whose ends differ from grapher's (a warning, not a failure, since a bar chart over
-  years rightly pads its range and centers its labels under the bars): the first tick label not left-aligned to its tick or the last not
+  years rightly pads its range and centers its labels under the bars, and an area or band read as no
+  ``line__`` series may rightly carry the axis past the lines): labels past the data, where no series
+  line reaches the first or last labelled year; the first tick label not left-aligned to its tick or the last not
   right-aligned (within half a template px), or a bottom spine that runs past the end ticks, through
   x-range padding or a projecting cap, or is not 1px wide
 - a frame that no longer matches the template it targets, because something reintroduced
@@ -720,7 +722,25 @@ def _xs(node: ET.Element) -> list[float]:
 
 
 def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, str, list[str], int | None]]:
-    """Each end of a year axis that a series line runs past: the side, subject, that end's label, the lines, their year.
+    """Each end of a year axis that a series line runs past: the side, subject, that end's label, the lines, their year."""
+    return _year_axis_ends(root, year_axes)[0]
+
+
+def year_axis_shortfalls(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, str, int]]:
+    """Each end of a year axis that no series line reaches: the side, subject, that end's label, the year the lines reach.
+
+    The mirror of `year_axis_overruns`, read on the same scale: the axis is labelled past the data when
+    every line starts more than half a year after the first labelled tick, or ends more than half a
+    year before the last (on a date axis, when no line reaches the first or last labelled year). An
+    axis with a single labelled tick has no scale and is left alone.
+    """
+    return _year_axis_ends(root, year_axes)[1]
+
+
+def _year_axis_ends(
+    root: ET.Element, year_axes: set[str]
+) -> tuple[list[tuple[str, str, str, list[str], int | None]], list[tuple[str, str, str, int]]]:
+    """The overruns and shortfalls of every year axis (`year_axis_overruns`, `year_axis_shortfalls`).
 
     The side is `start` when lines begin before the first labelled tick and `end` when they run on past
     the last.
@@ -795,6 +815,7 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
             spans.setdefault(subject, {})[gid] = (min(xs), max(xs))
 
     overruns = []
+    shortfalls: list[tuple[str, str, str, int]] = []
     for subject in sorted(spans):
         marks = placed.get(subject, {})
         years = label_years.get(subject, {})
@@ -838,13 +859,23 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
                     (gid, year_at(end)) for gid, (_, end) in spans[subject].items() if (end - last_x) / per_year > 0.5
                 ],
             }
+            data_start = min(start for start, _ in spans[subject].values())
+            data_end = max(end for _, end in spans[subject].values())
+            if (data_start - first_x) / per_year > 0.5:
+                found["short_start"] = [("", year_at(data_start))]
+            if (last_x - data_end) / per_year > 0.5:
+                found["short_end"] = [("", year_at(data_end))]
         if found["start"]:
             lines, reached = zip(*found["start"])
             overruns.append(("start", subject, texts[first_value], sorted(lines), min(reached)))
         if found["end"]:
             lines, reached = zip(*found["end"])
             overruns.append(("end", subject, texts[last_value], sorted(lines), max(reached)))
-    return overruns
+        if found.get("short_start"):
+            shortfalls.append(("start", subject, texts[first_value], found["short_start"][0][1]))
+        if found.get("short_end"):
+            shortfalls.append(("end", subject, texts[last_value], found["short_end"][0][1]))
+    return overruns, shortfalls
 
 
 def _date_axis_overruns(
@@ -852,6 +883,8 @@ def _date_axis_overruns(
 ) -> dict[str, list[tuple[str, int]]]:
     """The lines that start before a date axis' first labelled year or reach the year after its last, with their year.
 
+    Also, under `short_start` and `short_end`, the year the data reaches when no line reaches the first
+    labelled year (every line starting in a later year) or the last (every line ending in an earlier one).
     Each labelled tick is taken to sit on January 1 of the year it reads, so a vertex's date is that day
     plus its distance in days, and the year after the last label begins that year's own length (365 or
     366 days) later. Half a day is allowed for rounding in the SVG's coordinates.
@@ -875,6 +908,13 @@ def _date_axis_overruns(
             found["start"].append((gid, year_of(start, first_value, first_year)))
         if v0 + (end - x0) / per_day >= next_year_value - 0.5:
             found["end"].append((gid, year_of(end, last_value, last_year)))
+    data_start = min(start for start, _ in spans.values())
+    data_end = max(end for _, end in spans.values())
+    second_year_value = first_value + (dt.date(first_year + 1, 1, 1) - dt.date(first_year, 1, 1)).days
+    if v0 + (data_start - x0) / per_day >= second_year_value - 0.5:
+        found["short_start"] = [("", year_of(data_start, first_value, first_year))]
+    if v0 + (data_end - x0) / per_day < last_value - 0.5:
+        found["short_end"] = [("", year_of(data_end, last_value, last_year))]
     return found
 
 
@@ -920,8 +960,10 @@ AXIS_LINE_PX = 1.0
 def year_axis_end_warnings(svg: str) -> list[str]:
     """Return warnings where a year axis' ends differ from grapher's x axis.
 
-    Grapher left-aligns the first tick label to its tick, right-aligns the last, and ends a 1px,
-    butt-capped axis line on the two end ticks. In the SVG an end label is a `<text>` whose x is its
+    Grapher's axis runs from the data's first year to its last, so it is labelled past the data when
+    no series line reaches its first or last labelled year (`year_axis_shortfalls`). It left-aligns the
+    first tick label to its tick, right-aligns the last, and ends a 1px, butt-capped axis line on the
+    two end ticks. In the SVG an end label is a `<text>` whose x is its
     anchor, so a `start` (first) or `end` (last) anchor within END_TOLERANCE_PX of its tick's `<use x>`
     puts its outer edge on the tick. The bottom spine (`<subject>__spine-bottom`) is a path whose stroke
     reaches past its end points by half its width under a `square` or `round` cap, matplotlib's default
@@ -929,7 +971,8 @@ def year_axis_end_warnings(svg: str) -> list[str]:
     MathText label, a hidden spine and an axis with a single tick are left alone.
 
     Warnings rather than failures: a bar chart over years needs half a bar of range past each end tick
-    and its labels centered under the bars, and its labels read as years like any other.
+    and its labels centered under the bars, and its labels read as years like any other; and only
+    `line__` series are read, so an area or band that carries the axis past the lines would be failed.
     """
     try:
         root = ET.fromstring(svg)
@@ -972,14 +1015,21 @@ def year_axis_end_warnings(svg: str) -> list[str]:
                 marks.setdefault(mark.group(1), {})[float(mark.group(2))] = xs[0]
 
     warnings = []
-    for subject in sorted(labels):
-        if not is_year_axis([text for text, *_ in labels[subject].values()]):
-            continue
+    year_axes = {subject for subject in labels if is_year_axis([text for text, *_ in labels[subject].values()])}
+    # Labelled past the data: every line opens after the first labelled year, or closes before the last.
+    short = {(subject, side): (label, year) for side, subject, label, year in year_axis_shortfalls(root, year_axes)}
+    for subject in sorted(year_axes):
+        problems = []
+        for side, verb in (("start", "starts its labels at"), ("end", "ends its labels at")):
+            if (subject, side) in short:
+                label, year = short[(subject, side)]
+                problems.append(f"it {verb} {label}, but its lines {side} in about {year}")
         ends = sorted((marks[subject][v], v) for v in labels[subject] if v in marks.get(subject, {}))
         if len(ends) < 2:
+            if problems:
+                warnings.append(f"the year axis of {subject} does not end as grapher's does: {'; '.join(problems)}.")
             continue
         (first_x, first_v), (last_x, last_v) = ends[0], ends[-1]
-        problems = []
         for side, tick_x, value, want, align in (
             ("first", first_x, first_v, "start", "left"),
             ("last", last_x, last_v, "end", "right"),
@@ -1017,7 +1067,7 @@ def year_axis_end_warnings(svg: str) -> list[str]:
         if problems:
             warnings.append(
                 f"the year axis of {subject} does not end as grapher's does: {'; '.join(problems)}. Grapher's axis "
-                "runs from the first year to the last, left-aligns the first label to its tick and right-aligns the "
+                "runs from the data's first year to its last, left-aligns the first label to its tick and right-aligns the "
                 "last, on a 1px butt-capped line; etl.viz.static.style_year_axis(ax, first, last) does all of it, "
                 "after set_xticks (WRITING-THE-STEP.md). A bar chart, whose bars need the padding, can leave it."
             )
