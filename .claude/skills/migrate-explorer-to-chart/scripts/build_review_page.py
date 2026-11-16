@@ -35,9 +35,11 @@ def dimension_summary(mapping: dict) -> list[dict]:
             rel = defaultdict(set)
             for s, t in pairs:
                 rel[s.get(name, "")].add(t.get(slug))
-            if all(len(v) == 1 for v in rel.values()):
-                choices = {k: next(iter(v)) for k, v in rel.items()}
-                score = len(set(choices.values()))
+            # A blank explorer choice (the dimension doesn't apply to the view) may become a different multidim
+            # choice per view, e.g. an animal of its own for each view on laws; every named choice maps to one.
+            if all(len(v) == 1 for k, v in rel.items() if k != ""):
+                choices = {k: ", ".join(sorted(map(str, v))) for k, v in rel.items()}
+                score = len({next(iter(v)) for k, v in rel.items() if k != ""})
                 if best is None or score > best[0]:
                     best = (score, slug, choices)
         out.append(

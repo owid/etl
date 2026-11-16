@@ -59,8 +59,11 @@ FACTS_JS = """() => {
     activeTab: t(g.querySelector('.Tabs__Tab[aria-selected="true"]')),
     legend: Array.from(g.querySelectorAll('.numericColorLegend text, .categoricalColorLegend text'))
       .map(x => x.textContent.trim()).filter(Boolean),
+    // Swatches carry their color in `style` (categorical) or the `fill` attribute (numeric); the
+    // transparent hover areas (opacity 0, fill #fff) are not swatches.
     legendColors: Array.from(g.querySelectorAll('.numericColorLegend rect, .categoricalColorLegend rect'))
-      .map(x => (x.getAttribute('fill') || '').toLowerCase().replace(/nodatapattern-\\d+/, 'nodatapattern'))
+      .filter(x => x.getAttribute('opacity') !== '0')
+      .map(x => (x.style.fill || x.getAttribute('fill') || '').toLowerCase().replace(/nodatapattern-\\d+/, 'nodatapattern'))
       .filter(c => c && c !== 'none'),
   };
 }"""
