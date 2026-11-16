@@ -63,7 +63,7 @@ dimensions:
   - slug: estimate
     name: Estimate
     presentation:
-      type: dropdown
+      type: toggle-buttons
     choices:
       - slug: midpoint
         name: Midpoint
@@ -86,13 +86,16 @@ dimensions:
         name: Total
       - slug: per_capita
         name: Per person
+      - slug: not_applicable
+        name: Not applicable
+        description: Only animal counts have a per-person version.
 
 views:
   - dimensions:
       metric: fur_farming_status
       animal: fur_animals
       estimate: not_applicable
-      per_capita: total
+      per_capita: not_applicable
     indicators:
       y:
         - catalogPath: fur_laws#fur_farming_status
@@ -115,7 +118,7 @@ views:
       metric: fur_trading_status
       animal: fur_animals
       estimate: not_applicable
-      per_capita: total
+      per_capita: not_applicable
     indicators:
       y:
         - catalogPath: fur_laws#fur_trading_status
@@ -135,7 +138,7 @@ views:
       metric: bullfighting_status
       animal: cattle
       estimate: not_applicable
-      per_capita: total
+      per_capita: not_applicable
     indicators:
       y:
         - catalogPath: bullfighting_laws#status
@@ -156,7 +159,7 @@ views:
       metric: chick_culling_status
       animal: chickens
       estimate: not_applicable
-      per_capita: total
+      per_capita: not_applicable
     indicators:
       y:
         - catalogPath: chick_culling_laws#status
@@ -172,7 +175,7 @@ views:
       metric: caged_hens
       animal: chickens
       estimate: not_applicable
-      per_capita: total
+      per_capita: not_applicable
     indicators:
       y:
         - catalogPath: eggs_and_hens_statistics#number_of_hens_in_cages
