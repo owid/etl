@@ -12,6 +12,10 @@ tables:
         unit: ""
         description_short: |-
           The Global Hunger Index combines undernourishment, child stunting, child wasting, and child mortality into a single score. It is measured on a 100-point scale where 0 is the best score (no hunger) and 100 is the worst.
+        description_key:
+          - "The score combines four indicators with different weights: undernourishment and child mortality each count for one third, and child stunting and child wasting for one sixth each."
+          - "The report groups scores by severity: low (9.9 or less), moderate (10 to 19.9), serious (20 to 34.9), alarming (35 to 49.9), and extremely alarming (50 or more)."
+          - For some countries without enough data for a score, the report gives a provisional severity group instead. This data shows the midpoint of that group, which may understate hunger, since the report calls these groups conservative.
         description_processing: |-
           Global Hunger Index scores recorded as "<5" are converted to 2.5, the midpoint between 0 and 5.
 
