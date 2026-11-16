@@ -413,7 +413,7 @@ views:
       hasMapTab: false                # Map doesn't work well with multiple indicators
 ```
 
-Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`, `numSignificantFigures`, `tolerance`, `zeroDay`. `numSignificantFigures` does nothing without `roundingMode: significantFigures`, and even then Grapher cuts values below 1 to `numDecimalPlaces` decimals (2 when unset): 2 significant figures with 2 decimals shows 0.031% as 0.03%. So a share that can go below 1% needs a higher `numDecimalPlaces` as well, while a count of people can keep 0.
+Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`, `numSignificantFigures`, `tolerance`, `zeroDay`. `numSignificantFigures` does nothing without `roundingMode: significantFigures`, and even then Grapher cuts values below 1 to `numDecimalPlaces` decimals (the view's, else the indicator's own, else 2): 2 significant figures with 2 decimals shows 0.031% as 0.03%. So a share that can go below 1% needs a higher `numDecimalPlaces` as well, while a count of people can keep 0.
 
 ### Dimension-specific common_views overrides
 
