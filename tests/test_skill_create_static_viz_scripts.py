@@ -1132,3 +1132,34 @@ def test_a_categorical_year_axis_is_not_read_as_dates(tmp_path, labelled, messag
     else:
         assert result.returncode == 1 and message in result.stdout, result.stdout
         assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "line_years, message",
+    [
+        # A line spanning 2020-2024 under a lone `2020` tick runs past it, though no scale gives its year.
+        ([2020, 2022, 2024], "ends its labels at 2020, but line__value run on past it"),
+        ([2016, 2018, 2020], "starts its labels at 2020, but line__value start before it"),
+    ],
+)
+def test_a_year_axis_with_one_labelled_tick_still_spans_the_line(tmp_path, line_years, message):
+    """A single labelled year gives no scale; a line reaching past it on either side still fails."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot(line_years, [0, 25, 20], gid="line__value")
+    ax.set_xticks([2020], ["2020"])
+    ax.set_xlim(min(line_years), max(line_years))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+    assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"

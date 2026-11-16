@@ -47,7 +47,6 @@ checks just that pair. Exits non-zero on the first failing pair, listing every f
 
 import argparse
 import datetime as dt
-import math
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -667,11 +666,14 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
     # its first labelled tick or runs on past its last.
     year_axes = {subject for subject in x_texts if is_year_axis(x_texts[subject])}
     for side, subject, label, lines, year in year_axis_overruns(root, year_axes):
+        # With a single labelled tick there is no scale to read a year from.
         if side == "start":
-            gap = f"starts its labels at {label}, but {', '.join(lines[:4])} start in about {year}"
+            reach = f"start in about {year}" if year is not None else "start before it"
+            gap = f"starts its labels at {label}, but {', '.join(lines[:4])} {reach}"
             fix = "add the first year plotted as the first tick"
         else:
-            gap = f"ends its labels at {label}, but {', '.join(lines[:4])} run on to about {year}"
+            reach = f"run on to about {year}" if year is not None else "run on past it"
+            gap = f"ends its labels at {label}, but {', '.join(lines[:4])} {reach}"
             fix = "add the last year plotted as the final tick"
         failures.append(
             f"the year axis of {subject} {gap}. Grapher keeps its round ticks and adds the data's first and last "
@@ -713,7 +715,7 @@ def _xs(node: ET.Element) -> list[float]:
     return xs + [x for child in node for x in _xs(child)]
 
 
-def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, str, list[str], int]]:
+def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str, str, str, list[str], int | None]]:
     """Each end of a year axis that a series line runs past: the side, subject, that end's label, the lines, their year.
 
     The side is `start` when lines begin before the first labelled tick and `end` when they run on past
@@ -729,8 +731,9 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
     more than half a year beyond its labelled tick. On a date axis a year's label marks its first day,
     so the axis is measured in those days and the calendar: a line runs past the last tick once it
     reaches January 1 of the next year, however long that year is, and past the first tick as soon as
-    it starts before that day. An axis with fewer than two placed, labelled marks is left alone, since
-    the tick-mark check already fails it.
+    it starts before that day. An axis with a single placed, labelled mark has no scale: there a line
+    runs past an end when it reaches more than a pixel either side of that mark, and no year is given.
+    An axis with no placed, labelled mark is left alone, since the tick-mark check already fails it.
     """
     parent = {child: node for node in root.iter() for child in node}
 
@@ -792,7 +795,16 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
         marks = placed.get(subject, {})
         years = label_years.get(subject, {})
         pairs = sorted((year, marks[value]) for value, year in years.items() if value in marks)
-        if len(pairs) < 2:
+        if not pairs:
+            continue
+        if len(pairs) == 1:
+            value, x = next((value, marks[value]) for value in years if value in marks)
+            early = sorted(gid for gid, (start, _) in spans[subject].items() if start < x - 1)
+            late = sorted(gid for gid, (_, end) in spans[subject].items() if end > x + 1)
+            if early:
+                overruns.append(("start", subject, label_texts[subject][value], early, None))
+            if late:
+                overruns.append(("end", subject, label_texts[subject][value], late, None))
             continue
         (y0, x0), (y1, x1) = pairs[0], pairs[-1]
         if x1 == x0 or y1 == y0:
