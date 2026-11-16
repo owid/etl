@@ -304,7 +304,7 @@ tables:
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
           - "{definitions.antigen_description_key}"
-          - We calculate the number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year by using coverage estimates from the WUENIC dataset and population data from the UN World Population Prospects. From 2024 onwards, we use the medium variant projections released by the UN.
+          - We calculate the number of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year by using coverage estimates from the WUENIC dataset and population data from the UN World Population Prospects. From 2024 onwards, we use the medium variant projections released by the UN.
         description_from_producer: |-
           {definitions.antigen_description_from_producer}
         display:
