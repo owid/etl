@@ -46,6 +46,7 @@ checks just that pair. Exits non-zero on the first failing pair, listing every f
 """
 
 import argparse
+import datetime as dt
 import math
 import re
 import sys
@@ -724,9 +725,10 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
     (`<use x=...>`) and the years their labels read, not the tick values in their gids: on a date
     axis those are matplotlib's day counts. On a year axis a line runs past an end when a vertex lies
     more than half a year beyond its labelled tick. On a date axis a year's label marks its first day,
-    so a line runs past the last tick once it reaches the next year, and past the first tick as soon
-    as it starts before that day. An axis with fewer than two placed, labelled marks is left alone,
-    since the tick-mark check already fails it.
+    so the axis is measured in those days and the calendar: a line runs past the last tick once it
+    reaches January 1 of the next year, however long that year is, and past the first tick as soon as
+    it starts before that day. An axis with fewer than two placed, labelled marks is left alone, since
+    the tick-mark check already fails it.
     """
     parent = {child: node for node in root.iter() for child in node}
 
@@ -793,33 +795,67 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
         (y0, x0), (y1, x1) = pairs[0], pairs[-1]
         if x1 == x0 or y1 == y0:
             continue
-        per_year = (x1 - x0) / (y1 - y0)
-        # Tick values far from the years their labels read mean a date axis, valued in days.
-        dated = any(abs(value - year) > 0.5 for value, year in years.items())
-
-        def year_at(x: float) -> int:
-            reached = y0 + (x - x0) / per_year
-            return math.floor(reached) if dated else round(reached)
-
         texts = label_texts[subject]
         first_value, last_value = min(years), max(years)
-        first_x = x0 + (years[first_value] - y0) * per_year
-        last_x = x0 + (years[last_value] - y0) * per_year
-        # A date line may start on its first label's day: allow half a day of rounding in the SVG.
-        early_limit = 0.5 / 366 if dated else 0.5
-        early = {
-            gid: start for gid, (start, _) in spans[subject].items() if (first_x - start) / per_year > early_limit
-        }
-        late = {
-            gid: end
-            for gid, (_, end) in spans[subject].items()
-            if ((end - last_x) / per_year >= 1 if dated else (end - last_x) / per_year > 0.5)
-        }
-        if early:
-            overruns.append(("start", subject, texts[first_value], sorted(early), year_at(min(early.values()))))
-        if late:
-            overruns.append(("end", subject, texts[last_value], sorted(late), year_at(max(late.values()))))
+        # Tick values far from the years their labels read mean a date axis, valued in days.
+        if any(abs(value - year) > 0.5 for value, year in years.items()):
+            found = _date_axis_overruns(spans[subject], marks, years)
+        else:
+            per_year = (x1 - x0) / (y1 - y0)
+
+            def year_at(x: float) -> int:
+                return round(y0 + (x - x0) / per_year)
+
+            first_x = x0 + (years[first_value] - y0) * per_year
+            last_x = x0 + (years[last_value] - y0) * per_year
+            found = {
+                "start": [
+                    (gid, year_at(start))
+                    for gid, (start, _) in spans[subject].items()
+                    if (first_x - start) / per_year > 0.5
+                ],
+                "end": [
+                    (gid, year_at(end)) for gid, (_, end) in spans[subject].items() if (end - last_x) / per_year > 0.5
+                ],
+            }
+        if found["start"]:
+            lines, reached = zip(*found["start"])
+            overruns.append(("start", subject, texts[first_value], sorted(lines), min(reached)))
+        if found["end"]:
+            lines, reached = zip(*found["end"])
+            overruns.append(("end", subject, texts[last_value], sorted(lines), max(reached)))
     return overruns
+
+
+def _date_axis_overruns(
+    spans: dict[str, tuple[float, float]], marks: dict[float, float], years: dict[float, float]
+) -> dict[str, list[tuple[str, int]]]:
+    """The lines that start before a date axis' first labelled year or reach the year after its last, with their year.
+
+    Each labelled tick is taken to sit on January 1 of the year it reads, so a vertex's date is that day
+    plus its distance in days, and the year after the last label begins that year's own length (365 or
+    366 days) later. Half a day is allowed for rounding in the SVG's coordinates.
+    """
+    found: dict[str, list[tuple[str, int]]] = {"start": [], "end": []}
+    placed = sorted((value, marks[value]) for value in years if value in marks)
+    (v0, x0), (v1, x1) = placed[0], placed[-1]
+    first_value, last_value = min(years), max(years)
+    first_year, last_year = int(years[first_value]), int(years[last_value])
+    if x1 == x0 or not 1 <= first_year <= last_year < 9999:
+        return found
+    per_day = (x1 - x0) / (v1 - v0)
+
+    def year_of(x: float, anchor_value: float, anchor_year: int) -> int:
+        day = v0 + (x - x0) / per_day
+        return (dt.date(anchor_year, 1, 1) + dt.timedelta(days=round(day - anchor_value))).year
+
+    next_year_value = last_value + (dt.date(last_year + 1, 1, 1) - dt.date(last_year, 1, 1)).days
+    for gid, (start, end) in spans.items():
+        if v0 + (start - x0) / per_day < first_value - 0.5:
+            found["start"].append((gid, year_of(start, first_value, first_year)))
+        if v0 + (end - x0) / per_day >= next_year_value - 0.5:
+            found["end"].append((gid, year_of(end, last_value, last_year)))
+    return found
 
 
 def _label_year(text: str) -> float | None:

@@ -1041,17 +1041,35 @@ def test_a_year_axis_spans_the_years_plotted(tmp_path, line_years, ticks, labels
 
 
 @pytest.mark.parametrize(
-    "first_date, last_date, message",
+    "first_date, last_date, tick_years, message",
     [
         # Later in the last labelled year: the label `2024` marks its first day, so this is not past it.
-        ("2020-01-01", "2024-09-30", None),
+        ("2020-01-01", "2024-09-30", (2020, 2022, 2024), None),
         # Into a year with no label, reported in years rather than matplotlib's day counts.
-        ("2020-01-01", "2026-06-01", "ends its labels at 2024, but line__value run on to about 2026"),
+        (
+            "2020-01-01",
+            "2026-06-01",
+            (2020, 2022, 2024),
+            "ends its labels at 2024, but line__value run on to about 2026",
+        ),
         # Starting in 2019, before the day the first label `2020` marks.
-        ("2019-06-01", "2024-01-01", "starts its labels at 2020, but line__value start in about 2019"),
+        (
+            "2019-06-01",
+            "2024-01-01",
+            (2020, 2022, 2024),
+            "starts its labels at 2020, but line__value start in about 2019",
+        ),
+        # A 365-day last year after a span with a leap day: the last day of 2023 passes, January 1 of 2024 fails.
+        ("2020-01-01", "2023-12-31", (2020, 2021, 2022, 2023), None),
+        (
+            "2020-01-01",
+            "2024-01-01",
+            (2020, 2021, 2022, 2023),
+            "ends its labels at 2023, but line__value run on to about 2024",
+        ),
     ],
 )
-def test_a_date_axis_is_judged_in_years(tmp_path, first_date, last_date, message):
+def test_a_date_axis_is_judged_in_years(tmp_path, first_date, last_date, tick_years, message):
     """On a datetime x-axis the tick values are day counts; the overrun check reads the years from the labels."""
     import datetime as dt
 
@@ -1066,7 +1084,7 @@ def test_a_date_axis_is_judged_in_years(tmp_path, first_date, last_date, message
     fig, ax = plt.subplots(figsize=(5.4, 5.4))
     dates = [dt.date.fromisoformat(first_date), dt.date(2022, 6, 1), dt.date.fromisoformat(last_date)]
     ax.plot(dates, [0, 25, 20], gid="line__value")
-    ticks = [dt.date(year, 1, 1) for year in (2020, 2022, 2024)]
+    ticks = [dt.date(year, 1, 1) for year in tick_years]
     ax.set_xticks(ticks, [str(t.year) for t in ticks])
     ax.set_xlim(dates[0], max(ticks[-1], dates[-1]))
     ax.tick_params(labelsize=15 * 0.72)
