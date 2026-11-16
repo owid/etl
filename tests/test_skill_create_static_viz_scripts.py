@@ -1027,3 +1027,42 @@ def test_a_year_axis_closes_on_the_last_year_plotted(tmp_path, line_years, ticks
     else:
         assert result.returncode == 1 and message in result.stdout, result.stdout
         assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "last_date, message",
+    [
+        # Later in the last labelled year: the label `2024` marks its first day, so this is not past it.
+        ("2024-09-30", None),
+        # Into a year with no label, reported in years rather than matplotlib's day counts.
+        ("2026-06-01", "ends its labels at 2024, but line__value run on to about 2026"),
+    ],
+)
+def test_a_date_axis_is_judged_in_years(tmp_path, last_date, message):
+    """On a datetime x-axis the tick values are day counts; the overrun check reads the years from the labels."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    dates = [dt.date(2020, 1, 1), dt.date(2022, 6, 1), dt.date.fromisoformat(last_date)]
+    ax.plot(dates, [0, 25, 20], gid="line__value")
+    ticks = [dt.date(year, 1, 1) for year in (2020, 2022, 2024)]
+    ax.set_xticks(ticks, [str(t.year) for t in ticks])
+    ax.set_xlim(dates[0], max(ticks[-1], dates[-1]))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"

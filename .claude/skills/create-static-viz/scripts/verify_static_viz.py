@@ -46,6 +46,7 @@ checks just that pair. Exits non-zero on the first failing pair, listing every f
 """
 
 import argparse
+import math
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -711,9 +712,11 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
     A series line is a `line__<Entity>` group, the name grapher gives one and the Figma restyle reads. It
     belongs to the nearest axes group above it (the `<g>` holding a `matplotlib.axis_*` group), so an
     inset's line is judged on the inset's axis. The axis' scale comes from where its tick marks sit
-    (`<use x=...>`) and the tick values in their gids; a line runs past when its last vertex lies more
-    than half a year beyond the last labelled tick. An axis with fewer than two placed marks is left
-    alone, since the tick-mark check already fails it.
+    (`<use x=...>`) and the years their labels read, not the tick values in their gids: on a date
+    axis those are matplotlib's day counts. A line runs past when its last vertex lies more than half
+    a year beyond the last labelled tick, or on a date axis a full year, since there a year's label
+    marks its first day. An axis with fewer than two placed, labelled marks is left alone, since the
+    tick-mark check already fails it.
     """
     parent = {child: node for node in root.iter() for child in node}
 
@@ -736,8 +739,10 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
                 return node
         return None
 
-    # Where each year tick's mark sits ({value: x}), and the value and text of the last labelled tick.
+    # Where each year tick's mark sits ({value: x}), the year each label reads ({value: year}), and the
+    # value and text of the last labelled tick.
     placed: dict[str, dict[float, float]] = {}
+    label_years: dict[str, dict[float, float]] = {}
     last_label: dict[str, tuple[float, str]] = {}
     for group in root.iter():
         gid = group.get("id") or ""
@@ -745,7 +750,9 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
         if lab:
             text = "".join(group.itertext()).strip()
             subject, value = lab.group(1), lab.group(2)
-            if subject in year_axes and NUMBER.fullmatch(value) and text:
+            year = _label_year(text)
+            if subject in year_axes and NUMBER.fullmatch(value) and year is not None:
+                label_years.setdefault(subject, {})[float(value)] = year
                 if float(value) >= last_label.get(subject, (float("-inf"), ""))[0]:
                     last_label[subject] = (float(value), text)
             continue
@@ -768,19 +775,37 @@ def year_axis_overruns(root: ET.Element, year_axes: set[str]) -> list[tuple[str,
 
     overruns = []
     for subject in sorted(ends):
-        ticks = placed.get(subject, {})
-        if len(ticks) < 2 or subject not in last_label:
+        marks = placed.get(subject, {})
+        years = label_years.get(subject, {})
+        pairs = sorted((year, marks[value]) for value, year in years.items() if value in marks)
+        if len(pairs) < 2 or subject not in last_label:
             continue
-        (v0, x0), (v1, x1) = min(ticks.items()), max(ticks.items())
-        if x1 == x0:
+        (y0, x0), (y1, x1) = pairs[0], pairs[-1]
+        if x1 == x0 or y1 == y0:
             continue
-        per_year = (x1 - x0) / (v1 - v0)
+        per_year = (x1 - x0) / (y1 - y0)
+        # Tick values far from the years their labels read mean a date axis, valued in days.
+        dated = any(abs(value - year) > 0.5 for value, year in years.items())
         last_value, last_text = last_label[subject]
-        last_x = x0 + (last_value - v0) * per_year
-        past = {gid: end for gid, end in ends[subject].items() if (end - last_x) / per_year > 0.5}
+        last_x = x0 + (years[last_value] - y0) * per_year
+        beyond = {gid: (end - last_x) / per_year for gid, end in ends[subject].items()}
+        past = {
+            gid: ends[subject][gid] for gid, years_on in beyond.items() if (years_on >= 1 if dated else years_on > 0.5)
+        }
         if past:
-            overruns.append((subject, last_text, sorted(past), round(v0 + (max(past.values()) - x0) / per_year)))
+            reached = y0 + (max(past.values()) - x0) / per_year
+            overruns.append((subject, last_text, sorted(past), math.floor(reached) if dated else round(reached)))
     return overruns
+
+
+def _label_year(text: str) -> float | None:
+    """The year a tick label reads (`2024`, `-500`, `12,000 BCE` as -12000), or None when it reads as none."""
+    text = text.strip()
+    match = YEAR_LABEL.fullmatch(text)
+    if not match:
+        return None
+    year = float((match.group(1) or match.group(2)).replace(",", ""))
+    return -year if text.startswith(("-", "−")) or text.endswith("BCE") else year
 
 
 # A tick label that reads as a year: a bare integer, maybe signed or marked BCE/CE. Grapher writes
