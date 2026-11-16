@@ -61,6 +61,23 @@ FULL_CONTEXTS = ("update", "create", "standalone")
 SITE = "https://ourworldindata.org/grapher"
 INDICATOR_API = "https://api.ourworldindata.org/v1/indicators"
 SMALL_DATASET = 20
+# File types a download URL can end in; any other suffix is part of a name (an API path such as `NY.GDP.ZS.AD`).
+FILE_TYPES = {
+    *fetch_docs.DATA_SUFFIXES,
+    ".tsv",
+    ".txt",
+    ".json",
+    ".xml",
+    ".pdf",
+    ".ods",
+    ".xlsm",
+    ".xlsb",
+    ".tar",
+    ".tgz",
+    ".bz2",
+    ".xz",
+    ".sas7bdat",
+}
 MAX_SERIES_SHOWN = 30
 MAX_FLAGGED = 20
 MAX_TEXT_LINKS = 25
@@ -356,9 +373,12 @@ def check_sources(origins: list[dict]) -> list[dict]:
 def converted_download(origin: dict) -> str:
     """Why the snapshot stores something other than the downloaded file (an archive extracted, a format converted).
 
-    Empty when the two file types agree, or when the URL names no file type (an API endpoint): those are compared.
+    Empty when the two file types agree, or when the URL names no known file type (an API endpoint, or a path
+    ending in a dotted identifier such as `NY.GDP.DEFL.ZS.AD`): those are compared.
     """
     downloaded = Path(urlsplit(str(origin["url_download"])).path).suffix.lower()
+    if downloaded not in FILE_TYPES:
+        return ""
     stored = Path(str(origin.get("stored") or "")).suffix.lower()
     if downloaded and stored and downloaded != stored:
         return f"the source serves a `{downloaded}` file and the snapshot stores a `{stored}`"
@@ -402,11 +422,23 @@ def rendered_metadata(namespace: str, version: str, short_name: str) -> tuple[st
                 )
         return f"the local {channel} build (`data/{channel}/{namespace}/{version}/{short_name}`)", indicators
 
-    rows = collect_dods._query(
-        "SELECT v.catalogPath, v.name, v.unit, v.shortUnit, v.titlePublic, v.descriptionShort, v.descriptionKey, "
-        "v.descriptionProcessing, v.descriptionFromProducer FROM variables v JOIN datasets d ON d.id = v.datasetId "
+    dataset_variables = (
+        "SELECT v.id FROM variables v JOIN datasets d ON d.id = v.datasetId "
         f"WHERE d.catalogPath = '{namespace}/{version}/{short_name}'"
     )
+    rows = collect_dods._query(
+        "SELECT v.id, v.catalogPath, v.name, v.unit, v.shortUnit, v.titlePublic, v.descriptionShort, v.descriptionKey, "
+        f"v.descriptionProcessing, v.descriptionFromProducer FROM variables v WHERE v.id IN ({dataset_variables})"
+    )
+    # The origins each indicator carries: a derived dataset has no `.dvc` of its own, so they are its sources.
+    carried: dict[int, list[dict]] = {}
+    for origin in collect_dods._query(
+        "SELECT ov.variableId, o.producer, o.title, o.urlMain, o.urlDownload, o.datePublished, o.dateAccessed, "
+        "o.versionProducer, o.citationFull FROM origins o JOIN origins_variables ov ON ov.originId = o.id "
+        f"WHERE ov.variableId IN ({dataset_variables})"
+    ):
+        variable_id = origin.pop("variableId")
+        carried.setdefault(variable_id, []).append({k: v for k, v in origin.items() if v is not None})
     indicators = [
         {
             "identity": row["catalogPath"].split("/", 4)[-1] if row["catalogPath"] else row["name"],
@@ -419,6 +451,7 @@ def rendered_metadata(namespace: str, version: str, short_name: str) -> tuple[st
             "description_key": as_text(row["descriptionKey"]),
             "description_processing": row["descriptionProcessing"],
             "description_from_producer": row["descriptionFromProducer"],
+            "origins": carried.get(row["id"], []),
         }
         for row in rows
     ]

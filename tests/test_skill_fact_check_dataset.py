@@ -364,6 +364,9 @@ def test_converted_download_is_not_compared_byte_for_byte():
     assert "`.zip`" in prepare.converted_download(origin)
     assert prepare.converted_download({"url_download": "https://example.org/file.csv", "stored": "file.csv"}) == ""
     assert prepare.converted_download({"url_download": "https://example.org/api/v1", "stored": "file.json"}) == ""
+    # A dotted identifier at the end of an API path is not a file type: the download is still hashed.
+    dotted = {"url_download": "https://api.wb.org/v2/indicator/NY.GDP.DEFL.ZS.AD", "stored": "wdi_gdp_linked.zip"}
+    assert prepare.converted_download(dotted) == ""
 
 
 def test_daily_periods_are_shown_as_dates():
@@ -863,3 +866,46 @@ def test_indicator_that_cannot_be_loaded_is_an_error(monkeypatch):
     monkeypatch.setattr(prepare.session, "get", lambda *a, **k: Response())
     with pytest.raises(LookupError, match="HTTP 503"):
         prepare.load_indicator(7, None)
+
+
+def test_production_metadata_carries_each_indicators_origins(monkeypatch, tmp_path):
+    """With no local build, a derived dataset's sources come from the origins its published indicators carry."""
+    monkeypatch.setattr(prepare.paths, "DATA_DIR", tmp_path)
+    calls = []
+
+    def fake_query(sql):
+        calls.append(sql)
+        if "FROM origins o" in sql:
+            return [
+                {
+                    "variableId": 7,
+                    "producer": "Ember",
+                    "title": "Yearly data",
+                    "urlMain": "https://ember.org",
+                    "urlDownload": None,
+                    "datePublished": None,
+                    "dateAccessed": None,
+                    "versionProducer": None,
+                    "citationFull": None,
+                }
+            ]
+        return [
+            {
+                "id": 7,
+                "catalogPath": "grapher/energy/2026-01-01/mix/mix#coal",
+                "name": "Coal",
+                "unit": "TWh",
+                "shortUnit": None,
+                "titlePublic": None,
+                "descriptionShort": None,
+                "descriptionKey": None,
+                "descriptionProcessing": None,
+                "descriptionFromProducer": None,
+            }
+        ]
+
+    monkeypatch.setattr(prepare.collect_dods, "_query", fake_query)
+    source, indicators = prepare.rendered_metadata("energy", "2026-01-01", "mix")
+    assert source.startswith("production")
+    assert indicators[0]["origins"] == [{"producer": "Ember", "title": "Yearly data", "urlMain": "https://ember.org"}]
+    assert prepare.unique_origins(indicators[0]["origins"])[0]["url_main"] == "https://ember.org"
