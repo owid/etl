@@ -223,6 +223,8 @@ tables:
           <%- else -%>
           Number of << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
           <%- endif -%>
+        # NOTE: The same text for every regime type, since the data page of the stacked chart shows its first indicator's.
+        description_short: Number of countries that are full democracies, flawed democracies, hybrid regimes, or authoritarian regimes, as classified by the Economist Intelligence Unit.
         description_key: *regime_eiu_key
         unit: "countries"
 
@@ -235,11 +237,7 @@ tables:
           <%- else -%>
           Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
           <%- endif -%>
-        description_short: |-
-          <%- if category == '-1' -%>
-          Number of people living in countries that the Economist Intelligence Unit doesn’t cover.
-          <%- else -%>
-          Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>, as classified by the Economist Intelligence Unit.
-          <%- endif -%>
+        # NOTE: The same text for every regime type, since the data page of the stacked chart shows its first indicator's.
+        description_short: Number of people living in full democracies, flawed democracies, hybrid regimes, and authoritarian regimes, as classified by the Economist Intelligence Unit, and in countries it doesn’t cover.
         description_key: *regime_eiu_key
         unit: "people"
