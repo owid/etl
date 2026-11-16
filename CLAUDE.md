@@ -177,7 +177,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 
 ## Git Workflow
 
-**Always use `etl pr`** - never use `git checkout -b` + `gh pr create` manually.
+**Always use `etl pr`** - never use `git checkout -b` + `gh pr create` manually. `etl pr` carries uncommitted changes onto the new branch: if `git status` shows changes that aren't yours, add `-t` to start in a worktree of its own.
 
 ```bash
 # 1. Create PR (creates new branch, does NOT commit)
