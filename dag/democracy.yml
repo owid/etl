@@ -46,11 +46,11 @@ steps:
   data-private://grapher/democracy/2026-10-23/eiu:
     - data-private://garden/democracy/2026-10-23/eiu:
         - data-private://meadow/democracy/2026-10-23/eiu:
-            - snapshot://democracy/2024-05-22/eiu_gapminder.csv
-            - snapshot://democracy/2024-05-22/eiu_2021.csv
-            - snapshot://democracy/2024-05-22/eiu_2022.csv
-            - snapshot://democracy/2024-05-22/eiu_2023.csv
-            - snapshot://democracy/2025-03-05/eiu_2024.csv
+            - snapshot-private://democracy/2024-05-22/eiu_gapminder.csv
+            - snapshot-private://democracy/2024-05-22/eiu_2021.csv
+            - snapshot-private://democracy/2024-05-22/eiu_2022.csv
+            - snapshot-private://democracy/2024-05-22/eiu_2023.csv
+            - snapshot-private://democracy/2025-03-05/eiu_2024.csv
             - snapshot-private://democracy/2026-10-23/eiu.xlsx
         - data://garden/demography/2024-07-15/population
         - data://garden/regions/2023-01-01/regions
@@ -59,11 +59,11 @@ steps:
   data-private://grapher/democracy/2025-03-05/eiu:
     - data-private://garden/democracy/2025-03-05/eiu:
       - data-private://meadow/democracy/2025-03-05/eiu:
-        - snapshot://democracy/2024-05-22/eiu_gapminder.csv
-        - snapshot://democracy/2024-05-22/eiu_2021.csv
-        - snapshot://democracy/2024-05-22/eiu_2022.csv
-        - snapshot://democracy/2024-05-22/eiu_2023.csv
-        - snapshot://democracy/2025-03-05/eiu_2024.csv
+        - snapshot-private://democracy/2024-05-22/eiu_gapminder.csv
+        - snapshot-private://democracy/2024-05-22/eiu_2021.csv
+        - snapshot-private://democracy/2024-05-22/eiu_2022.csv
+        - snapshot-private://democracy/2024-05-22/eiu_2023.csv
+        - snapshot-private://democracy/2025-03-05/eiu_2024.csv
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
 
