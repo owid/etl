@@ -19,36 +19,71 @@ Usage:
 
 import argparse
 import json
-from collections import defaultdict
 from pathlib import Path
 
 READER_CHECKS = ["mapping", "indicators", "data", "metadata", "rendered"]
 
 
+def _slugify(text: str) -> str:
+    return "".join(ch if ch.isalnum() else "_" for ch in text.lower()).strip("_")
+
+
 def dimension_summary(mapping: dict) -> list[dict]:
-    """Per explorer dimension: the multidim dimension it became and each choice's slug."""
-    pairs = [(r["source"]["dimensions"], (r["target"] or {}).get("dimensions") or {}) for r in mapping["redirects"]]
+    """Per multidim dimension and choice: the explorer selections whose redirect lands on it.
+
+    Reads from the multidim side because explorer and multidim dimensions need not pair up: two
+    checkboxes can become one toggle, and a dimension an explorer view leaves out (not in its URL)
+    can land on a different multidim choice depending on another dimension. Each choice gets the
+    shortest conditions that pick out exactly its views: `Per capita = true`, or `Sub-metric` not
+    set, or `Animal = Cattle` *or* `Metric = Bans on bullfighting`.
+    """
+    names = mapping["explorer"]["dimensions"]
+    rows = [(r["source"]["dimensions"], r["target"]) for r in mapping["redirects"] if r["target"]]
+    several = len({t["mdim"] for _, t in rows}) > 1
     out = []
-    for name in mapping["explorer"]["dimensions"]:
-        best = None
-        for slug in {k for _, t in pairs for k in t}:
-            rel = defaultdict(set)
-            for s, t in pairs:
-                rel[s.get(name, "")].add(t.get(slug))
-            # A blank explorer choice (the dimension doesn't apply to the view) may become a different multidim
-            # choice per view, e.g. an animal of its own for each view on laws; every named choice maps to one.
-            if all(len(v) == 1 for k, v in rel.items() if k != ""):
-                choices = {k: ", ".join(sorted(map(str, v))) for k, v in rel.items()}
-                score = len({next(iter(v)) for k, v in rel.items() if k != ""})
-                if best is None or score > best[0]:
-                    best = (score, slug, choices)
-        out.append(
-            {
-                "explorer": name,
-                "multidim": best[1] if best else None,
-                "choices": [{"explorer": k, "multidim": v} for k, v in (best[2] if best else {}).items()],
-            }
-        )
+    for target in mapping["targets"]:
+        mrows = [({n: s.get(n, "") for n in names}, t["dimensions"]) for s, t in rows if t["mdim"] == target["mdim"]]
+        for slug in target["dimensions"]:
+            # Prefer the explorer dimension named like this one, then explorer order, to break ties.
+            order = sorted(names, key=lambda n: (_slugify(n) != slug, names.index(n)))
+            choices = list(dict.fromkeys(t.get(slug) for _, t in mrows if t.get(slug) is not None))
+            summary = []
+            for choice in choices:
+                pos = [s for s, t in mrows if t.get(slug) == choice]
+                neg = [s for s, t in mrows if t.get(slug) != choice]
+
+                def valid(cond: dict) -> bool:
+                    return not any(all(s[n] == v for n, v in cond.items()) for s in neg)
+
+                rules: list[dict] = []
+                left = pos
+                while left:
+                    # One or two conditions, whichever covers the most views left (ties: fewer conditions).
+                    cands = [{n: s[n]} for s in left for n in order]
+                    cands += [{a: s[a], b: s[b]} for s in left for i, a in enumerate(order) for b in order[i + 1 :]]
+                    cands = [c for c in cands if valid(c)] or [dict(left[0])]
+                    best = max(cands, key=lambda c: (sum(all(s[n] == v for n, v in c.items()) for s in left), -len(c)))
+                    rules.append(best)
+                    left = [s for s in left if not all(s[n] == v for n, v in best.items())]
+                # One-condition rules on the same dimension read as one: Metric = A, B or C.
+                merged: list[list[dict]] = []
+                for rule in rules:
+                    if len(rule) == 1:
+                        (n, v) = next(iter(rule.items()))
+                        same = next((m for m in merged if len(m) == 1 and m[0]["dim"] == n), None)
+                        if same:
+                            same[0]["values"].append(v)
+                            continue
+                    merged.append([{"dim": n, "values": [v]} for n, v in rule.items()])
+                summary.append({"choice": choice, "when": merged})
+            used = list(dict.fromkeys(c["dim"] for ch in summary for rule in ch["when"] for c in rule))
+            out.append(
+                {
+                    "multidim": f"{target['mdim']}.{slug}" if several else slug,
+                    "explorer": sorted(used, key=names.index),
+                    "choices": summary,
+                }
+            )
     return out
 
 
@@ -203,6 +238,7 @@ button.mini{font-size:.72rem;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .dimcard{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .dimcard h3{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .arrow{color:var(--muted)}
+.dimcard td.mono{overflow-wrap:anywhere}
 pre{margin:0;max-height:420px;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:.74rem;line-height:1.45}
 .banner{border-radius:8px;padding:10px 14px;font-size:.9rem}
 .banner.bad{background:var(--bad-bg);color:var(--bad)} .banner.ok{background:var(--ok-bg);color:var(--ok)}
@@ -397,8 +433,10 @@ document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async ()
 
 // Dimension mapping.
 $("dimtext").innerHTML = `Explorer URLs name dimensions and choices by their labels (<code>?Measure=Conflict+deaths</code>); multidim URLs by slug (<code>?measure=deaths</code>). Each redirect rewrites one into the other and keeps every other parameter (<code>country</code>, <code>time</code>, <code>tab</code>). A bare <code>/explorers/${esc(E.explorer.slug)}</code> goes to the multidim's default view.`;
-$("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3>${esc(d.explorer)} <span class="arrow">→</span> <code>${esc(d.multidim||"?")}</code></h3>
-  <div class="tablebox"><table><thead><tr><th>Explorer choice</th><th>Multidim choice</th></tr></thead><tbody>${d.choices.map(c=>`<tr><td>${c.explorer===""?'<span class="small">(blank: not in the URL)</span>':esc(c.explorer)}</td><td class="mono">${esc(c.multidim)}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
+const cond = c => c.values.length===1 && c.values[0]==="" ? `<b>${esc(c.dim)}</b> <span class="small">not in the URL</span>`
+  : `<b>${esc(c.dim)}</b> = ${c.values.map(v=>v===""?'<span class="small">not in the URL</span>':esc(v)).join(c.values.length>2?", ":" or ").replace(/, ([^,]*)$/," or $1")}`;
+$("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3><code>${esc(d.multidim)}</code> <span class="arrow">←</span> ${d.explorer.map(esc).join(", ") || '<span class="small">no explorer dimension (one choice)</span>'}</h3>
+  <div class="tablebox"><table><thead><tr><th>Multidim choice</th><th>When the explorer URL has</th></tr></thead><tbody>${d.choices.map(c=>`<tr><td class="mono">${esc(c.choice)}</td><td>${c.when.map(r=>r.map(cond).join(" and ")).join('<br><span class="small">or</span> ')}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
 
 // Payload.
 const prodPayload = D.payloadEnv === "production";
