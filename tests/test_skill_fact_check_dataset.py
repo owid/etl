@@ -628,3 +628,96 @@ def test_assemble_clean_review(tmp_path):
     text, problems, counts = assemble_report.assemble(_dossier(tmp_path, claims, values), False, None, "2026-11-16")
     assert problems == [] and sum(counts.values()) == 0
     assert "No findings: the review came back clean." in text
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# Review fixes
+# ----------------------------------------------------------------------------------------------------------------
+
+
+def test_refetched_dataset_page_drops_documents_it_no_longer_links(tmp_path, monkeypatch):
+    """A methodology the producer took down must not live on in the index once the dataset page is read again."""
+    now = dt.datetime(2026, 11, 16, 12, 0)
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
+    saved = [
+        {
+            "url": "https://x.org/",
+            "role": "url_main",
+            "status": "ok",
+            "file": "01.txt",
+            "fetched_at": "2026-11-01 09:00",
+        },
+        {
+            "url": "https://x.org/old-method.pdf",
+            "role": "linked-from-main",
+            "status": "ok",
+            "file": "02.txt",
+            "fetched_at": "2026-11-15 09:00",
+        },
+    ]
+    for entry in saved:
+        (docs_dir / entry["file"]).write_text("text")
+    (docs_dir / "index.json").write_text(json.dumps(saved))
+
+    def fake_fetch(doc, docs_dir, number, now):
+        doc.status, doc.via, doc.links = "ok", "direct", [("Methodology", "https://x.org/new-method.pdf")]
+        return doc
+
+    monkeypatch.setattr(fetch_docs, "fetch_one", fake_fetch)
+    # The dataset page is older than seven days, so it is fetched again: its current links are the list.
+    urls = {d.url for d in fetch_docs.fetch_all([("https://x.org/", "url_main")], tmp_path, now=now)}
+    assert "https://x.org/new-method.pdf" in urls and "https://x.org/old-method.pdf" not in urls
+    # While the page itself is served from the cache, the documents it led to last time are reused.
+    saved[0]["fetched_at"] = "2026-11-15 09:00"
+    (docs_dir / "index.json").write_text(json.dumps(saved))
+    urls = {d.url for d in fetch_docs.fetch_all([("https://x.org/", "url_main")], tmp_path, now=now)}
+    assert "https://x.org/old-method.pdf" in urls
+
+
+def test_stated_year_is_checked_against_the_series_the_string_names():
+    data = pd.DataFrame(
+        {
+            "Entity": ["France", "France"],
+            "Year": [1990, 2000],
+            "GDP": [1.0, 2.0],
+            "Unemployment": [float("nan"), 8.0],
+        }
+    )
+    out = "\n".join(prepare.section_strings(["Unemployment in France since 1990"], data))
+    assert "`1990`: NO data that year in Unemployment for France" in out
+    # A string that names no series is held to any series having data that year.
+    out = "\n".join(prepare.section_strings(["France since 1990"], data))
+    assert "NO data that year" not in out
+
+
+def test_earlier_versions_of_script_and_package_steps(tmp_path):
+    for version in ("2024-01-01", "2025-01-01", "2026-01-01"):
+        (tmp_path / "ns" / version / "thing").mkdir(parents=True)
+        (tmp_path / "ns" / version / "flat.meta.yml").write_text(version)
+        (tmp_path / "ns" / version / "thing" / "thing.meta.yml").write_text(version)
+    flat = tmp_path / "ns" / "2025-01-01" / "flat.meta.yml"
+    package = tmp_path / "ns" / "2026-01-01" / "thing" / "thing.meta.yml"
+    assert [v for v, _ in prepare.earlier_versions(flat, "2025-01-01")] == ["2024-01-01"]
+    assert [v for v, _ in prepare.earlier_versions(package, "2026-01-01")] == ["2024-01-01", "2025-01-01"]
+
+
+def test_chart_on_an_inactive_version_keeps_its_own_origins(tmp_path, monkeypatch):
+    """The steps on disk are a newer release; the chart's indicators say which release it shows."""
+    monkeypatch.setattr(prepare.paths, "STEPS_DATA_DIR", tmp_path / "steps")
+    monkeypatch.setattr(prepare.paths, "SNAPSHOTS_DIR", tmp_path / "snapshots")
+    monkeypatch.setattr(prepare.paths, "BASE_DIR", tmp_path)
+    (tmp_path / "steps" / "garden" / "ns" / "2026-01-01").mkdir(parents=True)
+    (tmp_path / "steps" / "garden" / "ns" / "2026-01-01" / "thing.py").write_text("")
+    _dvc(tmp_path / "snapshots/ns/2026-01-01/thing.csv.dvc", "Producer", "Release 2026")
+    dag = {
+        "data://garden/ns/2026-01-01/thing": {"snapshot://ns/2026-01-01/thing.csv"},
+    }
+    monkeypatch.setattr(prepare.fetch_docs, "fetch_all", lambda links, dossier, refresh: [])
+    monkeypatch.setattr(prepare, "check_sources", lambda origins: [])
+    carried = [{"producer": "Producer", "title": "Release 2025", "urlMain": "https://x.org/2025"}]
+    result = prepare.dataset_sources(dag, ("ns", "2025-01-01", "thing"), False, [], carried)
+    assert "not in this checkout's active DAG" in result["version_note"]
+    assert [(o["title"], o["file"]) for o in result["origins"]] == [
+        ("Release 2025", "(the chart's indicators, version 2025-01-01)")
+    ]

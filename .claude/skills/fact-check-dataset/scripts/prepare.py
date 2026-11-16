@@ -889,7 +889,20 @@ def dataset_sources(
             )
             chain, siblings = pipeline(dag, namespace, versions[-1], short_name)
     files = step_files(chain + siblings, namespace, version, short_name)
-    origins = all_origins(dag, chain, files, unique_origins(indicator_origins))
+    carried = unique_origins(indicator_origins)
+    if version_note and carried:
+        # The steps on disk are a newer version's: their snapshots are a later release than the chart shows. The
+        # origins the chart's own indicators carry say which release that is.
+        origins = [
+            {
+                **origin,
+                "file": f"(the chart's indicators, version {version})",
+                "note": "no `.dvc` of this version on disk",
+            }
+            for origin in carried
+        ]
+    else:
+        origins = all_origins(dag, chain, files, carried)
     dossier = dossier_dir(namespace, version, short_name)
     with ThreadPoolExecutor(max_workers=2) as pool:
         links = collect_links(origins, files["text"], first_texts)
@@ -990,10 +1003,17 @@ def section_strings(strings: list[str], data: pd.DataFrame) -> list[str]:
                         "a release year, an external fact, or a mistake"
                     ]
                 elif first is not None and entity_col:
-                    have = set(data.loc[years == number["value"], entity_col])
+                    columns = series_named(text, data, entity_col)
+                    at_year = data.loc[years == number["value"]]
+                    have = set(at_year.loc[at_year[columns].notna().any(axis=1), entity_col]) if columns else set()
                     lacking = [str(e) for e in dict.fromkeys(data[entity_col]) if e not in have]
                     if lacking:
-                        out += [f"  - `{number['text']}`: NO data that year for {', '.join(lacking[:8])}"]
+                        which = (
+                            f" in {', '.join(map(str, columns))}"
+                            if len(columns) < len(value_columns(data, entity_col))
+                            else ""
+                        )
+                        out += [f"  - `{number['text']}`: NO data that year{which} for {', '.join(lacking[:8])}"]
                 continue
             hits = match_number(number, data, text)
             if hits:
@@ -1001,6 +1021,20 @@ def section_strings(strings: list[str], data: pd.DataFrame) -> list[str]:
             else:
                 out += [f"  - `{number['text']}`: NOT in the displayed data (derived or external: check it by hand)"]
     return out + [""]
+
+
+def value_columns(data: pd.DataFrame, entity_col: str | None) -> list:
+    """The displayed data's numeric series (not the entity, its code or the time column)."""
+    skip = {entity_col, "Code", "Year", "year", "Day", "date"}
+    return [c for c in data.columns if c not in skip and pd.api.types.is_numeric_dtype(data[c])]
+
+
+def series_named(text: str, data: pd.DataFrame, entity_col: str | None) -> list:
+    """The series a string names (by column name, case-insensitive), or every series when it names none."""
+    columns = value_columns(data, entity_col)
+    said = " ".join(text.lower().split())
+    named = [c for c in columns if str(c).lower() in said]
+    return named or columns
 
 
 def section_data(data: pd.DataFrame, data_path: Path | None, main: list[dict]) -> list[str]:
@@ -1190,24 +1224,38 @@ def metadata_changes(meta_files: list[Path], namespace: str, version: str) -> di
             ).stdout
             base = "origin/master"
         else:
-            older = sorted(p for p in file.parents[1].glob(f"*/{file.name}") if p.parent.name < version and p != file)
+            older = earlier_versions(file, version)
             if not older:
                 summary.append(f"`{file.name}` is new (no earlier version on disk): all of its text is in scope")
                 continue
             diff = "".join(
                 difflib.unified_diff(
-                    older[-1].read_text().splitlines(keepends=True),
+                    older[-1][1].read_text().splitlines(keepends=True),
                     file.read_text().splitlines(keepends=True),
-                    rel(older[-1]),
+                    rel(older[-1][1]),
                     relative,
                     n=2,
                 )
             )
-            base = f"version {older[-1].parent.name}"
+            base = f"version {older[-1][0]}"
         changed = sum(1 for line in diff.splitlines() if line[:1] in "+-" and line[:3] not in ("+++", "---"))
         summary.append(f"`{file.name}`: {changed} changed lines against {base}")
         chunks.append(diff)
     return {"text": "\n".join(chunks), "summary": "; ".join(summary) or "no metadata files"}
+
+
+def earlier_versions(file: Path, version: str) -> list[tuple[str, Path]]:
+    """The same file in the earlier versions of its step, as (version, path), oldest first.
+
+    The version is a directory of the path, wherever the file sits below it: `<ns>/<version>/<short>.meta.yml` for
+    a script step, `<ns>/<version>/<short>/<short>.meta.yml` for a package step.
+    """
+    version_dir = next((p for p in file.parents if p.name == version), None)
+    if version_dir is None:
+        return []
+    below = file.relative_to(version_dir)
+    found = ((p.relative_to(version_dir.parent).parts[0], p) for p in version_dir.parent.glob(f"*/{below}"))
+    return sorted((name, p) for name, p in found if name < version)
 
 
 def section_selection(rows: list[dict], note: str, dossier: Path) -> list[str]:
