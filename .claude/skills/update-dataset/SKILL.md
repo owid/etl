@@ -54,7 +54,7 @@ Assumptions:
 - [ ] Run `/check-metadata-typos` and `/check-metadata-style` on the new steps (see 6b)
 - [ ] Changelog: decide whether this release deserves an entry in `dataset.changelog` of the garden `.meta.yml`, dated with the new version, whether or not the dataset has a changelog yet. Entries are optional. They are release notes for the people who use the data, so capture only changes that matter to them, briefly. Show the user the draft before committing it.
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c)
-- [ ] Run the adversarial review (`/fact-check-dataset`) as a background agent once the garden step is built, with effort scaled to the update (see 6c-bis)
+- [ ] Run the adversarial review (`/fact-check-dataset`) once the garden step is built: its `prepare.py` command, then its two lanes as background agents, then the assembled report (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Pull admin edits of the dataset's ETL-authored single charts into ETL (`/pull-chart`) before pushing their `viz://chart` steps: pull admin drift into the YAML, list it in the PR description, and confirm `in sync` on staging afterwards (see step 7)
@@ -602,7 +602,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 6c-bis) Adversarial data & metadata review (mandatory — run it in the background)
    Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<new_version>/<short_name>`. Step 6c verified that the links *resolve*; this step actually **reads the producer's documentation behind them** and cross-checks the data against independent sources online — it's the only step that can catch a mistake made by the source itself (unit slips, wrong-year values, stale pre-revision numbers).
 
-   **Run it as a background agent once the garden step is built**, and fold its findings in before 6d, the commit and the PR description, so the fixes land in this PR. Go deeper on red flags: large unexplained churn, an in-place source revision, a new producer, editorial claims riding on specific values.
+   **Run it once the garden step is built, as two background lanes:**
+   ```bash
+   .venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<new_version>/<short_name> --context update
+   ```
+   The command prints a dossier (steps, origins, the producer's documentation saved as text, the indicators ranked by chart views, the anomaly candidates, the DoDs) and writes two briefs. Start both briefs as background agents **in one message**, each with the prompt `Read <brief> and do what it says.`, and go on with 6d while they run. When both are back, settle the notes each lane left for the other and run the `assemble_report.py` command the dossier prints. Fold the findings in before the commit and the PR description, so the fixes land in this PR. Go deeper on red flags (large unexplained churn, an in-place source revision, a new producer, editorial claims riding on specific values): run the command again with a larger `--top` or with `--indicators`; the documentation is reused.
 
    **For sources that compile national-office figures (OECD, Eurostat, UN agencies), compare a few countries' new years with the national office.** A series shifted by one year at the source passes every diff and bound check.
 
