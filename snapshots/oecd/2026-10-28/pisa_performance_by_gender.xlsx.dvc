@@ -31,7 +31,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: https://www.oecd.org/en/about/terms-conditions.html
+      url: https://www.oecd.org/en/about/oecd-open-by-default-policy.html
 outs:
   - md5: e17c1a1e3d80fd2cd9cf3aefdea1475e
     size: 1263735

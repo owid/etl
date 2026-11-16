@@ -12,59 +12,52 @@ paths = PathFinder(__file__)
 SUBJECTS = ["math", "science", "reading"]
 # First PISA cycle with comparable results for each subject.
 FIRST_YEAR = {"reading": 2000, "math": 2003, "science": 2006}
-# The PISA 2025 report gives scores of girls and boys from this cycle onward; earlier ones come from the Data Explorer.
+# From this year on, boys and girls scores come from the PISA 2025 report; earlier ones come from the Data Explorer.
 FIRST_YEAR_BY_GENDER = 2015
 # Countries the PISA 2025 report marks with an asterisk, because they didn't meet one or more PISA sampling standards.
 EXPECTED_FLAGGED_COUNTRIES = {"Albania", "Canada", "Netherlands", "New Zealand", "Norway", "United States"}
-# The PISA 2025 report only gives the average of all OECD countries for some cycles; the others come from the Data
-# Explorer, whose average is the same measure (both are 491.8 in reading in 2012, and 488.5 in 2015).
+# The PISA 2025 report only gives the average of all OECD countries for some cycles; the others come from the Data Explorer.
 OECD_AVERAGE = "OECD average"
 # The report gives these countries' PISA for Development results (an assessment held in 2017) under "PISA 2018".
-# The meadow step checks this against the note under each trend table.
 PISA_FOR_DEVELOPMENT = {"Cambodia", "Ecuador", "Guatemala", "Paraguay", "Zambia"}
+# Producer text, quoted from PISA 2025 Results (Volume I): "What is PISA?", p. 48 (definitions), and Box 1, p. 23 (scale).
+SUBJECT_DEFINITIONS = {
+    "mathematics": "Mathematics proficiency is defined as students' capacity to reason mathematically and to formulate, employ and interpret mathematics to solve problems in a variety of real-world contexts.",
+    "reading": "Reading proficiency is defined as students' capacity to understand, use, evaluate, reflect on and engage with texts in order to achieve goals, develop knowledge and potential, and participate in society.",
+    "science": "Science proficiency is defined as students' capacity to engage with science-related issues, and with the ideas of science, as a reflective citizen, and to use them for informed decision making.",
+}
+SCALE_DESCRIPTION = "PISA scores do not have a substantive meaning, as they are not physical units such as metres or grams. Instead, they are set in relation to the variation in results observed across all test participants. There is, theoretically, no minimum or maximum score in PISA; rather, the results are scaled to fit approximately normal distributions (i.e. means around 500 score points, standard deviations around 100 score points)."
 
-# NOTE: The PISA 2025 report's trend tables show no value ("m", data removed for technical reasons) for the
-# country-years below, although the PISA Data Explorer exports (up to PISA 2022) have one. We leave them out too, so
-# that our series match the OECD's own comparisons over time. Except for Ukraine and Viet Nam, the 2025 report carries
-# forward exclusions the OECD made in earlier cycles (the PISA 2022 Results, Volume I, already showed "m" for all of
-# them). `check_values_omitted_by_report` fails when this list no longer matches the report, so check it on every
-# update.
+# NOTE: The PISA 2025 report's trend tables show no value ("m", data removed for technical reasons) for the country-years below.
+# We leave them out too, so we match the OECD's own comparisons over time.
+# `check_values_omitted_by_report` fails when this list no longer matches the report, so check it on every update.
 VALUES_OMITTED_BY_PISA_2025 = {
-    # Argentina, Kazakhstan, Malaysia 2015: Argentina's sample didn't cover all eligible schools after a restructuring
-    # of secondary schools; Kazakhstan's national coders marked too leniently, so the human-coded items were dropped;
-    # Malaysia's school response rate (51%) fell well short of the 85% standard. PISA 2015 Results (Volume I),
-    # Annex A4, p. 304: https://doi.org/10.1787/9789264266490-en
+    # Argentina, Kazakhstan, Malaysia 2015: PISA 2015 Results (Volume I), Annex A4, p. 304:
+    # https://doi.org/10.1787/9789264266490-en
     ("Argentina", 2015): ("math", "science", "reading"),
     ("Kazakhstan", 2015): ("math", "science", "reading"),
     ("Malaysia", 2015): ("math", "science", "reading"),
-    # Austria 2009: a teachers' union boycott affected how the test was administered and students' motivation, so the
-    # results aren't comparable with other years. PISA 2009 Results (Volume I), Annex A4, p. 186:
+    # Austria 2009: PISA 2009 Results (Volume I), Annex A4, p. 186:
     # https://doi.org/10.1787/9789264091450-en
     ("Austria", 2009): ("math", "science", "reading"),
-    # Jordan, reading and science before 2022: when Jordan moved to computer-based tests in 2022, its reading and
-    # science results could only be linked to the international scale at the expense of comparability over time, so
-    # the OECD only reports trends in mathematics. PISA 2022 Results (Volume I), Annex A4, p. 282:
+    # Jordan, reading and science before 2022: PISA 2022 Results (Volume I), Annex A4, p. 282:
     # https://doi.org/10.1787/53f23881-en
     ("Jordan", 2006): ("science", "reading"),
     ("Jordan", 2009): ("science", "reading"),
     ("Jordan", 2012): ("science", "reading"),
     ("Jordan", 2015): ("science", "reading"),
     ("Jordan", 2018): ("science", "reading"),
-    # Spain 2018: some regions held high-stakes exams at the end of the PISA testing window, and many students didn't
-    # try their best, so comparability with other years "cannot be fully ensured". The OECD never published Spain's
-    # 2018 reading results. PISA 2018 Results (Volume I), Annex A9 (updated 23 July 2020):
+    # Spain 2018: PISA 2018 Results (Volume I), Annex A9 (updated 23 July 2020):
     # https://www.oecd.org/pisa/PISA2018-AnnexA9-Spain.pdf
     ("Spain", 2018): ("math", "science"),
-    # Ukraine 2018: the report's Ukraine row covers only the 17 of 27 regions assessed in 2022 and 2025 (the others
-    # weren't covered because of Russia's war against Ukraine), while PISA 2018 covered a larger part. PISA 2025
-    # Results (Volume I), Reader's Guide: https://doi.org/10.1787/73451bc5-en
+    # Ukraine 2018: PISA 2025 Results (Volume I), Reader's Guide:
+    # https://doi.org/10.1787/73451bc5-en
     ("Ukraine", 2018): ("math", "science", "reading"),
-    # United Kingdom 2000 and 2003: the samples didn't meet PISA's response-rate standards. PISA 2012 Results
-    # (Volume I), p. 53: https://doi.org/10.1787/9789264208780-en
+    # United Kingdom 2000 and 2003: PISA 2012 Results (Volume I), p. 53:
+    # https://doi.org/10.1787/9789264208780-en
     ("United Kingdom", 2000): ("reading",),
     ("United Kingdom", 2003): ("math", "reading"),
-    # Viet Nam before 2025: it moved to computer-based tests in 2025, after older paper-based tests in all earlier
-    # cycles, so the OECD leaves it out of trend analyses. PISA 2025 Results (Volume I), Reader's Guide:
+    # Viet Nam before 2025: PISA 2025 Results (Volume I), Reader's Guide:
     # https://doi.org/10.1787/73451bc5-en
     ("Vietnam", 2012): ("math", "science", "reading"),
     ("Vietnam", 2015): ("math", "science", "reading"),
@@ -101,15 +94,13 @@ def run() -> None:
     # Step 3: Check which values the PISA 2025 report leaves out, and that they are the ones listed above.
     check_values_omitted_by_report(tb_report=tb_report, tb_explorer=tb_explorer)
 
-    # Step 4: Combine both tables. The PISA 2025 report wins where both have a value (it includes revisions, e.g. the
-    # Palestinian Authority's 2022 results, recalculated to match the 2025 coverage); the Data Explorer fills in the
-    # rest (countries that didn't take part in PISA 2025, and girls and boys before 2015).
+    # Step 4: Combine both tables; the PISA 2025 report wins where both have a value, the Data Explorer fills the rest.
     tb_report["priority"] = 0
     tb_explorer["priority"] = 1
     tb = pr.concat([tb_report, tb_explorer], ignore_index=True).sort_values(["country", "year", "priority"])
     tb = tb.groupby(["country", "year"], as_index=False, observed=True).first().drop(columns=["priority"])
 
-    # Step 5: Leave out the values the PISA 2025 report no longer shows (see the note above).
+    # Step 5: Leave out the values the PISA 2025 report no longer shows.
     for (country, year), subjects in VALUES_OMITTED_BY_PISA_2025.items():
         columns = [c for c in tb.columns if any(c.startswith(f"pisa_{subject}_") for subject in subjects)]
         tb.loc[(tb["country"] == country) & (tb["year"] == year), columns] = pd.NA
@@ -192,12 +183,10 @@ def add_metadata(tb: Table) -> None:
         metadata = tb[column].metadata
         metadata.display = {"numDecimalPlaces": 0}
         metadata.description_short = description_short
-        if "bound" not in column:
-            metadata.description_from_producer = f"Average score of 15-year-old {students} on the PISA {subject} scale. Initially, the average PISA score across subjects and all OECD countries was at 500 with a standard deviation of 100, so that most students scored between 400 and 600. Scores in later cycles were calibrated to remain comparable to this baseline."
-        else:
+        metadata.description_from_producer = f"{SUBJECT_DEFINITIONS[subject]}\n\n{SCALE_DESCRIPTION}"
+        if "bound" in column:
             bound_type = "upper" if "upper" in column else "lower"
             metadata.unit = "score"
-            metadata.description_from_producer = f"Represents the {bound_type} bound of the average {subject} score for 15-year-old {students} on the PISA scale. Initially, the average PISA score across subjects and all OECD countries was at 500 with a standard deviation of 100, so that most students scored between 400 and 600. Scores in later cycles were calibrated to remain comparable to this baseline."
             metadata.title = (
                 f"{bound_type.capitalize()} bound of performance of 15-year-old {students} on the {subject} scale"
             )
@@ -227,7 +216,7 @@ def sanity_check_inputs(tb_report: Table, tb_explorer: Table) -> None:
 def sanity_check_outputs(tb: Table) -> None:
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
     averages = [column for column in tb.columns if "_average" in column]
-    # PISA mean scores lie well within 200-700 (the OECD average was set to 500, with a standard deviation of 100).
+    # PISA mean scores lie well within 200-700.
     values = tb[averages]
     assert ((values.isna()) | ((values > 200) & (values < 700))).all().all(), "Mean scores outside 200-700."
     for subject in SUBJECTS:
