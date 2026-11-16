@@ -92,6 +92,15 @@ def test_scan_flags_coverage_drop_in_latest_period():
     assert _kinds(frame) == ["COVERAGE"]
 
 
+def test_scan_coverage_is_judged_per_dimension_slice():
+    """A slice that loses its countries in the latest year is flagged even when the other slice keeps them all."""
+    men = pd.concat([_series(c, [1, 2, 3]) for c in "ABCDEFGHIJ"]).assign(sex="men")
+    women = pd.concat([_series(c, [1, 2]) for c in "ABCDEFGHIJ"]).assign(sex="women")
+    findings = anomaly_scan.scan_table(pd.concat([men, women]), "t", {}, dims=["sex"])
+    assert [(f["kind"], f["period"]) for f in findings] == [("COVERAGE", 2002)]
+    assert findings[0]["detail"] == "sex=women, 2002: 0 countries vs 10"
+
+
 def test_scan_flags_repeated_values_but_not_repeated_zeroes():
     assert _kinds(_series("A", [7, 7, 7, 7, 8])) == ["CONSTANT"]
     # A sparse count that is mostly zero is not a forward-fill.

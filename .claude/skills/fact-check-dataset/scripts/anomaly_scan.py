@@ -10,7 +10,7 @@ Flags, per numeric column:
   SIGN       a negative value in a count-like unit
   OUTLIER    a value more than 6 robust z-scores (median/MAD) from its own series, for series of 8+ points
   BREAK      a jump of x10 or more between consecutive non-zero values (the signature of a unit error)
-  COVERAGE   the latest period has under 70% of the previous period's countries
+  COVERAGE   the latest period has under 70% of the previous period's countries, per slice of the extra dimensions
   CONSTANT   more than half of a series repeats the previous period's non-zero value (a source forward-fill?)
   WORLD_SUM  in an additive unit, World differs from the sum of countries by more than 5% in the latest year
 
@@ -105,10 +105,21 @@ def scan_table(
         for _, row in ordered[jumps].head(MAX_ROWS_PER_FLAG).iterrows():
             add(column, "BREAK", f"{label(row)}: ≥×10 jump from the previous period", row[year_col])
 
-        coverage = s.groupby(year_col)["country"].nunique()
-        if len(coverage) > 1 and coverage.iloc[-1] < 0.7 * coverage.iloc[-2]:
-            detail = f"{coverage.index[-1]}: {coverage.iloc[-1]} countries vs {coverage.iloc[-2]}"
-            add(column, "COVERAGE", detail, coverage.index[-1])
+        # Each slice of the extra dimensions is compared with itself: a slice that drops out of the latest period
+        # entirely counts as zero countries there, even when the other slices keep every country.
+        periods = sorted(s[year_col].unique())
+        if len(periods) > 1:
+            latest, previous = periods[-1], periods[-2]
+            recent = s[s[year_col].isin([latest, previous])]
+            counts = recent.groupby(dims + [year_col], observed=True, dropna=False)["country"].nunique()
+            coverage = counts.unstack(year_col) if dims else counts.to_frame().T
+            coverage = coverage.reindex(columns=[previous, latest]).fillna(0).astype(int)
+            dropped = coverage[coverage[latest] < 0.7 * coverage[previous]]
+            for slice_key, row in dropped.head(MAX_ROWS_PER_FLAG).iterrows():
+                slice_values = slice_key if isinstance(slice_key, tuple) else (slice_key,)
+                where = "".join(f"{d}={v}, " for d, v in zip(dims, slice_values))
+                detail = f"{where}{latest}: {row[latest]} countries vs {row[previous]}"
+                add(column, "COVERAGE", detail, latest)
 
         # Repeated zeroes are normal for sparse counts and do not count as a forward-fill.
         repeats = (ordered[column] == ordered_groups.shift()) & (ordered[column] != 0)
