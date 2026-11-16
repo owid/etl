@@ -284,7 +284,7 @@ def _ranking(views: dict[str, int]):
 
 def test_selection_top_n_plus_flagged_and_everything_else_skipped_with_a_reason():
     ranking = _ranking({"t#c0": 900, "t#c1": 500, "t#c2": 100})
-    findings = [{"column": "c4", "kind": "BREAK"}]
+    findings = [{"table": "t", "column": "c4", "kind": "BREAK"}]
     rows, _ = prepare.select_indicators(_indicators(6), ranking, findings, top=2, full=False, forced=[])
     by = {row["identity"]: row for row in rows}
     assert [by[f"t#c{i}"]["selected"] for i in range(6)] == [True, True, False, False, True, False]
@@ -296,7 +296,7 @@ def test_selection_top_n_plus_flagged_and_everything_else_skipped_with_a_reason(
 
 def test_selection_caps_flagged_indicators_and_says_so():
     ranking = _ranking({"t#c0": 900})
-    findings = [{"column": f"c{i}", "kind": "OUTLIER"} for i in range(1, 6)]
+    findings = [{"table": "t", "column": f"c{i}", "kind": "OUTLIER"} for i in range(1, 6)]
     rows, _ = prepare.select_indicators(_indicators(6), ranking, findings, 1, False, [], max_flagged=2)
     assert sum(row["selected"] for row in rows) == 3
     skipped = [row for row in rows if not row["selected"]]
@@ -319,6 +319,39 @@ def test_selection_full_forced_and_renamed():
     assert "`t#gone`" in note and "not in this build" in note
     rows, _ = prepare.select_indicators(_indicators(3), ranking, [], 1, True, [])
     assert all(row["selected"] for row in rows)
+
+
+def test_selection_folds_dimensioned_grapher_columns_into_the_built_column():
+    """Grapher publishes `t#c0__sex_female` and `t#c0__sex_male`; the local build has the one column `t#c0`."""
+    ranking = _ranking({"t#c0__sex_female": 500, "t#c0__sex_male": 400, "t#c1": 100})
+    rows, note = prepare.select_indicators(_indicators(prepare.SMALL_DATASET + 1), ranking, [], 1, False, [])
+    by = {row["identity"]: row for row in rows}
+    assert by["t#c0"]["views_365d"] == 900 and by["t#c0"]["selected"]
+    assert "not in this build" not in note
+
+
+def test_selection_keys_anomaly_flags_by_table_and_column():
+    indicators = [{"identity": "a#x", "column": "x"}, {"identity": "b#x", "column": "x"}]
+    empty = (pd.DataFrame(columns=["identity", "n_charts", "views_365d"]), "chart views")
+    rows, _ = prepare.select_indicators(
+        indicators, empty, [{"table": "b", "column": "x", "kind": "BREAK"}], 0, False, []
+    )
+    assert {row["identity"]: row["anomaly_flags"] for row in rows} == {"a#x": 0, "b#x": 1}
+
+
+def test_converted_download_is_not_compared_byte_for_byte():
+    origin = {"url_download": "https://example.org/data/file.zip?raw=1", "stored": "file.xlsx"}
+    assert "`.zip`" in prepare.converted_download(origin)
+    assert prepare.converted_download({"url_download": "https://example.org/file.csv", "stored": "file.csv"}) == ""
+    assert prepare.converted_download({"url_download": "https://example.org/api/v1", "stored": "file.json"}) == ""
+
+
+def test_daily_periods_are_shown_as_dates():
+    data = pd.DataFrame({"Entity": "A", "Day": ["2020-01-01", "2020-01-02"], "cases": [1.0, 3.0]})
+    lines = prepare.section_data(data, None, [])
+    assert any("(2020-01-01) → 3 (2020-01-02)" in line for line in lines)
+    yearly = prepare.section_data(pd.DataFrame({"Entity": "A", "Year": [2000, 2001], "x": [1.0, 2.0]}), None, [])
+    assert any("(2000) → 2 (2001)" in line for line in yearly)
 
 
 def test_selection_survives_a_failed_ranking():

@@ -191,7 +191,7 @@ def prepare_dataset(args: argparse.Namespace) -> str:
         pd.DataFrame(rows).to_csv(dossier / "ranking.csv", index=False)
         selected = [row for row in rows if row["selected"]]
         out += section_selection(rows, ranking_note, dossier)
-        out += section_anomalies(findings, notes, dossier, {row["column"] for row in selected})
+        out += section_anomalies(findings, notes, dossier, {row["identity"] for row in selected})
     if context != "snapshot":
         out += section_dods(done["dods"], dossier)
     out += section_earlier(short_name, dossier)
@@ -279,7 +279,7 @@ def read_origins(dvc_files: list[Path]) -> list[dict]:
         meta = content.get("meta") or {}
         origin = dict(meta.get("origin") or {})
         outs = (content.get("outs") or [{}])[0]
-        origin.update(file=rel(file), md5=outs.get("md5", ""), size=outs.get("size"))
+        origin.update(file=rel(file), md5=outs.get("md5", ""), size=outs.get("size"), stored=file.name[: -len(".dvc")])
         if not meta.get("origin"):
             origin["note"] = "no `meta.origin` block (an old `source`-style snapshot)"
         origins.append(origin)
@@ -322,7 +322,8 @@ def collect_links(
 
 def check_sources(origins: list[dict]) -> list[dict]:
     """Hash each snapshot's source file again (never cached): an in-place revision is the top find of Phase 0."""
-    todo = [o for o in origins if o.get("url_download") and o.get("md5")]
+    converted = [o for o in origins if o.get("url_download") and o.get("md5") and converted_download(o)]
+    todo = [o for o in origins if o.get("url_download") and o.get("md5") and o not in converted]
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(
             pool.map(lambda o: fetch_docs.check_freshness(str(o["url_download"]), o["md5"], o.get("size")), todo)
@@ -340,7 +341,28 @@ def check_sources(origins: list[dict]) -> list[dict]:
         }
         for o in skipped
     ]
+    results += [
+        {
+            "file": o["file"],
+            "status": "by-hand",
+            "detail": f"{converted_download(o)}: the download's bytes cannot match the snapshot's",
+            "date_accessed": str(o.get("date_accessed", "")),
+        }
+        for o in converted
+    ]
     return results
+
+
+def converted_download(origin: dict) -> str:
+    """Why the snapshot stores something other than the downloaded file (an archive extracted, a format converted).
+
+    Empty when the two file types agree, or when the URL names no file type (an API endpoint): those are compared.
+    """
+    downloaded = Path(urlsplit(str(origin["url_download"])).path).suffix.lower()
+    stored = Path(str(origin.get("stored") or "")).suffix.lower()
+    if downloaded and stored and downloaded != stored:
+        return f"the source serves a `{downloaded}` file and the snapshot stores a `{stored}`"
+    return ""
 
 
 def rendered_metadata(namespace: str, version: str, short_name: str) -> tuple[str, list[dict]]:
@@ -538,10 +560,12 @@ def select_indicators(
         ranked, source = ranking
     else:
         ranked, source = pd.DataFrame(columns=["identity", "n_charts", "views_365d"]), f"ranking FAILED ({ranking})"
-    use = {row["identity"]: row for row in ranked.to_dict("records")}
+    known = {item["identity"] for item in indicators}
+    use = {row["identity"]: row for row in fold_dimensions(ranked, known).to_dict("records")}
     flags: dict[str, int] = {}
     for finding in findings:
-        flags[finding["column"]] = flags.get(finding["column"], 0) + 1
+        key = f"{finding.get('table', '')}#{finding['column']}"
+        flags[key] = flags.get(key, 0) + 1
 
     rows = []
     for item in indicators:
@@ -552,7 +576,7 @@ def select_indicators(
                 "column": item["column"],
                 "n_charts": int(charted.get("n_charts", 0)),
                 "views_365d": int(charted.get("views_365d", 0)),
-                "anomaly_flags": flags.get(item["column"], 0),
+                "anomaly_flags": flags.get(item["identity"], 0),
             }
         )
     rows.sort(key=lambda row: (-row["views_365d"], -row["n_charts"], row["identity"]))
@@ -580,7 +604,6 @@ def select_indicators(
             )
             row["why"] = f"SKIPPED: rank {rank}, {row['views_365d']:,} views, {row['n_charts']} charts, {flags_note}"
 
-    known = {item["identity"] for item in indicators}
     missing = [identity for identity in use if identity not in known]
     note = f"Ranked by {source}."
     if not any_charted and not review_all and not forced:
@@ -596,6 +619,29 @@ def select_indicators(
         )
         note += "." if len(missing) <= 15 else f", and {len(missing) - 15} more."
     return rows, note
+
+
+def fold_dimensions(ranked: pd.DataFrame, known: set[str]) -> pd.DataFrame:
+    """Chart use of a dimensioned indicator, summed over the Grapher columns it is published as.
+
+    Grapher publishes each slice of a dimensioned column as its own indicator (`table#rate__sex_female`), while
+    the local build has one column (`table#rate`). A chart that shows several slices counts once per slice.
+    """
+    if ranked.empty:
+        return ranked
+
+    def base(identity: str) -> str:
+        if identity in known:
+            return identity
+        parts = identity.split("__")
+        for end in range(len(parts) - 1, 0, -1):
+            if "__".join(parts[:end]) in known:
+                return "__".join(parts[:end])
+        return identity
+
+    folded = ranked.assign(identity=ranked["identity"].map(base))
+    folded = folded.groupby("identity", as_index=False)[["n_charts", "views_365d"]].sum()
+    return folded.sort_values(["views_365d", "n_charts"], ascending=False).reset_index(drop=True)
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -982,7 +1028,7 @@ def section_data(data: pd.DataFrame, data_path: Path | None, main: list[dict]) -
                     (first_year, start), (last_year, end) = series.iloc[0], series.iloc[-1]
                     change = f": ×{end / start:.3g}, {(end / start - 1) * 100:+.1f}%" if start > 0 else ""
                     out += [
-                        f"  - {entity}, {column}: {start:,.6g} ({first_year:g}) → {end:,.6g} ({last_year:g}){change}"
+                        f"  - {entity}, {column}: {start:,.6g} ({_period(first_year)}) → {end:,.6g} ({_period(last_year)}){change}"
                     ]
         elif year_col:
             out += [f"  - {len(entities) * len(values)} series: read first and last values from the file"]
@@ -1190,12 +1236,21 @@ def section_anomalies(findings: list[dict], notes: list[str], dossier: Path, sel
         order = {kind: position for position, kind in enumerate(ANOMALY_ORDER)}
         shown = sorted(
             findings,
-            key=lambda f: (f["column"] not in selected, order.get(f["kind"], 99), -_as_number(f.get("period"))),
+            key=lambda f: (
+                f"{f['table']}#{f['column']}" not in selected,
+                order.get(f["kind"], 99),
+                -_as_number(f.get("period")),
+            ),
         )[:40]
         out += [f"- {f['kind']} `{f['table']}.{f['column']}`: {f['detail']}" for f in shown]
         if len(findings) > len(shown):
             out += [f"- … and {len(findings) - len(shown):,} more in the CSV (filter it by column or kind)"]
     return out + [""]
+
+
+def _period(value) -> str:
+    """A year without its trailing `.0`; a day (`2020-01-01`) as it is."""
+    return f"{value:g}" if pd.api.types.is_number(value) else str(value)
 
 
 def _as_number(value) -> float:
