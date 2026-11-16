@@ -373,17 +373,25 @@ def nice_year_ticks(year_min: int, year_max: int, *, max_ticks: int = 8) -> list
     """
     if year_max <= year_min:
         return [year_min]
-    for mag in range(0, 6):
-        for mult in (1, 2, 5):
-            step = mult * 10**mag
-            first = -(-year_min // step) * step  # ceil to a multiple of step
-            ticks = list(range(int(first), year_max + 1, step))
-            # Count the ticks, not the intervals between them. When both endpoints land on a
-            # multiple of `step` there is one more tick than interval, which is how a `max_ticks=8`
-            # request came back with nine ticks for 1700..2100.
-            if 3 <= len(ticks) <= max_ticks:
-                return ticks
+    for step in _round_year_steps():
+        ticks = _multiples_of(step, year_min, year_max)
+        # Count the ticks, not the intervals between them. When both endpoints land on a
+        # multiple of `step` there is one more tick than interval, which is how a `max_ticks=8`
+        # request came back with nine ticks for 1700..2100.
+        if 3 <= len(ticks) <= max_ticks:
+            return ticks
     return [year_min, year_max]
+
+
+def _round_year_steps() -> list[int]:
+    """The 1-2-5 x power-of-ten ladder of year steps, finest first: 1, 2, 5, 10, 20, 50, ..."""
+    return [mult * 10**mag for mag in range(0, 6) for mult in (1, 2, 5)]
+
+
+def _multiples_of(step: int, year_min: int, year_max: int) -> list[int]:
+    """Every multiple of `step` in [year_min, year_max]."""
+    first = -(-year_min // step) * step  # ceil to a multiple of step
+    return list(range(int(first), year_max + 1, step))
 
 
 def year_axis_ticks(
@@ -396,23 +404,27 @@ def year_axis_ticks(
 ) -> list[int]:
     """Ticks for a time axis as grapher draws one: round years on a round step, plus the data's first and last year.
 
-    The round years are `nice_year_ticks`'s (every 5 or 10 years, say), never re-spaced to fit the
-    ends: 2000..2024 gives 2000, 2005, 2010, 2015, 2020, 2024. The first and last year are added as
-    ticks of their own, and a round year is dropped only when its label would collide with an end's at
-    the plot's width: closer to it than `min_gap_px`, where `plot_width_px` spans the whole range.
-    56 px is the room a centred four-digit label at 14-15px needs beside the outermost one, anchored
-    inwards. Pass the plot's own width in template px (the default is the narrowest template's): on
-    the 850-wide templates 1950..2023 drops 2020 next to 2023, and 2000..2022 keeps it. Pair it with
-    `ax.set_xlim(ticks[0], ticks[-1])`, so the axis ends where the data does.
+    The round years sit on one round step (every 5 or 10 years, say), never re-spaced to fit the
+    ends: 2000..2024 gives 2000, 2005, 2010, 2015, 2020, 2024. The step is the finest on the 1-2-5
+    ladder whose ticks sit at least `min_gap_px` apart at the plot's width, where `plot_width_px`
+    spans the whole range, and that keeps the total within `max_ticks`: on a 200 px plot 2000..2014
+    steps every 5 years, not 2. The first and last year are added as ticks of their own, and a round
+    year is dropped only when its label would collide with an end's: closer to it than `min_gap_px`.
+    56 px is the room a centred four-digit label at 14-15px needs beside the next one. Pass the plot's
+    own width in template px (the default is the narrowest template's), and a panel's own width on a
+    faceted frame: on the 850-wide templates 1950..2023 drops 2020 next to 2023, and 2000..2022 keeps
+    it. Pair it with `ax.set_xlim(ticks[0], ticks[-1])`, so the axis ends where the data does.
     """
     if year_max <= year_min:
         return [year_min]
     px_per_year = plot_width_px / (year_max - year_min)
-    for limit in range(max(max_ticks, 2), 1, -1):
-        round_years = nice_year_ticks(year_min, year_max, max_ticks=limit)
+    for step in _round_year_steps():
+        # A finer step would put neighbouring round labels on top of each other.
+        if step * px_per_year < min_gap_px:
+            continue
         inner = [
             t
-            for t in round_years
+            for t in _multiples_of(step, year_min, year_max)
             if (t - year_min) * px_per_year >= min_gap_px and (year_max - t) * px_per_year >= min_gap_px
         ]
         ticks = [year_min, *inner, year_max]

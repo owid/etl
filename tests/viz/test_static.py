@@ -467,3 +467,26 @@ def test_year_axis_ticks_drop_a_round_year_only_where_its_label_collides():
     assert year_axis_ticks(1950, 2023, plot_width_px=770) == [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2023]
     assert year_axis_ticks(2000, 2022, plot_width_px=770) == [2000, 2005, 2010, 2015, 2020, 2022]
     assert year_axis_ticks(2000, 2022, plot_width_px=400) == [2000, 2005, 2010, 2015, 2022]
+
+
+@pytest.mark.parametrize(
+    "lo,hi,plot_width_px",
+    [(2000, 2014, 200), (1950, 2023, 200), (2000, 2024, 470), (1950, 2023, 770), (1990, 2024, 300)],
+)
+def test_year_axis_ticks_keep_the_minimum_gap_between_every_pair_of_ticks(lo, hi, plot_width_px):
+    """On a narrow plot or a facet the round step coarsens, so no two neighbouring labels overlap.
+
+    Checking the gap only against the two ends let 2000..2014 at 200 px keep a 2-year step, with
+    interior labels about 29 px apart.
+    """
+    min_gap_px = 56
+    ticks = year_axis_ticks(lo, hi, plot_width_px=plot_width_px, min_gap_px=min_gap_px)
+    assert ticks[0] == lo and ticks[-1] == hi, ticks
+    px_per_year = plot_width_px / (hi - lo)
+    gaps = [(b - a) * px_per_year for a, b in zip(ticks, ticks[1:])]
+    assert min(gaps) >= min_gap_px, f"{lo}..{hi} at {plot_width_px}px: {ticks} has gaps {gaps}"
+
+
+def test_year_axis_ticks_coarsen_the_round_step_on_a_narrow_plot():
+    assert year_axis_ticks(2000, 2014, plot_width_px=200) == [2000, 2005, 2010, 2014]
+    assert year_axis_ticks(1950, 2023, plot_width_px=200) == [1950, 2000, 2023]

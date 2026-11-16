@@ -281,9 +281,11 @@ ax.set_xlim(ticks[0], ticks[-1])
 over 2000..2024 come out 2000, 2006, 2012, 2018, 2024, years nobody reads a chart by. Drop the round
 tick before the last year only when the two labels would collide at the chart's width (2020 next to
 2023 over 73 years on an 850-wide frame), not because they are close in years: 2020 next to 2024 over
-24 years keeps both. `year_axis_ticks` does exactly this, at `min_gap_px=56` between tick positions
-for four-digit labels at 14–15px. On a frame with several panels, take the years over everything
-the axis plots, not one series. `verify_static_viz.py` fails a year axis whose `line__<Entity>` series
+24 years keeps both. On a narrow plot, coarsen the round step instead of crowding it: 2000..2014 at
+200 px steps every 5 years, not 2. `year_axis_ticks` does exactly this, keeping `min_gap_px=56`
+between every pair of neighbouring tick positions for four-digit labels at 14–15px. On a frame with
+several panels, pass one panel's width as `plot_width_px`, and take the years over everything the
+axis plots, not one series. `verify_static_viz.py` fails a year axis whose `line__<Entity>` series
 runs on past its last labelled tick, and Figma's restyle warns about the same on import.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
