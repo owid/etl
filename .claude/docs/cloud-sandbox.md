@@ -23,9 +23,12 @@ For agent sessions running in a Claude Code cloud sandbox
   (`gh pr create --draft`) with the first push, without being asked, and give
   the preview link. Don't build `viz://` steps here; the staging build does it.
   Tell the user the moment the preview is ready: poll the pushed commit's
-  `buildkite/etl-automated-staging-environment` status in a background command
-  (`run_in_background`), which wakes you when it ends, instead of promising to
-  check back. It is the earliest signal the sandbox can see.
+  `buildkite/etl-automated-staging-environment/etl-build` status in a background
+  command (`run_in_background`), which wakes you when it ends, instead of
+  promising to check back. It passes once the build has written the push's
+  charts and MDims to staging, a minute or more before the whole build's
+  `buildkite/etl-automated-staging-environment` status. Wait for that one
+  instead if the commit has no `etl-build` status.
 
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
