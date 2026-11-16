@@ -1,6 +1,6 @@
 grapher_schema: "011"
 title:
-  title: "Access to electricity"
+  title: "Electricity access"
 topic_tags:
   - "Access to Energy"
   - "Energy"
@@ -22,7 +22,7 @@ definitions:
           - "DiscreteBar"
           - "SlopeChart"
         hasMapTab: true
-        tab: "line"
+        tab: "map"
         hideAnnotationFieldsInTitle:
           time: true
         originUrl: "/energy-access"
