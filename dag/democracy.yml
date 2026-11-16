@@ -56,9 +56,9 @@ steps:
         - data://garden/regions/2023-01-01/regions
 
   # EIU (2025)
-  data://grapher/democracy/2025-03-05/eiu:
-    - data://garden/democracy/2025-03-05/eiu:
-      - data://meadow/democracy/2025-03-05/eiu:
+  data-private://grapher/democracy/2025-03-05/eiu:
+    - data-private://garden/democracy/2025-03-05/eiu:
+      - data-private://meadow/democracy/2025-03-05/eiu:
         - snapshot://democracy/2024-05-22/eiu_gapminder.csv
         - snapshot://democracy/2024-05-22/eiu_2021.csv
         - snapshot://democracy/2024-05-22/eiu_2022.csv
