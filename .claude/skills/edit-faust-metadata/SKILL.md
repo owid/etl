@@ -211,6 +211,8 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 
 **The single checkpoint rule: nothing is committed or pushed before the user's explicit go-ahead.** Everything up to the checkpoint happens on the branch + staging server only.
 
+**In a cloud session** (`CLAUDE_CODE_REMOTE=true`) staging is unreachable, so edits reach it only by push, and only on a branch with an open PR. Open the draft PR (step 2), then in step 7 commit and push instead of writing to staging; the go-ahead gates marking the PR ready. Don't build the step in the sandbox. After each push, give the preview link (host from `get_container_name`) and say when `buildkite/etl-automated-staging-environment` passes on that commit. Steps that read the staging DB fall back to the public Datasette; list what went unchecked. Route (c) isn't possible from the sandbox.
+
 1. Parse the request; run `resolve_target.py --no-db` for instant identification feedback to the user.
 2. Create the branch + draft PR: `.venv/bin/etl pr "<title, no emoji>" data` (never manual branching). This spins up the staging server the whole workflow depends on. Name the title after the field that actually changes, using the team's own shorthand where one exists — when the edit is only about `description_key`, write **WYSK**, not the full "What you should know about this indicator" (e.g. `Add WYSK to the ILO gender wage gap indicator`). The shorthand is in CLAUDE.md's glossary, so every colleague reads it, and it leaves room in the title for the indicator being edited.
 3. Wait for staging readiness: retry `OWIDEnv.from_staging(branch).read_sql("SELECT 1")` (builds take a few minutes).
@@ -223,7 +225,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
    - route (c): `update_chart_config.py --branch <b> --chart-id <id> --set ... [--dry-run first]`.
 7. Reflect on staging **without committing**:
    - route (a): `.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds>` then `STAGING=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (the MySQL upsert takes ~50 s+/dataset — warn the user; the automatic rebuild after the eventual push re-does it harmlessly). Needed because the staging auto-rebuild only sees *pushed* code.
-   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`.
+   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`. For a step that is only a `.config.yml`, add `--only --watch` in the background and show the user each change as it lands (see `/create-chart`).
    - route (c): already live on staging.
 8. Run the metadata quality checks scoped to the edit (next section); fix findings and re-run the affected steps.
 9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.

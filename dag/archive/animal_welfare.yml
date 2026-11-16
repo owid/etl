@@ -262,3 +262,10 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/animal_welfare/latest/banning_of_chick_culling:
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
+  # archived; last active in 0c905ac084c5 on 2026-11-15
+  viz://explorer/animal_welfare/latest/animal_welfare:
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/animal_welfare/2026-06-11/eggs_and_hens_statistics
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+    - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
+    - data://grapher/animal_welfare/2026-07-01/fur_laws
