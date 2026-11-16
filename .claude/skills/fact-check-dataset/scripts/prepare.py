@@ -468,13 +468,18 @@ def upstream_snapshots(dag: dict, seeds: list[str]) -> list[Path]:
 
 
 def all_origins(dag: dict, chain: list[str], files: dict, indicator_origins: list[dict]) -> list[dict]:
-    """The dataset's origins: its own snapshots, plus the upstream ones its indicators carry.
+    """The dataset's origins: its own snapshots or, for a derived dataset, the upstream ones its indicators carry.
 
     A derived dataset (one that combines other datasets) has no snapshot in its own chain: its indicators carry
     the origins of the datasets it reads. Each one is matched to its `.dvc` upstream in the DAG, which gives the
     md5 for the live check of the source file; an origin with no `.dvc` match is kept as the indicator states it.
+    A dataset with snapshots of its own keeps just those: the origins its indicators pick up from the datasets it
+    merges in (population, regions) are other datasets' sources, not this one's, and on a large dataset they would
+    each be fetched and hashed.
     """
     origins = read_origins(files["dvc"])
+    if origins:
+        return origins
     known = {origin_key(o) for o in origins}
     wanted = {origin_key(o): o for o in indicator_origins if origin_key(o) not in known}
     if not wanted:
@@ -576,7 +581,7 @@ def select_indicators(
                 "column": item["column"],
                 "n_charts": int(charted.get("n_charts", 0)),
                 "views_365d": int(charted.get("views_365d", 0)),
-                "anomaly_flags": flags.get(item["identity"], 0),
+                "anomaly_flags": flags_for(item["identity"], flags),
             }
         )
     rows.sort(key=lambda row: (-row["views_365d"], -row["n_charts"], row["identity"]))
@@ -1237,7 +1242,7 @@ def section_anomalies(findings: list[dict], notes: list[str], dossier: Path, sel
         shown = sorted(
             findings,
             key=lambda f: (
-                f"{f['table']}#{f['column']}" not in selected,
+                not any(identity_matches(i, f"{f['table']}#{f['column']}") for i in selected),
                 order.get(f["kind"], 99),
                 -_as_number(f.get("period")),
             ),
@@ -1262,6 +1267,22 @@ def _years(data: pd.DataFrame) -> pd.Series | None:
 def _period(value) -> str:
     """A year without its trailing `.0`; a day (`2020-01-01`) as it is."""
     return f"{value:g}" if pd.api.types.is_number(value) else str(value)
+
+
+def identity_matches(identity: str, key: str) -> bool:
+    """Whether an indicator (`table#column`, a grapher name when built) is the garden column a flag names.
+
+    The scan reads the garden build, where dimensions are columns; the grapher build flattens them into the name
+    (`t#rate__sex_female` is garden `t#rate` at `sex=female`), so a garden column's flags belong to all its slices.
+    """
+    table, _, column = identity.partition("#")
+    key_table, _, key_column = key.partition("#")
+    return table == key_table and anomaly_scan.column_matches(column, key_column)
+
+
+def flags_for(identity: str, flags: dict[str, int]) -> int:
+    """The anomaly flags on an indicator: those on its own column, or on the garden column it is a slice of."""
+    return sum(count for key, count in flags.items() if identity_matches(identity, key))
 
 
 def _as_number(value) -> float:

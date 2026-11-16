@@ -282,6 +282,26 @@ def _ranking(views: dict[str, int]):
     return frame, "chart views"
 
 
+def test_garden_flags_reach_the_grapher_slices_of_their_column():
+    """The scan reads garden columns; a built grapher dataset names each dimension slice separately."""
+    flags = {"t#rate": 3, "t#rate_other": 1, "u#rate": 5}
+    assert prepare.flags_for("t#rate__sex_female", flags) == 3
+    assert prepare.flags_for("t#rate", flags) == 3
+    # Neither a column that merely starts with the same letters nor another table's column counts.
+    assert prepare.flags_for("t#rate_other__age_all", flags) == 1
+    assert prepare.flags_for("t#rates", flags) == 0
+    rows, _ = prepare.select_indicators(
+        [{"identity": "t#rate__sex_female", "column": "rate__sex_female"}, {"identity": "t#x", "column": "x"}],
+        (pd.DataFrame(columns=["identity", "n_charts", "views_365d"]), "chart views"),
+        [{"table": "t", "column": "rate", "kind": "BREAK"}],
+        top=10,
+        full=False,
+        forced=[],
+    )
+    by = {row["identity"]: row for row in rows}
+    assert by["t#rate__sex_female"]["anomaly_flags"] == 1 and by["t#rate__sex_female"]["selected"]
+
+
 def test_selection_top_n_plus_flagged_and_everything_else_skipped_with_a_reason():
     ranking = _ranking({"t#c0": 900, "t#c1": 500, "t#c2": 100})
     findings = [{"table": "t", "column": "c4", "kind": "BREAK"}]
@@ -463,9 +483,10 @@ def test_derived_dataset_takes_the_upstream_origins_its_indicators_carry(tmp_pat
         ("Ember", "abc", "ember/2026-01-01/electricity.csv.dvc"),
         ("Energy Institute", None, "(indicator metadata)"),
     ]
-    # A dataset with its own snapshot and no further origins is left alone.
+    # A dataset with a snapshot of its own keeps only its own origins, even when its indicators carry others
+    # (picked up from merged-in datasets such as population): those are other datasets' sources.
     own = {"dvc": [tmp_path / "ember/2026-01-01/electricity.csv.dvc"]}
-    assert len(prepare.all_origins(dag, [], own, carried[:1])) == 1
+    assert [o["producer"] for o in prepare.all_origins(dag, list(dag), own, carried)] == ["Ember"]
 
 
 def test_strings_section_reports_matches_misses_and_years():
