@@ -691,9 +691,9 @@ class OWIDEnv:
     def thumb_url(self, slug: str):
         """
         Turn https://ourworldindata.org/grapher/life-expectancy"
-        Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
+        Into https://ourworldindata.org/grapher/life-expectancy.png
         """
-        return f"{self.site}/grapher/thumbnail/{slug}.png"
+        return f"{self.site}/grapher/{slug}.png"
 
     def indicator_metadata_url(self, variable_id):
         return f"{self.indicators_url}/{variable_id}.metadata.json"
