@@ -211,6 +211,9 @@ def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
                 key = "default" if tab is None else "other"
                 urls = {"explorer": p_["explorer_url"], "multidim": p_["multidim_url"]}
                 if tab == "other":
+                    # The default render failed (reported as a page error): no tabs to pick from.
+                    if "facts" not in p_["rendered"]["default"]["explorer"]:
+                        break
                     default_tab = (p_["rendered"]["default"]["explorer"]["facts"]["activeTab"] or "").lower()
                     if "map" in default_tab:
                         other = "chart"
@@ -270,6 +273,22 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
     tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %s", params=(slug,)).iloc[0, 0]
     graphers = parse_tsv_section(tsv, "graphers")
     columns = {c.get("catalogPath") or c.get("slug"): c for c in parse_tsv_section(tsv, "columns")}
+    # Rows can list indicators as `ySlugs` instead of `yVariableIds`: slugs of columns that
+    # duplicate a variable (`transform: duplicate <id>`), often to restyle it. Resolve each to
+    # its variable's catalog path, keeping the column (and its name) for the display check.
+    dup_ids = {
+        slug: int(c["transform"].split()[1])
+        for slug, c in columns.items()
+        if (c.get("transform") or "").startswith("duplicate ")
+    }
+    id_paths = (
+        prod.read_sql("SELECT id, catalogPath FROM variables WHERE id IN %s", params=(tuple(set(dup_ids.values())),))
+        .set_index("id")["catalogPath"]
+        .to_dict()
+        if dup_ids
+        else {}
+    )
+    slug_path = {slug: id_paths.get(i) for slug, i in dup_ids.items()}
     dcols = dim_columns(list(graphers[0].keys()))
 
     # Multidim side (staging): views, indicators and full view configs.
@@ -290,6 +309,9 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
         row = next(g for g in graphers if all(g[c].strip() == src.get(name, "") for c, name in dcols.items()))
         e_paths = [full_catalog_path(x) for x in row.get("yVariableIds", "").split()]
         e_names = [columns.get(x, {}).get("name") or None for x in e_paths]
+        for col in row.get("ySlugs", "").split():
+            e_paths.append(slug_path.get(col) or col)
+            e_names.append(columns.get(col, {}).get("name") or None)
         mv = mviews.get(tuple(sorted((tgt or {}).get("dimensions", {}).items()))) if tgt else None
         m_full = json.loads(full[mv["fullConfigId"]]) if mv else {}
         m_paths = [y.get("catalogPath") for y in (mv or {}).get("indicators", {}).get("y", [])]
