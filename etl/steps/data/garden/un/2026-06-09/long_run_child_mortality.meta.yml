@@ -165,6 +165,8 @@ tables:
         unit: deaths per 100 live births
         short_unit: "%"
         description_short: Estimated share of newborns who die before reaching the age of five.
+        description_processing: |-
+          The UN World Population Prospects publishes figures for World and for income groups, which we show as they are. We add averages for continents and the European Union, weighting each country's rate by its number of live births. We also recalculate the UN's own regions in the same way, shown as, for example, "Africa (UN, births-weighted)", next to the UN's published figure, "Africa (UN)". We only calculate an average for a region and year if the countries with data are home to at least 80% of the region's population.
         display:
           name: Child mortality rate (UN WPP)
           numDecimalPlaces: 1

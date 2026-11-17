@@ -11,6 +11,15 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 REGIONS = geo.REGIONS
+# UN regions, as published by UN WPP.
+UN_REGIONS = [
+    "Africa (UN)",
+    "Asia (UN)",
+    "Europe (UN)",
+    "Latin America and the Caribbean (UN)",
+    "Northern America (UN)",
+    "Oceania (UN)",
+]
 
 LOG = structlog.get_logger()
 
@@ -111,12 +120,12 @@ def run() -> None:
         ["country", "year"], short_name="long_run_child_mortality_regions"
     )
 
-    # Keep UN WPP under-five mortality as a separate table, for comparison.
-    tb_un_wpp_cm = (
-        tb_un_wpp_cm[["country", "year", "mortality_rate"]]
-        .rename(columns={"mortality_rate": "child_mortality_rate"}, errors="raise")
-        .format(["country", "year"], short_name="un_wpp_child_mortality")
+    # Keep UN WPP under-five mortality as a separate table, for comparison, with OWID regions added.
+    tb_un_wpp_cm = tb_un_wpp_cm[["country", "year", "mortality_rate"]].rename(
+        columns={"mortality_rate": "child_mortality_rate"}, errors="raise"
     )
+    tb_un_wpp_cm = add_owid_regions_to_un_wpp(tb_un_wpp_cm, tb_un_wpp_births)
+    tb_un_wpp_cm = tb_un_wpp_cm.format(["country", "year"], short_name="un_wpp_child_mortality")
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
@@ -124,6 +133,40 @@ def run() -> None:
     )
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_owid_regions_to_un_wpp(tb_cm: Table, tb_births: Table, min_frac_population: float = 0.8) -> Table:
+    """Add births-weighted regions to UN WPP child mortality.
+
+    UN WPP already publishes World and income groups, so we keep those and add the OWID regions it lacks (continents
+    and the EU). We also recalculate the UN regions with births weights, under names like
+    "Africa (UN, births-weighted)", so they can be compared with UN WPP's own figures (e.g. "Africa (UN)").
+    """
+    regions_owid = [region for region in REGIONS if region not in set(tb_cm["country"])]
+    aggregations = {"child_mortality_rate": "mean_weighted_by_births", "births": "sum"}
+
+    # Add births as weights.
+    tb = pr.merge(tb_cm, tb_births[["country", "year", "births"]], on=["country", "year"], how="left")
+
+    # Calculate births-weighted averages for the missing OWID regions.
+    tb = paths.regions.add_aggregates(
+        tb, regions=regions_owid, aggregations=aggregations, min_frac_population=min_frac_population
+    )
+
+    # Recalculate the UN regions from their member countries, without UN WPP's own figures for them.
+    tb_un = paths.regions.add_aggregates(
+        tb[~tb["country"].isin(UN_REGIONS)],
+        regions=UN_REGIONS,
+        aggregations=aggregations,
+        min_frac_population=min_frac_population,
+    )
+    tb_un = tb_un[tb_un["country"].isin(UN_REGIONS)].reset_index(drop=True)
+    tb_un["country"] = tb_un["country"].astype(str).str.replace("(UN)", "(UN, births-weighted)", regex=False)
+
+    tb = pr.concat([tb, tb_un], ignore_index=True)
+    tb = tb.drop(columns=["births"]).dropna(subset=["child_mortality_rate"])
+
+    return tb
 
 
 def calculate_regional_averages(
