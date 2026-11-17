@@ -75,7 +75,7 @@ bump — not part of the monthly run.
    dataset above. `climate_change_impacts`'s frozen deps (EPA, global_sea_level) stay on
    their old versions — reference them unchanged.
 2. Bump and run `long_run_ghg_concentration`, then the `climate_change_impacts` aggregate.
-3. Run all grapher steps and the `climate_change` explorer (the explorer stays `latest`).
+3. Run all grapher steps and the `climate_change` multidim (`viz://chart/climate/latest/climate_change`, which stays `latest`).
 
 The grapher families to rebuild: the 7 `surface_*` graphers, `total_precipitation_annual`,
 the 4 wildfire graphers, `sst`/`sst_by_month`, `nasa_ozone_hole`, the 3 `sea_ice_*`
