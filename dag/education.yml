@@ -152,9 +152,12 @@ steps:
   # Mdim for PISA scores
   viz://chart/education/latest/pisa_performance:
     # OECD PISA data on educational attainment in mathematics, science, and reading
-    - data://grapher/oecd/2023-12-06/pisa:
-      - data://garden/oecd/2023-12-06/pisa:
-        - data://meadow/oecd/2023-12-06/pisa:
+    - data://grapher/oecd/2026-10-28/pisa:
+      - data://garden/oecd/2026-10-28/pisa:
+        - data://meadow/oecd/2026-10-28/pisa:
+          - snapshot://oecd/2026-10-28/pisa_mean_performance.xlsx
+          - snapshot://oecd/2026-10-28/pisa_performance_by_gender.xlsx
+          # PISA Data Explorer exports (up to PISA 2022), used to backfill what the PISA 2025 report tables don't cover.
           - snapshot://oecd/2023-12-06/pisa_math_all.xls
           - snapshot://oecd/2023-12-06/pisa_science_all.xls
           - snapshot://oecd/2023-12-06/pisa_reading_all.xls
