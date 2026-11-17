@@ -165,10 +165,21 @@ tables:
         unit: deaths per 100 live births
         short_unit: "%"
         description_short: Estimated share of newborns who die before reaching the age of five.
-        description_processing: |-
-          The UN World Population Prospects publishes figures for World and for income groups, which we show as they are. We add averages for continents and the European Union, weighting each country's rate by its number of live births. We also recalculate the UN's own regions in the same way, shown as, for example, "Africa (UN, births-weighted)", next to the UN's published figure, "Africa (UN)". We only calculate an average for a region and year if the countries with data are home to at least 80% of the region's population.
         display:
           name: Child mortality rate (UN WPP)
+          numDecimalPlaces: 1
+        presentation:
+          attribution: UN, World Population Prospects (2024)
+          attribution_short: UN WPP
+      child_mortality_rate_births_weighted:
+        title: Child mortality rate (UN World Population Prospects, births-weighted regional average)
+        unit: deaths per 100 live births
+        short_unit: "%"
+        description_short: Estimated share of newborns who die before reaching the age of five. Regional averages are weighted by each country's number of live births.
+        description_processing: |-
+          We calculate regional averages from the UN World Population Prospects estimates for each country, weighting each country's rate by its number of live births. We do this for continents, income groups, the European Union and the world, and for the UN's own regions, so they can be compared with the regional figures the UN publishes. We only calculate an average for a region and year if the countries with data are home to at least 80% of the region's population.
+        display:
+          name: Child mortality rate (UN WPP, births-weighted)
           numDecimalPlaces: 1
         presentation:
           attribution: UN, World Population Prospects (2024)
