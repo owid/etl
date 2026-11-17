@@ -80,6 +80,7 @@ definitions:
 
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
+    rate_method: To calculate the death rate, we divide the number of deaths by the population and multiply by 100,000, using our [long-term population estimates](https://ourworldindata.org/population-sources). For world regions, the population is that of the countries in each region, as defined by UCDP. Population estimates from 2024 onwards are projections released by the UN.
     key_point_1: |-
       This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [non-state conflicts](#dod:nonstate-ucdp), [violence against civilians](#dod:onesided-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
     key_point_2: |-
@@ -421,6 +422,8 @@ tables:
           numDecimalPlaces: 1
         description_processing: |-
           {definitions.all.location_conflicts_method}
+
+          {definitions.number_deaths.rate_method}
         presentation:
           grapher_config:
             note: *preliminary_note
@@ -441,6 +444,8 @@ tables:
         description_processing: |-
           {definitions.all.location_conflicts_method}
 
+          {definitions.number_deaths.rate_method}
+
       number_deaths_ongoing_conflicts_low_per_capita:
         title: Death rate in ongoing conflicts (low estimate)
         unit: deaths per 100,000 people
@@ -452,6 +457,8 @@ tables:
           numDecimalPlaces: 1
         description_processing: |-
           {definitions.all.location_conflicts_method}
+
+          {definitions.number_deaths.rate_method}
 
       #####################
       # Ongoing conflicts #
