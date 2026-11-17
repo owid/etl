@@ -15,6 +15,7 @@ definitions:
       - The OECD leaves some earlier results out of its own comparisons over time, because it no longer considers them comparable. We leave them out too. This affects Argentina, Kazakhstan and Malaysia in 2015, Austria in 2009, the United Kingdom in 2000 and 2003, Spain in 2018, Jordan's reading and science results before 2022 and Viet Nam's results before 2025, and Ukraine in 2018.
       - For Cambodia, Ecuador, Guatemala, Paraguay and Zambia, the OECD reports the results of the PISA for Development assessment, which took place in 2017, under PISA 2018. We show them as 2017.
     presentation:
+      attribution: OECD (2026)
       attribution_short: OECD
       topic_tags:
         - Global Education
