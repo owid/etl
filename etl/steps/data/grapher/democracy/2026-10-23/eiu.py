@@ -17,9 +17,9 @@ def run() -> None:
     # Process data.
     #
     tables = [
-        ds_garden["eiu"],
-        ds_garden["num_countries"],
-        ds_garden["num_people"],
+        ds_garden.read("eiu", reset_index=False),
+        ds_garden.read("num_countries", reset_index=False),
+        ds_garden.read("num_people", reset_index=False),
     ]
     #
     # Save outputs.
