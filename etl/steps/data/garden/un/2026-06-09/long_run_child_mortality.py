@@ -23,6 +23,25 @@ def run() -> None:
     ds_igme = paths.load_dataset("igme")
     ds_gapminder_v11 = paths.load_dataset("under_five_mortality", version="2023-09-21")
     ds_gapminder_v7 = paths.load_dataset("under_five_mortality", version="2023-09-18")
+    ds_unwpp = paths.load_dataset("un_wpp")
+
+    # Read UN WPP under-five mortality without its templated metadata (it's described in this step's .meta.yml).
+    tb_un_wpp_cm = ds_unwpp.read("mortality_rate", reset_metadata="keep_origins")
+    tb_un_wpp_cm = tb_un_wpp_cm[
+        (tb_un_wpp_cm["age"] == "0-4") & (tb_un_wpp_cm["variant"] == "estimates") & (tb_un_wpp_cm["sex"] == "all")
+    ]
+
+    tb_un_wpp_births = ds_unwpp.read("births")
+    tb_un_wpp_births = tb_un_wpp_births[
+        (tb_un_wpp_births["age"] == "all") & (tb_un_wpp_births["variant"] == "estimates")
+    ][["country", "year", "births"]]
+
+    tb_pop = ds_unwpp.read("population")
+    tb_pop = tb_pop[
+        ((tb_pop["age"] == "all") | (tb_pop["age"] == "0-4"))
+        & (tb_pop["variant"] == "estimates")
+        & (tb_pop["sex"] == "all")
+    ][["country", "year", "age", "population"]]
 
     # Perform sanity checks on input datasets
     _validate_input_datasets(ds_igme, ds_gapminder_v11, ds_gapminder_v7)
@@ -86,10 +105,93 @@ def run() -> None:
     tb_combined_sel["source"].metadata.origins = tb_combined_sel["child_mortality_rate"].metadata.origins
     tb_combined_sel["source_url"].metadata.origins = tb_combined_sel["child_mortality_rate"].metadata.origins
 
+    # calculate regional averages from selected data:
+    tb_regional_averages = calculate_regional_averages(tb_combined_sel, tb_pop, tb_un_wpp_births)
+    tb_regional_averages = tb_regional_averages.format(
+        ["country", "year"], short_name="long_run_child_mortality_regions"
+    )
+
+    # Keep UN WPP under-five mortality as a separate table, for comparison.
+    tb_un_wpp_cm = (
+        tb_un_wpp_cm[["country", "year", "mortality_rate"]]
+        .rename(columns={"mortality_rate": "child_mortality_rate"}, errors="raise")
+        .format(["country", "year"], short_name="un_wpp_child_mortality")
+    )
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb_combined_full, tb_combined_sel], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(
+        tables=[tb_combined_full, tb_combined_sel, tb_regional_averages, tb_un_wpp_cm], check_variables_metadata=True
+    )
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_regional_averages(
+    tb_data: Table,
+    tb_pop: Table,
+    tb_births: Table,
+    min_frac_population: float = 0.8,
+    year_min: int = 1950,
+) -> Table:
+    """Calculate regional child mortality rates for all OWID regions, with three different weights.
+
+    Returns a table with only region rows and three columns:
+    - child_mortality_rate_weighted_population: weighted by total population.
+    - child_mortality_rate_weighted_population_0_4: weighted by the population aged 0-4.
+    - child_mortality_rate_weighted_births: weighted by births in the same year.
+
+    A region-year is left empty when the countries with data cover less than `min_frac_population` of the region's
+    total population. Only years from `year_min` onwards are kept, since UN WPP weights start in 1950.
+    """
+    # All OWID regions (continents and income groups), plus World, which geo.REGIONS doesn't include.
+    regions = list(REGIONS) + ["World"]
+    weights = {
+        "population": "population_total",
+        "population_0_4": "population_0_4",
+        "births": "births",
+    }
+
+    # Keep only countries (regions are recomputed below) and years with UN WPP weights.
+    tb = tb_data.reset_index()[["country", "year", "child_mortality_rate"]]
+    tb = tb[~tb["country"].isin(regions) & (tb["year"] >= year_min)].dropna(subset=["child_mortality_rate"])
+
+    # Add the three weights as columns.
+    tb_pop_total = tb_pop[tb_pop["age"] == "all"][["country", "year", "population"]].rename(
+        columns={"population": "population_total"}
+    )
+    tb_pop_0_4 = tb_pop[tb_pop["age"] == "0-4"][["country", "year", "population"]].rename(
+        columns={"population": "population_0_4"}
+    )
+    tb = pr.merge(tb, tb_pop_total, on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_pop_0_4, on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_births[["country", "year", "births"]], on=["country", "year"], how="left")
+
+    # One copy of the rate per weight. Blank the copy where its weight is missing, so that country neither enters the
+    # weighted mean nor counts as covered in the population threshold.
+    aggregations = {}
+    for name, weight_col in weights.items():
+        col = f"child_mortality_rate_weighted_{name}"
+        tb[col] = tb["child_mortality_rate"].copy()
+        tb.loc[tb[weight_col].isna(), col] = None
+        aggregations[col] = f"mean_weighted_by_{weight_col}"
+    # Weight columns are summed (they're needed as columns for the weighted means, but dropped afterwards).
+    aggregations.update({weight_col: "sum" for weight_col in weights.values()})
+
+    # Calculate weighted regional averages, dropping region-years with less than 80% population coverage.
+    tb = paths.regions.add_aggregates(
+        tb.drop(columns=["child_mortality_rate"]),
+        regions=regions,
+        aggregations=aggregations,
+        population_col="population_total",
+        min_frac_population=min_frac_population,
+    )
+
+    # Keep only regions and the weighted rates.
+    tb = tb[tb["country"].isin(regions)].drop(columns=list(weights.values()))
+    rate_cols = [f"child_mortality_rate_weighted_{name}" for name in weights]
+    tb = tb.dropna(subset=rate_cols, how="all").reset_index(drop=True)
+
+    return tb
 
 
 def add_world_from_gapminder_full_to_selected(tb_gap_full: Table, tb_gap_sel: Table) -> Table:

@@ -260,6 +260,10 @@ steps:
 
   # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2026-06-09/long_run_child_mortality:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/gapminder/2023-09-18/under_five_mortality:
       - data://meadow/gapminder/2023-09-18/under_five_mortality:
         - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx

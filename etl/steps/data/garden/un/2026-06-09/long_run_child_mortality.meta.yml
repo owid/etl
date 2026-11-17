@@ -4,6 +4,12 @@ definitions:
       topic_tags:
         - Child & Infant Mortality
       attribution: Gapminder (2015); UN Inter-agency Group for Child Mortality Estimation (2025)
+  regions:
+    description_processing: |-
+      We calculate regional averages from our long-run child mortality data for each country, which combines Gapminder and UN IGME estimates. Each country's rate counts in proportion to its weight. We use three different weights, each from the UN World Population Prospects: total population, the population under age five, and the number of live births in the same year.
+
+      We only calculate an average for a region and year if the countries with data are home to at least 80% of the region's population. We only show years from 1950 onwards, the first year with UN World Population Prospects data.
+    attribution: Gapminder (2015); UN Inter-agency Group for Child Mortality Estimation (2025); UN, World Population Prospects (2024)
 
 dataset:
   update_period_days: 365
@@ -115,3 +121,53 @@ tables:
               - India
               - Ghana
               - Nigeria
+  long_run_child_mortality_regions:
+    title: Long-run child mortality – regional averages
+    variables:
+      child_mortality_rate_weighted_population:
+        title: Child mortality rate (regional average, weighted by total population)
+        unit: deaths per 100 live births
+        short_unit: "%"
+        description_short: Estimated share of newborns who die before reaching the age of five. Regional averages are weighted by each country's total population.
+        description_processing: "{definitions.regions.description_processing}"
+        display:
+          name: Weighted by total population
+          numDecimalPlaces: 1
+        presentation:
+          attribution: "{definitions.regions.attribution}"
+      child_mortality_rate_weighted_population_0_4:
+        title: Child mortality rate (regional average, weighted by population under age five)
+        unit: deaths per 100 live births
+        short_unit: "%"
+        description_short: Estimated share of newborns who die before reaching the age of five. Regional averages are weighted by each country's population under age five.
+        description_processing: "{definitions.regions.description_processing}"
+        display:
+          name: Weighted by population under age five
+          numDecimalPlaces: 1
+        presentation:
+          attribution: "{definitions.regions.attribution}"
+      child_mortality_rate_weighted_births:
+        title: Child mortality rate (regional average, weighted by births)
+        unit: deaths per 100 live births
+        short_unit: "%"
+        description_short: Estimated share of newborns who die before reaching the age of five. Regional averages are weighted by each country's number of live births.
+        description_processing: "{definitions.regions.description_processing}"
+        display:
+          name: Weighted by births
+          numDecimalPlaces: 1
+        presentation:
+          attribution: "{definitions.regions.attribution}"
+  un_wpp_child_mortality:
+    title: Child mortality rate – UN World Population Prospects
+    variables:
+      child_mortality_rate:
+        title: Child mortality rate (UN World Population Prospects)
+        unit: deaths per 100 live births
+        short_unit: "%"
+        description_short: Estimated share of newborns who die before reaching the age of five.
+        display:
+          name: Child mortality rate (UN WPP)
+          numDecimalPlaces: 1
+        presentation:
+          attribution: UN, World Population Prospects (2024)
+          attribution_short: UN WPP
