@@ -19,4 +19,6 @@ def run() -> None:
     c = paths.create_chart(config=config, short_name="conflict_data")
     c.views = c_source.views
 
-    c.save()
+    # NOTE: no download package until it handles indicators that share a title across sources
+    # (UCDP, UCDP + PRIO and PRIO); building it fails on duplicate column names. See owid/etl#7336.
+    c.save(download_package=False)
