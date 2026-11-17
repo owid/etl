@@ -40,8 +40,8 @@ definitions:
           time: true
           changeInPrefix: true
 
-# The explorer's "Long-run series" checkbox is a toggle here. Only the three greenhouse gas
-# concentrations have a long-term series; every other metric has the short-term one only.
+# The explorer's "Long-run series" checkbox is a dropdown here. Only the three greenhouse gas
+# concentrations have a short- and a long-term series; every other metric shows "Not applicable".
 dimensions:
   - slug: metric
     name: Metric
@@ -79,7 +79,7 @@ dimensions:
   - slug: long_run_series
     name: Long-run series
     presentation:
-      type: toggle-buttons
+      type: dropdown
     choices:
       - slug: short
         name: Short-term series
@@ -87,11 +87,13 @@ dimensions:
       - slug: long
         name: Long-term series
         description: Annual values going back hundreds of thousands of years, reconstructed from air trapped in ice cores.
+      - slug: na
+        name: Not applicable
 
 views:
   - dimensions:
       metric: temperature_anomaly
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#near_surface_temperature_anomaly
@@ -101,7 +103,7 @@ views:
         min: auto
   - dimensions:
       metric: sea_surface_temperature_anomaly
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#sea_temperature_anomaly
@@ -112,7 +114,7 @@ views:
         min: auto
   - dimensions:
       metric: ocean_heat_content__top_700m
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#ocean_heat_content_csiro_700m
@@ -127,7 +129,7 @@ views:
         min: auto
   - dimensions:
       metric: ocean_heat_content__top_2000m
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#ocean_heat_content_iap_2000m
@@ -141,7 +143,7 @@ views:
         min: auto
   - dimensions:
       metric: ocean_ph
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#ocean_ph
@@ -158,7 +160,7 @@ views:
         changeInPrefix: true
   - dimensions:
       metric: sea_level_rise
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#sea_level_church_and_white_2011
@@ -171,7 +173,7 @@ views:
         min: auto
   - dimensions:
       metric: arctic_sea_ice_extent
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_max
@@ -183,7 +185,7 @@ views:
         min: 0
   - dimensions:
       metric: antarctic_sea_ice_extent
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_min
@@ -195,7 +197,7 @@ views:
         min: 0
   - dimensions:
       metric: mass_balance_of_ice_sheets
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#land_ice_mass_nasa
@@ -208,7 +210,7 @@ views:
         min: -5200
   - dimensions:
       metric: mass_balance_of_u_s__glaciers
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#mass_balance_us_glaciers
@@ -219,7 +221,7 @@ views:
         min: -50
   - dimensions:
       metric: snow_cover
-      long_run_series: short
+      long_run_series: na
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#snow_cover_extent
