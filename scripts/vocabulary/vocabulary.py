@@ -65,6 +65,9 @@ from etl.paths import CACHE_DIR  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
+# Per-topic fields in the published file: what the site's consumers read (the
+# all-charts block reads `keywords`, search reranking also `topic_name`).
+PUBLISHED_FIELDS = ("topic_name", "keywords")
 
 DEFAULT_MODEL = "claude-sonnet-5-5"
 
@@ -726,15 +729,22 @@ def main(
         )
         sys.exit(1)
 
-    # Upload to R2
+    # Upload to R2. The published file carries only what the site reads; the stats
+    # (cost, coverage, per-term shares) stay in --output and --report, where they're
+    # read when tuning, instead of making up most of every page load.
     if not no_upload:
+        published = {
+            slug: {field: entry[field] for field in PUBLISHED_FIELDS} for slug, entry in output_data.items()
+        }
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-            json.dump(output_data, f, indent=2)
+            json.dump(published, f, separators=(",", ":"))
             tmp_path = f.name
 
         try:
             s3_url = f"s3://{S3_BUCKET_NAME}/{upload_path}"
-            s3_utils.upload(s3_url, tmp_path, public=True)
+            # Without a Content-Type R2 serves the object untyped, and Cloudflare
+            # compresses only typed responses, so this is what gets it gzip/brotli.
+            s3_utils.upload(s3_url, tmp_path, public=True, content_type="application/json")
             click.echo()
             # files.ourworldindata.org is the worker in front of this bucket; it
             # is what the site reads, because it adds CORS and an edge cache.

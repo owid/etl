@@ -136,43 +136,29 @@ matters: the terms it lists first are the ones most likely to be shown.
 
 ## Output Format
 
-### Single topic
+### Published file
+
+The uploaded file holds only what the site reads, keyed by topic slug, as compact JSON served with `Content-Type: application/json` (which is what lets Cloudflare compress it):
+
 ```json
 {
-  "topic_slug": "energy",
-  "topic_name": "Energy",
-  "keywords": [
-    "solar panels",
-    "fossil fuels",
-    "coal",
-    "wind turbines",
-    "nuclear power",
-    ...
-  ],
-  "stats": {
-    "num_charts_texts": 200,
-    "num_keywords": 30,
-    "input_tokens": 4236,
-    "output_tokens": 199,
-    "total_cost_usd": 0.000189
-  }
+  "energy": {"topic_name": "Energy", "keywords": ["solar panels", "fossil fuels", ...]},
+  "climate-change": {"topic_name": "Climate Change", "keywords": [...]}
 }
 ```
 
-### Multiple topics
+### `--output` file
+
+The local file has the same keys but keeps the full record per topic, stats included (cost, coverage, and per-term shares in `keyword_stats`):
+
 ```json
 {
   "energy": {
     "topic_slug": "energy",
     "topic_name": "Energy",
     "keywords": [...],
-    "stats": {...}
-  },
-  "climate-change": {
-    "topic_slug": "climate-change",
-    "topic_name": "Climate Change",
-    "keywords": [...],
-    "stats": {...}
+    "stats": {"num_keywords": 8, "weighted_coverage": 0.62, "input_tokens": 4236, ...},
+    "keyword_stats": [{"term": "solar panels", "own_share": 0.21, "marginal_share": 0.21, ...}, ...]
   }
 }
 ```
