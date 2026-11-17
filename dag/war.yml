@@ -206,29 +206,6 @@ steps:
   viz://chart/war/latest/countries_in_conflict_data:
     - data://grapher/war/2026-06-10/ucdp
 
-  # Conflict Data Source explorer — single config covering all seven data sources
-  # via a leading `data_source` dropdown.
-  viz://explorer/war/latest/conflict_data_source:
-    - data://grapher/war/2023-09-21/cow
-    - data://grapher/war/2023-09-21/cow_mid
-    - data://grapher/war/2023-09-21/mars
-    - data://grapher/war/2023-09-21/mie
-    - data://grapher/war/2023-09-21/prio_v31
-    - data://grapher/war/2026-06-10/ucdp
-    - data://grapher/war/2026-06-10/ucdp_prio
-
-  # Conflict explorer — same view set as conflict_data_source, re-ordered with
-  # `conflict_type` as the primary dropdown and `data_source` demoted.
-  viz://explorer/war/latest/conflict_data:
-    - viz://explorer/war/latest/conflict_data_source
-    - data://grapher/war/2023-09-21/cow
-    - data://grapher/war/2023-09-21/cow_mid
-    - data://grapher/war/2023-09-21/mars
-    - data://grapher/war/2023-09-21/mie
-    - data://grapher/war/2023-09-21/prio_v31
-    - data://grapher/war/2026-06-10/ucdp
-    - data://grapher/war/2026-06-10/ucdp_prio
-
   # Conflict Data Source multidim, shown as a data explorer (replaces the conflict-data-source explorer).
   viz://chart/war/latest/conflict_data_source:
     - data://grapher/war/2023-09-21/cow
