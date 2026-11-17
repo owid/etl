@@ -2168,7 +2168,8 @@ def to_multidim_views(chart) -> None:
       `yAxis.canChangeScaleType`.
     - The explorer-level settings in `SHARED_VIEW_CONFIG` are set on every view.
     - Indicator `colorScale*` display keys become the view's `map.colorScale`, taken from the
-      map's indicator (`map.columnSlug`, or the only indicator).
+      map's indicator (`map.columnSlug`, or the only indicator), and also its `colorScale` in
+      Swimlane views.
     """
     for view in chart.views:
         cfg = view.config or {}
@@ -2191,6 +2192,10 @@ def to_multidim_views(chart) -> None:
             and any(k in map_indicator.display for k in COLOR_SCALE_KEYS)
         ):
             cfg.setdefault("map", {})["colorScale"] = _color_scale_from_explorer(map_indicator.display)
+            # A Swimlane chart colors its segments with the column's color scale, which the explorer
+            # takes from these same display keys; a multidim reads it from the chart's `colorScale`.
+            if "Swimlane" in cfg.get("chartTypes", []):
+                cfg["colorScale"] = _color_scale_from_explorer(map_indicator.display)
         for y in ys:
             if y.display:
                 y.display = {k: v for k, v in y.display.items() if k not in COLOR_SCALE_KEYS} or None
