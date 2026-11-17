@@ -1,14 +1,22 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+#
+# EIU sent this spreadsheet to OWID directly; it isn't a public download. Create the snapshot from the local file:
+#   etls democracy/<version>/eiu --path-to-file EIU_Democracy_Index.xlsx
+#
+# NOTE: Check the whole history against EIU's yearly reports at every update. In the file EIU sent in November 2026
+# (a corrected version of an earlier one), the overall scores match the reports and the ranks follow the scores, but
+# many regime labels contradict the scores, mostly in 2011-2016. That's why the garden step derives the regime type
+# from the score.
 meta:
   is_public: false
   origin:
     # Data product / Snapshot
     title: "Democracy Index 2025: Democracy stabilizes after eight years of decline"
     description: |-
-      The Democracy Index, produced by the Economist Intelligence Unit (EIU), measures the state of democracy in 167 countries and territories, covering almost the entire population of the world. Each country gets a score from 0 to 10, which is the average of five category scores: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. These category scores are built from 60 indicators, mostly assessed by EIU's country experts. Based on its overall score, each country is classified as one of four types of regime: "full democracy" (scores from 8 to 10), "flawed democracy" (6 to 7.99), "hybrid regime" (4 to 5.99) or "authoritarian regime" (below 4).
+      The Democracy Index, produced by the Economist Intelligence Unit (EIU), measures the state of democracy in 167 countries and territories, covering almost the entire population of the world. Each country gets a score from 0 to 10, which is the average of five category scores: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. These category scores are built from 60 indicators, mostly assessed by EIU’s country experts. Based on its overall score, each country is classified as one of four types of regime: “full democracy” (scores from 8 to 10), “flawed democracy” (6 to 7.99), “hybrid regime” (4 to 5.99), or “authoritarian regime” (below 4).
 
-      This edition covers 2025. EIU provided the overall score, the rank and the regime type of each country for every edition since 2006 as a spreadsheet. The index was not published for 2007 and 2009. The five category scores are only available through EIU's paid data services.
+      This edition covers 2025. EIU provided the overall score, the rank and the regime type of each country for every edition since 2006 as a spreadsheet. The index was not published for 2007 and 2009. The spreadsheet doesn’t include the five category scores. EIU published them in its yearly reports up to the 2024 edition. The 2025 report doesn’t include them, and EIU delivers its Democracy Index data to clients through Snowflake and the EIU API.
     date_published: "2026-04-07"
     # Citation
     producer: Economist Intelligence Unit
@@ -21,7 +29,7 @@ meta:
 
     # License
     license:
-      name: The Economist Intelligence Unit Limited
+      name: © 2026 The Economist Intelligence Unit Limited
       url: https://www.eiu.com/n/terms/
 outs:
   - md5: 5f0a56ee7eaee153c5b31058320f883b

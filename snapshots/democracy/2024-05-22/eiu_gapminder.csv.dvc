@@ -14,7 +14,7 @@ meta:
     # Citation
     producer: Gapminder
     citation_full: |-
-      Democracy Index. Economist Intelligence Unit (2006-2020). Obtained via Gapminder 2021.
+      Democracy Index. Economist Intelligence Unit (2006-2020). Obtained via Gapminder 2021. Free data from www.gapminder.org.
 
     # Files
     url_main: https://www.gapminder.org/data/documentation/democracy-index/

@@ -31,7 +31,7 @@ meta:
 
     # License
     license:
-      name: The Economist Intelligence Unit Limited
+      name: © 2024 The Economist Intelligence Unit Limited
       url: https://www.eiu.com/n/terms/
 outs:
   - md5: cf87e0d395a3ac553ce96790796777fc
