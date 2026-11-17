@@ -1,6 +1,6 @@
 # OWID Topic Vocabulary Extraction
 
-Simple LLM-based CLI to extract characteristic keywords from OWID chart titles and subtitles, grouped by topic.
+Simple LLM-based CLI to extract characteristic keywords from OWID chart titles and subtitles, grouped by topic, and to suggest the countries most worth looking at on each topic.
 
 ## Overview
 
@@ -120,7 +120,8 @@ matters: the terms it lists first are the ones most likely to be shown.
    terms proposed should describe what people actually look at, and two runs
    should see the same input)
 4. **LLM extraction**: Feeds all text to Claude with instructions to extract modern, searchable keywords. A topic whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
-5. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
+5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. Each answer is matched against OWID's country names (names, short names and aliases in the regions definitions), since the site filters charts by those exact names; anything that isn't a current country is dropped and listed in the topic's `unrecognized_countries` stat
+6. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 
 ## Output Format
 
@@ -130,8 +131,8 @@ The uploaded file holds only what the site reads (`PUBLISHED_FIELDS` in the expo
 
 ```json
 {
-  "energy": {"topic_slug": "energy", "topic_name": "Energy", "keywords": ["solar panels", "fossil fuels", ...]},
-  "climate-change": {"topic_slug": "climate-change", "topic_name": "Climate Change", "keywords": [...]}
+  "energy": {"topic_slug": "energy", "topic_name": "Energy", "keywords": ["solar panels", "fossil fuels", ...], "countries": ["Norway", "China", ...]},
+  "climate-change": {"topic_slug": "climate-change", "topic_name": "Climate Change", "keywords": [...], "countries": [...]}
 }
 ```
 
@@ -145,7 +146,8 @@ The committed file has the same keys but keeps the full record per topic, stats 
     "topic_slug": "energy",
     "topic_name": "Energy",
     "keywords": [...],
-    "stats": {"num_keywords": 8, "weighted_coverage": 0.62, "input_tokens": 4236, ...},
+    "countries": [...],
+    "stats": {"num_keywords": 8, "num_countries": 5, "unrecognized_countries": [], "weighted_coverage": 0.62, "input_tokens": 4236, ...},
     "keyword_stats": [{"term": "solar panels", "own_share": 0.21, "marginal_share": 0.21, ...}, ...]
   }
 }

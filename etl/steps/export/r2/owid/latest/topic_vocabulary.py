@@ -27,11 +27,12 @@ S3_BUCKET_NAME = "owid-public"
 PRODUCTION_KEY = "topic_vocabulary.json"
 
 # Per-topic fields in the published file: what the site's consumers read (the
-# all-charts block and search reranking read `keywords` and `topic_name`), plus
+# all-charts block reads `keywords` and `countries`, search reranking `keywords`
+# and `topic_name`), plus
 # `topic_slug`, so an entry still says which topic it is once taken out of the file.
 # The stats stay in the committed file, where they're read when tuning, instead of
 # making up most of every page load.
-PUBLISHED_FIELDS = ("topic_slug", "topic_name", "keywords")
+PUBLISHED_FIELDS = ("topic_slug", "topic_name", "keywords", "countries")
 
 
 def published_vocabulary(vocabulary: dict) -> dict:
@@ -57,11 +58,13 @@ def sanity_check(vocabulary: dict) -> None:
     for slug, entry in vocabulary.items():
         assert entry.get("topic_slug") == slug, f"Entry under '{slug}' says it is '{entry.get('topic_slug')}'."
         assert entry.get("topic_name"), f"Topic '{slug}' has no topic_name."
-        keywords = entry.get("keywords")
-        # An empty list is legitimate: no candidate term covered anything, and the site then shows none.
-        assert isinstance(keywords, list) and all(isinstance(k, str) and k for k in keywords), (
-            f"Topic '{slug}' has keywords that aren't a list of non-empty strings."
-        )
+        # An empty list is legitimate (no candidate term covered anything, no country stood out), and the
+        # site then shows none.
+        for field in ("keywords", "countries"):
+            values = entry.get(field)
+            assert isinstance(values, list) and all(isinstance(v, str) and v for v in values), (
+                f"Topic '{slug}' has {field} that aren't a list of non-empty strings."
+            )
 
 
 def run(dest_dir: str) -> None:
