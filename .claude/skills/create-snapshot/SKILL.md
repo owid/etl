@@ -61,7 +61,7 @@ Present the inferred metadata and ask the user to fill in or correct:
 - `license_name` — e.g. `CC BY 4.0`
 - `license_url` — license page URL (optional)
 - `file_extension` — inferred from download URL or `csv`
-- `is_private` — default `false`; `true` when the license restricts redistribution. Settle it before the first upload: a public snapshot can't be deleted from our side (the public bucket refuses deletes), so making it private later needs the infrastructure team to remove the public copy and the public catalog files.
+- `is_private` — default `false`; `true` when the license restricts redistribution or the data isn't meant for public sharing (a draft, or a file supplied to us privately; see `docs/guides/private-import.md`), and ask the user when its status is unclear. Settle it before the first upload: a public snapshot can't be deleted from our side (the public bucket refuses deletes), so making it private later needs the infrastructure team to remove the public copy and the public catalog files.
 - `dataset_manual_import` — default `false` (set to `true` if there's no `url_download` and none can be inferred)
 
 Present this as a summary block so the user can quickly scan and correct individual fields. Wait for confirmation before proceeding.
