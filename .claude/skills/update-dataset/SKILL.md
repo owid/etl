@@ -215,7 +215,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
 3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
-   - Before the first upload, check the producer's terms: when they restrict redistribution, set `is_public: false` in the new `.dvc` files and use `data-private://` for the new steps. A public upload can't be undone from our side (see `/create-snapshot`, `is_private`).
+   - Before the first upload, check the producer's terms: when they restrict redistribution, set `is_public: false` in the new `.dvc` files, use `data-private://` for the new steps, and change their snapshot dependencies in the dag to `snapshot-private://` (`etl update` carries the old `snapshot://` URI forward). A public upload can't be undone from our side (see `/create-snapshot`, `is_private`).
 
    **Producer documentation for the new release.** While the snapshot runs, find the producer's latest documentation per `.claude/rules/producer-documentation.md`. The links carried over in the `.dvc` and `.meta.yml` point at the previous edition, so search for the current one. The what's-new notes tell you which changes to expect in the snapshot, meadow and garden diffs, and they feed the changelog. The methodology is what §6b contrasts the carried-over text against.
 
