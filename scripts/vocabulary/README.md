@@ -65,7 +65,7 @@ staging server.
 ## CLI Options
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
-- `--output PATH` - Output JSON file path (optional, prints to console if not provided)
+- `--output PATH` - Write the full results, stats included, to this JSON file (optional)
 - `--model MODEL` - Claude model to use (default: `claude-sonnet-5-5`). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
 - `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
 - `--no-upload` - Generate without writing to R2

@@ -66,7 +66,7 @@ from etl.paths import CACHE_DIR  # ty: ignore
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 # Per-topic fields in the published file: what the site's consumers read (the
-# all-charts block reads `keywords`, search reranking also `topic_name`).
+# all-charts block and search reranking read `keywords` and `topic_name`).
 PUBLISHED_FIELDS = ("topic_name", "keywords")
 
 DEFAULT_MODEL = "claude-sonnet-5-5"
@@ -462,10 +462,6 @@ async def process_topics(
                 "weighting": weighting,
                 "views_column": views_column,
                 "selection": "coverage",
-                # The consumer keys "trust this order" off `refined`; the order is
-                # now measured rather than guessed, so it still holds. See
-                # rankSuggestedKeywords in owid-grapher.
-                "refined": True,
             }
         )
         candidates["keyword_stats"] = [
@@ -497,7 +493,7 @@ async def process_topics(
     multiple=True,
     help="Topic slug(s) to extract vocabulary for (e.g., 'energy'). Can be specified multiple times. If not provided, extracts for all topics.",
 )
-@click.option("--output", help="Output JSON file path (optional, prints to console if not provided)")
+@click.option("--output", help="Write the full results, stats included, to this JSON file (optional)")
 @click.option(
     "--model",
     default=DEFAULT_MODEL,
