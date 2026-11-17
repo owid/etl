@@ -66,6 +66,7 @@ tables:
             - SlopeChart
             - DiscreteBar
             - Marimekko
+            - Dumbbell
       description_processing: |-
         We take the overall score for every year from a spreadsheet the Economist Intelligence Unit provided to us. We take the scores of the five categories from Gapminder's compilation of EIU's yearly reports for 2006 to 2020, and from the yearly reports themselves for 2021 to 2024. EIU didn't publish the index for 2007 and 2009, so these years are not included.
 
