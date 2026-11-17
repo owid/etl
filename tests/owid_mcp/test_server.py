@@ -13,6 +13,9 @@ from owid_mcp.server import RequestLoggingMiddleware, mcp
 # with `make test-integration`; the whole module goes away with owid_mcp after its shutdown (#6921).
 pytestmark = pytest.mark.integration
 
+# Datasette is offline until owid/ops#877 (a security issue) is resolved; re-enable these tests when it is back.
+requires_datasette = pytest.mark.skip(reason="Datasette is offline (owid/ops#877)")
+
 
 @pytest.mark.asyncio
 async def test_mcp_server_health():
@@ -181,6 +184,7 @@ async def test_fetch_indicator_metadata_tool():
 #         assert any(word in column.lower() for word in ["date", "flowering", "bloom", "cherry"])
 
 
+@requires_datasette
 @pytest.mark.asyncio
 async def test_run_sql_basic():
     """Test basic run_sql functionality with a simple query."""
@@ -210,6 +214,7 @@ async def test_run_sql_basic():
         assert header.strip() == "id,name"
 
 
+@requires_datasette
 @pytest.mark.asyncio
 async def test_search_posts_and_fetch():
     """Test searching for posts about poverty and fetching the first result."""
@@ -270,6 +275,7 @@ async def test_search_posts_and_fetch():
         print(f"✅ Successfully fetched post: '{metadata['title']}' ({metadata['length']} chars)")
 
 
+@requires_datasette
 @pytest.mark.asyncio
 async def test_search_posts_algolia_vs_sql():
     """Test that search_posts works with both SQL and Algolia backends."""
@@ -436,6 +442,7 @@ async def test_load_chart_table_data_global_warming():
         print(f"✅ Year range: {min(years) if years else 'N/A'} - {max(years) if years else 'N/A'}")
 
 
+@requires_datasette
 @pytest.mark.asyncio
 async def test_run_sql_invalid_column_error():
     """Test that run_sql returns a helpful error message when querying with an invalid column."""
@@ -451,6 +458,7 @@ async def test_run_sql_invalid_column_error():
         assert "column 'abc' does not exist" in error.lower()
 
 
+@requires_datasette
 @pytest.mark.asyncio
 async def test_run_sql_syntax_error():
     """Test that run_sql returns a helpful error message for SQL syntax errors."""
