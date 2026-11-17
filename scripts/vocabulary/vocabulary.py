@@ -26,9 +26,7 @@ Usage:
 import asyncio
 import hashlib
 import json
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 import anthropic
@@ -56,19 +54,17 @@ from coverage_report import (  # ty: ignore
     render_run_summary,
     render_topic_table,
 )
-from owid.catalog import s3_utils  # ty: ignore
 
 from apps.utils.llms.claude import text_of  # ty: ignore
 from etl import config  # ty: ignore
 from etl.config import OWID_ENV  # ty: ignore
 from etl.paths import CACHE_DIR  # ty: ignore
-
-S3_BUCKET_NAME = "owid-public"
-DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
-# Per-topic fields in the published file: what the site's consumers read (the
-# all-charts block and search reranking read `keywords` and `topic_name`), plus
-# `topic_slug`, so an entry still says which topic it is once taken out of the file.
-PUBLISHED_FIELDS = ("topic_slug", "topic_name", "keywords")
+from etl.steps.export.r2.owid.latest.topic_vocabulary import (  # ty: ignore
+    PRODUCTION_KEY,
+    VOCABULARY_FILE,
+    published_vocabulary,
+    upload,
+)
 
 DEFAULT_MODEL = "claude-sonnet-5-5"
 
@@ -494,7 +490,15 @@ async def process_topics(
     multiple=True,
     help="Topic slug(s) to extract vocabulary for (e.g., 'energy'). Can be specified multiple times. If not provided, extracts for all topics.",
 )
-@click.option("--output", help="Write the full results, stats included, to this JSON file (optional)")
+@click.option(
+    "--output",
+    type=click.Path(dir_okay=False, writable=True, path_type=Path),
+    default=VOCABULARY_FILE,
+    help=(
+        "Write the full results, stats included, to this JSON file (default: the committed vocabulary "
+        "next to the export://r2/owid/latest/topic_vocabulary step, which publishes it once merged)."
+    ),
+)
 @click.option(
     "--model",
     default=DEFAULT_MODEL,
@@ -502,11 +506,10 @@ async def process_topics(
 )
 @click.option(
     "--upload-path",
-    default=DEFAULT_S3_VOCABULARY_PATH,
     help=(
-        f"Key to upload to inside the {S3_BUCKET_NAME} bucket (default: {DEFAULT_S3_VOCABULARY_PATH}, "
-        "the one the site reads). Use another key to try a vocabulary on a staging server without "
-        "overwriting production, e.g. --upload-path topic_vocabulary/my-branch.json"
+        "Also upload the published part to this key in the public bucket, to try the vocabulary on a "
+        "staging server, e.g. --upload-path topic_vocabulary/my-branch.json. Production is published "
+        "only by the export step, from the committed file."
     ),
 )
 @click.option(
@@ -542,18 +545,16 @@ async def process_topics(
     show_default=True,
     help="Stop once the next term would reveal less than this share of a topic's views.",
 )
-@click.option("--no-upload", is_flag=True, help="Skip uploading to R2 (useful for testing)")
 def main(
     topic: tuple[str, ...],
-    output: str | None,
+    output: Path,
     model: str,
-    upload_path: str,
+    upload_path: str | None,
     report_path: str | None,
     weighting: str,
     views_column: str,
     max_terms: int,
     min_marginal_share: float,
-    no_upload: bool,
 ):
     """Build the OWID topic vocabulary: the suggested search terms per topic.
 
@@ -573,22 +574,26 @@ def main(
         click.echo("No topics specified, extracting for all topics...")
         topic_slugs = get_all_topic_slugs()
 
-    # A run over some of the topics cannot be published to the key the site
-    # reads: the file *replaces* the vocabulary rather than merging into it, so
-    # every topic the run skipped would lose its suggestions. Retrying a handful
-    # of topics is still useful — point --upload-path at another key to look at
-    # the result, or --no-upload --output to keep it locally — but publishing
+    # The committed file *replaces* the vocabulary rather than merging into it,
+    # and merging it publishes it, so a run over some of the topics can't be
+    # written there: every topic it skipped would lose its suggestions. Retrying a
+    # handful of topics is still useful, written to another --output (and
+    # optionally uploaded to a scratch --upload-path), but the committed file
     # takes a run over every topic. Checked before the first API call, so the
     # mistake costs nothing.
-    if topic and not no_upload and upload_path == DEFAULT_S3_VOCABULARY_PATH:
+    writes_committed_file = output.resolve() == VOCABULARY_FILE.resolve()
+    if topic and writes_committed_file:
         click.secho(
-            f"✗ Refusing to publish a {len(topic_slugs)}-topic run to {DEFAULT_S3_VOCABULARY_PATH}, "
-            "the key the site reads: it would drop every other topic's suggestions.",
+            f"✗ Refusing to write a {len(topic_slugs)}-topic run to the committed vocabulary "
+            f"({VOCABULARY_FILE.name}): it would drop every other topic's suggestions once merged.",
             fg="red",
         )
+        click.secho("  Drop --topic to cover every topic, or pass --output somewhere else.", fg="red")
+        sys.exit(1)
+    if upload_path == PRODUCTION_KEY:
         click.secho(
-            "  Drop --topic to cover every topic, or keep this run out of production with "
-            "--no-upload (optionally with --output) or --upload-path.",
+            f"✗ Refusing to upload to {PRODUCTION_KEY}, the key the site reads: production is published "
+            "only by the export step, from the committed file, so that the live file is always the one on master.",
             fg="red",
         )
         sys.exit(1)
@@ -599,8 +604,9 @@ def main(
     click.echo(f"Model:     {model}")
     click.echo(f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}")
     click.echo(f"Terms:     at most {max_terms}, stopping below {min_marginal_share:.1%}")
-    upload_target = "skipped" if no_upload else f"s3://{S3_BUCKET_NAME}/{upload_path}"
-    click.echo(f"Upload:    {upload_target}")
+    click.echo(f"Output:    {output}")
+    if upload_path:
+        click.echo(f"Upload:    {upload_path} (scratch key)")
     click.echo("=" * 80)
     click.echo()
 
@@ -700,59 +706,36 @@ def main(
     # all rather than to one topic.
     output_data = {r["topic_slug"]: r for r in results}
 
-    # Written before the guard below, so a run that ends up refusing to publish
-    # still leaves behind whatever it did manage to produce.
-    if output:
-        with open(output, "w") as f:
-            json.dump(output_data, f, indent=2)
-        click.echo()
-        click.secho(f"✓ Saved results to: {output}", fg="green")
-
-    # Refuse to publish a vocabulary that is missing topics. A run fans out one
-    # request per topic, so a transient API failure used to mean those topics
-    # quietly vanished from the file — and uploading that over a complete
-    # vocabulary loses their suggestions until someone notices.
-    if failed_slugs and not no_upload:
+    # Refuse to write a vocabulary that is missing topics over the committed one.
+    # A run fans out one request per topic, so a transient API failure means
+    # those topics are missing from the results, and merging that file would
+    # lose their suggestions until someone notices. The answers that did come
+    # back are cached, so the rerun only asks again for the failed topics.
+    if failed_slugs and writes_committed_file:
         click.echo()
         click.secho(
             f"✗ {len(failed_slugs)} of {len(topic_slugs)} topics failed: {', '.join(failed_slugs)}",
             fg="red",
         )
         click.secho(
-            "  Not uploading a partial vocabulary over a complete one. Re-run over every topic to "
-            "publish — re-running just these few can't be, since the file replaces the whole "
-            "vocabulary. Pass --no-upload to keep this partial result.",
+            f"  Not writing a partial vocabulary over {output}. Re-run over every topic, or pass "
+            "--output somewhere else to keep this partial result.",
             fg="red",
         )
         sys.exit(1)
 
-    # Upload to R2. The published file carries only what the site reads; the stats
-    # (cost, coverage, per-term shares) stay in --output and --report, where they're
-    # read when tuning, instead of making up most of every page load.
-    if not no_upload:
-        published = {
-            slug: {field: entry[field] for field in PUBLISHED_FIELDS} for slug, entry in output_data.items()
-        }
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-            json.dump(published, f, separators=(",", ":"))
-            tmp_path = f.name
+    output.write_text(json.dumps(output_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    click.echo()
+    click.secho(f"✓ Saved results to: {output}", fg="green")
+    if writes_committed_file:
+        click.secho("  Commit it in a PR: merging is what publishes it.", fg="green")
 
-        try:
-            s3_url = f"s3://{S3_BUCKET_NAME}/{upload_path}"
-            # Without a Content-Type R2 serves the object untyped, and Cloudflare
-            # compresses only typed responses, so this is what gets it gzip/brotli.
-            s3_utils.upload(s3_url, tmp_path, public=True, content_type="application/json")
-            click.echo()
-            # files.ourworldindata.org is the worker in front of this bucket; it
-            # is what the site reads, because it adds CORS and an edge cache.
-            click.secho(f"✓ Uploaded to: https://files.ourworldindata.org/{upload_path}", fg="green")
-            if upload_path != DEFAULT_S3_VOCABULARY_PATH:
-                click.secho(
-                    "  (not the key the site reads by default — point TOPIC_VOCABULARY_URL at it to try it out)",
-                    fg="yellow",
-                )
-        finally:
-            os.unlink(tmp_path)
+    # Upload to a scratch key, to try the vocabulary on a staging server.
+    if upload_path:
+        url = upload(published_vocabulary(output_data), upload_path)
+        click.echo()
+        click.secho(f"✓ Uploaded to: {url}", fg="green")
+        click.secho("  (point TOPIC_VOCABULARY_URL at it to try it out on a staging server)", fg="yellow")
 
 
 if __name__ == "__main__":
