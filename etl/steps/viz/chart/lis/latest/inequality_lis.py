@@ -23,7 +23,6 @@ AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
 BEFORE_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income before taxes and benefits."
 AFTER_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income after taxes and benefits."
 
-EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
 
@@ -129,22 +128,8 @@ def run() -> None:
                         if col_meta.presentation and col_meta.presentation.grapher_config:
                             existing_subtitle = col_meta.presentation.grapher_config.get("subtitle", "")
 
-            # Get note from indicator metadata
-            if view.indicators.y:
-                first_indicator_path = view.indicators.y[0].catalogPath
-                indicator_col = first_indicator_path.split("#")[-1]
-
-                if indicator_col in tb.columns:
-                    col_meta = tb[indicator_col].metadata
-                    if col_meta.presentation and col_meta.presentation.grapher_config:
-                        existing_note = col_meta.presentation.grapher_config.get("note", "")
-
-                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
-                        # Remove EQUIVALENCE_SCALE_NOTE if present
-                        new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
-
-                        # Set note in view config
-                        view.config["note"] = new_note
+            # NOTE: the explorer step stripped the equivalization note here, but an explorer falls back to the
+            # indicator's note when the view's note is empty, so readers kept it. The multidim keeps it too.
 
             # Add EQUIVALENCE_SCALE_SUBTITLE at the end
             if existing_subtitle:
