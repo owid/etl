@@ -25,14 +25,7 @@ default_dimensions:
   period: year
   equivalence_scale: per capita
 
-definitions:
-  common_views:
-    - config:
-        originUrl: https://ourworldindata.org/economic-inequality
-        # The explorer showed this link in a block below the chart.
-        relatedQuestions:
-          - url: https://ourworldindata.org/owid-data-collection-inequality-and-poverty
-            text: "OWID Data Collection: Inequality and Poverty"
+# originUrl and the related link are set on every view in the step.
 
 dimensions:
   - name: Indicator

@@ -27,6 +27,18 @@ AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
 BEFORE_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income before taxes and benefits."
 AFTER_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income after taxes and benefits."
 
+# Set on every view, grouped ones included (the config's common_views don't reach the views that
+# group_views creates). The related link is the one the explorer showed in a block below the chart.
+COMMON_VIEW_CONFIG = {
+    "originUrl": "https://ourworldindata.org/economic-inequality",
+    "relatedQuestions": [
+        {
+            "url": "https://ourworldindata.org/owid-data-collection-inequality-and-poverty",
+            "text": "OWID Data Collection: Inequality and Poverty",
+        }
+    ],
+}
+
 EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
@@ -98,9 +110,10 @@ def run() -> None:
         # Initialize config if it's None
         if view.config is None:
             view.config = {}
+        view.config = {**COMMON_VIEW_CONFIG, **view.config}
 
-        if view.dimensions["welfare_type"] in ["dhi", "mi"]:
-            # Set tab as map
+        # Open on the map, in views that have one (grouped views don't).
+        if view.dimensions["welfare_type"] in ["dhi", "mi"] and view.config.get("hasMapTab") is not False:
             view.config["tab"] = "map"
 
         if view.dimensions["welfare_type"] == "after_vs_before_tax":
@@ -164,12 +177,13 @@ def run() -> None:
                     if col_meta.presentation and col_meta.presentation.grapher_config:
                         existing_note = col_meta.presentation.grapher_config.get("note", "")
 
-                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
                         # Remove EQUIVALENCE_SCALE_NOTE if present
                         new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
 
-                        # Set note in view config
-                        view.config["note"] = new_note
+                        # NOTE: when nothing else is left, keep the indicator's note (as the explorer did, which
+                        # fell back to it): an empty note here would remove it from the chart.
+                        if new_note:
+                            view.config["note"] = new_note
 
             # Add EQUIVALENCE_SCALE_SUBTITLE at the end
             if existing_subtitle:
