@@ -11,11 +11,12 @@ Both tables use the same column names as the previous version of this dataset.
 """
 
 import re
+from copy import deepcopy
 from functools import reduce
 
 import numpy as np
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Origin, Table
 
 from etl.helpers import PathFinder
 
@@ -71,9 +72,12 @@ def run() -> None:
     tb["sampling_standards_not_met"] = tb["country"].str.endswith(FLAG_SAMPLING_STANDARDS)
     tb["country"] = tb["country"].str.rstrip(FLAG_SAMPLING_STANDARDS).str.strip()
     tb["sampling_standards_not_met"] = tb.groupby("country")["sampling_standards_not_met"].transform("any")
+
+    # Step 3: Give all columns one origin for the PISA 2025 report, instead of one per snapshot file.
+    tb = set_single_origin(tb, origin=data_product_origin(snap_all))
     tb = tb.format(["country", "year"], short_name="pisa")
 
-    # Step 3: Read the PISA Data Explorer exports of the previous version, as they were processed then.
+    # Step 4: Read the PISA Data Explorer exports of the previous version, as they were processed then.
     tb_explorer = read_data_explorer_exports()
 
     #
@@ -168,7 +172,29 @@ def read_data_explorer_exports() -> Table:
         tbs_gender.append(tb[["country", "year"] + columns])
 
     tb = reduce(lambda left, right: pr.merge(left, right, on=["country", "year"], how="outer"), tbs_all + tbs_gender)
+    # Give all columns one origin for the PISA Database, instead of one per export.
+    tb = set_single_origin(tb, origin=data_product_origin(paths.load_snapshot("pisa_math_all.xls")))
     tb = tb.format(["country", "year"], short_name="pisa_data_explorer")
+    return tb
+
+
+def data_product_origin(snap) -> Origin:
+    """Return the snapshot's origin without the fields that describe that one file.
+
+    The snapshot files of each data product differ only in those fields, so without them all files share one origin
+    (and each indicator lists the data product once, not once per file).
+    """
+    origin = deepcopy(snap.metadata.origin)
+    origin.title_snapshot = None
+    origin.description_snapshot = None
+    origin.url_download = None
+    return origin
+
+
+def set_single_origin(tb: Table, origin: Origin) -> Table:
+    """Replace the origins of every column of the table with the given origin."""
+    for column in tb.columns:
+        tb[column].metadata.origins = [origin]
     return tb
 
 
