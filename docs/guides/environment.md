@@ -107,7 +107,15 @@ git commit -m ":honeybee: trigger rebuild" --allow-empty && git push
 
 **Note:** This will **delete all data on staging** and replace it with the latest data from the production database. Everything done only on staging is lost with it: the indicator upgrade, Chart Diff approvals, and chart or DoD edits made through the staging admin. Redo them after the rebuild.
 
-If `rclone` isn't installed locally, run the purge on the staging server itself (`ssh owid@staging-site-yourname 'rclone purge …'`). If the refresh stalls, an idle session (often the Wizard) is holding a metadata lock on a table it needs to replace: list sessions with `SHOW PROCESSLIST` on the staging MySQL and `KILL` the sleeping ones that hold open transactions.
+If `rclone` isn't installed locally, run the purge on the staging server itself (`ssh owid@staging-site-yourname 'rclone purge …'`). If the refresh stalls, an idle session (often the Wizard) is holding a metadata lock on a table it needs to replace. Find the owner on the staging MySQL and kill only that connection:
+
+```sql
+SELECT t.PROCESSLIST_ID, l.OBJECT_NAME, l.LOCK_TYPE, l.LOCK_STATUS
+FROM performance_schema.metadata_locks l
+JOIN performance_schema.threads t ON t.THREAD_ID = l.OWNER_THREAD_ID
+WHERE l.OBJECT_SCHEMA = 'owid' AND l.LOCK_STATUS = 'GRANTED';
+-- then: KILL <PROCESSLIST_ID>;
+```
 
 #### Backup the Staging Server
 
