@@ -181,7 +181,9 @@ multi-dims are served from `/grapher/`. A row with no query string names the def
 `/explorers/<slug>?…` produces a url-typed row, and only that row carries the
 `country=`/`time=` pins the downstream audits grade. Also featured metrics, under
 `/explorers/<slug>`; an explorer's row always carries a query string, since the admin
-refuses one without it.
+refuses one without it. A link whose params name a choice the explorer no longer has is
+not necessarily broken: the explorer swaps an invalid choice for the closest valid one and
+keeps the rest, so open the link and read the view it lands on before reporting it stale.
 
 **Image subjects**: every gdoc that places the image from the library
 (`posts_gdocs_x_images`, so an `{.image}` block, a featured image or an image inside a
