@@ -160,12 +160,13 @@ def run() -> None:
                     if col_meta.presentation and col_meta.presentation.grapher_config:
                         existing_note = col_meta.presentation.grapher_config.get("note", "")
 
-                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
                         # Remove EQUIVALENCE_SCALE_NOTE if present
                         new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
 
-                        # Set note in view config
-                        view.config["note"] = new_note
+                        # NOTE: an empty note isn't set, so the view keeps the indicator's note, as the explorer
+                        # did (an empty explorer note falls back to it).
+                        if new_note:
+                            view.config["note"] = new_note
 
             # Add EQUIVALENCE_SCALE_SUBTITLE at the end
             if existing_subtitle:
