@@ -2092,7 +2092,9 @@ def run() -> None:
     # Turn the explorer-style view settings into grapher config.
     to_multidim_views(final)
 
-    final.save()
+    # NOTE: no download package until it handles indicators that share a title across sources
+    # (UCDP, UCDP + PRIO and PRIO); building it fails on duplicate column names. See owid/etl#7336.
+    final.save(download_package=False)
 
 
 # Settings the explorer applied to every view (from its explorer-level config).
