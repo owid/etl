@@ -66,8 +66,9 @@ from etl.paths import CACHE_DIR  # ty: ignore
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 # Per-topic fields in the published file: what the site's consumers read (the
-# all-charts block and search reranking read `keywords` and `topic_name`).
-PUBLISHED_FIELDS = ("topic_name", "keywords")
+# all-charts block and search reranking read `keywords` and `topic_name`), plus
+# `topic_slug`, so an entry still says which topic it is once taken out of the file.
+PUBLISHED_FIELDS = ("topic_slug", "topic_name", "keywords")
 
 DEFAULT_MODEL = "claude-sonnet-5-5"
 

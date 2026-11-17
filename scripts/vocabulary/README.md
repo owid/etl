@@ -142,8 +142,8 @@ The uploaded file holds only what the site reads, keyed by topic slug, as compac
 
 ```json
 {
-  "energy": {"topic_name": "Energy", "keywords": ["solar panels", "fossil fuels", ...]},
-  "climate-change": {"topic_name": "Climate Change", "keywords": [...]}
+  "energy": {"topic_slug": "energy", "topic_name": "Energy", "keywords": ["solar panels", "fossil fuels", ...]},
+  "climate-change": {"topic_slug": "climate-change", "topic_name": "Climate Change", "keywords": [...]}
 }
 ```
 
