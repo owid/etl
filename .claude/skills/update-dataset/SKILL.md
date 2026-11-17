@@ -168,7 +168,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Either way, run `etl update` **once**. Don't call it separately per channel — that leaves stale version references in the DAG (e.g., new garden pointing to old meadow).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify the dag file**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow) — a garden still on the old meadow or old snapshot silently loads stale data.
-   - **Check every dependency that shares the dataset's short_name.** `etl update` points it at the step's own predecessor: right for a rolling accumulator (each release builds on the last), wrong for a fixed historical vintage (restore the version the old step used). Read the step code; ask if unclear. Also check by hand any nested-form steps it reports as "not found in dag file".
+   - **Check every dependency that shares the dataset's short_name.** `etl update` points it at the step's own predecessor: right for a rolling accumulator (each release builds on the last), wrong for a fixed historical vintage (restore the version the old step used). Read the step code; ask if unclear. Also check by hand any nested-form steps it reports as "not found in dag file": on a nested DAG it can re-indent the whole file, so run `git diff --stat dag/`, and if blocks of other datasets changed, revert the file and add the new nested block by hand.
    - **`etl update` writes the new entries in the *flat* DAG form — convert them to the nested (compact) form now**, while you're in the file, rather than leaving it until archiving (otherwise the flat block tends to survive the whole update unnoticed). See the example and `load_dag()` parse-check under "Removing the old version & reordering the DAG" step 4.
 
 1a-bis) Add yourself to `dataset.owners` in the new garden `.meta.yml`
@@ -215,6 +215,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
 3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
+   - Before the first upload, check the producer's terms: when they restrict redistribution, set `is_public: false` in the new `.dvc` files and use `data-private://` for the new steps. A public upload can't be undone from our side (see `/create-snapshot`, `is_private`).
 
    **Producer documentation for the new release.** While the snapshot runs, find the producer's latest documentation per `.claude/rules/producer-documentation.md`. The links carried over in the `.dvc` and `.meta.yml` point at the previous edition, so search for the current one. The what's-new notes tell you which changes to expect in the snapshot, meadow and garden diffs, and they feed the changelog. The methodology is what §6b contrasts the carried-over text against.
 
@@ -975,6 +976,8 @@ It doesn't announce itself — CI is green, the chart renders, and the diff look
 ```
 
 The fix is to merge `master` in, rebuild, and remap only the affected charts' foreign dimensions. Two scoping notes: chart-diff only covers charts your branch's datasets touch, so charts using *only* the other dataset are stale on staging but never sync — leave them, they're not yours to fix and repointing them adds review load. And remap by editing those chart configs directly rather than via a variable-level mapping, which would sweep in other charts sharing the same variables and pull them into the review queue.
+
+A chart *config* edited on production after the staging server was created (by hand, or by another PR's chart sync) is the same problem without a dataset: staging still holds the old config, so Chart Diff flags a conflict and approving it would revert the production edit. Refresh the staging database from production ("Refresh the Staging Server MySQL Database" in `docs/guides/environment.md`), then redo the indicator upgrade and any staging-only chart or DoD edits.
 
 ## Downstream dependency check
 
