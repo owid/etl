@@ -343,6 +343,8 @@ dimensions:
         name: Females
       - slug: male
         name: Males
+      # Quote a slug YAML could read as a number (`"5_14"`, `"2020"`) here, in `views` and in `default_dimensions`:
+      # unquoted, 5_14 loads as the int 514 and the step fails because the views no longer match the choices.
 
 views:
   - dimensions:
@@ -411,8 +413,7 @@ views:
       hasMapTab: false                # Map doesn't work well with multiple indicators
 ```
 
-Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`,
-`numSignificantFigures`, `tolerance`, `zeroDay`.
+Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`, `numSignificantFigures`, `tolerance`, `zeroDay`. `numSignificantFigures` does nothing without `roundingMode: significantFigures`, and even then Grapher cuts values below 1 to `numDecimalPlaces` decimals (the view's, else the indicator's own, else 2): 2 significant figures with 2 decimals shows 0.031% as 0.03%. So a share that can go below 1% needs a higher `numDecimalPlaces` as well, while a count of people can keep 0.
 
 ### Dimension-specific common_views overrides
 

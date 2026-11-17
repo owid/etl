@@ -50,6 +50,12 @@ def main() -> None:
     args = parser.parse_args()
     parts = args.step.replace("data://", "").strip("/").split("/")
     namespace, version, short_name = parts[-3:]
+    print(collect(namespace, version, short_name, args.staging))
+
+
+def collect(namespace: str, version: str, short_name: str, staging: str | None = None) -> str:
+    """The Markdown listing of every DoD the dataset's readers see (see the module docstring)."""
+    out: list[str] = []
 
     # DoD name -> set of surfaces that reference it.
     refs: dict[str, set[str]] = defaultdict(set)
@@ -60,7 +66,7 @@ def main() -> None:
         for name in _dods_in_local_dataset(local):
             refs[name].add(f"indicator metadata (local build of {namespace}/{version}/{short_name})")
     else:
-        print(f"Note: no local grapher build at {local}; only published text is scanned.\n")
+        out.append(f"Note: no local grapher build at {local}; only published text is scanned.\n")
 
     # Indicator metadata and charts on production, for any version of the dataset.
     variables = _query(
@@ -138,7 +144,7 @@ def main() -> None:
     # Slugs posts can use for those charts: the current one, old slugs that redirect to it, the slugs of the MDims
     # whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's), the slugs of
     # those explorers, and retired chart or explorer slugs that redirect into one of the MDim views.
-    redirect_slugs, gap = _mdim_redirect_slugs(view_config_ids, args.staging)
+    redirect_slugs, gap = _mdim_redirect_slugs(view_config_ids, staging)
     gaps = [gap] if gap else []
     dataset_slugs = (
         f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
@@ -203,44 +209,44 @@ def main() -> None:
         refs[row["dod"].strip()].add(f"data-insight {row['gdoc']}")
 
     if not refs:
-        print("No DoD references found.")
-        return
+        return "\n".join(out + ["No DoD references found."])
 
     # Fetch the DoD text from production, and from the staging server when asked.
     names = ",".join(f"'{n}'" for n in sorted(refs))
     dods = {r["name"]: r for r in _query(f"SELECT name, updatedAt, content FROM dods WHERE name IN ({names})")}
     source = "production"
-    if args.staging:
+    if staging:
         from etl.config import OWIDEnv
 
         production = dods
-        staging = OWIDEnv.from_staging(args.staging)
-        df = staging.read_sql(
+        staging_env = OWIDEnv.from_staging(staging)
+        df = staging_env.read_sql(
             "SELECT name, updatedAt, content FROM dods WHERE name IN %(n)s", params={"n": tuple(refs)}
         )
         dods = {r["name"]: r for r in df.to_dict("records")}
         for name, row in dods.items():
             if production.get(name, {}).get("content", "").strip() != (row["content"] or "").strip():
                 row["note"] = "staging text differs from the production mirror"
-        source = f"staging server {staging.conf.DB_HOST}"
+        source = f"staging server {staging_env.conf.DB_HOST}"
 
-    print(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
-    print(f"DoD text from {source}.\n")
+    out.append(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
+    out.append(f"DoD text from {source}.\n")
     for note in gaps:
-        print(f"Not scanned: {note}\n")
+        out.append(f"Not scanned: {note}\n")
     missing = sorted(set(refs) - set(dods))
     if missing:
-        print("## Referenced but missing from the dods table (broken links)\n")
+        out.append("## Referenced but missing from the dods table (broken links)\n")
         for name in missing:
-            print(f"- {name}: {', '.join(sorted(refs[name])[:5])}")
-        print()
+            out.append(f"- {name}: {', '.join(sorted(refs[name])[:5])}")
+        out.append("")
     for name in sorted(dods):
         surfaces = sorted(refs[name])
         shown = ", ".join(surfaces[:5]) + (f", and {len(surfaces) - 5} more" if len(surfaces) > 5 else "")
         note = f"; {dods[name]['note']}" if dods[name].get("note") else ""
-        print(f"## {name} (last edited {dods[name]['updatedAt']}{note})\n")
-        print(f"Referenced from: {shown}\n")
-        print(dods[name]["content"].strip() + "\n")
+        out.append(f"## {name} (last edited {dods[name]['updatedAt']}{note})\n")
+        out.append(f"Referenced from: {shown}\n")
+        out.append(dods[name]["content"].strip() + "\n")
+    return "\n".join(out)
 
 
 def _dods_in_local_dataset(path: Path) -> set[str]:

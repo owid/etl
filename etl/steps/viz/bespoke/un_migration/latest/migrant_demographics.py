@@ -77,6 +77,17 @@ FEED_NOTE = (
     "them."
 )
 
+# What the viz shows about the data. It describes the whole feed, not one column, so it is set here
+# rather than in the garden metadata (which a feed combining several columns doesn't carry).
+DESCRIPTION_KEY = """\
+This data comes from the United Nations Department of Economic and Social Affairs (UN DESA). It publishes a new release of its International Migrant Stock every few years. The latest one is from 2024.
+
+Unfortunately, that release did not provide sex and age profiles of immigrant populations, as it had in previous versions. Here, we therefore have to rely on data from its 2020 release instead. If a future release has immigrant demographic data, we will update this visualization accordingly.
+
+In its dataset, the UN defines an immigrant as someone who **lives in a different country from the one in which they were born.** So, it’s based on birthplace, not citizenship. However, for any countries where place of birth data is not available, they do have to rely on other measures, such as citizenship.
+
+The data is based on the **total number of people living in another country,** not the flow of migrants each year."""
+
 # The visualization requires a finite number in every band of every year it lists, and throws into
 # its error state otherwise (`parseEntityYears` in owid-grapher's
 # `bespoke/projects/migrant-demographics`). The UN reports no migrant stock at all for the years
@@ -180,6 +191,7 @@ def run() -> None:
     # For the same reason, leave out when the data was last fetched.
     for origin in feed_metadata["origins"]:
         origin.pop("dateAccessed", None)
+    feed_metadata["descriptionKey"] = DESCRIPTION_KEY
 
     manifest = {
         "meta": {

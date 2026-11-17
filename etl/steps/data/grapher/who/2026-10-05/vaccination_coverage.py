@@ -15,11 +15,12 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("vaccination_coverage", reset_index=False)
+    tb_cohorts = ds_garden.read("cohort_population", reset_index=False)
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = paths.create_dataset(
-        tables=[tb],
+        tables=[tb, tb_cohorts],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
     )

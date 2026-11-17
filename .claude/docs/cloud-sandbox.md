@@ -9,6 +9,8 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **Rename the pre-created `claude/<slug>-<suffix>` branch before pushing** —
   `git branch -m <short-name>`, or let `etl pr` name it (see the root CLAUDE.md).
+  If the session may only push to its own branch, keep the name: it's cosmetic,
+  and not a reason to delay a PR.
 
 - **No MySQL here, and staging is on Tailscale**, so `--grapher`, `make query`
   and `OWID_ENV.read_sql` don't work. **This overrides the root CLAUDE.md's
@@ -16,9 +18,39 @@ For agent sessions running in a Claude Code cloud sandbox
   the grapher feather still build. Upserts, chart-diff and the admin happen on
   the PR's staging server after you push.
 
-- **A branch gets a staging server only once it has an open PR.** Open a draft
-  PR before pushing work meant for staging. Don't build `viz://` steps here;
-  the staging build does it.
+- **A branch gets a staging server only once it has an open PR.** A chart,
+  MDim or metadata edit can only be seen there, so open a draft PR
+  (`gh pr create --draft`) with the first push, without being asked. Don't
+  build `viz://` steps here; the staging build does it.
+  Tell the user the moment the preview is ready, in one short message whose
+  first line is the full preview link, which works before the step is published:
+
+  ```bash
+  # MDim: pass its catalog path. Chart: pass "chart" and its slug.
+  .venv/bin/python -c "import sys, subprocess, urllib.parse as u; from etl.config import get_container_name as g; \
+    h = 'http://' + g(subprocess.check_output(['git','branch','--show-current'], text=True).strip()); \
+    print(h + ('/grapher/' + sys.argv[2] if sys.argv[1] == 'chart' else '/admin/grapher/' + u.quote(sys.argv[1], safe='')))" \
+    '<namespace>/latest/<short_name>#<short_name>'
+  ```
+
+  Send the link only once it's ready, not with a guess at how long it will
+  take. Run this in the background (`run_in_background`), which wakes you when
+  it ends:
+
+  ```bash
+  sha=$(git rev-parse HEAD)
+  for i in $(seq 60); do
+    s=$(curl -s "https://api.github.com/repos/owid/etl/commits/$sha/statuses" | .venv/bin/python -c "import json, sys; d = {}; [d.setdefault(x['context'], x['state']) for x in json.load(sys.stdin)]; c = 'buildkite/etl-automated-staging-environment'; print(d.get(c + '/etl-build') or d.get(c) or 'none')")
+    case $s in success|failure|error) echo "$s"; break;; esac
+    sleep 20
+  done
+  ```
+
+  It reads the public API without auth, so it works when this session's `gh`
+  is limited, and it stays inside the unauthenticated rate limit. The
+  `etl-build` status passes once the build has written the push's charts and
+  MDims to staging, about a minute after the push; the whole build's status,
+  which it falls back to, comes later.
 
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
@@ -114,11 +146,3 @@ For agent sessions running in a Claude Code cloud sandbox
   session's tool list rather than inferring it from the environment; where they
   are deferred, load the ones a run needs in a single `ToolSearch` instead of
   one per turn.
-
-- **After pushing, give the user a deep-linked staging URL** (it takes a while to
-  build, especially the first time):
-
-  ```bash
-  .venv/bin/python -c "from etl.config import get_container_name; import subprocess; \
-    print('http://' + get_container_name(subprocess.check_output(['git','branch','--show-current'], text=True).strip()))"
-  ```
