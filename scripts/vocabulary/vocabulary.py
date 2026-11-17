@@ -571,45 +571,47 @@ async def process_topics(
         selections.append(selection)
 
         total = selection.total_weight
-        candidates["keywords"] = [term.term for term in selection.selected]
-        candidates["stats"].update(
-            {
-                "num_keywords": len(selection.selected),
-                "num_candidates": len(offered),
-                "num_records": selection.total_count,
-                "weighted_coverage": round(selection.covered_weight / total if total else 0.0, 4),
-                "chart_coverage": round(
-                    (selection.total_count - len(selection.uncovered)) / selection.total_count
-                    if selection.total_count
-                    else 0.0,
-                    4,
-                ),
-                "topic_name_share": round(selection.topic_name_share, 4),
-                "weighting": weighting,
-                "views_column": views_column,
-                "selection": "coverage",
-            }
-        )
-        candidates["keyword_stats"] = [
-            {
-                "term": term.term,
-                "own_share": round(term.own_share(total), 4),
-                "own_records": term.own_count,
-                "marginal_share": round(term.marginal_share(total), 4),
-                "marginal_records": term.marginal_count,
-                "cumulative_share": round(term.cumulative_share(total), 4),
-            }
-            for term in selection.selected
-        ]
-        candidates["stats"]["num_countries"] = len(countries["countries"])
-        candidates["stats"]["unrecognized_countries"] = countries["unrecognized"]
-        # Both requests count towards the topic's cost.
-        candidates["stats"]["input_tokens"] += countries["input_tokens"]
-        candidates["stats"]["output_tokens"] += countries["output_tokens"]
-        stats = candidates.pop("stats")
-        keyword_stats = candidates.pop("keyword_stats")
+        stats = candidates["stats"]
         results.append(
-            {**candidates, "countries": countries["countries"], "stats": stats, "keyword_stats": keyword_stats}
+            {
+                "topic_slug": topic_slug,
+                "topic_name": topic_name,
+                "keywords": [term.term for term in selection.selected],
+                "countries": countries["countries"],
+                "stats": {
+                    **stats,
+                    "num_keywords": len(selection.selected),
+                    # Both requests count towards the topic's cost.
+                    "input_tokens": stats["input_tokens"] + countries["input_tokens"],
+                    "output_tokens": stats["output_tokens"] + countries["output_tokens"],
+                    "num_candidates": len(offered),
+                    "num_records": selection.total_count,
+                    "weighted_coverage": round(selection.covered_weight / total if total else 0.0, 4),
+                    "chart_coverage": round(
+                        (selection.total_count - len(selection.uncovered)) / selection.total_count
+                        if selection.total_count
+                        else 0.0,
+                        4,
+                    ),
+                    "topic_name_share": round(selection.topic_name_share, 4),
+                    "weighting": weighting,
+                    "views_column": views_column,
+                    "selection": "coverage",
+                    "num_countries": len(countries["countries"]),
+                    "unrecognized_countries": countries["unrecognized"],
+                },
+                "keyword_stats": [
+                    {
+                        "term": term.term,
+                        "own_share": round(term.own_share(total), 4),
+                        "own_records": term.own_count,
+                        "marginal_share": round(term.marginal_share(total), 4),
+                        "marginal_records": term.marginal_count,
+                        "cumulative_share": round(term.cumulative_share(total), 4),
+                    }
+                    for term in selection.selected
+                ],
+            }
         )
 
         share = selection.covered_weight / total if total else 0.0
@@ -769,9 +771,9 @@ def main(
         click.secho("\n✗ No results generated", fg="red")
         sys.exit(1)
 
-    # Calculate total costs, pricing each topic's request on its own: long-context tiers
-    # apply per request, so pricing the summed tokens could put a whole run in the
-    # expensive tier. A model genai-prices doesn't know still runs; its cost is simply
+    # Calculate total costs, pricing each topic on its own: long-context tiers apply per
+    # request, so pricing the run's summed tokens could put all of it in the expensive
+    # tier (a topic's two requests together stay far below it). A model genai-prices doesn't know still runs; its cost is simply
     # reported as unknown (the whole run costs a couple of cents either way).
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)

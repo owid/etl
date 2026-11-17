@@ -28,8 +28,8 @@ PRODUCTION_KEY = "topic_vocabulary.json"
 
 # Per-topic fields in the published file: what the site's consumers read (the
 # all-charts block reads `keywords` and `countries`, search reranking `keywords`
-# and `topic_name`), plus
-# `topic_slug`, so an entry still says which topic it is once taken out of the file.
+# and `topic_name`), plus `topic_slug`, so an entry still says which topic it is
+# once taken out of the file.
 # The stats stay in the committed file, where they're read when tuning, instead of
 # making up most of every page load.
 PUBLISHED_FIELDS = ("topic_slug", "topic_name", "keywords", "countries")
