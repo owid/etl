@@ -1,0 +1,106 @@
+grapher_schema: "012"
+
+# Multidim shown as a data explorer, replacing the incomes-across-distribution-lis explorer. It keeps the
+# explorer's views; the curated incomes_lis multidim (slug incomes-across-distribution-lis) is separate.
+title:
+  title: Incomes Across the Distribution - Luxembourg Income Study
+  title_variant: ""
+slug: incomes-across-distribution-lis-explorer
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore Luxembourg Income Study data on the distribution of incomes.
+topic_tags:
+  - Economic Inequality
+default_selection:
+  - Brazil
+  - Chile
+  - China
+  - France
+  - South Africa
+  - United States
+default_dimensions:
+  indicator: thr
+  decile: "9"
+  welfare_type: dhi
+  period: year
+  equivalence_scale: per capita
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/economic-inequality
+        # The explorer showed this link in a block below the chart.
+        relatedQuestions:
+          - url: https://ourworldindata.org/owid-data-collection-inequality-and-poverty
+            text: "OWID Data Collection: Inequality and Poverty"
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: mean
+        name: Mean income
+      - slug: median
+        name: Median income
+      - slug: avg
+        name: Mean income, by decile
+      - slug: thr
+        name: Decile thresholds
+      - slug: share
+        name: Decile shares
+  - name: Decile
+    slug: decile
+    choices:
+      - slug: "1"
+        name: "1 (poorest)"
+      - slug: "2"
+        name: "2"
+      - slug: "3"
+        name: "3"
+      - slug: "4"
+        name: "4"
+      - slug: "5"
+        name: "5"
+      - slug: "6"
+        name: "6"
+      - slug: "7"
+        name: "7"
+      - slug: "8"
+        name: "8"
+      - slug: "9"
+        name: "9"
+      - slug: "10"
+        name: "10 (richest)"
+      - slug: all
+        name: All deciles
+      - slug: nan
+        name: "-"
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: "dhi"
+        name: "After tax"
+      - slug: "mi"
+        name: "Before tax"
+      - slug: "after_vs_before_tax"
+        name: "After vs. before tax"
+  - name: Period
+    slug: period
+    choices:
+      - slug: "day"
+        name: "Day"
+      - slug: "month"
+        name: "Month"
+      - slug: "year"
+        name: "Year"
+      - slug: "nan"
+        name: ""
+  - name: Adjust for cost sharing within households (equivalized income)
+    slug: equivalence_scale
+    choices:
+      - slug: "per capita"
+        name: "Per capita"
+      - slug: "square root"
+        name: "Equivalized"
+
+views: []

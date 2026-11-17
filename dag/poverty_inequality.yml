@@ -94,6 +94,9 @@ steps:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://chart/lis/latest/incomes_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
+  # Multidim shown as a data explorer (replaces the incomes-across-distribution-lis explorer).
+  viz://chart/lis/latest/incomes_across_distribution_lis:
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
 
   # Inequality comparison data
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
