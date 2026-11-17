@@ -1526,11 +1526,11 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     #    explicitly below so we keep `conflict_type` for MIC sources (where it
     #    has a single choice but still needs to surface in the combined
     #    explorer for `combine_charts` to merge cleanly).
-    estimate_in_use = list(c.dimension_choices_in_use().get("_estimate", set()))
-    if "best" in estimate_in_use:
-        estimate_in_use = ["best"] + [
-            e for e in estimate_in_use if e != "best"
-        ]  # "best" is the default, not a real choice
+    # Fixed order (best, low, high, then fatality buckets): the choices come from a set,
+    # and the stack order sets the legend and tooltip order.
+    order = ["best", "low", "high"] + [helper for _, helper, _ in FATALITY_BUCKETS]
+    in_use = c.dimension_choices_in_use().get("_estimate", set())
+    estimate_in_use = [e for e in order if e in in_use] + sorted(in_use - set(order))
     c.group_views(
         groups=[{"dimension": "_estimate", "choices": estimate_in_use, "choice_new_slug": "_ci", "replace": True}],
         drop_dimensions_if_single_choice=False,
