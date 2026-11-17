@@ -31,9 +31,11 @@ definitions:
         chartTypes:
           - LineChart
           - DiscreteBar
+        # The explorer's own related link pointed at itself; this one points where the block below the
+        # explorer did.
         relatedQuestions:
-          - url: https://ourworldindata.org/explorers/climate-change
-            text: "Data explorer: how is the Earth's climate changing?"
+          - url: https://ourworldindata.org/explorers/co2
+            text: Explore data on CO₂ and greenhouse gas emissions
         # The explorer hides the time span in its titles, so readers never saw it there.
         hideAnnotationFieldsInTitle:
           entity: true
