@@ -1,4 +1,4 @@
-"""Conflict Data Source explorer.
+"""Conflict Data Source multidim, shown as a data explorer (replaces the conflict-data-source explorer).
 
 Each data source is described by a small `SourceSpec` and built programmatically
 from its grapher table(s) via the same `build_source_explorer` pipeline:
@@ -34,6 +34,7 @@ step.
 """
 
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -1504,7 +1505,7 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     if spec.locations_table:
         indicator_names.append([M.LOCATIONS])
 
-    c = paths.create_explorer(
+    c = paths.create_chart(
         config=sub_config,
         tb=tables,
         indicator_names=indicator_names,
@@ -1525,11 +1526,11 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     #    explicitly below so we keep `conflict_type` for MIC sources (where it
     #    has a single choice but still needs to surface in the combined
     #    explorer for `combine_charts` to merge cleanly).
-    estimate_in_use = list(c.dimension_choices_in_use().get("_estimate", set()))
-    if "best" in estimate_in_use:
-        estimate_in_use = ["best"] + [
-            e for e in estimate_in_use if e != "best"
-        ]  # "best" is the default, not a real choice
+    # Fixed order (best, low, high, then fatality buckets): the choices come from a set,
+    # and the stack order sets the legend and tooltip order.
+    order = ["best", "low", "high"] + [helper for _, helper, _ in FATALITY_BUCKETS]
+    in_use = c.dimension_choices_in_use().get("_estimate", set())
+    estimate_in_use = [e for e in order if e in in_use] + sorted(in_use - set(order))
     c.group_views(
         groups=[{"dimension": "_estimate", "choices": estimate_in_use, "choice_new_slug": "_ci", "replace": True}],
         drop_dimensions_if_single_choice=False,
@@ -2061,19 +2062,17 @@ def run() -> None:
     yaml_config = paths.load_config()
     _validate_constants_match_yaml(yaml_config)
 
-    # The YAML carries dim definitions + explorer-level config only — every
-    # source is built programmatically now.
-    yaml_explorer = paths.create_explorer(
+    # The YAML carries dim definitions + multidim-level config only; every source is built
+    # programmatically.
+    yaml_chart = paths.create_chart(
         config=yaml_config,
-        short_name="conflict-data-source",
+        short_name="conflict_data_source",
     )
 
-    # Per-source sub_config shared by all programmatic specs: same dim
-    # definitions as the YAML (minus `data_source`, which combine_charts
-    # re-introduces below), same `definitions` block, no views.
+    # Per-source sub_config shared by all programmatic specs: same dim definitions as the
+    # YAML (minus `data_source`, which combine_charts re-introduces below), no views.
     sub_config = {
-        "config": {},
-        "definitions": yaml_config.get("definitions", {}),
+        "grapher_schema": yaml_config["grapher_schema"],
         "dimensions": [d for d in yaml_config["dimensions"] if d["slug"] != "data_source"],
         "views": [],
     }
@@ -2082,21 +2081,122 @@ def run() -> None:
 
     final = combine_charts(
         charts=programmatic_subs,
-        catalog_path=yaml_explorer.catalog_path,
-        config={"config": yaml_config.get("config", {})},
+        catalog_path=yaml_chart.catalog_path,
+        config={k: v for k, v in yaml_config.items() if k not in ("dimensions", "views")},
         force_chart_dimension=True,
         chart_dimension_slug="data_source",
         chart_dimension_name="Data source",
         chart_choices_names=[spec.name for spec in PROGRAMMATIC_SPECS],
     )
 
-    # The "related question" link is the same on every view. The YAML's
-    # `common_views` can't carry it post-combine (group_views recreates views),
-    # so set it globally here.
-    final.set_global_config(
+    # Turn the explorer-style view settings into grapher config.
+    to_multidim_views(final)
+
+    # NOTE: no download package until it handles indicators that share a title across sources
+    # (UCDP, UCDP + PRIO and PRIO); building it fails on duplicate column names. See owid/etl#7336.
+    final.save(download_package=False)
+
+
+# Settings the explorer applied to every view (from its explorer-level config).
+SHARED_VIEW_CONFIG = {
+    "entityType": "region",
+    "entityTypePlural": "regions",
+    "yAxis": {"min": 0},
+    # The explorer hides the entity and time span in its titles, so readers never saw them there.
+    "hideAnnotationFieldsInTitle": {"entity": True, "time": True, "changeInPrefix": True},
+    "originUrl": "https://ourworldindata.org/war-and-peace",
+    "relatedQuestions": [
         {
-            "relatedQuestionText": "How do different approaches measure armed conflicts and their deaths?",
-            "relatedQuestionUrl": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+            "text": "How do different approaches measure armed conflicts and their deaths?",
         }
-    )
-    final.save(tolerate_extra_indicators=True)
+    ],
+}
+# Explorer-only indicator display keys that become the view's map color scale.
+COLOR_SCALE_KEYS = ("colorScaleScheme", "colorScaleNumericBins", "colorScaleCategoricalBins")
+
+
+def _color_scale_from_explorer(display: dict[str, Any]) -> dict[str, Any]:
+    """Translate an explorer column's colorScale* keys into a grapher map colorScale.
+
+    Follows grapher's own parser (`ColorScaleConfig.fromDSL`): numeric bins are
+    `value[,color[,label]]` separated by `;`, starting from a minimum of 0; categorical bins
+    are `value,color[,label]`.
+    """
+    scale: dict[str, Any] = {"binningStrategy": "manual"}
+    if "colorScaleScheme" in display:
+        scale["baseColorScheme"] = display["colorScaleScheme"]
+    if "colorScaleNumericBins" in display:
+        values: list[float] = [0]
+        colors: list[str | None] = []
+        labels: list[str | None] = []
+        for chunk in display["colorScaleNumericBins"].split(";"):
+            value, *rest = [part.strip() for part in chunk.split(",")]
+            if not value:
+                continue
+            values.append(float(value))
+            colors.append((rest[0] if rest else "") or None)
+            labels.append(",".join(rest[1:]).strip() or None)
+        scale["customNumericValues"] = values
+        if any(colors):
+            scale["customNumericColors"] = colors
+            scale["customNumericColorsActive"] = True
+        if any(labels):
+            scale["customNumericLabels"] = labels
+    if "colorScaleCategoricalBins" in display:
+        colors_by_value: dict[str, str] = {}
+        labels_by_value: dict[str, str] = {}
+        for chunk in display["colorScaleCategoricalBins"].split(";"):
+            value, *rest = [part.strip() for part in chunk.split(",")]
+            if not value:
+                continue
+            if rest and rest[0]:
+                colors_by_value[value] = rest[0]
+            if len(rest) > 1 and ",".join(rest[1:]).strip():
+                labels_by_value[value] = ",".join(rest[1:]).strip()
+        if colors_by_value:
+            scale["customCategoryColors"] = colors_by_value
+        if labels_by_value:
+            scale["customCategoryLabels"] = labels_by_value
+    return scale
+
+
+def to_multidim_views(chart) -> None:
+    """Rewrite each view's explorer-style settings as grapher config.
+
+    - `type` (space-separated chart types) becomes `chartTypes`, and `yScaleToggle` becomes
+      `yAxis.canChangeScaleType`.
+    - The explorer-level settings in `SHARED_VIEW_CONFIG` are set on every view.
+    - Indicator `colorScale*` display keys become the view's `map.colorScale`, taken from the
+      map's indicator (`map.columnSlug`, or the only indicator), and also its `colorScale` in
+      Swimlane views.
+    """
+    for view in chart.views:
+        cfg = view.config or {}
+        if "type" in cfg:
+            cfg["chartTypes"] = cfg.pop("type").split()
+        if cfg.pop("yScaleToggle", False):
+            cfg.setdefault("yAxis", {})["canChangeScaleType"] = True
+        for key, value in SHARED_VIEW_CONFIG.items():
+            if isinstance(value, dict):
+                cfg[key] = {**deepcopy(value), **cfg.get(key, {})}
+            else:
+                cfg.setdefault(key, deepcopy(value))
+
+        ys = (view.indicators.y if view.indicators else None) or []
+        map_path = (cfg.get("map") or {}).get("columnSlug")
+        map_indicator = next((y for y in ys if y.catalogPath == map_path), None) or (ys[0] if len(ys) == 1 else None)
+        if (
+            map_indicator is not None
+            and map_indicator.display
+            and any(k in map_indicator.display for k in COLOR_SCALE_KEYS)
+        ):
+            cfg.setdefault("map", {})["colorScale"] = _color_scale_from_explorer(map_indicator.display)
+            # A Swimlane chart colors its segments with the column's color scale, which the explorer
+            # takes from these same display keys; a multidim reads it from the chart's `colorScale`.
+            if "Swimlane" in cfg.get("chartTypes", []):
+                cfg["colorScale"] = _color_scale_from_explorer(map_indicator.display)
+        for y in ys:
+            if y.display:
+                y.display = {k: v for k, v in y.display.items() if k not in COLOR_SCALE_KEYS} or None
+        view.config = cfg

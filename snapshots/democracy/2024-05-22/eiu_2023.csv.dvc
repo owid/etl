@@ -1,6 +1,7 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
+  is_public: false
   origin:
     # Data product / Snapshot
     title: "Democracy Index 2023: Age of Conflict"
@@ -30,7 +31,7 @@ meta:
 
     # License
     license:
-      name: The Economist Intelligence Unit Limited
+      name: © 2024 The Economist Intelligence Unit Limited
       url: https://www.eiu.com/n/terms/
 outs:
   - md5: cf87e0d395a3ac553ce96790796777fc

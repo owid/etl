@@ -1,22 +1,26 @@
-definitions:
-  common_views:
-    - config:
-        yAxisMin: 0
-        hideAnnotationFieldsInTitle: true
-        type: LineChart DiscreteBar
-        entityType: country
-        relatedQuestionText: How do different approaches measure armed conflicts and their deaths?
-        relatedQuestionUrl: https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths
-config:
-  explorerTitle: Conflict Data Source
-  explorerSubtitle: Explore the world's conflicts through the leading approaches to measuring them.
-  isPublished: true
-  selection:
-    - World
-  entityType: region
-  entityTypePlural: regions
-  hideAnnotationFieldsInTitle: true
-  yAxisMin: 0
+grapher_schema: "012"
+
+title:
+  title: Conflict Data Source
+  title_variant: ""
+slug: conflict-data-source
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore the world's conflicts through the leading approaches to measuring them.
+topic_tags:
+  - War & Peace
+default_selection:
+  - World
+# The explorer's default view (its first row).
+default_dimensions:
+  data_source: ucdp
+  conflict_type: all_armed_conflicts
+  measure: conflict_deaths
+  conflict_sub_type: by_sub_type
+  sub_measure: country_and_region_data
+
+# A multidim shows every dimension (disabled when only one choice is available), so views a
+# dimension doesn't apply to get its "Not applicable" choice. The step builds every view.
 dimensions:
   - slug: data_source
     name: Data source
@@ -79,7 +83,7 @@ dimensions:
       type: dropdown
     choices:
       - slug: na
-        name: ""
+        name: Not applicable
       - slug: by_sub_type
         name: "By sub-type"
       - slug: all_sub_types
@@ -96,7 +100,7 @@ dimensions:
       type: dropdown
     choices:
       - slug: na
-        name: ""
+        name: Not applicable
       - slug: country_and_region_data
         name: "Country and region data"
       - slug: all_ongoing_conflicts
