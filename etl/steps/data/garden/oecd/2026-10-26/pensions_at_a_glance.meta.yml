@@ -46,9 +46,11 @@ definitions:
     <%- else %>
     mandatory pension schemes
     <%- endif %>
-  # Added to the title of the indicators of one type of mandatory scheme, so they can be told apart from the total.
+  # Added to the chart title of the indicators of other schemes than mandatory ones, so they can be told apart.
   title_schemes_suffix: |-
-    <% if pension_schemes == "Public" %>
+    <% if pension_schemes == "Mandatory and voluntary" %>
+    , including voluntary schemes
+    <%- elif pension_schemes == "Public" %>
     , from public schemes
     <%- elif pension_schemes == "Quasi-mandatory private" %>
     , from quasi-mandatory private schemes
@@ -56,7 +58,7 @@ definitions:
     , from other mandatory private schemes
     <%- endif %>
   # NOTE: Update the year people start working (2024) to the new edition's.
-  note_modeled_pensions: The OECD models these values for a person who starts working at age 22 in 2024 and works without interruption until the normal retirement age, under the pension rules each country has already legislated. They are not the pensions that today’s retirees receive.
+  note_modeled_pensions: These are estimates for a person who starts working at age 22 in 2024 and works without interruption until they can retire on a full pension. They are based on pension rules that each country has already passed into law. They are not the pensions that today’s retirees receive.
   earnings_phrase: |-
     <% if earnings == "50% of average wage" %>
     half the average wage
@@ -230,19 +232,19 @@ definitions:
   description_key_replacement_rate_definition: |-
     The replacement rate is the pension a person receives when they retire, as a share of what they earned while working.
   description_short_gross_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured before income taxes and social security contributions.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} throughout their careers can expect to receive when they retire, as a share of their earnings while they worked. Both are measured before income taxes and social security contributions.
   description_key_gross_replacement_rate_taxes: |-
     In the gross rate, both are measured before income taxes and social security contributions.
   subtitle_gross_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured before income taxes and social security contributions.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} throughout their careers can expect to receive from {definitions.schemes_phrase} when they retire, as a share of their earnings while they worked. Both are measured before income taxes and social security contributions.
   description_short_net_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive when they retire, as a share of what they earned while working. Both are measured after income taxes and social security contributions.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} throughout their careers can expect to receive when they retire, as a share of their earnings while they worked. Both are measured after income taxes and social security contributions.
   description_key_net_replacement_rate_taxes: |-
     In the net rate, both are measured after the income taxes and social security contributions that workers and pensioners pay.
   description_key_net_vs_gross_replacement_rates: |-
     Net rates are usually higher than gross rates, mainly because pensioners pay less in taxes and contributions than workers.
   subtitle_net_replacement_rate: |-
-    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive from {definitions.schemes_phrase} when they retire, as a share of what they earned while working. Both are measured after income taxes and social security contributions.
+    Pension that <<sex.lower()>> earning {definitions.earnings_phrase} throughout their careers can expect to receive from {definitions.schemes_phrase} when they retire, as a share of their earnings while they worked. Both are measured after income taxes and social security contributions.
   description_short_gross_replacement_rate_at_age_80: |-
     Pension that <<sex.lower()>> earning {definitions.earnings_phrase} can expect to receive at age 80, as a share of the average wage at that time. Both are measured before income taxes and social security contributions.
   subtitle_gross_replacement_rate_at_age_80: |-
@@ -531,7 +533,7 @@ tables:
         presentation:
           title_public: Gross pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
           grapher_config:
-            title: Gross pension replacement rate for <<sex.lower()>> earning {definitions.earnings_phrase}{definitions.title_schemes_suffix}
+            title: Pensions as a share of previous earnings for <<sex.lower()>> earning {definitions.earnings_phrase}{definitions.title_schemes_suffix} (before tax)
             subtitle: '{definitions.subtitle_gross_replacement_rate}'
             note: "{definitions.note_modeled_pensions}"
 
@@ -562,7 +564,7 @@ tables:
         presentation:
           title_public: Net pension replacement rate (<<sex.lower()>>, <<earnings.lower()>>, <<pension_schemes.lower()>> schemes)
           grapher_config:
-            title: Net pension replacement rate for <<sex.lower()>> earning {definitions.earnings_phrase}
+            title: Pensions as a share of previous earnings for <<sex.lower()>> earning {definitions.earnings_phrase}{definitions.title_schemes_suffix} (after tax)
             subtitle: '{definitions.subtitle_net_replacement_rate}'
             note: "{definitions.note_modeled_pensions}"
 
