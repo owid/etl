@@ -530,6 +530,7 @@ async def process_topics(
     weighting: str,
     views_column: str,
     max_terms: int,
+    kept_countries: dict[str, list[str]] | None = None,
 ) -> tuple[list[dict], list[str], dict[str, WeightedUniverse], list[TopicSelection]]:
     """Generate a vocabulary for each topic: its suggestion line and its countries.
 
@@ -538,7 +539,7 @@ async def process_topics(
     2. Per topic, fetch the record set the all-charts block lists and weight each
        record by its views.
     3. Ask the model for candidate terms and for countries, having shown it that
-       record set.
+       record set. A topic in kept_countries reuses those countries instead.
     4. Measure what each candidate would show (measure_candidates), and ask the
        model to choose the line from those measurements. Which terms make a good
        line is a judgment (whether a term means anything on its own, whether two
@@ -601,8 +602,15 @@ async def process_topics(
     if not prompt_inputs:
         return [], failed, universes, []
 
+    kept_countries = kept_countries or {}
     click.echo(f"\nAsking for candidate terms and countries for {len(prompt_inputs)} topics...")
     country_names = load_country_names()
+
+    async def countries_for(topic_slug: str, topic_name: str, texts: list[str]) -> dict:
+        if topic_slug in kept_countries:
+            return {"countries": kept_countries[topic_slug], "unrecognized": [], "input_tokens": 0, "output_tokens": 0}
+        return await suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
+
     client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=LLM_MAX_RETRIES)
     try:
         cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
@@ -623,8 +631,8 @@ async def process_topics(
             ),
             asyncio.gather(
                 *(
-                    suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
-                    for _, topic_name, texts in prompt_inputs
+                    countries_for(topic_slug, topic_name, texts)
+                    for topic_slug, topic_name, texts in prompt_inputs
                 ),
                 return_exceptions=True,
             ),
@@ -782,6 +790,14 @@ async def process_topics(
     ),
 )
 @click.option(
+    "--keep-countries",
+    is_flag=True,
+    help=(
+        "Reuse each topic's countries from the committed vocabulary instead of asking for them again, "
+        "to iterate on the keywords for less. Topics missing from it are still asked."
+    ),
+)
+@click.option(
     "--max-terms",
     default=DEFAULT_MAX_TERMS,
     show_default=True,
@@ -796,6 +812,7 @@ def main(
     weighting: str,
     views_column: str,
     max_terms: int,
+    keep_countries: bool,
 ):
     """Build the OWID topic vocabulary: the suggested search terms per topic.
 
@@ -845,6 +862,8 @@ def main(
     click.echo(f"Model:     {model}")
     click.echo(f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}")
     click.echo(f"Terms:     at most {max_terms}")
+    if keep_countries:
+        click.echo(f"Countries: kept from {VOCABULARY_FILE.name}")
     click.echo(f"Output:    {output}")
     if upload_path:
         click.echo(f"Upload:    {upload_path} (scratch key)")
@@ -859,6 +878,11 @@ def main(
                 weighting=weighting,
                 views_column=views_column,
                 max_terms=max_terms,
+                kept_countries=(
+                    {slug: entry["countries"] for slug, entry in json.loads(VOCABULARY_FILE.read_text()).items()}
+                    if keep_countries
+                    else None
+                ),
             )
         )
     except EmptyAnalyticsError as e:
