@@ -89,8 +89,9 @@ def run() -> None:
     # tb = concat([tb, tb_avg_countries], ignore_index=True)
 
     # Store categorical indicators as text. Done after the aggregates, which use the numeric codes. The numeric regime
-    # score is kept for the chart that compares the classifications of several sources.
-    tb["regime_bti_score"] = tb["regime_bti"].copy()
+    # score is kept for the chart that compares the classifications of several sources. It starts at 0, like the
+    # other sources in that chart, so that the lowest category plots at 0 once normalized to range from 0 to 1.
+    tb["regime_bti_score"] = tb["regime_bti"] - 1
     tb = codes_to_categories(tb, LABELS)
 
     #

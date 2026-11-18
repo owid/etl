@@ -149,7 +149,7 @@ tables:
         title: Political regime (score)
         unit: ""
         description_short: |-
-          Identifies the political regime of a country. It distinguishes between hard-line autocracies (1), moderate autocracies (2), highly defective democracies (3), defective democracies (4), and consolidating democracies (5).
+          Identifies the political regime of a country. It distinguishes between hard-line autocracies (0), moderate autocracies (1), highly defective democracies (2), defective democracies (3), and consolidating democracies (4).
         description_key: *regime_bti_key
         presentation:
           title_public: Political regime
