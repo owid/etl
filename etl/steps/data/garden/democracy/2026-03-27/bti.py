@@ -92,6 +92,9 @@ def run() -> None:
     # score is kept for the chart that compares the classifications of several sources. It starts at 0, like the
     # other sources in that chart, so that the lowest category plots at 0 once normalized to range from 0 to 1.
     tb["regime_bti_score"] = tb["regime_bti"] - 1
+
+    # Democracy score recoded to start at 0, for the chart that compares the democracy indices of several sources.
+    tb["democracy_recod_bti"] = tb["democracy_bti"] - 1
     tb = codes_to_categories(tb, LABELS)
 
     #
