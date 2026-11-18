@@ -217,9 +217,11 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
-          entityAnnotationsMap: |-
-            Korea: includes North & South
-            Czechoslovakia: includes Czechia & Slovakia
+        annotations:
+          - entities: [Korea]
+            text: includes North & South
+          - entities: [Czechoslovakia]
+            text: includes Czechia & Slovakia
 
   share_by_origin_group:
     variables:

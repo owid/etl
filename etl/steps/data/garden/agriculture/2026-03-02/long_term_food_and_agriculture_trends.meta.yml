@@ -34,6 +34,10 @@ tables:
         short_unit: ""
         display:
           name: Population
+        annotations:
+          - entities: [Africa (FAO)]
+            time: 2010
+            text: The sudden increase in 2010 is caused by several African countries that only have data from that year onward.
         presentation:
           title_public: Population
       food_supply:
@@ -44,6 +48,10 @@ tables:
         short_unit: kcal/day
         display:
           name: Caloric supply
+        annotations:
+          - entities: [Africa (FAO)]
+            time: 2010
+            text: The sudden increase in 2010 is caused by several African countries that only have data from that year onward.
         presentation:
           title_public: Daily food supply
       agricultural_land:
