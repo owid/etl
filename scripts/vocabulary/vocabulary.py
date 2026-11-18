@@ -32,6 +32,7 @@ from pathlib import Path
 import anthropic
 import click
 import httpx
+import yaml
 from genai_prices import Usage, calc_price
 
 # Add parent directory to path for imports
@@ -58,7 +59,7 @@ from coverage_report import (  # ty: ignore
 from apps.utils.llms.claude import text_of  # ty: ignore
 from etl import config  # ty: ignore
 from etl.config import OWID_ENV  # ty: ignore
-from etl.paths import CACHE_DIR  # ty: ignore
+from etl.paths import CACHE_DIR, LATEST_REGIONS_YML  # ty: ignore
 from etl.steps.export.r2.owid.latest.topic_vocabulary import (  # ty: ignore
     PRODUCTION_KEY,
     VOCABULARY_FILE,
@@ -92,6 +93,16 @@ KEYWORDS_SCHEMA = {
         "type": "object",
         "properties": {"keywords": {"type": "array", "items": {"type": "string"}}},
         "required": ["keywords"],
+        "additionalProperties": False,
+    },
+}
+
+COUNTRIES_SCHEMA = {
+    "type": "json_schema",
+    "schema": {
+        "type": "object",
+        "properties": {"countries": {"type": "array", "items": {"type": "string"}}},
+        "required": ["countries"],
         "additionalProperties": False,
     },
 }
@@ -264,29 +275,10 @@ never pad the list with variations to reach a number):
 }}"""
 
     try:
-        cache_key = hashlib.sha256(f"{model_id}\n{json.dumps(KEYWORDS_SCHEMA)}\n{prompt}".encode()).hexdigest()
-        input_tokens = output_tokens = 0
-        if cache_key in cache:
-            result_text = cache[cache_key]
-        else:
-            async with semaphore:
-                response = await client.messages.create(
-                    model=model_id,
-                    max_tokens=16000,
-                    messages=[{"role": "user", "content": prompt}],
-                    output_config={"format": KEYWORDS_SCHEMA},
-                )
-            if response.stop_reason != "end_turn":
-                raise RuntimeError(f"the model stopped early ({response.stop_reason})")
-            result_text = text_of(response)
-            # Thinking tokens are billed as output and included in output_tokens.
-            input_tokens, output_tokens = response.usage.input_tokens, response.usage.output_tokens
-
-        result = json.loads(result_text)
+        result, input_tokens, output_tokens = await ask_for_json(
+            prompt, KEYWORDS_SCHEMA, client, cache, semaphore, model_id
+        )
         keywords = result.get("keywords", [])
-        # Only an answer that parsed is worth reusing.
-        cache[cache_key] = result_text
-
         return {
             "topic_slug": topic_slug,
             "topic_name": topic_name,
@@ -301,6 +293,124 @@ never pad the list with variations to reach a number):
 
     except Exception as e:
         raise RuntimeError(f"LLM extraction failed for {topic_name}: {e}")
+
+
+def load_country_names() -> dict[str, str]:
+    """OWID's current country names, keyed by every spelling of them we know (name, short name, aliases), casefolded.
+
+    The site filters charts by these exact names, so a suggestion has to be one of them.
+    """
+    names: dict[str, str] = {}
+    for region in yaml.safe_load(LATEST_REGIONS_YML.read_text()):
+        if region.get("region_type", "country") != "country" or region.get("is_historical"):
+            continue
+        for spelling in [region["name"], region.get("short_name"), *(region.get("aliases") or [])]:
+            if spelling:
+                names.setdefault(spelling.casefold(), region["name"])
+    return names
+
+
+async def suggest_countries_with_llm(
+    topic_name: str,
+    texts: list[str],
+    country_names: dict[str, str],
+    client: anthropic.AsyncAnthropic,
+    cache: dict[str, str],
+    semaphore: asyncio.Semaphore,
+    model_id: str = DEFAULT_MODEL,
+) -> dict:
+    """Ask the model which countries are most worth looking at on this topic.
+
+    Returns: dict with the countries (as OWID names, in the model's order), the names that matched no
+    country, and token usage.
+    """
+    combined_text = "\n".join(texts)
+    prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
+the topic "{topic_name}", most-viewed first:
+
+{combined_text}
+
+On the topic's page, a search box filters these charts, and under it a short line
+suggests what to look at. Besides search terms, that line will suggest a few
+countries: clicking one shows the topic's charts for that country.
+
+Which countries should it suggest? Pick the ones whose story on this topic is most
+worth seeing, the countries someone who knows the topic well would point a curious
+reader to first: those the topic is famous for, leaders and laggards, striking
+outliers, and remarkable turnarounds. France on nuclear power, Norway on electric
+cars, South Korea on fertility.
+
+What makes the line useful is that it is specific to this topic. Don't fall back
+on the same handful of large countries for every topic; suggest one only when it
+really is a big part of this topic's story. The site adds the reader's own country
+separately, so there is no need to cover where readers live. Suggest countries
+only, not regions, continents or income groups, and use their common English names.
+
+Put the one most worth seeing first; only the first few are shown. About five is
+right for most topics; give fewer when only a few countries stand out.
+
+Output JSON:
+{{
+  "countries": ["country1", "country2", ...]
+}}"""
+
+    try:
+        result, input_tokens, output_tokens = await ask_for_json(
+            prompt, COUNTRIES_SCHEMA, client, cache, semaphore, model_id
+        )
+    except Exception as e:
+        raise RuntimeError(f"country suggestions failed for {topic_name}: {e}")
+
+    countries: list[str] = []
+    unrecognized: list[str] = []
+    for suggestion in result.get("countries", []):
+        name = country_names.get(suggestion.strip().casefold())
+        if name is None:
+            unrecognized.append(suggestion)
+        elif name not in countries:
+            countries.append(name)
+    return {
+        "countries": countries,
+        "unrecognized": unrecognized,
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+    }
+
+
+async def ask_for_json(
+    prompt: str,
+    schema: dict,
+    client: anthropic.AsyncAnthropic,
+    cache: dict[str, str],
+    semaphore: asyncio.Semaphore,
+    model_id: str,
+) -> tuple[dict, int, int]:
+    """Ask the model for an answer in `schema`, reusing the saved answer to an identical request.
+
+    Returns: (the parsed answer, input tokens, output tokens), the tokens zero when the answer came from the cache.
+    """
+    cache_key = hashlib.sha256(f"{model_id}\n{json.dumps(schema)}\n{prompt}".encode()).hexdigest()
+    input_tokens = output_tokens = 0
+    if cache_key in cache:
+        result_text = cache[cache_key]
+    else:
+        async with semaphore:
+            response = await client.messages.create(
+                model=model_id,
+                max_tokens=16000,
+                messages=[{"role": "user", "content": prompt}],
+                output_config={"format": schema},
+            )
+        if response.stop_reason != "end_turn":
+            raise RuntimeError(f"the model stopped early ({response.stop_reason})")
+        result_text = text_of(response)
+        # Thinking tokens are billed as output and included in output_tokens.
+        input_tokens, output_tokens = response.usage.input_tokens, response.usage.output_tokens
+
+    result = json.loads(result_text)
+    # Only an answer that parsed is worth reusing.
+    cache[cache_key] = result_text
+    return result, input_tokens, output_tokens
 
 
 async def build_topic_universe(
@@ -399,7 +509,8 @@ async def process_topics(
     if not prompt_inputs:
         return [], failed, universes, []
 
-    click.echo(f"\nAsking for candidate terms for {len(prompt_inputs)} topics...")
+    click.echo(f"\nAsking for candidate terms and countries for {len(prompt_inputs)} topics...")
+    country_names = load_country_names()
     client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=LLM_MAX_RETRIES)
     try:
         cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
@@ -408,12 +519,21 @@ async def process_topics(
         cache = {}
     llm_semaphore = asyncio.Semaphore(LLM_CONCURRENCY)
     try:
-        candidate_results = await asyncio.gather(
-            *(
-                extract_keywords_with_llm(topic_slug, topic_name, texts, client, cache, llm_semaphore, model)
-                for topic_slug, topic_name, texts in prompt_inputs
+        candidate_results, country_results = await asyncio.gather(
+            asyncio.gather(
+                *(
+                    extract_keywords_with_llm(topic_slug, topic_name, texts, client, cache, llm_semaphore, model)
+                    for topic_slug, topic_name, texts in prompt_inputs
+                ),
+                return_exceptions=True,
             ),
-            return_exceptions=True,
+            asyncio.gather(
+                *(
+                    suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
+                    for _, topic_name, texts in prompt_inputs
+                ),
+                return_exceptions=True,
+            ),
         )
     finally:
         # Saved even if the run is interrupted, so the answers already paid for aren't asked for again.
@@ -425,11 +545,20 @@ async def process_topics(
     click.echo("\nChoosing the terms that cover the most of each topic...")
     results: list[dict] = []
     selections: list[TopicSelection] = []
-    for (topic_slug, topic_name, _), candidates in zip(prompt_inputs, candidate_results, strict=True):
-        if isinstance(candidates, BaseException):
-            click.secho(f"✗ {topic_slug}: {candidates}", fg="red")
+    for (topic_slug, topic_name, _), candidates, countries in zip(
+        prompt_inputs, candidate_results, country_results, strict=True
+    ):
+        if isinstance(candidates, BaseException) or isinstance(countries, BaseException):
+            error = candidates if isinstance(candidates, BaseException) else countries
+            click.secho(f"✗ {topic_slug}: {error}", fg="red")
             failed.append(topic_slug)
             continue
+        if countries["unrecognized"]:
+            click.secho(
+                f"! {topic_name}: dropped suggestions that aren't OWID country names: "
+                f"{', '.join(countries['unrecognized'])}",
+                fg="yellow",
+            )
 
         universe = universes[topic_name]
         offered = list(candidates["keywords"])
@@ -442,42 +571,54 @@ async def process_topics(
         selections.append(selection)
 
         total = selection.total_weight
-        candidates["keywords"] = [term.term for term in selection.selected]
-        candidates["stats"].update(
+        stats = candidates["stats"]
+        results.append(
             {
-                "num_keywords": len(selection.selected),
-                "num_candidates": len(offered),
-                "num_records": selection.total_count,
-                "weighted_coverage": round(selection.covered_weight / total if total else 0.0, 4),
-                "chart_coverage": round(
-                    (selection.total_count - len(selection.uncovered)) / selection.total_count
-                    if selection.total_count
-                    else 0.0,
-                    4,
-                ),
-                "topic_name_share": round(selection.topic_name_share, 4),
-                "weighting": weighting,
-                "views_column": views_column,
-                "selection": "coverage",
+                "topic_slug": topic_slug,
+                "topic_name": topic_name,
+                "keywords": [term.term for term in selection.selected],
+                "countries": countries["countries"],
+                "stats": {
+                    **stats,
+                    "num_keywords": len(selection.selected),
+                    # Both requests count towards the topic's cost.
+                    "input_tokens": stats["input_tokens"] + countries["input_tokens"],
+                    "output_tokens": stats["output_tokens"] + countries["output_tokens"],
+                    "num_candidates": len(offered),
+                    "num_records": selection.total_count,
+                    "weighted_coverage": round(selection.covered_weight / total if total else 0.0, 4),
+                    "chart_coverage": round(
+                        (selection.total_count - len(selection.uncovered)) / selection.total_count
+                        if selection.total_count
+                        else 0.0,
+                        4,
+                    ),
+                    "topic_name_share": round(selection.topic_name_share, 4),
+                    "weighting": weighting,
+                    "views_column": views_column,
+                    "selection": "coverage",
+                    "num_countries": len(countries["countries"]),
+                    "unrecognized_countries": countries["unrecognized"],
+                },
+                "keyword_stats": [
+                    {
+                        "term": term.term,
+                        "own_share": round(term.own_share(total), 4),
+                        "own_records": term.own_count,
+                        "marginal_share": round(term.marginal_share(total), 4),
+                        "marginal_records": term.marginal_count,
+                        "cumulative_share": round(term.cumulative_share(total), 4),
+                    }
+                    for term in selection.selected
+                ],
             }
         )
-        candidates["keyword_stats"] = [
-            {
-                "term": term.term,
-                "own_share": round(term.own_share(total), 4),
-                "own_records": term.own_count,
-                "marginal_share": round(term.marginal_share(total), 4),
-                "marginal_records": term.marginal_count,
-                "cumulative_share": round(term.cumulative_share(total), 4),
-            }
-            for term in selection.selected
-        ]
-        results.append(candidates)
 
         share = selection.covered_weight / total if total else 0.0
         click.secho(
             f"✓ {topic_name}: {len(selection.selected)} terms cover {share:.0%} of views "
-            f"— {', '.join(term.term for term in selection.selected) or '(none)'}",
+            f"— {', '.join(term.term for term in selection.selected) or '(none)'}"
+            f" | countries: {', '.join(countries['countries']) or '(none)'}",
             fg="green" if share >= 0.35 else "yellow",
         )
 
@@ -630,9 +771,9 @@ def main(
         click.secho("\n✗ No results generated", fg="red")
         sys.exit(1)
 
-    # Calculate total costs, pricing each topic's request on its own: long-context tiers
-    # apply per request, so pricing the summed tokens could put a whole run in the
-    # expensive tier. A model genai-prices doesn't know still runs; its cost is simply
+    # Calculate total costs, pricing each topic on its own: long-context tiers apply per
+    # request, so pricing the run's summed tokens could put all of it in the expensive
+    # tier (a topic's two requests together stay far below it). A model genai-prices doesn't know still runs; its cost is simply
     # reported as unknown (the whole run costs a couple of cents either way).
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)

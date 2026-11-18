@@ -12,6 +12,13 @@
       "deaths by age",
       "adolescent birth rate"
     ],
+    "countries": [
+      "Japan",
+      "Niger",
+      "South Korea",
+      "Italy",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 45,
       "num_keywords": 8,
@@ -25,7 +32,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -107,6 +116,14 @@
       "nitrogen",
       "rice"
     ],
+    "countries": [
+      "United States",
+      "Brazil",
+      "China",
+      "India",
+      "Indonesia",
+      "Ukraine"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -120,7 +137,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -202,6 +221,13 @@
       "ozone",
       "PM2.5"
     ],
+    "countries": [
+      "India",
+      "China",
+      "United Kingdom",
+      "Nigeria",
+      "Mongolia"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -215,7 +241,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -294,6 +322,14 @@
       "deaths",
       "alcohol expenditure"
     ],
+    "countries": [
+      "Russia",
+      "United States",
+      "France",
+      "Belarus",
+      "Saudi Arabia",
+      "Moldova"
+    ],
     "stats": {
       "num_charts_texts": 108,
       "num_keywords": 5,
@@ -307,7 +343,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -365,6 +403,13 @@
       "crustaceans",
       "pain"
     ],
+    "countries": [
+      "China",
+      "United States",
+      "Brazil",
+      "United Kingdom",
+      "Spain"
+    ],
     "stats": {
       "num_charts_texts": 147,
       "num_keywords": 8,
@@ -378,7 +423,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -458,6 +505,13 @@
       "deaths",
       "bloodstream infections"
     ],
+    "countries": [
+      "India",
+      "China",
+      "Denmark",
+      "Greece",
+      "South Africa"
+    ],
     "stats": {
       "num_charts_texts": 67,
       "num_keywords": 6,
@@ -471,7 +525,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -537,6 +593,13 @@
       "generative AI",
       "jobs"
     ],
+    "countries": [
+      "United States",
+      "China",
+      "United Kingdom",
+      "Taiwan",
+      "Canada"
+    ],
     "stats": {
       "num_charts_texts": 56,
       "num_keywords": 8,
@@ -550,7 +613,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -632,6 +697,13 @@
       "rhino",
       "biomass"
     ],
+    "countries": [
+      "Madagascar",
+      "Brazil",
+      "Indonesia",
+      "Australia",
+      "Kenya"
+    ],
     "stats": {
       "num_charts_texts": 198,
       "num_keywords": 8,
@@ -645,7 +717,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -720,6 +794,13 @@
     "keywords": [
       "biofuel"
     ],
+    "countries": [
+      "Brazil",
+      "United States",
+      "Indonesia",
+      "Germany",
+      "Sweden"
+    ],
     "stats": {
       "num_charts_texts": 8,
       "num_keywords": 1,
@@ -733,7 +814,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -753,6 +836,13 @@
       "book titles",
       "books"
     ],
+    "countries": [
+      "Germany",
+      "United Kingdom",
+      "Italy",
+      "China",
+      "France"
+    ],
     "stats": {
       "num_charts_texts": 5,
       "num_keywords": 2,
@@ -766,7 +856,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -800,6 +892,14 @@
       "Parkinson's disease",
       "neglected tropical diseases"
     ],
+    "countries": [
+      "Central African Republic",
+      "United States",
+      "Japan",
+      "Lesotho",
+      "Democratic Republic of Congo",
+      "Afghanistan"
+    ],
     "stats": {
       "num_charts_texts": 197,
       "num_keywords": 8,
@@ -813,7 +913,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -895,6 +997,13 @@
       "survival rates",
       "children"
     ],
+    "countries": [
+      "Denmark",
+      "Mongolia",
+      "China",
+      "Japan",
+      "Uruguay"
+    ],
     "stats": {
       "num_charts_texts": 150,
       "num_keywords": 8,
@@ -908,7 +1017,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -989,6 +1100,13 @@
       "ischaemic heart disease",
       "cholesterol"
     ],
+    "countries": [
+      "Ukraine",
+      "Japan",
+      "United States",
+      "Finland",
+      "Bulgaria"
+    ],
     "stats": {
       "num_charts_texts": 95,
       "num_keywords": 7,
@@ -1002,7 +1120,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1076,6 +1196,13 @@
       "hepatitis",
       "smoking"
     ],
+    "countries": [
+      "United States",
+      "South Africa",
+      "Japan",
+      "Russia",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -1089,7 +1216,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1167,6 +1296,14 @@
       "school",
       "labor rights"
     ],
+    "countries": [
+      "Niger",
+      "Mali",
+      "Bangladesh",
+      "India",
+      "Brazil",
+      "Democratic Republic of Congo"
+    ],
     "stats": {
       "num_charts_texts": 30,
       "num_keywords": 4,
@@ -1180,7 +1317,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1227,6 +1366,14 @@
       "neonatal mortality",
       "causes of death"
     ],
+    "countries": [
+      "Niger",
+      "Sierra Leone",
+      "Somalia",
+      "Nigeria",
+      "South Korea",
+      "Bangladesh"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 5,
@@ -1240,7 +1387,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1292,6 +1441,13 @@
       "drinking water",
       "deaths"
     ],
+    "countries": [
+      "Chad",
+      "Ethiopia",
+      "Switzerland",
+      "India",
+      "Papua New Guinea"
+    ],
     "stats": {
       "num_charts_texts": 44,
       "num_keywords": 2,
@@ -1305,7 +1461,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1337,6 +1495,13 @@
       "handwashing",
       "water quality"
     ],
+    "countries": [
+      "India",
+      "Chad",
+      "Ethiopia",
+      "Bangladesh",
+      "Nigeria"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 6,
@@ -1350,7 +1515,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1416,6 +1583,14 @@
       "ocean acidification",
       "ocean heat content"
     ],
+    "countries": [
+      "China",
+      "United States",
+      "India",
+      "Tuvalu",
+      "Maldives",
+      "Russia"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -1429,7 +1604,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1511,6 +1688,13 @@
       "trade",
       "coal"
     ],
+    "countries": [
+      "China",
+      "United States",
+      "Qatar",
+      "United Kingdom",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -1524,7 +1708,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1606,6 +1792,13 @@
       "excess mortality",
       "case fatality rate"
     ],
+    "countries": [
+      "China",
+      "Sweden",
+      "United States",
+      "Peru",
+      "South Korea"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -1619,7 +1812,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1696,6 +1891,13 @@
       "bribe",
       "public administration"
     ],
+    "countries": [
+      "Denmark",
+      "Somalia",
+      "Singapore",
+      "Georgia",
+      "Venezuela"
+    ],
     "stats": {
       "num_charts_texts": 36,
       "num_keywords": 3,
@@ -1709,7 +1911,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1751,6 +1955,13 @@
       "banana",
       "rice"
     ],
+    "countries": [
+      "United Kingdom",
+      "Malaysia",
+      "Indonesia",
+      "China",
+      "Brazil"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -1764,7 +1975,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1844,6 +2057,13 @@
       "rule of law",
       "civil society"
     ],
+    "countries": [
+      "Norway",
+      "North Korea",
+      "India",
+      "Afghanistan",
+      "Tunisia"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 6,
@@ -1857,7 +2077,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -1923,6 +2145,13 @@
       "sanitation",
       "typhoid"
     ],
+    "countries": [
+      "Niger",
+      "Haiti",
+      "Yemen",
+      "Egypt",
+      "Nigeria"
+    ],
     "stats": {
       "num_charts_texts": 82,
       "num_keywords": 8,
@@ -1936,7 +2165,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2018,6 +2249,13 @@
       "food groups",
       "calories"
     ],
+    "countries": [
+      "India",
+      "United Kingdom",
+      "Mongolia",
+      "Argentina",
+      "Cambodia"
+    ],
     "stats": {
       "num_charts_texts": 47,
       "num_keywords": 8,
@@ -2031,7 +2269,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2113,6 +2353,14 @@
       "Working hours",
       "Manufacturing"
     ],
+    "countries": [
+      "China",
+      "South Korea",
+      "Venezuela",
+      "Japan",
+      "Ireland",
+      "Botswana"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -2126,7 +2374,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2206,6 +2456,14 @@
       "wealth",
       "global inequality"
     ],
+    "countries": [
+      "South Africa",
+      "Brazil",
+      "United States",
+      "Norway",
+      "China",
+      "Slovenia"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 6,
@@ -2219,7 +2477,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2285,6 +2545,13 @@
       "employment",
       "property rights"
     ],
+    "countries": [
+      "Iceland",
+      "South Korea",
+      "Saudi Arabia",
+      "Rwanda",
+      "United States"
+    ],
     "stats": {
       "num_charts_texts": 64,
       "num_keywords": 8,
@@ -2298,7 +2565,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2374,6 +2643,14 @@
       "electricity production",
       "electricity generation"
     ],
+    "countries": [
+      "France",
+      "Denmark",
+      "Iceland",
+      "Norway",
+      "South Africa",
+      "Paraguay"
+    ],
     "stats": {
       "num_charts_texts": 10,
       "num_keywords": 2,
@@ -2387,7 +2664,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2421,6 +2700,13 @@
       "small-scale manufacturing",
       "labor productivity"
     ],
+    "countries": [
+      "China",
+      "Sweden",
+      "Nepal",
+      "Burundi",
+      "United Kingdom"
+    ],
     "stats": {
       "num_charts_texts": 50,
       "num_keywords": 8,
@@ -2434,7 +2720,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2516,6 +2804,14 @@
       "energy intensity",
       "biofuel"
     ],
+    "countries": [
+      "Norway",
+      "China",
+      "France",
+      "Iceland",
+      "Saudi Arabia",
+      "Denmark"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -2529,7 +2825,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2606,6 +2904,13 @@
       "clean cooking",
       "lithium-ion"
     ],
+    "countries": [
+      "Nigeria",
+      "India",
+      "Democratic Republic of Congo",
+      "Bangladesh",
+      "Kenya"
+    ],
     "stats": {
       "num_charts_texts": 20,
       "num_keywords": 3,
@@ -2619,7 +2924,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2655,6 +2962,13 @@
       "primary energy",
       "fossil fuels"
     ],
+    "countries": [
+      "France",
+      "Iceland",
+      "China",
+      "Saudi Arabia",
+      "Denmark"
+    ],
     "stats": {
       "num_charts_texts": 15,
       "num_keywords": 2,
@@ -2668,7 +2982,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2702,6 +3018,13 @@
       "dietary choices",
       "seafood"
     ],
+    "countries": [
+      "Brazil",
+      "Netherlands",
+      "United Kingdom",
+      "China",
+      "Indonesia"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -2715,7 +3038,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2797,6 +3122,13 @@
       "dengue",
       "rabies"
     ],
+    "countries": [
+      "India",
+      "Nigeria",
+      "Chad",
+      "Pakistan",
+      "Afghanistan"
+    ],
     "stats": {
       "num_charts_texts": 99,
       "num_keywords": 8,
@@ -2810,7 +3142,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2888,6 +3222,14 @@
       "food insecurity",
       "undernourishment"
     ],
+    "countries": [
+      "Ethiopia",
+      "China",
+      "Ukraine",
+      "India",
+      "North Korea",
+      "Somalia"
+    ],
     "stats": {
       "num_charts_texts": 28,
       "num_keywords": 4,
@@ -2901,7 +3243,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -2947,6 +3291,13 @@
       "agricultural land",
       "smallholders"
     ],
+    "countries": [
+      "India",
+      "United States",
+      "Brazil",
+      "China",
+      "Uganda"
+    ],
     "stats": {
       "num_charts_texts": 19,
       "num_keywords": 4,
@@ -2960,7 +3311,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3010,6 +3363,13 @@
       "informal employment",
       "working hours"
     ],
+    "countries": [
+      "Saudi Arabia",
+      "Iceland",
+      "Afghanistan",
+      "Rwanda",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 64,
       "num_keywords": 8,
@@ -3023,7 +3383,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3105,6 +3467,13 @@
       "Child mortality",
       "Twins"
     ],
+    "countries": [
+      "South Korea",
+      "Niger",
+      "Japan",
+      "France",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 115,
       "num_keywords": 8,
@@ -3118,7 +3487,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3196,6 +3567,14 @@
       "phosphate",
       "phosphorus"
     ],
+    "countries": [
+      "China",
+      "India",
+      "Sri Lanka",
+      "Netherlands",
+      "Egypt",
+      "Brazil"
+    ],
     "stats": {
       "num_charts_texts": 72,
       "num_keywords": 4,
@@ -3209,7 +3588,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3255,6 +3636,13 @@
       "genuine savings",
       "per student"
     ],
+    "countries": [
+      "Cuba",
+      "Finland",
+      "South Korea",
+      "Niger",
+      "Singapore"
+    ],
     "stats": {
       "num_charts_texts": 26,
       "num_keywords": 4,
@@ -3268,7 +3656,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3318,6 +3708,13 @@
       "heritage spending",
       "polio"
     ],
+    "countries": [
+      "United States",
+      "Rwanda",
+      "Thailand",
+      "United Kingdom",
+      "Cuba"
+    ],
     "stats": {
       "num_charts_texts": 106,
       "num_keywords": 8,
@@ -3331,7 +3728,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3413,6 +3812,13 @@
       "illegal fishing",
       "fish discards"
     ],
+    "countries": [
+      "China",
+      "Peru",
+      "Canada",
+      "Iceland",
+      "Norway"
+    ],
     "stats": {
       "num_charts_texts": 86,
       "num_keywords": 8,
@@ -3426,7 +3832,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3506,6 +3914,13 @@
       "nutrient adequate diet",
       "food prices"
     ],
+    "countries": [
+      "Venezuela",
+      "Nigeria",
+      "United States",
+      "Lebanon",
+      "Zimbabwe"
+    ],
     "stats": {
       "num_charts_texts": 74,
       "num_keywords": 6,
@@ -3519,7 +3934,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3585,6 +4002,13 @@
       "sugar",
       "cropland"
     ],
+    "countries": [
+      "Ethiopia",
+      "United States",
+      "China",
+      "Ukraine",
+      "North Korea"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -3598,7 +4022,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3677,6 +4103,14 @@
       "scholarships",
       "guinea worm disease"
     ],
+    "countries": [
+      "United States",
+      "Norway",
+      "Afghanistan",
+      "Ethiopia",
+      "Sweden",
+      "Syria"
+    ],
     "stats": {
       "num_charts_texts": 94,
       "num_keywords": 5,
@@ -3690,7 +4124,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3744,6 +4180,13 @@
       "tree cover loss",
       "land degradation"
     ],
+    "countries": [
+      "Brazil",
+      "Indonesia",
+      "Democratic Republic of Congo",
+      "Costa Rica",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 75,
       "num_keywords": 4,
@@ -3757,7 +4200,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3804,6 +4249,14 @@
       "oil",
       "production"
     ],
+    "countries": [
+      "China",
+      "United States",
+      "Saudi Arabia",
+      "Russia",
+      "United Kingdom",
+      "Qatar"
+    ],
     "stats": {
       "num_charts_texts": 173,
       "num_keywords": 5,
@@ -3817,7 +4270,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3873,6 +4328,13 @@
       "unemployment",
       "drug use"
     ],
+    "countries": [
+      "China",
+      "India",
+      "South Korea",
+      "Azerbaijan",
+      "Qatar"
+    ],
     "stats": {
       "num_charts_texts": 29,
       "num_keywords": 6,
@@ -3886,7 +4348,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -3952,6 +4416,13 @@
       "formal education",
       "gender parity"
     ],
+    "countries": [
+      "South Korea",
+      "Finland",
+      "Niger",
+      "Afghanistan",
+      "Singapore"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -3965,7 +4436,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4034,6 +4507,111 @@
       }
     ]
   },
+  "global-health": {
+    "topic_slug": "global-health",
+    "topic_name": "Global Health",
+    "keywords": [
+      "life expectancy",
+      "child mortality",
+      "maternal mortality",
+      "sanitation",
+      "health spending",
+      "causes of death",
+      "reproductive health",
+      "vaccination"
+    ],
+    "countries": [
+      "Rwanda",
+      "United States",
+      "Sierra Leone",
+      "Cuba",
+      "Bangladesh",
+      "Niger"
+    ],
+    "stats": {
+      "num_charts_texts": 200,
+      "num_keywords": 8,
+      "input_tokens": 5080,
+      "output_tokens": 254,
+      "num_candidates": 38,
+      "num_records": 137,
+      "weighted_coverage": 0.8076,
+      "chart_coverage": 0.1606,
+      "topic_name_share": 0.0,
+      "weighting": "views",
+      "views_column": "views_365d",
+      "selection": "coverage",
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
+    },
+    "keyword_stats": [
+      {
+        "term": "life expectancy",
+        "own_share": 0.3504,
+        "own_records": 4,
+        "marginal_share": 0.3504,
+        "marginal_records": 4,
+        "cumulative_share": 0.3504
+      },
+      {
+        "term": "child mortality",
+        "own_share": 0.3441,
+        "own_records": 3,
+        "marginal_share": 0.3441,
+        "marginal_records": 3,
+        "cumulative_share": 0.6945
+      },
+      {
+        "term": "maternal mortality",
+        "own_share": 0.0482,
+        "own_records": 2,
+        "marginal_share": 0.0482,
+        "marginal_records": 2,
+        "cumulative_share": 0.7427
+      },
+      {
+        "term": "sanitation",
+        "own_share": 0.0151,
+        "own_records": 1,
+        "marginal_share": 0.0151,
+        "marginal_records": 1,
+        "cumulative_share": 0.7578
+      },
+      {
+        "term": "health spending",
+        "own_share": 0.0537,
+        "own_records": 4,
+        "marginal_share": 0.0147,
+        "marginal_records": 1,
+        "cumulative_share": 0.7725
+      },
+      {
+        "term": "causes of death",
+        "own_share": 0.0122,
+        "own_records": 4,
+        "marginal_share": 0.0122,
+        "marginal_records": 4,
+        "cumulative_share": 0.7848
+      },
+      {
+        "term": "reproductive health",
+        "own_share": 0.0118,
+        "own_records": 2,
+        "marginal_share": 0.0118,
+        "marginal_records": 2,
+        "cumulative_share": 0.7966
+      },
+      {
+        "term": "vaccination",
+        "own_share": 0.011,
+        "own_records": 5,
+        "marginal_share": 0.011,
+        "marginal_records": 5,
+        "cumulative_share": 0.8076
+      }
+    ]
+  },
   "government-spending": {
     "topic_slug": "government-spending",
     "topic_name": "Government Spending",
@@ -4046,6 +4624,13 @@
       "government revenues",
       "public debt",
       "cultural heritage"
+    ],
+    "countries": [
+      "France",
+      "United States",
+      "Japan",
+      "Sweden",
+      "Greece"
     ],
     "stats": {
       "num_charts_texts": 81,
@@ -4060,7 +4645,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4138,6 +4725,13 @@
       "friends",
       "family"
     ],
+    "countries": [
+      "Finland",
+      "Afghanistan",
+      "Denmark",
+      "Costa Rica",
+      "Bhutan"
+    ],
     "stats": {
       "num_charts_texts": 45,
       "num_keywords": 4,
@@ -4151,7 +4745,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4188,101 +4784,6 @@
       }
     ]
   },
-  "health-meta": {
-    "topic_slug": "health-meta",
-    "topic_name": "Global Health",
-    "keywords": [
-      "life expectancy",
-      "child mortality",
-      "maternal mortality",
-      "sanitation",
-      "health spending",
-      "causes of death",
-      "reproductive health",
-      "vaccination"
-    ],
-    "stats": {
-      "num_charts_texts": 200,
-      "num_keywords": 8,
-      "input_tokens": 5080,
-      "output_tokens": 254,
-      "num_candidates": 38,
-      "num_records": 137,
-      "weighted_coverage": 0.8076,
-      "chart_coverage": 0.1606,
-      "topic_name_share": 0.0,
-      "weighting": "views",
-      "views_column": "views_365d",
-      "selection": "coverage",
-      "refined": true
-    },
-    "keyword_stats": [
-      {
-        "term": "life expectancy",
-        "own_share": 0.3504,
-        "own_records": 4,
-        "marginal_share": 0.3504,
-        "marginal_records": 4,
-        "cumulative_share": 0.3504
-      },
-      {
-        "term": "child mortality",
-        "own_share": 0.3441,
-        "own_records": 3,
-        "marginal_share": 0.3441,
-        "marginal_records": 3,
-        "cumulative_share": 0.6945
-      },
-      {
-        "term": "maternal mortality",
-        "own_share": 0.0482,
-        "own_records": 2,
-        "marginal_share": 0.0482,
-        "marginal_records": 2,
-        "cumulative_share": 0.7427
-      },
-      {
-        "term": "sanitation",
-        "own_share": 0.0151,
-        "own_records": 1,
-        "marginal_share": 0.0151,
-        "marginal_records": 1,
-        "cumulative_share": 0.7578
-      },
-      {
-        "term": "health spending",
-        "own_share": 0.0537,
-        "own_records": 4,
-        "marginal_share": 0.0147,
-        "marginal_records": 1,
-        "cumulative_share": 0.7725
-      },
-      {
-        "term": "causes of death",
-        "own_share": 0.0122,
-        "own_records": 4,
-        "marginal_share": 0.0122,
-        "marginal_records": 4,
-        "cumulative_share": 0.7848
-      },
-      {
-        "term": "reproductive health",
-        "own_share": 0.0118,
-        "own_records": 2,
-        "marginal_share": 0.0118,
-        "marginal_records": 2,
-        "cumulative_share": 0.7966
-      },
-      {
-        "term": "vaccination",
-        "own_share": 0.011,
-        "own_records": 5,
-        "marginal_share": 0.011,
-        "marginal_records": 5,
-        "cumulative_share": 0.8076
-      }
-    ]
-  },
   "hiv-aids": {
     "topic_slug": "hiv-aids",
     "topic_name": "HIV/AIDS",
@@ -4295,6 +4796,13 @@
       "prevention",
       "condom use",
       "women"
+    ],
+    "countries": [
+      "South Africa",
+      "Eswatini",
+      "Botswana",
+      "Uganda",
+      "Thailand"
     ],
     "stats": {
       "num_charts_texts": 101,
@@ -4309,7 +4817,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4386,6 +4896,12 @@
       "shelters",
       "forms of homelessness"
     ],
+    "countries": [
+      "Finland",
+      "United States",
+      "Japan",
+      "Australia"
+    ],
     "stats": {
       "num_charts_texts": 13,
       "num_keywords": 3,
@@ -4399,7 +4915,11 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 4,
+      "unrecognized_countries": [
+        "England"
+      ]
     },
     "keyword_stats": [
       {
@@ -4437,6 +4957,14 @@
       "female homicide",
       "detainees"
     ],
+    "countries": [
+      "El Salvador",
+      "Colombia",
+      "South Africa",
+      "Japan",
+      "United States",
+      "Jamaica"
+    ],
     "stats": {
       "num_charts_texts": 56,
       "num_keywords": 4,
@@ -4450,7 +4978,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4495,6 +5025,13 @@
       "women",
       "year of birth"
     ],
+    "countries": [
+      "Netherlands",
+      "South Korea",
+      "Iran",
+      "Guatemala",
+      "Japan"
+    ],
     "stats": {
       "num_charts_texts": 31,
       "num_keywords": 3,
@@ -4508,7 +5045,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4550,6 +5089,13 @@
       "freedom of association",
       "physical integrity"
     ],
+    "countries": [
+      "Afghanistan",
+      "North Korea",
+      "Saudi Arabia",
+      "Rwanda",
+      "Netherlands"
+    ],
     "stats": {
       "num_charts_texts": 105,
       "num_keywords": 8,
@@ -4563,7 +5109,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4642,6 +5190,14 @@
       "hunger",
       "undernourishment"
     ],
+    "countries": [
+      "Madagascar",
+      "Yemen",
+      "India",
+      "Peru",
+      "Somalia",
+      "Ethiopia"
+    ],
     "stats": {
       "num_charts_texts": 73,
       "num_keywords": 5,
@@ -4655,7 +5211,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4713,6 +5271,13 @@
       "mental health",
       "drug trafficking"
     ],
+    "countries": [
+      "United States",
+      "Afghanistan",
+      "Russia",
+      "Portugal",
+      "Colombia"
+    ],
     "stats": {
       "num_charts_texts": 101,
       "num_keywords": 8,
@@ -4726,7 +5291,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4803,6 +5370,14 @@
       "deaths",
       "solid fuels"
     ],
+    "countries": [
+      "India",
+      "China",
+      "Nigeria",
+      "Democratic Republic of Congo",
+      "Ethiopia",
+      "Bangladesh"
+    ],
     "stats": {
       "num_charts_texts": 39,
       "num_keywords": 3,
@@ -4816,7 +5391,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4856,6 +5433,13 @@
       "acute respiratory infections",
       "sentinel surveillance"
     ],
+    "countries": [
+      "China",
+      "United States",
+      "Mexico",
+      "Cambodia",
+      "Japan"
+    ],
     "stats": {
       "num_charts_texts": 122,
       "num_keywords": 6,
@@ -4869,7 +5453,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -4932,6 +5518,13 @@
       "digital media",
       "mobile phone"
     ],
+    "countries": [
+      "Iceland",
+      "South Korea",
+      "China",
+      "North Korea",
+      "Eritrea"
+    ],
     "stats": {
       "num_charts_texts": 18,
       "num_keywords": 5,
@@ -4945,7 +5538,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5003,6 +5598,13 @@
       "vegetable oil",
       "agricultural land"
     ],
+    "countries": [
+      "Brazil",
+      "Indonesia",
+      "China",
+      "Australia",
+      "Malaysia"
+    ],
     "stats": {
       "num_charts_texts": 119,
       "num_keywords": 8,
@@ -5016,7 +5618,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5094,6 +5698,13 @@
       "petrol",
       "lead poisoning"
     ],
+    "countries": [
+      "United States",
+      "Algeria",
+      "India",
+      "Nigeria",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 25,
       "num_keywords": 4,
@@ -5107,7 +5718,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5157,6 +5770,13 @@
       "employment discrimination",
       "censorship"
     ],
+    "countries": [
+      "Netherlands",
+      "Uganda",
+      "Russia",
+      "South Africa",
+      "Taiwan"
+    ],
     "stats": {
       "num_charts_texts": 59,
       "num_keywords": 8,
@@ -5170,7 +5790,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5247,6 +5869,14 @@
       "median age",
       "lifespan inequality"
     ],
+    "countries": [
+      "Japan",
+      "Russia",
+      "Hong Kong",
+      "Eswatini",
+      "South Korea",
+      "Sierra Leone"
+    ],
     "stats": {
       "num_charts_texts": 109,
       "num_keywords": 3,
@@ -5260,7 +5890,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5296,6 +5928,13 @@
       "electricity",
       "lighting"
     ],
+    "countries": [
+      "United Kingdom",
+      "South Sudan",
+      "India",
+      "Kenya",
+      "South Korea"
+    ],
     "stats": {
       "num_charts_texts": 8,
       "num_keywords": 2,
@@ -5309,7 +5948,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5339,6 +5980,14 @@
       "age",
       "languages"
     ],
+    "countries": [
+      "Niger",
+      "South Sudan",
+      "Afghanistan",
+      "South Korea",
+      "Cuba",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 27,
       "num_keywords": 4,
@@ -5352,7 +6001,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5399,6 +6050,13 @@
       "GDP per capita",
       "funding"
     ],
+    "countries": [
+      "Nigeria",
+      "Democratic Republic of Congo",
+      "Sri Lanka",
+      "China",
+      "Uganda"
+    ],
     "stats": {
       "num_charts_texts": 31,
       "num_keywords": 5,
@@ -5412,7 +6070,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5468,6 +6128,13 @@
       "single parent",
       "household composition"
     ],
+    "countries": [
+      "Netherlands",
+      "Niger",
+      "India",
+      "Sweden",
+      "South Korea"
+    ],
     "stats": {
       "num_charts_texts": 36,
       "num_keywords": 6,
@@ -5481,7 +6148,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5541,6 +6210,14 @@
       "maternal mortality",
       "skilled health staff"
     ],
+    "countries": [
+      "Sierra Leone",
+      "Poland",
+      "Nigeria",
+      "India",
+      "Rwanda",
+      "United States"
+    ],
     "stats": {
       "num_charts_texts": 43,
       "num_keywords": 2,
@@ -5554,7 +6231,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5588,6 +6267,13 @@
       "livestock",
       "pigs"
     ],
+    "countries": [
+      "China",
+      "Brazil",
+      "United States",
+      "Argentina",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 95,
       "num_keywords": 8,
@@ -5601,7 +6287,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5682,6 +6370,13 @@
       "infectious disease",
       "biological sequence"
     ],
+    "countries": [
+      "United States",
+      "China",
+      "United Kingdom",
+      "Switzerland",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 31,
       "num_keywords": 7,
@@ -5695,7 +6390,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5769,6 +6466,13 @@
       "mental disorders",
       "burden of disease"
     ],
+    "countries": [
+      "United States",
+      "Greenland",
+      "Japan",
+      "Australia",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 139,
       "num_keywords": 8,
@@ -5782,7 +6486,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5864,6 +6570,13 @@
       "lithium",
       "potash"
     ],
+    "countries": [
+      "Democratic Republic of Congo",
+      "Chile",
+      "China",
+      "Australia",
+      "Indonesia"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -5877,7 +6590,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -5956,6 +6671,13 @@
       "iodized salt",
       "malnutrition"
     ],
+    "countries": [
+      "India",
+      "Niger",
+      "Bangladesh",
+      "Guatemala",
+      "Ethiopia"
+    ],
     "stats": {
       "num_charts_texts": 34,
       "num_keywords": 5,
@@ -5969,7 +6691,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6027,6 +6751,13 @@
       "asylum seekers",
       "deaths and disappearances"
     ],
+    "countries": [
+      "United States",
+      "Syria",
+      "Afghanistan",
+      "Venezuela",
+      "United Arab Emirates"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -6040,7 +6771,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6116,6 +6849,14 @@
       "military personnel",
       "military spending"
     ],
+    "countries": [
+      "United States",
+      "Israel",
+      "North Korea",
+      "Russia",
+      "Saudi Arabia",
+      "Ukraine"
+    ],
     "stats": {
       "num_charts_texts": 26,
       "num_keywords": 2,
@@ -6129,7 +6870,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6163,6 +6906,13 @@
       "asteroids",
       "volcanic eruptions"
     ],
+    "countries": [
+      "Japan",
+      "Bangladesh",
+      "United States",
+      "Haiti",
+      "Philippines"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -6176,7 +6926,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6258,6 +7010,13 @@
       "cysticercosis",
       "snakebite"
     ],
+    "countries": [
+      "Chad",
+      "India",
+      "Bangladesh",
+      "Democratic Republic of Congo",
+      "Brazil"
+    ],
     "stats": {
       "num_charts_texts": 76,
       "num_keywords": 8,
@@ -6271,7 +7030,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6346,6 +7107,13 @@
     "keywords": [
       "electricity"
     ],
+    "countries": [
+      "France",
+      "Japan",
+      "Germany",
+      "United States",
+      "Russia"
+    ],
     "stats": {
       "num_charts_texts": 8,
       "num_keywords": 1,
@@ -6359,7 +7127,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6379,6 +7149,13 @@
       "warheads",
       "nuclear weapons"
     ],
+    "countries": [
+      "United States",
+      "Russia",
+      "North Korea",
+      "South Africa",
+      "Iran"
+    ],
     "stats": {
       "num_charts_texts": 22,
       "num_keywords": 2,
@@ -6392,7 +7169,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6423,6 +7202,13 @@
       "deaths",
       "age"
     ],
+    "countries": [
+      "Nauru",
+      "United States",
+      "Japan",
+      "Egypt",
+      "Samoa"
+    ],
     "stats": {
       "num_charts_texts": 51,
       "num_keywords": 5,
@@ -6436,7 +7222,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6490,6 +7278,7 @@
       "accidents",
       "decade"
     ],
+    "countries": [],
     "stats": {
       "num_charts_texts": 11,
       "num_keywords": 4,
@@ -6503,7 +7292,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 0,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6548,6 +7339,13 @@
       "PM2.5",
       "particulate matter"
     ],
+    "countries": [
+      "India",
+      "China",
+      "Nepal",
+      "South Korea",
+      "United States"
+    ],
     "stats": {
       "num_charts_texts": 28,
       "num_keywords": 3,
@@ -6561,7 +7359,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6601,6 +7401,12 @@
       "chlorine",
       "environmental agreements"
     ],
+    "countries": [
+      "China",
+      "United States",
+      "India",
+      "Russia"
+    ],
     "stats": {
       "num_charts_texts": 22,
       "num_keywords": 6,
@@ -6614,7 +7420,11 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 4,
+      "unrecognized_countries": [
+        "Antarctica"
+      ]
     },
     "keyword_stats": [
       {
@@ -6680,6 +7490,13 @@
       "Vaccination",
       "Cholera"
     ],
+    "countries": [
+      "United Kingdom",
+      "South Africa",
+      "India",
+      "Democratic Republic of Congo",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 50,
       "num_keywords": 8,
@@ -6693,7 +7510,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6770,6 +7589,13 @@
       "cropland",
       "breakdown by type"
     ],
+    "countries": [
+      "Brazil",
+      "China",
+      "United States",
+      "France",
+      "Denmark"
+    ],
     "stats": {
       "num_charts_texts": 8,
       "num_keywords": 3,
@@ -6783,7 +7609,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6825,6 +7653,13 @@
       "greenhouse gas emissions",
       "imports"
     ],
+    "countries": [
+      "China",
+      "Philippines",
+      "India",
+      "United States",
+      "Malaysia"
+    ],
     "stats": {
       "num_charts_texts": 188,
       "num_keywords": 8,
@@ -6838,7 +7673,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6915,6 +7752,14 @@
       "pneumococcal",
       "children"
     ],
+    "countries": [
+      "Nigeria",
+      "India",
+      "Democratic Republic of Congo",
+      "Chad",
+      "Rwanda",
+      "Gambia"
+    ],
     "stats": {
       "num_charts_texts": 32,
       "num_keywords": 3,
@@ -6928,7 +7773,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -6965,6 +7812,13 @@
       "inactivated polio vaccine",
       "eradication"
     ],
+    "countries": [
+      "Pakistan",
+      "Afghanistan",
+      "India",
+      "Nigeria",
+      "United States"
+    ],
     "stats": {
       "num_charts_texts": 41,
       "num_keywords": 3,
@@ -6978,7 +7832,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7017,6 +7873,14 @@
       "population density",
       "demographic transition"
     ],
+    "countries": [
+      "China",
+      "India",
+      "Japan",
+      "Nigeria",
+      "South Korea",
+      "Niger"
+    ],
     "stats": {
       "num_charts_texts": 82,
       "num_keywords": 5,
@@ -7030,7 +7894,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7087,6 +7953,14 @@
       "national poverty lines",
       "consumer price index"
     ],
+    "countries": [
+      "China",
+      "India",
+      "Democratic Republic of Congo",
+      "Madagascar",
+      "Bangladesh",
+      "Vietnam"
+    ],
     "stats": {
       "num_charts_texts": 193,
       "num_keywords": 7,
@@ -7100,7 +7974,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7170,6 +8046,14 @@
       "trust",
       "neighbors"
     ],
+    "countries": [
+      "India",
+      "China",
+      "Israel",
+      "Saudi Arabia",
+      "Estonia",
+      "Czechia"
+    ],
     "stats": {
       "num_charts_texts": 56,
       "num_keywords": 4,
@@ -7183,7 +8067,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7230,6 +8116,13 @@
       "solar",
       "renewable energy"
     ],
+    "countries": [
+      "China",
+      "Brazil",
+      "Denmark",
+      "Iceland",
+      "Germany"
+    ],
     "stats": {
       "num_charts_texts": 51,
       "num_keywords": 5,
@@ -7243,7 +8136,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7300,6 +8195,13 @@
       "ocean science",
       "sustainable procurement"
     ],
+    "countries": [
+      "South Korea",
+      "Israel",
+      "China",
+      "Switzerland",
+      "United Kingdom"
+    ],
     "stats": {
       "num_charts_texts": 36,
       "num_keywords": 7,
@@ -7313,7 +8215,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7382,6 +8286,13 @@
       "open defecation",
       "unsafe water"
     ],
+    "countries": [
+      "India",
+      "Ethiopia",
+      "Bangladesh",
+      "Chad",
+      "Switzerland"
+    ],
     "stats": {
       "num_charts_texts": 55,
       "num_keywords": 3,
@@ -7395,7 +8306,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7432,6 +8345,13 @@
       "deaths",
       "life expectancy"
     ],
+    "countries": [
+      "India",
+      "Sweden",
+      "United Kingdom",
+      "Somalia",
+      "Brazil"
+    ],
     "stats": {
       "num_charts_texts": 16,
       "num_keywords": 3,
@@ -7445,7 +8365,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7484,6 +8406,13 @@
       "taxes",
       "quit smoking"
     ],
+    "countries": [
+      "United Kingdom",
+      "Kiribati",
+      "United States",
+      "Indonesia",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 50,
       "num_keywords": 5,
@@ -7497,7 +8426,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7551,6 +8482,13 @@
       "friends",
       "family"
     ],
+    "countries": [
+      "United States",
+      "Sweden",
+      "Japan",
+      "Germany",
+      "South Korea"
+    ],
     "stats": {
       "num_charts_texts": 23,
       "num_keywords": 4,
@@ -7564,7 +8502,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7613,6 +8553,13 @@
       "human visits",
       "payloads"
     ],
+    "countries": [
+      "United States",
+      "Russia",
+      "China",
+      "India",
+      "Japan"
+    ],
     "stats": {
       "num_charts_texts": 15,
       "num_keywords": 7,
@@ -7626,7 +8573,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7700,6 +8649,13 @@
       "living languages",
       "sovereign states"
     ],
+    "countries": [
+      "Somalia",
+      "Denmark",
+      "India",
+      "Afghanistan",
+      "China"
+    ],
     "stats": {
       "num_charts_texts": 76,
       "num_keywords": 8,
@@ -7713,7 +8669,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7790,6 +8748,14 @@
       "number of suicides",
       "share of deaths"
     ],
+    "countries": [
+      "South Korea",
+      "Lithuania",
+      "Greece",
+      "Russia",
+      "Japan",
+      "Guyana"
+    ],
     "stats": {
       "num_charts_texts": 46,
       "num_keywords": 3,
@@ -7803,7 +8769,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7841,6 +8809,13 @@
       "government revenue",
       "central government"
     ],
+    "countries": [
+      "Denmark",
+      "France",
+      "United States",
+      "Norway",
+      "Brazil"
+    ],
     "stats": {
       "num_charts_texts": 43,
       "num_keywords": 4,
@@ -7854,7 +8829,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7904,6 +8881,14 @@
       "air conditioning",
       "genome sequencing"
     ],
+    "countries": [
+      "United States",
+      "China",
+      "South Korea",
+      "Kenya",
+      "Japan",
+      "Taiwan"
+    ],
     "stats": {
       "num_charts_texts": 80,
       "num_keywords": 8,
@@ -7917,7 +8902,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -7995,6 +8982,14 @@
       "terrorism",
       "airliner"
     ],
+    "countries": [
+      "Iraq",
+      "Afghanistan",
+      "Nigeria",
+      "United States",
+      "Syria",
+      "Pakistan"
+    ],
     "stats": {
       "num_charts_texts": 44,
       "num_keywords": 4,
@@ -8008,7 +9003,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8054,6 +9051,13 @@
       "infections",
       "neonatal tetanus"
     ],
+    "countries": [
+      "India",
+      "Nigeria",
+      "Pakistan",
+      "Ethiopia",
+      "Bangladesh"
+    ],
     "stats": {
       "num_charts_texts": 24,
       "num_keywords": 4,
@@ -8067,7 +9071,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8116,6 +9122,13 @@
       "vacations",
       "retirement"
     ],
+    "countries": [
+      "Germany",
+      "South Korea",
+      "United States",
+      "Greece",
+      "Denmark"
+    ],
     "stats": {
       "num_charts_texts": 57,
       "num_keywords": 7,
@@ -8129,7 +9142,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8203,6 +9218,13 @@
       "spending abroad",
       "business trips"
     ],
+    "countries": [
+      "France",
+      "Spain",
+      "Macao",
+      "Maldives",
+      "Thailand"
+    ],
     "stats": {
       "num_charts_texts": 60,
       "num_keywords": 8,
@@ -8216,7 +9238,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8297,6 +9321,13 @@
       "manufacturing jobs",
       "export subsidies"
     ],
+    "countries": [
+      "China",
+      "Singapore",
+      "United States",
+      "Germany",
+      "Vietnam"
+    ],
     "stats": {
       "num_charts_texts": 128,
       "num_keywords": 7,
@@ -8310,7 +9341,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8381,6 +9414,13 @@
       "registered vehicles",
       "rail"
     ],
+    "countries": [
+      "Norway",
+      "China",
+      "United States",
+      "Japan",
+      "Netherlands"
+    ],
     "stats": {
       "num_charts_texts": 94,
       "num_keywords": 5,
@@ -8394,7 +9434,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8451,6 +9493,13 @@
       "political decision-making",
       "altruism"
     ],
+    "countries": [
+      "Norway",
+      "China",
+      "United States",
+      "Brazil",
+      "Denmark"
+    ],
     "stats": {
       "num_charts_texts": 60,
       "num_keywords": 7,
@@ -8464,7 +9513,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8536,6 +9587,14 @@
       "incidence",
       "treatment"
     ],
+    "countries": [
+      "India",
+      "South Africa",
+      "China",
+      "Russia",
+      "United States",
+      "Philippines"
+    ],
     "stats": {
       "num_charts_texts": 94,
       "num_keywords": 6,
@@ -8549,7 +9608,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8611,6 +9672,13 @@
       "sanitation",
       "capital city"
     ],
+    "countries": [
+      "China",
+      "Singapore",
+      "Nigeria",
+      "Japan",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 84,
       "num_keywords": 4,
@@ -8624,7 +9692,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8674,6 +9744,13 @@
       "pneumococcal",
       "flu"
     ],
+    "countries": [
+      "United States",
+      "India",
+      "Nigeria",
+      "Afghanistan",
+      "Pakistan"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -8687,7 +9764,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8769,6 +9848,13 @@
       "child homicide",
       "forced sex"
     ],
+    "countries": [
+      "Niger",
+      "Bangladesh",
+      "Somalia",
+      "United States",
+      "Ethiopia"
+    ],
     "stats": {
       "num_charts_texts": 50,
       "num_keywords": 8,
@@ -8782,7 +9868,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8864,6 +9952,14 @@
       "non-state conflicts",
       "peacekeeping"
     ],
+    "countries": [
+      "Ukraine",
+      "Syria",
+      "Afghanistan",
+      "Ethiopia",
+      "Israel",
+      "Sudan"
+    ],
     "stats": {
       "num_charts_texts": 200,
       "num_keywords": 8,
@@ -8877,7 +9973,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 6,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -8958,6 +10056,13 @@
       "recycling",
       "waste generation"
     ],
+    "countries": [
+      "South Korea",
+      "Philippines",
+      "Germany",
+      "Estonia",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 47,
       "num_keywords": 7,
@@ -8971,7 +10076,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -9045,6 +10152,13 @@
       "water productivity",
       "water quality"
     ],
+    "countries": [
+      "Saudi Arabia",
+      "India",
+      "Uzbekistan",
+      "Egypt",
+      "Kuwait"
+    ],
     "stats": {
       "num_charts_texts": 70,
       "num_keywords": 8,
@@ -9058,7 +10172,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -9134,6 +10250,13 @@
       "wildfires",
       "area burnt"
     ],
+    "countries": [
+      "Australia",
+      "Canada",
+      "Angola",
+      "Democratic Republic of Congo",
+      "Brazil"
+    ],
     "stats": {
       "num_charts_texts": 28,
       "num_keywords": 2,
@@ -9147,7 +10270,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -9181,6 +10306,13 @@
       "political empowerment",
       "sexual harassment"
     ],
+    "countries": [
+      "Rwanda",
+      "Afghanistan",
+      "Iceland",
+      "Saudi Arabia",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 125,
       "num_keywords": 8,
@@ -9194,7 +10326,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -9276,6 +10410,13 @@
       "sexual harassment",
       "informal employment"
     ],
+    "countries": [
+      "South Korea",
+      "Germany",
+      "Saudi Arabia",
+      "Rwanda",
+      "India"
+    ],
     "stats": {
       "num_charts_texts": 169,
       "num_keywords": 8,
@@ -9289,7 +10430,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
@@ -9368,6 +10511,13 @@
       "retirement",
       "GDP per capita"
     ],
+    "countries": [
+      "South Korea",
+      "Germany",
+      "Cambodia",
+      "Netherlands",
+      "Ireland"
+    ],
     "stats": {
       "num_charts_texts": 30,
       "num_keywords": 5,
@@ -9381,7 +10531,9 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "coverage",
-      "refined": true
+      "refined": true,
+      "num_countries": 5,
+      "unrecognized_countries": []
     },
     "keyword_stats": [
       {
