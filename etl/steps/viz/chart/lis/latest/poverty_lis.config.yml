@@ -101,15 +101,17 @@ dimensions:
         name: "Before tax"
       - slug: "after_vs_before_tax"
         name: "After vs. before tax"
-  - name: Adjust for cost sharing within households (equivalized income)
+  - name: Household size adjustment
     slug: equivalence_scale
     presentation:
       type: toggle-buttons
     choices:
       - slug: "per capita"
         name: "Per capita"
+        description: Each person, including children, is attributed an equal share of the total income received by all members of their household.
       - slug: "square root"
         name: "Equivalized"
+        description: Income is adjusted for household size, since people sharing a household can split costs like rent and heating. LIS divides the total household income by the square root of the number of people in the household.
 
 # Views are generated from the table in the .py.
 views: []
