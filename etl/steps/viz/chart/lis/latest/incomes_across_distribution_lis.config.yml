@@ -88,12 +88,14 @@ dimensions:
         name: "Year"
       - slug: "nan"
         name: ""
-  - name: Adjust for cost sharing within households (equivalized income)
+  - name: Household size adjustment
     slug: equivalence_scale
     choices:
       - slug: "per capita"
         name: "Per capita"
+        description: Each person, including children, is attributed an equal share of the total income received by all members of their household.
       - slug: "square root"
         name: "Equivalized"
+        description: Income is adjusted for household size, since people sharing a household can split costs like rent and heating. LIS divides the total household income by the square root of the number of people in the household.
 
 views: []
