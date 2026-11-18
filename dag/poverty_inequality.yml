@@ -82,8 +82,6 @@ steps:
         - snapshot://lis/2026-09-18/lis_incomes.csv
         - snapshot://lis/2026-09-18/lis_relative_poverty.csv
         - snapshot://lis/2026-09-18/lis_percentiles.csv
-  viz://explorer/lis/latest/poverty_lis:
-    - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://chart/lis/latest/gini_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://chart/lis/latest/relative_poverty_lis:
@@ -96,7 +94,7 @@ steps:
   # Incomes across the distribution multidim, shown as a data explorer.
   viz://chart/lis/latest/incomes_across_distribution_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
-  # Poverty multidim shown as a data explorer (replaces the poverty-lis explorer).
+  # Poverty multidim, shown as a data explorer.
   viz://chart/lis/latest/poverty_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
 
