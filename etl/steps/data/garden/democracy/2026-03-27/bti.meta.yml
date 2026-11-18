@@ -167,6 +167,10 @@ tables:
         presentation:
           title_public: Political regime
           title_variant: score
+          grapher_config:
+            yAxis:
+              max: 4
+              min: 0
         display:
           numDecimalPlaces: 0
 
