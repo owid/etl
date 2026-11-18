@@ -5,6 +5,7 @@ Inputs, all from earlier steps of the migration:
 - `<review>/references_full.json` from `scan_references.py`;
 - `<mapping-dir>/mapping.json` and `admin_bulk_payload.json` from `map-explorer-to-mdim`;
 - optional `--notes notes.json`: `{"<check>:<field prefix>": "why this difference is expected"}`.
+  The key `rendered:footer-link` explains a footer that differs only by the multidim's originUrl link.
   A difference with a note counts as explained, not as a mismatch. Write one only after checking
   the difference against the rendered pages.
 
@@ -19,6 +20,7 @@ Usage:
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 READER_CHECKS = ["mapping", "indicators", "data", "metadata", "rendered"]
@@ -87,12 +89,22 @@ def dimension_summary(mapping: dict) -> list[dict]:
     return out
 
 
+def _strip_footer_link(text: str) -> list[str]:
+    """Footer words without the origin link (`OurWorldinData.org/<page> |`) and the license."""
+    return re.sub(r"OurWorldinData\.org/\S+\s*\|?", " ", text).replace("CC BY", " ").split()
+
+
 def classify(pairs: list[dict], notes: dict) -> None:
     """Mark each difference as explained (has a note) or not, and give each view a verdict."""
     for p in pairs:
         for c in p["checks"]:
             key = f"{c['check'].split(':')[0]}:{c['field']}"
             c["note"] = next((v for k, v in notes.items() if key.startswith(k)), None)
+            # `rendered:footer-link` explains a footer that differs only by the multidim's added
+            # originUrl link (which also moves "CC BY" after the note), never any other change.
+            if c["check"].startswith("rendered") and c["field"] == "footer" and "rendered:footer-link" in notes:
+                if _strip_footer_link(c["multidim"] or "") == _strip_footer_link(c["explorer"] or ""):
+                    c["note"] = notes["rendered:footer-link"]
         visible = [c for c in p["checks"] if c["check"].split(":")[0] in READER_CHECKS and not c["note"]]
         other = [c for c in p["checks"] if c["check"].split(":")[0] not in READER_CHECKS and not c["note"]]
         p["verdict"] = "differs" if visible else ("config" if other else "match")
