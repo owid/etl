@@ -535,7 +535,9 @@ def measure_line(
         for candidate in candidates
         if candidate.term not in chosen
     ]
-    selection.near_misses = sorted((miss for miss in misses if miss.marginal_count), key=lambda miss: -miss.marginal_weight)[:3]
+    selection.near_misses = sorted(
+        (miss for miss in misses if miss.marginal_count), key=lambda miss: -miss.marginal_weight
+    )[:3]
 
     selection.covered = frozenset(covered)
     self_named = match_identities(universe, universe.topic_name)

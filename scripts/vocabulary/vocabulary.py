@@ -194,7 +194,7 @@ async def extract_keywords_with_llm(
 ) -> dict:
     """Ask the model for candidate terms for a topic's suggestion line, having shown it the chart texts.
 
-    Returns: dict with topic info, the candidates as `keywords`, and token usage (zero when the answer came from the cache)
+    Returns: dict with topic info, the candidates as `keywords`, and token usage (zero when cached)
     """
     # Combine all texts
     combined_text = "\n".join(texts)
@@ -579,10 +579,7 @@ async def process_topics(
                 return_exceptions=True,
             ),
             asyncio.gather(
-                *(
-                    countries_for(topic_slug, topic_name, texts)
-                    for topic_slug, topic_name, texts in prompt_inputs
-                ),
+                *(countries_for(topic_slug, topic_name, texts) for topic_slug, topic_name, texts in prompt_inputs),
                 return_exceptions=True,
             ),
         )
