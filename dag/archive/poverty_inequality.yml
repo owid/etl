@@ -656,3 +656,6 @@ steps:
   # archived; last active in 5c5c94012386 on 2026-11-18
   viz://explorer/lis/latest/incomes_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
+  # archived; last active in 56a286fad9f7 on 2026-11-18
+  viz://explorer/lis/latest/poverty_lis:
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
