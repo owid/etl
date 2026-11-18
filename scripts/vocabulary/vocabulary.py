@@ -192,9 +192,9 @@ async def extract_keywords_with_llm(
     semaphore: asyncio.Semaphore,
     model_id: str = DEFAULT_MODEL,
 ) -> dict:
-    """Use an LLM to extract good keywords/phrases from chart texts.
+    """Ask the model for candidate terms for a topic's suggestion line, having shown it the chart texts.
 
-    Returns: dict with topic info, keywords, and token usage (zero when the answer came from the cache)
+    Returns: dict with topic info, the candidates as `keywords`, and token usage (zero when the answer came from the cache)
     """
     # Combine all texts
     combined_text = "\n".join(texts)
@@ -329,19 +329,13 @@ Output JSON:
   "keywords": ["term1", "term2", ...]
 }}"""
 
-    try:
-        result, input_tokens, output_tokens = await ask_for_json(
-            prompt, line_schema([candidate.term for candidate in ordered]), client, cache, semaphore, model_id
-        )
-    except Exception as e:
-        raise RuntimeError(f"choosing the line failed for {universe.topic_name}: {e}")
+    result, input_tokens, output_tokens = await ask_for_json(
+        prompt, line_schema([candidate.term for candidate in ordered]), client, cache, semaphore, model_id
+    )
 
+    # The schema's enum keeps every answer among the candidates; a term named twice counts once.
     by_term = {candidate.term: candidate for candidate in candidates}
-    line: list[CandidateReach] = []
-    for term in result.get("keywords", []):
-        candidate = by_term.get(term)
-        if candidate is not None and candidate not in line:
-            line.append(candidate)
+    line = [by_term[term] for term in dict.fromkeys(result["keywords"])]
     return {"line": line[:max_terms], "input_tokens": input_tokens, "output_tokens": output_tokens}
 
 
@@ -483,7 +477,7 @@ async def process_topics(
     weighting: str,
     views_column: str,
     max_terms: int,
-    kept_countries: dict[str, list[str]] | None = None,
+    kept_countries: dict[str, dict] | None = None,
 ) -> tuple[list[dict], list[str], dict[str, WeightedUniverse], list[TopicSelection]]:
     """Generate a vocabulary for each topic: its suggestion line and its countries.
 
@@ -492,7 +486,8 @@ async def process_topics(
     2. Per topic, fetch the record set the all-charts block lists and weight each
        record by its views.
     3. Ask the model for candidate terms and for countries, having shown it that
-       record set. A topic in kept_countries reuses those countries instead.
+       record set. A topic in kept_countries (slug → its committed `countries` and
+       `unrecognized`) reuses those instead.
     4. Measure what each candidate would show (measure_candidates), and ask the
        model to choose the line from those measurements. Which terms make a good
        line is a judgment (whether a term means anything on its own, whether two
@@ -559,11 +554,6 @@ async def process_topics(
     click.echo(f"\nAsking for candidate terms and countries for {len(prompt_inputs)} topics...")
     country_names = load_country_names()
 
-    async def countries_for(topic_slug: str, topic_name: str, texts: list[str]) -> dict:
-        if topic_slug in kept_countries:
-            return {"countries": kept_countries[topic_slug], "unrecognized": [], "input_tokens": 0, "output_tokens": 0}
-        return await suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
-
     client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=LLM_MAX_RETRIES)
     try:
         cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
@@ -571,6 +561,12 @@ async def process_topics(
         click.secho(f"  Ignoring an unreadable answer cache at {LLM_CACHE_FILE}", fg="yellow")
         cache = {}
     llm_semaphore = asyncio.Semaphore(LLM_CONCURRENCY)
+
+    async def countries_for(topic_slug: str, topic_name: str, texts: list[str]) -> dict:
+        if topic_slug in kept_countries:
+            return {**kept_countries[topic_slug], "input_tokens": 0, "output_tokens": 0}
+        return await suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
+
     results: list[dict] = []
     selections: list[TopicSelection] = []
     try:
@@ -823,6 +819,15 @@ def main(
     click.echo("=" * 80)
     click.echo()
 
+    # Each kept topic's countries, and the suggestions that were dropped from them, as last committed.
+    kept_countries = (
+        {
+            slug: {"countries": entry["countries"], "unrecognized": entry["stats"].get("unrecognized_countries", [])}
+            for slug, entry in json.loads(VOCABULARY_FILE.read_text()).items()
+        }
+        if keep_countries
+        else None
+    )
     try:
         results, failed_slugs, universes, selections = asyncio.run(
             process_topics(
@@ -831,11 +836,7 @@ def main(
                 weighting=weighting,
                 views_column=views_column,
                 max_terms=max_terms,
-                kept_countries=(
-                    {slug: entry["countries"] for slug, entry in json.loads(VOCABULARY_FILE.read_text()).items()}
-                    if keep_countries
-                    else None
-                ),
+                kept_countries=kept_countries,
             )
         )
     except EmptyAnalyticsError as e:

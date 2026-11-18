@@ -7,12 +7,7 @@ Simple LLM-based CLI to extract characteristic keywords from OWID chart titles a
 For each OWID topic, this builds the short line of suggested search terms shown
 under the all-charts block's search box.
 
-Choosing the line is a judgment, so the model makes it, with measurements in
-hand: it proposes candidate terms, code measures what clicking each one would
-show (which charts, and their share of the topic's views), and the model then
-chooses the line from those measured candidates. Code only rules out what can be
-checked: places, terms that show nothing, and terms matching nearly every chart,
-which would narrow nothing.
+Choosing the line is a judgment, so the model makes it, with measurements in hand: it proposes candidate terms, code measures what clicking each one would show (which charts, and their share of the topic's views), and the model then chooses the line from those measured candidates. Code only rules out what can be checked: places, terms that show nothing, and terms matching nearly every chart, which would narrow nothing (unless every candidate does, as on a topic whose charts are all named after it).
 
 Four phases:
 
@@ -22,9 +17,7 @@ Four phases:
    charts, multi-dim views and explorer views alike — and weight each record by
    its views.
 3. Ask the model for candidate terms (and countries), having shown it that record set.
-4. Measure every candidate against it, and ask the model to choose the line,
-   showing it each candidate's chart count, view share and most-viewed charts. The
-   answer is constrained to the candidates offered.
+4. Measure every candidate against it, and ask the model to choose the line, showing it each candidate's chart count, view share and most-viewed charts. The answer is constrained to the candidates offered.
 
 ## Quick Start
 
@@ -119,7 +112,7 @@ matters: the terms it lists first are the ones most likely to be shown.
 3. **Sampling**: the 200 most-viewed distinct texts (not a random sample — the
    terms proposed should describe what people actually look at, and two runs
    should see the same input)
-4. **LLM extraction**: Feeds all text to Claude with instructions to extract modern, searchable keywords. A topic whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
+4. **Candidates**: feeds all text to Claude, asking for candidate search terms. Each of a topic's three requests (this one, countries, choosing the line) whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
 5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. Each answer is matched against OWID's country names (names, short names and aliases in the regions definitions), since the site filters charts by those exact names; anything that isn't a current country is dropped and listed in the topic's `unrecognized_countries` stat
 6. **Choosing the line**: a third request per topic shows the measured candidates and asks for the line, in order; `keyword_stats` then records what each chosen term shows and adds to the ones before it
 7. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio

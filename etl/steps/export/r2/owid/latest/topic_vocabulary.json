@@ -5740,7 +5740,9 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 4,
-      "unrecognized_countries": [],
+      "unrecognized_countries": [
+        "England"
+      ],
       "total_cost_usd": 0.017536
     },
     "keyword_stats": [
@@ -8948,7 +8950,9 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 4,
-      "unrecognized_countries": [],
+      "unrecognized_countries": [
+        "Antarctica"
+      ],
       "total_cost_usd": 0.02634
     },
     "keyword_stats": [

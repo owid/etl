@@ -404,21 +404,6 @@ class TopicSelection:
         return self.selected[-1].cumulative_weight if self.selected else 0.0
 
 
-def offerable_candidates(candidates: list[str], topic_name: str) -> list[str]:
-    """Drop the candidates that could never be worth a slot: places.
-
-    Nothing else. A term the topic's own name contains used to be dropped here
-    too, which cost the topics whose charts are simply called after them —
-    Religion reached 39% of its traffic without being allowed to say "religious".
-    Whether a term is too blunt to suggest turns out not to be answerable from
-    its text at all: "religious" is not a substring of "Religion" and covers 81%
-    of it, while "poverty line" contains the whole of "Poverty" and covers 12%.
-    It is answerable from what the term covers, which is what
-    measure_candidates does with SUBSUMING_CHART_SHARE.
-    """
-    return [candidate for candidate in candidates if not _is_place_name(candidate)]
-
-
 # The prompt asks for no places, and this catches the ones that slip through
 # anyway, since a country named in many chart titles can otherwise win a slot on
 # coverage alone ("Sweden" on Smallpox). Bare continent words aren't all regions
@@ -464,29 +449,14 @@ def _is_place_name(term: str) -> bool:
 
 
 # A term matching this share of a topic's charts narrows nothing: a reader
-# clicking it is shown the page they are already on. "malaria" matches all 20
-# charts on Malaria, "poverty" all but a handful of Poverty's 250 — offering them
-# spends the line's first slot to stand still, and, since everything else is then
-# a subset that adds nothing, the line stops there. Held back, those topics
-# suggest "cases, deaths, children, funding" and "extreme poverty, relative
-# poverty, national poverty lines" instead.
-#
-# Counted in charts, not views, and set where terms stop narrowing rather than
-# where they start being broad. Both of those were wrong before, and together
-# they made the rule a coin toss:
-#
-# - It read views, so the *same* term on the same charts changed category as
-#   traffic moved. "sex ratio" matches 6 of Gender Ratio's 15 charts and sat at
-#   53% of its views — just over the old bar — so it was withheld, and the topic
-#   suggested six terms reaching half of it while five charts named "Sex ratio …"
-#   had nothing pointing at them. A week earlier the same code had suggested it
-#   first and reached 99%. A chart count only moves when charts are published, so
-#   the decision now holds still.
-# - The bar was half the topic, which is where useful terms live, not useless
-#   ones: a term matching six charts in fifteen is the most narrowing thing on
-#   offer. Anywhere in 80–95% the outcome is near enough identical (median
-#   coverage 94.3%, 95.0%, 95.7%), because almost nothing real sits there — which
-#   is the point of putting the bar there.
+# clicking it is shown the page they are already on ("malaria" matches all 20
+# charts on Malaria, "poverty" all but a handful of Poverty's 250), so it is not
+# offered to the model. Counted in charts rather than views, so the same term on
+# the same charts doesn't change category as traffic moves; a chart count only
+# moves when charts are published. The bar sits where terms stop narrowing, not
+# where they start being broad: a term matching six charts in fifteen is the most
+# narrowing thing on offer, and anywhere in 80-95% almost nothing real sits. When
+# every candidate is that broad, they are all offered (see measure_candidates).
 SUBSUMING_CHART_SHARE = 0.9
 
 
@@ -502,15 +472,15 @@ class CandidateReach:
 def measure_candidates(universe: WeightedUniverse, candidates: list[str]) -> list[CandidateReach]:
     """What each candidate would show, for the ones worth offering the model to choose from.
 
-    Left out are places (offerable_candidates), terms that show nothing, and terms
+    Left out are places, terms that show nothing, and terms
     matching nearly every chart, which narrow nothing (SUBSUMING_CHART_SHARE) —
     unless every candidate does, as on a topic whose charts are all named after it
     (Energy Mix), where a term that narrows nothing still beats no suggestion.
     """
     measured: list[CandidateReach] = []
     seen: set[str] = set()
-    for term in offerable_candidates(candidates, universe.topic_name):
-        if term.casefold() in seen:
+    for term in candidates:
+        if _is_place_name(term) or term.casefold() in seen:
             continue
         seen.add(term.casefold())
         records = match_identities(universe, term)
@@ -519,6 +489,22 @@ def measure_candidates(universe: WeightedUniverse, candidates: list[str]) -> lis
     total_count = len(universe.records)
     narrowing = [c for c in measured if len(c.records) / total_count <= SUBSUMING_CHART_SHARE]
     return narrowing or measured
+
+
+def _term_coverage(
+    universe: WeightedUniverse, candidate: CandidateReach, covered: set[str], covered_weight: float
+) -> TermCoverage:
+    """What a candidate shows, and what it adds to the records already covered (worth `covered_weight`)."""
+    new = candidate.records - covered
+    marginal = universe.weight_of(new)
+    return TermCoverage(
+        term=candidate.term,
+        own_weight=candidate.weight,
+        own_count=len(candidate.records),
+        marginal_weight=marginal,
+        marginal_count=len(new),
+        cumulative_weight=covered_weight + marginal,
+    )
 
 
 def measure_line(
@@ -539,37 +525,17 @@ def measure_line(
     )
     covered: set[str] = set()
     for candidate in line:
-        new = candidate.records - covered
-        marginal = universe.weight_of(new)
-        selection.selected.append(
-            TermCoverage(
-                term=candidate.term,
-                own_weight=candidate.weight,
-                own_count=len(candidate.records),
-                marginal_weight=marginal,
-                marginal_count=len(new),
-                cumulative_weight=selection.covered_weight + marginal,
-            )
-        )
-        covered |= new
+        term = _term_coverage(universe, candidate, covered, selection.covered_weight)
+        selection.selected.append(term)
+        covered |= candidate.records
 
     chosen = {term.term for term in selection.selected}
-    misses = sorted(
-        (c for c in candidates if c.term not in chosen and c.records - covered),
-        key=lambda c: -universe.weight_of(c.records - covered),
-    )
-    for candidate in misses[:3]:
-        new = candidate.records - covered
-        selection.near_misses.append(
-            TermCoverage(
-                term=candidate.term,
-                own_weight=candidate.weight,
-                own_count=len(candidate.records),
-                marginal_weight=universe.weight_of(new),
-                marginal_count=len(new),
-                cumulative_weight=selection.covered_weight + universe.weight_of(new),
-            )
-        )
+    misses = [
+        _term_coverage(universe, candidate, covered, selection.covered_weight)
+        for candidate in candidates
+        if candidate.term not in chosen
+    ]
+    selection.near_misses = sorted((miss for miss in misses if miss.marginal_count), key=lambda miss: -miss.marginal_weight)[:3]
 
     selection.covered = frozenset(covered)
     self_named = match_identities(universe, universe.topic_name)
