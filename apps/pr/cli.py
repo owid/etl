@@ -1189,8 +1189,8 @@ def remove_worktree(repo: Repo, worktree_path: Path) -> None:
     and the files are deleted from there.
 
     Falls back to `git worktree remove` when the worktree is already gone, is locked, has changes
-    that would make git refuse, or can't be renamed (e.g. it is on another filesystem), so git's own
-    checks and messages still apply there.
+    or populated submodules that would make git refuse, or can't be renamed (e.g. it is on another
+    filesystem), so git's own checks and messages still apply there.
     """
     trash_dir = Path(repo.git.rev_parse("--path-format=absolute", "--git-common-dir")) / "worktree-trash"
     # Remove anything an interrupted earlier run left behind.
@@ -1203,7 +1203,12 @@ def remove_worktree(repo: Repo, worktree_path: Path) -> None:
             admin_dir = Path(Repo(worktree_path).git.rev_parse("--absolute-git-dir"))
         except (InvalidGitRepositoryError, NoSuchPathError, GitCommandError):
             pass
-    if admin_dir is None or (admin_dir / "locked").exists() or worktree_blocking_changes(worktree_path):
+    if (
+        admin_dir is None
+        or (admin_dir / "locked").exists()
+        or worktree_blocking_changes(worktree_path)
+        or _has_populated_submodules(worktree_path, admin_dir)
+    ):
         repo.git.worktree("remove", str(worktree_path))
         return
 
@@ -1217,3 +1222,19 @@ def remove_worktree(repo: Repo, worktree_path: Path) -> None:
     # Drop git's record of the worktree, whose folder is now gone. `rmtree` doesn't follow symlinks.
     repo.git.worktree("prune")
     shutil.rmtree(trash_dir, ignore_errors=True)
+
+
+def _has_populated_submodules(worktree_path: Path, admin_dir: Path) -> bool:
+    """Return True if the worktree has submodules that make `git worktree remove` refuse.
+
+    Mirrors git's own check: the worktree's git dir holds a `modules/` dir, or a submodule entry in
+    the index (mode 160000) is checked out, i.e. has a `.git` in its folder. A clean `git status`
+    doesn't rule these out, and removing such a worktree would delete the submodule's own files.
+    """
+    if (admin_dir / "modules").is_dir():
+        return True
+    for line in Repo(worktree_path).git.ls_files("--stage", "-z").split("\0"):
+        mode, _, path = line.partition("\t")
+        if mode.startswith("160000 ") and (worktree_path / path / ".git").exists():
+            return True
+    return False

@@ -222,14 +222,23 @@ def test_remove_worktree_keeps_symlink_targets(repo_with_worktree, tmp_path):
     assert (shared / "keep.txt").read_text() == "shared"
 
 
-@pytest.mark.parametrize("setup", ["dirty", "locked"])
+@pytest.mark.parametrize("setup", ["dirty", "locked", "submodule"])
 def test_remove_worktree_leaves_refused_worktree_in_place(repo_with_worktree, setup):
     """Where `git worktree remove` would refuse, it is still git that decides, so nothing is renamed."""
     repo, worktree_path = repo_with_worktree
     if setup == "dirty":
         (worktree_path / "a.txt").write_text("uncommitted edit")
-    else:
+    elif setup == "locked":
         repo.git.worktree("lock", str(worktree_path))
+    else:
+        # A checked-out submodule, committed, so `git status` is clean but git still refuses.
+        sub = Repo.init(worktree_path / "sub")
+        _set_identity(sub)
+        _commit_file(sub, "s.txt", "sub", "submodule commit")
+        worktree = Repo(worktree_path)
+        worktree.git.add("sub")
+        worktree.git.commit("-m", "add submodule")
+        assert worktree_blocking_changes(worktree_path) == []
 
     with pytest.raises(GitCommandError):
         remove_worktree(repo, worktree_path)
