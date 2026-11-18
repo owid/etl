@@ -310,6 +310,9 @@ one a curious reader would want to click through, and it gets there by three thi
 - **Together they reach what readers come for.** The view shares say where the topic's
   readers go; a line that skips its most-viewed charts has missed the topic. Put the terms
   that open the most-viewed parts first.
+  A subject the charts are only compared against, such as GDP per capita on the axis of
+  "... vs. GDP per capita" charts, is not what the topic's readers come for, unless the topic
+  is about it (GDP per capita on an economic topic).
 - **Each term makes sense on its own.** The reader sees the term alone, with no chart next to
   it, and should know what clicking it will show. A subject ("working hours", "lung cancer")
   passes. These don't, however much they reach: a word that only means something next to the
