@@ -1,0 +1,69 @@
+grapher_schema: "012"
+
+title:
+  title: Inequality - Luxembourg Income Study
+  title_variant: ""
+slug: inequality-lis
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore Luxembourg Income Study data on inequality.
+topic_tags:
+  - Unlisted
+default_selection:
+  - Brazil
+  - Chile
+  - China
+  - France
+  - South Africa
+  - United States
+# The explorer's default view (its first row).
+default_dimensions:
+  indicator: gini
+  welfare_type: dhi
+  equivalence_scale: per capita
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/economic-inequality
+        # The explorer showed a link to this article below the chart.
+        relatedQuestions:
+          - url: https://ourworldindata.org/owid-data-collection-inequality-and-poverty
+            text: "OWID Data Collection: Inequality and Poverty"
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: gini
+        name: Gini coefficient
+      - slug: share_top_10
+        name: Share of the richest 10%
+      - slug: share_bottom_50
+        name: Share of the poorest 50%
+      - slug: palma_ratio
+        name: Palma ratio
+      - slug: share_below_50pct_median
+        name: Share in relative poverty
+  - name: Income measure
+    slug: welfare_type
+    choices:
+      - slug: "dhi"
+        name: "After tax"
+      - slug: "mi"
+        name: "Before tax"
+      - slug: "after_vs_before_tax"
+        name: "After vs. before tax"
+  - name: Household size adjustment
+    slug: equivalence_scale
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: "per capita"
+        name: "Per capita"
+        description: Each person, including children, is attributed an equal share of the total income received by all members of their household.
+      - slug: "square root"
+        name: "Equivalized"
+        description: Income is adjusted for household size, since people sharing a household can split costs like rent and heating. LIS divides the total household income by the square root of the number of people in the household.
+
+views: []

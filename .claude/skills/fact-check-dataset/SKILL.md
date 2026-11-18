@@ -1,7 +1,7 @@
 ---
 name: fact-check-dataset
 description: >-
-  Adversarially review an ETL dataset's data and metadata for factual accuracy — verifies metadata claims against the producer's own documentation (fetched from the links in snapshot .dvc files and metadata texts) and cross-checks anomalous plus anchor values against independent sources online, to catch unit errors, wrong-year values, and hard-to-detect mistakes made by the source itself. Also checks the texts of a static chart (a Figma frame or a static viz) against the indicator and its producer. Use when the user asks to "adversarially review a dataset", "fact-check this dataset", "fact-check this chart's text", "verify the data against the source", "cross-check the values", or as the factual-accuracy step inside /update-dataset, /create-dataset, /review-data-pr, /create-static-viz and /owid-staff:create-figma-chart.
+  Adversarially review an ETL dataset's data and metadata for factual accuracy — verifies metadata claims against the producer's own documentation (fetched from the links in snapshot .dvc files and metadata texts) and cross-checks anomalous plus anchor values against independent sources online, to catch unit errors, wrong-year values, and hard-to-detect mistakes made by the source itself. Also checks the texts of a static chart (a Figma frame or a static viz) against the indicator and its producer. Use when someone wants a dataset's values or metadata, or a static chart's text, checked against the producer and independent sources, or as the factual-accuracy step inside /update-dataset, /create-dataset, /review-data-pr, /create-static-viz and /owid-staff:create-figma-chart.
 metadata:
   internal: true
   owner: paarriagadap

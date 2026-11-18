@@ -123,7 +123,7 @@ Once they've said it looks right, the review's findings are handled and the PR's
 
 Wait for `buildkite/etl-deploy-master` to succeed on the merge commit (`gh api repos/owid/etl/commits/<merge sha>/status`): that run writes the MDim to production. If it fails, find out why, fix it if it's this MDim, and tell them in plain words.
 
-> **Temporary step:** publishing an MDim is still done by hand in the admin. This is expected to go away.
+> **Temporary step:** publishing an MDim is still done by hand in the admin.
 
 Then send something like:
 

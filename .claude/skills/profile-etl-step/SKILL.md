@@ -100,22 +100,15 @@ tb = ds_meadow.read("table_name", safe_types=False)
 
 **Symptom**: `.apply(lambda row: ..., axis=1)` or Python loops over rows showing high time.
 
-**Fix with `np.select`**:
+**Fix with masked assignment** (vectorized, and keeps origins, unlike `np.where`/`np.select`):
 ```python
 # Bad — iterates row by row
 tb["result"] = tb.apply(lambda row: row["a"] if row["a"] > 0 else row["b"], axis=1)
 
 # Good — vectorized
-import numpy as np
-conditions = [tb["a"] > 0]
-choices = [tb["a"]]
-tb["result"] = np.select(conditions, choices, default=tb["b"])
-```
-
-**Note on origins**: `np.where` and `np.select` strip OWID metadata origins. To preserve them:
-```python
 tb["result"] = tb["b"]  # default
-tb.loc[tb["a"] > 0, "result"] = tb.loc[tb["a"] > 0, "a"]
+mask = tb["a"] > 0
+tb.loc[mask, "result"] = tb.loc[mask, "a"]
 ```
 
 ### 4. Expensive Groupby on Large Tables

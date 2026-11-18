@@ -10,13 +10,14 @@ import shutil
 from pathlib import Path
 
 import pytest
-from git import Repo
+from git import GitCommandError, Repo
 
 from apps.pr.cli import (
     _CLEAN_ALL,
     _CLEAN_ALL_CLOSED,
     _CLEAN_ALL_MERGED,
     clean_branch,
+    remove_worktree,
     resolve_branches_to_clean,
     worktree_blocking_changes,
 )
@@ -190,3 +191,64 @@ def test_clean_branch_removes_clean_worktree_and_salvages_scratch_dirs(repo_with
     assert not worktree_path.exists()
     assert "feature" not in [b.name for b in repo.branches]
     assert (main_path / "workbench" / "feature" / "notes.txt").read_text() == "keep me"
+
+
+def _trash_dir(repo: Repo) -> Path:
+    return Path(repo.git_dir) / "worktree-trash"
+
+
+def test_remove_worktree_renames_then_deletes(repo_with_worktree):
+    repo, worktree_path = repo_with_worktree
+    # A leftover from an interrupted earlier run is cleaned up too.
+    (_trash_dir(repo) / "stale").mkdir(parents=True)
+
+    remove_worktree(repo, worktree_path)
+
+    assert not worktree_path.exists()
+    assert str(worktree_path) not in repo.git.worktree("list", "--porcelain")
+    assert not _trash_dir(repo).exists()
+
+
+def test_remove_worktree_keeps_symlink_targets(repo_with_worktree, tmp_path):
+    repo, worktree_path = repo_with_worktree
+    shared = tmp_path / "shared"
+    shared.mkdir()
+    (shared / "keep.txt").write_text("shared")
+    (worktree_path / "data").symlink_to(shared)
+
+    remove_worktree(repo, worktree_path)
+
+    assert not worktree_path.exists()
+    assert (shared / "keep.txt").read_text() == "shared"
+
+
+@pytest.mark.parametrize("setup", ["dirty", "locked", "submodule", "replaced"])
+def test_remove_worktree_leaves_refused_worktree_in_place(repo_with_worktree, setup):
+    """Where `git worktree remove` would refuse, it is still git that decides, so nothing is renamed."""
+    repo, worktree_path = repo_with_worktree
+    if setup == "replaced":
+        # The worktree was deleted by hand and a separate, clean repo now sits at its path.
+        shutil.rmtree(worktree_path)
+        other = Repo.init(worktree_path, initial_branch="master")
+        _set_identity(other)
+        _commit_file(other, "a.txt", "unrelated", "unrelated commit")
+        assert worktree_blocking_changes(worktree_path) == []
+    elif setup == "dirty":
+        (worktree_path / "a.txt").write_text("uncommitted edit")
+    elif setup == "locked":
+        repo.git.worktree("lock", str(worktree_path))
+    else:
+        # A checked-out submodule, committed, so `git status` is clean but git still refuses.
+        sub = Repo.init(worktree_path / "sub")
+        _set_identity(sub)
+        _commit_file(sub, "s.txt", "sub", "submodule commit")
+        worktree = Repo(worktree_path)
+        worktree.git.add("sub")
+        worktree.git.commit("-m", "add submodule")
+        assert worktree_blocking_changes(worktree_path) == []
+
+    with pytest.raises(GitCommandError):
+        remove_worktree(repo, worktree_path)
+
+    assert (worktree_path / "a.txt").exists()
+    assert str(worktree_path) in repo.git.worktree("list", "--porcelain")
