@@ -23,21 +23,9 @@ Ask the user which scope they want to check:
 
 ## Implementation Strategy
 
-### 0. Check codespell installation
+### 0. Check codespell
 
-**IMPORTANT:** Check if codespell is installed before attempting to use it. Since codespell is a dev dependency in the project, it should already be installed, but verify first to avoid reinstalling unnecessarily.
-
-```bash
-# Check if codespell is installed
-if ! .venv/bin/codespell --version &> /dev/null; then
-    echo "codespell not found, installing..."
-    uv add --dev codespell
-else
-    echo "codespell is already installed"
-fi
-```
-
-If codespell is not installed and `uv add --dev codespell` fails, tell the user to rebuild the environment with `make .venv`.
+codespell is a dev dependency, so `.venv/bin/codespell` should exist. If it doesn't, the venv is incomplete: run `make .venv` and retry.
 
 ### 1. Exclude archived steps and snapshots
 

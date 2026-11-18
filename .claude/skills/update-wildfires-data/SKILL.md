@@ -29,7 +29,7 @@ datasets, [`/update-dataset`](../update-dataset/SKILL.md) for the generic update
 | garden | `climate/<version>/weekly_wildfires` (+ regions, + `faostat_rl` for land area) |
 | grapher | `weekly_wildfires`, `wildfires_by_year`, `wildfires_by_week`, `wildfires_by_week_average` |
 
-Four grapher datasets, feeding **14 charts and 2 narrative charts**. `wildfires_by_week_average`
+Four grapher datasets, feeding the wildfire charts and narrative charts. `wildfires_by_week_average`
 reads `wildfires_by_week` rather than the garden table, so it has to run after it.
 
 ## Run it
@@ -150,8 +150,8 @@ print(env.read_sql("""
 """, params={"p": "climate/%wildfires%"}).to_string())
 ```
 
-The `<old>` rows must all read 0 and the `<new>` rows must carry the charts (2 / 7 / 5 / 2 for
-`weekly_wildfires` / `by_year` / `by_week` / `by_week_average`).
+Run the query once before `upgrade` to record each `<old>` row's count. Afterwards the `<old>` rows
+must all read 0 and each `<new>` row must carry the count its `<old>` counterpart had.
 
 ### 8. Verify on staging
 

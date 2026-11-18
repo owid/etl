@@ -227,7 +227,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ## Config YAML: single chart
 
 ```yaml
-grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
+grapher_schema: "012"  # QUOTED — a bare 011 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
 slug: banning-of-chick-culling
 topic_tags:
@@ -299,7 +299,7 @@ Key fields:
 # QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
 # current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
-grapher_schema: "011"
+grapher_schema: "012"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
 # chart-level pin, so the two silently disagree. ETL warns when that happens.
 
@@ -563,7 +563,7 @@ UUID.
 and that the file is included from `dag/main.yml`.
 
 **Preview URL shows errors**: verify that the catalogPaths in your config match actual indicators in the
-grapher dataset. Check by running the grapher step first: `.venv/bin/etlr data://grapher/{namespace}/{version}/{dataset} --grapher`.
+grapher dataset. Check by running the grapher step first: `.venv/bin/etlr grapher://grapher/{namespace}/{version}/{dataset} --grapher`.
 
 **`config must not contain {'description_key'}` or similar**: view-level metadata like `description_key`,
 `description_short`, and `presentation` belong under `metadata`, not `config`. The `config` block is for

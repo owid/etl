@@ -108,6 +108,7 @@ from etl.http import session as http_session
 env = OWIDEnv.from_staging("<branch>")
 PREFIX = env.indicators_url  # normalized container name — never hand-build staging-site-<branch>
 cache = {}
+unknown = []
 
 def entities(var_id, prefix=PREFIX):
     key = (prefix, var_id)

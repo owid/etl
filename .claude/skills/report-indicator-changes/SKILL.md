@@ -24,7 +24,7 @@ This skill drafts the kind of message you send to a topic owner when a dataset u
 ## Inputs to gather before drafting
 
 1. **Dataset path** — `namespace/version/short_name` (e.g. `lgbt_rights/2026-05-11/lgbti_national_policy_dataset`). Used to query the staging DB for the affected variables and to construct admin URLs.
-2. **Staging site URL** — read from `OWID_ENV.site` (run `from etl.config import OWID_ENV; print(OWID_ENV.site)`), or infer from the current git branch (`staging-site-<branch>`).
+2. **Staging site URL** — `http://staging-site-<branch>`, from the current git branch (normalized as `make query` does). `OWID_ENV.site` returns it only when run with `STAGING=1`.
 3. **Reviewer handle** — Slack handle for a Slack post, or GitHub username for a PR comment. Check `workbench/<dataset>/` for prior drafts to confirm.
 4. **What's changed since the last round** — concise list of indicator-level changes since the previous message: new indicators built, categories renamed or collapsed, alternative versions added, decisions taken. Tip: `git log --oneline <since>` plus the latest commit messages.
 5. **One or two open design questions** — choices the reviewer needs to weigh in on (label wording, schema A vs B, include or skip a category, etc.). If there's nothing actionable for them, the message isn't ready.
@@ -41,7 +41,9 @@ This skill drafts the kind of message you send to a topic owner when a dataset u
 
 ## Output structure
 
-Write the draft to `workbench/<dataset>/<reviewer-slug>-update-<N>.md`, picking a short reviewer slug (their first name, GitHub handle, or "reviewer" if it's ambiguous). Keep it short — ideally under ~600 words. Four sections:
+Write the draft to `workbench/<dataset>/<reviewer-slug>-update-<N>.md`, picking a short reviewer slug (their first name, GitHub handle, or "reviewer" if it's ambiguous). Keep it scannable: what changed, what the reviewer has to decide, and where to sign off. Four sections:
+
+The draft's first line is the attribution line from `CLAUDE.md` (Team section), above the greeting.
 
 ### 1. Greeting + status one-liner
 
@@ -69,7 +71,7 @@ Markdown link example:
 Get IDs from staging:
 
 ```bash
-make query SQL="SELECT id, shortName FROM variables WHERE catalogPath LIKE 'grapher/<namespace>/<version>/<short_name>/<table>%'"
+.venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql('SELECT id, shortName FROM variables WHERE catalogPath LIKE %(p)s', params={'p': 'grapher/<namespace>/<version>/<short_name>/<table>%'}))"
 ```
 
 ### 3. Open questions / things to discuss
@@ -126,13 +128,7 @@ Each round of the back-and-forth has a slightly different shape. A typical seque
 
 ## Examples
 
-Canonical drafts from the LGBTI v2 redesign cycle live under `workbench/lgbti_national_policy_dataset/` — `ls` that directory for files matching `*-update-*.md` and `*-reply-*.md`. The set covers:
-
-- A full first-round update with grouped indicator lists, three open questions with option tables, and a Chart Diff CTA.
-- A point-by-point reply to a numbered list of reviewer questions.
-- A short status check-in with a two-option pick (e.g. "version A or version B?") and a Chart Diff re-pass CTA.
-
-Read these before drafting a new round for a different dataset — the patterns transfer.
+If earlier rounds for this dataset exist under `workbench/<dataset>/` (`*-update-*.md`, `*-reply-*.md`), read them before drafting the next round and keep their structure.
 
 ## Artifacts
 

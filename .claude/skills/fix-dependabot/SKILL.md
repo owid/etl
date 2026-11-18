@@ -179,7 +179,7 @@ If it fails, fix the issues (commonly: removed/renamed kwargs that type checkers
 
 If you modified any `lib/{catalog,datautils,repack}/pyproject.toml`, also bump that file's `version = "x.y.z"` (patch bump). The `publish-owid-packages.yml` workflow republishes these packages to PyPI on master push and rejects the publish if the version already exists.
 
-After bumping, re-run `uv lock` (top-level and inside each modified `lib/<name>/`) so the lockfiles pick up the new version.
+After bumping, add a changelog entry and re-run `uv lock` (top-level and inside each modified `lib/<name>/`), following the release checklist in `lib/catalog/DEVELOPMENT.md`.
 
 ## Step 6: Create PR
 

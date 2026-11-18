@@ -32,11 +32,8 @@ Accepts chart slugs, mdim slugs, or file paths:
 # Mdim slug
 .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py energy/latest/energy_prices#energy_prices
 
-# Export multidim file path
+# Viz chart / multidim config path
 .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/viz/chart/energy/latest/energy_prices.config.yml
-
-# Chart file path
-.venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/graph/covid/latest/covid-cases.chart.yml
 ```
 
 ### Option 2: Construct manually
@@ -47,11 +44,7 @@ Accepts chart slugs, mdim slugs, or file paths:
 
 | File type | URL pattern |
 |---|---|
-| `.chart.yml` (simple, no `#` in slug) | `http://<container>/grapher/<slug>` |
-| `.chart.yml` (mdim, `#` in slug) | `http://<container>/admin/grapher/<catalogPath>` |
 | `viz/chart/*.config.yml` or `*.py` | `http://<container>/admin/grapher/<namespace>/<version>/<shortName>%23<shortName>` |
-
-For `.chart.yml`: the `slug` is in the YAML `slug:` field. For mdim slugs containing `#`, the catalogPath inserts the version from the file path.
 
 For viz chart steps: derive from path `etl/steps/viz/chart/<namespace>/<version>/<shortName>.*` → catalogPath is `<namespace>/<version>/<shortName>#<shortName>`.
 
@@ -63,7 +56,7 @@ The fastest, most reliable way to grab a chart's rendered image — works for **
 
 ```bash
 # Resolve slug → by-uuid PNG URL, then fetch
-URL=$(.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug-or-id>)
+URL=$(STAGING=1 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug-or-id>)
 curl -o ai/chart_preview.png "$URL"
 ```
 
@@ -74,7 +67,7 @@ Pass extra grapher query params with `--<key>=<value>`:
 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
 ```
 
-The helper queries the staging MySQL via `etl.config.OWID_ENV.read_sql` (which auto-routes to `staging-site-<branch>`).
+The helper queries MySQL via `etl.config.OWID_ENV.read_sql`, which targets `staging-site-<branch>` only when `STAGING=1` is set; without it the UUID comes from the DB in your `.env`.
 
 Use the resulting PNG by reading it directly with the `Read` tool (Claude can view images).
 
@@ -97,9 +90,6 @@ This 404s for drafts — use the by-uuid route above instead.
 If the chart hasn't been pushed yet:
 
 ```bash
-# For graph step charts
-.venv/bin/etlr graph://<namespace>/<version>/<slug> --graph --graph-push
-
 # For viz chart steps (charts and MDIMs)
 .venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher
 ```

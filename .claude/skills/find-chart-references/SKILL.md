@@ -60,8 +60,8 @@ default — it multiplies the work on a widely-charted dataset. It changes nothi
 `--mdim` or `--explorer` subject (their references are all direct), and the run says so
 rather than letting the flag imply a wider sweep than it made.
 
-Output rows: `subject_type, subject, subject_id, surface, kind, where, where_path,
-surface_id, config_id, context, query_string, text, published`.
+Output rows: `subject_type, subject, subject_label, subject_id, surface, kind, where, where_path,
+surface_id, config_id, context, query_string, text, published, preview_url, admin_url`.
 
 Two fields carry the weight for callers:
 

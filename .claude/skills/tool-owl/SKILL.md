@@ -91,4 +91,4 @@ Dependencies wire **by parameter name** (a `raw_data` parameter resolves to the 
 ## Repo conventions that still apply inside `step.py`
 
 - **Preserve metadata/origins** in transforms: no `np.where`, no `pd.concat`/`pd.to_numeric` (use `pr.*` from `owid.catalog.processing`), no `pd.DataFrame(tb)`. See the "Preserving metadata/origins" rules in `CLAUDE.md`.
-- Run `make check` before committing. Don't commit, push, or open PRs unless explicitly told to.
+- Don't commit, push, or open PRs unless explicitly told to.

@@ -21,7 +21,7 @@ Two modes:
 
 **description_short / description_key** resolve from the namesake top-level fields on `VariableMeta` — not from `grapher_config`.
 
-Not every chart has `presentation.grapher_config` populated: some charts are edited only in the admin DB, so the ETL metadata looks empty. Treat those fields as chart-level (see routing below) rather than inventing a fallback. See `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` for the full rule.
+Not every chart has `presentation.grapher_config` populated: some charts are edited only in the admin DB, so the ETL metadata looks empty. Treat those fields as chart-level (see routing below) rather than inventing a fallback.
 
 Field mapping — user vocabulary → where the field can live:
 
@@ -69,7 +69,7 @@ Notes baked into the resolver — don't re-derive them by hand:
 - MDims are served at `/grapher/<slug>` too — slug lookups check `multi_dim_data_pages` after `charts`.
 - Old slugs resolve through `chart_slug_redirects`; the canonical slug is reported.
 - Duplicate slugs prefer the published chart; editing an unpublished chart gets a warning.
-- MDim choice values can carry deliberate trailing spaces — dims are matched stripped but written back raw (memory: `reference_mdim_choice_name_trailing_space`).
+- MDim choice values can carry deliberate trailing spaces — dims are matched stripped but written back raw.
 - Never hand-build `staging-site-<branch>` hostnames — branch names get normalized and truncated to 28 chars (`etl.config.get_container_name`); a wrong name silently serves a different environment.
 - When a `<short_name>.meta.override.yml` exists next to the meta.yml, the resolver lists it first — that's the manual-curation surface (the main meta.yml is likely auto-generated; see the route (a) note below).
 
@@ -77,7 +77,7 @@ Notes baked into the resolver — don't re-derive them by hand:
 
 Primitives:
 
-- **Explicitly set at chart level** ⇔ the key exists in the authored layer (the `chart_configs` row named by `patchConfigId`). Never judge this from the rendered config — that has every inherited value merged in, so an inherited title looks identical to an override there (`etl/indicator_upgrade/indicator_update.py:207`).
+- **Explicitly set at chart level** ⇔ the key exists in the authored layer (the `chart_configs` row named by `patchConfigId`). Never judge this from the rendered config — that has every inherited value merged in, so an inherited title looks identical to an override there (`etl/indicator_upgrade/indicator_update.py`).
 - **Inheritable** ⇔ the chart's primary y variable has an ETL grapher config (`variables.patchConfigIdETL IS NOT NULL`) and that config carries the field.
 
 Three routes:
@@ -241,8 +241,7 @@ Two things leave the fast path for the full workflow below: indicator text (a `m
 9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.
 10. **CHECKPOINT** — show: the `git diff` (routes a/b) and/or the chart-patch JSON diff (route c), staging preview links (strip the `.tail6e23.ts.net` suffix from admin links), the blast-radius summary (link Metadata Diff's `?diff-type=blast` beside it once the grapher step is on staging — the same claim, verified against what the server actually renders), and any unresolved check findings. **Wait for the user's explicit go-ahead.**
 11. After the go-ahead, hands-off:
-    - `make check`;
-    - commit `🔨🤖 <description>` with `Co-Authored-By: Claude <model name> <noreply@anthropic.com>`;
+    - commit (the pre-commit hook runs `make check`) `🔨🤖 <description>` with `Co-Authored-By: Claude <model name> <noreply@anthropic.com>`;
     - first push needs the upstream: `git push -u origin <branch>`, then verify `gh pr view --json files` is non-empty;
     - PR description via `gh pr edit` — first line is the attribution blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`), then: what changed and why (public facts only), which documentation passage the new text rests on (or that it is inferred), the blast-radius summary, any route-(c) DB-only edits (they have **no file diff** — describe them explicitly and note they ride to production via chart-diff approval), and any `#dod:` follow-ups ("create in admin");
     - if the PR has committed files: post a bare `@codex review` comment, record its exact timestamp, and spawn the `babysit-pr` skill's background agent to watch CI, judge/fix findings, reply + resolve threads;
@@ -316,10 +315,8 @@ Never suggest it; enter it only when the user asks for a dump, report or audit o
 - Do NOT monkey-patch around a MySQL outage by calling `Chart.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. If MySQL is down, stop and tell the user.
 - Do NOT suggest dump + compare mode — only enter it on explicit request.
 
-## Related memories, skills, and references
+## Related skills and references
 
-- `.claude/projects/-Users-parriagadap-etl/memory/faust_definition.md` — FAUST = Footnote, Axis titles, Units, Subtitle, Title.
-- `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` — the inheritance rule, with the caveat about `grapher_config` not being universally populated.
 - `.claude/skills/generate-metadata/SKILL.md` — writing style rules + the canonical metadata-check suite.
 - `.claude/skills/babysit-pr/SKILL.md` — the Codex review→fix→resolve background loop (step 11).
 - `.claude/skills/check-chart-preview/SKILL.md` — visual QA on staging.
