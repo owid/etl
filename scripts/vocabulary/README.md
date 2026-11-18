@@ -7,10 +7,12 @@ Simple LLM-based CLI to extract characteristic keywords from OWID chart titles a
 For each OWID topic, this builds the short line of suggested search terms shown
 under the all-charts block's search box.
 
-Selection is an optimisation, not a judgement call: **cover as much of the
-topic's chart list as a few terms can, weighting charts by how much they are
-viewed**, first term revealing the most, each next one adding the most that is
-still uncovered. The LLM only proposes candidates; arithmetic picks them.
+Choosing the line is a judgment, so the model makes it, with measurements in
+hand: it proposes candidate terms, code measures what clicking each one would
+show (which charts, and their share of the topic's views), and the model then
+chooses the line from those measured candidates. Code only rules out what can be
+checked: places, terms that show nothing, and terms matching nearly every chart,
+which would narrow nothing.
 
 Four phases:
 
@@ -19,12 +21,10 @@ Four phases:
 2. Per topic, fetch the record set the all-charts block actually lists — plain
    charts, multi-dim views and explorer views alike — and weight each record by
    its views.
-3. Ask the model for candidate terms, having shown it that record set.
-4. Choose the terms covering the most of it, by greedy weighted maximum coverage.
-
-Two things follow from (4) rather than needing a second LLM pass: a term whose
-rows are already covered adds nothing and is not chosen, and a term the block
-would show nothing for covers nothing and cannot be chosen at all.
+3. Ask the model for candidate terms (and countries), having shown it that record set.
+4. Measure every candidate against it, and ask the model to choose the line,
+   showing it each candidate's chart count, view share and most-viewed charts. The
+   answer is constrained to the candidates offered.
 
 ## Quick Start
 
@@ -64,7 +64,6 @@ The committed file *replaces* the vocabulary rather than merging into it, so a `
 - `--weighting {views,uniform}` - Weight charts by views (default) or count them equally
 - `--views-column {views_7d,views_14d,views_365d}` - Which window to weight by (default `views_365d`; a vocabulary is read for weeks, so the year is steadier than the week)
 - `--max-terms N` - Most terms to publish per topic (default 8; the site shows five and drops some, so a couple of spares keep the line full)
-- `--min-marginal-share F` - Stop once the next term would reveal less than this share of a topic's views (default 0.01)
 
 ## Chart view data
 
@@ -121,7 +120,8 @@ matters: the terms it lists first are the ones most likely to be shown.
    should see the same input)
 4. **LLM extraction**: Feeds all text to Claude with instructions to extract modern, searchable keywords. A topic whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
 5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. Each answer is matched against OWID's country names (names, short names and aliases in the regions definitions), since the site filters charts by those exact names; anything that isn't a current country is dropped and listed in the topic's `unrecognized_countries` stat
-6. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
+6. **Choosing the line**: a third request per topic shows the measured candidates and asks for the line, in order; `keyword_stats` then records what each chosen term shows and adds to the ones before it
+7. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 
 ## Output Format
 
