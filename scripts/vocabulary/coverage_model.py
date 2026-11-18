@@ -406,8 +406,9 @@ class TopicSelection:
 
 # The prompt asks for no places, and this catches the ones that slip through
 # anyway, since a country named in many chart titles can otherwise win a slot on
-# coverage alone ("Sweden" on Smallpox). Bare continent words aren't all regions
-# of their own, so they are listed too.
+# coverage alone ("Sweden" on Smallpox). Region names are compared as written
+# (see _place_spellings), and these few in any case, "america" included, which
+# isn't a region of its own.
 _COMMON_PLACE_WORDS = frozenset({"world", "africa", "asia", "europe", "america", "oceania", "antarctica"})
 
 
@@ -425,27 +426,19 @@ def region_spellings(region: dict) -> list[str]:
 
 
 @cache
-def _place_spellings() -> tuple[frozenset[str], frozenset[str]]:
-    """Every spelling of every region, casefolded, plus the abbreviations kept as written.
+def _place_spellings() -> frozenset[str]:
+    """Every spelling of every region, as written.
 
-    Abbreviations are compared exactly because casefolding them collides with
-    ordinary words: "CAR" (Central African Republic) is not "car".
+    Compared as written because place names are proper nouns and many are also
+    ordinary words: "Turkey" is a country and "turkey" a bird with charts of its
+    own, as "CAR" (Central African Republic) is not "car".
     """
-    folded = set(_COMMON_PLACE_WORDS)
-    exact = set()
-    for region in regions_definitions():
-        for spelling in region_spellings(region):
-            if spelling.isupper():
-                exact.add(spelling)
-            else:
-                folded.add(spelling.casefold())
-    return frozenset(folded), frozenset(exact)
+    return frozenset(spelling for region in regions_definitions() for spelling in region_spellings(region))
 
 
 def _is_place_name(term: str) -> bool:
-    folded, exact = _place_spellings()
     term = term.strip()
-    return term in exact or term.casefold() in folded
+    return term in _place_spellings() or term.casefold() in _COMMON_PLACE_WORDS
 
 
 # A term matching this share of a topic's charts narrows nothing: a reader
