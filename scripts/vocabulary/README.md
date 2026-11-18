@@ -7,10 +7,7 @@ Simple LLM-based CLI to extract characteristic keywords from OWID chart titles a
 For each OWID topic, this builds the short line of suggested search terms shown
 under the all-charts block's search box.
 
-Selection is an optimisation, not a judgement call: **cover as much of the
-topic's chart list as a few terms can, weighting charts by how much they are
-viewed**, first term revealing the most, each next one adding the most that is
-still uncovered. The LLM only proposes candidates; arithmetic picks them.
+Choosing the line is a judgment, so the model makes it, with measurements in hand: it proposes candidate terms, code measures what clicking each one would show (which charts, and their share of the topic's views), and the model then chooses the line from those measured candidates. Code only rules out what can be checked: places, terms that show nothing, and terms matching nearly every chart, which would narrow nothing (unless every candidate does, as on a topic whose charts are all named after it).
 
 Four phases:
 
@@ -19,12 +16,8 @@ Four phases:
 2. Per topic, fetch the record set the all-charts block actually lists — plain
    charts, multi-dim views and explorer views alike — and weight each record by
    its views.
-3. Ask the model for candidate terms, having shown it that record set.
-4. Choose the terms covering the most of it, by greedy weighted maximum coverage.
-
-Two things follow from (4) rather than needing a second LLM pass: a term whose
-rows are already covered adds nothing and is not chosen, and a term the block
-would show nothing for covers nothing and cannot be chosen at all.
+3. Ask the model for candidate terms (and countries), having shown it that record set.
+4. Measure every candidate against it, and ask the model to choose the line, showing it each candidate's chart count, view share and most-viewed charts. The answer is constrained to the candidates offered.
 
 ## Quick Start
 
@@ -50,21 +43,21 @@ The committed file *replaces* the vocabulary rather than merging into it, so a `
 
 ### Choose model
 ```bash
-# Use a faster/cheaper model (default: claude-sonnet-5-5)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json --model claude-haiku-5-5
+# Use a cheaper model (default: claude-opus-5-5)
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json --model claude-sonnet-5-5
 ```
 
 ## CLI Options
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Write the full results, stats included, to this JSON file (default: the committed `etl/steps/export/r2/owid/latest/topic_vocabulary.json`)
-- `--model MODEL` - Claude model to use (default: `claude-sonnet-5-5`). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
+- `--model MODEL` - Claude model to use (default: `claude-opus-5-5`; a full run costs about $5, and `--keep-countries` saves about a third). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
 - `--upload-path KEY` - Also upload the published part to this scratch key in the `owid-public` bucket, to try it on a staging server (refuses `topic_vocabulary.json`, the key the site reads)
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
 - `--weighting {views,uniform}` - Weight charts by views (default) or count them equally
 - `--views-column {views_7d,views_14d,views_365d}` - Which window to weight by (default `views_365d`; a vocabulary is read for weeks, so the year is steadier than the week)
-- `--max-terms N` - Most terms to publish per topic (default 8; the site shows five and drops some, so a couple of spares keep the line full)
-- `--min-marginal-share F` - Stop once the next term would reveal less than this share of a topic's views (default 0.01)
+- `--max-terms N` - Most terms to publish per topic (default 8; the site shows five, skipping the one that matches what the reader has already typed, so a couple of spares keep the line full)
+- `--keep-countries` - Reuse each topic's countries from the committed vocabulary instead of asking for them again, to iterate on the keywords for less (topics missing from it are still asked)
 
 ## Chart view data
 
@@ -119,9 +112,10 @@ matters: the terms it lists first are the ones most likely to be shown.
 3. **Sampling**: the 200 most-viewed distinct texts (not a random sample — the
    terms proposed should describe what people actually look at, and two runs
    should see the same input)
-4. **LLM extraction**: Feeds all text to Claude with instructions to extract modern, searchable keywords. A topic whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
-5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. Each answer is matched against OWID's country names (names, short names and aliases in the regions definitions), since the site filters charts by those exact names; anything that isn't a current country is dropped and listed in the topic's `unrecognized_countries` stat
-6. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
+4. **Candidates**: feeds all text to Claude, asking for candidate search terms. Each of a topic's three requests (this one, countries, choosing the line) whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
+5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. The prompt lists OWID's current (harmonized) country names and the answer's JSON schema allows only those, since the site filters charts by those exact names
+6. **Choosing the line**: a third request per topic shows the measured candidates and asks for the line, in order; `keyword_stats` then records what each chosen term shows and adds to the ones before it
+7. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 
 ## Output Format
 
@@ -147,7 +141,7 @@ The committed file has the same keys but keeps the full record per topic, stats 
     "topic_name": "Energy",
     "keywords": [...],
     "countries": [...],
-    "stats": {"num_keywords": 8, "num_countries": 5, "unrecognized_countries": [], "weighted_coverage": 0.62, "input_tokens": 4236, ...},
+    "stats": {"num_keywords": 8, "num_countries": 5, "weighted_coverage": 0.62, "input_tokens": 4236, ...},
     "keyword_stats": [{"term": "solar panels", "own_share": 0.21, "marginal_share": 0.21, ...}, ...]
   }
 }

@@ -32,7 +32,6 @@ from pathlib import Path
 import anthropic
 import click
 import httpx
-import yaml
 from genai_prices import Usage, calc_price
 
 # Add parent directory to path for imports
@@ -40,6 +39,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from coverage_model import (  # ty: ignore
     DEFAULT_VIEWS_COLUMN,
+    CandidateReach,
     EmptyAnalyticsError,
     TopicSelection,
     ViewAnalytics,
@@ -47,7 +47,9 @@ from coverage_model import (  # ty: ignore
     fetch_topic_universe,
     load_mdim_view_config_ids,
     load_view_analytics,
-    select_terms_by_coverage,
+    measure_candidates,
+    measure_line,
+    regions_definitions,
     weigh_universe,
 )
 from coverage_report import (  # ty: ignore
@@ -59,7 +61,7 @@ from coverage_report import (  # ty: ignore
 from apps.utils.llms.claude import text_of  # ty: ignore
 from etl import config  # ty: ignore
 from etl.config import OWID_ENV  # ty: ignore
-from etl.paths import CACHE_DIR, LATEST_REGIONS_YML  # ty: ignore
+from etl.paths import CACHE_DIR  # ty: ignore
 from etl.steps.export.r2.owid.latest.topic_vocabulary import (  # ty: ignore
     PRODUCTION_KEY,
     VOCABULARY_FILE,
@@ -67,7 +69,8 @@ from etl.steps.export.r2.owid.latest.topic_vocabulary import (  # ty: ignore
     upload,
 )
 
-DEFAULT_MODEL = "claude-sonnet-5-5"
+# Choosing a line is a judgment call, where Opus is clearly better than Sonnet; a full run costs about $5.
+DEFAULT_MODEL = "claude-opus-5-5"
 
 # Reuse the answer for an identical request. Left alone, two runs of identical code
 # disagreed on almost every topic — Gender Ratio came back covering 30% of its
@@ -97,27 +100,12 @@ KEYWORDS_SCHEMA = {
     },
 }
 
-COUNTRIES_SCHEMA = {
-    "type": "json_schema",
-    "schema": {
-        "type": "object",
-        "properties": {"countries": {"type": "array", "items": {"type": "string"}}},
-        "required": ["countries"],
-        "additionalProperties": False,
-    },
-}
-
 # How many topics' record sets to fetch at once.
 SEARCH_CONCURRENCY = 8
 
-# How many terms to publish. The site shows five, then drops any that name a place
-# or repeat the topic's own name, so a couple of spares keep the line full.
+# How many terms to publish. The site shows five, skipping the one that matches
+# what the reader has already typed, so a couple of spares keep the line full.
 DEFAULT_MAX_TERMS = 8
-
-# A term revealing less than this share of a topic's views is not worth one of
-# five slots on a single line. Terms just below it are reported as near misses so
-# the floor can be judged from the output.
-DEFAULT_MIN_MARGINAL_SHARE = 0.01
 
 
 def get_all_topic_slugs() -> list[str]:
@@ -159,9 +147,9 @@ def texts_for_prompt(universe: WeightedUniverse, limit: int = 200) -> list[str]:
     Taken from the topic's *rendered* record set rather than from the `charts`
     table, which was the old source and a real hole: multi-dim and explorer views
     never reached the model, so on a topic like Climate Change it was proposing
-    terms having seen 67 of 714 records. Since selection now scores terms on how
-    much of that list they cover, the model has to be shown the list it is
-    being scored against.
+    terms having seen 67 of 714 records. Since candidates are measured on what
+    they show of that list, the model has to be shown the list it is being
+    measured against.
 
     Ordered by views and cut at `limit` rather than sampled at random, so the
     terms proposed are the ones describing what people actually look at, and two
@@ -193,83 +181,33 @@ async def extract_keywords_with_llm(
     semaphore: asyncio.Semaphore,
     model_id: str = DEFAULT_MODEL,
 ) -> dict:
-    """Use an LLM to extract good keywords/phrases from chart texts.
+    """Ask the model for candidate terms for a topic's suggestion line, having shown it the chart texts.
 
-    Returns: dict with topic info, keywords, and token usage (zero when the answer came from the cache)
+    Returns: dict with topic info, the candidates as `keywords`, and token usage (zero when cached)
     """
     # Combine all texts
     combined_text = "\n".join(texts)
 
     prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
-the topic "{topic_name}", most-viewed first. They include the individual views of
-its multi-dimensional charts and its explorers, which is what the topic page
-actually lists:
+the topic "{topic_name}", most-viewed first:
 
 {combined_text}
 
-Give me search terms for this topic. They are offered to a reader on the topic's
-page, under a search box that filters exactly the charts listed above, as a short
-line of suggestions: "Suggested: term, term, term…". Only the first few are ever
-shown, so put the ones you would most want a reader to see first.
+On the topic's page, a search box filters these charts, and a short line under it
+suggests search terms. Clicking a term shows the charts whose title or subtitle
+contains it. Propose candidates for that line. A later step measures what each one
+would show and chooses the line, so a good term is lost only if nobody proposes it:
+be generous.
 
-What makes this list good is that each term takes the reader somewhere *different*.
+Work out the distinct things these charts are about (a topic's charts usually span
+more than its name suggests) and, for each, give the terms a reader would use to
+look for it: the plain word and the narrower phrases the titles build on it
+("alcohol" and "alcohol consumption"), the topic's own name included. Use the
+titles' own wording, since a term only finds the charts that contain it. Each term
+should name something a reader would want charts of: not only how a number is
+expressed (a unit, a share, "per capita"), and not a place.
 
-1. Cover the range of what these charts are about. Read the whole list above and
-   work out which distinct subjects it spans, then give at least one term for
-   each. A topic's charts usually cover several: charts about sex ratios AND
-   about unemployment AND about mental health all belong to "Gender Ratio", so a
-   list that only describes the sex-ratio charts has missed most of the topic.
-2. One term per subject. Do not give near-synonyms or variations on the same
-   phrase — they land the reader on the same charts and waste the line.
-   - Bad: "sex ratio", "sex ratio at birth", "sex ratio by age" (one subject, three terms)
-   - Good: "sex ratio", "missing women", "life expectancy", "unemployment", "judiciary"
-     (five terms, five different parts of the chart list)
-3. Order the list so that each term adds something the ones before it did not.
-4. Give the shortest form that still names the subject. A reader clicking "sex
-   ratio" is shown every chart about it; "sex ratio at birth" hides most of them
-   for no gain.
-5. Every term must name **what a chart is about** — its subject. That is the
-   whole test, and everything below follows from it rather than being a separate
-   rule to remember:
-   - Not how a number is expressed. A measurement's shape is not a subject, and
-     a reader looking for one is not looking for charts. Prefer "oil" to "oil
-     prices", "electricity" to "electricity consumption". These are never a term
-     on their own and never the head of a phrase: per capita, share, rate, death
-     rate, total, annual, average, level, index, projections, reported,
-     confirmed, vital registration. The list is spelled out because it is the
-     rule most often broken.
-
-     **Unless a chart above is actually called that.** Then it is a subject, by
-     definition — someone named a chart after it. "GDP per capita" reads like a
-     unit and is one of the charts on the Poverty topic, worth a third of its
-     traffic; refusing it leaves that chart with nothing pointing at it. The test
-     is the titles in front of you, not how the words sound: if one of them is
-     essentially just this term, give it.
-   - Not a place. Countries, regions and income groups say *who* rather than
-     *what*; these charts mention them constantly and readers search for them
-     separately.
-   - Not a word that was only ever true of the past, unless people still search
-     for it.
-   Say the term out loud as a thing a reader wants to see charts of. If that
-   doesn't work — "annual", "vital registration", "reported" — leave it out.
-
-Do not worry about whether a term is too broad, or too close to the topic's own
-name. That is measured afterwards against the chart list, far more reliably than
-either of us can guess: the only term dropped for breadth is one matching nearly
-every chart above, which would narrow nothing. Anything short of that competes on
-what it reveals. So offer the obvious central terms — "child mortality" on Child &
-Infant Mortality, "religious" on Religion, "sex ratio" and "female population" on
-Gender Ratio — including the topic's own name and the bare root of it. Withholding
-them is how a topic ends up with no way to reach the very charts it exists for;
-offering one that turns out too broad costs nothing.
-
-Give a generous list — only a handful are ever shown, and they are picked from
-yours by measuring how much of the chart list above each one actually brings up.
-So favour the words those titles really use, and include a term that is right but
-not obvious: it costs nothing if it loses, and it is the only way it can win.
-
-Output JSON (up to 40 terms; far fewer is right when the topic is narrow —
-never pad the list with variations to reach a number):
+Output JSON, up to 40 terms (fewer when the topic is narrow):
 {{
   "keywords": ["term1", "term2", ...]
 }}"""
@@ -295,25 +233,133 @@ never pad the list with variations to reach a number):
         raise RuntimeError(f"LLM extraction failed for {topic_name}: {e}")
 
 
-def load_country_names() -> dict[str, str]:
-    """OWID's current country names, keyed by every spelling of them we know (name, short name, aliases), casefolded.
+def line_schema(terms: list[str]) -> dict:
+    """An answer naming only these terms, so the model can choose among the candidates but not add to them."""
+    return {
+        "type": "json_schema",
+        "schema": {
+            "type": "object",
+            "properties": {"keywords": {"type": "array", "items": {"type": "string", "enum": terms}}},
+            "required": ["keywords"],
+            "additionalProperties": False,
+        },
+    }
+
+
+def describe_candidate(universe: WeightedUniverse, candidate: CandidateReach, examples: int = 3) -> str:
+    """One candidate as the model sees it: what clicking it shows, and the most-viewed of those charts."""
+    total = universe.total_weight
+    share = candidate.weight / total if total else 0.0
+    titles: list[str] = []
+    for identity in sorted(candidate.records, key=lambda identity: -universe.weights.get(identity, 0.0)):
+        title = universe.records[identity].get("title")
+        if title and title not in titles:
+            titles.append(str(title))
+        if len(titles) == examples:
+            break
+    return f'- "{candidate.term}": {len(candidate.records)} charts, {share:.0%} of views — ' + "; ".join(
+        f'"{title}"' for title in titles
+    )
+
+
+async def choose_line_with_llm(
+    universe: WeightedUniverse,
+    candidates: list[CandidateReach],
+    max_terms: int,
+    client: anthropic.AsyncAnthropic,
+    cache: dict[str, str],
+    semaphore: asyncio.Semaphore,
+    model_id: str = DEFAULT_MODEL,
+) -> dict:
+    """Ask the model to choose the suggestion line from the measured candidates.
+
+    Returns: dict with the chosen candidates in the model's order, and token usage.
+    """
+    if not candidates:
+        return {"line": [], "input_tokens": 0, "output_tokens": 0}
+    ordered = sorted(candidates, key=lambda candidate: -candidate.weight)
+    described = "\n".join(describe_candidate(universe, candidate) for candidate in ordered)
+    prompt = f"""On the Our World in Data page for the topic "{universe.topic_name}", a search box
+filters the topic's {len(universe.records)} charts, and under it a line suggests a few search
+terms: "Suggested: term, term, term…". Clicking a term shows the charts whose title or
+subtitle contains it. Only the first five are shown.
+
+Here are the candidate terms. For each: how many charts clicking it shows, the share of the
+topic's views those charts get, and the most-viewed of them.
+
+{described}
+
+Choose the line: up to {max_terms} of these terms, in the order to show them. A good line is
+one a curious reader would want to click through, and it gets there by three things at once:
+
+- **Each term leads somewhere different.** Read the example charts: two terms whose charts
+  are mostly the same, or that are two phrasings or spellings of one subject ("cancer deaths"
+  and "cancer death rate", "R&D" and "research and development", "area burnt" and "area
+  burned"), spend two slots on one subject. Keep the one that shows more.
+- **Together they reach what readers come for.** The view shares say where the topic's
+  readers go; a line that skips its most-viewed charts has missed the topic. Put the terms
+  that open the most-viewed parts first.
+  A subject the charts are only compared against, such as GDP per capita on the axis of
+  "... vs. GDP per capita" charts, is not what the topic's readers come for, unless the topic
+  is about it (GDP per capita on an economic topic).
+- **Each term makes sense on its own.** The reader sees the term alone, with no chart next to
+  it, and should know what clicking it will show. A subject ("working hours", "lung cancer")
+  passes. These don't, however much they reach: a word that only means something next to the
+  rest of a title ("age" or "work" on Time Use), a fragment of a title ("time with", or
+  "street" lifted out of "living on the street"), a unit or measure ("tonnes", "death rate",
+  "share"), something about the data rather than the world (how it was collected, how complete
+  it is, which source it comes from), or a place, including its people ("Americans"). It
+  should also be what a reader would type: a few words, not a chart's whole title. A term
+  repeating the topic's own name is fine when it narrows: on Alcohol Consumption, "alcohol
+  consumption" opens its central charts.
+
+The site shows five, so give at least five when the candidates allow it, plus spares in case
+one is hidden; stop short only when the next term would not be worth a reader's click.
+
+Output JSON:
+{{
+  "keywords": ["term1", "term2", ...]
+}}"""
+
+    result, input_tokens, output_tokens = await ask_for_json(
+        prompt, line_schema([candidate.term for candidate in ordered]), client, cache, semaphore, model_id
+    )
+
+    # The schema's enum keeps every answer among the candidates; a term named twice counts once.
+    by_term = {candidate.term: candidate for candidate in candidates}
+    line = [by_term[term] for term in dict.fromkeys(result["keywords"])]
+    return {"line": line[:max_terms], "input_tokens": input_tokens, "output_tokens": output_tokens}
+
+
+def load_country_names() -> list[str]:
+    """OWID's current (harmonized) country names, sorted.
 
     The site filters charts by these exact names, so a suggestion has to be one of them.
     """
-    names: dict[str, str] = {}
-    for region in yaml.safe_load(LATEST_REGIONS_YML.read_text()):
-        if region.get("region_type", "country") != "country" or region.get("is_historical"):
-            continue
-        for spelling in [region["name"], region.get("short_name"), *(region.get("aliases") or [])]:
-            if spelling:
-                names.setdefault(spelling.casefold(), region["name"])
-    return names
+    return sorted(
+        region["name"]
+        for region in regions_definitions()
+        if region.get("region_type", "country") == "country" and not region.get("is_historical")
+    )
+
+
+def countries_schema(country_names: list[str]) -> dict:
+    """A JSON schema whose answer can only name countries from `country_names`."""
+    return {
+        "type": "json_schema",
+        "schema": {
+            "type": "object",
+            "properties": {"countries": {"type": "array", "items": {"type": "string", "enum": country_names}}},
+            "required": ["countries"],
+            "additionalProperties": False,
+        },
+    }
 
 
 async def suggest_countries_with_llm(
     topic_name: str,
     texts: list[str],
-    country_names: dict[str, str],
+    country_names: list[str],
     client: anthropic.AsyncAnthropic,
     cache: dict[str, str],
     semaphore: asyncio.Semaphore,
@@ -321,10 +367,10 @@ async def suggest_countries_with_llm(
 ) -> dict:
     """Ask the model which countries are most worth looking at on this topic.
 
-    Returns: dict with the countries (as OWID names, in the model's order), the names that matched no
-    country, and token usage.
+    Returns: dict with the countries (OWID names, in the model's order) and token usage.
     """
     combined_text = "\n".join(texts)
+    known_countries = ", ".join(country_names)
     prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
 the topic "{topic_name}", most-viewed first:
 
@@ -344,7 +390,8 @@ What makes the line useful is that it is specific to this topic. Don't fall back
 on the same handful of large countries for every topic; suggest one only when it
 really is a big part of this topic's story. The site adds the reader's own country
 separately, so there is no need to cover where readers live. Suggest countries
-only, not regions, continents or income groups, and use their common English names.
+only, not regions, continents or income groups, named as in this list of the countries
+the site knows: {known_countries}.
 
 Put the one most worth seeing first; only the first few are shown. About five is
 right for most topics; give fewer when only a few countries stand out.
@@ -356,22 +403,14 @@ Output JSON:
 
     try:
         result, input_tokens, output_tokens = await ask_for_json(
-            prompt, COUNTRIES_SCHEMA, client, cache, semaphore, model_id
+            prompt, countries_schema(country_names), client, cache, semaphore, model_id
         )
     except Exception as e:
         raise RuntimeError(f"country suggestions failed for {topic_name}: {e}")
 
-    countries: list[str] = []
-    unrecognized: list[str] = []
-    for suggestion in result.get("countries", []):
-        name = country_names.get(suggestion.strip().casefold())
-        if name is None:
-            unrecognized.append(suggestion)
-        elif name not in countries:
-            countries.append(name)
+    # The schema's enum keeps every answer among OWID's country names; a country named twice counts once.
     return {
-        "countries": countries,
-        "unrecognized": unrecognized,
+        "countries": list(dict.fromkeys(result["countries"])),
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
     }
@@ -434,24 +473,22 @@ async def process_topics(
     weighting: str,
     views_column: str,
     max_terms: int,
-    min_marginal_share: float,
+    kept_countries: dict[str, dict] | None = None,
 ) -> tuple[list[dict], list[str], dict[str, WeightedUniverse], list[TopicSelection]]:
-    """Generate a vocabulary for each topic and choose its terms by coverage.
-
-    Four phases. The first three are shared setup and one request per topic; only
-    the LLM call is per topic and expensive.
+    """Generate a vocabulary for each topic: its suggestion line and its countries.
 
     1. Load, once: topic names, chart view counts, and the multi-dim view →
        config id map that lets a view's own popularity be found.
     2. Per topic, fetch the record set the all-charts block lists and weight each
        record by its views.
-    3. Ask the model for candidate terms, having shown it that record set.
-    4. Choose the terms that cover the most of it — see select_terms_by_coverage.
-
-    There used to be a second LLM pass here, re-picking the shortlist from what
-    the search returned for each candidate. Coverage subsumes it: a term whose
-    rows are already covered adds nothing and is not chosen, and a term the block
-    would show nothing for covers nothing and cannot be chosen at all.
+    3. Ask the model for candidate terms and for countries, having shown it that
+       record set. A topic in kept_countries (slug → its committed `countries`)
+       reuses those instead.
+    4. Measure what each candidate would show (measure_candidates), and ask the
+       model to choose the line from those measurements. Which terms make a good
+       line is a judgment (whether a term means anything on its own, whether two
+       are the same subject), so the model makes it; code only rules out what can
+       be checked, and measures the result (measure_line).
 
     Returns: (results, failed slugs, universes by topic name, selections)
     """
@@ -509,8 +546,10 @@ async def process_topics(
     if not prompt_inputs:
         return [], failed, universes, []
 
+    kept_countries = kept_countries or {}
     click.echo(f"\nAsking for candidate terms and countries for {len(prompt_inputs)} topics...")
     country_names = load_country_names()
+
     client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=LLM_MAX_RETRIES)
     try:
         cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
@@ -518,6 +557,14 @@ async def process_topics(
         click.secho(f"  Ignoring an unreadable answer cache at {LLM_CACHE_FILE}", fg="yellow")
         cache = {}
     llm_semaphore = asyncio.Semaphore(LLM_CONCURRENCY)
+
+    async def countries_for(topic_slug: str, topic_name: str, texts: list[str]) -> dict:
+        if topic_slug in kept_countries:
+            return {**kept_countries[topic_slug], "input_tokens": 0, "output_tokens": 0}
+        return await suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
+
+    results: list[dict] = []
+    selections: list[TopicSelection] = []
     try:
         candidate_results, country_results = await asyncio.gather(
             asyncio.gather(
@@ -528,12 +575,33 @@ async def process_topics(
                 return_exceptions=True,
             ),
             asyncio.gather(
-                *(
-                    suggest_countries_with_llm(topic_name, texts, country_names, client, cache, llm_semaphore, model)
-                    for _, topic_name, texts in prompt_inputs
-                ),
+                *(countries_for(topic_slug, topic_name, texts) for topic_slug, topic_name, texts in prompt_inputs),
                 return_exceptions=True,
             ),
+        )
+
+        # Topics whose first requests failed go no further.
+        to_choose = []
+        for (topic_slug, topic_name, _), candidates, countries in zip(
+            prompt_inputs, candidate_results, country_results, strict=True
+        ):
+            if isinstance(candidates, BaseException) or isinstance(countries, BaseException):
+                error = candidates if isinstance(candidates, BaseException) else countries
+                click.secho(f"✗ {topic_slug}: {error}", fg="red")
+                failed.append(topic_slug)
+                continue
+            universe = universes[topic_name]
+            to_choose.append(
+                (topic_slug, universe, candidates, countries, measure_candidates(universe, candidates["keywords"]))
+            )
+
+        click.echo(f"\nChoosing the suggestion line for {len(to_choose)} topics...")
+        line_results = await asyncio.gather(
+            *(
+                choose_line_with_llm(universe, measured, max_terms, client, cache, llm_semaphore, model)
+                for _, universe, _, _, measured in to_choose
+            ),
+            return_exceptions=True,
         )
     finally:
         # Saved even if the run is interrupted, so the answers already paid for aren't asked for again.
@@ -542,32 +610,14 @@ async def process_topics(
         tmp_file.write_text(json.dumps(cache))
         tmp_file.replace(LLM_CACHE_FILE)  # atomic, so an interrupted write can't leave a broken cache
 
-    click.echo("\nChoosing the terms that cover the most of each topic...")
-    results: list[dict] = []
-    selections: list[TopicSelection] = []
-    for (topic_slug, topic_name, _), candidates, countries in zip(
-        prompt_inputs, candidate_results, country_results, strict=True
-    ):
-        if isinstance(candidates, BaseException) or isinstance(countries, BaseException):
-            error = candidates if isinstance(candidates, BaseException) else countries
-            click.secho(f"✗ {topic_slug}: {error}", fg="red")
+    for (topic_slug, universe, candidates, countries, measured), chosen in zip(to_choose, line_results, strict=True):
+        topic_name = universe.topic_name
+        if isinstance(chosen, BaseException):
+            click.secho(f"✗ {topic_slug}: {chosen}", fg="red")
             failed.append(topic_slug)
             continue
-        if countries["unrecognized"]:
-            click.secho(
-                f"! {topic_name}: dropped suggestions that aren't OWID country names: "
-                f"{', '.join(countries['unrecognized'])}",
-                fg="yellow",
-            )
 
-        universe = universes[topic_name]
-        offered = list(candidates["keywords"])
-        selection = select_terms_by_coverage(
-            universe,
-            candidates["keywords"],
-            max_terms=max_terms,
-            min_marginal_share=min_marginal_share,
-        )
+        selection = measure_line(universe, chosen["line"], measured)
         selections.append(selection)
 
         total = selection.total_weight
@@ -581,10 +631,11 @@ async def process_topics(
                 "stats": {
                     **stats,
                     "num_keywords": len(selection.selected),
-                    # Both requests count towards the topic's cost.
-                    "input_tokens": stats["input_tokens"] + countries["input_tokens"],
-                    "output_tokens": stats["output_tokens"] + countries["output_tokens"],
-                    "num_candidates": len(offered),
+                    # All three requests count towards the topic's cost.
+                    "input_tokens": stats["input_tokens"] + countries["input_tokens"] + chosen["input_tokens"],
+                    "output_tokens": stats["output_tokens"] + countries["output_tokens"] + chosen["output_tokens"],
+                    "num_candidates": len(candidates["keywords"]),
+                    "num_measured_candidates": len(measured),
                     "num_records": selection.total_count,
                     "weighted_coverage": round(selection.covered_weight / total if total else 0.0, 4),
                     "chart_coverage": round(
@@ -596,9 +647,8 @@ async def process_topics(
                     "topic_name_share": round(selection.topic_name_share, 4),
                     "weighting": weighting,
                     "views_column": views_column,
-                    "selection": "coverage",
+                    "selection": "model",
                     "num_countries": len(countries["countries"]),
-                    "unrecognized_countries": countries["unrecognized"],
                 },
                 "keyword_stats": [
                     {
@@ -675,16 +725,18 @@ async def process_topics(
     ),
 )
 @click.option(
+    "--keep-countries",
+    is_flag=True,
+    help=(
+        "Reuse each topic's countries from the committed vocabulary instead of asking for them again, "
+        "to iterate on the keywords for less. Topics missing from it are still asked."
+    ),
+)
+@click.option(
     "--max-terms",
     default=DEFAULT_MAX_TERMS,
     show_default=True,
     help="Most terms to publish per topic.",
-)
-@click.option(
-    "--min-marginal-share",
-    default=DEFAULT_MIN_MARGINAL_SHARE,
-    show_default=True,
-    help="Stop once the next term would reveal less than this share of a topic's views.",
 )
 def main(
     topic: tuple[str, ...],
@@ -695,14 +747,14 @@ def main(
     weighting: str,
     views_column: str,
     max_terms: int,
-    min_marginal_share: float,
+    keep_countries: bool,
 ):
     """Build the OWID topic vocabulary: the suggested search terms per topic.
 
     For each topic, fetches the chart list its all-charts block shows, weights
     every chart by how much it is viewed, asks an LLM for candidate search terms,
-    and then picks the terms covering the most of that list — most-revealing
-    first, each next one adding the most that is still uncovered.
+    measures what each candidate would show, and asks the LLM to choose the line
+    from those measurements.
     """
     if not config.ANTHROPIC_API_KEY:
         click.secho("✗ ANTHROPIC_API_KEY not set (in .env or the environment)", fg="red")
@@ -744,13 +796,21 @@ def main(
     click.echo(f"Topics:    {len(topic_slugs)}")
     click.echo(f"Model:     {model}")
     click.echo(f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}")
-    click.echo(f"Terms:     at most {max_terms}, stopping below {min_marginal_share:.1%}")
+    click.echo(f"Terms:     at most {max_terms}")
+    if keep_countries:
+        click.echo(f"Countries: kept from {VOCABULARY_FILE.name}")
     click.echo(f"Output:    {output}")
     if upload_path:
         click.echo(f"Upload:    {upload_path} (scratch key)")
     click.echo("=" * 80)
     click.echo()
 
+    # Each kept topic's countries, as last committed.
+    kept_countries = (
+        {slug: {"countries": entry["countries"]} for slug, entry in json.loads(VOCABULARY_FILE.read_text()).items()}
+        if keep_countries
+        else None
+    )
     try:
         results, failed_slugs, universes, selections = asyncio.run(
             process_topics(
@@ -759,7 +819,7 @@ def main(
                 weighting=weighting,
                 views_column=views_column,
                 max_terms=max_terms,
-                min_marginal_share=min_marginal_share,
+                kept_countries=kept_countries,
             )
         )
     except EmptyAnalyticsError as e:
@@ -773,8 +833,8 @@ def main(
 
     # Calculate total costs, pricing each topic on its own: long-context tiers apply per
     # request, so pricing the run's summed tokens could put all of it in the expensive
-    # tier (a topic's two requests together stay far below it). A model genai-prices doesn't know still runs; its cost is simply
-    # reported as unknown (the whole run costs a couple of cents either way).
+    # tier (a topic's requests together stay far below it). A model genai-prices doesn't know
+    # still runs; its cost is simply reported as unknown.
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
     try:
