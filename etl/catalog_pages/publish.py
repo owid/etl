@@ -56,7 +56,7 @@ def build_and_publish_catalog_pages(
 
     When ``only`` is given, restrict generation to datasets whose
     ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
-    Otherwise only datasets that opt in via ``dataset: jsonld: true`` in their
+    Otherwise only datasets that opt in via ``dataset: dataset_page: true`` in their
     metadata are considered.
 
     ``restrict_to`` keeps only the opted-in datasets whose ``"<namespace>/<dataset>"`` is in the set.
@@ -104,7 +104,7 @@ def publish_staging_dataset_pages(dry_run: bool = False) -> None:
     from etl.io import get_all_changed_catalog_paths
 
     if config.DATA_API_ENV == "production":
-        raise ValueError("Production pages are published by `etl d publish --jsonld`, not by this command.")
+        raise ValueError("Production pages are published by `etl d publish --dataset-pages`, not by this command.")
     changed_paths = set()
     for catalog_path in get_all_changed_catalog_paths(get_changed_files()):
         parts = catalog_path.split("/")

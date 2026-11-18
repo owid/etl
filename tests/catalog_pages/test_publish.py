@@ -74,7 +74,7 @@ def _add_eligible_dataset(
             description=f"{dataset} description",
             non_redistributable=non_redistributable,
             # Opt in via metadata: the publish default only considers flagged datasets.
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")

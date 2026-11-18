@@ -118,7 +118,7 @@ def build_catalog_page_artifacts(
     per table its CSV, parquet, workbook, codebook and sources, plus ``readme.md`` and ``manifest.json`` (see
     :mod:`etl.catalog_pages.pages`), and, when the dataset passes every quality gate, ``dataset.jsonld``. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
-    otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.
+    otherwise only datasets that opt in via ``DatasetMeta.dataset_page`` are considered.
 
     ``channel`` is one channel or several. A garden step and a grapher step can both have a page; when the two
     are at the same ``<namespace>/<dataset>`` they claim the same page: the grapher step gets it, and a warning
@@ -171,19 +171,19 @@ def build_catalog_page_artifacts(
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
 
-    # Without an explicit allowlist, only datasets that opt in via `dataset: jsonld: true`
-    # in their metadata are considered (canary rollout of the catalog-discovery project).
+    # Without an explicit allowlist, only datasets that opt in via `dataset: dataset_page: true`
+    # in their metadata are considered.
     # Unflagged datasets are invisible to this build: not emitted, not reported, and any
     # previously published artifacts are left untouched.
     candidates: list[tuple[LatestDatasetPath, Dataset]] = []
     for entry in latest_paths:
         ds = Dataset(catalog_dir / entry.catalog_path)
         if entry.channel == "garden":
-            opted_in = bool(ds.metadata.jsonld) or only is not None
+            opted_in = bool(ds.metadata.dataset_page) or only is not None
         else:
             # A grapher step copies its dataset metadata from the garden step, flag included, so for it the flag
             # only counts when the metadata file of the step itself sets it.
-            opted_in = bool(ds.metadata.jsonld) and step_sets_jsonld(entry.catalog_path, steps_dir)
+            opted_in = bool(ds.metadata.dataset_page) and step_sets_dataset_page(entry.catalog_path, steps_dir)
         if opted_in and (restrict_to is None or entry.short_key in restrict_to):
             candidates.append((entry, ds))
 
@@ -311,13 +311,13 @@ def build_catalog_page_artifacts(
     return result
 
 
-def step_sets_jsonld(catalog_path: str, steps_dir: Path | None = None) -> bool:
+def step_sets_dataset_page(catalog_path: str, steps_dir: Path | None = None) -> bool:
     """Whether the metadata file of the step itself (not metadata copied from another step) opts in to a page."""
     path = (steps_dir or STEP_DIR / "data") / f"{catalog_path}.meta.yml"
     if not path.exists():
         return False
     content = yaml.safe_load(path.read_text()) or {}
-    return bool((content.get("dataset") or {}).get("jsonld"))
+    return bool((content.get("dataset") or {}).get("dataset_page"))
 
 
 def _sitemap_entry(entry: LatestDatasetPath, base_url: str) -> SitemapEntry:

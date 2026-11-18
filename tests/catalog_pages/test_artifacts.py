@@ -21,7 +21,7 @@ def _add_eligible_dataset(
     dataset: str,
     version: str = "2025-01-01",
     non_redistributable: bool = False,
-    jsonld: bool = True,
+    dataset_page: bool = True,
 ) -> str:
     """Create a minimal, quality-eligible garden dataset and return its catalog path."""
     dataset_dir = data_dir / "garden" / namespace / version / dataset
@@ -42,7 +42,7 @@ def _add_eligible_dataset(
             title=f"{dataset} title",
             description=f"{dataset} description",
             non_redistributable=non_redistributable,
-            jsonld=jsonld,
+            dataset_page=dataset_page,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -74,7 +74,7 @@ def test_build_catalog_page_artifacts_writes_dataset_jsonld_sitemap_and_report(t
             short_name="example_dataset",
             title="Example dataset",
             description="Dataset description",
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -141,7 +141,7 @@ def test_build_catalog_page_artifacts_cleans_up_stale_old_location_for_emitted_d
             short_name="example_dataset",
             title="Example dataset",
             description="Dataset description",
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -423,7 +423,7 @@ def test_build_catalog_page_artifacts_renders_templated_metadata_via_dimensions(
             short_name="long_dataset",
             title="Long dataset",
             description="Dataset description",
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(
@@ -498,8 +498,8 @@ def test_build_catalog_page_artifacts_blocks_raw_jinja_leaking_from_unguarded_fi
 
 def test_build_catalog_page_artifacts_requires_metadata_opt_in_without_allowlist(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
-    _add_eligible_dataset(data_dir, namespace="example", dataset="flagged", jsonld=True)
-    _add_eligible_dataset(data_dir, namespace="example", dataset="unflagged", jsonld=False)
+    _add_eligible_dataset(data_dir, namespace="example", dataset="flagged", dataset_page=True)
+    _add_eligible_dataset(data_dir, namespace="example", dataset="unflagged", dataset_page=False)
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
     active_steps = {_step_uri("garden/example/2025-01-01/flagged"), _step_uri("garden/example/2025-01-01/unflagged")}

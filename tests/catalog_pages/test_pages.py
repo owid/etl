@@ -33,7 +33,7 @@ def _add_dataset(
     description: str | None = "Dataset description.",
     tables: int = 1,
     channel: str = "garden",
-    jsonld: bool = True,
+    dataset_page: bool = True,
     update_period_days: int | None = None,
 ) -> str:
     dataset_dir = data_dir / channel / namespace / version / dataset
@@ -48,7 +48,7 @@ def _add_dataset(
             description=description,
             changelog=[{"date": version, "changes": ["First release."]}],
             licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
-            jsonld=jsonld,
+            dataset_page=dataset_page,
             update_period_days=update_period_days,
             owners=["Pablo Rosado", "Mojmír Vinkler"],
         ),
@@ -412,7 +412,9 @@ def test_link_to_a_table_or_column_that_the_built_grapher_dataset_lacks_is_repor
     steps_dir = tmp_path / "steps"
     catalog_path = _add_dataset(data_dir)
     # The linked grapher dataset is built: its table "energy_mix" has the column "hydro_energy_twh".
-    grapher_path = _add_dataset(data_dir, dataset="energy_mix", version="2026-06-30", channel="grapher", jsonld=False)
+    grapher_path = _add_dataset(
+        data_dir, dataset="energy_mix", version="2026-06-30", channel="grapher", dataset_page=False
+    )
     _write_step_file(
         steps_dir,
         catalog_path,
@@ -533,7 +535,7 @@ def test_grapher_step_gets_a_page_when_its_own_metadata_file_opts_in(tmp_path: P
     data_dir = tmp_path / "data"
     steps_dir = tmp_path / "steps"
     catalog_path = _add_dataset(data_dir, channel="grapher")
-    _write_step_file(steps_dir, catalog_path, ".meta.yml", "dataset:\n  jsonld: true\n")
+    _write_step_file(steps_dir, catalog_path, ".meta.yml", "dataset:\n  dataset_page: true\n")
 
     result = build_catalog_page_artifacts(
         output_dir=tmp_path / "pages",
@@ -571,7 +573,7 @@ def test_when_garden_and_grapher_steps_both_opt_in_the_grapher_step_gets_the_pag
     steps_dir = tmp_path / "steps"
     garden_path = _add_dataset(data_dir)
     grapher_path = _add_dataset(data_dir, channel="grapher")
-    _write_step_file(steps_dir, grapher_path, ".meta.yml", "dataset:\n  jsonld: true\n")
+    _write_step_file(steps_dir, grapher_path, ".meta.yml", "dataset:\n  dataset_page: true\n")
 
     result = build_catalog_page_artifacts(
         output_dir=tmp_path / "pages",
@@ -595,7 +597,7 @@ def test_restrict_to_keeps_only_the_listed_datasets_and_does_not_override_the_op
     data_dir = tmp_path / "data"
     changed_path = _add_dataset(data_dir)
     unchanged_path = _add_dataset(data_dir, dataset="unchanged")
-    not_opted_in_path = _add_dataset(data_dir, dataset="not_opted_in", jsonld=False)
+    not_opted_in_path = _add_dataset(data_dir, dataset="not_opted_in", dataset_page=False)
 
     result = build_catalog_page_artifacts(
         output_dir=tmp_path / "pages",

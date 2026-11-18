@@ -1,6 +1,5 @@
 dataset:
-  # Opt in to the public catalog page (rendered from this dataset's metadata) and its JSON-LD side product.
-  jsonld: true
+  dataset_page: true
   title: Energy dataset
   description: |-
     Our complete energy data in one table. For every country and year, it has total energy supply, the energy mix by source, electricity generation and trade, emissions and carbon intensity, and fossil fuel production.
