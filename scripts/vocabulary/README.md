@@ -50,15 +50,15 @@ The committed file *replaces* the vocabulary rather than merging into it, so a `
 
 ### Choose model
 ```bash
-# Use a faster/cheaper model (default: claude-sonnet-5-5)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json --model claude-haiku-5-5
+# Use a cheaper model (default: claude-opus-5-5)
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json --model claude-sonnet-5-5
 ```
 
 ## CLI Options
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Write the full results, stats included, to this JSON file (default: the committed `etl/steps/export/r2/owid/latest/topic_vocabulary.json`)
-- `--model MODEL` - Claude model to use (default: `claude-sonnet-5-5`). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
+- `--model MODEL` - Claude model to use (default: `claude-opus-5-5`; a full run costs about $5, and `--keep-countries` saves about a third). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
 - `--upload-path KEY` - Also upload the published part to this scratch key in the `owid-public` bucket, to try it on a staging server (refuses `topic_vocabulary.json`, the key the site reads)
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
 - `--weighting {views,uniform}` - Weight charts by views (default) or count them equally

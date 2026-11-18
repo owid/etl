@@ -70,7 +70,8 @@ from etl.steps.export.r2.owid.latest.topic_vocabulary import (  # ty: ignore
     upload,
 )
 
-DEFAULT_MODEL = "claude-sonnet-5-5"
+# Choosing a line is a judgment call, where Opus is clearly better than Sonnet; a full run costs about $5.
+DEFAULT_MODEL = "claude-opus-5-5"
 
 # Reuse the answer for an identical request. Left alone, two runs of identical code
 # disagreed on almost every topic — Gender Ratio came back covering 30% of its
@@ -848,8 +849,8 @@ def main(
 
     # Calculate total costs, pricing each topic on its own: long-context tiers apply per
     # request, so pricing the run's summed tokens could put all of it in the expensive
-    # tier (a topic's two requests together stay far below it). A model genai-prices doesn't know still runs; its cost is simply
-    # reported as unknown (the whole run costs a couple of cents either way).
+    # tier (a topic's requests together stay far below it). A model genai-prices doesn't know
+    # still runs; its cost is simply reported as unknown.
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
     try:
