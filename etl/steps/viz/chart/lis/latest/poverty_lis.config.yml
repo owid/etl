@@ -60,7 +60,7 @@ dimensions:
   - name: Poverty line
     slug: poverty_line
     presentation:
-      type: dropdown
+      type: dropdown-with-search
     choices:
       - slug: "1"
         name: "$1 per day"
