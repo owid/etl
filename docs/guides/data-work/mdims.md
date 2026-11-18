@@ -47,7 +47,7 @@ MDIMs can be crafted in various ways, going from totally manual to fully automat
 Below is a simple MDIM configuration file (modified for demo purposes):
 
 ```yaml title="etl/steps/viz/chart/covid/latest/covid.deaths.yml"
-grapher_schema: "011"
+grapher_schema: "012"
 title:
   title: COVID-19 confirmed deaths
   title_variant: ""
@@ -114,9 +114,11 @@ In this example, we note that we can group together indicators from any dataset.
     Two forms are accepted — the short version, or the full URL:
 
     ```yaml
-    grapher_schema: "011"
-    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json
+    grapher_schema: "012"
+    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.012.json
     ```
+
+    A new MDIM pins the current version, `DEFAULT_GRAPHER_SCHEMA_VERSION` in `etl/config.py`.
 
     **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
 
@@ -130,10 +132,10 @@ In this example, we note that we can group together indicators from any dataset.
 
     | Where | Key | Value |
     |---|---|---|
-    | config YAML | `grapher_schema` | `"011"` |
-    | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"011"` |
-    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
-    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.011.json` |
+    | config YAML | `grapher_schema` | `"012"` |
+    | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"012"` |
+    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.012.json` |
+    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.012.json` |
 
     The generated JSON keeps the authored short form because `ChartSet.read()` loads it back through `Chart.from_dict`; only the upsert payload is camelized and resolved to a full URL. So grepping the generated JSON for `grapherConfigSchema` finds nothing even when the pin is working perfectly.
 
