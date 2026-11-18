@@ -316,8 +316,9 @@ one a curious reader would want to click through, and it gets there by three thi
   "street" lifted out of "living on the street"), a unit or measure ("tonnes", "death rate",
   "share"), something about the data rather than the world (how it was collected, how complete
   it is, which source it comes from), or a place, including its people ("Americans"). It
-  should also be what a reader would type: a few words, not a chart's whole title. A term repeating the topic's own name is fine when it narrows: on Alcohol
-  Consumption, "alcohol consumption" opens its central charts.
+  should also be what a reader would type: a few words, not a chart's whole title. A term
+  repeating the topic's own name is fine when it narrows: on Alcohol Consumption, "alcohol
+  consumption" opens its central charts.
 
 The site shows five, so give at least five when the candidates allow it, plus spares in case
 one is hidden; stop short only when the next term would not be worth a reader's click.
