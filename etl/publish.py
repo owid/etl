@@ -67,8 +67,6 @@ class CannotPublish(Exception):
     help="Generate and publish the page files (CSV, XLSX, codebook, README, manifest, Schema.org JSON-LD) "
     "of the datasets that opt in via `dataset: dataset_page: true` in their metadata.",
 )
-# Old name of --dataset-pages, still called by the production publish script in ops.
-@click.option("--jsonld", "jsonld_old_name", is_flag=True, default=False, hidden=True)
 @click.option(
     "--dataset-pages-base-url",
     type=str,
@@ -88,7 +86,6 @@ def publish_cli(
     bucket: str,
     channel: Iterable[CHANNEL],
     dataset_pages: bool,
-    jsonld_old_name: bool,
     dataset_pages_base_url: str,
     dataset_pages_only: tuple[str, ...],
 ) -> None:
@@ -98,7 +95,7 @@ def publish_cli(
         private=private,
         bucket=bucket,
         channel=channel,
-        dataset_pages=dataset_pages or jsonld_old_name,
+        dataset_pages=dataset_pages,
         dataset_pages_base_url=dataset_pages_base_url,
         dataset_pages_only=dataset_pages_only,
     )

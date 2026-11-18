@@ -158,13 +158,13 @@ def _page_keys(result: JsonLdBuildResult, catalog_dir: Path) -> tuple[list[str],
         delete_keys.extend(short_key_files(entry))
     # Datasets archived outright (no active replacement at all) never appear above, since no on-disk version
     # of them is active, but a prior publish may still have left their files live on R2. Several
-    # archived_entries can share the same short key, so dedupe. A short key that a page of this build owns
-    # (a grapher step's page, when the garden step of the same name was archived) is left alone.
+    # archived_entries can share the same short key, so dedupe. A short key that an opted-in dataset of this build
+    # owns (a grapher step's page, when the garden step of the same name was archived) is left alone, even when
+    # that page failed to build and kept its published files.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.archived_entries)
-    owned_short_keys = {entry.short_key for entry in result.page_entries}
     archived_short_key_files: set[str] = set()
     for entry in result.archived_entries:
-        if entry.short_key in owned_short_keys:
+        if entry.short_key in result.owned_short_keys:
             continue
         archived_short_key_files.update(short_key_files(entry))
     delete_keys.extend(sorted(archived_short_key_files))

@@ -367,43 +367,6 @@ def test_build_catalog_page_artifacts_blocks_reserved_namespace(tmp_path: Path) 
     assert not (data_dir / "garden" / "something" / "dataset.jsonld").exists()
 
 
-def test_build_catalog_page_artifacts_blocks_duplicate_short_keys(tmp_path: Path, monkeypatch) -> None:
-    """No two emitted datasets in a build may resolve to the same "<namespace>/<dataset>" short
-    key. This can't happen today (latest_dataset_paths already dedupes per (channel, namespace,
-    dataset) and the builder is single-channel), so the collision is forced here to exercise the
-    batch-level guard that protects a future multi-channel build."""
-    data_dir = tmp_path / "data"
-    path_a = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2")
-    path_b = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2_dup")
-    LocalCatalog(data_dir, channels=("garden",)).reindex()
-
-    import etl.catalog_pages.artifacts as artifacts_module
-
-    real_latest_dataset_paths = artifacts_module.latest_dataset_paths
-
-    def fake_latest_dataset_paths(frame, *, channel="garden", only=None, active_steps=None):
-        entries = real_latest_dataset_paths(frame, channel=channel, only=only, active_steps=active_steps)
-        return [
-            artifacts_module.LatestDatasetPath(
-                catalog_path=entry.catalog_path, namespace="emissions", dataset="owid_co2", version=entry.version
-            )
-            for entry in entries
-        ]
-
-    monkeypatch.setattr(artifacts_module, "latest_dataset_paths", fake_latest_dataset_paths)
-
-    result = artifacts_module.build_catalog_page_artifacts(
-        output_dir=data_dir,
-        catalog_dir=data_dir,
-        channel="garden",
-        active_steps={_step_uri(path_a), _step_uri(path_b)},
-    )
-
-    assert result.emitted == []
-    assert {item.catalog_path for item in result.skipped} == {path_a, path_b}
-    assert all("duplicate_short_key" in item.blockers for item in result.skipped)
-
-
 def test_build_catalog_page_artifacts_renders_templated_metadata_via_dimensions(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     dataset_dir = data_dir / "garden" / "example" / "2025-01-01" / "long_dataset"

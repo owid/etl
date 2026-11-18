@@ -41,7 +41,7 @@ from etl.catalog_pages.quality import (
 )
 from etl.catalog_pages.sitemap import SitemapEntry, sitemap_xml
 from etl.dag_helpers import graph_nodes, load_dag
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.paths import DATA_DIR
 
 log = get_logger()
 
@@ -93,6 +93,8 @@ class JsonLdBuildResult:
     warnings: list[DatasetQualityResult] = field(default_factory=list)
     archived_entries: list[LatestDatasetPath] = field(default_factory=list)
     superseded_entries: list[LatestDatasetPath] = field(default_factory=list)
+    # The short keys of every opted-in dataset of the build, also those whose page failed: no cleanup deletes them.
+    owned_short_keys: set[str] = field(default_factory=set)
 
 
 def build_catalog_page_artifacts(
@@ -120,16 +122,15 @@ def build_catalog_page_artifacts(
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
     otherwise only datasets that opt in via ``DatasetMeta.dataset_page`` are considered.
 
-    ``channel`` is one channel or several. A garden step and a grapher step can both have a page; when the two
-    are at the same ``<namespace>/<dataset>`` they claim the same page: the grapher step gets it, and a warning
-    is reported. ``restrict_to``
-    keeps only the opted-in datasets whose ``"<namespace>/<dataset>"`` is in the set (unlike ``only``, it does
+    ``channel`` is one channel or several. A garden step and a grapher step can both have a page, but two steps at
+    the same ``<namespace>/<dataset>`` cannot both opt in: they would claim the same page, so that raises an error.
+    ``restrict_to`` keeps only the opted-in datasets whose ``"<namespace>/<dataset>"`` is in the set (unlike ``only``, it does
     not override the opt-in).
 
     ``active_steps`` overrides the set of active DAG step URIs used to exclude stale,
     archived on-disk builds (see :func:`latest_dataset_paths`). Defaults to the real DAG;
     tests should pass an explicit set instead of relying on ``dag/*.yml``. ``steps_dir`` is the folder of the
-    data steps, where the links file and the metadata file of a step are read from.
+    data steps, where the links file of a step is read from.
     """
     channels: tuple[CHANNEL, ...] = (channel,) if isinstance(channel, str) else tuple(channel)
     if active_steps is None:
@@ -178,28 +179,20 @@ def build_catalog_page_artifacts(
     candidates: list[tuple[LatestDatasetPath, Dataset]] = []
     for entry in latest_paths:
         ds = Dataset(catalog_dir / entry.catalog_path)
-        if entry.channel == "garden":
-            opted_in = bool(ds.metadata.dataset_page) or only is not None
-        else:
-            # A grapher step copies its dataset metadata from the garden step, flag included, so for it the flag
-            # only counts when the metadata file of the step itself sets it.
-            opted_in = bool(ds.metadata.dataset_page) and step_sets_dataset_page(entry.catalog_path, steps_dir)
+        opted_in = bool(ds.metadata.dataset_page) or (entry.channel == "garden" and only is not None)
         if opted_in and (restrict_to is None or entry.short_key in restrict_to):
             candidates.append((entry, ds))
 
-    # A garden step and a grapher step at the same `<namespace>/<dataset>` claim the same page. The grapher step
-    # only opts in through its own metadata file, so its flag is the deliberate one: it gets the page.
-    grapher_short_keys = {entry.short_key for entry, _ in candidates if entry.channel == "grapher"}
-    ignored_garden_paths = {
-        entry.short_key: entry.catalog_path
-        for entry, _ in candidates
-        if entry.channel == "garden" and entry.short_key in grapher_short_keys
-    }
-    candidates = [(entry, ds) for entry, ds in candidates if entry.catalog_path not in ignored_garden_paths.values()]
-
+    # Two steps at the same `<namespace>/<dataset>` (a garden step and its grapher step) would claim the same page.
     duplicate_catalog_paths = find_duplicate_short_key_paths(
         (entry.catalog_path, entry.namespace, entry.dataset) for entry, _ in candidates
     )
+    if duplicate_catalog_paths:
+        raise ValueError(
+            f"These steps opt in to a dataset page at the same <namespace>/<dataset>: {sorted(duplicate_catalog_paths)}. "
+            "Only one of them can set `dataset: dataset_page: true`."
+        )
+    result.owned_short_keys = {entry.short_key for entry, _ in candidates}
 
     for entry, ds in candidates:
         catalog_path = entry.catalog_path
@@ -209,14 +202,7 @@ def build_catalog_page_artifacts(
             namespace=entry.namespace,
             dataset_meta=ds.metadata,
             tables=tables,
-            duplicate_short_key=catalog_path in duplicate_catalog_paths,
         )
-        if entry.channel == "grapher" and entry.short_key in ignored_garden_paths:
-            garden_path = ignored_garden_paths[entry.short_key]
-            quality.warnings.append(
-                f"the garden step {garden_path} also opts in: the page is built from the grapher step"
-            )
-            log.warning("catalog_pages.garden_opt_in_ignored", dataset=catalog_path, garden=garden_path)
         if not quality.is_page_eligible:
             # The dataset must not be served at all: the publish step removes every page file from R2.
             result.skipped.append(quality)
@@ -309,15 +295,6 @@ def build_catalog_page_artifacts(
         (output_dir / QUALITY_REPORT_FILENAME).write_text(json.dumps(quality_report(result), indent=2) + "\n")
 
     return result
-
-
-def step_sets_dataset_page(catalog_path: str, steps_dir: Path | None = None) -> bool:
-    """Whether the metadata file of the step itself (not metadata copied from another step) opts in to a page."""
-    path = (steps_dir or STEP_DIR / "data") / f"{catalog_path}.meta.yml"
-    if not path.exists():
-        return False
-    content = yaml.safe_load(path.read_text()) or {}
-    return bool((content.get("dataset") or {}).get("dataset_page"))
 
 
 def _sitemap_entry(entry: LatestDatasetPath, base_url: str) -> SitemapEntry:

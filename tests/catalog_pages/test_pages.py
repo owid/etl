@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 from owid.catalog import Dataset, DatasetMeta, License, Origin, Table, VariableMeta, VariablePresentationMeta
 from owid.catalog.api.legacy import LocalCatalog
 
@@ -531,18 +532,16 @@ def test_links_file_that_is_not_a_mapping_keeps_the_published_page(tmp_path: Pat
     assert not [key for key in _page_keys(result, data_dir)[1] if key.startswith("energy/")]
 
 
-def test_grapher_step_gets_a_page_when_its_own_metadata_file_opts_in(tmp_path: Path) -> None:
+def test_grapher_step_that_opts_in_gets_a_page(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
-    steps_dir = tmp_path / "steps"
     catalog_path = _add_dataset(data_dir, channel="grapher")
-    _write_step_file(steps_dir, catalog_path, ".meta.yml", "dataset:\n  dataset_page: true\n")
 
     result = build_catalog_page_artifacts(
         output_dir=tmp_path / "pages",
         catalog_dir=data_dir,
         channel=("garden", "grapher"),
         active_steps={_step_uri(catalog_path)},
-        steps_dir=steps_dir,
+        steps_dir=tmp_path / "steps",
     )
 
     assert result.pages == [catalog_path]
@@ -550,46 +549,39 @@ def test_grapher_step_gets_a_page_when_its_own_metadata_file_opts_in(tmp_path: P
     assert manifest["catalog_path"] == "grapher/energy/2026-09-10/owid_energy"
 
 
-def test_flag_copied_from_the_garden_step_does_not_give_the_grapher_step_a_page(tmp_path: Path) -> None:
+def test_garden_and_grapher_steps_that_both_opt_in_raise(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     garden_path = _add_dataset(data_dir)
-    # The grapher dataset carries the flag in its metadata, as copied from garden, but its step has no file that sets it.
     grapher_path = _add_dataset(data_dir, channel="grapher")
 
-    result = build_catalog_page_artifacts(
-        output_dir=tmp_path / "pages",
-        catalog_dir=data_dir,
-        channel=("garden", "grapher"),
-        active_steps={_step_uri(garden_path), _step_uri(grapher_path)},
-        steps_dir=tmp_path / "steps",
-    )
-
-    assert result.pages == [garden_path]
-    assert result.skipped == []
+    with pytest.raises(ValueError, match="same <namespace>/<dataset>"):
+        build_catalog_page_artifacts(
+            output_dir=tmp_path / "pages",
+            catalog_dir=data_dir,
+            channel=("garden", "grapher"),
+            active_steps={_step_uri(garden_path), _step_uri(grapher_path)},
+            steps_dir=tmp_path / "steps",
+        )
 
 
-def test_when_garden_and_grapher_steps_both_opt_in_the_grapher_step_gets_the_page(tmp_path: Path) -> None:
+def test_archived_garden_step_does_not_delete_the_page_of_a_grapher_step_that_failed(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     steps_dir = tmp_path / "steps"
-    garden_path = _add_dataset(data_dir)
+    # A garden step removed from the DAG, and an active grapher step of the same name whose page fails to build.
+    _add_dataset(data_dir, version="2025-01-01")
     grapher_path = _add_dataset(data_dir, channel="grapher")
-    _write_step_file(steps_dir, grapher_path, ".meta.yml", "dataset:\n  dataset_page: true\n")
+    _write_step_file(steps_dir, grapher_path, ".indicator_links.yml", "- just\n- a list\n")
 
     result = build_catalog_page_artifacts(
         output_dir=tmp_path / "pages",
         catalog_dir=data_dir,
         channel=("garden", "grapher"),
-        active_steps={_step_uri(garden_path), _step_uri(grapher_path)},
+        active_steps={_step_uri(grapher_path)},
         steps_dir=steps_dir,
     )
 
-    assert result.pages == [grapher_path]
-    manifest = json.loads((tmp_path / "pages" / "energy" / "owid_energy" / "manifest.json").read_text())
-    assert manifest["catalog_path"] == grapher_path
-    assert [item.warnings for item in result.warnings] == [
-        [f"the garden step {garden_path} also opts in: the page is built from the grapher step"]
-    ]
-    # Nothing of the page is deleted.
+    assert list(result.page_failures) == [grapher_path]
+    # The page that was published before stays.
     assert not [key for key in _page_keys(result, data_dir)[1] if key.startswith("energy/owid_energy/")]
 
 
