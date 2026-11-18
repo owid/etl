@@ -45,6 +45,8 @@ Ask first, every time, and wait for a yes that names the action:
 - **Posting to Slack**, in any channel or DM, including drafts. Give the user the text, and they
   post it.
 - **Anything on production**: redirects, featured metrics, gdoc edits, unpublishing the explorer.
+- **Contacting anyone outside OWID**, such as the sites that embed the explorer. Draft the
+  message; the user sends it.
 
 Approval covers that one action. It does not carry over to the next explorer or the next step.
 
@@ -59,6 +61,9 @@ Writes `inventory.csv` and `inventory.json`: views and dimensions, pageviews, pu
 link to or embed it, site redirects that end on it, featured metrics, step size, and flags for
 explorer-only settings. Check which env file holds prod credentials (`ls -la .env*`) and ask the
 user if none does.
+
+Also list the external sites that embed it in an iframe, from the analytics referrers
+([reference/external-embeds.md](reference/external-embeds.md)).
 
 Start with explorers that have few views, no embeds, no featured metrics and no redirects
 ending on them. Read the flags before committing to one:
@@ -236,6 +241,9 @@ In this order, because creating the redirects darkens the explorer at once:
    (preflight reads the DB, not the site). After the user pastes it, poll a few views with
    `curl -s -o /dev/null -w '%{http_code} %{redirect_url}'` until they return 302, including one
    with a `country=` param to check it is carried over.
+4. **External embeds.** Re-run the referrer query from
+   [reference/external-embeds.md](reference/external-embeds.md) and give the user the sites, with
+   the multidim embed that replaces each. Their iframes keep working through the redirect.
 
 ## 8. Retire the explorer and its orphaned data
 
@@ -259,4 +267,5 @@ rebuild the review page with `--stage retire`.
 ## Report
 
 Close with what is still open: unchecked views, flags handled by dropping something, embeds or
-featured metrics not yet swapped, the retirement PR, and anything you didn't verify.
+featured metrics not yet swapped, external sites not yet told, the retirement PR, and anything you
+didn't verify.
