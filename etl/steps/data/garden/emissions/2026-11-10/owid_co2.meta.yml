@@ -1,5 +1,4 @@
 dataset:
-  # Canary for the public catalog landing page / Schema.org JSON-LD (catalog-discovery project).
   jsonld: true
   title: CO₂ and greenhouse gas emissions dataset
   description: |-
