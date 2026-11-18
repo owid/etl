@@ -353,19 +353,20 @@ Choose the line: up to {max_terms} of these terms, in the order to show them. A 
 one a curious reader would want to click through, and it gets there by three things at once:
 
 - **Each term leads somewhere different.** Read the example charts: two terms whose charts
-  are mostly the same, or that are two phrasings of one subject ("cancer deaths" and "cancer
-  death rate", "R&D" and "research and development"), spend two slots on one subject. Keep
-  the one that shows more.
+  are mostly the same, or that are two phrasings or spellings of one subject ("cancer deaths"
+  and "cancer death rate", "R&D" and "research and development", "area burnt" and "area
+  burned"), spend two slots on one subject. Keep the one that shows more.
 - **Together they reach what readers come for.** The view shares say where the topic's
   readers go; a line that skips its most-viewed charts has missed the topic. Put the terms
   that open the most-viewed parts first.
 - **Each term makes sense on its own.** The reader sees the term alone, with no chart next to
   it, and should know what clicking it will show. A subject ("working hours", "lung cancer")
   passes. These don't, however much they reach: a word that only means something next to the
-  rest of a title ("age" or "work" on Time Use), a fragment of a title ("time with"), a unit
-  or measure ("tonnes", "death rate", "share"), how the data was collected ("survey"), or a
-  place, including its people ("Americans"). It should also be what a reader would type: a
-  few words, not a chart's whole title. A term repeating the topic's own name is fine when it narrows: on Alcohol
+  rest of a title ("age" or "work" on Time Use), a fragment of a title ("time with", or
+  "street" lifted out of "living on the street"), a unit or measure ("tonnes", "death rate",
+  "share"), something about the data rather than the world (how it was collected, how complete
+  it is, which source it comes from), or a place, including its people ("Americans"). It
+  should also be what a reader would type: a few words, not a chart's whole title. A term repeating the topic's own name is fine when it narrows: on Alcohol
   Consumption, "alcohol consumption" opens its central charts.
 
 The site shows five, so give at least five when the candidates allow it, plus spares in case
