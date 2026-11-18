@@ -16,8 +16,9 @@
       "Japan",
       "Niger",
       "South Korea",
+      "China",
       "Italy",
-      "China"
+      "United Arab Emirates"
     ],
     "stats": {
       "num_charts_texts": 45,
@@ -33,8 +34,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.018548
     },
     "keyword_stats": [
@@ -118,12 +118,13 @@
       "palm oil"
     ],
     "countries": [
-      "United States",
       "Brazil",
-      "China",
-      "India",
+      "Ukraine",
       "Indonesia",
-      "Ukraine"
+      "Netherlands",
+      "Cote d'Ivoire",
+      "United States",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -139,8 +140,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.014992
     },
     "keyword_stats": [
@@ -224,11 +224,11 @@
       "fossil fuels"
     ],
     "countries": [
-      "India",
       "China",
+      "India",
       "United Kingdom",
-      "Nigeria",
-      "Mongolia"
+      "Bangladesh",
+      "Indonesia"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -245,7 +245,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.026088
     },
     "keyword_stats": [
@@ -330,11 +329,11 @@
     ],
     "countries": [
       "Russia",
-      "United States",
+      "Czechia",
       "France",
-      "Belarus",
-      "Saudi Arabia",
-      "Moldova"
+      "United States",
+      "Moldova",
+      "United Kingdom"
     ],
     "stats": {
       "num_charts_texts": 108,
@@ -351,7 +350,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.016128
     },
     "keyword_stats": [
@@ -435,11 +433,12 @@
       "fur farming"
     ],
     "countries": [
-      "China",
       "United States",
-      "Brazil",
       "United Kingdom",
-      "Spain"
+      "China",
+      "Germany",
+      "Spain",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 153,
@@ -455,8 +454,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.017424
     },
     "keyword_stats": [
@@ -539,11 +537,12 @@
       "surveillance"
     ],
     "countries": [
+      "Netherlands",
       "India",
       "China",
-      "Denmark",
-      "Greece",
-      "South Africa"
+      "Sweden",
+      "Cyprus",
+      "Russia"
     ],
     "stats": {
       "num_charts_texts": 67,
@@ -559,8 +558,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.02554
     },
     "keyword_stats": [
@@ -638,9 +636,10 @@
     "countries": [
       "United States",
       "China",
+      "Ireland",
       "United Kingdom",
       "Taiwan",
-      "Canada"
+      "United Arab Emirates"
     ],
     "stats": {
       "num_charts_texts": 56,
@@ -656,8 +655,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.022952
     },
     "keyword_stats": [
@@ -741,11 +739,12 @@
       "whales"
     ],
     "countries": [
-      "Madagascar",
       "Brazil",
       "Indonesia",
-      "Australia",
-      "Kenya"
+      "Madagascar",
+      "South Africa",
+      "Canada",
+      "China"
     ],
     "stats": {
       "num_charts_texts": 199,
@@ -761,8 +760,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.022516
     },
     "keyword_stats": [
@@ -848,8 +846,9 @@
       "Brazil",
       "United States",
       "Indonesia",
-      "Germany",
-      "Sweden"
+      "Finland",
+      "Denmark",
+      "Germany"
     ],
     "stats": {
       "num_charts_texts": 8,
@@ -865,8 +864,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.008424
     },
     "keyword_stats": [
@@ -940,10 +938,10 @@
       "published"
     ],
     "countries": [
+      "Netherlands",
       "Germany",
       "United Kingdom",
       "Italy",
-      "China",
       "France"
     ],
     "stats": {
@@ -961,7 +959,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.012736
     },
     "keyword_stats": [
@@ -1029,12 +1026,12 @@
       "pneumonia"
     ],
     "countries": [
-      "Central African Republic",
-      "United States",
+      "Nigeria",
       "Japan",
-      "Lesotho",
-      "Democratic Republic of Congo",
-      "Afghanistan"
+      "Ethiopia",
+      "United States",
+      "Rwanda",
+      "Central African Republic"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -1051,7 +1048,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.019472
     },
     "keyword_stats": [
@@ -1135,11 +1131,11 @@
       "breast cancer"
     ],
     "countries": [
-      "Denmark",
-      "Mongolia",
-      "China",
       "Japan",
-      "Uruguay"
+      "United States",
+      "Mongolia",
+      "Australia",
+      "Eswatini"
     ],
     "stats": {
       "num_charts_texts": 150,
@@ -1156,7 +1152,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.021116
     },
     "keyword_stats": [
@@ -1240,11 +1235,12 @@
       "cholesterol"
     ],
     "countries": [
-      "Ukraine",
       "Japan",
-      "United States",
+      "Russia",
       "Finland",
-      "Bulgaria"
+      "United States",
+      "France",
+      "Ukraine"
     ],
     "stats": {
       "num_charts_texts": 98,
@@ -1260,8 +1256,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.025808
     },
     "keyword_stats": [
@@ -1346,10 +1341,10 @@
     ],
     "countries": [
       "United States",
-      "South Africa",
-      "Japan",
       "Russia",
-      "India"
+      "Japan",
+      "Nigeria",
+      "South Africa"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -1366,7 +1361,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.02244
     },
     "keyword_stats": [
@@ -1450,12 +1444,12 @@
       "household chores"
     ],
     "countries": [
-      "Niger",
-      "Mali",
-      "Bangladesh",
-      "India",
+      "United Kingdom",
       "Brazil",
-      "Democratic Republic of Congo"
+      "Ethiopia",
+      "Cote d'Ivoire",
+      "India",
+      "Bangladesh"
     ],
     "stats": {
       "num_charts_texts": 32,
@@ -1472,7 +1466,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.020016
     },
     "keyword_stats": [
@@ -1557,11 +1550,12 @@
     ],
     "countries": [
       "Niger",
-      "Sierra Leone",
-      "Somalia",
+      "Sweden",
       "Nigeria",
-      "South Korea",
-      "Bangladesh"
+      "Bangladesh",
+      "Somalia",
+      "India",
+      "Rwanda"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -1577,8 +1571,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.02322
     },
     "keyword_stats": [
@@ -1663,10 +1656,11 @@
     ],
     "countries": [
       "Chad",
-      "Ethiopia",
-      "Switzerland",
       "India",
-      "Papua New Guinea"
+      "Democratic Republic of Congo",
+      "Ethiopia",
+      "Bangladesh",
+      "Central African Republic"
     ],
     "stats": {
       "num_charts_texts": 44,
@@ -1682,8 +1676,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.021636
     },
     "keyword_stats": [
@@ -1771,7 +1764,8 @@
       "Chad",
       "Ethiopia",
       "Bangladesh",
-      "Nigeria"
+      "Nigeria",
+      "Papua New Guinea"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -1787,8 +1781,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.027444
     },
     "keyword_stats": [
@@ -1872,12 +1865,11 @@
       "ocean heat content"
     ],
     "countries": [
-      "China",
       "United States",
+      "China",
       "India",
-      "Tuvalu",
-      "Maldives",
-      "Russia"
+      "Russia",
+      "Brazil"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -1893,8 +1885,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 5,
       "total_cost_usd": 0.023716
     },
     "keyword_stats": [
@@ -1980,9 +1971,10 @@
     "countries": [
       "China",
       "United States",
-      "Qatar",
       "United Kingdom",
-      "India"
+      "India",
+      "Qatar",
+      "Sweden"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -1998,8 +1990,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.025316
     },
     "keyword_stats": [
@@ -2084,10 +2075,11 @@
     ],
     "countries": [
       "China",
-      "Sweden",
-      "United States",
       "Peru",
-      "South Korea"
+      "Sweden",
+      "New Zealand",
+      "Israel",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -2103,8 +2095,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.019084
     },
     "keyword_stats": [
@@ -2189,10 +2180,11 @@
     ],
     "countries": [
       "Denmark",
-      "Somalia",
       "Singapore",
       "Georgia",
-      "Venezuela"
+      "Venezuela",
+      "Somalia",
+      "Hungary"
     ],
     "stats": {
       "num_charts_texts": 36,
@@ -2208,8 +2200,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.018892
     },
     "keyword_stats": [
@@ -2294,10 +2285,11 @@
     ],
     "countries": [
       "United Kingdom",
-      "Malaysia",
-      "Indonesia",
+      "India",
       "China",
-      "Brazil"
+      "Netherlands",
+      "Ethiopia",
+      "Malawi"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -2313,8 +2305,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.020368
     },
     "keyword_stats": [
@@ -2400,9 +2391,11 @@
     "countries": [
       "Norway",
       "North Korea",
+      "Hungary",
+      "South Korea",
+      "Venezuela",
       "India",
-      "Afghanistan",
-      "Tunisia"
+      "Taiwan"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -2418,8 +2411,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.021072
     },
     "keyword_stats": [
@@ -2503,10 +2495,11 @@
       "typhoid"
     ],
     "countries": [
-      "Niger",
+      "Bangladesh",
+      "Chad",
       "Haiti",
       "Yemen",
-      "Egypt",
+      "India",
       "Nigeria"
     ],
     "stats": {
@@ -2523,8 +2516,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.025212
     },
     "keyword_stats": [
@@ -2609,10 +2601,11 @@
     ],
     "countries": [
       "India",
+      "United States",
       "United Kingdom",
-      "Mongolia",
-      "Argentina",
-      "Cambodia"
+      "China",
+      "Japan",
+      "Bangladesh"
     ],
     "stats": {
       "num_charts_texts": 48,
@@ -2628,8 +2621,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.025556
     },
     "keyword_stats": [
@@ -2713,12 +2705,12 @@
       "prices"
     ],
     "countries": [
-      "China",
       "South Korea",
+      "China",
+      "United Kingdom",
+      "Botswana",
       "Venezuela",
-      "Japan",
-      "Ireland",
-      "Botswana"
+      "Ireland"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -2735,7 +2727,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.023276
     },
     "keyword_stats": [
@@ -2820,11 +2811,11 @@
     ],
     "countries": [
       "South Africa",
-      "Brazil",
       "United States",
-      "Norway",
+      "Brazil",
+      "Slovakia",
       "China",
-      "Slovenia"
+      "Sweden"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -2841,7 +2832,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.025376
     },
     "keyword_stats": [
@@ -2925,10 +2915,11 @@
       "low pay"
     ],
     "countries": [
-      "Iceland",
       "South Korea",
+      "Iceland",
+      "Japan",
       "Saudi Arabia",
-      "Rwanda",
+      "Sweden",
       "United States"
     ],
     "stats": {
@@ -2945,8 +2936,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.014816
     },
     "keyword_stats": [
@@ -3031,11 +3021,12 @@
     ],
     "countries": [
       "France",
-      "Denmark",
-      "Iceland",
+      "United Kingdom",
       "Norway",
-      "South Africa",
-      "Paraguay"
+      "Germany",
+      "China",
+      "Uruguay",
+      "Denmark"
     ],
     "stats": {
       "num_charts_texts": 12,
@@ -3051,8 +3042,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.017256
     },
     "keyword_stats": [
@@ -3136,11 +3126,12 @@
       "informal employment"
     ],
     "countries": [
+      "United Kingdom",
+      "South Korea",
       "China",
-      "Sweden",
-      "Nepal",
       "Burundi",
-      "United Kingdom"
+      "Netherlands",
+      "United States"
     ],
     "stats": {
       "num_charts_texts": 48,
@@ -3156,8 +3147,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.028588
     },
     "keyword_stats": [
@@ -3241,12 +3231,13 @@
       "electric cars"
     ],
     "countries": [
-      "Norway",
       "China",
       "France",
+      "Norway",
       "Iceland",
-      "Saudi Arabia",
-      "Denmark"
+      "United Kingdom",
+      "Germany",
+      "Qatar"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -3262,8 +3253,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.023312
     },
     "keyword_stats": [
@@ -3347,11 +3337,12 @@
       "energy use"
     ],
     "countries": [
-      "Nigeria",
       "India",
+      "Nigeria",
       "Democratic Republic of Congo",
       "Bangladesh",
-      "Kenya"
+      "Vietnam",
+      "South Sudan"
     ],
     "stats": {
       "num_charts_texts": 20,
@@ -3367,8 +3358,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.013228
     },
     "keyword_stats": [
@@ -3450,11 +3440,12 @@
       "traditional biomass"
     ],
     "countries": [
-      "France",
       "Iceland",
+      "France",
+      "Sweden",
+      "United Kingdom",
       "China",
-      "Saudi Arabia",
-      "Denmark"
+      "Germany"
     ],
     "stats": {
       "num_charts_texts": 15,
@@ -3470,8 +3461,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.016008
     },
     "keyword_stats": [
@@ -3540,10 +3530,10 @@
     ],
     "countries": [
       "Brazil",
-      "Netherlands",
-      "United Kingdom",
       "China",
-      "Indonesia"
+      "United Kingdom",
+      "Indonesia",
+      "Democratic Republic of Congo"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -3560,7 +3550,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.018104
     },
     "keyword_stats": [
@@ -3644,11 +3633,12 @@
       "hepatitis"
     ],
     "countries": [
-      "India",
-      "Nigeria",
-      "Chad",
       "Pakistan",
-      "Afghanistan"
+      "Afghanistan",
+      "Somalia",
+      "Chad",
+      "India",
+      "Sri Lanka"
     ],
     "stats": {
       "num_charts_texts": 101,
@@ -3664,8 +3654,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.016528
     },
     "keyword_stats": [
@@ -3749,11 +3738,12 @@
       "population growth"
     ],
     "countries": [
-      "Ethiopia",
       "China",
-      "Ukraine",
       "India",
+      "Ukraine",
+      "Ethiopia",
       "North Korea",
+      "Ireland",
       "Somalia"
     ],
     "stats": {
@@ -3770,8 +3760,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.011176
     },
     "keyword_stats": [
@@ -3857,9 +3846,9 @@
     "countries": [
       "India",
       "United States",
-      "Brazil",
+      "Australia",
       "China",
-      "Uganda"
+      "Ethiopia"
     ],
     "stats": {
       "num_charts_texts": 19,
@@ -3876,7 +3865,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.022732
     },
     "keyword_stats": [
@@ -3960,11 +3948,12 @@
       "weekly hours"
     ],
     "countries": [
+      "India",
       "Saudi Arabia",
-      "Iceland",
-      "Afghanistan",
-      "Rwanda",
-      "India"
+      "Sweden",
+      "United States",
+      "Yemen",
+      "Rwanda"
     ],
     "stats": {
       "num_charts_texts": 65,
@@ -3980,8 +3969,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.01532
     },
     "keyword_stats": [
@@ -4067,9 +4055,10 @@
     "countries": [
       "South Korea",
       "Niger",
-      "Japan",
-      "France",
-      "China"
+      "Iran",
+      "China",
+      "Israel",
+      "Japan"
     ],
     "stats": {
       "num_charts_texts": 115,
@@ -4085,8 +4074,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.015736
     },
     "keyword_stats": [
@@ -4171,11 +4159,10 @@
     ],
     "countries": [
       "China",
-      "India",
       "Sri Lanka",
       "Netherlands",
-      "Egypt",
-      "Brazil"
+      "Malawi",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 60,
@@ -4191,8 +4178,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 5,
       "total_cost_usd": 0.016524
     },
     "keyword_stats": [
@@ -4276,10 +4262,10 @@
     ],
     "countries": [
       "Cuba",
+      "Vietnam",
       "Finland",
-      "South Korea",
-      "Niger",
-      "Singapore"
+      "Nigeria",
+      "South Korea"
     ],
     "stats": {
       "num_charts_texts": 26,
@@ -4296,7 +4282,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.019696
     },
     "keyword_stats": [
@@ -4373,10 +4358,11 @@
     ],
     "countries": [
       "United States",
-      "Rwanda",
+      "Cuba",
+      "Singapore",
+      "Costa Rica",
       "Thailand",
-      "United Kingdom",
-      "Cuba"
+      "Nigeria"
     ],
     "stats": {
       "num_charts_texts": 104,
@@ -4392,8 +4378,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.02096
     },
     "keyword_stats": [
@@ -4477,11 +4462,12 @@
       "greenhouse gas emissions"
     ],
     "countries": [
+      "Canada",
       "China",
       "Peru",
-      "Canada",
-      "Iceland",
-      "Norway"
+      "United Kingdom",
+      "Norway",
+      "Indonesia"
     ],
     "stats": {
       "num_charts_texts": 88,
@@ -4497,8 +4483,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.023848
     },
     "keyword_stats": [
@@ -4582,11 +4567,12 @@
       "commodity price index"
     ],
     "countries": [
-      "Venezuela",
-      "Nigeria",
       "United States",
-      "Lebanon",
-      "Zimbabwe"
+      "Nigeria",
+      "India",
+      "Venezuela",
+      "Madagascar",
+      "Kenya"
     ],
     "stats": {
       "num_charts_texts": 63,
@@ -4602,8 +4588,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.023132
     },
     "keyword_stats": [
@@ -4687,11 +4672,12 @@
       "sugar"
     ],
     "countries": [
-      "Ethiopia",
-      "United States",
+      "India",
       "China",
       "Ukraine",
-      "North Korea"
+      "United States",
+      "Central African Republic",
+      "Indonesia"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -4707,8 +4693,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.022968
     },
     "keyword_stats": [
@@ -4794,10 +4779,9 @@
     "countries": [
       "United States",
       "Norway",
-      "Afghanistan",
-      "Ethiopia",
-      "Sweden",
-      "Syria"
+      "South Korea",
+      "Ukraine",
+      "Afghanistan"
     ],
     "stats": {
       "num_charts_texts": 102,
@@ -4813,8 +4797,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 5,
       "total_cost_usd": 0.021968
     },
     "keyword_stats": [
@@ -4900,9 +4883,10 @@
     "countries": [
       "Brazil",
       "Indonesia",
-      "Democratic Republic of Congo",
+      "China",
       "Costa Rica",
-      "China"
+      "Democratic Republic of Congo",
+      "Malaysia"
     ],
     "stats": {
       "num_charts_texts": 76,
@@ -4918,8 +4902,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.026592
     },
     "keyword_stats": [
@@ -5003,12 +4986,12 @@
       "subsidies"
     ],
     "countries": [
-      "China",
-      "United States",
-      "Saudi Arabia",
-      "Russia",
       "United Kingdom",
-      "Qatar"
+      "China",
+      "Saudi Arabia",
+      "United States",
+      "Qatar",
+      "Venezuela"
     ],
     "stats": {
       "num_charts_texts": 162,
@@ -5025,7 +5008,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.016004
     },
     "keyword_stats": [
@@ -5113,7 +5095,8 @@
       "India",
       "South Korea",
       "Azerbaijan",
-      "Qatar"
+      "Qatar",
+      "Russia"
     ],
     "stats": {
       "num_charts_texts": 31,
@@ -5129,8 +5112,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.013596
     },
     "keyword_stats": [
@@ -5215,10 +5197,11 @@
     ],
     "countries": [
       "South Korea",
-      "Finland",
+      "Singapore",
       "Niger",
       "Afghanistan",
-      "Singapore"
+      "Vietnam",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -5234,8 +5217,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.028428
     },
     "keyword_stats": [
@@ -5319,12 +5301,12 @@
       "universal health coverage"
     ],
     "countries": [
-      "Rwanda",
       "United States",
-      "Sierra Leone",
-      "Cuba",
-      "Bangladesh",
-      "Niger"
+      "Rwanda",
+      "Japan",
+      "Nigeria",
+      "Sri Lanka",
+      "Cuba"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -5341,7 +5323,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.017896
     },
     "keyword_stats": [
@@ -5426,10 +5407,11 @@
     ],
     "countries": [
       "France",
+      "Sweden",
       "United States",
       "Japan",
-      "Sweden",
-      "Greece"
+      "Greece",
+      "Ireland"
     ],
     "stats": {
       "num_charts_texts": 81,
@@ -5445,8 +5427,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.022076
     },
     "keyword_stats": [
@@ -5534,7 +5515,8 @@
       "Afghanistan",
       "Denmark",
       "Costa Rica",
-      "Bhutan"
+      "China",
+      "Lebanon"
     ],
     "stats": {
       "num_charts_texts": 45,
@@ -5550,8 +5532,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.016948
     },
     "keyword_stats": [
@@ -5639,7 +5620,8 @@
       "Eswatini",
       "Botswana",
       "Uganda",
-      "Thailand"
+      "Thailand",
+      "Russia"
     ],
     "stats": {
       "num_charts_texts": 101,
@@ -5655,8 +5637,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.021328
     },
     "keyword_stats": [
@@ -5741,7 +5722,8 @@
       "Finland",
       "United States",
       "Japan",
-      "Australia"
+      "New Zealand",
+      "United Kingdom"
     ],
     "stats": {
       "num_charts_texts": 13,
@@ -5757,10 +5739,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 4,
-      "unrecognized_countries": [
-        "England"
-      ],
+      "num_countries": 5,
       "total_cost_usd": 0.016116
     },
     "keyword_stats": [
@@ -5829,11 +5808,11 @@
     ],
     "countries": [
       "El Salvador",
-      "Colombia",
-      "South Africa",
-      "Japan",
       "United States",
-      "Jamaica"
+      "Colombia",
+      "Japan",
+      "South Africa",
+      "Mexico"
     ],
     "stats": {
       "num_charts_texts": 56,
@@ -5850,7 +5829,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.013356
     },
     "keyword_stats": [
@@ -5937,7 +5915,9 @@
       "Netherlands",
       "South Korea",
       "Iran",
+      "United States",
       "Guatemala",
+      "Latvia",
       "Japan"
     ],
     "stats": {
@@ -5954,8 +5934,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.01778
     },
     "keyword_stats": [
@@ -6039,11 +6018,12 @@
       "right to vote"
     ],
     "countries": [
-      "Afghanistan",
       "North Korea",
-      "Saudi Arabia",
       "Rwanda",
-      "Netherlands"
+      "Hungary",
+      "New Zealand",
+      "Saudi Arabia",
+      "Taiwan"
     ],
     "stats": {
       "num_charts_texts": 109,
@@ -6059,8 +6039,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.015312
     },
     "keyword_stats": [
@@ -6144,12 +6123,12 @@
       "Global Hunger Index"
     ],
     "countries": [
-      "Madagascar",
-      "Yemen",
       "India",
-      "Peru",
+      "Ethiopia",
+      "China",
+      "Yemen",
       "Somalia",
-      "Ethiopia"
+      "Venezuela"
     ],
     "stats": {
       "num_charts_texts": 79,
@@ -6166,7 +6145,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.022184
     },
     "keyword_stats": [
@@ -6251,10 +6229,11 @@
     ],
     "countries": [
       "United States",
-      "Afghanistan",
-      "Russia",
       "Portugal",
-      "Colombia"
+      "Canada",
+      "Colombia",
+      "Afghanistan",
+      "Mexico"
     ],
     "stats": {
       "num_charts_texts": 101,
@@ -6270,8 +6249,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.021396
     },
     "keyword_stats": [
@@ -6355,11 +6333,10 @@
     ],
     "countries": [
       "India",
+      "Indonesia",
       "China",
       "Nigeria",
-      "Democratic Republic of Congo",
-      "Ethiopia",
-      "Bangladesh"
+      "Madagascar"
     ],
     "stats": {
       "num_charts_texts": 39,
@@ -6375,8 +6352,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 5,
       "total_cost_usd": 0.023036
     },
     "keyword_stats": [
@@ -6453,10 +6429,11 @@
     ],
     "countries": [
       "China",
-      "United States",
-      "Mexico",
       "Cambodia",
-      "Japan"
+      "Egypt",
+      "Mexico",
+      "Australia",
+      "South Korea"
     ],
     "stats": {
       "num_charts_texts": 122,
@@ -6472,8 +6449,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.034892
     },
     "keyword_stats": [
@@ -6555,11 +6531,13 @@
       "primary schools"
     ],
     "countries": [
-      "Iceland",
       "South Korea",
+      "India",
       "China",
+      "Eritrea",
       "North Korea",
-      "Eritrea"
+      "Iceland",
+      "United States"
     ],
     "stats": {
       "num_charts_texts": 18,
@@ -6575,8 +6553,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.019948
     },
     "keyword_stats": [
@@ -6646,9 +6623,10 @@
     "countries": [
       "Brazil",
       "Indonesia",
-      "China",
+      "United States",
       "Australia",
-      "Malaysia"
+      "China",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 117,
@@ -6664,8 +6642,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.02126
     },
     "keyword_stats": [
@@ -6751,9 +6728,10 @@
     "countries": [
       "United States",
       "Algeria",
+      "Bangladesh",
       "India",
-      "Nigeria",
-      "China"
+      "Georgia",
+      "Nigeria"
     ],
     "stats": {
       "num_charts_texts": 25,
@@ -6769,8 +6747,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.011828
     },
     "keyword_stats": [
@@ -6856,9 +6833,10 @@
     "countries": [
       "Netherlands",
       "Uganda",
+      "Taiwan",
+      "Malta",
       "Russia",
-      "South Africa",
-      "Taiwan"
+      "Ireland"
     ],
     "stats": {
       "num_charts_texts": 62,
@@ -6874,8 +6852,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.015528
     },
     "keyword_stats": [
@@ -6961,10 +6938,10 @@
     "countries": [
       "Japan",
       "Russia",
-      "Hong Kong",
-      "Eswatini",
+      "United States",
       "South Korea",
-      "Sierra Leone"
+      "Botswana",
+      "Nigeria"
     ],
     "stats": {
       "num_charts_texts": 111,
@@ -6981,7 +6958,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.02404
     },
     "keyword_stats": [
@@ -7065,9 +7041,10 @@
     "countries": [
       "United Kingdom",
       "South Sudan",
-      "India",
-      "Kenya",
-      "South Korea"
+      "North Korea",
+      "Bangladesh",
+      "Chad",
+      "Vietnam"
     ],
     "stats": {
       "num_charts_texts": 8,
@@ -7083,8 +7060,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.008648
     },
     "keyword_stats": [
@@ -7151,11 +7127,10 @@
     ],
     "countries": [
       "Niger",
-      "South Sudan",
       "Afghanistan",
-      "South Korea",
-      "Cuba",
-      "China"
+      "India",
+      "Sweden",
+      "Cuba"
     ],
     "stats": {
       "num_charts_texts": 25,
@@ -7171,8 +7146,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 5,
       "total_cost_usd": 0.021092
     },
     "keyword_stats": [
@@ -7244,7 +7218,8 @@
       "Democratic Republic of Congo",
       "Sri Lanka",
       "China",
-      "Uganda"
+      "Uganda",
+      "India"
     ],
     "stats": {
       "num_charts_texts": 33,
@@ -7260,8 +7235,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.01182
     },
     "keyword_stats": [
@@ -7347,9 +7321,10 @@
     "countries": [
       "Netherlands",
       "Niger",
-      "India",
-      "Sweden",
-      "South Korea"
+      "United Kingdom",
+      "Chile",
+      "Japan",
+      "Iceland"
     ],
     "stats": {
       "num_charts_texts": 36,
@@ -7365,8 +7340,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.012224
     },
     "keyword_stats": [
@@ -7450,12 +7424,12 @@
       "pre-term"
     ],
     "countries": [
-      "Sierra Leone",
-      "Poland",
+      "Sweden",
+      "Sri Lanka",
+      "United States",
       "Nigeria",
-      "India",
-      "Rwanda",
-      "United States"
+      "South Sudan",
+      "Cambodia"
     ],
     "stats": {
       "num_charts_texts": 43,
@@ -7472,7 +7446,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.022232
     },
     "keyword_stats": [
@@ -7557,10 +7530,10 @@
     ],
     "countries": [
       "China",
-      "Brazil",
+      "India",
       "United States",
-      "Argentina",
-      "India"
+      "Brazil",
+      "Argentina"
     ],
     "stats": {
       "num_charts_texts": 101,
@@ -7577,7 +7550,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.014984
     },
     "keyword_stats": [
@@ -7663,8 +7635,9 @@
       "United States",
       "China",
       "United Kingdom",
-      "Switzerland",
-      "India"
+      "Japan",
+      "Germany",
+      "South Korea"
     ],
     "stats": {
       "num_charts_texts": 29,
@@ -7680,8 +7653,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.020616
     },
     "keyword_stats": [
@@ -7757,11 +7729,11 @@
       "bipolar disorder"
     ],
     "countries": [
+      "Iceland",
       "United States",
-      "Greenland",
-      "Japan",
+      "South Korea",
       "Australia",
-      "India"
+      "Japan"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -7778,7 +7750,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.028112
     },
     "keyword_stats": [
@@ -7866,7 +7837,8 @@
       "Chile",
       "China",
       "Australia",
-      "Indonesia"
+      "Indonesia",
+      "South Africa"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -7882,8 +7854,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.021896
     },
     "keyword_stats": [
@@ -7968,9 +7939,10 @@
     ],
     "countries": [
       "India",
+      "Peru",
+      "Yemen",
       "Niger",
       "Bangladesh",
-      "Guatemala",
       "Ethiopia"
     ],
     "stats": {
@@ -7987,8 +7959,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.014224
     },
     "keyword_stats": [
@@ -8074,9 +8045,10 @@
     "countries": [
       "United States",
       "Syria",
-      "Afghanistan",
+      "United Arab Emirates",
+      "Ukraine",
       "Venezuela",
-      "United Arab Emirates"
+      "Germany"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -8092,8 +8064,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.019596
     },
     "keyword_stats": [
@@ -8176,11 +8147,11 @@
     ],
     "countries": [
       "United States",
-      "Israel",
+      "Ukraine",
       "North Korea",
+      "Israel",
       "Russia",
-      "Saudi Arabia",
-      "Ukraine"
+      "Costa Rica"
     ],
     "stats": {
       "num_charts_texts": 26,
@@ -8197,7 +8168,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.023128
     },
     "keyword_stats": [
@@ -8265,11 +8235,12 @@
       "hurricanes"
     ],
     "countries": [
-      "Japan",
-      "Bangladesh",
-      "United States",
       "Haiti",
-      "Philippines"
+      "Bangladesh",
+      "Japan",
+      "China",
+      "Indonesia",
+      "United States"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -8285,8 +8256,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.024836
     },
     "keyword_stats": [
@@ -8370,11 +8340,12 @@
       "snakebite"
     ],
     "countries": [
-      "Chad",
       "India",
-      "Bangladesh",
+      "South Sudan",
       "Democratic Republic of Congo",
-      "Brazil"
+      "Chad",
+      "Brazil",
+      "Ethiopia"
     ],
     "stats": {
       "num_charts_texts": 76,
@@ -8390,8 +8361,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.016676
     },
     "keyword_stats": [
@@ -8474,10 +8444,11 @@
     ],
     "countries": [
       "France",
-      "Japan",
       "Germany",
+      "Japan",
       "United States",
-      "Russia"
+      "China",
+      "Sweden"
     ],
     "stats": {
       "num_charts_texts": 8,
@@ -8493,8 +8464,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.012784
     },
     "keyword_stats": [
@@ -8565,7 +8535,8 @@
       "Russia",
       "North Korea",
       "South Africa",
-      "Iran"
+      "Ukraine",
+      "China"
     ],
     "stats": {
       "num_charts_texts": 22,
@@ -8581,8 +8552,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.027592
     },
     "keyword_stats": [
@@ -8658,11 +8628,12 @@
       "risk factor"
     ],
     "countries": [
-      "Nauru",
       "United States",
+      "Nauru",
       "Japan",
-      "Egypt",
-      "Samoa"
+      "Mexico",
+      "Tonga",
+      "Vietnam"
     ],
     "stats": {
       "num_charts_texts": 51,
@@ -8678,8 +8649,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.02454
     },
     "keyword_stats": [
@@ -8776,7 +8746,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 0,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.013888
     },
     "keyword_stats": [
@@ -8844,11 +8813,12 @@
       "household air pollution"
     ],
     "countries": [
-      "India",
       "China",
-      "Nepal",
-      "South Korea",
-      "United States"
+      "India",
+      "Bangladesh",
+      "Pakistan",
+      "United Kingdom",
+      "Finland"
     ],
     "stats": {
       "num_charts_texts": 28,
@@ -8864,8 +8834,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.022016
     },
     "keyword_stats": [
@@ -8952,7 +8921,9 @@
       "China",
       "United States",
       "India",
-      "Russia"
+      "Japan",
+      "Russia",
+      "Australia"
     ],
     "stats": {
       "num_charts_texts": 22,
@@ -8968,10 +8939,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 4,
-      "unrecognized_countries": [
-        "Antarctica"
-      ],
+      "num_countries": 6,
       "total_cost_usd": 0.01122
     },
     "keyword_stats": [
@@ -9055,11 +9023,11 @@
       "antibiotic"
     ],
     "countries": [
-      "United Kingdom",
       "South Africa",
+      "United Kingdom",
       "India",
-      "Democratic Republic of Congo",
-      "China"
+      "Peru",
+      "Eswatini"
     ],
     "stats": {
       "num_charts_texts": 49,
@@ -9076,7 +9044,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.0212
     },
     "keyword_stats": [
@@ -9161,8 +9128,9 @@
       "Brazil",
       "China",
       "United States",
-      "France",
-      "Denmark"
+      "Sri Lanka",
+      "Costa Rica",
+      "Netherlands"
     ],
     "stats": {
       "num_charts_texts": 8,
@@ -9178,8 +9146,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.007628
     },
     "keyword_stats": [
@@ -9247,11 +9214,12 @@
       "microplastics"
     ],
     "countries": [
-      "China",
       "Philippines",
+      "China",
       "India",
       "United States",
-      "Malaysia"
+      "Malaysia",
+      "Indonesia"
     ],
     "stats": {
       "num_charts_texts": 181,
@@ -9267,8 +9235,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.025288
     },
     "keyword_stats": [
@@ -9354,10 +9321,10 @@
     "countries": [
       "Nigeria",
       "India",
-      "Democratic Republic of Congo",
       "Chad",
-      "Rwanda",
-      "Gambia"
+      "Japan",
+      "Pakistan",
+      "China"
     ],
     "stats": {
       "num_charts_texts": 32,
@@ -9374,7 +9341,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.02436
     },
     "keyword_stats": [
@@ -9459,9 +9425,10 @@
     "countries": [
       "Pakistan",
       "Afghanistan",
-      "India",
       "Nigeria",
-      "United States"
+      "India",
+      "United States",
+      "Democratic Republic of Congo"
     ],
     "stats": {
       "num_charts_texts": 41,
@@ -9477,8 +9444,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.02458
     },
     "keyword_stats": [
@@ -9554,12 +9520,12 @@
       "children under 5"
     ],
     "countries": [
-      "China",
-      "India",
       "Japan",
+      "China",
+      "Niger",
+      "India",
       "Nigeria",
-      "South Korea",
-      "Niger"
+      "Bulgaria"
     ],
     "stats": {
       "num_charts_texts": 83,
@@ -9576,7 +9542,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.023436
     },
     "keyword_stats": [
@@ -9662,10 +9627,10 @@
     "countries": [
       "China",
       "India",
+      "Nigeria",
+      "Vietnam",
       "Democratic Republic of Congo",
-      "Madagascar",
-      "Bangladesh",
-      "Vietnam"
+      "Bangladesh"
     ],
     "stats": {
       "num_charts_texts": 196,
@@ -9682,7 +9647,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.025808
     },
     "keyword_stats": [
@@ -9766,12 +9730,12 @@
       "Muslims"
     ],
     "countries": [
-      "India",
+      "United States",
       "China",
+      "India",
+      "Czechia",
       "Israel",
-      "Saudi Arabia",
-      "Estonia",
-      "Czechia"
+      "Indonesia"
     ],
     "stats": {
       "num_charts_texts": 56,
@@ -9788,7 +9752,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.022524
     },
     "keyword_stats": [
@@ -9873,10 +9836,12 @@
     ],
     "countries": [
       "China",
-      "Brazil",
       "Denmark",
       "Iceland",
-      "Germany"
+      "Germany",
+      "Brazil",
+      "Uruguay",
+      "Norway"
     ],
     "stats": {
       "num_charts_texts": 55,
@@ -9892,8 +9857,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.015392
     },
     "keyword_stats": [
@@ -9977,11 +9941,12 @@
       "life science"
     ],
     "countries": [
-      "South Korea",
       "Israel",
+      "South Korea",
       "China",
+      "United States",
       "Switzerland",
-      "United Kingdom"
+      "Japan"
     ],
     "stats": {
       "num_charts_texts": 36,
@@ -9997,8 +9962,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.023324
     },
     "keyword_stats": [
@@ -10083,10 +10047,11 @@
     ],
     "countries": [
       "India",
-      "Ethiopia",
       "Bangladesh",
-      "Chad",
-      "Switzerland"
+      "Ethiopia",
+      "Niger",
+      "Nepal",
+      "Chad"
     ],
     "stats": {
       "num_charts_texts": 56,
@@ -10102,8 +10067,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.01682
     },
     "keyword_stats": [
@@ -10186,11 +10150,12 @@
       "World Health Assembly"
     ],
     "countries": [
-      "India",
       "Sweden",
       "United Kingdom",
       "Somalia",
-      "Brazil"
+      "India",
+      "Bangladesh",
+      "Ethiopia"
     ],
     "stats": {
       "num_charts_texts": 16,
@@ -10206,8 +10171,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.009556
     },
     "keyword_stats": [
@@ -10284,10 +10248,11 @@
     ],
     "countries": [
       "United Kingdom",
-      "Kiribati",
-      "United States",
+      "China",
       "Indonesia",
-      "China"
+      "Sweden",
+      "Uruguay",
+      "Myanmar"
     ],
     "stats": {
       "num_charts_texts": 50,
@@ -10303,8 +10268,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.024372
     },
     "keyword_stats": [
@@ -10391,8 +10355,8 @@
       "United States",
       "Sweden",
       "Japan",
-      "Germany",
-      "South Korea"
+      "Finland",
+      "Denmark"
     ],
     "stats": {
       "num_charts_texts": 23,
@@ -10409,7 +10373,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.015136
     },
     "keyword_stats": [
@@ -10497,7 +10460,8 @@
       "Russia",
       "China",
       "India",
-      "Japan"
+      "Japan",
+      "New Zealand"
     ],
     "stats": {
       "num_charts_texts": 15,
@@ -10513,8 +10477,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.018196
     },
     "keyword_stats": [
@@ -10600,9 +10563,10 @@
     "countries": [
       "Somalia",
       "Denmark",
-      "India",
+      "Singapore",
+      "Rwanda",
       "Afghanistan",
-      "China"
+      "Botswana"
     ],
     "stats": {
       "num_charts_texts": 76,
@@ -10618,8 +10582,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.013264
     },
     "keyword_stats": [
@@ -10704,10 +10667,11 @@
     "countries": [
       "South Korea",
       "Lithuania",
-      "Greece",
-      "Russia",
+      "Sri Lanka",
       "Japan",
-      "Guyana"
+      "Greenland",
+      "Guyana",
+      "Russia"
     ],
     "stats": {
       "num_charts_texts": 46,
@@ -10723,8 +10687,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 6,
-      "unrecognized_countries": [],
+      "num_countries": 7,
       "total_cost_usd": 0.021272
     },
     "keyword_stats": [
@@ -10803,8 +10766,9 @@
       "Denmark",
       "France",
       "United States",
-      "Norway",
-      "Brazil"
+      "Sweden",
+      "Ireland",
+      "Nigeria"
     ],
     "stats": {
       "num_charts_texts": 45,
@@ -10820,8 +10784,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.021396
     },
     "keyword_stats": [
@@ -10906,11 +10869,11 @@
     ],
     "countries": [
       "United States",
-      "China",
       "South Korea",
       "Kenya",
-      "Japan",
-      "Taiwan"
+      "China",
+      "United Kingdom",
+      "Japan"
     ],
     "stats": {
       "num_charts_texts": 90,
@@ -10927,7 +10890,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.021584
     },
     "keyword_stats": [
@@ -11015,8 +10977,8 @@
       "Afghanistan",
       "Nigeria",
       "United States",
-      "Syria",
-      "Pakistan"
+      "United Kingdom",
+      "Burkina Faso"
     ],
     "stats": {
       "num_charts_texts": 44,
@@ -11033,7 +10995,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.014592
     },
     "keyword_stats": [
@@ -11118,10 +11079,11 @@
     ],
     "countries": [
       "India",
-      "Nigeria",
       "Pakistan",
+      "Nigeria",
+      "Somalia",
       "Ethiopia",
-      "Bangladesh"
+      "Afghanistan"
     ],
     "stats": {
       "num_charts_texts": 26,
@@ -11137,8 +11099,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.012544
     },
     "keyword_stats": [
@@ -11225,8 +11186,9 @@
       "Germany",
       "South Korea",
       "United States",
-      "Greece",
-      "Denmark"
+      "Japan",
+      "Netherlands",
+      "Mexico"
     ],
     "stats": {
       "num_charts_texts": 57,
@@ -11242,8 +11204,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.01406
     },
     "keyword_stats": [
@@ -11328,10 +11289,11 @@
     ],
     "countries": [
       "France",
-      "Spain",
-      "Macao",
       "Maldives",
-      "Thailand"
+      "Spain",
+      "Thailand",
+      "Iceland",
+      "China"
     ],
     "stats": {
       "num_charts_texts": 59,
@@ -11347,8 +11309,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.024524
     },
     "keyword_stats": [
@@ -11434,9 +11395,10 @@
     "countries": [
       "China",
       "Singapore",
+      "Vietnam",
       "United States",
-      "Germany",
-      "Vietnam"
+      "Ireland",
+      "North Korea"
     ],
     "stats": {
       "num_charts_texts": 126,
@@ -11452,8 +11414,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.020512
     },
     "keyword_stats": [
@@ -11539,8 +11500,8 @@
     "countries": [
       "Norway",
       "China",
+      "United Kingdom",
       "United States",
-      "Japan",
       "Netherlands"
     ],
     "stats": {
@@ -11558,7 +11519,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 5,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.016584
     },
     "keyword_stats": [
@@ -11643,10 +11603,11 @@
     ],
     "countries": [
       "Norway",
-      "China",
-      "United States",
       "Brazil",
-      "Denmark"
+      "United States",
+      "China",
+      "Denmark",
+      "Colombia"
     ],
     "stats": {
       "num_charts_texts": 60,
@@ -11662,8 +11623,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.018444
     },
     "keyword_stats": [
@@ -11749,10 +11709,10 @@
     "countries": [
       "India",
       "South Africa",
-      "China",
       "Russia",
-      "United States",
-      "Philippines"
+      "Philippines",
+      "Lesotho",
+      "United Kingdom"
     ],
     "stats": {
       "num_charts_texts": 94,
@@ -11769,7 +11729,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.016008
     },
     "keyword_stats": [
@@ -11854,10 +11813,11 @@
     ],
     "countries": [
       "China",
-      "Singapore",
+      "India",
       "Nigeria",
       "Japan",
-      "India"
+      "Burundi",
+      "Singapore"
     ],
     "stats": {
       "num_charts_texts": 84,
@@ -11873,8 +11833,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.023524
     },
     "keyword_stats": [
@@ -11959,10 +11918,11 @@
     ],
     "countries": [
       "United States",
-      "India",
       "Nigeria",
-      "Afghanistan",
-      "Pakistan"
+      "France",
+      "Rwanda",
+      "Pakistan",
+      "Samoa"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -11978,8 +11938,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.03024
     },
     "keyword_stats": [
@@ -12064,8 +12023,9 @@
     ],
     "countries": [
       "Niger",
-      "Bangladesh",
       "Somalia",
+      "Bangladesh",
+      "Sweden",
       "United States",
       "Ethiopia"
     ],
@@ -12083,8 +12043,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.022772
     },
     "keyword_stats": [
@@ -12170,10 +12129,10 @@
     "countries": [
       "Ukraine",
       "Syria",
+      "Sudan",
       "Afghanistan",
       "Ethiopia",
-      "Israel",
-      "Sudan"
+      "Democratic Republic of Congo"
     ],
     "stats": {
       "num_charts_texts": 200,
@@ -12190,7 +12149,6 @@
       "views_column": "views_365d",
       "selection": "model",
       "num_countries": 6,
-      "unrecognized_countries": [],
       "total_cost_usd": 0.026812
     },
     "keyword_stats": [
@@ -12274,11 +12232,12 @@
       "electronic waste"
     ],
     "countries": [
-      "South Korea",
       "Philippines",
+      "India",
       "Germany",
-      "Estonia",
-      "India"
+      "South Korea",
+      "United States",
+      "Malaysia"
     ],
     "stats": {
       "num_charts_texts": 47,
@@ -12294,8 +12253,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.015368
     },
     "keyword_stats": [
@@ -12381,9 +12339,10 @@
     "countries": [
       "Saudi Arabia",
       "India",
-      "Uzbekistan",
+      "Israel",
       "Egypt",
-      "Kuwait"
+      "Turkmenistan",
+      "Singapore"
     ],
     "stats": {
       "num_charts_texts": 70,
@@ -12399,8 +12358,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.023016
     },
     "keyword_stats": [
@@ -12483,11 +12441,12 @@
       "PM2.5"
     ],
     "countries": [
-      "Australia",
       "Canada",
-      "Angola",
-      "Democratic Republic of Congo",
-      "Brazil"
+      "Australia",
+      "Brazil",
+      "United States",
+      "Greece",
+      "Democratic Republic of Congo"
     ],
     "stats": {
       "num_charts_texts": 28,
@@ -12503,8 +12462,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.019856
     },
     "keyword_stats": [
@@ -12581,10 +12539,11 @@
     ],
     "countries": [
       "Rwanda",
-      "Afghanistan",
-      "Iceland",
       "Saudi Arabia",
-      "India"
+      "Iceland",
+      "Afghanistan",
+      "India",
+      "New Zealand"
     ],
     "stats": {
       "num_charts_texts": 132,
@@ -12600,8 +12559,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.019824
     },
     "keyword_stats": [
@@ -12685,11 +12643,12 @@
       "informal employment"
     ],
     "countries": [
-      "South Korea",
       "Germany",
+      "South Africa",
+      "South Korea",
+      "Netherlands",
       "Saudi Arabia",
-      "Rwanda",
-      "India"
+      "United States"
     ],
     "stats": {
       "num_charts_texts": 170,
@@ -12705,8 +12664,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.016972
     },
     "keyword_stats": [
@@ -12790,11 +12748,12 @@
       "hourly wage"
     ],
     "countries": [
-      "South Korea",
       "Germany",
+      "South Korea",
       "Cambodia",
-      "Netherlands",
-      "Ireland"
+      "Mexico",
+      "Japan",
+      "Netherlands"
     ],
     "stats": {
       "num_charts_texts": 30,
@@ -12810,8 +12769,7 @@
       "weighting": "views",
       "views_column": "views_365d",
       "selection": "model",
-      "num_countries": 5,
-      "unrecognized_countries": [],
+      "num_countries": 6,
       "total_cost_usd": 0.011324
     },
     "keyword_stats": [
