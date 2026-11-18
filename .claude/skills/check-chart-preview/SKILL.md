@@ -56,18 +56,18 @@ The fastest, most reliable way to grab a chart's rendered image — works for **
 
 ```bash
 # Resolve slug → by-uuid PNG URL, then fetch
-URL=$(STAGING=1 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug-or-id>)
+URL=$(.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug-or-id>)
 curl -o ai/chart_preview.png "$URL"
 ```
 
 Pass extra grapher query params with `--<key>=<value>`:
 
 ```bash
-STAGING=1 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=map
-STAGING=1 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
+.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=map
+.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
 ```
 
-The helper queries MySQL via `etl.config.OWID_ENV.read_sql`, which targets `staging-site-<branch>` only when `STAGING=1` is set; without it the UUID comes from the DB in your `.env`.
+The helper looks the UUID up in the current branch's staging DB and returns a URL on that same server; prefix `STAGING=<branch>` to target another branch's server.
 
 Use the resulting PNG by reading it directly with the `Read` tool (Claude can view images).
 
