@@ -117,9 +117,7 @@ def record_matches_term(record: dict, term: str) -> bool:
     leading, last = term_words[:-1], term_words[-1]
     for text in record_subject_texts(record):
         text_words = split_into_match_words(text)
-        if all(word in text_words for word in leading) and any(
-            word.startswith(last) for word in text_words
-        ):
+        if all(word in text_words for word in leading) and any(word.startswith(last) for word in text_words):
             return True
     return False
 
@@ -137,9 +135,7 @@ def record_identity(record: dict) -> str:
 # -------------------------------------------------------------------- universe
 
 
-async def fetch_topic_universe(
-    client: httpx.AsyncClient, topic_name: str, semaphore: asyncio.Semaphore
-) -> list[dict]:
+async def fetch_topic_universe(client: httpx.AsyncClient, topic_name: str, semaphore: asyncio.Semaphore) -> list[dict]:
     """Every record the all-charts block lists for a topic.
 
     The same facets the block's baseline query uses (see `buildChartsFacetFilters`
@@ -150,6 +146,7 @@ async def fetch_topic_universe(
     the same title, subtitle and producers as its plain twin, so it matches
     identically and keys identically.
     """
+
     async def fetch_page(page: int) -> dict:
         async with semaphore:
             response = await client.post(
@@ -179,15 +176,11 @@ async def fetch_topic_universe(
     # its explorers) need two or three.
     pages = first.get("nbPages") or 1
     if pages > 1:
-        for payload in await asyncio.gather(
-            *(fetch_page(page) for page in range(1, pages))
-        ):
+        for payload in await asyncio.gather(*(fetch_page(page) for page in range(1, pages))):
             hits.extend(payload.get("hits") or [])
 
     if first.get("nbHits", 0) > len(hits):
-        raise RuntimeError(
-            f"{topic_name}: {first['nbHits']} records but only {len(hits)} fetched"
-        )
+        raise RuntimeError(f"{topic_name}: {first['nbHits']} records but only {len(hits)} fetched")
 
     # One record per identity. Where an FM copy and its plain twin both appear,
     # either will do: they render the same text.
@@ -244,12 +237,8 @@ def load_view_analytics(views_column: str = DEFAULT_VIEWS_COLUMN) -> ViewAnalyti
         elif row.chart_slug:
             by_slug[row.chart_slug] = views
 
-    average_by_slug = {
-        slug: round(sum(counts) / len(counts)) for slug, counts in slug_totals.items()
-    }
-    return ViewAnalytics(
-        by_config_id=by_config_id, average_by_slug=average_by_slug, by_slug=by_slug
-    )
+    average_by_slug = {slug: round(sum(counts) / len(counts)) for slug, counts in slug_totals.items()}
+    return ViewAnalytics(by_config_id=by_config_id, average_by_slug=average_by_slug, by_slug=by_slug)
 
 
 def load_mdim_view_config_ids() -> dict[tuple[str, frozenset], str]:
@@ -261,9 +250,7 @@ def load_mdim_view_config_ids() -> dict[tuple[str, frozenset], str]:
     the encoded string, which sidesteps every encoding discrepancy between
     Python's urlencode and the browser's URLSearchParams.
     """
-    rows = OWID_ENV.read_sql(
-        "SELECT slug, config FROM multi_dim_data_pages WHERE published = 1"
-    )
+    rows = OWID_ENV.read_sql("SELECT slug, config FROM multi_dim_data_pages WHERE published = 1")
     mapping: dict[tuple[str, frozenset], str] = {}
     for row in rows.itertuples(index=False):
         config = json.loads(row.config) if isinstance(row.config, str) else row.config
@@ -363,11 +350,7 @@ def weigh_universe(
 
 def match_identities(universe: WeightedUniverse, term: str) -> frozenset[str]:
     """The records the block would show for a term, within this topic."""
-    return frozenset(
-        identity
-        for identity, record in universe.records.items()
-        if record_matches_term(record, term)
-    )
+    return frozenset(identity for identity, record in universe.records.items() if record_matches_term(record, term))
 
 
 # ------------------------------------------------------------------- selection
@@ -434,9 +417,7 @@ def offerable_candidates(candidates: list[str], topic_name: str) -> list[str]:
 # Region names are the site's business, and it filters them itself with the
 # lookup that knows every variant name; this is a cheap first pass so an obvious
 # one can't win a slot on coverage alone.
-_COMMON_PLACE_WORDS = frozenset(
-    {"world", "africa", "asia", "europe", "america", "oceania", "antarctica"}
-)
+_COMMON_PLACE_WORDS = frozenset({"world", "africa", "asia", "europe", "america", "oceania", "antarctica"})
 
 
 def _is_place_name(term: str) -> bool:
@@ -512,27 +493,17 @@ def select_terms_by_coverage(
     # — see SUBSUMING_CHART_SHARE. Everything else competes on coverage as usual,
     # however much of the topic it happens to reveal.
     narrowing = [
-        term
-        for term in candidates
-        if not (
-            total_count and len(matches[term]) / total_count > SUBSUMING_CHART_SHARE
-        )
+        term for term in candidates if not (total_count and len(matches[term]) / total_count > SUBSUMING_CHART_SHARE)
     ]
 
-    selection = _greedy(
-        universe, narrowing, matches, weight, max_terms, min_marginal_share
-    )
+    selection = _greedy(universe, narrowing, matches, weight, max_terms, min_marginal_share)
     if not selection.selected:
         # Every candidate matches the whole topic. That happens on a topic whose
         # charts are all named after it — Energy Mix, whose ten charts are all
         # about the energy mix — where a term that narrows nothing is still better
         # than no suggestion at all.
-        selection = _greedy(
-            universe, candidates, matches, weight, max_terms, min_marginal_share
-        )
-    selection.topic_name_share = (
-        weight(self_named) / total_weight if total_weight else 0.0
-    )
+        selection = _greedy(universe, candidates, matches, weight, max_terms, min_marginal_share)
+    selection.topic_name_share = weight(self_named) / total_weight if total_weight else 0.0
     selection.uncovered = _uncovered(universe, selection, matches)
     return selection
 
