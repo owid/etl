@@ -1,6 +1,6 @@
 ---
 name: fix-dependabot
-description: Resolve Dependabot security alerts on owid/etl by upgrading vulnerable dependencies. Use when the user wants Dependabot or other security alerts on owid/etl's dependencies resolved, including when they paste a Dependabot URL.
+description: Resolve Dependabot security alerts on owid/etl by upgrading vulnerable dependencies. Use when the user wants Dependabot alerts or PRs, CVEs, or other vulnerable dependencies in owid/etl resolved, including when they paste a Dependabot URL.
 metadata:
   internal: true
   owner: Marigold
