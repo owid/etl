@@ -70,7 +70,7 @@ It's a spectrum, not a switch. Mix freely: use table-driven for the bulk of view
 
 - **Single-indicator views dominate.** Each view is a thin wrapper around one indicator → that indicator's metadata is the right home for chart text.
 - **Many views (>20)** following the cartesian product of a few dimensions. Hand-listing them is repetitive; auto-expansion plus YAML dimensions is significantly less code.
-- **Upstream is a dimensional table** (one row per country/year × dim_a × dim_b × …) with one indicator. `create_explorer(tb=tb, indicator_names=..., dimensions=...)` matches this shape directly — model: `emissions/latest/co2.py`.
+- **Upstream is a dimensional table** (one row per country/year × dim_a × dim_b × …) with one indicator. `create_explorer(tb=tb, indicator_names=..., dimensions=...)` matches this shape directly — model: `emissions/latest/air_pollution.py`.
 - **Same indicators back standalone grapher charts.** Pushing FAUST upstream means explorer view and standalone chart inherit the same text — no drift over time.
 
 **Stick with full-YAML when:**

@@ -227,7 +227,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ## Config YAML: single chart
 
 ```yaml
-grapher_schema: "012"  # QUOTED — a bare 011 is YAML octal
+grapher_schema: "012"  # QUOTED — a bare 012 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
 slug: banning-of-chick-culling
 topic_tags:
@@ -296,7 +296,7 @@ Key fields:
 
 ```yaml
 # REQUIRED — grapher chart-config schema the view configs below are written against, as a
-# QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
+# QUOTED string (a bare `012` is YAML octal). There is no fallback: ETL fails without it. Use the
 # current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
 grapher_schema: "012"

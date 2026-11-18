@@ -63,8 +63,8 @@ curl -o ai/chart_preview.png "$URL"
 Pass extra grapher query params with `--<key>=<value>`:
 
 ```bash
-.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=map
-.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
+STAGING=1 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=map
+STAGING=1 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
 ```
 
 The helper queries MySQL via `etl.config.OWID_ENV.read_sql`, which targets `staging-site-<branch>` only when `STAGING=1` is set; without it the UUID comes from the DB in your `.env`.
@@ -91,5 +91,5 @@ If the chart hasn't been pushed yet:
 
 ```bash
 # For viz chart steps (charts and MDIMs)
-.venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher
+STAGING=1 .venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher
 ```

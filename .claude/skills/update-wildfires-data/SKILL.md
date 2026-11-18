@@ -114,7 +114,8 @@ Two things that will trip you up here: `datasets.catalogPath` has **no `grapher/
 not `:name`. If the four `<new>` rows are missing, staging has not finished; wait rather than
 proceeding.
 
-Then match each old dataset to its new counterpart and apply. Four pairs, matching short names
+Before applying anything, run the chart-count query under "Confirm it took" below and record each
+`<old>` row's count. Then match each old dataset to its new counterpart and apply. Four pairs, matching short names
 in the same order (`weekly_wildfires`, `wildfires_by_year`, `wildfires_by_week`,
 `wildfires_by_week_average`):
 
@@ -150,8 +151,8 @@ print(env.read_sql("""
 """, params={"p": "climate/%wildfires%"}).to_string())
 ```
 
-Run the query once before `upgrade` to record each `<old>` row's count. Afterwards the `<old>` rows
-must all read 0 and each `<new>` row must carry the count its `<old>` counterpart had.
+The `<old>` rows must all read 0 and each `<new>` row must carry the count you recorded for its
+`<old>` counterpart before the upgrade.
 
 ### 8. Verify on staging
 

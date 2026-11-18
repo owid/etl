@@ -657,7 +657,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```bash
      # verify
      STAGING=<branch> .venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql(\"SELECT COUNT(*) n FROM variables WHERE catalogPath LIKE %(p)s\", params={'p':'%<namespace>/<new_version>/<short_name>%'}).n[0])"
-     # if 0, force the upsert:
+     # if 0, re-run the upsert (the checksum is written only after a complete upsert, so it is not skipped):
      STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
    - **Locally, this upload can fail with `AccessDenied` on `PutObject`** (no write access to the staging R2 bucket). Push and let the staging rebuild upload it. The variable count doesn't prove the upload worked (rows are written before it fails): before the indicator upgrade, wait for a green `buildkite/etl-automated-staging-environment/etl-build` on your latest push and check that `<indicators_url>/<new_variable_id>.metadata.json` is served (`OWID_ENV.indicators_url` with `STAGING=<branch>`).
@@ -1280,7 +1280,7 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 ## Example usage
 
 - With an explicit branch:
-  - `update-dataset irena/2024-11-15/renewable_power_generation_costs update-irena-costs`
+  - `update-dataset irena/2026-07-28/renewable_power_generation_costs update-irena-costs`
 
 ---
 

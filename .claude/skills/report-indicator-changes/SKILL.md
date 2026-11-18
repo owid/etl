@@ -41,9 +41,7 @@ This skill drafts the kind of message you send to a topic owner when a dataset u
 
 ## Output structure
 
-Write the draft to `workbench/<dataset>/<reviewer-slug>-update-<N>.md`, picking a short reviewer slug (their first name, GitHub handle, or "reviewer" if it's ambiguous). Keep it scannable: what changed, what the reviewer has to decide, and where to sign off. Four sections:
-
-The draft's first line is the attribution line from `CLAUDE.md` (Team section), above the greeting.
+Write the draft to `workbench/<dataset>/<reviewer-slug>-update-<N>.md`, picking a short reviewer slug (their first name, GitHub handle, or "reviewer" if it's ambiguous). Keep it scannable: what changed, what the reviewer has to decide, and where to sign off. The draft's first line is the attribution line from `CLAUDE.md` (Team section), above the greeting. Then four sections:
 
 ### 1. Greeting + status one-liner
 

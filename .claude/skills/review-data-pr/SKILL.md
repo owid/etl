@@ -334,7 +334,7 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 
 | Item | Verify by |
 |---|---|
-| Indicator upgrade ran (§7) | `SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'`, run through a `.sql` file (§9 "Staging query mechanics") — non-zero |
+| Indicator upgrade ran (§7) | `SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'`, run through a `.sql` file (this skill's §9, "Staging query mechanics") — non-zero |
 | Explorers / MDims re-exported (§7) | Only if the DAG has `viz://explorer/...` or `viz://chart/...` steps for this dataset (`rg -e "viz://explorer/.*/<short_name>" -e "viz://chart/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the viz step wasn't re-run. |
 | Admin edits of ETL-authored single charts pulled into ETL (§7) | Only when the dataset feeds `viz://chart` steps with `chart_config_id`. Run `.venv/bin/etl chart-pull --dataset <ns>/<short_name> --env <branch>` (dry run): every chart should report `in sync`. Drift or a stale variable pin left on `dimensions` (the chart still plots the old variables) = 🔴. A stale `map.columnSlug`/`sortColumnSlug` pin left uncleared = 🟡. Other drift that is neither pulled nor documented in the PR = 🟡. |
 | Hardcoded-time-bounds audit ran (§7 / §8e) | Spot-check per §8e. Skipped audit or an unfixed, undocumented pin = 🟡. |
