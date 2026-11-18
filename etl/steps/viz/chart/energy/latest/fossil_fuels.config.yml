@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: "Fossil fuels"
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: "Explore production, consumption, trade, and reserves of fossil fuels."
 default_selection:
   - "World"
 # Default to an individual fuel (coal) rather than the "Total" aggregate: several metrics (imports,
