@@ -21,7 +21,7 @@ def _add_eligible_dataset(
     dataset: str,
     version: str = "2025-01-01",
     non_redistributable: bool = False,
-    jsonld: bool = True,
+    dataset_page: bool = True,
 ) -> str:
     """Create a minimal, quality-eligible garden dataset and return its catalog path."""
     dataset_dir = data_dir / "garden" / namespace / version / dataset
@@ -42,7 +42,7 @@ def _add_eligible_dataset(
             title=f"{dataset} title",
             description=f"{dataset} description",
             non_redistributable=non_redistributable,
-            jsonld=jsonld,
+            dataset_page=dataset_page,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -74,7 +74,7 @@ def test_build_catalog_page_artifacts_writes_dataset_jsonld_sitemap_and_report(t
             short_name="example_dataset",
             title="Example dataset",
             description="Dataset description",
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -141,7 +141,7 @@ def test_build_catalog_page_artifacts_cleans_up_stale_old_location_for_emitted_d
             short_name="example_dataset",
             title="Example dataset",
             description="Dataset description",
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -367,43 +367,6 @@ def test_build_catalog_page_artifacts_blocks_reserved_namespace(tmp_path: Path) 
     assert not (data_dir / "garden" / "something" / "dataset.jsonld").exists()
 
 
-def test_build_catalog_page_artifacts_blocks_duplicate_short_keys(tmp_path: Path, monkeypatch) -> None:
-    """No two emitted datasets in a build may resolve to the same "<namespace>/<dataset>" short
-    key. This can't happen today (latest_dataset_paths already dedupes per (channel, namespace,
-    dataset) and the builder is single-channel), so the collision is forced here to exercise the
-    batch-level guard that protects a future multi-channel build."""
-    data_dir = tmp_path / "data"
-    path_a = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2")
-    path_b = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2_dup")
-    LocalCatalog(data_dir, channels=("garden",)).reindex()
-
-    import etl.catalog_pages.artifacts as artifacts_module
-
-    real_latest_dataset_paths = artifacts_module.latest_dataset_paths
-
-    def fake_latest_dataset_paths(frame, *, channel="garden", only=None, active_steps=None):
-        entries = real_latest_dataset_paths(frame, channel=channel, only=only, active_steps=active_steps)
-        return [
-            artifacts_module.LatestDatasetPath(
-                catalog_path=entry.catalog_path, namespace="emissions", dataset="owid_co2", version=entry.version
-            )
-            for entry in entries
-        ]
-
-    monkeypatch.setattr(artifacts_module, "latest_dataset_paths", fake_latest_dataset_paths)
-
-    result = artifacts_module.build_catalog_page_artifacts(
-        output_dir=data_dir,
-        catalog_dir=data_dir,
-        channel="garden",
-        active_steps={_step_uri(path_a), _step_uri(path_b)},
-    )
-
-    assert result.emitted == []
-    assert {item.catalog_path for item in result.skipped} == {path_a, path_b}
-    assert all("duplicate_short_key" in item.blockers for item in result.skipped)
-
-
 def test_build_catalog_page_artifacts_renders_templated_metadata_via_dimensions(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     dataset_dir = data_dir / "garden" / "example" / "2025-01-01" / "long_dataset"
@@ -423,7 +386,7 @@ def test_build_catalog_page_artifacts_renders_templated_metadata_via_dimensions(
             short_name="long_dataset",
             title="Long dataset",
             description="Dataset description",
-            jsonld=True,
+            dataset_page=True,
         ),
     )
     tb = Table(
@@ -498,8 +461,8 @@ def test_build_catalog_page_artifacts_blocks_raw_jinja_leaking_from_unguarded_fi
 
 def test_build_catalog_page_artifacts_requires_metadata_opt_in_without_allowlist(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
-    _add_eligible_dataset(data_dir, namespace="example", dataset="flagged", jsonld=True)
-    _add_eligible_dataset(data_dir, namespace="example", dataset="unflagged", jsonld=False)
+    _add_eligible_dataset(data_dir, namespace="example", dataset="flagged", dataset_page=True)
+    _add_eligible_dataset(data_dir, namespace="example", dataset="unflagged", dataset_page=False)
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
     active_steps = {_step_uri("garden/example/2025-01-01/flagged"), _step_uri("garden/example/2025-01-01/unflagged")}

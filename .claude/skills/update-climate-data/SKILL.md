@@ -75,9 +75,9 @@ bump — not part of the monthly run.
    dataset above. `climate_change_impacts`'s frozen deps (EPA, global_sea_level) stay on
    their old versions — reference them unchanged.
 2. Bump and run `long_run_ghg_concentration`, then the `climate_change_impacts` aggregate.
-3. Run all grapher steps and the `climate_change` explorer (the explorer stays `latest`).
+3. Run all grapher steps and the `climate_change` multidim (`viz://chart/climate/latest/climate_change`, which stays `latest`).
 
-The grapher families to rebuild: the 7 `surface_*` graphers, `total_precipitation_annual`,
+The grapher families to rebuild: the 6 `surface_*` graphers, `total_precipitation_annual`,
 the 4 wildfire graphers, `sst`/`sst_by_month`, `nasa_ozone_hole`, the 3 `sea_ice_*`
 graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
 
@@ -112,7 +112,7 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
    ```
 
    It detects 18 of the 20 pairs. The two `climate_change_impacts_*` grapher steps are declared
-   only under the explorer's `viz://` entry and the version tracker does not list them; remap
+   only under the `climate_change` multidim's `viz://chart` entry and the version tracker does not list them; remap
    those two by hand (`match -old <id> -new <id> --perfect-match-only`, then `upgrade`; dataset
    ids from `datasets` on staging, whose `catalogPath` has no `grapher/` prefix). Staging can
    hold *two* old wildfire versions (the batch's and the last weekly one): pair the one that

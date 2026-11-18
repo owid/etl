@@ -1,7 +1,6 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Inequality from the Luxembourg Income Study, as a multidim shown as a data explorer (replaces the inequality-lis explorer)."""
 
 from etl.helpers import PathFinder
-from etl.viz.chart.model.dimension import DimensionPresentation
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -24,7 +23,6 @@ AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
 BEFORE_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income before taxes and benefits."
 AFTER_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income after taxes and benefits."
 
-EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
 
@@ -42,18 +40,13 @@ def run() -> None:
     #
     # Create chart object
     #
-    c = paths.create_explorer(
+    c = paths.create_chart(
         config=config,
-        short_name="inequality-lis",
+        short_name="inequality_lis",
         tb=tb,
         indicator_names=INDICATOR_NAMES,
         # dimensions=DIMENSIONS_CONFIG,
     )
-
-    # Make the equivalence_scale dimension a checkbox
-    for dimension in c.dimensions:
-        if dimension.slug == "equivalence_scale":
-            dimension.presentation = DimensionPresentation(type="checkbox", choice_slug_true="square root")
 
     # Add After tax vs. Before tax dimension
     c.group_views(
@@ -62,18 +55,19 @@ def run() -> None:
                 "dimension": "welfare_type",
                 "choice_new_slug": "after_vs_before_tax",
                 "view_config": {
-                    "hideRelativeToggle": "false",
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
-                    "hasMapTab": "false",
-                    "type": "LineChart",
+                    "hasMapTab": False,
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
     )
 
-    #
-    # (optional) Edit views
-    #
+    # The grouped views are created after the config's common_views were applied: apply them again.
+    c.edit_views(config["definitions"]["common_views"])
+
+    # Edit views.
     for view in c.views:
         # Initialize config if it's None
         if view.config is None:
@@ -134,22 +128,8 @@ def run() -> None:
                         if col_meta.presentation and col_meta.presentation.grapher_config:
                             existing_subtitle = col_meta.presentation.grapher_config.get("subtitle", "")
 
-            # Get note from indicator metadata
-            if view.indicators.y:
-                first_indicator_path = view.indicators.y[0].catalogPath
-                indicator_col = first_indicator_path.split("#")[-1]
-
-                if indicator_col in tb.columns:
-                    col_meta = tb[indicator_col].metadata
-                    if col_meta.presentation and col_meta.presentation.grapher_config:
-                        existing_note = col_meta.presentation.grapher_config.get("note", "")
-
-                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
-                        # Remove EQUIVALENCE_SCALE_NOTE if present
-                        new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
-
-                        # Set note in view config
-                        view.config["note"] = new_note
+            # NOTE: the explorer step stripped the equivalization note here, but an explorer falls back to the
+            # indicator's note when the view's note is empty, so readers kept it. The multidim keeps it too.
 
             # Add EQUIVALENCE_SCALE_SUBTITLE at the end
             if existing_subtitle:
@@ -157,15 +137,5 @@ def run() -> None:
             else:
                 view.config["subtitle"] = EQUIVALENCE_SCALE_SUBTITLE
 
-        # Set default view
-        if (
-            view.dimensions["indicator"] == "gini"
-            and view.dimensions["welfare_type"] == "dhi"
-            and view.dimensions["equivalence_scale"] == "per capita"
-        ):
-            view.config["defaultView"] = True
-
-    #
-    # Save garden dataset.
-    #
+    # Save the multidim.
     c.save()
