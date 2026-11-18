@@ -92,7 +92,6 @@ dataset:
   # over per-source origin licenses on the catalog landing page / JSON-LD.
   licenses:
     - name: CC BY 4.0
-      url: https://creativecommons.org/licenses/by/4.0/
   update_period_days: 365
   owners:
     - Pablo Rosado
