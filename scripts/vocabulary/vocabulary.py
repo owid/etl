@@ -49,7 +49,6 @@ from coverage_model import (  # ty: ignore
     load_view_analytics,
     measure_candidates,
     measure_line,
-    region_spellings,
     regions_definitions,
     weigh_universe,
 )
@@ -97,16 +96,6 @@ KEYWORDS_SCHEMA = {
         "type": "object",
         "properties": {"keywords": {"type": "array", "items": {"type": "string"}}},
         "required": ["keywords"],
-        "additionalProperties": False,
-    },
-}
-
-COUNTRIES_SCHEMA = {
-    "type": "json_schema",
-    "schema": {
-        "type": "object",
-        "properties": {"countries": {"type": "array", "items": {"type": "string"}}},
-        "required": ["countries"],
         "additionalProperties": False,
     },
 }
@@ -342,24 +331,35 @@ Output JSON:
     return {"line": line[:max_terms], "input_tokens": input_tokens, "output_tokens": output_tokens}
 
 
-def load_country_names() -> dict[str, str]:
-    """OWID's current country names, keyed by every spelling of them we know (name, short name, aliases), casefolded.
+def load_country_names() -> list[str]:
+    """OWID's current (harmonized) country names, sorted.
 
     The site filters charts by these exact names, so a suggestion has to be one of them.
     """
-    names: dict[str, str] = {}
-    for region in regions_definitions():
-        if region.get("region_type", "country") != "country" or region.get("is_historical"):
-            continue
-        for spelling in region_spellings(region):
-            names.setdefault(spelling.casefold(), region["name"])
-    return names
+    return sorted(
+        region["name"]
+        for region in regions_definitions()
+        if region.get("region_type", "country") == "country" and not region.get("is_historical")
+    )
+
+
+def countries_schema(country_names: list[str]) -> dict:
+    """A JSON schema whose answer can only name countries from `country_names`."""
+    return {
+        "type": "json_schema",
+        "schema": {
+            "type": "object",
+            "properties": {"countries": {"type": "array", "items": {"type": "string", "enum": country_names}}},
+            "required": ["countries"],
+            "additionalProperties": False,
+        },
+    }
 
 
 async def suggest_countries_with_llm(
     topic_name: str,
     texts: list[str],
-    country_names: dict[str, str],
+    country_names: list[str],
     client: anthropic.AsyncAnthropic,
     cache: dict[str, str],
     semaphore: asyncio.Semaphore,
@@ -367,10 +367,10 @@ async def suggest_countries_with_llm(
 ) -> dict:
     """Ask the model which countries are most worth looking at on this topic.
 
-    Returns: dict with the countries (as OWID names, in the model's order), the names that matched no
-    country, and token usage.
+    Returns: dict with the countries (OWID names, in the model's order) and token usage.
     """
     combined_text = "\n".join(texts)
+    known_countries = ", ".join(country_names)
     prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
 the topic "{topic_name}", most-viewed first:
 
@@ -390,7 +390,8 @@ What makes the line useful is that it is specific to this topic. Don't fall back
 on the same handful of large countries for every topic; suggest one only when it
 really is a big part of this topic's story. The site adds the reader's own country
 separately, so there is no need to cover where readers live. Suggest countries
-only, not regions, continents or income groups, and use their common English names.
+only, not regions, continents or income groups, named as in this list of the countries
+the site knows: {known_countries}.
 
 Put the one most worth seeing first; only the first few are shown. About five is
 right for most topics; give fewer when only a few countries stand out.
@@ -402,22 +403,14 @@ Output JSON:
 
     try:
         result, input_tokens, output_tokens = await ask_for_json(
-            prompt, COUNTRIES_SCHEMA, client, cache, semaphore, model_id
+            prompt, countries_schema(country_names), client, cache, semaphore, model_id
         )
     except Exception as e:
         raise RuntimeError(f"country suggestions failed for {topic_name}: {e}")
 
-    countries: list[str] = []
-    unrecognized: list[str] = []
-    for suggestion in result.get("countries", []):
-        name = country_names.get(suggestion.strip().casefold())
-        if name is None:
-            unrecognized.append(suggestion)
-        elif name not in countries:
-            countries.append(name)
+    # The schema's enum keeps every answer among OWID's country names; a country named twice counts once.
     return {
-        "countries": countries,
-        "unrecognized": unrecognized,
+        "countries": list(dict.fromkeys(result["countries"])),
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
     }
@@ -489,8 +482,8 @@ async def process_topics(
     2. Per topic, fetch the record set the all-charts block lists and weight each
        record by its views.
     3. Ask the model for candidate terms and for countries, having shown it that
-       record set. A topic in kept_countries (slug → its committed `countries` and
-       `unrecognized`) reuses those instead.
+       record set. A topic in kept_countries (slug → its committed `countries`)
+       reuses those instead.
     4. Measure what each candidate would show (measure_candidates), and ask the
        model to choose the line from those measurements. Which terms make a good
        line is a judgment (whether a term means anything on its own, whether two
@@ -623,12 +616,6 @@ async def process_topics(
             click.secho(f"✗ {topic_slug}: {chosen}", fg="red")
             failed.append(topic_slug)
             continue
-        if countries["unrecognized"]:
-            click.secho(
-                f"! {topic_name}: dropped suggestions that aren't OWID country names: "
-                f"{', '.join(countries['unrecognized'])}",
-                fg="yellow",
-            )
 
         selection = measure_line(universe, chosen["line"], measured)
         selections.append(selection)
@@ -662,7 +649,6 @@ async def process_topics(
                     "views_column": views_column,
                     "selection": "model",
                     "num_countries": len(countries["countries"]),
-                    "unrecognized_countries": countries["unrecognized"],
                 },
                 "keyword_stats": [
                     {
@@ -819,12 +805,9 @@ def main(
     click.echo("=" * 80)
     click.echo()
 
-    # Each kept topic's countries, and the suggestions that were dropped from them, as last committed.
+    # Each kept topic's countries, as last committed.
     kept_countries = (
-        {
-            slug: {"countries": entry["countries"], "unrecognized": entry["stats"].get("unrecognized_countries", [])}
-            for slug, entry in json.loads(VOCABULARY_FILE.read_text()).items()
-        }
+        {slug: {"countries": entry["countries"]} for slug, entry in json.loads(VOCABULARY_FILE.read_text()).items()}
         if keep_countries
         else None
     )

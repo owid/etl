@@ -113,7 +113,7 @@ matters: the terms it lists first are the ones most likely to be shown.
    terms proposed should describe what people actually look at, and two runs
    should see the same input)
 4. **Candidates**: feeds all text to Claude, asking for candidate search terms. Each of a topic's three requests (this one, countries, choosing the line) whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
-5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. Each answer is matched against OWID's country names (names, short names and aliases in the regions definitions), since the site filters charts by those exact names; anything that isn't a current country is dropped and listed in the topic's `unrecognized_countries` stat
+5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. The prompt lists OWID's current (harmonized) country names and the answer's JSON schema allows only those, since the site filters charts by those exact names
 6. **Choosing the line**: a third request per topic shows the measured candidates and asks for the line, in order; `keyword_stats` then records what each chosen term shows and adds to the ones before it
 7. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 
@@ -141,7 +141,7 @@ The committed file has the same keys but keeps the full record per topic, stats 
     "topic_name": "Energy",
     "keywords": [...],
     "countries": [...],
-    "stats": {"num_keywords": 8, "num_countries": 5, "unrecognized_countries": [], "weighted_coverage": 0.62, "input_tokens": 4236, ...},
+    "stats": {"num_keywords": 8, "num_countries": 5, "weighted_coverage": 0.62, "input_tokens": 4236, ...},
     "keyword_stats": [{"term": "solar panels", "own_share": 0.21, "marginal_share": 0.21, ...}, ...]
   }
 }
