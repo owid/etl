@@ -63,7 +63,7 @@ The committed file *replaces* the vocabulary rather than merging into it, so a `
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
 - `--weighting {views,uniform}` - Weight charts by views (default) or count them equally
 - `--views-column {views_7d,views_14d,views_365d}` - Which window to weight by (default `views_365d`; a vocabulary is read for weeks, so the year is steadier than the week)
-- `--max-terms N` - Most terms to publish per topic (default 8; the site shows five and drops some, so a couple of spares keep the line full)
+- `--max-terms N` - Most terms to publish per topic (default 8; the site shows five, skipping the one that matches what the reader has already typed, so a couple of spares keep the line full)
 - `--keep-countries` - Reuse each topic's countries from the committed vocabulary instead of asking for them again, to iterate on the keywords for less (topics missing from it are still asked)
 
 ## Chart view data
