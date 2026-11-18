@@ -353,7 +353,6 @@ reports `Finished`, your worktree's files never change, and that reads exactly l
 
 ```bash
 make .venv                             # uv sync --frozen --all-extras --group dev; the pre-commit hook also does this
-ln -s /path/to/main/checkout/data data # gitignored; the built deps only exist in the main checkout
 .venv/bin/etlr viz://static/...
 ```
 

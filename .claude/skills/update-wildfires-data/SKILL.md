@@ -29,7 +29,7 @@ datasets, [`/update-dataset`](../update-dataset/SKILL.md) for the generic update
 | garden | `climate/<version>/weekly_wildfires` (+ regions, + `faostat_rl` for land area) |
 | grapher | `weekly_wildfires`, `wildfires_by_year`, `wildfires_by_week`, `wildfires_by_week_average` |
 
-Four grapher datasets, feeding **14 charts and 2 narrative charts**. `wildfires_by_week_average`
+Four grapher datasets, feeding the wildfire charts and narrative charts. `wildfires_by_week_average`
 reads `wildfires_by_week` rather than the garden table, so it has to run after it.
 
 ## Run it
@@ -114,7 +114,8 @@ Two things that will trip you up here: `datasets.catalogPath` has **no `grapher/
 not `:name`. If the four `<new>` rows are missing, staging has not finished; wait rather than
 proceeding.
 
-Then match each old dataset to its new counterpart and apply. Four pairs, matching short names
+Before applying anything, run the chart-count query under "Confirm it took" below and record each
+`<old>` row's count. Then match each old dataset to its new counterpart and apply. Four pairs, matching short names
 in the same order (`weekly_wildfires`, `wildfires_by_year`, `wildfires_by_week`,
 `wildfires_by_week_average`):
 
@@ -150,8 +151,8 @@ print(env.read_sql("""
 """, params={"p": "climate/%wildfires%"}).to_string())
 ```
 
-The `<old>` rows must all read 0 and the `<new>` rows must carry the charts (2 / 7 / 5 / 2 for
-`weekly_wildfires` / `by_year` / `by_week` / `by_week_average`).
+The `<old>` rows must all read 0 and each `<new>` row must carry the count you recorded for its
+`<old>` counterpart before the upgrade.
 
 ### 8. Verify on staging
 

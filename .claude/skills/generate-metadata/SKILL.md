@@ -235,9 +235,10 @@ tables:
   undp_hdr_sex:
     variables:
       gni_pc:
-        description_key:
-          - "{definitions.description_key_gni}"
-          - "{definitions.description_key_gni_per_capita_total_or_by_sex}"
+        description_key: |-
+          {definitions.description_key_gni}
+
+          {definitions.description_key_gni_per_capita_total_or_by_sex}
 ```
 
 ❌ `- "<% if sex == 'total' %>{definitions.a}<% else %>{definitions.b}<% endif %>"`, a one-line conditional inside the variable.
@@ -270,7 +271,7 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 3. **Research sources**: Starting from the snapshot `.dvc` origin URLs, find the producer's latest documentation (dataset page, methodology, indicator definitions, codebook, main report, what's new) per `.claude/rules/producer-documentation.md`, and show the user its links before writing. Use it to fill the fields and to contrast any text already written, and ask the user when it is missing, insufficient or inaccessible. Check what you write against the passages it comes from, and in the handoff say which source and section or page each indicator's text rests on, or that it is inferred from the data ("Say what the metadata rests on")
 4. **Write top-down**: Start with `definitions:` and `common:` to identify shared patterns before individual variables
 5. **Fill systematically**: For each variable: title -> units -> description_short -> description_key -> processing_level -> display
-6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr data://grapher/<ns>/<ver>/<ds> --grapher --only`
+6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (INSTANT speeds up the garden step, which `--only` would skip; the named `grapher://` step brings it along and runs the MySQL upsert)
 7. **Run the metadata quality checks** (next section)
 
 ## Metadata quality checks

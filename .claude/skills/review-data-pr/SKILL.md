@@ -24,7 +24,7 @@ End-to-end review of a dataset-update PR. Goes deeper than `/review`: actually r
 gh pr view <num> --json title,body,isDraft,mergeable,statusCheckRollup,comments,reviews
 ```
 
-Flag if **PR description is empty** (per user's standing rule: keep PR body in sync with substantial changes).
+Flag if **PR description is empty** (the PR body should stay in sync with substantial changes).
 
 Flag 🟡 if the Summary doesn't open with a **tracking-issue link** (`Tracks: owid/owid-issues#NNNN`) — `/update-dataset` requires it as the first line; most data updates have a corresponding `owid-issues` ticket.
 
@@ -76,7 +76,7 @@ When it's a restructure:
 ```
 
 The `--grapher` upload is required to verify MySQL ingestion and the indicator metadata in the DB, and to enable later checks (chart count, indicator upgrade verification). Confirm:
-- All four steps run cleanly (snapshot pulled from S3 if `.dvc` is committed, otherwise re-fetched)
+- All four steps run cleanly (snapshot pulled from R2 if `.dvc` is committed, otherwise re-fetched)
 - MySQL upload returns a `dataset id` and shows variable upserts
 - No errors / no empty tables
 
@@ -115,7 +115,7 @@ Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.d
 ### 7. Code clarity & docs
 
 For each step file, check:
-- **Snapshot script (if present)**: docstring explains source choice; no hidden hardcoded year/date constants without `--cli-flag` parametrization (or at minimum a clear update comment). Note: a `.py` upload script is optional — many snapshots ship with only the `.dvc` and a `url_download` or a local file path. Don't flag the absence of a script.
+- **Snapshot script (if present)**: docstring explains source choice; no hidden hardcoded year/date constants without a clear update comment. Note: a `.py` upload script is optional — many snapshots ship with only the `.dvc` and a `url_download` or a local file path. Don't flag the absence of a script.
 - **Meadow / garden / grapher**: clear top-level docstrings; no commented-out code; no silent exception handlers
 - **Garden**: harmonization uses `paths.regions.harmonize_names(tb, ...)` (the new API), not the legacy `geo.harmonize_countries`
 - **Garden assertions**: sanity checks present when the step does non-trivial logic (harmonization, renames, aggregations, derivations) and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant). Check value-bound coverage per indicator type (shares in [0,1], percentages-of-a-whole in [0,100], non-negativity for level indicators, mutually exclusive share categories summing to 100 within rounding tolerance, exception sets for documented outliers) — but verify any bound against the actual data before suggesting it: "% of GDP" indicators legitimately exceed 100 (see `/update-dataset` §5b-bis)
@@ -137,7 +137,7 @@ Separately, the metadata/origin-stripping patterns from CLAUDE.md (`pd.concat`�
 - **Annotations**: scan the diff for any `# NOTE:` / `# TODO:` / `# FIXME:` / `# HACK:` / `# XXX:` that are unchanged from the old version. For each, confirm the PR body mentions whether the workaround is still needed, or that it was deleted with its code. Unresolved + undocumented = 🟡. For snapshot `.dvc` files, compare against the old version's `.dvc` instead: `etl update` drops their comments, so a `.dvc` note missing from the new version without a word in the PR body was most likely lost rather than resolved (🟡).
 - **Sanity-check log flags**: grep the diff for `SHOW_SANITY_CHECK_LOGS`, `DEBUG`, `LONG_FORMAT` set to `True`. If a debug flag was left enabled, that's a 🔴 — must be reverted.
 - **Silent deletes**: in any `sanity_checks` function, scan for `drop`, `filter`, `tb = tb[...]` — row removals that the user might miss. Make sure the PR body lists them.
-- **Findings surfaced, not just flags reverted**: if the step has any sanity-check logic (function or inline `# Sanity check` block), the PR body should carry a "Sanity-check findings" section reporting what the checks said on the new data. A green pipeline run is **not** proof the invariants held — checks that `paths.log.warning(...)`/`.critical(...)` instead of `assert`/`raise` pass silently. If the new garden chain has logging-style checks and the PR body has no findings section, re-run the garden step (`--private --force --only`) and scan stdout/stderr for `warning`, `dropped`, `outlier`, `AssertionError`. Undocumented findings = 🟡; a check that newly raises on the new data = 🔴 (must be triaged with the author per `/update-dataset` §5b).
+- **Findings surfaced, not just flags reverted**: if the step has any sanity-check logic (function or inline `# Sanity check` block), the PR body should carry a "Sanity-check findings" section reporting what the checks said on the new data. A green pipeline run is **not** proof the invariants held — checks that `paths.log.warning(...)`/`.critical(...)` instead of `assert`/`raise` pass silently. If the new garden chain has logging-style checks and the PR body has no findings section, re-run the garden step (`--force --only`) and scan stdout/stderr for `warning`, `dropped`, `outlier`, `AssertionError`. Undocumented findings = 🟡; a check that newly raises on the new data = 🔴 (must be triaged with the author per `/update-dataset` §5b).
 
 ### 8c. Country harmonization audit (review side)
 
@@ -192,7 +192,8 @@ The mandatory-fields checklist, the `dataset.update_period_days` requirement, an
 Quick verification that `presentation.attribution_short` actually landed on the produced indicators (origin's value does NOT propagate):
 
 ```bash
-make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
+echo "SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'" > /tmp/q.sql
+mysql -h staging-site-<normalized-branch> -u owid --port 3306 -D owid < /tmp/q.sql
 ```
 Any `NULL` row is a 🔴.
 
@@ -333,7 +334,7 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 
 | Item | Verify by |
 |---|---|
-| Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
+| Indicator upgrade ran (§7) | `SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'`, run through a `.sql` file (this skill's §9, "Staging query mechanics") — non-zero |
 | Explorers / MDims re-exported (§7) | Only if the DAG has `viz://explorer/...` or `viz://chart/...` steps for this dataset (`rg -e "viz://explorer/.*/<short_name>" -e "viz://chart/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the viz step wasn't re-run. |
 | Admin edits of ETL-authored single charts pulled into ETL (§7) | Only when the dataset feeds `viz://chart` steps with `chart_config_id`. Run `.venv/bin/etl chart-pull --dataset <ns>/<short_name> --env <branch>` (dry run): every chart should report `in sync`. Drift or a stale variable pin left on `dimensions` (the chart still plots the old variables) = 🔴. A stale `map.columnSlug`/`sortColumnSlug` pin left uncleared = 🟡. Other drift that is neither pulled nor documented in the PR = 🟡. |
 | Hardcoded-time-bounds audit ran (§7 / §8e) | Spot-check per §8e. Skipped audit or an unfixed, undocumented pin = 🟡. |
@@ -341,7 +342,7 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Scheduled-issue workflow checked (§6d) | An `update-*.yml` in `owid/owid-issues` covers this dataset — exact name `update-<namespace>-<short_name>.yml`, fuzzy filename, or group workflow (check `$OWID_ISSUES_DIR/.github/workflows/` from the etl `.env`, asking the user where their checkout is if the variable isn't set — a filename-only `gh api …/contents` listing can't verify cron/body or find group workflows); its cron is consistent with `update_period_days` + the release cadence evident from the PR (and fires *after* the producer's release window, not before); the issue body tells the next updater to run `/update-dataset <short_name>` (space-separated short names for group workflows) and carries no generic to-do checklist (a list written for that specific dataset is fine). Missing workflow for a ≥annual dataset, a cron that contradicts the observed cadence, a stale body or a generic checklist, or a workflow file missing its `.yml` extension (Actions never runs it) = 🟡. |
 | Pinned chart FAUST not stale (§ Guardrails) | Only when the PR changed methodology/scope wording in indicator metadata (`grapher_config.note`, deflator/source claims): for each affected chart, read the authored layer (the `chart_configs` row named by `patchConfigId`) on staging — a chart overriding `title`/`subtitle`/`note` keeps the old text regardless of the metadata fix. Stale method/scope claim on a published chart's pinned FAUST = 🔴 (reader-facing contradiction with the data page). |
 | Narrative-chart stale-FAUST sweep ran (§7) | Only when narrative charts carry the dataset's variables (query `narrative_charts` joined via parent `chart_dimensions` on staging). The upgrader warns only about charts visited in its own run, so the author must sweep **all** of them (`_find_stale_faust_overrides` + a plain grep of the patches for old unit/base-year strings — see `/update-dataset` §7). Cheap outcome check: grep the narrative patches on staging for the *previous* release's unit/base-year strings (e.g. "constant <old base year> US$") — a hit on a published narrative chart = 🔴; narrative charts present but no sweep evidence in the PR = 🟡. |
-| `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
+| `@codex review` posted (§10) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | Write the query to a file and pass `-F query=@file.graphql` (see GraphQL note below) — list `reviewThreads(first:20){ nodes { isResolved } }`; all `isResolved: true`. |
 
 A **clean Codex review has a different shape**: no inline comments and zero review threads — just a single top-level "no issues" comment from `chatgpt-codex-connector[bot]` in the issue comments. That counts as reviewed (the threads row passes vacuously); don't flag the absence of inline threads as "review missing". Codex review state is `COMMENTED` (not `APPROVED`); fetch its inline notes via `gh api repos/owid/etl/pulls/<num>/comments --paginate --jq '.[] | select(.user.login|test("codex";"i"))'`. After `@codex review`, it usually responds in ~2–5 min — poll with a backgrounded `until` loop rather than blocking.
@@ -349,7 +350,7 @@ A **clean Codex review has a different shape**: no inline comments and zero revi
 **GitHub API gotchas (when posting/fetching review comments):**
 - **GraphQL via `gh api graphql -f query='...'` breaks on shell quoting** (the inline query gets truncated → `Expected NAME` parse errors). Write the query/mutation to a file and use `gh api graphql -F query=@/tmp/q.graphql` with variables as separate `-f name=val` (string) / `-F name=val` (typed int/file). Read bodies from a file with `-F body=@/tmp/comment.md`.
 - **Editing/adding comments inside a *pending* review** (the author's in-progress review) needs GraphQL, not REST: REST `PATCH pulls/comments/{id}` 404s on a draft, and `POST pulls/{n}/comments` errors `one pending review per pull request`. Add with `addPullRequestReviewThread(input:{pullRequestReviewId, path, line, side:RIGHT, body})`, edit with `updatePullRequestReviewComment(input:{pullRequestReviewCommentId, body})`. Get the pending review id via `reviews(first:50, states:PENDING)` and a draft comment's node id via that review's `comments`.
-- **Disclosure on review comments.** Open any inline review comment you author with `> _Written by Claude <model name> — @<handle> at the wheel._` (model name = the model actually generating the content, e.g. "Sonnet 5"; handle = the human directing the work), same as PR descriptions. Skip it only on genuinely trivial one-liners (an `@codex review` ping).
+- **Disclosure on review comments.** Open any inline review comment you author with `> _Written by Claude <model name> — @<handle> at the wheel._` (model name = the model actually generating the content, e.g. "Sonnet 5"; handle = the human directing the work), same as PR descriptions. Skip it only on a bare token with no prose (a lone `@codex review` ping or a 👍).
 
 **Out of scope for review:** Slack announcement and the QA hand-off (Anomalist, Chart Diff, data-diff report) are author-side concerns, not reviewer checks.
 

@@ -66,8 +66,8 @@ row with `gh issue edit`.
 The `explorers` table is the source of truth. Do **not** read `owid-content/explorers/*.tsv`; that
 repo is stale and mis-routes migrations. Priority:
 
-1. **Production**, read-only, through the `.env.prod` the repo ships. It is reachable when `.env`
-   declares `ENV_FILE_PROD` (see `etl/config.py`):
+1. **Production**, read-only, through your local production env file. It is reachable when `.env`
+   declares `ENV_FILE_PROD` (see `etl/config.py`); ask the user if it doesn't:
    ```python
    from etl.config import ENV_FILE_PROD, OWIDEnv
    PROD = OWIDEnv.from_env_file(ENV_FILE_PROD)
@@ -146,7 +146,7 @@ In the YAML, write the escape (`name: "\xad\xad\xadElectoral democracy"`), never
 they load identically, and the escape is visible in editors and diffs. `ruamel.yaml` re-emits `\xad`
 as the raw character on round-trip, so if you scaffold the YAML programmatically, post-process the
 dump to swap raw soft hyphens back to `\xad` inside double-quoted strings. When prefixes diverge
-across sub-configs that share a slug, `combine_collections` renames the conflicting slugs internally
+across sub-configs that share a slug, `combine_charts` renames the conflicting slugs internally
 (`_update_choice_slugs_in_views` in `etl/viz/chart/core/combine.py`); slug renames are invisible to
 URL parameters, so that is fine.
 

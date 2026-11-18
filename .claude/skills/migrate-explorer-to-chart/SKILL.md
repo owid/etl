@@ -89,7 +89,7 @@ name to the user; don't request the review or tag them yourself (see above).
 Create `etl/steps/viz/chart/<ns>/latest/<short>.config.yml` from the explorer step, and a
 `viz://chart/<ns>/latest/<short>` DAG entry with the same direct dependencies. Add a `.py` only if
 the explorer's script does more than load the config and save (a config-only chart step needs
-none). Pin `grapher_schema: "012"` (quoted) at the top: the build fails without it. Leave the
+none). Pin `grapher_schema` (quoted) to the current `DEFAULT_GRAPHER_SCHEMA_VERSION` in `etl/config.py` at the top: the build fails without it. Leave the
 `viz://explorer` step and its DAG entry in place: the explorer stays live until the redirects
 exist.
 

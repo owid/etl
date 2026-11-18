@@ -43,8 +43,8 @@ scripts only work where that DB actually contains both the explorer and the publ
 MDIMs. There are three ways to point `OWID_ENV` at such a DB — **figure out which one
 applies before running, and don't assume `.env.prod` exists:**
 
-1. **Staging branch** (often easiest): if you're on a `staging-site-<branch>` branch,
-   `OWID_ENV` already points at that prod-clone DB — run the commands as-is, no prefix.
+1. **Staging branch** (often easiest): prefix commands with `STAGING=1` to read the current
+   branch's `staging-site-<branch>` prod-clone DB (`STAGING=<branch>` for another branch's).
 2. **Production, read-only, via an env file**: prefix commands with
    `ENV_FILE=<prod creds> DATA_API_ENV=production`. Don't assume the file name — check
    what exists (`ls -la .env*`); on some machines it is `.env.prod`, on others `.env.live`.
@@ -407,7 +407,7 @@ that is not the route (and no explorer config in the repo carries `isPublished: 
 
 Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
 (see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, so a config left behind stays
-on disk as an orphan), remove the `dag/*.yml` entry, `make check`, **commit**; then run
+on disk as an orphan), remove the `dag/*.yml` entry, **commit** (the pre-commit hook runs `make check`); then run
 `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
 upstream — a garden step that existed only to feed this explorer — in a second round. If any of

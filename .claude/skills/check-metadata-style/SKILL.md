@@ -333,15 +333,14 @@ After fixes:
 
 1. Rebuild the step if metadata text was changed in a way that affects rendering:
    ```bash
-   .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --force --only
+   PREFER_DOWNLOAD=1 .venv/bin/etlr grapher/<namespace>/<version>/<dataset>
    ```
 2. Re-run steps 3–5b of this skill on the same step. Expect zero whitespace issues and zero violations.
-3. Run `make check` to confirm no lint/format regressions from the YAML edits.
 
 ---
 
 ## Notes
 
-- **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
-- **Between syncs (step 1), always audit against the committed `STYLE_GUIDE.md`**, so the skill stays deterministic and offline-capable.
+- **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent files tied to this skill are `STYLE_GUIDE.md` and `HARMONIZED_FAUST.md` (the committed rulebooks).
+- **Between syncs (step 1), always audit against the committed rulebooks**, so the skill stays deterministic and offline-capable.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
