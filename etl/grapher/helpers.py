@@ -63,6 +63,18 @@ def _yield_wide_table(
     # Keep only entity_id and year in index
     table = table.reset_index(level=dim_names)
 
+    # Check annotation scopes before any variable is yielded and upserted
+    for column in table.columns:
+        if column in dim_names or not any(a.dimensions for a in table[column].m.annotations):
+            continue
+        if dim_names:
+            counts = table.groupby(dim_names, observed=True, dropna=False)[column].count()
+            combos = [c if isinstance(c, tuple) else (c,) for c in counts[counts > 0].index]
+        else:
+            combos = [()] if table[column].notna().any() else []
+        dim_dicts = [_create_dim_dict(dim_names, list(combo)) for combo in combos]
+        _check_annotation_scopes_match(column, table[column].m.annotations, dim_names, dim_dicts)
+
     if dim_names:
         # `dropna=False` makes sure we don't drop NaN values from index
         grouped = table.groupby(
@@ -170,18 +182,39 @@ def _annotation_in_scope(annotation: catalog.Annotation, dim_dict: dict[str, Any
     return all(k in dim_dict and str(dim_dict[k]) == str(v) for k, v in (annotation.dimensions or {}).items())
 
 
+def _check_annotation_dimension_names(annotation: catalog.Annotation, dim_names: list[str], column: str) -> None:
+    """Check that an annotation is scoped only to dimensions the table has."""
+    unknown = set(annotation.dimensions or {}) - set(dim_names)
+    if unknown:
+        raise ValueError(
+            f"Annotation of column '{column}' is scoped to dimensions {sorted(unknown)}, which the table does not have "
+            f"(its dimensions are {sorted(dim_names)}): {annotation.text!r}"
+        )
+
+
+def _check_annotation_scopes_match(
+    column: str, annotations: list[catalog.Annotation], dim_names: list[str], dim_dicts: list[dict[str, Any]]
+) -> None:
+    """Check that each scoped annotation matches some combination of dimensions with data, so a typo in a dimension
+    value fails instead of silently dropping the annotation."""
+    for annotation in annotations:
+        if not annotation.dimensions:
+            continue
+        _check_annotation_dimension_names(annotation, dim_names, column)
+        if not any(_annotation_in_scope(annotation, dim_dict) for dim_dict in dim_dicts):
+            raise ValueError(
+                f"Annotation of column '{column}' is scoped to dimensions {annotation.dimensions}, "
+                f"which match no data: {annotation.text!r}"
+            )
+
+
 def _annotations_for_dimensions(
     annotations: list[catalog.Annotation], dim_dict: dict[str, Any], dim_names: list[str], column: str
 ) -> list[catalog.Annotation]:
     """Keep the annotations that apply to a combination of dimensions, without their `dimensions` scope."""
     kept = []
     for annotation in annotations:
-        unknown = set(annotation.dimensions or {}) - set(dim_names)
-        if unknown:
-            raise ValueError(
-                f"Annotation of column '{column}' is scoped to dimensions {sorted(unknown)}, which the table does not have "
-                f"(its dimensions are {sorted(dim_names)}): {annotation.text!r}"
-            )
+        _check_annotation_dimension_names(annotation, dim_names, column)
         if _annotation_in_scope(annotation, dim_dict):
             kept.append(replace(annotation, dimensions=None))
     return kept
@@ -230,18 +263,9 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
         # Create metadata for the column from dimensions
         metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column, dim_names))
 
-    # A scoped annotation that matches no combination with data is most likely a typo in a dimension value
     for column in dict.fromkeys(dims[0] for dims in wide_tb.columns):
-        scoped = [a for a in long_tb[column].m.annotations if a.dimensions]
-        if not scoped:
-            continue
         dim_dicts = [_create_dim_dict(dim_names, dims[1:]) for dims in wide_tb.columns if dims[0] == column]
-        for annotation in scoped:
-            if not any(_annotation_in_scope(annotation, dim_dict) for dim_dict in dim_dicts):
-                raise ValueError(
-                    f"Annotation of column '{column}' is scoped to dimensions {annotation.dimensions}, "
-                    f"which match no data: {annotation.text!r}"
-                )
+        _check_annotation_scopes_match(column, long_tb[column].m.annotations, dim_names, dim_dicts)
 
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
@@ -880,10 +904,15 @@ def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> N
                 f"Annotation of column `{col}` must give its time as a {'year' if yearly else 'YYYY-MM-DD date'}, "
                 f"like the column's data: {annotation.text!r}"
             )
-            assert all(first <= t <= last for t in times), (
-                f"Annotation of column `{col}` has time {times} outside the column's data ({first} to {last}): "
-                f"{annotation.text!r}"
-            )
+            # Check the times against the data of each annotated entity, or of the whole column
+            for entity in annotation.entities or [None]:
+                if entity is not None:
+                    first, last = _time_range(rows[rows["country"] == entity], display)
+                scope = "the column's data" if entity is None else f"the data of {entity}"
+                assert all(first <= t <= last for t in times), (
+                    f"Annotation of column `{col}` has time {times} outside {scope} ({first} to {last}): "
+                    f"{annotation.text!r}"
+                )
 
 
 def _time_range(rows: pd.DataFrame, display: dict[str, Any]) -> tuple[Any, Any]:

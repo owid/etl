@@ -303,8 +303,34 @@ def test_long_to_wide_rejects_annotations_scoped_to_missing_dimensions(dimension
         gh.long_to_wide(tb)
 
 
+def test_yield_wide_table_keeps_annotations_of_matching_dimensions():
+    tb = _long_table_with_annotations([Annotation(text="Only cause A.", dimensions={"cause": "A"})])
+    tb = tb.reset_index().rename(columns={"country": "entityId"}).set_index(["entityId", "year", "cause"])
+    annotations = {t.columns[0]: t.iloc[:, 0].m.annotations for t in gh._yield_wide_table(tb)}
+    assert annotations == {"deaths__cause_a": [Annotation(text="Only cause A.")], "deaths__cause_b": []}
+
+
+@pytest.mark.parametrize(
+    "dimensions, error",
+    [({"sex": "female"}, "which the table does not have"), ({"cause": "C"}, "which match no data")],
+)
+def test_yield_wide_table_rejects_annotations_scoped_to_missing_dimensions(dimensions, error):
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions=dimensions)])
+    tb = tb.reset_index().rename(columns={"country": "entityId"}).set_index(["entityId", "year", "cause"])
+    tables = gh._yield_wide_table(tb)
+    # Fails before yielding any variable
+    with pytest.raises(ValueError, match=error):
+        next(tables)
+
+
 def _annotated_table(annotation: Annotation, display: dict | None = None) -> Table:
-    df = pd.DataFrame({"country": ["France", "France", "Spain"], "year": [2000, 2010, 2000], "value": [1.0, 2.0, None]})
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France", "Spain", "Italy"],
+            "year": [2000, 2010, 2000, 2000],
+            "value": [1.0, 2.0, None, 3.0],
+        }
+    )
     tb = Table(df.set_index(["country", "year"]), short_name="tb")
     tb["value"].metadata = VariableMeta(  # ty: ignore[unresolved-attribute]
         title="Value", unit="", origins=[Origin(producer="P", title="T")], annotations=[annotation], display=display
@@ -322,6 +348,8 @@ def test_grapher_checks_accepts_valid_annotations():
     [
         (Annotation(text="Note.", entities=["Spain"]), None, "entities without data \\['Spain'\\]"),
         (Annotation(text="Note.", time=1990), None, "outside the column's data \\(2000 to 2010\\)"),
+        # France has data in 2010, but Italy doesn't
+        (Annotation(text="Note.", entities=["Italy"], time=2010), None, "outside the data of Italy \\(2000 to 2000\\)"),
         (Annotation(text="Note.", time="2000-01-01"), None, "must give its time as a year"),
         (Annotation(text="Note."), {"entityAnnotationsMap": "France: Note."}, "sets both"),
         (Annotation(text="Note.", dimensions={"cause": "A"}), None, "but the column has none"),
