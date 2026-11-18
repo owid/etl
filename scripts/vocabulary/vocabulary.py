@@ -199,75 +199,25 @@ async def extract_keywords_with_llm(
     combined_text = "\n".join(texts)
 
     prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
-the topic "{topic_name}", most-viewed first. They include the individual views of
-its multi-dimensional charts and its explorers, which is what the topic page
-actually lists:
+the topic "{topic_name}", most-viewed first:
 
 {combined_text}
 
-Suggest search terms for this topic. They are offered to a reader on the topic's
-page, under a search box that filters exactly the charts listed above, as a short
-line: "Suggested: term, term, term…". Clicking a term shows the charts whose title
-or subtitle contains it.
+On the topic's page, a search box filters these charts, and a short line under it
+suggests search terms. Clicking a term shows the charts whose title or subtitle
+contains it. Propose candidates for that line. A later step measures what each one
+would show and chooses the line, so a good term is lost only if nobody proposes it:
+be generous.
 
-You are proposing candidates, not choosing the line. Each candidate is measured
-afterwards against the chart list above, for which charts clicking it shows and
-how much they are viewed, and the line is then chosen from the candidates with
-those measurements in hand. One matching nearly every chart is left out, since
-clicking it would narrow nothing. So a missing candidate is the mistake that
-can't be fixed afterwards; a weaker one simply isn't chosen.
+Work out the distinct things these charts are about (a topic's charts usually span
+more than its name suggests) and, for each, give the terms a reader would use to
+look for it: the plain word and the narrower phrases the titles build on it
+("alcohol" and "alcohol consumption"), the topic's own name included. Use the
+titles' own wording, since a term only finds the charts that contain it. Each term
+should name something a reader would want charts of: not only how a number is
+expressed (a unit, a share, "per capita"), and not a place.
 
-1. Cover every subject the charts span. Read the whole list and work out which
-   distinct subjects it covers, then give terms for each. A topic's charts usually
-   cover several: charts about sex ratios AND about unemployment AND about mental
-   health all belong to "Gender Ratio", so a list that only describes the
-   sex-ratio charts has missed most of the topic.
-2. For each subject, give its bare word and the narrower phrases built on it that
-   the titles use: "alcohol" and "alcohol consumption"; "electricity" and
-   "electricity production". The bare word is often withheld for matching nearly
-   everything ("alcohol" on Alcohol Consumption, "electricity" on Electricity
-   Mix), and then only the narrower phrase can reach those charts; when the bare
-   word is taken instead, the narrower one adds nothing and is skipped. That
-   includes the topic's own name: on Alcohol Consumption, "alcohol consumption"
-   brings up its central charts and is shown to the reader like any other term.
-3. Every term must name **what a chart is about**, its subject, in words that
-   make sense on their own. The reader sees the term alone in a line, with no
-   chart next to it, and should know what clicking it will show. Everything
-   below follows from that rather than being a separate rule to remember:
-   - Not how a number is expressed. A measurement's shape is not a subject, and
-     a reader looking for one is not looking for charts. These are never a term
-     on their own and never the head of a phrase: per capita, share, rate, death
-     rate, total, annual, average, level, index, projections, reported,
-     confirmed, vital registration, and units such as tonnes or terawatt-hours.
-     Nor is the yardstick a number is divided by: "GDP" on Research &
-     Development, where it appears only in "spending as a share of GDP". Nor
-     how the data was collected: survey, surveys, estimates, data.
-
-     **Unless a chart above is actually called that.** Then it is a subject, by
-     definition — someone named a chart after it. "GDP per capita" reads like a
-     unit and is one of the charts on the Poverty topic, worth a third of its
-     traffic; refusing it leaves that chart with nothing pointing at it. The test
-     is the titles in front of you, not how the words sound: if one of them is
-     essentially just this term, give it.
-   - Not a word that only means something next to the rest of a title. "age" or
-     "work" on Time Use match charts about unrelated things that happen to share
-     the word; "working hours" and "domestic work" each name one thing. The same
-     word can pass on another topic: "deaths" on Cancer plainly means cancer
-     deaths. And never a fragment of a title, such as "time with".
-   - Not a place. Countries, regions and income groups say *who* rather than
-     *what*; these charts mention them constantly and readers search for them
-     separately.
-   - Not a word that was only ever true of the past, unless people still search
-     for it.
-   Say the term out loud as a thing a reader wants to see charts of. If that
-   doesn't work — "annual", "vital registration", "reported" — leave it out.
-
-Give a generous list, favour the words those titles really use, and include a
-term that is right but not obvious: it costs nothing if it loses, and it is the
-only way it can win.
-
-Output JSON (up to 40 terms; far fewer is right when the topic is narrow —
-never pad the list to reach a number):
+Output JSON, up to 40 terms (fewer when the topic is narrow):
 {{
   "keywords": ["term1", "term2", ...]
 }}"""
