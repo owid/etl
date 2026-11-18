@@ -88,6 +88,9 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.4.0`
+- **`DatasetMeta.jsonld` is renamed `DatasetMeta.dataset_page`** (`dataset: dataset_page: true` in a step's `.meta.yml`). The flag opts a dataset into a whole public page (data files, codebook, sources, README, manifest), of which the Schema.org JSON-LD is one file. An `index.json` that still has `jsonld` loads without error, with `dataset_page` false until the dataset is rebuilt
+
 ### `v1.3.1`
 - No change to the package. Dev tooling: the lockfile now resolves only for Python >= 3.11.5, so it no longer pins a vulnerable soupsieve 2.x for Python 3.11.0–3.11.4
 

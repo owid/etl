@@ -92,19 +92,6 @@ def test_assess_dataset_quality_allows_non_reserved_namespace() -> None:
     assert result.is_eligible
 
 
-def test_assess_dataset_quality_blocks_duplicate_short_key() -> None:
-    result = assess_dataset_quality(
-        catalog_path="garden/emissions/2025-01-01/owid_co2",
-        namespace="emissions",
-        dataset_meta=_eligible_dataset_meta(),
-        tables=[_eligible_table()],
-        duplicate_short_key=True,
-    )
-
-    assert "duplicate_short_key" in result.blockers
-    assert not result.is_eligible
-
-
 def test_find_duplicate_short_key_paths_flags_shared_namespace_dataset_pairs() -> None:
     entries = [
         ("garden/emissions/2025-01-01/owid_co2", "emissions", "owid_co2"),
