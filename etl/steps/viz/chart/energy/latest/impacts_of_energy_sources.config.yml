@@ -34,10 +34,6 @@ definitions:
         originUrl: https://ourworldindata.org/energy
         entityType: source
         entityTypePlural: sources
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
 
 dimensions:
   - slug: impact_metric

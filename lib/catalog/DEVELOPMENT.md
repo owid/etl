@@ -66,7 +66,8 @@ From `lib/catalog/`:
    replacement for anything you removed.
 3. **Refresh both lockfiles.** The version is recorded twice: in `lib/catalog/uv.lock`
    and in the repo-root `uv.lock` (as `owid-catalog … source = { editable = "lib/catalog" }`).
-   Run `make .venv` in `lib/catalog/` **and** at the repo root — or `uv lock` in both.
+   Run `uv lock` in `lib/catalog/` **and** at the repo root. (`make .venv` installs from
+   the lockfile as it is and never refreshes it.)
    Every past bump touches all three files; a bump that only edits `pyproject.toml`
    leaves the repo out of sync.
 4. **Check** (`make check && make test` from `lib/catalog/`) and, because the whole repo
@@ -103,14 +104,14 @@ The same goes for `owid-repack` and `owid-datautils`. When a catalog change reli
 
 ```bash
 cd lib/catalog
-make .venv          # uv sync --all-extras --group dev
+make .venv          # uv sync --frozen --all-extras --group dev
 .venv/bin/pytest tests/
 ```
 
 - **Never run bare `uv sync`** — it prunes optional dependencies. `make .venv` runs the
   right command.
 - Change dependencies with `uv add` / `uv remove` from inside `lib/catalog/`, then
-  refresh the root lockfile as well (step 3 above).
+  refresh the root lockfile as well with `uv lock` (step 3 above).
 - Targets come from [`../../default.mk`](../../default.mk): `make test`
   (= `check-formatting check-linting check-typing unittest`), `make check` (fix + lint +
   typecheck), `make watch`, `make unittest`, `make coverage`, `make format`, `make lint`.

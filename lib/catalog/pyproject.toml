@@ -1,6 +1,6 @@
 [project]
 name = "owid-catalog"
-version = "1.3.0"
+version = "1.3.1"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
@@ -64,6 +64,10 @@ dev = [
 
 [tool.uv]
 exclude-newer = "3 days"
+# Lock only for Python >= 3.11.5: soupsieve 4 (the first patched release of its CVEs) requires it,
+# and resolving for 3.11.0-3.11.4 too would keep a vulnerable soupsieve 2.x in the lockfile.
+# This narrows the lockfile, not `requires-python`, so the published package metadata is unchanged.
+environments = ["python_full_version >= '3.11.5'"]
 # certifi is the CA trust store; its releases distrust compromised CAs, so a cooldown would
 # only keep forged certificates trusted for longer.
 exclude-newer-package = { certifi = false }

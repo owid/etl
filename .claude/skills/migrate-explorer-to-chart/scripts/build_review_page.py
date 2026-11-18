@@ -5,6 +5,7 @@ Inputs, all from earlier steps of the migration:
 - `<review>/references_full.json` from `scan_references.py`;
 - `<mapping-dir>/mapping.json` and `admin_bulk_payload.json` from `map-explorer-to-mdim`;
 - optional `--notes notes.json`: `{"<check>:<field prefix>": "why this difference is expected"}`.
+  The key `rendered:footer-link` explains a footer that differs only by the multidim's originUrl link.
   A difference with a note counts as explained, not as a mismatch. Write one only after checking
   the difference against the rendered pages.
 
@@ -19,35 +20,78 @@ Usage:
 
 import argparse
 import json
-from collections import defaultdict
+import re
 from pathlib import Path
 
 READER_CHECKS = ["mapping", "indicators", "data", "metadata", "rendered"]
 
 
+def _slugify(text: str) -> str:
+    return "".join(ch if ch.isalnum() else "_" for ch in text.lower()).strip("_")
+
+
 def dimension_summary(mapping: dict) -> list[dict]:
-    """Per explorer dimension: the multidim dimension it became and each choice's slug."""
-    pairs = [(r["source"]["dimensions"], (r["target"] or {}).get("dimensions") or {}) for r in mapping["redirects"]]
+    """Per multidim dimension and choice: the explorer selections whose redirect lands on it.
+
+    Reads from the multidim side because explorer and multidim dimensions need not pair up: two
+    checkboxes can become one toggle, and a dimension an explorer view leaves out (not in its URL)
+    can land on a different multidim choice depending on another dimension. Each choice gets the
+    shortest conditions that pick out exactly its views: `Per capita = true`, or `Sub-metric` not
+    set, or `Animal = Cattle` *or* `Metric = Bans on bullfighting`.
+    """
+    names = mapping["explorer"]["dimensions"]
+    rows = [(r["source"]["dimensions"], r["target"]) for r in mapping["redirects"] if r["target"]]
+    several = len({t["mdim"] for _, t in rows}) > 1
     out = []
-    for name in mapping["explorer"]["dimensions"]:
-        best = None
-        for slug in {k for _, t in pairs for k in t}:
-            rel = defaultdict(set)
-            for s, t in pairs:
-                rel[s.get(name, "")].add(t.get(slug))
-            if all(len(v) == 1 for v in rel.values()):
-                choices = {k: next(iter(v)) for k, v in rel.items()}
-                score = len(set(choices.values()))
-                if best is None or score > best[0]:
-                    best = (score, slug, choices)
-        out.append(
-            {
-                "explorer": name,
-                "multidim": best[1] if best else None,
-                "choices": [{"explorer": k, "multidim": v} for k, v in (best[2] if best else {}).items()],
-            }
-        )
+    for target in mapping["targets"]:
+        mrows = [({n: s.get(n, "") for n in names}, t["dimensions"]) for s, t in rows if t["mdim"] == target["mdim"]]
+        for slug in target["dimensions"]:
+            # Prefer the explorer dimension named like this one, then explorer order, to break ties.
+            order = sorted(names, key=lambda n: (_slugify(n) != slug, names.index(n)))
+            choices = list(dict.fromkeys(t.get(slug) for _, t in mrows if t.get(slug) is not None))
+            summary = []
+            for choice in choices:
+                pos = [s for s, t in mrows if t.get(slug) == choice]
+                neg = [s for s, t in mrows if t.get(slug) != choice]
+
+                def valid(cond: dict) -> bool:
+                    return not any(all(s[n] == v for n, v in cond.items()) for s in neg)
+
+                rules: list[dict] = []
+                left = pos
+                while left:
+                    # One or two conditions, whichever covers the most views left (ties: fewer conditions).
+                    cands = [{n: s[n]} for s in left for n in order]
+                    cands += [{a: s[a], b: s[b]} for s in left for i, a in enumerate(order) for b in order[i + 1 :]]
+                    cands = [c for c in cands if valid(c)] or [dict(left[0])]
+                    best = max(cands, key=lambda c: (sum(all(s[n] == v for n, v in c.items()) for s in left), -len(c)))
+                    rules.append(best)
+                    left = [s for s in left if not all(s[n] == v for n, v in best.items())]
+                # One-condition rules on the same dimension read as one: Metric = A, B or C.
+                merged: list[list[dict]] = []
+                for rule in rules:
+                    if len(rule) == 1:
+                        (n, v) = next(iter(rule.items()))
+                        same = next((m for m in merged if len(m) == 1 and m[0]["dim"] == n), None)
+                        if same:
+                            same[0]["values"].append(v)
+                            continue
+                    merged.append([{"dim": n, "values": [v]} for n, v in rule.items()])
+                summary.append({"choice": choice, "when": merged})
+            used = list(dict.fromkeys(c["dim"] for ch in summary for rule in ch["when"] for c in rule))
+            out.append(
+                {
+                    "multidim": f"{target['mdim']}.{slug}" if several else slug,
+                    "explorer": sorted(used, key=names.index),
+                    "choices": summary,
+                }
+            )
     return out
+
+
+def _strip_footer_link(text: str) -> list[str]:
+    """Footer words without the origin link (`OurWorldinData.org/<page> |`) and the license."""
+    return re.sub(r"OurWorldinData\.org/\S+\s*\|?", " ", text).replace("CC BY", " ").split()
 
 
 def classify(pairs: list[dict], notes: dict) -> None:
@@ -56,6 +100,11 @@ def classify(pairs: list[dict], notes: dict) -> None:
         for c in p["checks"]:
             key = f"{c['check'].split(':')[0]}:{c['field']}"
             c["note"] = next((v for k, v in notes.items() if key.startswith(k)), None)
+            # `rendered:footer-link` explains a footer that differs only by the multidim's added
+            # originUrl link (which also moves "CC BY" after the note), never any other change.
+            if c["check"].startswith("rendered") and c["field"] == "footer" and "rendered:footer-link" in notes:
+                if _strip_footer_link(c["multidim"] or "") == _strip_footer_link(c["explorer"] or ""):
+                    c["note"] = notes["rendered:footer-link"]
         visible = [c for c in p["checks"] if c["check"].split(":")[0] in READER_CHECKS and not c["note"]]
         other = [c for c in p["checks"] if c["check"].split(":")[0] not in READER_CHECKS and not c["note"]]
         p["verdict"] = "differs" if visible else ("config" if other else "match")
@@ -68,6 +117,18 @@ def render_page(review: Path, live: bool = False) -> str:
     notes_path = Path(cfg["notes"]) if cfg.get("notes") else None
     ev = json.loads((review / "eval.json").read_text())
     refs = json.loads((review / "references_full.json").read_text())
+    # The first scan is the to-do list; a later scan that no longer finds a link means it was swapped.
+    base_path = review / "references_baseline.json"
+    if base_path.exists():
+        # Keyed without the surface label, so relabelling a row in the scanner doesn't read as a swap.
+        key = lambda r: (r["where"], r["old_url"], r.get("link_text"))  # noqa: E731
+        now = {key(r): r for r in refs["references"]}
+        base = json.loads(base_path.read_text())["references"]
+        for i, r in enumerate(base):
+            base[i] = dict(now[key(r)], status="pending") if key(r) in now else dict(r, status="done")
+        extra = [dict(r, status="new") for r in refs["references"] if key(r) not in {key(b) for b in base}]
+        refs = dict(refs, references=base + extra)
+    preflight = (review / "preflight.txt").read_text() if (review / "preflight.txt").exists() else None
     mapping = json.loads((mapping_dir / "mapping.json").read_text())
     payload = json.loads((mapping_dir / "admin_bulk_payload.json").read_text())
     notes = json.loads(notes_path.read_text()) if notes_path else {}
@@ -81,6 +142,7 @@ def render_page(review: Path, live: bool = False) -> str:
         "stage": stage,
         "catchAll": mapping["catchAll"],
         "live": live,
+        "preflight": preflight,
     }
     title = f"{ev['explorer']['slug']} migration"
     return TEMPLATE.replace("__TITLE__", title).replace("__DATA__", json.dumps(data).replace("</", "<\\/"))
@@ -177,6 +239,9 @@ tr.pick{cursor:pointer} tr.pick:hover td{background:var(--soft)} tr.sel td{backg
 td.c{text-align:center;font-variant-numeric:tabular-nums}
 .y{color:var(--ok);font-weight:600} .n{color:var(--bad);font-weight:600} .e{color:var(--warn);font-weight:600} .na{color:var(--muted)}
 .url{font-family:var(--mono);font-size:.74rem;overflow-wrap:anywhere;max-width:40ch}
+.url a{color:inherit}
+details.info{border:1px solid var(--line);border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:10px}
+details.info summary{cursor:pointer;font-weight:700}
 .find{min-width:16ch;max-width:34ch} .find b{font-weight:600}
 button.mini{font-size:.72rem;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .group{display:flex;flex-direction:column;gap:8px}
@@ -185,6 +250,7 @@ button.mini{font-size:.72rem;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .dimcard{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .dimcard h3{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .arrow{color:var(--muted)}
+.dimcard td.mono{overflow-wrap:anywhere}
 pre{margin:0;max-height:420px;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:.74rem;line-height:1.45}
 .banner{border-radius:8px;padding:10px 14px;font-size:.9rem}
 .banner.bad{background:var(--bad-bg);color:var(--bad)} .banner.ok{background:var(--ok-bg);color:var(--ok)}
@@ -208,7 +274,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="compare">
-    <div class="sec-head"><h2>Side by side</h2><p>Production explorer on the left, staging multidim on the right. The controls pick the explorer view; the right side shows the multidim view it redirects to. Live pages need the staging server reachable (Tailscale); screenshots are from a headless browser at 1280px.</p></div>
+    <div class="sec-head"><h2>Side by side</h2><p>Production explorer on the left, the multidim on the right (staging before the merge, production after). The controls pick the explorer view; the right side shows the multidim view it redirects to. Live pages need the staging server reachable (Tailscale); screenshots are from a headless browser at 1280px.</p></div>
     <div class="nav" id="nav"></div>
     <div class="twoup" id="panes"></div>
     <div class="difflist" id="vdiffs"></div>
@@ -248,10 +314,11 @@ const E = D.eval, P = E.pairs, $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const show = v => v === null || v === undefined ? "—" : (typeof v === "string" ? v : JSON.stringify(v));
 const dimNames = E.explorer.dimensions;
+const MD = E.staging === "production" ? "Production multidim" : "Staging multidim";
 const family = c => c.check.split(":")[0];
 
 $("h1").textContent = `${E.explorer.slug} → /grapher/${E.multidim.slug}`;
-$("lede").innerHTML = `Live explorer: <a href="${E.explorer.url}" target="_blank" rel="noopener">${esc(E.explorer.url)}</a>. Staging multidim: <a href="${E.multidim.staging_url}" target="_blank" rel="noopener">${esc(E.multidim.staging_url)}</a> (<a href="${E.multidim.staging_admin}" target="_blank" rel="noopener">admin preview</a>). Catalog path <code>${esc(E.multidim.catalogPath)}</code>.`;
+$("lede").innerHTML = `Live explorer: <a href="${E.explorer.url}" target="_blank" rel="noopener">${esc(E.explorer.url)}</a>. ${MD}: <a href="${E.multidim.staging_url}" target="_blank" rel="noopener">${esc(E.multidim.staging_url)}</a> (<a href="${E.multidim.staging_admin}" target="_blank" rel="noopener">admin preview</a>). Catalog path <code>${esc(E.multidim.catalogPath)}</code>.`;
 const STAGES = [["review","1. Review the multidim, merge the PR"],["links","2. Replace links in docs"],["redirects","3. Create the redirects"],["retire","4. Unpublish and archive"]];
 const si = STAGES.findIndex(s => s[0] === D.stage);
 $("stages").innerHTML = STAGES.map((s,i) => `<span class="stage ${i===si?"now":i<si?"done":""}">${i<si?"✓ ":""}${s[1]}</span>`).join("");
@@ -324,7 +391,7 @@ function render(){
   const rr = (p.rendered||{})[tab] || null;
   const verdict = {match:'<span class="pill ok">Match</span>', config:'<span class="pill warn">Config differs</span>', differs:'<span class="pill bad">Differs</span>'}[p.verdict];
   $("vlabel").innerHTML = `View ${idx()+1} of ${P.length} · ${verdict}`;
-  $("panes").innerHTML = pane("explorer", rr&&rr.explorer, p.explorer_url, "Production explorer") + pane("multidim", rr&&rr.multidim, p.multidim_url, `Staging multidim · ${esc(p.multidim_view||"no target")}`);
+  $("panes").innerHTML = pane("explorer", rr&&rr.explorer, p.explorer_url, "Production explorer") + pane("multidim", rr&&rr.multidim, p.multidim_url, `${MD} · ${esc(p.multidim_view||"no target")}`);
   const checks = p.checks;
   $("vdiffs").innerHTML = checks.length ? checks.map(c => `<dl class="diff ${c.note?"explained":""}"><dt>Check</dt><dd>${esc(c.check)} · ${esc(c.field)}</dd><dt>Explorer</dt><dd>${esc(show(c.explorer))}</dd><dt>Multidim</dt><dd>${esc(show(c.multidim))}</dd>${c.note?`<dt>Note</dt><dd style="font-family:var(--body);font-size:.84rem">${esc(c.note)}</dd>`:""}</dl>`).join("")
     : `<div class="okline">✓ This view matches on indicators, display names, data and metadata checksums, chart config${E.rendered_ids.includes(p.id)?", and what readers see on both tabs":""}.</div>`;
@@ -344,35 +411,51 @@ $("mtable").innerHTML = `<thead><tr><th>#</th>${dimNames.map(d=>`<th>${esc(d)}</
 document.querySelectorAll("#mtable tr.pick").forEach(tr => { tr.onclick = () => { go(+tr.dataset.id); $("compare").scrollIntoView({behavior:"smooth"}); }; tr.onkeydown = e => { if (e.key==="Enter") tr.click(); }; });
 
 // Links to replace.
-const R = D.refs.references;
+// WordPress rows need no edit: legacy posts and unused blocks reach no reader, and a block still
+// shown on another explorer only holds plain links, which the redirect covers.
+const isInfo = r => r.how==="legacy copy" || r.surface.startsWith("WordPress");
+const RA = D.refs.references, R = RA.filter(r=>!isInfo(r)), RI = RA.filter(isInfo);
 const breaks = R.filter(r=>r.breaks_on_redirect).length;
-$("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"} found, ${breaks} of them break the moment the redirects exist (swap those first). Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.`;
+const nDone = R.filter(r=>r.status==="done").length, pendBreak = R.filter(r=>r.status!=="done" && r.breaks_on_redirect).length;
+$("linkscope").innerHTML = `${R.length} reference${R.length===1?"":"s"}${R.some(r=>r.status)?`: <b>${nDone} swapped</b>, ${R.length-nDone} still to do${pendBreak?`, of which <b>${pendBreak} break the moment the redirects exist</b>`:""}`:`, ${breaks} of them break the moment the redirects exist (swap those first)`}. Scanned ${D.refs.scanned_columns} text and JSON columns in ${D.refs.scanned_tables.length} production tables, plus the ${D.refs.repos.join(" and ")} repo${D.refs.repos.length>1?"s":""}. Skipped history and analytics tables: <span class="mono">${D.refs.skipped_tables.join(", ")}</span>.${RI.length?` ${RI.length} more in WordPress need nothing from you (listed at the bottom).`:""}`;
+// Links open in a new tab, so old and new can be compared side by side. Relative links are on the site.
+const urlLink = u => { const h = /^https?:/.test(u) ? u : u.startsWith("/") ? "https://ourworldindata.org" + u.replace(/`$/,"") : ""; return h ? `<a href="${esc(h)}" target="_blank" rel="noopener">${esc(u)}</a>` : esc(u); };
 // What to search for in the doc: the linked words (or card title), and the text just before them.
 const findCell = r => {
   if (!r.link_text && !r.context) return '<span class="small">—</span>';
   const what = r.link_text ? `<b>“${esc(r.link_text)}”</b><button class="mini" data-copy="${esc(r.link_text)}">Copy</button>` : `<span class="small">${r.how==="chart"?"embed, below:":"after:"}</span>`;
   return `${what}${r.context?`<div class="small">…${esc(r.context.trim())}</div>`:""}`;
 };
-const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
+const statusLabel = r => r.status==="done" ? '<span class="pill ok">✓ swapped</span> ' : r.status==="pending" ? '<span class="pill warn">to do</span> ' : r.status==="new" ? '<span class="pill bad">new since first scan</span> ' : "";
+const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : r.how==="legacy copy" ? `<span class="pill neutral">legacy copy · no reader sees it</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
+const renderGroups = (rows, empty) => {
 const groups = {};
-R.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
+rows.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
 const order = Object.entries(groups).sort((a,b) => (b[1].some(r=>r.breaks_on_redirect)-a[1].some(r=>r.breaks_on_redirect)) || (a[0].startsWith("Repo")-b[0].startsWith("Repo")));
-$("linkgroups").innerHTML = order.length ? order.map(([k, rs]) => {
+return order.length ? order.map(([k, rs]) => {
   const [surface, where] = k.split("|"), r0 = rs[0];
   const links = [r0.edit_url&&`<a href="${esc(r0.edit_url)}" target="_blank" rel="noopener">Edit ↗</a>`, r0.preview_url&&`<a href="${esc(r0.preview_url)}" target="_blank" rel="noopener">Admin preview ↗</a>`, r0.page_url&&`<a href="${esc(r0.page_url)}" target="_blank" rel="noopener">Live page ↗</a>`].filter(Boolean).join(" · ");
   return `<div class="group"><div class="group-head"><h3>${esc(where)}</h3><span class="small">${esc(surface)} · ${rs.length} link${rs.length===1?"":"s"}</span><span class="small">${links}</span></div>
-    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${esc(r.old_url)}</td><td class="url">${esc(r.new_url)}</td><td>${esc(r.match)}${Object.keys(r.stale_params||{}).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
-}).join("") : `<div class="okline">✓ Nothing references this explorer.</div>`;
+    <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${statusLabel(r)}${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${urlLink(r.old_url)}</td><td class="url">${urlLink(r.new_url)}</td><td>${esc(r.match)}${(r.repairs||[]).length?`<div class="small">${r.repairs.map(esc).join("; ")}</div>`:""}${Object.keys(r.stale_params||{}).length&&!(r.repairs||[]).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
+}).join("") : empty;
+};
+$("linkgroups").innerHTML = renderGroups(R, `<div class="okline">✓ Nothing to replace.</div>`)
+  + (RI.length ? `<details class="info"><summary>WordPress: ${RI.length} link${RI.length===1?"":"s"}, nothing to do</summary><p class="small">Legacy WordPress posts are private copies of pages now served from Google Docs, and unused reusable blocks render nowhere, so no reader sees these. A block still shown on another explorer holds only plain links, which the redirect covers.</p>${renderGroups(RI, "")}</details>` : "");
 document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
 
 // Dimension mapping.
 $("dimtext").innerHTML = `Explorer URLs name dimensions and choices by their labels (<code>?Measure=Conflict+deaths</code>); multidim URLs by slug (<code>?measure=deaths</code>). Each redirect rewrites one into the other and keeps every other parameter (<code>country</code>, <code>time</code>, <code>tab</code>). A bare <code>/explorers/${esc(E.explorer.slug)}</code> goes to the multidim's default view.`;
-$("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3>${esc(d.explorer)} <span class="arrow">→</span> <code>${esc(d.multidim||"?")}</code></h3>
-  <div class="tablebox"><table><thead><tr><th>Explorer choice</th><th>Multidim choice</th></tr></thead><tbody>${d.choices.map(c=>`<tr><td>${c.explorer===""?'<span class="small">(blank: not in the URL)</span>':esc(c.explorer)}</td><td class="mono">${esc(c.multidim)}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
+const cond = c => c.values.length===1 && c.values[0]==="" ? `<b>${esc(c.dim)}</b> <span class="small">not in the URL</span>`
+  : `<b>${esc(c.dim)}</b> = ${c.values.map(v=>v===""?'<span class="small">not in the URL</span>':esc(v)).join(c.values.length>2?", ":" or ").replace(/, ([^,]*)$/," or $1")}`;
+$("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3><code>${esc(d.multidim)}</code> <span class="arrow">←</span> ${d.explorer.map(esc).join(", ") || '<span class="small">no explorer dimension (one choice)</span>'}</h3>
+  <div class="tablebox"><table><thead><tr><th>Multidim choice</th><th>When the explorer URL has</th></tr></thead><tbody>${d.choices.map(c=>`<tr><td class="mono">${esc(c.choice)}</td><td>${c.when.map(r=>r.map(cond).join(" and ")).join('<br><span class="small">or</span> ')}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
 
 // Payload.
 const prodPayload = D.payloadEnv === "production";
-$("pbanner").innerHTML = prodPayload ? `<div class="banner ok">✓ Built and checked against production. This is the version to paste.</div>`
+const pfReady = D.preflight && /^Ready:/m.test(D.preflight);
+const pfLines = D.preflight ? D.preflight.split("\n").filter(l=>/^(BLOCKER|WARN)/.test(l)).map(l=>`<div class="mono" style="font-size:.78rem">${esc(l.replace(/\s+/g," "))}</div>`).join("") : "";
+$("pbanner").innerHTML = prodPayload && pfReady ? `<div class="banner ok">✓ Built against production and the pre-apply check passed. This is the version to paste.${pfLines}</div>`
+  : prodPayload ? `<div class="banner bad">Built against production, but the pre-apply check is not passing yet, so don't paste it.${pfLines}</div>`
   : `<div class="banner bad">Preview built against staging. Each view's config id differs on production, so this version must not be pasted: it gets rebuilt and checked against production after the PR merges, and this section updates.</div>`;
 const nRules = (D.payload.redirects||[]).filter(r=>r.target).length + (D.payload.catchAll?1:0);
 $("pstats").textContent = `${nRules} redirect rules (${(D.payload.redirects||[]).length} views + the bare explorer URL).`;

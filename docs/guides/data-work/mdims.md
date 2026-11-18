@@ -17,7 +17,7 @@ MDIMs and Explorer (simply referred t as "MDIMs" from now on) steps are [viz ste
 These have a similar structure to regular steps. They write to the grapher DB with the `--grapher` flag (without it, the step only writes the expanded config under `viz/`):
 
 ```bash
-etlr viz://explorer/minerals/latest/minerals --grapher
+etlr viz://chart/minerals/latest/minerals --grapher
 ```
 
 Instead of creating a `Dataset` object, these create `Chart` or `Explorer` objects and save them to the database. Both share the same data structure (class `Chart`, see [:fontawesome-brands-github: `etl.viz.chart.model`](https://github.com/owid/etl/blob/master/etl/viz/chart/model/core.py)); `Explorer` is a subclass with minor differences due to legacy reasons.
@@ -330,7 +330,6 @@ The same helpers work for explorers: call `paths.create_explorer` instead of `pa
 - [:fontawesome-brands-github:  Population and Demography](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/un/latest/un_wpp.py): Configuration automatically generated (mostly) from dimensions, using `expand_config` and other tools. This one is a good example for explorers with a large number of views.
 - [:fontawesome-brands-github:  COVID-19](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/covid/latest/covid.config.yml): Manually crafted.
 - [:fontawesome-brands-github:  Monkeypox](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/monkeypox.py): Manually crafted.
-- [:fontawesome-brands-github:  Climate change](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/climate/latest/climate_change.config.yml): Manually crafted.
 
 ### How are explorers saved in admin?
 Like MDIMs, explorers are upserted to the grapher DB when calling `.save()`. Staging servers write to their own DB, and production is updated when the PR is merged.

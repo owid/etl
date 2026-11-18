@@ -390,3 +390,23 @@ steps:
       - data://garden/war/2026-06-10/ucdp
       - data://garden/demography/2024-07-15/population
       - data://garden/countries/2024-08-27/gleditsch
+  # archived; last active in 1bfbb1b83add on 2026-11-12
+  viz://explorer/war/latest/countries_in_conflict_data:
+    - data://grapher/war/2026-06-10/ucdp
+  # archived; last active in 0b91af74bb51 on 2026-11-17
+  viz://explorer/war/latest/conflict_data:
+    - data://grapher/war/2026-06-10/ucdp_prio
+    - data://grapher/war/2026-06-10/ucdp
+    - data://grapher/war/2023-09-21/prio_v31
+    - data://grapher/war/2023-09-21/cow
+    - data://grapher/war/2023-09-21/mie
+    - data://grapher/war/2023-09-21/mars
+    - viz://explorer/war/latest/conflict_data_source:
+      - data://grapher/war/2026-06-10/ucdp_prio
+      - data://grapher/war/2026-06-10/ucdp
+      - data://grapher/war/2023-09-21/prio_v31
+      - data://grapher/war/2023-09-21/cow
+      - data://grapher/war/2023-09-21/mie
+      - data://grapher/war/2023-09-21/mars
+      - data://grapher/war/2023-09-21/cow_mid
+    - data://grapher/war/2023-09-21/cow_mid

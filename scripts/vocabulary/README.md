@@ -1,6 +1,6 @@
 # OWID Topic Vocabulary Extraction
 
-Simple LLM-based CLI to extract characteristic keywords from OWID chart titles and subtitles, grouped by topic.
+Simple LLM-based CLI to extract characteristic keywords from OWID chart titles and subtitles, grouped by topic, and to suggest the countries most worth looking at on each topic.
 
 ## Overview
 
@@ -28,47 +28,38 @@ would show nothing for covers nothing and cannot be chosen at all.
 
 ## Quick Start
 
-### Extract for all topics
+### Build a new vocabulary
 ```bash
 .venv/bin/python scripts/vocabulary/vocabulary.py
 ```
 
+This writes the full result, stats included, to `etl/steps/export/r2/owid/latest/topic_vocabulary.json`. Commit it in a PR: once merged, the production ETL run publishes it (see [Where the vocabulary goes](#where-the-vocabulary-goes-and-how-to-try-one-out)). The diff of that file is how one run is compared with the last.
+
 ### Extract for specific topics
 
-The uploaded file *replaces* the vocabulary rather than merging into it, so a
-`--topic` run can't go to the key the site reads — every topic it skipped would
-lose its suggestions. Such a run therefore has to say where its result should go
-instead: `--no-upload` to keep it local, or `--upload-path` to try it on a
-staging server.
+The committed file *replaces* the vocabulary rather than merging into it, so a `--topic` run can't be written there: every topic it skipped would lose its suggestions once merged. Such a run has to go to another `--output`:
 
 ```bash
-# Single topic, kept out of production
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload
+# Single topic, kept local
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json
 
-# Multiple topics (run in parallel), published to a staging key
+# Multiple topics (run in parallel), also uploaded to a scratch key to try on a staging server
 .venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change \
-    --upload-path topic_vocabulary/my-branch.json
-```
-
-### Save to file
-```bash
-# A dict keyed by topic slug, whatever the topic count
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --output vocab.json
+    --output vocab.json --upload-path topic_vocabulary/my-branch.json
 ```
 
 ### Choose model
 ```bash
 # Use a faster/cheaper model (default: claude-sonnet-5-5)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model claude-haiku-5-5
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json --model claude-haiku-5-5
 ```
 
 ## CLI Options
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
-- `--output PATH` - Output JSON file path (optional, prints to console if not provided)
+- `--output PATH` - Write the full results, stats included, to this JSON file (default: the committed `etl/steps/export/r2/owid/latest/topic_vocabulary.json`)
 - `--model MODEL` - Claude model to use (default: `claude-sonnet-5-5`). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
-- `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
-- `--no-upload` - Generate without writing to R2
+- `--upload-path KEY` - Also upload the published part to this scratch key in the `owid-public` bucket, to try it on a staging server (refuses `topic_vocabulary.json`, the key the site reads)
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
 - `--weighting {views,uniform}` - Weight charts by views (default) or count them equally
 - `--views-column {views_7d,views_14d,views_365d}` - Which window to weight by (default `views_365d`; a vocabulary is read for weeks, so the year is steadier than the week)
@@ -93,30 +84,27 @@ back that way.
 
 ## Where the vocabulary goes, and how to try one out
 
-The result is uploaded to the `owid-public` R2 bucket and served through
-`files.ourworldindata.org`, whose worker adds CORS and a 5-minute edge cache.
-The site reads the default key directly from the browser:
+The site reads the vocabulary directly from the browser at
 
     https://files.ourworldindata.org/topic_vocabulary.json
 
-**A plain run overwrites the vocabulary the live site uses.** To try a new one
-without doing that, upload it under a different key — the worker serves the
-whole bucket, so any key works:
+an object in the `owid-public` R2 bucket, served through a worker that adds CORS and a 5-minute edge cache.
+
+**Only the `export://r2/owid/latest/topic_vocabulary` step writes it**, and only with `--export`, which the production ETL run passes after every merge to master. The committed JSON counts toward that step's checksum, so merging a new vocabulary is what publishes it, and the live file is always the one on master. Local and staging builds of the step build it without uploading.
+
+To try a new vocabulary before merging, upload it under a scratch key (the worker serves the whole bucket, so any key works):
 
 ```bash
-python scripts/vocabulary/vocabulary.py \
-    --upload-path topic_vocabulary/my-branch.json
+.venv/bin/python scripts/vocabulary/vocabulary.py --upload-path topic_vocabulary/my-branch.json
 ```
 
-then point a staging server at it (see `TOPIC_VOCABULARY_URL` in owid-grapher's
-`settings/clientSettings.ts`):
+then point a staging server at it (see `TOPIC_VOCABULARY_URL` in owid-grapher's `settings/clientSettings.ts`):
 
 ```
 TOPIC_VOCABULARY_URL=https://files.ourworldindata.org/topic_vocabulary/my-branch.json
 ```
 
-Suggestions fall back to the production vocabulary if that key isn't there, so
-a half-finished experiment leaves the page looking normal.
+Suggestions fall back to the production vocabulary if that key isn't there, so a half-finished experiment leaves the page looking normal.
 
 Keywords are consumed by the all-charts block's "Suggested:" line on topic
 pages. It shows the leading few terms per topic, so ordering within a topic
@@ -132,47 +120,35 @@ matters: the terms it lists first are the ones most likely to be shown.
    terms proposed should describe what people actually look at, and two runs
    should see the same input)
 4. **LLM extraction**: Feeds all text to Claude with instructions to extract modern, searchable keywords. A topic whose prompt and model are unchanged reuses its earlier answer from `.cache/vocabulary_llm_answers.json`, so a rerun reproduces the last result; delete that file to sample afresh
-5. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
+5. **Countries**: a second request per topic, shown the same chart texts, asks for the countries whose story on the topic is most worth seeing, best first. Each answer is matched against OWID's country names (names, short names and aliases in the regions definitions), since the site filters charts by those exact names; anything that isn't a current country is dropped and listed in the topic's `unrecognized_countries` stat
+6. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 
 ## Output Format
 
-### Single topic
+### Published file
+
+The uploaded file holds only what the site reads (`PUBLISHED_FIELDS` in the export step), keyed by topic slug, as compact JSON served with `Content-Type: application/json` (which is what lets Cloudflare compress it):
+
 ```json
 {
-  "topic_slug": "energy",
-  "topic_name": "Energy",
-  "keywords": [
-    "solar panels",
-    "fossil fuels",
-    "coal",
-    "wind turbines",
-    "nuclear power",
-    ...
-  ],
-  "stats": {
-    "num_charts_texts": 200,
-    "num_keywords": 30,
-    "input_tokens": 4236,
-    "output_tokens": 199,
-    "total_cost_usd": 0.000189
-  }
+  "energy": {"topic_slug": "energy", "topic_name": "Energy", "keywords": ["solar panels", "fossil fuels", ...], "countries": ["Norway", "China", ...]},
+  "climate-change": {"topic_slug": "climate-change", "topic_name": "Climate Change", "keywords": [...], "countries": [...]}
 }
 ```
 
-### Multiple topics
+### Committed (`--output`) file
+
+The committed file has the same keys but keeps the full record per topic, stats included (cost, coverage, and per-term shares in `keyword_stats`):
+
 ```json
 {
   "energy": {
     "topic_slug": "energy",
     "topic_name": "Energy",
     "keywords": [...],
-    "stats": {...}
-  },
-  "climate-change": {
-    "topic_slug": "climate-change",
-    "topic_name": "Climate Change",
-    "keywords": [...],
-    "stats": {...}
+    "countries": [...],
+    "stats": {"num_keywords": 8, "num_countries": 5, "unrecognized_countries": [], "weighted_coverage": 0.62, "input_tokens": 4236, ...},
+    "keyword_stats": [{"term": "solar panels", "own_share": 0.21, "marginal_share": 0.21, ...}, ...]
   }
 }
 ```

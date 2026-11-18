@@ -39,7 +39,7 @@ uv add package_name     # Add a new package
 uv remove package_name  # Remove a package
 ```
 
-**Never run bare `uv sync`** — it prunes optional deps the repo needs and breaks the `etl` CLI. To install or repair the environment, use `uv sync --all-extras --group dev` (what `make .venv` runs).
+**Never run bare `uv sync`** — it prunes optional deps the repo needs and breaks the `etl` CLI. To install or repair the environment, use `uv sync --frozen --all-extras --group dev` (what `make .venv` runs).
 
 ### Common Development Tasks
 

@@ -1,0 +1,2346 @@
+grapher_schema: "012"
+title:
+  title: Water, Sanitation and Hygiene (WASH)
+  title_variant: ''
+slug: water-and-sanitation
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore global data on water, sanitation and hygiene access.
+topic_tags:
+  - Clean Water & Sanitation
+default_selection:
+  - India
+  - United States
+  - Kenya
+  - World
+  - Bangladesh
+  - South Africa
+  - China
+definitions:
+  common_views:
+    - config:
+        tab: map
+        chartTypes:
+          - LineChart
+          - DiscreteBar
+        hasMapTab: true
+        yAxis:
+          min: 0
+        # The explorer hides the time span and entity in its titles; keep them hidden.
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        map:
+          colorScale:
+            binningStrategy: manual
+
+# Titles and subtitles come from each indicator's garden metadata (set in water_and_sanitation.py).
+# Map colors and bins are the ones the explorer showed. Its timeTolerance of 10 years is the
+# indicators' own display.tolerance, set in garden.
+dimensions:
+  - slug: resource
+    name: Resource
+    choices:
+      - slug: drinking_water
+        name: Drinking water
+      - slug: sanitation
+        name: Sanitation
+      - slug: handwashing_facilities
+        name: Handwashing facilities
+    presentation:
+      type: toggle-buttons
+  - slug: level_of_use_access
+    name: Level of Use/Access
+    choices:
+      - slug: safely_managed
+        name: Safely managed
+        description: The highest level of service. Drinking water from an improved source on premises, available when needed and free from contamination; or improved sanitation not shared with other households, with excreta safely disposed of.
+      - slug: basic
+        name: Basic
+        description: Drinking water from an improved source within a 30-minute round trip; improved sanitation not shared with other households; or a handwashing facility at home with soap and water.
+      - slug: limited
+        name: Limited
+        description: Drinking water from an improved source more than a 30-minute round trip away; improved sanitation shared with other households; or a handwashing facility at home without soap or water.
+      - slug: unimproved
+        name: Unimproved
+        description: Drinking water from an unprotected dug well or spring; or pit latrines without a slab, hanging latrines or bucket latrines.
+      - slug: no_facilities
+        name: No facilities
+        description: Drinking water taken directly from rivers, lakes, ponds or other surface water; open defecation; or no handwashing facility at home.
+      - slug: improved
+        name: Improved
+        description: Sources and facilities that can deliver safe water or that separate excreta from human contact, whatever the collection time and whether or not they are shared.
+    presentation:
+      type: dropdown
+  - slug: residence
+    name: Residence
+    choices:
+      - slug: total
+        name: Total
+      - slug: urban
+        name: Urban
+      - slug: rural
+        name: Rural
+    presentation:
+      type: toggle-buttons
+  - slug: relative_to_population
+    name: Relative to population
+    choices:
+      - slug: share_of_population
+        name: Share of population
+      - slug: number_of_people
+        name: Number of people
+    presentation:
+      type: toggle-buttons
+views:
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: safely_managed
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_sm__residence_total
+          display:
+            name: Usage of safely managed drinking water services
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_bas__residence_total
+          display:
+            name: Usage of basic drinking water services
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_lim__residence_total
+          display:
+            name: Usage of limited drinking water services
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: unimproved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_unimp__residence_total
+          display:
+            name: Usage of unimproved drinking water sources
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_ns__residence_total
+          display:
+            name: No usage of drinking water facilities
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: improved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_imp__residence_total
+          display:
+            name: Usage of improved drinking water sources
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: safely_managed
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_sm_pop__residence_total
+          display:
+            name: Number using safely managed drinking water services
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_bas_pop__residence_total
+          display:
+            name: Number using basic drinking water services
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_lim_pop__residence_total
+          display:
+            name: Number using limited drinking water services
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: unimproved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_unimp_pop__residence_total
+          display:
+            name: Number using unimproved drinking water sources
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_ns_pop__residence_total
+          display:
+            name: Number with not using drinking water facilities
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: total
+      level_of_use_access: improved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_imp_pop__residence_total
+          display:
+            name: Number using improved drinking water sources
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: safely_managed
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_sm__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_bas__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_lim__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: unimproved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_unimp__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_ns__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: improved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_imp__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: safely_managed
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_sm_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_bas_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_lim_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: unimproved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_unimp_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_ns_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: urban
+      level_of_use_access: improved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_imp_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: safely_managed
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_sm__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_bas__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_lim__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: unimproved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_unimp__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_ns__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: improved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#wat_imp__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: safely_managed
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_sm_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_bas_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_lim_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: unimproved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_unimp_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_ns_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: drinking_water
+      residence: rural
+      level_of_use_access: improved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#wat_imp_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: PuBuGn
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: safely_managed
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_sm__residence_total
+          display:
+            name: Usage of safely managed sanitation services
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_bas__residence_total
+          display:
+            name: Usage of basic sanitation services
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_lim__residence_total
+          display:
+            name: Usage of limited sanitation services
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: unimproved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_unimp__residence_total
+          display:
+            name: Usage of unimproved sanitation facilities
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_ns__residence_total
+          display:
+            name: Open defecation (no use of any sanitation facilities)
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: improved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_imp__residence_total
+          display:
+            name: Usage of improved sanitation facilities
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: safely_managed
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_sm_pop__residence_total
+          display:
+            name: Number using sanitation with off-site wastewater treatment
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_bas_pop__residence_total
+          display:
+            name: Number using basic sanitation services
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_lim_pop__residence_total
+          display:
+            name: Number using limited sanitation services
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: unimproved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_unimp_pop__residence_total
+          display:
+            name: Number using unimproved sanitation facilities
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_ns_pop__residence_total
+          display:
+            name: Number practicing open defecation (no use of any sanitation facilities)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: total
+      level_of_use_access: improved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_imp_pop__residence_total
+          display:
+            name: Number using improved sanitation facilities
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: safely_managed
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_sm__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_bas__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_lim__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: unimproved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_unimp__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_ns__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: improved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_imp__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: safely_managed
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_sm_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_bas_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_lim_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: unimproved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_unimp_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_ns_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: urban
+      level_of_use_access: improved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_imp_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: safely_managed
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_sm__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_bas__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_lim__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: unimproved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_unimp__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_ns__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+            - 45
+            - 0
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: improved
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#san_imp__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: safely_managed
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_sm_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_bas_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_lim_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: unimproved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_unimp_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_ns_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: sanitation
+      residence: rural
+      level_of_use_access: improved
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#san_imp_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Greens
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: total
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_bas__residence_total
+          display:
+            name: Access to basic handwashing facilities
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: GnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: total
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_lim__residence_total
+          display:
+            name: Access to limited handwashing facilities
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: total
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_nfac__residence_total
+          display:
+            name: No handwashing facilities
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: total
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_bas_pop__residence_total
+          display:
+            name: Number with access to basic handwashing facilities
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Purples
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: total
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_lim_pop__residence_total
+          display:
+            name: Number with access to limited handwashing facilities
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: total
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_nfac_pop__residence_total
+          display:
+            name: Number with no handwashing facilities
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: urban
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_bas__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: GnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: urban
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_lim__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: urban
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_nfac__residence_urban
+          display:
+            name: Urban usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: urban
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_bas_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Purples
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: urban
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_lim_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: urban
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_nfac_pop__residence_urban
+          display:
+            name: Urban usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: rural
+      level_of_use_access: basic
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_bas__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: GnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: rural
+      level_of_use_access: limited
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_lim__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: rural
+      level_of_use_access: no_facilities
+      relative_to_population: share_of_population
+    indicators:
+      y:
+        - catalogPath: household#hyg_nfac__residence_rural
+          display:
+            name: Rural usage
+            unit: '%'
+            shortUnit: '%'
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+  - dimensions:
+      resource: handwashing_facilities
+      residence: rural
+      level_of_use_access: basic
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_bas_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: Purples
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: rural
+      level_of_use_access: limited
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_lim_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000
+  - dimensions:
+      resource: handwashing_facilities
+      residence: rural
+      level_of_use_access: no_facilities
+      relative_to_population: number_of_people
+    indicators:
+      y:
+        - catalogPath: household#hyg_nfac_pop__residence_rural
+          display:
+            name: Rural usage (number of people)
+            unit: people
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          customNumericValues:
+            - 0
+            - 100000
+            - 1000000
+            - 10000000
+            - 100000000
+            - 1000000000

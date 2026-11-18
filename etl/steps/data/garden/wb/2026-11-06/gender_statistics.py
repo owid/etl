@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import itertools
 import json
 
 import pandas as pd
@@ -13,9 +14,12 @@ paths = PathFinder(__file__)
 
 # Women, Business and the Law (WBL 1.0) topic scores, and the yes/no questions each one is the share of (times 100).
 # NOTE: Gender Statistics dropped all of these in its October 2026 release, when WBL moved to its 2.0 framework, so we
-# take them from the WBL website's 1971-2024 historical panel instead (see the women_business_and_the_law meadow step,
-# which also explains why the 2026 report isn't used yet). On the next update, check whether Gender Statistics publishes
-# them again, and whether the World Bank has published a corrected WBL 1.0 history.
+# take them from WBL directly (see the women_business_and_the_law meadow step): the 1971-2024 historical panel, corrected
+# with the revisions the World Bank listed in its 2026 report, plus that report. On the next update, check whether the
+# World Bank has published its WBL 2.0 panel, which replaces both.
+# NOTE: WBL data is processed inside this Gender Statistics dataset only so that its indicators keep their IDs, and the
+# WBL charts don't need remapping. When moving to the WBL 2.0 panel, which needs remapping anyway, give WBL its own
+# dataset instead, and remove it from this step.
 WBL_TOPICS = {
     "sg_law_indx_mo": ["sg_loc_live_eq", "sg_hme_trvl_eq", "sg_apl_pspt_eq", "sg_ctr_trvl_eq"],
     "sg_law_indx_wp": ["sg_get_jobs_eq", "sg_law_nodc_hr", "sg_leg_sxhr_em", "sg_pen_sxhr_em"],
@@ -78,6 +82,7 @@ def run() -> None:
     # Load Women, Business and the Law (WBL 1.0) data.
     ds_wbl = paths.load_dataset("women_business_and_the_law")
     tb_wbl = ds_wbl.read("women_business_and_the_law")
+    tb_wbl_changes = ds_wbl.read("women_business_and_the_law_changes")
 
     # Retrieve snapshot.
     snap = paths.load_snapshot("gender_statistics.zip")
@@ -122,7 +127,7 @@ def run() -> None:
     tb = add_metadata(tb, tb_meta)
 
     # Add WBL 1.0 indicators, under the codes Gender Statistics used for them.
-    tb_wbl = prepare_wbl(tb_wbl)
+    tb_wbl = prepare_wbl(tb_wbl, tb_changes=tb_wbl_changes)
     tb = pr.merge(tb, tb_wbl, on=["country", "year"], how="outer")
 
     # Improve table format.
@@ -204,23 +209,90 @@ def check_unused_country_names(tb: Table, tb_wbl: Table) -> None:
         paths.log.warning(f"Unused names in the countries file: {unused}")
 
 
-def prepare_wbl(tb_wbl: Table) -> Table:
-    """Turn WBL answers into 1/0, assign each report to its data year, and harmonize country names."""
+def prepare_wbl(tb_wbl: Table, tb_changes: Table) -> Table:
+    """Turn WBL answers into 1/0, assign each report to its data year, harmonize country names, and apply revisions."""
     tb_wbl = tb_wbl.copy()
     for column in WBL_QUESTIONS:
         tb_wbl[column] = (tb_wbl[column] == "Yes").astype("Int8").copy_metadata(tb_wbl[column])
 
-    # Each report describes the laws in force on October 1 of the previous year, which is how Gender Statistics
-    # dated these indicators (for example, the 2026 report is shown as 2025).
+    # Each report describes the laws in force in the previous year, which is how Gender Statistics dated these
+    # indicators, and what the World Bank recommends (for example, the 2026 report is shown as 2025).
     tb_wbl["year"] = tb_wbl["report_year"] - 1
     tb_wbl = tb_wbl.drop(columns=["report_year"])
 
+    # Harmonize country names (the list of changes uses the latest report's names, which differ for a few economies).
     tb_wbl = paths.regions.harmonize_names(
         tb_wbl, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
     )
+    tb_changes = paths.regions.harmonize_names(
+        tb_changes, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
+    )
+
+    # Correct the historical panel with the World Bank's revisions, and recompute the scores from the corrected answers.
+    tb_wbl = apply_wbl_revisions(tb_wbl, tb_changes=tb_changes)
 
     # Rebuild the averages of the WBL scores that Gender Statistics used to publish for World Bank groups.
     tb_wbl = add_wbl_averages(tb_wbl)
+
+    return tb_wbl
+
+
+def apply_wbl_revisions(tb_wbl: Table, tb_changes: Table) -> Table:
+    """Apply the World Bank's revisions (corrections of earlier answers) to the WBL 1.0 historical panel.
+
+    The 2026 report lists every answer that changed since the 2024 report, as a reform (a change in the law) or a revision
+    (a correction), with the first report year it applies to. The World Bank didn't correct the 1971-2024 panel for the
+    revisions, so we do it here: each revised answer takes its new value from its first report year onward. Reforms need
+    nothing, as they took place after the 2024 report. Scores are then recomputed from the corrected answers, the same
+    way WBL computes them.
+    """
+    tb_wbl = tb_wbl.copy()
+    tb_changes = tb_changes.copy()
+    for column in ["original_value", "new_value"]:
+        assert set(tb_changes[column].astype(str)) <= {"Yes", "No"}, f"Unexpected values in {column}."
+        tb_changes[column] = (tb_changes[column].astype(str) == "Yes").astype(int)
+    # The report years shown in our data are one year earlier (see prepare_wbl).
+    tb_changes["first_year"] = tb_changes["first_report_year"] - 1
+    last_panel_year = 2023
+    latest_year = int(tb_wbl["year"].max())
+    assert latest_year == 2025, f"Unexpected latest WBL year: {latest_year}"
+
+    # Each change goes from its original value in the last panel year to its new value in the latest report.
+    values = tb_wbl.set_index(["country", "year"])
+    assert set(tb_changes["category"].astype(str)) == {"Reform", "Revision"}, "Unexpected categories of changes."
+    for _, change in tb_changes.iterrows():
+        key = (change["country"], change["indicator"])
+        assert values.loc[(key[0], last_panel_year), key[1]] == change["original_value"], f"Original value: {key}"
+        assert values.loc[(key[0], latest_year), key[1]] == change["new_value"], f"New value: {key}"
+    # Reforms took place after the last panel year (in the 2025 or 2026 report).
+    reforms = tb_changes[tb_changes["category"] == "Reform"]
+    assert (reforms["first_year"] > last_panel_year).all(), "A reform dates from before the last panel year."
+
+    # Apply each revision from its first year to the last panel year.
+    revisions = tb_changes[(tb_changes["category"] == "Revision") & (tb_changes["first_year"] <= last_panel_year)]
+    assert (revisions["first_year"] >= int(tb_wbl["year"].min())).all(), "A revision dates from before the panel."
+    for _, revision in revisions.iterrows():
+        mask = (
+            (tb_wbl["country"] == revision["country"])
+            & (tb_wbl["year"] >= revision["first_year"])
+            & (tb_wbl["year"] <= last_panel_year)
+        )
+        # The panel must hold the original answer from some year until the last panel year, possibly preceded by the
+        # corrected one (a later change to the original answer was then the error).
+        # NOTE: In the 2026 report, this applies to three revisions (Bosnia and Herzegovina's equal pay, and Brazil's and
+        # Senegal's industrial jobs).
+        old = tb_wbl.loc[mask].sort_values("year")[revision["indicator"]].tolist()
+        n_new = len(old) - len(list(itertools.takewhile(lambda v: v == revision["original_value"], reversed(old))))
+        assert all(v == revision["new_value"] for v in old[:n_new]), f"Unexpected history: {revision.to_dict()}"
+        tb_wbl.loc[mask, revision["indicator"]] = revision["new_value"]
+
+    # Recompute each area score (the share of its questions answered "yes", from 0 to 100) and the index (their average).
+    scores = {topic: tb_wbl[questions].astype(float).mean(axis=1) * 100 for topic, questions in WBL_TOPICS.items()}
+    scores["sg_law_indx"] = pd.concat(scores.values(), axis=1).mean(axis=1)
+    for column, values in scores.items():
+        meta = tb_wbl[column].metadata
+        tb_wbl[column] = values
+        tb_wbl[column].metadata = meta
 
     return tb_wbl
 
@@ -250,7 +322,8 @@ def sanity_check_outputs(tb: Table) -> None:
     """Check the combined output table."""
     wbl = tb[WBL_COLUMNS].dropna(how="all")
     years = set(wbl.index.get_level_values("year"))
-    assert years == set(range(1970, 2024)), f"Unexpected WBL years: {sorted(years)}"
+    # NOTE: The World Bank published no WBL 1.0 data for the 2025 report year, so there is no data point for 2024.
+    assert years == set(range(1970, 2024)) | {2025}, f"Unexpected WBL years: {sorted(years)}"
     for column in WBL_QUESTIONS:
         assert set(wbl[column].dropna().unique()) <= {0, 1}, f"{column} is not 1/0."
     # Each total is at least as long as each of its parts.

@@ -187,7 +187,13 @@ Confirm the upsert actually succeeded before moving on: it should print the data
 
 ### Step 6b — Adversarial fact-check of data and metadata (mandatory — run it in the background)
 
-Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>` as a background agent once the garden step is built. Skip it only on the user's explicit request, and say so in the PR body. Scale the effort: the main indicators with a few value cross-checks each, more where the build raised red flags. The empty-entity audit doesn't apply yet (no charts).
+Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>` once the garden step is built:
+
+```bash
+.venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<version>/<short_name> --context create
+```
+
+The command prints a dossier and writes two briefs. Start both as background agents in one message, each with the prompt `Read <brief> and do what it says.`, and carry on; when both are back, settle the notes each lane left for the other and run the `assemble_report.py` command the dossier prints. Skip the review only on the user's explicit request, and say so in the PR body. Scale the effort: the main indicators with a few value cross-checks each, more where the build raised red flags. The empty-entity audit doesn't apply yet (no charts).
 
 Review all indicators when there are few. This catches the two things the Step 7 review table can't: metadata you inferred that the source's own documentation contradicts (units, definitions, scope), and values the *source itself* got wrong (unit slips, wrong-year rows) — verified against independent sources online. Fold the findings into the handoff in plain language ("I double-checked the numbers against <independent source> — X and Y match; Z looks off, here's why"), and route confirmed source errors to `<short_name>.corrections.yml` per that skill's routing table rather than editing the data inline.
 
