@@ -1188,11 +1188,13 @@ def remove_worktree(repo: Repo, worktree_path: Path) -> None:
     into the main repo's git dir in one step, which VS Code only ever sees as the worktree being gone,
     and the files are deleted from there.
 
-    Falls back to `git worktree remove` when the worktree is already gone, is locked, has changes
-    or populated submodules that would make git refuse, or can't be renamed (e.g. it is on another
-    filesystem), so git's own checks and messages still apply there.
+    Falls back to `git worktree remove` when the worktree is already gone, isn't (or is no longer)
+    this repo's registered worktree, is locked, has changes or populated submodules that would make
+    git refuse, or can't be renamed (e.g. it is on another filesystem), so git's own checks and
+    messages still apply there.
     """
-    trash_dir = Path(repo.git.rev_parse("--path-format=absolute", "--git-common-dir")) / "worktree-trash"
+    common_dir = Path(repo.git.rev_parse("--path-format=absolute", "--git-common-dir"))
+    trash_dir = common_dir / "worktree-trash"
     # Remove anything an interrupted earlier run left behind.
     if trash_dir.exists():
         shutil.rmtree(trash_dir, ignore_errors=True)
@@ -1205,6 +1207,7 @@ def remove_worktree(repo: Repo, worktree_path: Path) -> None:
             pass
     if (
         admin_dir is None
+        or not _is_registered_worktree(common_dir, worktree_path, admin_dir)
         or (admin_dir / "locked").exists()
         or worktree_blocking_changes(worktree_path)
         or _has_populated_submodules(worktree_path, admin_dir)
@@ -1222,6 +1225,22 @@ def remove_worktree(repo: Repo, worktree_path: Path) -> None:
     # Drop git's record of the worktree, whose folder is now gone. `rmtree` doesn't follow symlinks.
     repo.git.worktree("prune")
     shutil.rmtree(trash_dir, ignore_errors=True)
+
+
+def _is_registered_worktree(common_dir: Path, worktree_path: Path, admin_dir: Path) -> bool:
+    """Return True if `worktree_path` is the linked worktree that `common_dir` has registered there.
+
+    The folder's git dir must sit under `<common_dir>/worktrees/` and point back at the folder, as
+    git's own validation requires. This rules out a separate repo (or another repo's worktree) that
+    now occupies the path of a worktree deleted by hand.
+    """
+    if admin_dir.resolve().parent != (common_dir / "worktrees").resolve():
+        return False
+    try:
+        gitdir = Path((admin_dir / "gitdir").read_text().strip())
+    except OSError:
+        return False
+    return gitdir.resolve() == (worktree_path / ".git").resolve()
 
 
 def _has_populated_submodules(worktree_path: Path, admin_dir: Path) -> bool:

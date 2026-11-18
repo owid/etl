@@ -222,11 +222,18 @@ def test_remove_worktree_keeps_symlink_targets(repo_with_worktree, tmp_path):
     assert (shared / "keep.txt").read_text() == "shared"
 
 
-@pytest.mark.parametrize("setup", ["dirty", "locked", "submodule"])
+@pytest.mark.parametrize("setup", ["dirty", "locked", "submodule", "replaced"])
 def test_remove_worktree_leaves_refused_worktree_in_place(repo_with_worktree, setup):
     """Where `git worktree remove` would refuse, it is still git that decides, so nothing is renamed."""
     repo, worktree_path = repo_with_worktree
-    if setup == "dirty":
+    if setup == "replaced":
+        # The worktree was deleted by hand and a separate, clean repo now sits at its path.
+        shutil.rmtree(worktree_path)
+        other = Repo.init(worktree_path, initial_branch="master")
+        _set_identity(other)
+        _commit_file(other, "a.txt", "unrelated", "unrelated commit")
+        assert worktree_blocking_changes(worktree_path) == []
+    elif setup == "dirty":
         (worktree_path / "a.txt").write_text("uncommitted edit")
     elif setup == "locked":
         repo.git.worktree("lock", str(worktree_path))
