@@ -204,6 +204,7 @@ Review all indicators when there are few. This catches the two things the Step 7
    ```bash
    git add snapshots/<namespace>/<version>/<short_name>* etl/steps/data/*/<namespace>/<version>/<short_name>* dag/<topic>.yml  # explicit paths: another session may share this worktree
    git add etl/owners.py schemas/dataset-schema.json  # only if Step 5 added an owner mapping
+   git status --short  # add any other file this dataset created (a helper module, a snapshot under another name)
    git commit -m "📊🤖 Add <dataset title> (<producer>)"
    git push
    ```
