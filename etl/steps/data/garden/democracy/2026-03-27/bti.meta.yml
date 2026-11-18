@@ -118,7 +118,7 @@ tables:
         description_short: |-
           Captures the extent of democratic features — political participation, rule of law, stable democratic institutions, political and social integration, and a capable state. It ranges from 0 to 9 (most democratic).
         description_processing: |-
-          We subtract 1 from the BTI's democracy score, so it ranges from 0 to 9 instead of 1 to 10.
+          To compare it with other sources' democracy indices, we subtract 1 from the BTI's democracy score, so it ranges from 0 to 9 instead of 1 to 10.
         unit: ""
         presentation:
           title_public: Democracy score
@@ -167,7 +167,7 @@ tables:
           Identifies the political regime of a country. It distinguishes between hard-line autocracies (0), moderate autocracies (1), highly defective democracies (2), defective democracies (3), and consolidating democracies (4).
         description_key: *regime_bti_key
         description_processing: |-
-          We give each category a number, from 0 (hard-line autocracy) to 4 (consolidating democracy), so the lowest category is 0, as in the other sources' classifications.
+          The BTI codes these categories from 1 (consolidating democracy) to 5 (hard-line autocracy). To compare them with other sources' classifications, we reverse the order and start it at 0, so the categories run from 0 (hard-line autocracy) to 4 (consolidating democracy).
         presentation:
           title_public: Political regime
           title_variant: score
