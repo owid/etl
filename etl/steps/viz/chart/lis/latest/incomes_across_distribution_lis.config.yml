@@ -67,7 +67,7 @@ dimensions:
       - slug: all
         name: All deciles
       - slug: nan
-        name: "-"
+        name: Not applicable
   - name: Income measure
     slug: welfare_type
     choices:
@@ -87,7 +87,7 @@ dimensions:
       - slug: "year"
         name: "Year"
       - slug: "nan"
-        name: ""
+        name: Not applicable
   - name: Household size adjustment
     slug: equivalence_scale
     choices:
