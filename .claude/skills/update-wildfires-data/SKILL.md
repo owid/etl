@@ -197,8 +197,7 @@ Two things always change, and only one of them is new data:
 GWIS reports 7-day bins anchored at 1 January, **labelled by their last day**: bin N ends on day
 7N of the year. Consequences:
 
-- **The closing weekday shifts every year.** 2026 bins close on Wednesdays, 2027 bins on
-  Thursdays. Never hardcode a weekday, and re-derive it when revisiting the reminder's cron.
+- **The closing weekday shifts every year**: it is the weekday of 7 January. Never hardcode a weekday, and re-derive it when revisiting the reminder's cron.
 - **`mddate` is authoritative; the API's `week` field is not** — it is offset by one from the ISO
   week (its week 30 carries `mddate` 20260729, which falls in ISO week 31).
 - **All 52 bins are always returned**, with nulls for those that have not closed. A row existing
@@ -221,8 +220,7 @@ to move.
 
 So the newest point on every wildfire chart is an undercount of roughly 5-10% until a later
 update fills it in. **Never quote the latest week as a finished number** in an announcement, a
-footnote, or a reply to a journalist: this is precisely the mechanism behind leading-edge
-readings of a record-quiet fire season.
+footnote, or a reply to a journalist, and don't call a season unusually quiet on the strength of it.
 
 Waiting longer trades staleness for accuracy but never removes the effect. A closed bin is in the
 API within 2 days; there is no

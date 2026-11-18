@@ -1,11 +1,9 @@
 ---
 name: create-etl-steps
-description: Create vanilla meadow, garden, and grapher ETL step files by invoking the wizard's cookiecutter templates, given a snapshot path.
-triggers:
-  - create etl steps
-  - create meadow garden grapher
-  - create pipeline steps
-  - scaffold etl steps
+description: >-
+  Scaffold vanilla meadow, garden and grapher step files and their DAG entries for a snapshot that
+  already exists, using the wizard's cookiecutter templates. Use when only the scaffold is wanted;
+  /create-dataset calls it when building a whole new dataset.
 metadata:
   internal: true
   owner: antea04
