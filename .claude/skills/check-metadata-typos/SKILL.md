@@ -223,7 +223,7 @@ rm -f /tmp/archived_files.txt /tmp/all_meta_files.txt /tmp/active_meta_files.txt
       /tmp/all_step_files.txt /tmp/all_snapshot_files.txt /tmp/codespell_targets.txt
 ```
 
-The run leaves only the fixed metadata files and, if it was missing, `.codespell-ignore.txt`; analysis stays in the session, not in new files in the repo.
+The run leaves only the fixed metadata files; analysis stays in the session, not in new files in the repo.
 
 ---
 

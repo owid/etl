@@ -8,8 +8,9 @@ description: >-
   on) plus the featured metrics pointing at it, preflights every validation the endpoint
   performs — including site redirects that would block it — and covers retiring the
   explorer's ETL step afterwards.
-  Use when an explorer is being retired in favor of MDIMs and its views need mapping or
-  redirecting to MDIM views, or when someone needs to review or sign off such a mapping.
+  Use when an explorer is being retired in favor of MDIMs that already exist and its views need
+  mapping or redirecting to theirs, or when someone needs to review or sign off such a mapping.
+  To build the replacement MDIM from an ETL explorer, use migrate-explorer-to-chart.
 metadata:
   internal: true
   owner: paarriagadap

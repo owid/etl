@@ -7,7 +7,7 @@ description: >-
   this changes or goes away", and distinguishes surfaces a URL redirect fixes from
   surfaces that render the object themselves. Read-only, pure SQL. Use when someone
   asks where an object is linked, embedded or shown, or what a change to it or its
-  retirement would break, or when another skill needs the surface sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
+  retirement would break (its blast radius), or when another skill needs the surface sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
   update-dataset).
 metadata:
   internal: true
