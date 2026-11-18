@@ -71,10 +71,12 @@ def run() -> None:
         # dimensions=DIMENSIONS_CONFIG,
     )
 
-    # Show the equivalence scale (a checkbox in the explorer) and the period (radio buttons) as toggle buttons.
+    # Show the equivalence scale (a checkbox in the explorer) as toggle buttons, and the period as a dropdown.
     for dimension in c.dimensions:
-        if dimension.slug in ["equivalence_scale", "period"]:
+        if dimension.slug == "equivalence_scale":
             dimension.presentation = DimensionPresentation(type="toggle-buttons")
+        elif dimension.slug == "period":
+            dimension.presentation = DimensionPresentation(type="dropdown")
 
     # Add After tax vs. Before tax dimension
     c.group_views(
