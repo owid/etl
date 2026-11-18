@@ -5,11 +5,9 @@ description: >-
   library image — articles (links vs embeds), explorers, narrative charts, data
   insights, static viz, key-chart slots, MDIM views, data-page FAQs. Answers "what breaks or goes stale if
   this changes or goes away", and distinguishes surfaces a URL redirect fixes from
-  surfaces that render the object themselves. Read-only, pure SQL. Trigger when the
-  user asks "what references this chart/indicator", "where is this chart embedded",
-  "what's the blast radius of this change", "which articles link to X", "what do I
-  have to update if I retire this chart", "which pages show this image", or when another skill needs the surface
-  sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
+  surfaces that render the object themselves. Read-only, pure SQL. Use when someone
+  asks where an object is linked, embedded or shown, or what a change to it or its
+  retirement would break, or when another skill needs the surface sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
   update-dataset).
 metadata:
   internal: true
@@ -149,8 +147,7 @@ Matching is on **pathname alone**, deliberately: for an MDIM or explorer the row
 whose params no longer name a live view. The params travel in `query_string` instead. One object
 can hold several rows; the key is `(url, parentTagId, incomeGroup)`.
 
-WordPress (`posts` / `posts_links`) is **not** swept, and adding it back would be a
-regression. Every published post there that links a chart 404s on the live site, and none
+WordPress (`posts` / `posts_links`) is **not** swept: every published post there that links a chart 404s on the live site, and none
 of those slugs exists as a published gdoc — they are a dead mirror, not migrated content.
 
 **Indicator subjects**: charts (`chart_dimensions`), MDIM views

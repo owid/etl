@@ -15,8 +15,8 @@ Check metadata files for spelling typos using comprehensive spell checking.
 Ask the user which scope they want to check:
 
 1. **Current step only** - Ask the user to specify the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
-2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/{garden,meadow,grapher}/` (automatically excludes ~3,570 archived steps)
-3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/` (~7,915 files)
+2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/{garden,meadow,grapher}/` (archived steps excluded)
+3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/`
 4. **All metadata** - Check both ETL steps and snapshot metadata files
 
 ---
@@ -43,9 +43,7 @@ If codespell is not installed and `uv add --dev codespell` fails, tell the user 
 
 **IMPORTANT:** Do not check archived steps and snapshots as they are no longer in use.
 
-Archived steps and snapshots are defined in `dag/archive/*.yml` files:
-- ~3,570 deprecated steps (garden, meadow, grapher)
-- ~736 deprecated snapshots
+Archived steps and snapshots are listed in `dag/archive/*.yml`.
 
 To exclude them, extract their paths and create a list of active files:
 
@@ -218,26 +216,14 @@ Should return 0 results. If the user chose to review typos one by one and delibe
 
 ### 7. Clean up
 
-**IMPORTANT:** Delete any temporary files created during the check:
+Delete the temporary lists:
 
 ```bash
 rm -f /tmp/archived_files.txt /tmp/all_meta_files.txt /tmp/active_meta_files.txt \
-      /tmp/all_step_files.txt /tmp/active_step_files.txt \
-      /tmp/all_snapshot_files.txt /tmp/active_snapshot_files.txt \
-      /tmp/codespell_output.txt
+      /tmp/all_step_files.txt /tmp/all_snapshot_files.txt /tmp/codespell_targets.txt
+```
 
-The only persistent files should be:
-
-- The `.codespell-ignore.txt` whitelist (if it doesn't exist, create it)
-- Modified `.meta.yml` files (if fixes were applied)
-
-**Do NOT create new persistent files in the repo like:**
-
-- ❌ `TYPO_CHECK_REPORT.md`
-- ❌ `scripts/analyze_typos.py`
-- ❌ `scripts/advanced_spell_checker.py`
-
-All analysis logic should be embedded in this command execution, not saved as separate files.
+The run leaves only the fixed metadata files and, if it was missing, `.codespell-ignore.txt`; analysis stays in the session, not in new files in the repo.
 
 ---
 

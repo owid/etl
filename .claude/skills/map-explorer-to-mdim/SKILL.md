@@ -8,11 +8,8 @@ description: >-
   on) plus the featured metrics pointing at it, preflights every validation the endpoint
   performs — including site redirects that would block it — and covers retiring the
   explorer's ETL step afterwards.
-  Trigger when the user says "map explorer <slug> to mdim(s) <...>", "suggest
-  explorer->MDIM redirects", "we're sunsetting the <slug> explorer, map its views to
-  the new multidims", "redirect these explorers to MDIMs", "review the explorer->MDIM
-  mapping", "build a review tool for the <slug> migration", "make a side-by-side HTML so
-  <reviewer> can sign off", or similar.
+  Use when an explorer is being retired in favor of MDIMs and its views need mapping or
+  redirecting to MDIM views, or when someone needs to review or sign off such a mapping.
 metadata:
   internal: true
   owner: paarriagadap

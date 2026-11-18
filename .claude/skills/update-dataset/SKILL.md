@@ -142,7 +142,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       ```
       It lists every step of the chain (including older-version upstream steps and same-version siblings such as extra snapshots or helper gardens), each step's files, the inputs from outside the chain, the direct consumers (other data steps, `viz://` charts/MDims/explorers, `export://`; readers of a shared sibling such as a common snapshot are listed apart, as they don't consume this dataset), the garden `owners`, the commit that created the garden step (= the last update), and the previous version (archived, or still active mid-update). It also warns when a newer version is already active, which means you have the wrong `old_version`.
    2. Skim the step scripts: the docstrings, `run()`, and the helper names are usually enough. Don't read every line of a 1,000-line garden.
-   3. Tell the user in **about 5–8 lines**, no more:
+   3. Tell the user briefly:
       - the chain in one line (`snapshot (xlsx) → meadow → garden (+ income_groups_aggregations) → grapher`), plus the number of snapshots if there's more than one;
       - what each non-trivial step does, in plain words ("meadow reshapes wide → long; garden harmonizes countries, adds population-weighted regional aggregates and per-capita columns");
       - key external inputs (population, regions, income groups, other datasets) and who consumes the output (counted by type; name the `viz://` ones). The script only sees DAG steps, so when it lists none, say that admin-built charts still read the grapher dataset directly — don't let "no consumers" read as "unused";
@@ -679,7 +679,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      Don't filter to published charts — drafts count too: the upgrader remaps them as well, a draft left on ghost variables can be published later with stale data, and its variable references block archiving the old version exactly like a published chart's.
      **Scope the predicate to the namespace, and escape literal underscores in every substituted component — the namespace as well as the short name** (`LIKE 'worldbank\_wdi/%/fertility\_rate'`) — short names recur across namespaces (`fertility_rate` exists under both `demography` and `gapminder`), a suffix-only `LIKE '%<short_name>'` sweeps unrelated datasets into the results, and an unescaped `_` is a single-character wildcard in MySQL `LIKE`, so it can quietly match a similarly named dataset or namespace too; since the follow-on mapping pairs variables by `shortName` alone, either slip would redirect another dataset's charts onto your new variables. Anything on an older version is remappable the same way (one `WizardDB.add_variable_mapping` per old dataset id, paired by `shortName`). This matters beyond tidiness: the flagship chart for the very indicator an update exists to fix can be sitting on a version from months earlier and receive none of the new data. Whatever remains after the sweep is charts whose indicators have no `shortName` twin in the new version — which means **renamed or retired**, not automatically retired: a rename in an earlier cycle breaks the twin too, so first check the unpaired new-version shortNames and the producer's release notes for a successor, and map any true rename by hand (same `WizardDB.add_variable_mapping` mechanics, paired semantically instead of by `shortName`). Only the genuinely retired ones need a replace-or-retire decision and are the reason those old versions can't be archived.
    - **Set `GRAPHER_USER_ID` alongside `STAGING`.** `cli_upgrade_indicators(dry_run=False)` asserts on it (`AssertionError: GRAPHER_USER_ID is not set!`) only *after* computing the whole mapping and listing the affected charts, so a missing value fails late and looks like a mapping bug. The value is the human's own grapher user id — the repo's main `.env` has it; `SELECT id, fullName FROM users` confirms which is theirs (other `.env.*` files may carry a colleague's).
-   - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging:
+   - After the upgrader finishes, verify it worked by querying staging:
      ```bash
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
@@ -1286,7 +1286,7 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 
 ### Common issues when data structure changes
 
-- SILENT FAILURES WARNING: Never return empty tables or comment code as workarounds — fix the parsing/transformations instead!
+- Don't return empty tables or comment out code as a workaround: it hides the breakage. Fix the parsing or transformation instead.
 - Column name changes: If columns are renamed/split (e.g., single cost → local currency + PPP), update:
   - Python code references in the garden step
   - Garden metadata YAML (e.g., `food_prices_for_nutrition.meta.yml`)
