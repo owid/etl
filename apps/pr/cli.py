@@ -1165,7 +1165,7 @@ def clean_branch(
         # Backstop only: dirty worktrees were already skipped above, but the removal can still fail
         # (e.g. changes made between the check and now, or a submodule in the worktree).
         try:
-            repo.git.worktree("remove", str(worktree_path))
+            remove_worktree(repo, worktree_path)
             log.info(f"Removed worktree '{worktree_path}'.")
         except GitCommandError as e:
             log.warning(f"Could not remove worktree '{worktree_path}'. Leaving branch '{branch}' in place.\n{e}")
@@ -1176,3 +1176,44 @@ def clean_branch(
         log.info(f"Deleted local branch '{branch}'.")
     except GitCommandError as e:
         log.warning(f"Could not delete branch '{branch}':\n{e}")
+
+
+def remove_worktree(repo: Repo, worktree_path: Path) -> None:
+    """Remove a worktree in a way that VS Code's Source Control view copes with.
+
+    `git worktree remove` deletes the files one by one. With `git.detectWorktrees` on, VS Code opens
+    each worktree as a repository of its own, and when several worktrees are removed in a row it
+    refreshes the next one while it is half deleted. It then lists every tracked file as deleted and
+    keeps showing that count until the Source Control view is opened. So the folder is first renamed
+    into the main repo's git dir in one step, which VS Code only ever sees as the worktree being gone,
+    and the files are deleted from there.
+
+    Falls back to `git worktree remove` when the worktree is already gone, is locked, has changes
+    that would make git refuse, or can't be renamed (e.g. it is on another filesystem), so git's own
+    checks and messages still apply there.
+    """
+    trash_dir = Path(repo.git.rev_parse("--path-format=absolute", "--git-common-dir")) / "worktree-trash"
+    # Remove anything an interrupted earlier run left behind.
+    if trash_dir.exists():
+        shutil.rmtree(trash_dir, ignore_errors=True)
+
+    admin_dir = None
+    if worktree_path.exists():
+        try:
+            admin_dir = Path(Repo(worktree_path).git.rev_parse("--absolute-git-dir"))
+        except (InvalidGitRepositoryError, NoSuchPathError, GitCommandError):
+            pass
+    if admin_dir is None or (admin_dir / "locked").exists() or worktree_blocking_changes(worktree_path):
+        repo.git.worktree("remove", str(worktree_path))
+        return
+
+    trash_dir.mkdir()
+    try:
+        worktree_path.rename(trash_dir / worktree_path.name)
+    except OSError:
+        trash_dir.rmdir()
+        repo.git.worktree("remove", str(worktree_path))
+        return
+    # Drop git's record of the worktree, whose folder is now gone. `rmtree` doesn't follow symlinks.
+    repo.git.worktree("prune")
+    shutil.rmtree(trash_dir, ignore_errors=True)
