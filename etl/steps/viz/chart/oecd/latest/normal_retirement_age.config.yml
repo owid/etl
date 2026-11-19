@@ -31,14 +31,14 @@ definitions:
         matchingEntitiesOnly: true
         map:
           hideTimeline: true
-          # Grapher's automated equal-size brackets between 59 and 67 give one-year steps. The lowest bracket opens
-          # (60 and below), because a few countries have much lower ages (down to 47); the highest opens on its own
-          # if a country goes above 67.
+          # One-year brackets, open at both ends: "60 and below" (a few countries have much lower ages, down to 47)
+          # and "above 66". Automated brackets can't open the top, because no country is above 67, so the edges are
+          # manual. Grapher opens an end bracket from the second edge in: the first edge (59) only has to sit above
+          # the lowest value, and the last value (0.59, below the top edge) switches the top bracket on.
           colorScale:
             baseColorScheme: Purples
-            binningStrategy: equalSizeBins-normal
-            minValue: 59
-            maxValue: 67
+            binningStrategy: manual
+            customNumericValues: [59, 60, 61, 62, 63, 64, 65, 66, 0.59]
 
 # NOTE: Update the year (2024) in the subtitle of the comparison view to the new edition's.
 dimensions:
