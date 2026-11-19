@@ -711,6 +711,9 @@
                   "requirement_level": "optional",
                   "guidelines": [
                     [
+                      "Start `text` with a capital letter and end it with a period, even when it is short."
+                    ],
+                    [
                       "Omit `entities` for a note on the whole indicator."
                     ],
                     [
