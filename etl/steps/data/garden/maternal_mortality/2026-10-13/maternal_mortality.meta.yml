@@ -40,12 +40,9 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-        # NOTE: Scatter plots don't show range annotations yet, so this note is missing from
-        # maternal-mortality-vs-female-labor-force-participation until they do.
+        # NOTE: Scatter plots can't show ranges yet. When they can, add time: 2003 and time_end: 2017.
         annotations:
           - entities: [United States]
-            time: 2003
-            time_end: 2017
             text: Values from 2003–2017 affected by measurement change.
         description_key:
           - "{definitions.description_maternal_mortality}"
