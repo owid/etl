@@ -366,8 +366,8 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
             if unit in UNITS_IN_RADIO_BUTTONS:
                 pass
             elif unit in UNITS_NOT_IN_RADIO_BUTTONS:
-                # We remove the unit in these cases, so they don't appear in the dropdown.
-                unit = ""
+                # These metrics have a single unit: no unit choice to make (a multidim slug can't be empty).
+                unit = "not_applicable"
             else:
                 raise ValueError(f"Unexpected unit {unit}")
             tb[column].metadata.dimensions = {
@@ -510,7 +510,12 @@ def run():
     )
 
     # Set the default view (the explorer's: maize production, in total).
-    config["default_dimensions"] = {"item": "maize", "metric": "production", "unit": "", "per_capita": "False"}
+    config["default_dimensions"] = {
+        "item": "maize",
+        "metric": "production",
+        "unit": "not_applicable",
+        "per_capita": "False",
+    }
 
     # Sort food and metric elements in the dropdown alphabetically.
     for dropdown_i in [0, 1]:
@@ -523,7 +528,7 @@ def run():
     # Views whose metric has a single unit have none, shown as "Not applicable".
     choice_names = {
         "per_capita": {"False": "Total", "True": "Per capita"},
-        "unit": {"": "Not applicable"},
+        "unit": {"not_applicable": "Not applicable"},
     }
     for dimension in config["dimensions"]:
         if dimension["slug"] in choice_names:
