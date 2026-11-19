@@ -41,7 +41,7 @@ def _initialize_semantic_search():
     global _indicators, _embeddings_model, _initialization_complete, _initialization_error
 
     try:
-        _indicators = load_indicators()
+        _indicators = [Indicator(**row) for row in load_indicators().to_dict(orient="records")]  # ty: ignore
 
         # Get embedding model.
         model = get_model()

@@ -14,18 +14,18 @@ from pathlib import Path
 
 import click
 import pandas as pd
-import requests
 import structlog
 from owid.catalog import s3_utils
 
-from apps.wizard.app_pages.indicator_search.data import Indicator
 from etl import config
 from etl.db import read_sql
+from etl.http import session as http_session
 
 log = structlog.get_logger()
 
-S3_URL = "s3://owid-public/search_indicators.parquet"
-PUBLIC_URL = "https://files.ourworldindata.org/search_indicators.parquet"
+KEY = "search_indicators.parquet"
+S3_URL = f"s3://owid-public/{KEY}"
+PUBLIC_URL = f"https://files.ourworldindata.org/{KEY}"
 
 # Everything in it comes from tables in the public metadata export (owid-grapher's db/exportMetadataTables.ts).
 QUERY = """
@@ -55,14 +55,16 @@ def indicators_from_db() -> pd.DataFrame:
 
 
 def indicators_from_url(url: str) -> pd.DataFrame:
-    response = requests.get(url, timeout=120)
+    response = http_session.get(url, timeout=120)
     response.raise_for_status()
     return pd.read_parquet(io.BytesIO(response.content))
 
 
-def load_indicators() -> list[Indicator]:
-    df = indicators_from_url(config.SEARCH_INDICATORS_URL) if config.SEARCH_INDICATORS_URL else indicators_from_db()
-    return [Indicator(**row) for row in df.to_dict(orient="records")]  # ty: ignore
+def load_indicators() -> pd.DataFrame:
+    """One row per indicator, with the fields of `apps.wizard.app_pages.indicator_search.data.Indicator`."""
+    # This module doesn't build the `Indicator`s itself: their module imports the embedding libraries, which the
+    # publishing CLI doesn't need.
+    return indicators_from_url(config.SEARCH_INDICATORS_URL) if config.SEARCH_INDICATORS_URL else indicators_from_db()
 
 
 def publish(df: pd.DataFrame) -> None:
@@ -70,7 +72,7 @@ def publish(df: pd.DataFrame) -> None:
     # every search result.
     assert not df.empty, "The query returned no indicators."
     with tempfile.TemporaryDirectory() as tmp_dir:
-        path = Path(tmp_dir) / "search_indicators.parquet"
+        path = Path(tmp_dir) / KEY
         df.to_parquet(path, index=False)
         s3_utils.upload(S3_URL, path, public=True, content_type="application/vnd.apache.parquet")
     log.info("search_indicators.published", url=PUBLIC_URL, indicators=len(df))
@@ -79,6 +81,10 @@ def publish(df: pd.DataFrame) -> None:
 @click.command()
 def main() -> None:
     """Publish the indicators from the database to R2, where production search reads them."""
+    # There is one published copy and production search reads it, so a copy of a local or staging database would
+    # replace production's list until the next deploy.
+    if config.DATA_API_ENV != "production":
+        raise click.ClickException(f"Only production publishes this copy, and DATA_API_ENV is {config.DATA_API_ENV!r}.")
     publish(indicators_from_db())
 
 
