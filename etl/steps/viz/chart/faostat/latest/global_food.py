@@ -531,6 +531,9 @@ def run():
         "unit": {"not_applicable": "Not applicable"},
     }
     for dimension in config["dimensions"]:
+        # The item dropdown is long (one choice per food), so let readers search it.
+        if dimension["slug"] == "item":
+            dimension["presentation"] = {"type": "dropdown-with-search"}
         if dimension["slug"] in choice_names:
             dimension["presentation"] = {"type": "toggle-buttons"}
             for choice in dimension["choices"]:
