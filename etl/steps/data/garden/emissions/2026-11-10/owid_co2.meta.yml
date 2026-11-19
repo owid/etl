@@ -99,7 +99,7 @@ tables:
   owid_co2:
     title: CO₂ and greenhouse gas emissions dataset
     description: |-
-      On this page you can find Our World in Data's dataset on CO₂ and greenhouse gas emissions, which is behind most of our charts on this topic.
+      Our World in Data's dataset on CO₂ and greenhouse gas emissions has the data behind most of our charts on this topic.
 
       It brings together two main sources. Data on CO₂ emissions comes from the Global Carbon Project's [Global Carbon Budget](https://globalcarbonbudget.org/). Data on methane, nitrous oxide, all greenhouse gases, and each country's contribution to global warming comes from Jones et al.'s [national contributions to climate change](https://zenodo.org/records/7636699/latest).
 
