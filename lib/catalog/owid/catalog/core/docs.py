@@ -99,6 +99,7 @@ def _origin_key(origin: Origin) -> tuple[Any, ...]:
         origin_label(origin),
         origin.producer,
         origin.title or origin.title_snapshot,
+        origin.title_snapshot,
         origin.description or origin.description_snapshot,
         str(origin.date_published or ""),
         str(origin.date_accessed or ""),

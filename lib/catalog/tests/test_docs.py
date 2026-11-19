@@ -149,6 +149,15 @@ def test_sources_tell_apart_files_of_one_product_by_title_snapshot():
     assert gcb["url_download"].tolist() == ["https://example.org/fossil.csv", "https://example.org/land_use.xlsx"]
 
 
+def test_sources_keep_files_that_differ_only_in_title_snapshot():
+    annual = Origin(producer="Jones et al.", title="National contributions", title_snapshot="Annual emissions")
+    cumulative = copy.deepcopy(annual)
+    cumulative.title_snapshot = "Cumulative emissions"
+    tb = make_table()
+    tb["hydro_energy_twh"].metadata.origins = [annual, cumulative]
+    assert {"Annual emissions", "Cumulative emissions"} <= set(tb.sources["title_snapshot"])
+
+
 def test_codebook_labels_match_sources_labels():
     tb = make_table()
     labels = {label for cell in tb.codebook["source"] for label in cell.split("; ") if label}
