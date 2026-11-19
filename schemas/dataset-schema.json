@@ -714,6 +714,9 @@
                       "Start `text` with a capital letter and end it with a period, even when it is short."
                     ],
                     [
+                      "Don't repeat `time` or `time_end` in `text`: charts already show them next to the note."
+                    ],
+                    [
                       "Omit `entities` for a note on the whole indicator."
                     ],
                     [
