@@ -8,10 +8,9 @@ from etl.viz.explorer import Explorer
 
 
 def normalize_metadata_annotations(chart: Chart | Explorer) -> None:
-    """Check the annotations in chart-level and view-level metadata overrides, and write their times as years or
-    YYYY-MM-DD strings (YAML reads unquoted dates as date objects)."""
-    metadatas = [getattr(chart, "metadata", None), *(view.metadata for view in chart.views)]
-    for metadata in metadatas:
+    """Check the annotations in view-level metadata overrides, and write their times as years or YYYY-MM-DD strings
+    (YAML reads unquoted dates as date objects)."""
+    for metadata in (view.metadata for view in chart.views):
         if not metadata or not metadata.get("annotations"):
             continue
         annotations = [Annotation(**annotation) for annotation in metadata["annotations"]]
