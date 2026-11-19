@@ -90,9 +90,6 @@ definitions:
     Ill-defined diseases include symptoms, signs, abnormal results of clinical or other investigative procedures, and ill-defined conditions regarding which no diagnosis classifiable elsewhere is recorded. The proportion of deaths assigned to this category is an indicator of data quality.
     <%- endif -%>
 
-  annotation: |-
-    <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
-
   # Rendered only for the age bands we derive; see add_derived_age_groups in the garden step. The death-rate text is
   # the retired cancer dataset's, kept as it was; the count one is new (the count is derived too).
   description_processing_derived_age_group_count: |-
@@ -189,8 +186,12 @@ tables:
         display:
           name: "{definitions.display_name_deaths}"
           numDecimalPlaces: 0
-          entityAnnotationsMap: |-
-            {definitions.annotation}
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            dimensions: {cause: Maternal conditions, sex: Both sexes}
+            text: Values from 2003–2017 affected by measurement change.
         presentation:
           grapher_config:
             note: |-
@@ -222,8 +223,12 @@ tables:
         display:
           name: "{definitions.display_name_death_rate_age_standardized}"
           numDecimalPlaces: 1
-          entityAnnotationsMap: |-
-            {definitions.annotation}
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            dimensions: {cause: Maternal conditions, sex: Both sexes}
+            text: Values from 2003–2017 affected by measurement change.
         presentation:
           grapher_config:
             note: |-
@@ -239,8 +244,12 @@ tables:
         display:
           name: "{definitions.display_name_death_rate}"
           numDecimalPlaces: 1
-          entityAnnotationsMap: |-
-            {definitions.annotation}
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            dimensions: {cause: Maternal conditions, sex: Both sexes}
+            text: Values from 2003–2017 affected by measurement change.
         presentation:
           grapher_config:
             note: |-
