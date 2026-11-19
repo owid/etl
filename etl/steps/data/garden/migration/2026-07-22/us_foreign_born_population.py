@@ -345,9 +345,20 @@ def make_changes(tb_census: Table, tb_acs: Table) -> tuple[Table, Table]:
 
     # Charts built on the decade table inherit this text as their subtitle, so the years covered
     # by the current, partial decade must follow the data on every update.
+    # The value for year Y is the change from Y-1 to Y, so the current decade starts at its first
+    # year: the 2020s value is the change from 2020 to the latest year.
     last_year = int(tb_stepped["year"].max())
     decade_label = (last_year - 1) // 10 * 10
-    covers = f" The value for the {decade_label}s covers {decade_label + 1} to {last_year}."
+    covers = f" The value for the {decade_label}s is the average change from {decade_label} to {last_year}."
+    # Say how the current decade bridges any year without an estimate (no ACS 1-year data for 2020).
+    observed = sorted(int(y) for y in tb["year"])
+    for start, end in zip(observed, observed[1:]):
+        if end > decade_label and end - start > 1:
+            missing = ", ".join(str(y) for y in range(start + 1, end))
+            covers += (
+                f" There is no survey estimate for {missing}, so the change from {start} to {end} is split evenly"
+                f" over {' and '.join(str(y) for y in range(start + 1, end + 1))}."
+            )
     tb_decade["annual_change"].m.description_short = (
         "Average change per year in the number of people living in the United States who were not "
         "US citizens at birth." + covers
