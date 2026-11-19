@@ -2,11 +2,11 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate vsce-compile vsce-sync install-hooks setup.worktree
 
 include default.mk
 
-SRC = etl snapshots apps api_search tests docs owid_mcp owl_steps lib/owl/owl
+SRC = etl snapshots apps api_search tests docs owl_steps lib/owl/owl
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/catalog lib/datautils lib/owl lib/repack
 
