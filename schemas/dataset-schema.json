@@ -723,7 +723,7 @@
                       "Write times as years for yearly data, and as YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
                     ],
                     [
-                      "Must not be combined with `display.entityAnnotationsMap` on the same indicator."
+                      "Replaces `display.entityAnnotationsMap`, which is now deprecated. The two must not be combined on the same indicator."
                     ]
                   ],
                   "items": {
