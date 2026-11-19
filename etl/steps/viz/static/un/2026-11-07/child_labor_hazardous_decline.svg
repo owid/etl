@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="365.76pt" height="201.6pt" viewBox="0 0 365.76 201.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 201.6 
+L 365.76 201.6 
+L 365.76 0 
+L 0 0 
+L 0 201.6 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="bar__other-child-labor">
+    <path d="M 0 188.136 
+L 37.233054 188.136 
+L 37.233054 134.993841 
+L 0 134.993841 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+    <path d="M 54.754491 188.136 
+L 91.987545 188.136 
+L 91.987545 121.602017 
+L 54.754491 121.602017 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+    <path d="M 109.508982 188.136 
+L 146.742036 188.136 
+L 146.742036 117.350644 
+L 109.508982 117.350644 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+    <path d="M 164.263473 188.136 
+L 201.496527 188.136 
+L 201.496527 129.537913 
+L 164.263473 129.537913 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+    <path d="M 219.017964 188.136 
+L 256.251018 188.136 
+L 256.251018 132.088736 
+L 219.017964 132.088736 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+    <path d="M 273.772455 188.136 
+L 311.005509 188.136 
+L 311.005509 130.742468 
+L 273.772455 130.742468 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+    <path d="M 328.526946 188.136 
+L 365.76 188.136 
+L 365.76 128.909418 
+L 328.526946 128.909418 
+z
+" style="fill: #38aaba; fill-opacity: 0.9"/>
+   </g>
+   <g id="bar__hazardous-child-labor">
+    <path d="M 0 134.993841 
+L 37.233054 134.993841 
+L 37.233054 14.184 
+L 0 14.184 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+    <path d="M 54.754491 121.602017 
+L 91.987545 121.602017 
+L 91.987545 30.622641 
+L 54.754491 30.622641 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+    <path d="M 109.508982 117.350644 
+L 146.742036 117.350644 
+L 146.742036 35.653432 
+L 109.508982 35.653432 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+    <path d="M 164.263473 129.537913 
+L 201.496527 129.537913 
+L 201.496527 69.097564 
+L 164.263473 69.097564 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+    <path d="M 219.017964 132.088736 
+L 256.251018 132.088736 
+L 256.251018 80.717983 
+L 219.017964 80.717983 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+    <path d="M 273.772455 130.742468 
+L 311.005509 130.742468 
+L 311.005509 74.766061 
+L 273.772455 74.766061 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+    <path d="M 328.526946 128.909418 
+L 365.76 128.909418 
+L 365.76 90.664778 
+L 328.526946 90.664778 
+z
+" style="fill: #9a5129; fill-opacity: 0.9"/>
+   </g>
+   <g id="horizontal-axis__zero-line">
+    <path d="M 0 188.136 
+L 365.76 188.136 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+   </g>
+   <g id="horizontal-axis__ticks">
+    <path d="M 18.616527 188.136 
+L 18.616527 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+    <path d="M 73.371018 188.136 
+L 73.371018 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+    <path d="M 128.125509 188.136 
+L 128.125509 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+    <path d="M 182.88 188.136 
+L 182.88 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+    <path d="M 237.634491 188.136 
+L 237.634491 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+    <path d="M 292.388982 188.136 
+L 292.388982 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+    <path d="M 347.143473 188.136 
+L 347.143473 191.736 
+" style="fill: none; stroke: #999999; stroke-width: 0.72"/>
+   </g>
+   <g id="value__total-2000">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="0" y="9.3618" transform="rotate(-0 0 9.3618)">246 million</text>
+   </g>
+   <g id="horizontal-axis__2000">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="18.616527" y="200.1573" transform="rotate(-0 18.616527 200.1573)">2000</text>
+   </g>
+   <g id="value__other-2000">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="18.616527" y="163.985358" transform="rotate(-0 18.616527 163.985358)">75m</text>
+   </g>
+   <g id="value__hazardous-2000">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="18.616527" y="77.009358" transform="rotate(-0 18.616527 77.009358)">171m</text>
+   </g>
+   <g id="value__total-2004">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="73.371018" y="25.800441" transform="rotate(-0 73.371018 25.800441)">222</text>
+   </g>
+   <g id="horizontal-axis__2004">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="73.371018" y="200.1573" transform="rotate(-0 73.371018 200.1573)">2004</text>
+   </g>
+   <g id="value__other-2004">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="73.371018" y="157.289446" transform="rotate(-0 73.371018 157.289446)">94</text>
+   </g>
+   <g id="value__hazardous-2004">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="73.371018" y="78.532767" transform="rotate(-0 73.371018 78.532767)">128</text>
+   </g>
+   <g id="value__total-2008">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.125509" y="30.831232" transform="rotate(-0 128.125509 30.831232)">215</text>
+   </g>
+   <g id="horizontal-axis__2008">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="128.125509" y="200.1573" transform="rotate(-0 128.125509 200.1573)">2008</text>
+   </g>
+   <g id="value__other-2008">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="128.125509" y="155.16376" transform="rotate(-0 128.125509 155.16376)">100</text>
+   </g>
+   <g id="value__hazardous-2008">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="128.125509" y="78.922476" transform="rotate(-0 128.125509 78.922476)">115</text>
+   </g>
+   <g id="value__total-2012">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="182.88" y="64.275364" transform="rotate(-0 182.88 64.275364)">168</text>
+   </g>
+   <g id="horizontal-axis__2012">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="182.88" y="200.1573" transform="rotate(-0 182.88 200.1573)">2012</text>
+   </g>
+   <g id="value__other-2012">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="182.88" y="161.257394" transform="rotate(-0 182.88 161.257394)">83</text>
+   </g>
+   <g id="value__hazardous-2012">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="182.88" y="101.738176" transform="rotate(-0 182.88 101.738176)">85</text>
+   </g>
+   <g id="value__total-2016">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="237.634491" y="75.895783" transform="rotate(-0 237.634491 75.895783)">152</text>
+   </g>
+   <g id="horizontal-axis__2016">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="237.634491" y="200.1573" transform="rotate(-0 237.634491 200.1573)">2016</text>
+   </g>
+   <g id="value__other-2016">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="237.634491" y="162.532806" transform="rotate(-0 237.634491 162.532806)">79</text>
+   </g>
+   <g id="value__hazardous-2016">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="237.634491" y="108.823797" transform="rotate(-0 237.634491 108.823797)">73</text>
+   </g>
+   <g id="value__total-2020">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.388982" y="69.943861" transform="rotate(-0 292.388982 69.943861)">160</text>
+   </g>
+   <g id="horizontal-axis__2020">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="292.388982" y="200.1573" transform="rotate(-0 292.388982 200.1573)">2020</text>
+   </g>
+   <g id="value__other-2020">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.388982" y="161.859672" transform="rotate(-0 292.388982 161.859672)">81</text>
+   </g>
+   <g id="value__hazardous-2020">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="292.388982" y="105.174702" transform="rotate(-0 292.388982 105.174702)">79</text>
+   </g>
+   <g id="horizontal-axis__2024">
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="347.143473" y="200.1573" transform="rotate(-0 347.143473 200.1573)">2024</text>
+   </g>
+   <g id="value__other-2024">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="347.143473" y="160.943147" transform="rotate(-0 347.143473 160.943147)">84</text>
+   </g>
+   <g id="value__hazardous-2024">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="347.143473" y="112.207536" transform="rotate(-0 347.143473 112.207536)">54</text>
+   </g>
+  </g>
+ </g>
+</svg>
