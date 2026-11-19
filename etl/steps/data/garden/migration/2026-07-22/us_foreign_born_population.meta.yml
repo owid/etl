@@ -139,6 +139,7 @@ tables:
         title: Average annual change in the foreign-born population of the United States, by decade
         unit: people
         short_unit: ""
+        description_short: Average change per year in the number of people living in the United States who were not US citizens at birth.
         description_key: |-
           {definitions.change_meaning}
 
@@ -161,11 +162,12 @@ tables:
           timeInterval: decade
         presentation:
           grapher_config:
-            note: "{definitions.change_footnote}"
+            note: "{definitions.change_footnote} {current_decade_note}"
       annual_change_share_of_population:
         title: Average annual change in the foreign-born population of the United States, by decade, as a share of the total population
         unit: "%"
         short_unit: "%"
+        description_short: Average change per year in the number of people living in the United States who were not US citizens at birth, as a share of the total US population.
         description_key: |-
           {definitions.change_meaning}
 
@@ -188,7 +190,7 @@ tables:
           timeInterval: decade
         presentation:
           grapher_config:
-            note: "{definitions.change_footnote}"
+            note: "{definitions.change_footnote} {current_decade_note}"
 
   by_country_of_birth:
     variables:
