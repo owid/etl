@@ -26,7 +26,6 @@ meta:
     # Files
     url_main: https://data-explorer.oecd.org/vis?df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_PAG%40DF_PAG&df[ag]=OECD.ELS.SPD&df[vs]=1.0
     # NOTE: The 2025 report also ships each table and figure as a StatLink Excel file (e.g. Table 4.1: https://stat.link/oeavq4).
-    # Only Figure 4.3 is snapshotted (pensions_at_a_glance_tax_rates), because this dataflow lacks the workers' tax rate.
     # The dataflow is only at version 1.0 (2026-10-26).
     url_download: https://sdmx.oecd.org/public/rest/data/OECD.ELS.SPD,DSD_PAG@DF_PAG,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
     date_accessed: 2026-10-26
