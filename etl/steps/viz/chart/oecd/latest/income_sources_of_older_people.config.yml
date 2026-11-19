@@ -9,23 +9,25 @@ views:
   - dimensions: {}
     indicators:
       # Legend labels come from the indicators' display names in the garden metadata.
+      # Colors are the first four of OWID categorical E (OwidDistinctColors in owid-grapher). The two private sources,
+      # workplace pensions and capital income, take its adjacent dark copper and peach, so they share a hue.
       y:
         - catalogPath: income_sources_of_older_people#share_of_income_from_public_transfers
           display:
-            color: "#6D87B5"
+            color: "#286bbb"
         - catalogPath: income_sources_of_older_people#share_of_income_from_occupational_transfers
           display:
-            color: "#A2557C"
+            color: "#9a5129"
         - catalogPath: income_sources_of_older_people#share_of_income_from_capital
           display:
-            color: "#2C9C94"
+            color: "#e56e5a"
         - catalogPath: income_sources_of_older_people#share_of_income_from_work
           display:
-            color: "#C8A47E"
+            color: "#18470f"
     config:
       title: Where older people’s income comes from
-      subtitle: "Share of the gross income of people aged over 65 that comes from public transfers (public pensions and other government benefits), occupational pensions and transfers (private pensions and other payments through employers), capital income (personal pensions and income from savings), and work (earnings and self-employment)."
-      note: Incomes are measured for the whole household, so income from work can come from younger people living with older people. Only 14 countries report occupational pensions and transfers separately; in the others, they show as 0%.
+      subtitle: "Share of the income of people aged over 65 that comes from each source: public transfers (public pensions and other benefits), workplace pensions (and other payments through employers), capital income (personal pensions and income from savings), and work."
+      note: Incomes are measured before taxes. They are counted for the whole household, so income from work can come from younger people living with older people. Only 14 countries report workplace pensions separately; in the others, they are counted under other sources.
       tab: chart
       hasMapTab: false
       chartTypes:

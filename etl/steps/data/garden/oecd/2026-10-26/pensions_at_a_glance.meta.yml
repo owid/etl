@@ -342,10 +342,10 @@ definitions:
   description_short_share_of_income_from_occupational_transfers: |-
     Share of the gross income of people aged over 65 that comes from private pensions and other payments through employers, such as severance payments.
   description_key_occupational_transfers_definition: |-
-    Occupational pensions and transfers include pensions provided through employers, severance payments, and death grants.
-  # NOTE: Update the number of countries that report occupational transfers (14).
+    Workplace pensions include pensions provided through employers, as well as severance payments and death grants. The OECD calls them “private occupational transfers”.
+  # NOTE: Update the number of countries that report workplace pensions (14).
   description_key_occupational_transfers_reporting: |-
-    The OECD notes that only 14 countries report occupational pensions and transfers separately. In the other countries, this income shows as 0%, even if older people receive it.
+    The OECD notes that only 14 countries report workplace pensions separately. In the other countries, they show as 0% here and are counted under other sources.
   description_short_share_of_income_from_capital: |-
     Share of the gross income of people aged over 65 that comes from personal pensions and the returns on their savings.
   description_key_capital_income_definition: |-
@@ -358,7 +358,7 @@ definitions:
   description_processing_income_sources: |-
     {definitions.description_processing_repeated_surveys}
 
-    The four shares the OECD publishes (public transfers, occupational pensions and transfers, capital income, and work) don’t always add up to exactly 100%. For countries, they add up to between 99.9% and 100.1%, because the OECD rounds each share to one decimal. For the OECD average in 2020, they add up to 97.4%. So we rescale them: we divide each share by the sum of the four and multiply it by 100. This changes country values by about 0.1 percentage points at most, and the OECD average for 2020 by up to 1.5 points: public transfers, for example, go from 55.8% to 57.3%.
+    The four shares the OECD publishes (public transfers, workplace pensions, capital income, and work) don’t always add up to exactly 100%. For countries, they add up to between 99.9% and 100.1%, because the OECD rounds each share to one decimal. For the OECD average in 2020, they add up to 97.4%. So we rescale them: we divide each share by the sum of the four and multiply it by 100. This changes country values by about 0.1 percentage points at most, and the OECD average for 2020 by up to 1.5 points: public transfers, for example, go from 55.8% to 57.3%.
 
   #
   # Text for the indicators in the pension_expenditure table.
@@ -909,7 +909,7 @@ tables:
           title_public: Share of older people’s income from public transfers
 
       share_of_income_from_occupational_transfers:
-        title: Share of older people’s income from occupational pensions and transfers
+        title: Share of older people’s income from workplace pensions
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -926,11 +926,11 @@ tables:
           {definitions.description_key_equivalization}
         description_processing: "{definitions.description_processing_income_sources}"
         display:
-          name: Occupational pensions and transfers
+          name: Workplace pensions
           numDecimalPlaces: 1
           tolerance: 2
         presentation:
-          title_public: Share of older people’s income from occupational pensions and transfers
+          title_public: Share of older people’s income from workplace pensions
 
       share_of_income_from_capital:
         title: Share of older people’s income from capital
