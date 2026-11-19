@@ -13,7 +13,6 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age_and_survivors__programme_type_total
           display:
             name: Public spending on pensions
-            color: "#6D87B5"
             tolerance: 2
     config:
       title: Public spending on pensions as a share of GDP

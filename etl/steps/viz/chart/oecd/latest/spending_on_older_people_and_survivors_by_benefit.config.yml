@@ -67,6 +67,9 @@ dimensions:
       - slug: cash_and_in_kind
         name: Cash and in kind
 
+# Each benefit has a fixed OWID color (OwidDistinctColors in owid-grapher): blues for cash benefits for older people,
+# teals for services for older people, purples for cash benefits for survivors, and the adjacent dark copper and
+# peach of OWID categorical E for services for survivors.
 views:
   - dimensions:
       source: public
@@ -77,17 +80,17 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
     config:
       title: Public spending on cash benefits for older people as a share of GDP, by type of benefit
@@ -101,12 +104,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
     config:
       title: Public spending on services for older people as a share of GDP, by type of benefit
@@ -120,27 +123,27 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
     config:
       title: Public spending on older people as a share of GDP, by type of benefit
@@ -154,12 +157,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
     config:
       title: Public spending on cash benefits for survivors as a share of GDP, by type of benefit
@@ -173,12 +176,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public spending on services for survivors as a share of GDP, by type of benefit
@@ -192,22 +195,22 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public spending on survivors as a share of GDP, by type of benefit
@@ -221,27 +224,27 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
     config:
       title: Public spending on cash benefits for older people and survivors as a share of GDP, by type of benefit
@@ -255,22 +258,22 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public spending on services for older people and survivors as a share of GDP, by type of benefit
@@ -284,47 +287,47 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public spending on older people and survivors as a share of GDP, by type of benefit
@@ -338,17 +341,17 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
     config:
       title: Mandatory private spending on cash benefits for older people as a share of GDP, by type of benefit
@@ -362,12 +365,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
     config:
       title: Mandatory private spending on services for older people as a share of GDP, by type of benefit
@@ -381,27 +384,27 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
     config:
       title: Mandatory private spending on older people as a share of GDP, by type of benefit
@@ -415,12 +418,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
     config:
       title: Mandatory private spending on cash benefits for survivors as a share of GDP, by type of benefit
@@ -434,12 +437,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Mandatory private spending on services for survivors as a share of GDP, by type of benefit
@@ -453,22 +456,22 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Mandatory private spending on survivors as a share of GDP, by type of benefit
@@ -482,27 +485,27 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
     config:
       title: Mandatory private spending on cash benefits for older people and survivors as a share of GDP, by type of benefit
@@ -516,22 +519,22 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Mandatory private spending on services for older people and survivors as a share of GDP, by type of benefit
@@ -545,47 +548,47 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Mandatory private spending on older people and survivors as a share of GDP, by type of benefit
@@ -599,17 +602,17 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
     config:
       title: Public and mandatory private spending on cash benefits for older people as a share of GDP, by type of benefit
@@ -623,12 +626,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
     config:
       title: Public and mandatory private spending on services for older people as a share of GDP, by type of benefit
@@ -642,27 +645,27 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
     config:
       title: Public and mandatory private spending on older people as a share of GDP, by type of benefit
@@ -676,12 +679,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
     config:
       title: Public and mandatory private spending on cash benefits for survivors as a share of GDP, by type of benefit
@@ -695,12 +698,12 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public and mandatory private spending on services for survivors as a share of GDP, by type of benefit
@@ -714,22 +717,22 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public and mandatory private spending on survivors as a share of GDP, by type of benefit
@@ -743,27 +746,27 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
     config:
       title: Public and mandatory private spending on cash benefits for older people and survivors as a share of GDP, by type of benefit
@@ -777,22 +780,22 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public and mandatory private spending on services for older people and survivors as a share of GDP, by type of benefit
@@ -806,47 +809,47 @@ views:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
           display:
             name: Old-age pensions
-            color: "#3E6CA8"
+            color: "#286BBB"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
           display:
             name: Early retirement pensions
-            color: "#6D87B5"
+            color: "#00295B"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for older people
-            color: "#9BB0D3"
+            color: "#4C6A9C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
           display:
             name: Care homes and help at home
-            color: "#2C9C94"
+            color: "#00847E"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
           display:
             name: Other services for older people
-            color: "#7CC3BD"
+            color: "#58AC8C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
           display:
             name: Survivors’ pensions
-            color: "#A2557C"
+            color: "#6D3E91"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
           display:
             name: Other cash benefits for survivors
-            color: "#C487A6"
+            color: "#A2559C"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
           display:
             name: Funeral expenses
-            color: "#7A3E5C"
+            color: "#9A5129"
             tolerance: 2
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
           display:
             name: Other services for survivors
-            color: "#DDB4C9"
+            color: "#E56E5A"
             tolerance: 2
     config:
       title: Public and mandatory private spending on older people and survivors as a share of GDP, by type of benefit
