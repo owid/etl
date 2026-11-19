@@ -40,11 +40,14 @@ map:
 
 ## Open-ended brackets
 
-Grapher opens the first bracket when some values lie below its lower edge, and the last bracket when some lie above its upper edge. It then draws an arrow at that end of the legend and hides the edge's number. So an open end needs no setting of its own: put the outer edge inside the range of the data (`minValue` above the lowest value, or the last manual edge below the highest). The admin tricks in the Notion guide (an upper bound below the lower one for the last bracket, a "Minimum value" for the first) work the same way.
+Grapher builds brackets from consecutive pairs of edges. It opens the first bracket when some values lie below its lower edge, and the last bracket when some lie above its upper edge. It then draws an arrow at that end of the legend, hides that outer edge's number, and puts every value beyond the inner edge into the bracket. So an open bracket starts at the second edge from that end, and the outermost edge only switches it on:
+
+- An open bottom, such as the "60 and below" above, comes from setting the lowest edge (`minValue`, or the first manual edge) above the lowest value. The bracket then holds everything up to the second edge.
+- An open top in a manual scale needs one extra value after the edge you want as the threshold, and that value must be below it. Edges `[0, 50, …, 300, 350]` with data above 350 give an open "300 and above", not "350 and above". Append a value below 350, such as a hundredth of the first edge above 0, to get "350 and above" whatever the data. This is the Notion guide's admin trick (an upper bound below the lower one for the last bracket); `_open_top_sentinel` in `etl/steps/viz/chart/energy/latest/energy_mix.py` does it in code.
 
 ## Manual brackets
 
-Use `binningStrategy: manual` only for real-world thresholds, or when no automated strategy gives a regular scale. `customNumericValues` lists every edge, lowest first, and the edges still follow one of the patterns above:
+Use `binningStrategy: manual` only for real-world thresholds, or when no automated strategy gives a regular scale. `customNumericValues` lists every edge, lowest first (plus the extra value for an open top, see above), and the edges still follow one of the patterns above:
 
 ```yaml
 map:
