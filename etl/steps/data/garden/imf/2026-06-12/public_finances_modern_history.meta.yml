@@ -34,7 +34,7 @@ tables:
         annotations:
           - entities: [France]
             time: 1978
-            text: Break in 1978 is due to changes in series definition.
+            text: Break due to changes in series definition.
 
       expenditure:
         title: Government expenditure (% of GDP)
@@ -48,7 +48,7 @@ tables:
         annotations:
           - entities: [France]
             time: 1978
-            text: Break in 1978 is due to changes in series definition.
+            text: Break due to changes in series definition.
 
       interest_expense:
         title: Government interest expense (% of GDP)
@@ -62,7 +62,7 @@ tables:
         annotations:
           - entities: [France]
             time: 1978
-            text: Break in 1978 is due to changes in series definition.
+            text: Break due to changes in series definition.
 
       primary_expenditure:
         title: Government primary expenditure (% of GDP)
@@ -76,7 +76,7 @@ tables:
         annotations:
           - entities: [France]
             time: 1978
-            text: Break in 1978 is due to changes in series definition.
+            text: Break due to changes in series definition.
 
       primary_balance:
         title: Government primary balance (% of GDP)

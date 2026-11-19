@@ -44,7 +44,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values from 2003–2017 affected by measurement change.
+            text: Values affected by a change in measurement.
         description_key:
           - "{definitions.description_maternal_mortality}"
 
@@ -60,7 +60,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values from 2003–2017 affected by measurement change.
+            text: Values affected by a change in measurement.
         description_key:
           - "{definitions.description_maternal_mortality}"
       maternal_deaths:
@@ -76,7 +76,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values from 2003–2017 affected by measurement change.
+            text: Values affected by a change in measurement.
       live_births:
         title: Live births
         description_short: Estimated number of births from birth certificates, large-scale surveys and statistical modeling.

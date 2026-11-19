@@ -67,7 +67,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values from 2003–2017 affected by measurement change.
+            text: Values affected by a change in measurement.
         description_from_producer: |-
           {definitions.description_methodology}
 
@@ -83,7 +83,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values from 2003–2017 affected by measurement change.
+            text: Values affected by a change in measurement.
 
         description_from_producer: |-
           {definitions.description_methodology}
@@ -162,7 +162,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values from 2003–2017 affected by measurement change.
+            text: Values affected by a change in measurement.
         description_from_producer: |-
           {definitions.description_methodology}
 
