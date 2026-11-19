@@ -65,15 +65,10 @@ def _yield_wide_table(
 
     # Check annotation scopes before any variable is yielded and upserted
     for column in table.columns:
-        if column in dim_names or not any(a.dimensions for a in table[column].m.annotations):
+        if column in dim_names:
             continue
-        if dim_names:
-            counts = table.groupby(dim_names, observed=True, dropna=False)[column].count()
-            combos = [c if isinstance(c, tuple) else (c,) for c in counts[counts > 0].index]
-        else:
-            combos = [()] if table[column].notna().any() else []
-        dim_dicts = [_create_dim_dict(dim_names, list(combo)) for combo in combos]
-        _check_annotation_scopes_match(column, table[column].m.annotations, dim_names, dim_dicts)
+        for annotation in table[column].m.annotations:
+            _check_annotation_dimension_names(annotation, dim_names, column)
 
     if dim_names:
         # `dropna=False` makes sure we don't drop NaN values from index
@@ -192,22 +187,6 @@ def _check_annotation_dimension_names(annotation: catalog.Annotation, dim_names:
         )
 
 
-def _check_annotation_scopes_match(
-    column: str, annotations: list[catalog.Annotation], dim_names: list[str], dim_dicts: list[dict[str, Any]]
-) -> None:
-    """Check that each scoped annotation matches some combination of dimensions with data, so a typo in a dimension
-    value fails instead of silently dropping the annotation."""
-    for annotation in annotations:
-        if not annotation.dimensions:
-            continue
-        _check_annotation_dimension_names(annotation, dim_names, column)
-        if not any(_annotation_in_scope(annotation, dim_dict) for dim_dict in dim_dicts):
-            raise ValueError(
-                f"Annotation of column '{column}' is scoped to dimensions {annotation.dimensions}, "
-                f"which match no data: {annotation.text!r}"
-            )
-
-
 def _annotations_for_dimensions(
     annotations: list[catalog.Annotation], dim_dict: dict[str, Any], dim_names: list[str], column: str
 ) -> list[catalog.Annotation]:
@@ -262,10 +241,6 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
 
         # Create metadata for the column from dimensions
         metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column, dim_names))
-
-    for column in dict.fromkeys(dims[0] for dims in wide_tb.columns):
-        dim_dicts = [_create_dim_dict(dim_names, dims[1:]) for dims in wide_tb.columns if dims[0] == column]
-        _check_annotation_scopes_match(column, long_tb[column].m.annotations, dim_names, dim_dicts)
 
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names

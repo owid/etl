@@ -293,14 +293,17 @@ def test_long_to_wide_keeps_annotations_of_matching_dimensions():
     assert wide["deaths__cause_b"].m.annotations == [Annotation(text="Cause B.")]
 
 
-@pytest.mark.parametrize(
-    "dimensions, error",
-    [({"sex": "female"}, "which the table does not have"), ({"cause": "C"}, "which match no data")],
-)
-def test_long_to_wide_rejects_annotations_scoped_to_missing_dimensions(dimensions, error):
-    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions=dimensions)])
-    with pytest.raises(ValueError, match=error):
+def test_long_to_wide_rejects_annotations_scoped_to_unknown_dimensions():
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions={"sex": "female"})])
+    with pytest.raises(ValueError, match="which the table does not have"):
         gh.long_to_wide(tb)
+
+
+def test_long_to_wide_drops_annotations_that_match_no_data():
+    # Tables that share metadata may not all have the dimension values an annotation is scoped to
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions={"cause": "C"})])
+    wide = gh.long_to_wide(tb)
+    assert all(not wide[col].m.annotations for col in wide.columns)
 
 
 def test_yield_wide_table_keeps_annotations_of_matching_dimensions():
@@ -310,17 +313,19 @@ def test_yield_wide_table_keeps_annotations_of_matching_dimensions():
     assert annotations == {"deaths__cause_a": [Annotation(text="Only cause A.")], "deaths__cause_b": []}
 
 
-@pytest.mark.parametrize(
-    "dimensions, error",
-    [({"sex": "female"}, "which the table does not have"), ({"cause": "C"}, "which match no data")],
-)
-def test_yield_wide_table_rejects_annotations_scoped_to_missing_dimensions(dimensions, error):
-    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions=dimensions)])
+def test_yield_wide_table_rejects_annotations_scoped_to_unknown_dimensions():
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions={"sex": "female"})])
     tb = tb.reset_index().rename(columns={"country": "entityId"}).set_index(["entityId", "year", "cause"])
     tables = gh._yield_wide_table(tb)
     # Fails before yielding any variable
-    with pytest.raises(ValueError, match=error):
+    with pytest.raises(ValueError, match="which the table does not have"):
         next(tables)
+
+
+def test_yield_wide_table_drops_annotations_that_match_no_data():
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions={"cause": "C"})])
+    tb = tb.reset_index().rename(columns={"country": "entityId"}).set_index(["entityId", "year", "cause"])
+    assert all(not t.iloc[:, 0].m.annotations for t in gh._yield_wide_table(tb))
 
 
 def _annotated_table(annotation: Annotation, display: dict | None = None) -> Table:
