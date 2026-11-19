@@ -164,3 +164,12 @@
   reason: >-
     The shares of government spending in this year imply total government spending of 39.9% of GDP, against
     27.4% in the OECD's national accounts and 26.5% the year before, so the denominator looks wrong.
+# SOCX's OECD average for 2004 includes Japan's wrong shares of that year. For public cash spending on old age and
+# survivors, it is 18.0% of government spending, against 16.1% for the average of the members we keep, while the
+# two differ by about 0.2 points in 2003 and 2005.
+- <<: *government_spending
+  entity: OECD countries
+  years: [2004]
+  reason: >-
+    The OECD average of the shares of government spending in this year includes Japan's wrong values, which
+    raise it by about 2 points.

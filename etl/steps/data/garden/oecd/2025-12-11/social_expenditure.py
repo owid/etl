@@ -41,10 +41,12 @@ EXPECTED_EXPENDITURE_SOURCES = {
 # which the .corrections.yml file removes. Japan 2004 and the United Kingdom 1989 are far from the next year (34.9%
 # and 38.9%); Japan 2022 and Mexico 2020 and 2023 are far from the OECD's national accounts (43.3%, 29.3% and
 # 27.4%, as published in Government at a Glance). For the other country-years compared, the two agree within
-# about 3 points.
+# about 3 points. The OECD average for 2004 includes Japan's wrong values, which lower its implied government
+# spending to 38.8% (41.5% in 2003, 41.0% in 2005).
 # NOTE: Check on every update whether SOCX still publishes these values, and compare again with the national accounts.
 GOVERNMENT_SPENDING_ERRORS = {
     ("Japan", 2004): 8.8,
+    ("OECD countries", 2004): 38.8,
     ("Japan", 2022): 32.1,
     ("Mexico", 2020): 45.1,
     ("Mexico", 2023): 39.9,

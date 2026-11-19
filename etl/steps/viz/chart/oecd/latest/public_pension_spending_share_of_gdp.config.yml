@@ -17,8 +17,8 @@ views:
             tolerance: 2
     config:
       title: Public spending on pensions as a share of GDP
-      subtitle: Spending on pensions and other cash benefits for older people and survivors as a share of [gross domestic product (GDP)](#dod:gdp).
-      note: Private pensions (whether mandatory or voluntary) are not included.
+      subtitle: Government spending on pensions and other cash benefits for older people and for survivors, such as widows and widowers, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Private pensions and services such as care are not included.
+      note: Government includes central, state, and local governments and social security funds. Spending is measured before any taxes that pensioners might pay back on their pensions.
       tab: chart
       hasMapTab: true
       chartTypes:
