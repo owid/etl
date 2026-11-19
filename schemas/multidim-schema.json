@@ -419,6 +419,51 @@
                 "type": "string"
             }
         },
+        "presentation": {
+            "type": "object",
+            "title": "Page presentation",
+            "description": "Optional settings for the kind of page a multidim is shown as. Without it, the multidim is a plain data page.",
+            "requirement_level": "optional, multidims only",
+            "additionalProperties": false,
+            "required": [
+                "page_type",
+                "explorer_subtitle"
+            ],
+            "properties": {
+                "page_type": {
+                    "type": "string",
+                    "title": "Page type",
+                    "description": "The kind of page. `data-explorer` presents the multidim as a data explorer and lists it on the explorers page (ourworldindata.org/explorers).",
+                    "requirement_level": "required",
+                    "enum": [
+                        "data-explorer"
+                    ]
+                },
+                "explorer_subtitle": {
+                    "type": "string",
+                    "title": "Explorer subtitle",
+                    "description": "Short text shown on the multidim's card on the explorers page.",
+                    "requirement_level": "required",
+                    "minLength": 1,
+                    "guidelines": [
+                        [
+                            "Must start with a capital letter."
+                        ],
+                        [
+                            "Must end with a period."
+                        ]
+                    ]
+                }
+            },
+            "guidelines": [
+                [
+                    "Not allowed on single charts (`dimensions: []`), which aren't multidim pages."
+                ],
+                [
+                    "Grapher reads these keys in camelCase (`pageType`, `explorerSubtitle`); ETL converts them on upload."
+                ]
+            ]
+        },
         "download_package": {
             "type": "object",
             "title": "Complete-dataset download package",
@@ -569,6 +614,31 @@
                                 "Should provide helpful context for users."
                             ]
                         ]
+                    },
+                    "presentation": {
+                        "type": "object",
+                        "title": "Dimension presentation",
+                        "description": "Optional settings for how the dimension's control is shown on the page.",
+                        "requirement_level": "optional",
+                        "additionalProperties": false,
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "title": "Dimension control type",
+                                "description": "The control the dimension gets on the page: `dropdown` (a plain dropdown), `dropdown-with-search` (a dropdown with a search field in its menu) or `toggle-buttons` (a segmented group of toggle buttons). This is a recommendation, not a guarantee: toggle buttons that don't fit the controls row are shown as a dropdown. When omitted, Grapher picks a control automatically, based on how many choices the dimension has.",
+                                "requirement_level": "optional",
+                                "enum": [
+                                    "dropdown",
+                                    "dropdown-with-search",
+                                    "toggle-buttons"
+                                ],
+                                "guidelines": [
+                                    [
+                                        "Don't use `toggle-buttons` on a dimension whose choices have a `group`: the Grapher admin rejects such a config."
+                                    ]
+                                ]
+                            }
+                        }
                     },
                     "choices": {
                         "type": "array",

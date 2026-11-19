@@ -8,7 +8,7 @@ metadata:
 
 # Check Empty Entities
 
-After an indicator upgrade, a view can end up pinned to entities that have no data in the new indicators. Grapher drops those entities silently: the chart renders with series missing (a WHO-regions chart showing only `World`), or **empty** when every pin is dead. Chart-diff now flags edited charts with dead pins and the grapher step fails when an upsert removes pinned entities (`etl/grapher/entity_selection.py`), but neither covers MDim views, explorer views, narrative charts, article links, or charts whose config wasn't edited. This skill audits every surface that stores an entity selection against the entities that actually have data, and grades each finding against production so regressions and pre-existing gaps aren't conflated.
+After an indicator upgrade, a view can end up pinned to entities that have no data in the new indicators. Grapher drops those entities silently: the chart renders with series missing (a WHO-regions chart showing only `World`), or **empty** when every pin is dead. Chart Diff flags edited charts with dead pins and the grapher step fails when an upsert removes pinned entities (`etl/grapher/entity_selection.py`), but neither covers MDim views, explorer views, narrative charts, article links, or charts whose config wasn't edited. This skill audits every surface that stores an entity selection against the entities that actually have data, and grades each finding against production so regressions and pre-existing gaps aren't conflated.
 
 > **Called from:** `/update-dataset` step 7 (author side — fix regressions before merge) and `/review-data-pr` §8d (reviewer side — verify the outcome). Keep those pointers in sync with this file.
 
@@ -108,6 +108,7 @@ from etl.http import session as http_session
 env = OWIDEnv.from_staging("<branch>")
 PREFIX = env.indicators_url  # normalized container name — never hand-build staging-site-<branch>
 cache = {}
+unknown = []
 
 def entities(var_id, prefix=PREFIX):
     key = (prefix, var_id)

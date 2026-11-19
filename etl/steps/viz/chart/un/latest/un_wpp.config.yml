@@ -127,8 +127,6 @@ dimensions:
       - slug: male
         name: Male
         description: null
-    presentation:
-      type: radio
   - slug: age
     name: Age
     choices:
@@ -173,7 +171,5 @@ dimensions:
       - slug: high
         name: High
         description: Higher fertility than the medium variant
-    presentation:
-      type: radio
 
 views: []

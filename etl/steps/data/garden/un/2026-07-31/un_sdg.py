@@ -16,6 +16,15 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Indicators reported as codes, stored as text so the Swimlane chart can show them. Keys are garden table names; the
+# grapher step sets their order (ORDINAL_INDICATORS there must list the same labels).
+# NOTE: On each update, check in the UN SDG metadata that every code still means the category labeled here. The
+#   recoding fails on a code with no label, but not on a code whose meaning changed.
+CODED_INDICATORS = {
+    # 16.a.1: compliance of the national human rights institution with the Paris Principles.
+    "_16_a_1_sg_nhr_cmplnc": {0: "No status", 1: "Partially compliant", 2: "Fully compliant"},
+}
+
 
 def run(dest_dir: str) -> None:
     log.info("un_sdg.start")
@@ -72,6 +81,8 @@ def run(dest_dir: str) -> None:
         tb_garden.metadata = tb_meadow.metadata
         short_name = tb_garden.index[0][4] + "_" + tb_garden.index[0][5]
         tb_garden.metadata.short_name = underscore(short_name)
+        if tb_garden.metadata.short_name in CODED_INDICATORS:
+            tb_garden = codes_to_labels(tb_garden, CODED_INDICATORS[tb_garden.metadata.short_name])
         ds_garden.add(tb_garden)
 
     ds_garden.save()
@@ -493,3 +504,13 @@ def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
         df = pd.concat([df, df_lac], ignore_index=True)
 
     return df
+
+
+def codes_to_labels(tb: Table, labels: dict[int, str]) -> Table:
+    """Replace the codes in a coded indicator's `value` column with their labels."""
+    unknown = set(tb["value"].dropna().unique()) - set(labels)
+    assert not unknown, f"Table `{tb.metadata.short_name}` has codes without a label: {unknown}"
+    metadata = tb["value"].metadata
+    tb["value"] = tb["value"].map(labels)
+    tb["value"].metadata = metadata
+    return tb

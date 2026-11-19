@@ -75,7 +75,7 @@ definitions:
   footnote_idp: |-
     This data includes all internally displaced people, not just those who were displaced that year.
   footnote_refugees_asylum: |-
-    This data includes all refugees who live in this country, not just those who arrived that year.
+    This data includes all refugees who live in the country, not just those who arrived that year.
   footnote_asylum_asylum: |-
     This data includes all asylum seekers who live in this country, not just those who arrived or applied for asylum that year.
 
@@ -90,7 +90,7 @@ tables:
       refugees:
         title: Refugees by country of origin
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin and are in need of international protection. Refugees are those who have already been granted asylum status in the country they moved to. This includes all refugees, not just those who fled that year.
+          [Refugees](#dod:refugee) are people who fled their country of origin and are in need of international protection. They have already been granted asylum status in the country they moved to. This includes all refugees, not just those who fled that year.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         description_key:
           - "{definitions.description_key_refugee}"
@@ -100,7 +100,7 @@ tables:
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 1,000 people in their country of origin.
+          [Refugees](#dod:refugee) are people who fled their country of origin and are in need of international protection. This data is given per 1,000 people in their country of origin.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -116,7 +116,7 @@ tables:
       refugees_per_100k:
         title: Refugees by country of origin per 100,000 people
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 100,000 people in their country of origin.
+          [Refugees](#dod:refugee) are people who fled their country of origin and are in need of international protection. This data is given per 100,000 people in their country of origin.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -132,7 +132,7 @@ tables:
       asylum_seekers:
         title: Asylum seekers by country of origin
         description_short: |-
-          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in any country. This includes all asylum seekers living abroad, not just those who fled that year.
+          [Asylum seekers](#dod:asylumseeker) are people who fled their country of origin and are in need of international protection, but have not yet been granted asylum in any country. This includes all asylum seekers living abroad, not just those who fled that year.
         description_from_producer: "{definitions.description_unhcr_asylum}"
         presentation:
           grapher_config:
@@ -142,7 +142,7 @@ tables:
       asylum_seekers_per_100k:
         title: Asylum seekers by country of origin per 100,000 people
         description_short: |-
-          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in any country. This is given as the rate of asylum seekers per 100,000 people living in the origin country.
+          [Asylum seekers](#dod:asylumseeker) are people who fled their country of origin and are in need of international protection, but have not yet been granted asylum in any country. This is given as the rate of asylum seekers per 100,000 people living in the origin country.
         description_from_producer: "{definitions.description_unhcr_asylum}"
         display:
           numDecimalPlaces: 1
@@ -155,7 +155,7 @@ tables:
       idps:
         title: Internally displaced people due to conflict
         description_short: |-
-          [People](#dod:internally-displaced) who were forced to leave their homes due to armed conflict or violence.
+          [Internally displaced people](#dod:internally-displaced) are those who were forced to leave their homes due to armed conflict or violence.
         description_from_producer: "{definitions.description_unhcr_idp}"
         presentation:
           grapher_config:
@@ -163,7 +163,7 @@ tables:
       idps_per_100k:
         title: Internally displaced people due to conflict, per 100,000 people
         description_short: |-
-          [People](#dod:internally-displaced) who were forced to leave their homes due to armed conflict or violence, per 100,000 people living in that country. All displaced people are included, not just people displaced that year.
+          [Internally displaced people](#dod:internally-displaced) are those who were forced to leave their homes due to armed conflict or violence. This data is given per 100,000 people living in that country. All displaced people are included, not just people displaced that year.
         description_from_producer: "{definitions.description_unhcr_idp}"
         display:
           numDecimalPlaces: 1
@@ -174,7 +174,7 @@ tables:
       stateless:
         title: Stateless persons
         description_short: |-
-          [People](#dod:stateless) who are not considered nationals of any state. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
+          [Stateless people](#dod:stateless) are not considered nationals of any state. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
         description_from_producer: "{definitions.description_unhcr_stateless}"
       hst:
         title: People in host communities by country of origin
@@ -184,7 +184,7 @@ tables:
       ooc:
         title: Other persons of concern to UNHCR by country of origin
         description_short: |-
-          [People](#dod:unhcr-concern) who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
+          "[Others of concern](#dod:unhcr-concern)" are people who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
         description_from_producer: "{definitions.description_unhcr_ooc}"
         description_key:
           - Before 2025, UNHCR counted some groups of Afghans in Pakistan (Afghan Citizen Card holders) as others of concern. From 2025, it counts them as "other people in need of international protection", which we show separately.
@@ -210,14 +210,14 @@ tables:
       returned_idps:
         title: Returned internally displaced people
         description_short: |-
-          [People](#dod:internally-displaced) who had been forced to leave their homes within their country because of armed conflict or violence, and who returned home during that year.
+          [Internally displaced people](#dod:internally-displaced) who returned home during that year, after being forced to leave their homes within their country because of armed conflict or violence.
         description_from_producer: |-
           - {definitions.description_unhcr_idp_return}
           - {definitions.description_unhcr_idp}
       returned_idps_per_100k:
         title: Returned internally displaced people per 100,000 people
         description_short: |-
-          [People](#dod:internally-displaced) who had been forced to leave their homes within their country because of armed conflict or violence, and who returned home during that year, per 100,000 people living in that country.
+          [Internally displaced people](#dod:internally-displaced) who returned home during that year, after being forced to leave their homes within their country because of armed conflict or violence. This data is given per 100,000 people living in that country.
         description_from_producer: |-
           - {definitions.description_unhcr_idp_return}
           - {definitions.description_unhcr_idp}
@@ -233,7 +233,7 @@ tables:
       refugees:
         title: Refugees by country of asylum
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin and are in need of international protection. Refugees are those who have already been granted asylum status in the country they moved to. This includes all refugees who live in this country, not just those who arrived that year.
+          [Refugees](#dod:refugee) are people who fled their country of origin and are in need of international protection. They have already been granted asylum status in the country they moved to. This includes all refugees who live in this country, not just those who arrived that year.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         description_key:
           - "{definitions.description_key_refugee}"
@@ -243,7 +243,7 @@ tables:
       refugees_per_1000:
         title: Refugees by country of asylum per 1,000 people
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This is given per 1,000 people living in the country of asylum.
+          [Refugees](#dod:refugee) are people who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This is given per 1,000 people living in the asylum country.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -259,7 +259,7 @@ tables:
       refugees_per_100k:
         title: Refugees by country of asylum per 100,000 people
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the country of asylum.
+          [Refugees](#dod:refugee) are people who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the asylum country.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -275,12 +275,12 @@ tables:
       asylum_seekers:
         title: Asylum seekers by country they live in
         description_short: |-
-          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This includes all asylum seekers, not just those who applied for asylum that year.
+          [Asylum seekers](#dod:asylumseeker) are people who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This includes all asylum seekers, not just those who applied for asylum that year.
         description_from_producer: "{definitions.description_unhcr_asylum}"
       asylum_seekers_per_100k:
         title: Asylum seekers by country they live in per 100,000 people
         description_short: |-
-          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This data is given per 100,000 people living in the country of asylum.
+          [Asylum seekers](#dod:asylumseeker) are people who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This data is given per 100,000 people living in the asylum country.
         description_from_producer: "{definitions.description_unhcr_asylum}"
         display:
           numDecimalPlaces: 1
@@ -291,12 +291,12 @@ tables:
       stateless:
         title: Stateless people by country they live in
         description_short: |-
-          [People](#dod:stateless) who are not considered nationals of any state, by the country they live in. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
+          [Stateless people](#dod:stateless) are not considered nationals of any state. This data is given by the country they live in. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
         description_from_producer: "{definitions.description_unhcr_stateless}"
       stateless_per_100k:
         title: Stateless people by country they live in, per 100,000 people
         description_short: |-
-          [People](#dod:stateless) who are not considered nationals of any state, by the country they live in. This data is given per 100,000 inhabitants. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
+          [Stateless people](#dod:stateless) are not considered nationals of any state. This data is given by the country they live in, per 100,000 inhabitants. A person can be born stateless due to unknown parentage, discrimination against minority groups, or complex nationality laws. They can also later lose their nationality.
         description_from_producer: "{definitions.description_unhcr_stateless}"
         display:
           numDecimalPlaces: 1
@@ -309,7 +309,7 @@ tables:
       ooc:
         title: Other persons of concern to UNHCR by country they live in
         description_short: |-
-          [People](#dod:unhcr-concern) who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
+          "[Others of concern](#dod:unhcr-concern)" are people who don't fall into any of UNHCR's other groups, such as [refugees](#dod:refugee), [asylum seekers](#dod:asylumseeker), [stateless people](#dod:stateless), or [internally displaced people](#dod:internally-displaced), but whom UNHCR protects or assists for humanitarian or other special reasons.
         description_key:
           - Before 2025, UNHCR counted some groups of Afghans in Pakistan (Afghan Citizen Card holders) as others of concern. From 2025, it counts them as "other people in need of international protection", which we show separately.
         description_from_producer: "{definitions.description_unhcr_ooc}"

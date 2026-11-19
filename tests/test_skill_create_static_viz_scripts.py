@@ -87,6 +87,7 @@ def test_scaffold_renders_and_passes_the_verifier(sketch):
 
     verify = run(VERIFY, sketch, "--template", "horizontal", "--expect-gid", "line__placeholder")
     assert verify.returncode == 0, verify.stdout + verify.stderr
+    assert "warning" not in verify.stdout, "the scaffold's year axis ends as grapher's does"
     assert "frame matches horizontal" in verify.stdout
     assert "frame matches mobile" in verify.stdout, "the _mobile suffix must pick the mobile template"
     assert "font-family: 'Lato'" in (sketch / "demo.svg").read_text(), "Lato first, so Figma renders the template face"
@@ -104,6 +105,22 @@ def test_scaffold_names_every_mark(sketch):
     # A finalized sketch is a new step, and the skill asks new steps to pass the strict naming check.
     verify = run(VERIFY, sketch, "--template", "horizontal", "--require-named-marks")
     assert verify.returncode == 0, verify.stdout + verify.stderr
+
+
+def test_scaffold_draws_tick_marks_at_grapher_size(sketch):
+    """Grapher's mark is 5px x 1px in #999: 3.6pt x 0.72pt, as matplotlib takes both in points."""
+    if not (sketch / "demo.svg").is_file():
+        assert run(sketch / "sketch.py").returncode == 0
+    svg = (sketch / "demo.svg").read_text()
+    mark = re.search(r'<g id="axes__x-tick-\d+">\s*<defs>\s*<path [^>]*d="M 0 0\s+L 0 ([0-9.]+)\s*"[^>]*>', svg)
+    assert mark, "no x tick mark found in the scaffold's SVG"
+    width = re.search(r"stroke-width: ([0-9.]+)", mark.group())
+    stroke = re.search(r"stroke: (#[0-9a-f]+)", mark.group())
+    got = (float(mark.group(1)), float(width.group(1)) if width else None, stroke.group(1) if stroke else None)
+    assert got == (3.6, 0.72, "#999999"), mark.group()
+    assert re.search(r'id="axes__x-tick-label-\d+">\s*<text style="[^"]*fill: #5b5b5b', svg), (
+        "labels keep the text color"
+    )
 
 
 # --- verify_static_viz.py: named marks --------------------------------------------------------------
@@ -562,7 +579,7 @@ def test_finalize_refuses_a_rewritten_paths_line(tmp_path, sketch):
 
 def test_finalize_refuses_an_import_without_sketchpaths(tmp_path, sketch):
     repo = make_repo(tmp_path, "feature")
-    mutant = mutated(sketch, tmp_path, "TEMPLATES, SketchPaths, apply_svg_rcparams", "TEMPLATES, apply_svg_rcparams")
+    mutant = mutated(sketch, tmp_path, "    TEMPLATES,\n    SketchPaths,\n", "    TEMPLATES,\n")
     result = finalize(mutant, repo)
     assert result.returncode == 2 and "not a scaffold" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
@@ -614,3 +631,655 @@ def test_finalize_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sket
     assert result.returncode == 2 and "slug is 'demo'" in result.stderr and "'other'" in result.stderr
     assert not list((repo / "etl/steps/viz/static").iterdir()), "nothing may be written on a refusal"
     assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG
+
+
+# --- verify_static_viz.py: grapher's axes ------------------------------------------------------------
+
+
+def write_axes_frame(
+    tmp_path: Path,
+    *,
+    label_px: float = 15,
+    y_anchor: str = "end",
+    tick_marks: bool | str | None = True,
+    x_values: tuple[int, ...] = (2000, 2010, 2020),
+    x_format: str = "{}",
+    x_labels: tuple[str, ...] | None = None,
+    math: bool = False,
+    second_axes: bool = False,
+) -> Path:
+    """A 540-square SVG in points, as matplotlib writes it, with a year axis and a y axis named by name_furniture.
+
+    `tick_marks=None` omits the x-tick groups, as matplotlib does for a hidden mark (`bottom=False`), and
+    `"transparent"` writes them at zero opacity, as it does for `tick1line.set_alpha(0)`.
+    `x_format` turns each x tick value into its label text, or `x_labels` gives the texts outright.
+    `math` writes every label in matplotlib's MathText shape (see `math_label`), the y labels as
+    powers of ten. `second_axes` adds an `axes2` panel whose x axis counts (0, 50, 100) with tick marks
+    drawn.
+    """
+    from PIL import Image
+
+    stem = tmp_path / "frame_square"
+    style = f"font-size: {label_px * 0.72:.2f}px; font-family: 'Lato'; text-anchor: middle"
+    texts = x_labels or tuple(x_format.format(v) for v in x_values)
+
+    def label(text: str, anchor_style: str, anchor: str = "middle") -> str:
+        return math_label(text, label_px, anchor) if math else f'<text style="{anchor_style}">{text}</text>'
+
+    mark = (
+        '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" '
+        'style="fill-opacity: 0; stroke: #000000; stroke-opacity: 0; stroke-width: 0.8"/></g></g>'
+        if tick_marks == "transparent"
+        else '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" style="stroke: #999999"/></g></g>'
+        if tick_marks
+        else '<g id="axes__x-tick-{v}"/>'
+        if tick_marks is False
+        else ""
+    )
+    xs = "".join(
+        f'<g id="xtick_{i}">{mark.format(v=v)}<g id="axes__x-tick-label-{v}">{label(text, style)}</g></g>'
+        for i, (v, text) in enumerate(zip(x_values, texts))
+    )
+    if second_axes:
+        xs += "".join(
+            f'<g id="xtick_{i + 10}"><g id="axes2__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300"/></g></g>'
+            f'<g id="axes2__x-tick-label-{v}"><text style="{style}">{v}</text></g></g>'
+            for i, v in enumerate((0, 50, 100))
+        )
+    ystyle = style.replace("text-anchor: middle", f"text-anchor: {y_anchor}")
+    ys = "".join(
+        f'<g id="ytick_{i}"><g id="axes__y-tick-{v}"/>'
+        f'<g id="axes__y-tick-label-{v}">{label(f"10^{v}" if math else str(v), ystyle, y_anchor)}</g></g>'
+        for i, v in enumerate((0, 10, 20))
+    )
+    head = (
+        '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+        'width="388.8pt" height="388.8pt">'
+    )
+    defs = '<defs><path id="m1" d="M 0 0 L 0 5"/></defs>'
+    stem.with_suffix(".svg").write_text(f'{head}{defs}<g id="title"><text>Title</text></g>{xs}{ys}</svg>')
+    Image.new("RGB", (1620, 1620), "white").save(stem.with_suffix(".png"))
+    return stem
+
+
+def math_label(text: str, label_px: float, anchor: str = "middle") -> str:
+    """A tick label as matplotlib writes MathText: a comment, a transform group, one tspan per glyph.
+
+    It carries no text-anchor: matplotlib aligns it by moving the transform, so that its `anchor` edge
+    (start, middle or end) lands on x=40, one shared x for every label of an axis. A `^` raises the
+    rest of the text to a superscript, on its own baseline and at 70% of the size.
+    """
+    base, _, sup = text.partition("^")
+    glyphs = [(c, label_px, "-0.06") for c in base] + [(c, label_px * 0.7, "-4.8") for c in sup]
+    tspans = "".join(
+        f'<tspan x="{6 * i}" y="{y}" style="font-size: {px * 0.72:.2f}px; font-family: \'Lato\'">{c}</tspan>'
+        for i, (c, px, y) in enumerate(glyphs)
+    )
+    extent = 6 * (len(glyphs) - 1)
+    left = 40 - {"start": 0, "middle": extent / 2, "end": extent}[anchor]
+    return f'<!-- ${text}$ --><g transform="translate({left:g} 300)"><text>{tspans}</text></g>'
+
+
+@pytest.mark.parametrize("kwargs", [{}, {"math": True}])
+def test_grapher_axes_pass(tmp_path, kwargs):
+    result = run(VERIFY, write_axes_frame(tmp_path, **kwargs), "--template", "mobile-square")
+    assert result.returncode == 0, result.stdout
+
+
+@pytest.mark.parametrize(
+    "ha, label_pt, rotation, tick_alpha, message",
+    [
+        ("right", 13 * 0.72, 0, 1, "tick labels are 13px"),
+        ("left", 15 * 0.72, 0, 1, "y-axis tick labels are anchored start"),
+        ("center", 15 * 0.72, 0, 1, "y-axis tick labels are anchored middle"),
+        ("left", 15 * 0.72, 45, 1, "the y-axis tick labels of axes are rotated"),
+        ("right", 15 * 0.72, 0, 0, "the year axis of axes has no tick marks"),
+    ],
+)
+def test_mathtext_labels_from_matplotlib_are_checked(tmp_path, ha, label_pt, rotation, tick_alpha, message):
+    """A real log axis, whose labels matplotlib writes as MathText, is held to the size and alignment.
+
+    The last case hides the year axis' marks with an alpha of 0, which leaves them in the SVG unpainted.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [1, 1e5, 1e12], gid="line__value")
+    ax.set_yscale("log")
+    # Exponents of one and two digits, so the labels differ in width and their alignment shows.
+    ax.set_yticks([1, 1e5, 1e12])
+    ax.minorticks_off()
+    # Year labels written as grapher writes them, so the x axis reads as a year axis.
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    # Only the MathText labels are off, so only reading them can fail the frame.
+    ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
+    ax.tick_params(axis="y", labelsize=label_pt)
+    for tick_label in ax.get_yticklabels():
+        tick_label.set_horizontalalignment(ha)
+        tick_label.set_rotation(rotation)
+    for tick in ax.xaxis.get_major_ticks():
+        tick.tick1line.set_alpha(tick_alpha)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    assert "<!-- $" in (tmp_path / "frame_square.svg").read_text(), "matplotlib no longer writes MathText labels"
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+    assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "ha, edge, message",
+    [
+        ("right", "grid", None),
+        ("right", "spine", None),
+        # Drawn y ticks carry their mark's <defs>, at its own origin, which is not the plot edge.
+        ("right", "ticks", None),
+        ("left", "ticks", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("left", "grid", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("center", "grid", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("left", "spine", "the y-axis tick labels of axes run past the plot's left edge"),
+        ("right", None, "are MathText of one width with no y gridline"),
+    ],
+)
+def test_mathtext_labels_of_one_width_are_judged_against_the_plot_edge(tmp_path, ha, edge, message):
+    """A log axis of 10^1, 10^2, 10^3: labels of one width line up on every edge, so where they end is what is read.
+
+    `edge` is what marks the plot's left edge in the SVG: grapher's horizontal gridlines, the left
+    spine, drawn y tick marks, or nothing, when the alignment cannot be read at all.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [10, 100, 1000], gid="line__value")
+    ax.set_yscale("log")
+    ax.set_yticks([10, 100, 1000])
+    ax.minorticks_off()
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(axis="x", labelsize=15 * 0.72, length=5 * 0.72, width=0.72)
+    # As the scaffold draws a y axis: no tick marks, and the left spine only, when `edge` asks for them.
+    ax.tick_params(axis="y", labelsize=15 * 0.72, length=5 * 0.72 if edge == "ticks" else 0)
+    ax.yaxis.grid(edge == "grid")
+    ax.spines["left"].set_visible(edge == "spine")
+    for tick_label in ax.get_yticklabels():
+        tick_label.set_horizontalalignment(ha)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        ({"label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),
+        ({"y_anchor": "start"}, "y-axis tick labels are anchored start"),
+        ({"tick_marks": False}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": None}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": "transparent"}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": False, "second_axes": True}, "the year axis of axes has no tick marks"),
+        ({"tick_marks": False, "x_values": (-500, 0, 500, 1000, 1500, 2000)}, "the year axis of axes has no tick"),
+        ({"tick_marks": False, "x_values": (2000, 2100, 2200, 2300)}, "the year axis of axes has no tick"),
+        ({"tick_marks": False, "x_values": (0, 1000, 2000)}, "with a thousands separator (2,000)"),
+        # Long-run axes group the digits of BCE years (world_population_long_run writes "12,000 BCE").
+        (
+            {
+                "tick_marks": False,
+                "x_values": (-12000, -2000, 0, 2000),
+                "x_labels": ("12,000 BCE", "2,000 BCE", "0", "2000"),
+            },
+            "the year axis of axes has no tick marks",
+        ),
+        ({"tick_marks": False, "x_values": (1, 2), "x_labels": ("2,000 CE", "1,500 CE")}, "the year axis of axes"),
+        # MathText labels nest their text, and still get every axis check.
+        ({"math": True, "label_px": 13}, "tick labels are 13px; on a 540-wide template they are 15px"),
+        ({"math": True, "tick_marks": False}, "the year axis of axes has no tick marks"),
+        ({"math": True, "y_anchor": "start"}, "y-axis tick labels are anchored start"),
+        ({"math": True, "y_anchor": "middle"}, "y-axis tick labels are anchored middle"),
+    ],
+)
+def test_axes_that_differ_from_grapher_fail(tmp_path, kwargs, message):
+    result = run(VERIFY, write_axes_frame(tmp_path, **kwargs), "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"x_values": (0, 25, 50, 75, 100)},
+        {"x_values": (0, 1000, 2000), "x_format": "{:,}"},
+        {"x_values": (0, 50, 100), "x_format": "{}%"},
+        # A separator with no era suffix is a count, whatever the other labels are.
+        {"x_values": (0, 1000, 2000), "x_labels": ("0", "1,000", "2,000")},
+        # Powers of ten: the exponent's own baseline keeps 10^12 from reading as the year 1012.
+        {"x_values": (3, 6, 12), "x_labels": ("10^3", "10^6", "10^12"), "math": True},
+    ],
+)
+def test_a_non_year_axis_needs_no_tick_marks(tmp_path, kwargs):
+    """Shares, small counts and counts labelled with a thousands separator are not years."""
+    result = run(VERIFY, write_axes_frame(tmp_path, tick_marks=False, **kwargs), "--template", "mobile-square")
+    assert result.returncode == 0, result.stdout
+
+
+@pytest.mark.parametrize(
+    "x_width, right_labels, y_rotation, y_ha, message",
+    [
+        (0, False, 0, None, "the year axis of axes has no tick marks"),
+        (0.72, True, 0, None, "the y-axis tick labels of axes are drawn on the right"),
+        # Rotated plain labels pass the anchor check, so only their transform shows the turn.
+        (0.72, False, 45, "right", "the y-axis tick labels of axes are rotated"),
+        (0.72, False, 45, None, "the y-axis tick labels of axes are rotated"),
+    ],
+)
+def test_hidden_marks_and_right_side_labels_from_matplotlib_fail(
+    tmp_path, x_width, right_labels, y_rotation, y_ha, message
+):
+    """Ways a real step loses grapher's axes: x ticks at width 0 (a strokeless <use>), y labels on the right or rotated."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=x_width)
+    if right_labels:
+        ax.tick_params(axis="y", labelright=True, labelleft=False)
+    ax.tick_params(axis="y", rotation=y_rotation)
+    if y_ha:
+        for tick_label in ax.get_yticklabels():
+            tick_label.set_horizontalalignment(y_ha)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+    assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+def test_an_axis_labelled_on_its_minor_ticks_is_checked(tmp_path):
+    """Years written on minor ticks (FixedLocator/FixedFormatter), with the marks hidden, still fail."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FixedFormatter, FixedLocator, NullFormatter, NullLocator
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.xaxis.set_major_locator(NullLocator())
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.xaxis.set_minor_locator(FixedLocator([2000, 2010, 2020]))
+    ax.xaxis.set_minor_formatter(FixedFormatter(["2000", "2010", "2020"]))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", which="minor", labelsize=15 * 0.72, length=0)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    assert "x-minor-tick-label-" in (tmp_path / "frame_square.svg").read_text()
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and "the year axis of axes has no tick marks" in result.stdout, result.stdout
+
+
+def test_a_year_axis_missing_one_of_its_marks_fails(tmp_path):
+    """Every labelled year needs its own mark: hiding one tick1line is caught, not excused by the rest."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    ax.xaxis.get_major_ticks()[1].tick1line.set_visible(False)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and "has no tick mark at 2010" in result.stdout, result.stdout
+
+
+def test_x_labels_drawn_at_the_top_fail(tmp_path):
+    """`labeltop=True, labelbottom=False` writes `x-tick-label2-*` groups: grapher's x labels sit below the plot."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2010, 2020], [0, 25, 20], gid="line__value")
+    ax.set_xticks([2000, 2010, 2020], ["2000", "2010", "2020"])
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", labeltop=True, labelbottom=False, length=0)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and "are drawn at the top (labeltop)" in result.stdout, result.stdout
+
+
+@pytest.mark.parametrize(
+    "line_years, ticks, labels, message",
+    [
+        # The line runs to 2024 while the axis stops at a round 2020.
+        ([2000, 2010, 2024], [2000, 2010, 2020], None, "ends its labels at 2020, but line__value run on to about 2024"),
+        # A blank last label (a step thinning the ticks) does not count as closing the axis.
+        ([2000, 2010, 2020], [2000, 2010, 2020], ["2000", "2010", ""], "ends its labels at 2010"),
+        ([2000, 2010, 2024], [2000, 2010, 2024], None, None),
+        # Grapher's pattern: the round step kept, the last year added after it.
+        ([2000, 2010, 2024], [2000, 2005, 2010, 2015, 2020, 2024], None, None),
+        # Within half a year of the last tick, as a bar centred on it reaches: not past it.
+        ([2000, 2010, 2020.4], [2000, 2010, 2020], None, None),
+        # The line starts in 1995 while the axis starts at a round 2000.
+        (
+            [1995, 2010, 2020],
+            [2000, 2010, 2020],
+            None,
+            "starts its labels at 2000, but line__value start in about 1995",
+        ),
+        # Grapher's pattern at the start: the first year added before the round step.
+        ([1995, 2010, 2020], [1995, 2000, 2010, 2020], None, None),
+        # Within half a year of the first tick: not before it.
+        ([1999.6, 2010, 2020], [2000, 2010, 2020], None, None),
+    ],
+)
+def test_a_year_axis_spans_the_years_plotted(tmp_path, line_years, ticks, labels, message):
+    """Grapher's time axis starts on the data's first year and ends on its last; a line past either end tick fails."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot(line_years, [0, 25, 20], gid="line__value")
+    ax.set_xticks(ticks, labels or [str(t) for t in ticks])
+    ax.set_xlim(min(ticks[0], line_years[0]), max(ticks[-1], line_years[-1]))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    # An inset on another scale, whose own line must not be judged against the main axis.
+    inset = ax.inset_axes([0.6, 0.6, 0.3, 0.3])
+    inset.plot([0, 1], [0, 1], gid="line__inset")
+    inset.set_xticks([0, 1], ["0", "1"])
+    inset.tick_params(labelsize=15 * 0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "first_date, last_date, tick_years, message",
+    [
+        # Later in the last labelled year: the label `2024` marks its first day, so this is not past it.
+        ("2020-01-01", "2024-09-30", (2020, 2022, 2024), None),
+        # Into a year with no label, reported in years rather than matplotlib's day counts.
+        (
+            "2020-01-01",
+            "2026-06-01",
+            (2020, 2022, 2024),
+            "ends its labels at 2024, but line__value run on to about 2026",
+        ),
+        # Starting in 2019, before the day the first label `2020` marks.
+        (
+            "2019-06-01",
+            "2024-01-01",
+            (2020, 2022, 2024),
+            "starts its labels at 2020, but line__value start in about 2019",
+        ),
+        # A 365-day last year after a span with a leap day: the last day of 2023 passes, January 1 of 2024 fails.
+        ("2020-01-01", "2023-12-31", (2020, 2021, 2022, 2023), None),
+        (
+            "2020-01-01",
+            "2024-01-01",
+            (2020, 2021, 2022, 2023),
+            "ends its labels at 2023, but line__value run on to about 2024",
+        ),
+    ],
+)
+def test_a_date_axis_is_judged_in_years(tmp_path, first_date, last_date, tick_years, message):
+    """On a datetime x-axis the tick values are day counts; the overrun check reads the years from the labels."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    dates = [dt.date.fromisoformat(first_date), dt.date(2022, 6, 1), dt.date.fromisoformat(last_date)]
+    ax.plot(dates, [0, 25, 20], gid="line__value")
+    ticks = [dt.date(year, 1, 1) for year in tick_years]
+    ax.set_xticks(ticks, [str(t.year) for t in ticks])
+    ax.set_xlim(dates[0], max(ticks[-1], dates[-1]))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "labelled, message",
+    [
+        # Every category labelled: the axis ends on the last year plotted.
+        (["2000", "2010", "2024"], None),
+        # The last category unlabelled: the line runs past the `2010` tick, though positions are not days.
+        (["2000", "2010"], "ends its labels at 2010, but line__value run on to about"),
+    ],
+)
+def test_a_categorical_year_axis_is_not_read_as_dates(tmp_path, labelled, message):
+    """Years plotted as strings sit at positions 0, 1, 2; the check reads them through the labels, not as days."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot(["2000", "2010", "2024"], [0, 25, 20], gid="line__value")
+    ax.set_xticks(range(len(labelled)), labelled)
+    ax.set_xlim(0, 2)
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert result.returncode == 0, result.stdout
+    else:
+        assert result.returncode == 1 and message in result.stdout, result.stdout
+        assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "line_years, message",
+    [
+        # A line spanning 2020-2024 under a lone `2020` tick runs past it, though no scale gives its year.
+        ([2020, 2022, 2024], "ends its labels at 2020, but line__value run on past it"),
+        ([2016, 2018, 2020], "starts its labels at 2020, but line__value start before it"),
+    ],
+)
+def test_a_year_axis_with_one_labelled_tick_still_spans_the_line(tmp_path, line_years, message):
+    """A single labelled year gives no scale; a line reaching past it on either side still fails."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot(line_years, [0, 25, 20], gid="line__value")
+    ax.set_xticks([2020], ["2020"])
+    ax.set_xlim(min(line_years), max(line_years))
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 1 and message in result.stdout, result.stdout
+    assert result.stdout.count("\n  - ") == 1, f"only the {message!r} failure is expected: {result.stdout}"
+
+
+@pytest.mark.parametrize(
+    "axis, warnings",
+    [
+        # style_year_axis: end labels on their ticks, a 1px butt-capped line stopping at the end ticks.
+        ("grapher", []),
+        # matplotlib's defaults: centered end labels, a 0.8pt line whose square cap overhangs both ends.
+        (
+            "default",
+            [
+                "its first label, 2000, is centered on its tick, not left-aligned",
+                "its last label, 2024, is centered on its tick, not right-aligned",
+                "its axis line runs 0.6px past the end ticks, from its square cap",
+                "its axis line is 1.1px wide, not 1px",
+            ],
+        ),
+        # Range padding past the end ticks, which a butt cap does not fix.
+        ("padded", ["runs 29.9px past the end ticks, from padding in the x range"]),
+        # The first label right-aligned, so it hangs past the start of the axis.
+        ("right-anchors", ["its first label, 2000, is right-aligned to its tick, not left-aligned"]),
+        # A date axis is judged on where its labels and marks sit, like any other.
+        ("date", []),
+        # One labelled tick cannot anchor both ends.
+        ("single", []),
+    ],
+)
+def test_a_year_axis_ends_as_grapher_draws_it(tmp_path, axis, warnings):
+    """Grapher insets the end labels to their ticks and stops a 1px butt-capped line on them; the verifier warns."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame, style_year_axis
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ticks: list = [2000, 2010, 2020, 2024]
+    if axis == "date":
+        ticks = [dt.date(year, 1, 1) for year in ticks]
+    elif axis == "single":
+        ticks = [2020]
+    ax.plot([ticks[0], ticks[-1]], [0, 20], gid="line__value")
+    ax.set_xticks(ticks, [str(getattr(t, "year", t)) for t in ticks])
+    ax.tick_params(labelsize=15 * 0.72)
+    if axis == "default":
+        ax.set_xlim(ticks[0], ticks[-1])
+        ax.tick_params(axis="x", length=5 * 0.72, width=0.72)
+    elif axis == "single":
+        style_year_axis(ax, 2019, 2021)
+    else:
+        style_year_axis(ax, ticks[0], ticks[-1])
+    if axis == "padded":
+        ax.set_xlim(1998, 2026)
+    elif axis == "right-anchors":
+        ax.xaxis.get_major_ticks()[0].label1.set_horizontalalignment("right")
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 0, "the ends are a warning, never a failure: " + result.stdout
+    if not warnings:
+        assert "warning" not in result.stdout, result.stdout
+    for warning in warnings:
+        assert warning in result.stdout, result.stdout
+    assert result.stdout.count("! warning") == (1 if warnings else 0), result.stdout
+
+
+@pytest.mark.parametrize(
+    "ticks, line, warning",
+    [
+        # Labelled on to 2030 while the data ends in 2024.
+        ((2000, 2010, 2020, 2030), (2000, 2024), "it ends its labels at 2030, but its lines end in about 2024"),
+        # Labelled from 1990 while the data starts in 2000.
+        ((1990, 2000, 2010, 2024), (2000, 2024), "it starts its labels at 1990, but its lines start in about 2000"),
+        # Within half a year of each end: the axis ends on the data.
+        ((2000, 2010, 2024), (2000.4, 2023.6), None),
+        # A date axis whose data stops in 2023 under a last label of 2024.
+        (
+            (2020, 2022, 2024),
+            ("2020-01-01", "2023-06-01"),
+            "it ends its labels at 2024, but its lines end in about 2023",
+        ),
+        # Data reaching any day of the last labelled year reaches it.
+        ((2020, 2022, 2024), ("2020-03-01", "2024-03-01"), None),
+    ],
+)
+def test_a_year_axis_labelled_past_the_data_warns(tmp_path, ticks, line, warning):
+    """The axis ends on the data's first and last year, so labels beyond every line are flagged, as a warning."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame, style_year_axis
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    if isinstance(line[0], str):
+        xs: list = [dt.date.fromisoformat(d) for d in line]
+        positions: list = [dt.date(year, 1, 1) for year in ticks]
+    else:
+        xs, positions = list(line), list(ticks)
+    ax.plot(xs, [0, 20], gid="line__value")
+    ax.set_xticks(positions, [str(t) for t in ticks])
+    ax.tick_params(labelsize=15 * 0.72)
+    style_year_axis(ax, positions[0], positions[-1])
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert result.returncode == 0, "labels past the data are a warning, never a failure: " + result.stdout
+    if warning is None:
+        assert "warning" not in result.stdout, result.stdout
+    else:
+        assert warning in result.stdout and result.stdout.count("! warning") == 1, result.stdout

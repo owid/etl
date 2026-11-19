@@ -88,6 +88,12 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.4.0`
+- **`DatasetMeta.jsonld` is renamed `DatasetMeta.dataset_page`** (`dataset: dataset_page: true` in a step's `.meta.yml`). The flag opts a dataset into a whole public page (data files, codebook, sources, README, manifest), of which the Schema.org JSON-LD is one file. An `index.json` that still has `jsonld` loads without error, with `dataset_page` false until the dataset is rebuilt
+
+### `v1.3.1`
+- No change to the package. Dev tooling: the lockfile now resolves only for Python >= 3.11.5, so it no longer pins a vulnerable soupsieve 2.x for Python 3.11.0–3.11.4
+
 ### `v1.3.0`
 - **`Dataset.read()` returns strings as pandas' default `str` dtype** (pyarrow-backed, `NaN` for missing values) instead of `string[pyarrow]` (`pd.NA` for missing values), through `owid-repack>=0.2.0`. Strings read from a dataset now behave like strings pandas 3 creates: merging on them no longer turns the key into `object`, and comparisons give `False` rather than `<NA>` for missing values. Check for missing values with `pd.isna()`, not `is pd.NA`. `ds[...]` and `read(safe_types=False)` are unchanged
 - `description_key` items that YAML parses as mappings (a plain item containing `: `) raise a `ValueError` that names the indicator and says to quote the item, instead of a bare assertion

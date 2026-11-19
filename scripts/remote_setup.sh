@@ -74,7 +74,7 @@ echo "📦 Installing dependencies (uv sync)..."
 INSTALL_START=$(date +%s)
 
 SYNC_LOG=$(mktemp)
-if uv sync --all-extras --group dev >"$SYNC_LOG" 2>&1; then
+if uv sync --frozen --all-extras --group dev >"$SYNC_LOG" 2>&1; then
   echo "✅ Dependencies installed ($(($(date +%s) - INSTALL_START))s)"
 else
   echo "❌ uv sync failed — the session may not have a working .venv:"
@@ -88,7 +88,7 @@ echo "🔍 Verifying installation..."
 if [ -x .venv/bin/etl ]; then
   echo "   ✓ ETL CLI available ($(.venv/bin/python --version 2>&1))"
 else
-  echo "   ✗ .venv/bin/etl not found — run 'uv sync --all-extras --group dev' in the session."
+  echo "   ✗ .venv/bin/etl not found — run 'uv sync --frozen --all-extras --group dev' in the session."
 fi
 
 # A dirty uv.lock here is never intentional — `uv sync` only rewrites it when it

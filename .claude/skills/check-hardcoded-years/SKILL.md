@@ -144,7 +144,7 @@ for p in Path("etl/steps").rglob("*.yml"):
             print(f"UNPARSED (likely Jinja-templated): {p} — inspect its map: block manually")
 ```
 
-Don't drop the unparsed files silently — Jinja-templated garden metas fail `safe_load`, and one of them can be exactly the file carrying the pin (e.g. `pisa.meta.yml` nests `map: time: 2022` under `presentation.grapher_config`).
+Don't drop the unparsed files silently — Jinja-templated garden metas fail `safe_load`, and one of them can be exactly the file carrying the pin (a garden `.meta.yml` can nest `map: time: <year>` under `presentation.grapher_config`).
 
 ## Script skeleton
 

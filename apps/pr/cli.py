@@ -567,14 +567,14 @@ def install_worktree_venv(worktree_path: Path) -> bool:
     """Run `uv sync` in the new worktree to set up its `.venv/`. Returns True on success.
 
     This matches what the project's Makefile does for the `.venv` target — see
-    `default.mk` (`uv sync --all-extras --group dev`). Doing this automatically lets
+    `default.mk` (`uv sync --frozen --all-extras --group dev`). Doing this automatically lets
     the user just `cd` into the new worktree afterwards (with a chpwd hook the venv
     activates automatically; without one, only `source .venv/bin/activate` is needed).
     """
-    log.info(f"Installing dependencies in '{worktree_path}' (one-time, ~1 min)...")
+    log.info(f"Installing dependencies in '{worktree_path}' (one-time, a few seconds with a warm uv cache)...")
     try:
         subprocess.run(
-            ["uv", "sync", "--all-extras", "--group", "dev"],
+            ["uv", "sync", "--frozen", "--all-extras", "--group", "dev"],
             cwd=worktree_path,
             check=True,
         )
@@ -1165,7 +1165,7 @@ def clean_branch(
         # Backstop only: dirty worktrees were already skipped above, but the removal can still fail
         # (e.g. changes made between the check and now, or a submodule in the worktree).
         try:
-            repo.git.worktree("remove", str(worktree_path))
+            remove_worktree(repo, worktree_path)
             log.info(f"Removed worktree '{worktree_path}'.")
         except GitCommandError as e:
             log.warning(f"Could not remove worktree '{worktree_path}'. Leaving branch '{branch}' in place.\n{e}")
@@ -1176,3 +1176,84 @@ def clean_branch(
         log.info(f"Deleted local branch '{branch}'.")
     except GitCommandError as e:
         log.warning(f"Could not delete branch '{branch}':\n{e}")
+
+
+def remove_worktree(repo: Repo, worktree_path: Path) -> None:
+    """Remove a worktree in a way that VS Code's Source Control view copes with.
+
+    `git worktree remove` deletes the files one by one. With `git.detectWorktrees` on, VS Code opens
+    each worktree as a repository of its own, and when several worktrees are removed in a row it
+    refreshes the next one while it is half deleted. It then lists every tracked file as deleted and
+    keeps showing that count until the Source Control view is opened. So the folder is first renamed
+    into the main repo's git dir in one step, which VS Code only ever sees as the worktree being gone,
+    and the files are deleted from there.
+
+    Falls back to `git worktree remove` when the worktree is already gone, isn't (or is no longer)
+    this repo's registered worktree, is locked, has changes or populated submodules that would make
+    git refuse, or can't be renamed (e.g. it is on another filesystem), so git's own checks and
+    messages still apply there.
+    """
+    common_dir = Path(repo.git.rev_parse("--path-format=absolute", "--git-common-dir"))
+    trash_dir = common_dir / "worktree-trash"
+    # Remove anything an interrupted earlier run left behind.
+    if trash_dir.exists():
+        shutil.rmtree(trash_dir, ignore_errors=True)
+
+    admin_dir = None
+    if worktree_path.exists():
+        try:
+            admin_dir = Path(Repo(worktree_path).git.rev_parse("--absolute-git-dir"))
+        except (InvalidGitRepositoryError, NoSuchPathError, GitCommandError):
+            pass
+    if (
+        admin_dir is None
+        or not _is_registered_worktree(common_dir, worktree_path, admin_dir)
+        or (admin_dir / "locked").exists()
+        or worktree_blocking_changes(worktree_path)
+        or _has_populated_submodules(worktree_path, admin_dir)
+    ):
+        repo.git.worktree("remove", str(worktree_path))
+        return
+
+    trash_dir.mkdir()
+    try:
+        worktree_path.rename(trash_dir / worktree_path.name)
+    except OSError:
+        trash_dir.rmdir()
+        repo.git.worktree("remove", str(worktree_path))
+        return
+    # Drop git's record of the worktree, whose folder is now gone. `rmtree` doesn't follow symlinks.
+    repo.git.worktree("prune")
+    shutil.rmtree(trash_dir, ignore_errors=True)
+
+
+def _is_registered_worktree(common_dir: Path, worktree_path: Path, admin_dir: Path) -> bool:
+    """Return True if `worktree_path` is the linked worktree that `common_dir` has registered there.
+
+    The folder's git dir must sit under `<common_dir>/worktrees/` and point back at the folder, as
+    git's own validation requires. This rules out a separate repo (or another repo's worktree) that
+    now occupies the path of a worktree deleted by hand.
+    """
+    if admin_dir.resolve().parent != (common_dir / "worktrees").resolve():
+        return False
+    try:
+        gitdir = Path((admin_dir / "gitdir").read_text().strip())
+    except OSError:
+        return False
+    return gitdir.resolve() == (worktree_path / ".git").resolve()
+
+
+def _has_populated_submodules(worktree_path: Path, admin_dir: Path) -> bool:
+    """Return True if the worktree has submodules that make `git worktree remove` refuse.
+
+    Mirrors git's own check: the worktree's git dir holds a `modules/` dir, or a submodule entry in
+    the index (mode 160000) is checked out, i.e. has a `.git` in its folder. A clean `git status`
+    doesn't rule these out, and removing such a worktree would delete the submodule's own files.
+    """
+    if (admin_dir / "modules").is_dir():
+        return True
+    for line in Repo(worktree_path).git.ls_files("--stage", "-z").split("\0"):
+        mode, _, path = line.partition("\t")
+        if mode.startswith("160000 ") and (worktree_path / path / ".git").exists():
+            return True
+    return False

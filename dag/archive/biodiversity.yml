@@ -124,3 +124,6 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://explorers/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss
+  # archived; last active in 950def9efa56 on 2026-11-11
+  viz://explorer/biodiversity/latest/fish_stocks:
+    - data://grapher/biodiversity/2024-10-30/fish_stocks

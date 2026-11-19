@@ -110,7 +110,7 @@ views:
       y:
         - catalogPath: vdem_uni_without_regions#regime_row_owid
     config:
-      colorVariableId: vdem_uni_without_regions#regime_row_owid
+      type: Swimlane
   - dimensions:
       metric: political_regime
       sub_metric: number_and_share_of_democracies
@@ -160,7 +160,7 @@ views:
       y:
         - catalogPath: vdem_uni_without_regions#regime_redux_row_owid
     config:
-      colorVariableId: vdem_uni_without_regions#regime_redux_row_owid
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: multi_party_elections
@@ -168,7 +168,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#electmulpar_row__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#electmulpar_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: multi_party_elections_for_chief_executive
@@ -176,7 +176,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: multi_party_elections_for_legislature
@@ -184,7 +184,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#electmulpar_leg_row__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#electmulpar_leg_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: free_and_fair_elections
@@ -192,7 +192,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#electfreefair_row__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#electfreefair_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: democratic_electoral_institutions
@@ -200,7 +200,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: age_of_electoral_democracy
@@ -255,11 +255,11 @@ views:
       y:
         - catalogPath: vdem_uni_without_regions#regime_row_owid
           display:
-            colorScaleNumericBins: 0.999,#8D6E71,Closed autocracy;1.999,#C6A1A5,Electoral autocracy;2.999,#F3D0D4,Electoral democracy;3.999,#2C7BB6,Liberal democracy
+            colorScaleCategoricalBins: Closed autocracy,#8D6E71;Electoral autocracy,#C6A1A5;Electoral democracy,#F3D0D4;Liberal democracy,#2C7BB6
     config:
-      colorVariableId: vdem_uni_without_regions#regime_row_owid
       title: "Liberal democracy"
       subtitle: *group_subtitle_2
+      type: Swimlane
       # map:
       #   colorScale:
       #     baseColorScheme: "RdYlBu"
@@ -291,7 +291,7 @@ views:
         - catalogPath: vdem_multi_without_regions#transplaws_row__estimate_best
 
     config:
-      colorVariableId: vdem_multi_without_regions#transplaws_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: liberal_democracy
       sub_metric: access_to_justice_for_men
@@ -299,7 +299,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#accessjust_m_row__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#accessjust_m_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: liberal_democracy
       sub_metric: access_to_justice_for_women
@@ -307,7 +307,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#accessjust_w_row__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#accessjust_w_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: liberal_democracy
       sub_metric: liberal_political_institutions
@@ -315,7 +315,7 @@ views:
       y:
         - catalogPath: vdem_multi_without_regions#lib_dich_row__estimate_best
     config:
-      colorVariableId: vdem_multi_without_regions#lib_dich_row__estimate_best
+      type: Swimlane
   - dimensions:
       metric: liberal_democracy
       sub_metric: age_of_liberal_democracy
@@ -376,7 +376,7 @@ views:
       y:
         - catalogPath: vdem_uni_without_regions#regime_amb_row_owid
     config:
-      colorVariableId: vdem_uni_without_regions#regime_amb_row_owid
+      type: Swimlane
   - dimensions:
       metric: political_regime_including_ambiguous_categories
       sub_metric: number_and_share_of_democracies

@@ -1,6 +1,6 @@
 ---
 name: fix-dependabot
-description: Resolve Dependabot security alerts on owid/etl by upgrading vulnerable dependencies. Use when the user mentions "dependabot", "security alerts", "vulnerability", "CVE", "security fixes", "dependabot alerts", or wants to fix vulnerable packages. Also trigger when the user pastes a GitHub Dependabot URL or asks about outdated/insecure dependencies.
+description: Resolve Dependabot security alerts on owid/etl by upgrading vulnerable dependencies. Use when the user wants Dependabot alerts or PRs, CVEs, or other vulnerable dependencies in owid/etl resolved, including when they paste a Dependabot URL.
 metadata:
   internal: true
   owner: Marigold
@@ -179,7 +179,7 @@ If it fails, fix the issues (commonly: removed/renamed kwargs that type checkers
 
 If you modified any `lib/{catalog,datautils,repack}/pyproject.toml`, also bump that file's `version = "x.y.z"` (patch bump). The `publish-owid-packages.yml` workflow republishes these packages to PyPI on master push and rejects the publish if the version already exists.
 
-After bumping, re-run `uv lock` (top-level and inside each modified `lib/<name>/`) so the lockfiles pick up the new version.
+After bumping, add a changelog entry and re-run `uv lock` (top-level and inside each modified `lib/<name>/`), following the release checklist in `lib/catalog/DEVELOPMENT.md`.
 
 ## Step 6: Create PR
 

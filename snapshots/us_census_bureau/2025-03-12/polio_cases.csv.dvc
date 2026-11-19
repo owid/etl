@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical diphtheria cases in the United States – United States Census Bureau
+    title: Historical polio cases in the United States – United States Census Bureau
     description: |-
-      Data on historical diphtheria cases in the United States, from the United States Census Bureau.
+      Data on historical polio cases in the United States, from the United States Census Bureau.
 
       * 1941: [Statistical Abstract of the United States: 1944-45 (Part 2 - Vital Statistics, Page 82)](https://www.census.gov/library/publications/1945/compendia/statab/66ed.html)
 
