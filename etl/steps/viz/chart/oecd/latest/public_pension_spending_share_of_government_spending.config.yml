@@ -15,8 +15,8 @@ views:
             tolerance: 2
     config:
       title: Public spending on pensions as a share of total government spending
-      subtitle: Government spending on pensions and other cash benefits for older people and for survivors, such as widows and widowers, as a share of total government spending. Private pensions and services such as care are not included.
-      note: Government includes central, state, and local governments and social security funds. Spending is measured before any taxes that pensioners might pay back on their pensions.
+      subtitle: Government spending on pensions and other cash benefits for older people and for survivors, such as widows and widowers, expressed as a percentage of total government spending. Private pensions and services such as care are not included.
+      note: Government includes central, state, and local governments and social security funds. Spending is measured before any taxes that people might pay back on these benefits.
       tab: chart
       hasMapTab: true
       chartTypes:
