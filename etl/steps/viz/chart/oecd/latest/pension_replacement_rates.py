@@ -34,16 +34,18 @@ EARNINGS = {"average": "the average wage", "half": "half the average wage"}
 EARNINGS_CODES = {"average": "average_wage", "half": "50pct_of_average_wage"}
 
 # Stacked views of the gross rate by type of mandatory scheme: for each choice, the types it stacks (pension schemes
-# code in the indicator name, legend label and color), bottom first.
+# code in the indicator name, legend label and color), bottom first. Colors are OWID colors (OwidDistinctColors in
+# owid-grapher): denim for public schemes, and the adjacent dark copper and peach of OWID categorical E for the two
+# kinds of private scheme, so they share a hue.
 STACKED_SCHEMES = {
     "public_and_quasi_mandatory": [
         ("public", "Public", "#4C6A9C"),
-        ("quasi_mandatory_private", "Quasi-mandatory private", "#E56E5A"),
+        ("quasi_mandatory_private", "Quasi-mandatory private", "#9A5129"),
     ],
     "mandatory_by_scheme": [
         ("public", "Public", "#4C6A9C"),
-        ("quasi_mandatory_private", "Quasi-mandatory private", "#E56E5A"),
-        ("other_mandatory_private", "Other mandatory private", "#A2B4DA"),
+        ("quasi_mandatory_private", "Quasi-mandatory private", "#9A5129"),
+        ("other_mandatory_private", "Other mandatory private", "#E56E5A"),
     ],
 }
 STACKED_TITLE_ENDS = {
