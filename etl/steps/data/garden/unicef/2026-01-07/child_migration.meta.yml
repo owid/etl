@@ -26,6 +26,8 @@ definitions:
       They operate in Jordan, Lebanon, Syria the West Bank including East Jerusalem, and Gaza. The Agency does not have a mandate to engage in political negotiations or durable solutions.
     population: &population |-
       To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+    china_indochinese: &china_indochinese |-
+      A large group of refugees from current-day Vietnam settled in China after the Vietnam War in the late 1970s and early 1980s. These refugees and their descendants are [de facto integrated into Chinese society](https://www.unhcr.org/asia/where-we-work/countries/china), have full access to public services, and enjoy the same rights as Chinese nationals. UNHCR therefore stopped counting them in the refugee population in 2022.
 
 dataset:
   update_period_days: 365
@@ -69,6 +71,8 @@ tables:
         title: Child refugees by country of asylum
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of asylum. This counts all refugees who are currently living in the asylum country, not only refugees arriving in this year.
         description_from_producer: *refugee
+        description_key:
+          - *china_indochinese
       refugees_under_18_asylum_per_1000:
         title: Child refugees by country of asylum per 1000 inhabitants
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants — of all ages — in the asylum country. This counts all refugees who are currently living in the asylum country, not only refugees arriving in this year.
@@ -78,10 +82,14 @@ tables:
           - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
         display:
           numDecimalPlaces: 1
+        description_key:
+          - *china_indochinese
       refugees_under_18_origin:
         title: Child refugees by country of origin
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by their country of origin. This counts all refugees who have left this country, not only refugees leaving in this year.
         description_from_producer: *refugee
+        description_key:
+          - *china_indochinese
       refugees_under_18_origin_per_1000:
         title: Child refugees by country of origin per 1000 inhabitants
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants — of all ages — in the origin country. This counts all refugees who have left this country, not only refugees leaving in this year.
@@ -91,6 +99,8 @@ tables:
           - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
         display:
           numDecimalPlaces: 1
+        description_key:
+          - *china_indochinese
       refugees_under_18_unrwa_asylum:
         title: Child refugees under UNRWA mandate
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) under [UNRWA mandate](#dod:unrwa). These are registered Palestinian refugees who live in Jordan, Lebanon, Syria, the West Bank and Gaza.

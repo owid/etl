@@ -12,6 +12,7 @@ from etl.steps.data.garden.democracy.shared import (
     add_imputes,
     add_population_in_dummies,
     add_regions_and_global_aggregates,
+    codes_to_categories,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
@@ -52,6 +53,26 @@ REGIONS = {
         ]
     },
     "Oceania": {},
+}
+
+
+# Labels of categorical indicators, in order. They are stored as text, so the Swimlane chart can show them.
+# NOTE: On each update, check in the source's codebook (or in this step, for codes we build) that every code still
+#   means the category labeled here, and that no codes were added or removed. The recoding fails on a code with no
+#   label, but not on a code whose meaning changed.
+LABELS = {
+    "regime": {
+        0: "Not free",
+        1: "Partly free",
+        2: "Free",
+    },
+}
+# Categories with no ranking, stored as plain categorical indicators.
+LABELS_UNORDERED = {
+    "electdem": {
+        0: "No",
+        1: "Yes",
+    },
 }
 
 
@@ -104,6 +125,12 @@ def run() -> None:
 
     # Remove imputed flag
     tb = tb.drop(columns=[col_flag_imputed])
+
+    # Store categorical indicators as text. Done after the regional aggregates, which use the numeric codes. The numeric
+    # regime score is kept for the chart that compares the classifications of several sources.
+    tb["regime_score"] = tb["regime"].copy()
+    tb = codes_to_categories(tb, LABELS)
+    tb = codes_to_categories(tb, LABELS_UNORDERED, ordered=False)
 
     # Table list
     tables = [

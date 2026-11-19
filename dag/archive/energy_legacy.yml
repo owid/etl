@@ -14,3 +14,80 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/energy/2025-06-27/fossil_fuel_production
     - data://garden/energy/2026-04-24/electricity_mix
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2026-05-05/primary_energy_consumption:
+    - data://garden/energy/2026-05-05/primary_energy_consumption
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2026-04-24/electricity_mix:
+    - data://garden/energy/2026-04-24/electricity_mix
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2026-04-27/energy_ai:
+    - data://garden/energy/2026-04-27/energy_ai
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2025-06-27/fossil_fuel_production:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/papers/2023-12-12/smil_2017
+    - data://garden/energy/2026-07-02/uk_historical_energy
+    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2025-06-27/energy_mix:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy:
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
+    - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2026-04-24/electricity_mix:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/ember/2026-04-24/yearly_electricity
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2025-06-27/global_primary_energy:
+    - data://garden/energy/2025-06-27/global_primary_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2025-06-27/fossil_fuel_production:
+    - data://garden/energy/2025-06-27/fossil_fuel_production
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2026-05-05/primary_energy_consumption:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/eia/2026-05-05/international_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2026-04-27/energy_ai:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/energy/2026-04-27/energy_ai
+    - data://meadow/energy/2025-11-07/energy_ai
+    - data://garden/energy/2026-04-24/electricity_mix
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy:
+    - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.csv
+    - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2025-06-27/global_primary_energy:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/papers/2023-12-12/smil_2017
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2025-06-27/energy_mix:
+    - data://garden/energy/2025-06-27/energy_mix

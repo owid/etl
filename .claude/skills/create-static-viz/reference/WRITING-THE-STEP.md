@@ -242,9 +242,13 @@ single row can be re-checked without opening all four.
 |---|---|---|
 | Gridlines | **dashed** `4,4`, `#ddd` | `GRID_LINE_DASH_PATTERN`, `TICK_COLOR` |
 | Tick labels | `#5b5b5b` | `GRAPHER_DARK_TEXT` = `GRAY_80` |
+| Tick label size | **15px** on the 540-wide templates, **14px** on the 850-wide ones: grapher's own download once placed (16px on its 540 square, 13.5 on its 850 default) | measured on grapher's SVG downloads |
+| y-axis tick labels | **right-aligned** against the plot (`text-anchor: end`), a column whose right edge is the plot's left; never left-aligned at the margin | `VerticalAxisComponent` |
 | Axis label | **bold** (`fontWeight: 700`) | `Axis.ts` |
-| x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
-| Outermost tick labels | anchored **inwards** — `text-anchor` `start` on the first, `end` on the last | `HorizontalAxisComponent` |
+| x-axis tick marks | 5px long, 1px wide, `#999`, butt-capped, hanging below the axis — **draw them on every year axis** (`style_year_axis` sets the size, or `ax.tick_params(axis="x", length=5 * 0.72, width=0.72)`, in points like every stroke; matplotlib's tick marks are butt-capped already); `verify_static_viz.py` fails a year axis without them | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
+| Ticks on a year axis | round years on a **round step** (every 5 or 10 years), **plus the data's first and last year** as ticks of their own; a round year is dropped only where its label would collide with an end's (below) | `HorizontalAxis.baseTicks` adds the domain's start and end at top priority to the round ticks |
+| Outermost tick labels | anchored **inwards**: the first **left-aligned to its tick** (`ha="left"`, `text-anchor: start`), the last **right-aligned** (`ha="right"`, `end`), every one between centered — so no end label hangs past the axis | `HorizontalAxisComponent` |
+| Line along a year axis | 1px (`0.72`pt), `#999`, **butt-capped**, running from the first tick to the last and **no further**: matplotlib's default projecting cap overhangs each end tick by half its width | grapher's rendered x axis |
 | y-axis line | **none** — the gridlines carry the reading | no component exists |
 | y domain | `[lowest tick, highest tick]` — the extreme gridlines land **on** the plot's edges | verified on a rendered SVG |
 | The gridline on the baseline | drawn **solid** in the tick color, not dashed — it *is* the axis line | `t.solid` in `VerticalAxisGridLines` |
@@ -259,6 +263,44 @@ like an axis closed off with elbows. On a chart whose y-axis does not reach zero
 y=0 to draw, so apply the same treatment to the **baseline** instead, and **pin the x range to the
 outermost ticks** (`set_xlim(first_tick, last_tick)`) so those two marks sit at the ends of the line
 and close it. Leave the y-axis lineless either way.
+
+**A time axis starts at the data's first year and ends at its last.** matplotlib's locator stops at
+round years, so a line running from 1995 to 2024 starts before an axis labelled 2000 and ends past
+one labelled 2020, and the reader cannot tell which years the line opens and closes on. Grapher keeps
+its round ticks and adds the first and last year to them, so do the same, then close the axis on the
+ends as grapher's does: the range pinned to the first and last year, the first label left-aligned to
+its tick and the last right-aligned, on a 1px butt-capped line that stops at the end ticks.
+`style_year_axis` does all of that; call it **after** `set_xticks`, because matplotlib copies the
+first tick's alignment onto any tick it creates later:
+
+```python
+from etl.viz.static import style_year_axis, year_axis_ticks
+
+# 2000..2024 -> 2000, 2005, 2010, 2015, 2020, 2024; the plot's width in template px decides what collides.
+ticks = year_axis_ticks(int(tb["year"].min()), int(tb["year"].max()), plot_width_px=plot_w)
+ax.set_xticks(ticks, [str(t) for t in ticks])
+# set_xlim(first, last); bottom spine butt-capped at 0.72pt; ticks 5px x 1px; end labels ha="left" / "right".
+style_year_axis(ax, ticks[0], ticks[-1])
+```
+
+By hand, that is `ax.set_xlim(first, last)`, `ax.spines["bottom"].set_capstyle("butt")` and
+`.set_linewidth(0.72)`, then `ticks = ax.xaxis.get_major_ticks(); ticks[0].label1.set_ha("left");
+ticks[-1].label1.set_ha("right")`. A bar chart over years is the exception: its bars need half a bar
+of range past each end tick, and its labels sit centered under the bars.
+
+**Keep the round step; don't re-space the ticks from the first year to the last.** Five even ticks
+over 2000..2024 come out 2000, 2006, 2012, 2018, 2024, years nobody reads a chart by. Drop the round
+tick before the last year only when the two labels would collide at the chart's width (2020 next to
+2023 over 73 years on an 850-wide frame), not because they are close in years: 2020 next to 2024 over
+24 years keeps both. On a narrow plot, coarsen the round step instead of crowding it: 2000..2014 at
+200 px steps every 5 years, not 2. `year_axis_ticks` does exactly this, keeping `min_gap_px=56`
+between every pair of neighbouring tick positions for four-digit labels at 14–15px. On a frame with
+several panels, pass one panel's width as `plot_width_px`, and take the years over everything the
+axis plots, not one series. `verify_static_viz.py` fails a year axis whose `line__<Entity>` series
+starts before its first labelled tick or runs on past its last, and Figma's restyle warns about the
+same on import. It also warns, without failing, when the axis is labelled past the data (no line
+reaches its first or last labelled year), when an end label's outer edge sits more than half a pixel
+off its tick, or when the axis line runs past the end ticks or is not 1px wide.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
 that doesn't exist is weak evidence about what the chart *looks like*: it suggests grapher draws no
@@ -295,7 +337,7 @@ overlapping labels rather than shrinking or rotating them — so a tick set is a
 tick whose label sits closer to its neighbor than the rest of the axis is a tick to remove, even when
 the value is one the note mentions.
 
-**The x range and the label anchoring interact — set the range first.** Anchoring the first tick label
+**The x range and the label anchoring interact — set the range first** (`style_year_axis` does, in that order). Anchoring the first tick label
 left will collide with its neighbor while the range still carries padding, because padding compresses
 the left end; pinned to the ticks, the same anchoring has room. So when an anchor "doesn't fit", re-check it after any range change instead of
 concluding it can't be done — and measure the gap rather than eyeballing the render.
@@ -449,10 +491,12 @@ word or two — is worth removing at the same time, because it is both a copy de
 and the state one character away from adding a line: measure it by cloning the slot, setting
 `textAutoResize = "WIDTH_AND_HEIGHT"` to get the unwrapped width, and comparing against the slot's.
 
-**Break a wrapped subtitle into lines of about equal length, and give the frame the same breaks.** Wrap
-to the fewest lines the slot allows, then narrow the wrap width as far as that line count holds. A
-greedy fill leaves a long first line over a short last one; even lines read as one block and leave room
-beside them for a key to rise into. A sentence boundary outranks balance: when a subtitle holds two
+**Break a wrapped subtitle into full lines, fix a short last line, and give the frame the same
+breaks.** Wrap to the fewest lines the slot allows, each close to the slot's width. When the last line
+is under about 40% of the slot, move words down from the lines above, spreading the shortfall over
+them, until it isn't. Lines of about equal length are only for a key placed beside the subtitle's
+shorter lines (a stacked bar's category key); anywhere else nothing uses the space they free, and the
+subtitle just reads narrow. A sentence boundary outranks either: when a subtitle holds two
 sentences, start the second on a new line wherever that costs no extra line ("…according to the World
 Health Organization. / Children more than 2 standard deviations…", not "…Organization. Children / …").
 Set the frame's subtitle to the same text with explicit `\n`, so Figma's own wrap cannot move the breaks.
@@ -576,6 +620,14 @@ step's own render:
   17px a line (line height AUTO), while matplotlib's default line spacing lands imported lines about
   15px apart, so a re-import never matches a designer's typed label. With one call per line (above),
   place the lines 17px apart.
+- **Set an arrow's tail clearance from the Figma frame, after the label is re-anchored.** A
+  right-aligned label imports one TEXT per line, and re-anchoring each line on its right edge moves its
+  left end by however much wider Lato sets that line than the step's measuring face: about 3% on
+  average, more on a line with curly quotes or wide capitals. An arrow leaving from that end loses the
+  same air, so measure the tail-to-text gap on the frame, set the step's clearance from it, and measure
+  again after rewording the line. Write the label and aim its arrow by
+  `/owid-staff:create-figma-chart`'s `reference/ANNOTATIONS-AND-ARROWS.md`: no closing period, and a
+  chord that crosses the line it ends on at 45° or more.
 
 ### Porting a designer's rework
 

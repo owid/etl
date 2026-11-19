@@ -1,0 +1,51 @@
+# NOTE: update on every UCDP update (stable and quarterly preview): the `subtitle` and `note` must name the
+# preliminary year and the quarters it covers, using the same wording as the multidim (ucdp.py, `_set_subtitle`)
+# and `ucdp_preview.meta.yml`.
+chart_config_id: 01935059-8946-7532-ba24-d9f29416dd75
+grapher_schema: "012"
+slug: deaths-in-armed-conflicts-by-region
+topic_tags:
+  - War & Peace
+dimensions: []
+views:
+  - dimensions: {}
+    config:
+      note: "Data for 2026 is based on quarterly reports from the source, which come with a higher level of uncertainty, and in many cases can be underestimates."
+      title: "Deaths in armed conflicts by region"
+      yAxis:
+        min: 0
+      subtitle: "Reported deaths of combatants and civilians due to fighting in [armed conflicts](#dod:armed-conflict-ucdp). Deaths due to disease and starvation resulting from the conflict are not included. Data for 2026 is incomplete and includes deaths within the first three quarters."
+      originUrl: "/war-and-peace"
+      chartTypes:
+        - "StackedBar"
+        - "StackedDiscreteBar"
+      entityType: "region"
+      variantName: ""
+      entityTypePlural: "regions"
+      relatedQuestions:
+        - url: "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths"
+          text: "How do different approaches measure armed conflicts and their deaths?"
+      hideRelativeToggle: false
+      selectedEntityNames:
+        - "Asia and Oceania (UCDP)"
+        - "Middle East (UCDP)"
+        - "Europe (UCDP)"
+        - "Americas (UCDP)"
+        - "Africa (UCDP)"
+      selectedEntityColors:
+        Asia: "#00847e"
+        Africa (UCDP): "#a2559c"
+        Europe (UCDP): "#4c6a9c"
+        Asia & Oceania: "#9e2435"
+        Americas (UCDP): "#e56e5a"
+        Middle East (UCDP): "#bc8e5a"
+        Asia and Oceania (UCDP): "#00847e"
+      hideAnnotationFieldsInTitle:
+        time: true
+        entity: true
+        changeInPrefix: true
+    indicators:
+      y:
+        - catalogPath: "ucdp_preview#number_deaths_ongoing_conflicts__conflict_type_all"
+          display:
+            name: "Deaths in armed conflicts"

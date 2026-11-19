@@ -1,3 +1,5 @@
+from copy import deepcopy
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -264,8 +266,24 @@ def test_explorer_config_legacy(mock_map_func):
 
     # TODO: check df_grapher
     mask = df_grapher["yVariableIds"].notna()
-    assert (df_grapher[mask].index == [0, 1, 3]).all()
+    assert (df_grapher[mask].index == [0, 1]).all()
     mask = df_grapher["ySlugs"].notna()
     assert (df_grapher[mask].index == [2, 3, 5, 6]).all()
     mask = df_grapher["xSlug"].notna()
     assert (df_grapher[mask].index == [4]).all()
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+@patch("etl.viz.explorer.core.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
+def test_explorer_mixed_view_keeps_y_order(mock_map_func, reverse):
+    # View 3 has a duplicated indicator (total_cases) and a regular one (suspected_cases_cumulative). Grapher plots ySlugs before yVariableIds, so all its y-indicators must become slugs, in the authored order.
+    config: Any = deepcopy(EXPLORER_CONFIG)
+    if reverse:
+        config["views"][3]["indicators"]["y"].reverse()
+    expected = [y["catalogPath"].replace("#", "__") for y in config["views"][3]["indicators"]["y"]]
+
+    df_grapher, _ = extract_explorers_tables(Explorer.from_dict(config))
+
+    row = df_grapher.loc[3]
+    assert row["yVariableIds"] is None or row["yVariableIds"] != row["yVariableIds"]
+    assert [slug.rsplit("__", 1)[0] for slug in row["ySlugs"]] == expected

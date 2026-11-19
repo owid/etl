@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Internal displacement
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on people displaced within their own country by conflict or disasters.
 topic_tags:
   - Migration
   - War & Peace
@@ -64,8 +67,6 @@ dimensions:
       - slug: returned
         name: People who returned after displacement
         description: The number of internally displaced persons who have returned to their area of origin during the year.
-    presentation:
-      type: radio
   - slug: unit
     name: Unit
     choices:
@@ -73,8 +74,6 @@ dimensions:
         name: Total number
       - slug: per_capita
         name: Per capita
-    presentation:
-      type: radio
   - slug: age
     name: Age
     choices:
@@ -82,8 +81,6 @@ dimensions:
         name: All ages
       - slug: under_18
         name: Under 18
-    presentation:
-      type: radio
 
 views:
   # All causes
@@ -193,7 +190,7 @@ views:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000, 0]
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000, 0]
           minValue: 1640
     metadata:
       description_key:
@@ -290,7 +287,7 @@ views:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 0]
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 0]
           minValue: 1640
     metadata:
       description_key:

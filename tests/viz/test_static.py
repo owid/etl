@@ -27,7 +27,9 @@ from etl.viz.static import (
     nice_year_ticks,
     save_fig,
     source_citation,
+    style_year_axis,
     unclip,
+    year_axis_ticks,
 )
 
 
@@ -440,3 +442,142 @@ def test_nice_year_ticks_never_exceeds_the_requested_limit(lo, hi, max_ticks):
 def test_nice_year_ticks_degenerate_range():
     assert nice_year_ticks(2000, 2000) == [2000]
     assert nice_year_ticks(2000, 1990) == [2000]
+
+
+@pytest.mark.parametrize(
+    "lo,hi,max_ticks",
+    [(1700, 2100, 8), (1950, 2023, 8), (1990, 2024, 8), (1990, 2024, 4), (-10000, 2100, 6), (2000, 2005, 8)],
+)
+def test_year_axis_ticks_open_and_close_on_the_data(lo, hi, max_ticks):
+    """Grapher's time axis shows the first and last year, whatever the round years between them."""
+    ticks = year_axis_ticks(lo, hi, max_ticks=max_ticks)
+    assert ticks[0] == lo and ticks[-1] == hi, ticks
+    assert ticks == sorted(set(ticks)), ticks
+    assert len(ticks) <= max_ticks, ticks
+
+
+def test_year_axis_ticks_keep_the_round_step_and_add_the_last_year():
+    """Round years stay on their step, never re-spaced from first to last (2000, 2006, 2012, 2018, 2024)."""
+    assert year_axis_ticks(2000, 2024) == [2000, 2005, 2010, 2015, 2020, 2024]
+    assert year_axis_ticks(1700, 2100) == [1700, 1800, 1900, 2000, 2100]
+    assert year_axis_ticks(2000, 2000) == [2000]
+
+
+def test_year_axis_ticks_drop_a_round_year_only_where_its_label_collides():
+    """2020 next to 2023 collides on an 850-wide plot over 73 years; next to 2022 over 22 years it does not."""
+    assert year_axis_ticks(1950, 2023, plot_width_px=770) == [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2023]
+    assert year_axis_ticks(2000, 2022, plot_width_px=770) == [2000, 2005, 2010, 2015, 2020, 2022]
+    assert year_axis_ticks(2000, 2022, plot_width_px=400) == [2000, 2005, 2010, 2015, 2022]
+
+
+@pytest.mark.parametrize(
+    "lo,hi,plot_width_px",
+    [(2000, 2014, 200), (1950, 2023, 200), (2000, 2024, 470), (1950, 2023, 770), (1990, 2024, 300)],
+)
+def test_year_axis_ticks_keep_the_minimum_gap_between_every_pair_of_ticks(lo, hi, plot_width_px):
+    """On a narrow plot or a facet the round step coarsens, so no two neighbouring labels overlap.
+
+    Checking the gap only against the two ends let 2000..2014 at 200 px keep a 2-year step, with
+    interior labels about 29 px apart.
+    """
+    min_gap_px = 56
+    ticks = year_axis_ticks(lo, hi, plot_width_px=plot_width_px, min_gap_px=min_gap_px)
+    assert ticks[0] == lo and ticks[-1] == hi, ticks
+    px_per_year = plot_width_px / (hi - lo)
+    gaps = [(b - a) * px_per_year for a, b in zip(ticks, ticks[1:])]
+    assert min(gaps) >= min_gap_px, f"{lo}..{hi} at {plot_width_px}px: {ticks} has gaps {gaps}"
+
+
+def test_year_axis_ticks_coarsen_the_round_step_on_a_narrow_plot():
+    assert year_axis_ticks(2000, 2014, plot_width_px=200) == [2000, 2005, 2010, 2014]
+    assert year_axis_ticks(1950, 2023, plot_width_px=200) == [1950, 2000, 2023]
+
+
+def _year_axes(ticks, xs=None):
+    fig, ax = plt.subplots(figsize=(8.5, 6.38))
+    xs = xs if xs is not None else [ticks[0], ticks[-1]]
+    ax.plot(xs, [0, 1], gid="line__value")
+    ax.set_xticks(ticks, [str(getattr(t, "year", t)) for t in ticks])
+    return fig, ax
+
+
+def test_style_year_axis_closes_the_axis_as_grapher_draws_it():
+    """Range pinned to the ends, a 1px butt-capped spine, 5x1px marks, end labels inset to their ticks."""
+    fig, ax = _year_axes([2000, 2005, 2010, 2015, 2020, 2024])
+    style_year_axis(ax, 2000, 2024)
+    assert ax.get_xlim() == (2000, 2024)
+    spine = ax.spines["bottom"]
+    assert spine.get_capstyle() == "butt" and spine.get_linewidth() == pytest.approx(0.72)
+    # Drawing must keep the alignment: matplotlib reuses the ticks it zipped the locations with.
+    name_furniture(fig)
+    ticks = ax.xaxis.get_major_ticks()
+    assert [t.label1.get_horizontalalignment() for t in ticks] == [
+        "left",
+        "center",
+        "center",
+        "center",
+        "center",
+        "right",
+    ]
+    assert ticks[0].tick1line.get_markersize() == pytest.approx(3.6)
+    assert ticks[0].tick1line.get_markeredgewidth() == pytest.approx(0.72)
+    plt.close(fig)
+
+
+def test_style_year_axis_writes_end_labels_on_their_ticks_and_a_butt_spine(tmp_path):
+    """In the SVG, the end labels anchor start / end at their tick's x and the spine stops at the end ticks."""
+    import re
+
+    apply_svg_rcparams()
+    fig, ax = _year_axes([2000, 2010, 2020, 2024])
+    style_year_axis(ax, 2000, 2024)
+    ax.tick_params(labelsize=10)  # a later tick_params must not reset the alignment
+    name_furniture(fig)
+    unclip(fig)
+    path = tmp_path / "axis.svg"
+    fig.savefig(path, format="svg")
+    plt.close(fig)
+    svg = path.read_text()
+
+    def label(value):
+        match = re.search(
+            rf'id="axes__x-tick-label-{value}">\s*<text style="[^"]*text-anchor: (\w+)" x="([0-9.]+)"', svg
+        )
+        assert match, f"no label for {value}"
+        return match.group(1), float(match.group(2))
+
+    def mark(value):
+        match = re.search(rf'id="axes__x-tick-{value}">.*?<use [^>]*x="([0-9.]+)"', svg, re.S)
+        assert match, f"no tick mark for {value}"
+        return float(match.group(1))
+
+    assert label(2000) == ("start", mark(2000))
+    assert label(2024) == ("end", mark(2024))
+    assert label(2010)[0] == "middle"
+    spine = re.search(
+        r'id="axes__spine-bottom">\s*<path d="M ([0-9.]+) [0-9.]+\s+L ([0-9.]+) [0-9.]+\s*" style="([^"]*)"', svg
+    )
+    assert spine, "no bottom spine in the SVG"
+    assert (float(spine.group(1)), float(spine.group(2))) == (mark(2000), mark(2024))
+    assert "stroke-linecap: square" not in spine.group(3) and "stroke-width: 0.72" in spine.group(3)
+
+
+def test_style_year_axis_aligns_the_visible_end_ticks_on_a_date_axis():
+    """Dates are converted to the axis' units; a tick outside the range is not the one aligned."""
+    import datetime as dt
+
+    ticks = [dt.date(year, 1, 1) for year in (1995, 2000, 2010, 2020, 2030)]
+    fig, ax = _year_axes(ticks, xs=[dt.date(2000, 1, 1), dt.date(2020, 1, 1)])
+    style_year_axis(ax, dt.date(2000, 1, 1), dt.date(2020, 1, 1))
+    name_furniture(fig)
+    alignment = {t.get_loc(): t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()}
+    visible = [alignment[loc] for loc in sorted(alignment) if ax.get_xlim()[0] <= loc <= ax.get_xlim()[1]]
+    assert visible == ["left", "center", "right"]
+    plt.close(fig)
+
+
+def test_style_year_axis_centers_a_single_tick():
+    fig, ax = _year_axes([2020], xs=[2020, 2020])
+    style_year_axis(ax, 2019, 2021)
+    assert [t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()] == ["center"]
+    plt.close(fig)

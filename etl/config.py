@@ -8,7 +8,6 @@ only important for OWID staff.
 """
 
 import asyncio
-import json
 import logging
 import os
 import pwd
@@ -29,7 +28,7 @@ from joblib import Memory  # 0.08
 from sqlalchemy.engine import Engine  # 0.07
 from sqlalchemy.orm import Session  # ~ 0.07
 
-from etl.paths import BASE_DIR, CACHE_DIR, SCHEMAS_DIR
+from etl.paths import BASE_DIR, CACHE_DIR
 
 log = structlog.get_logger()
 
@@ -180,7 +179,13 @@ def load_STAGING() -> str | None:
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
-        branch_name = git.Repo(BASE_DIR).active_branch.name
+        repo = git.Repo(BASE_DIR)
+        if repo.head.is_detached:
+            # No branch, so no branch's staging server to target.
+            if not is_run_python_step:
+                log.warning("HEAD is detached, using local env instead of a staging server")
+            return None
+        branch_name = repo.active_branch.name
         if branch_name == "master":
             if not is_run_python_step:
                 log.warning("You're on master branch, using local env instead of STAGING=master")
@@ -230,6 +235,9 @@ else:
 
 # Override URLs from env variables if set
 SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
+
+# Where the Search API reads the indicators it ranks: MySQL when unset, else this published copy (api_search/indicators.py).
+SEARCH_INDICATORS_URL = env.get("SEARCH_INDICATORS_URL")
 
 
 def variable_data_url(variable_id):
@@ -338,47 +346,19 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Upstream alias that always serves the newest published grapher chart-config schema. Used only to
-# *discover* a new version at bump time (`scripts/generate_schema_types.py --bump-version`, and the
-# scheduled sync workflow). Never resolve it at run time: its `properties.$schema.const` names one
-# concrete version, so it can't validate a config pinned at an older one, and stamping it on our
-# output would claim configs match a version we haven't vendored, validated or generated types for.
+# *discover* a new version (`test_no_newer_grapher_schema_version`). Never stamp it on our output:
+# it names whatever version is current upstream, which may be one grapher does not yet render.
 GRAPHER_SCHEMA_LATEST_URL = "https://files.ourworldindata.org/schemas/grapher-schema.latest.json"
-
-_GRAPHER_SCHEMA_FILE_RE = re.compile(r"^grapher-schema\.\d{3}\.json$")
-
-
-def vendored_grapher_schema_id() -> str:
-    """`$id` of the grapher chart-config schema this repo vendors.
-
-    The vendored file under `schemas/` is the single source of truth for the version: it is what
-    `multidim-schema.json` / `explorer-schema.json` `$ref`, what `schema_types.py` is generated
-    from, and what ETL validates configs against offline. Reading its own `$id` instead of
-    repeating the version here means the constant can never name a version we don't have on disk.
-    """
-    vendored = sorted(p for p in SCHEMAS_DIR.glob("grapher-schema.*.json") if _GRAPHER_SCHEMA_FILE_RE.match(p.name))
-    if len(vendored) != 1:
-        raise RuntimeError(
-            f"Expected exactly one vendored grapher schema (grapher-schema.NNN.json) in {SCHEMAS_DIR}, "
-            f"found {[p.name for p in vendored]}. A version bump replaces the file rather than adding "
-            "one — run `python scripts/generate_schema_types.py --bump-version`."
-        )
-
-    path = vendored[0]
-    schema_id = json.loads(path.read_text()).get("$id")
-    if not isinstance(schema_id, str) or schema_id.rsplit("/", 1)[-1] != path.name:
-        raise RuntimeError(
-            f"Vendored {path.name} declares `$id` {schema_id!r}, which doesn't match its filename. "
-            "Grapher keys config migrations on the `$id`, and ETL resolves `$schema` URLs to local "
-            "files by basename, so the two must agree. Re-vendor with "
-            "`python scripts/generate_schema_types.py --refresh`."
-        )
-    return schema_id
-
 
 # Grapher chart-config schema version this repo is built against — the default `$schema` for
 # indicator-level `presentation.grapher_config`, and the version a new chart config should pin.
-# Derived from the vendored copy (see above); bump it with `--bump-version`, never by hand.
-DEFAULT_GRAPHER_SCHEMA = vendored_grapher_schema_id()
+# Grapher keys its config migrations on this, so it must name a version grapher renders; stamping
+# an older one is safe (grapher migrates the config forward), a newer one is rejected.
+# `test_no_newer_grapher_schema_version` watches for a new version upstream. Bump the version only
+# once grapher has deployed it; everything else (URL, scaffolds, error hints) derives from it.
+GRAPHER_SCHEMA_URL_TEMPLATE = "https://files.ourworldindata.org/schemas/grapher-schema.{version}.json"
+DEFAULT_GRAPHER_SCHEMA_VERSION = "012"
+DEFAULT_GRAPHER_SCHEMA = GRAPHER_SCHEMA_URL_TEMPLATE.format(version=DEFAULT_GRAPHER_SCHEMA_VERSION)
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -714,9 +694,9 @@ class OWIDEnv:
     def thumb_url(self, slug: str):
         """
         Turn https://ourworldindata.org/grapher/life-expectancy"
-        Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
+        Into https://ourworldindata.org/grapher/life-expectancy.png
         """
-        return f"{self.site}/grapher/thumbnail/{slug}.png"
+        return f"{self.site}/grapher/{slug}.png"
 
     def indicator_metadata_url(self, variable_id):
         return f"{self.indicators_url}/{variable_id}.metadata.json"
@@ -794,7 +774,7 @@ METABASE_URL = os.environ.get("METABASE_URL")
 # Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
 # The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
-METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+METABASE_URL = os.environ.get("METABASE_URL", "https://metabase.owid.io")
 
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.

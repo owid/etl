@@ -1,15 +1,13 @@
 ---
 name: find-chart-references
 description: >-
-  Find every OWID surface that references a chart, indicator, MDIM, or explorer —
-  articles (links vs embeds), explorers, narrative charts, data insights, static viz,
-  key-chart slots, MDIM views. Answers "what breaks or goes stale if
+  Find every OWID surface that references a chart, indicator, MDIM, explorer, or
+  library image — articles (links vs embeds), explorers, narrative charts, data
+  insights, static viz, key-chart slots, MDIM views, data-page FAQs. Answers "what breaks or goes stale if
   this changes or goes away", and distinguishes surfaces a URL redirect fixes from
-  surfaces that render the object themselves. Read-only, pure SQL. Trigger when the
-  user asks "what references this chart/indicator", "where is this chart embedded",
-  "what's the blast radius of this change", "which articles link to X", "what do I
-  have to update if I retire this chart", or when another skill needs the surface
-  sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
+  surfaces that render the object themselves. Read-only, pure SQL. Use when someone
+  asks where an object is linked, embedded or shown, or what a change to it or its
+  retirement would break (its blast radius), or when another skill needs the surface sweep (map-charts-to-mdim, check-empty-entities, check-hardcoded-years,
   update-dataset).
 metadata:
   internal: true
@@ -50,7 +48,9 @@ ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
 ```
 
 Subjects (combinable): `--chart-ids` · `--chart-slugs` · `--variable-ids` ·
-`--dataset-id` · `--mdim <slug|catalogPath>` · `--explorer <slug>`.
+`--dataset-id` · `--mdim <slug|catalogPath>` · `--explorer <slug>` ·
+`--image-filenames <a.png,b.png>` (an image in the admin library, such as a static viz
+being replaced).
 
 `--transitive` adds a second hop for indicator subjects **only**: after finding the
 charts that render an indicator, sweep the articles referencing those charts. Off by
@@ -58,8 +58,8 @@ default — it multiplies the work on a widely-charted dataset. It changes nothi
 `--mdim` or `--explorer` subject (their references are all direct), and the run says so
 rather than letting the flag imply a wider sweep than it made.
 
-Output rows: `subject_type, subject, subject_id, surface, kind, where, where_path,
-surface_id, config_id, context, query_string, text, published`.
+Output rows: `subject_type, subject, subject_label, subject_id, surface, kind, where, where_path,
+surface_id, config_id, context, query_string, text, published, preview_url, admin_url`.
 
 Two fields carry the weight for callers:
 
@@ -147,8 +147,7 @@ Matching is on **pathname alone**, deliberately: for an MDIM or explorer the row
 whose params no longer name a live view. The params travel in `query_string` instead. One object
 can hold several rows; the key is `(url, parentTagId, incomeGroup)`.
 
-WordPress (`posts` / `posts_links`) is **not** swept, and adding it back would be a
-regression. Every published post there that links a chart 404s on the live site, and none
+WordPress (`posts` / `posts_links`) is **not** swept: every published post there that links a chart 404s on the live site, and none
 of those slugs exists as a published gdoc — they are a dead mirror, not migrated content.
 
 **Indicator subjects**: charts (`chart_dimensions`), MDIM views
@@ -179,7 +178,17 @@ multi-dims are served from `/grapher/`. A row with no query string names the def
 `/explorers/<slug>?…` produces a url-typed row, and only that row carries the
 `country=`/`time=` pins the downstream audits grade. Also featured metrics, under
 `/explorers/<slug>`; an explorer's row always carries a query string, since the admin
-refuses one without it.
+refuses one without it. A link whose params name a choice the explorer no longer has is
+not necessarily broken: the explorer swaps an invalid choice for the closest valid one and
+keeps the rest, so open the link and read the view it lands on before reporting it stale.
+
+**Image subjects**: every gdoc that places the image from the library
+(`posts_gdocs_x_images`, so an `{.image}` block, a featured image or an image inside a
+fragment), and every static viz built on it. A fragment has no page of its own, so its row
+names the FAQ entry holding the image (`parsedFaqs`) and the published data pages that show
+that FAQ (`posts_gdocs_variables_faqs` → the charts plotting its variables), or says that none
+does. An image reached by a hard-coded URL, or set in a chart or explorer config, is not
+searched, and the report says so.
 
 Raw-URL targets are un-wrapped before matching: a link pasted through Google Docs can
 arrive as `google.com/url?q=<encoded>` (or `?url=<encoded>`), with the real URL and its

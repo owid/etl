@@ -25,7 +25,14 @@ def run() -> None:
     tb = clean_data(tb)
     tb = pr.concat([tb_recent, tb], ignore_index=True)
     tb = convert_date(tb)
+
+    # overwrite 1923 date with correction
+    tb.loc[tb["year"] == 1923, "Full-flowering date"] = "098"  # DOY: April 8th
+    # NOTE: Dr. Katata provided this update via email in Nov 2026 -
+    # for the next update, check whether this has been corrected in the original source and, if so, remove this manual correction.
+
     tb = tb.format(["country", "year"])
+
     #
     # Save outputs.
     #

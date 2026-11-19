@@ -21,7 +21,8 @@ from pathlib import Path
 
 import yaml
 
-from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.config import DEFAULT_GRAPHER_SCHEMA, DEFAULT_GRAPHER_SCHEMA_VERSION
+from etl.files import get_schema_from_url
 from etl.http import session as http_session
 
 HERE = Path(__file__).parent
@@ -70,17 +71,9 @@ def topic_tags() -> tuple[list[str], dict[str, str]]:
     return tags, slugs
 
 
-def grapher_schema_version() -> str:
-    """The version an MDim pins in `grapher_schema`, e.g. "011", taken from ETL's default schema URL."""
-    match = re.search(r"grapher-schema\.(\d+)\.json", DEFAULT_GRAPHER_SCHEMA)
-    assert match, f"Can't read a version from {DEFAULT_GRAPHER_SCHEMA}"
-    return match.group(1)
-
-
 def color_schemes() -> list[str]:
-    """Map colour schemes the vendored grapher schema accepts."""
-    (schema_path,) = (REPO / "schemas").glob(f"grapher-schema.{grapher_schema_version()}.json")
-    return json.loads(schema_path.read_text())["$defs"]["colorScheme"]["enum"]
+    """Map colour schemes the grapher schema ETL pins accepts."""
+    return get_schema_from_url(DEFAULT_GRAPHER_SCHEMA)["$defs"]["colorScheme"]["enum"]
 
 
 def latest_indicator(namespace: str, dataset: str, table: str, indicator: str) -> tuple[int, str]:
@@ -290,7 +283,7 @@ def build(out: Path, setup_path: Path | None = None) -> None:
         .replace("__EXAMPLE_PATH__", as_js(example_path))
         .replace("__STORAGE_KEY__", as_js(storage_key))
         .replace("__DEFAULT_SELECTION__", as_js(DEFAULT_SELECTION))
-        .replace("__GRAPHER_SCHEMA_VERSION__", as_js(grapher_schema_version()))
+        .replace("__GRAPHER_SCHEMA_VERSION__", as_js(DEFAULT_GRAPHER_SCHEMA_VERSION))
         .replace("__TOPIC_TAGS__", as_js(tags))
         .replace("__TAG_SLUGS__", as_js(tag_slugs))
         .replace("__COLOR_SCHEMES__", as_js(color_schemes()))

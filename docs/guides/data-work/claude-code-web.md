@@ -67,7 +67,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # hard-codes absolute paths — but sessions rebuild it in seconds from cache.)
 git clone --depth 1 https://github.com/owid/etl /opt/etl-setup
 cd /opt/etl-setup
-uv sync --all-extras --group dev
+uv sync --frozen --all-extras --group dev
 ```
 
 Sessions still build their own `.venv` via `scripts/remote_setup.sh`, wired as a

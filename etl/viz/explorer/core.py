@@ -66,6 +66,13 @@ class Explorer(Chart):
                 "`slug` is only supported for multidim charts, not explorers: their URL is the short name."
             )
 
+        # The page presentation turns a multidim into a data explorer; an explorer already is one.
+        if self.presentation is not None:
+            raise ValueError(
+                "`presentation` is only supported for multidim charts, not explorers: "
+                "set the explorer's title and subtitle in its `config` instead."
+            )
+
     @property
     def local_config_path(self) -> Path:
         # who/latest/influenza#influenza -> viz/explorer/who/latest/influenza/influenza.config.json
@@ -306,6 +313,14 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
         # B) NO: No need to add slug and all related complexity (skip)
         duplicate_indicators = df_columns["_slug_id"] != 0
         if duplicate_indicators.any():
+            # A view's y-indicators must be all slugs or all IDs: Grapher plots ySlugs before yVariableIds, so mixing them reorders the series (e.g. flips a stacked chart). So we also turn the other y-indicators of a view with a duplicate into slugs.
+            is_y = (df_columns["_axis"] == "y").to_numpy()
+            views_with_duplicates = df_columns.loc[duplicate_indicators & is_y, columns_widgets].drop_duplicates()
+            in_view_with_duplicates = (
+                df_columns[columns_widgets].merge(views_with_duplicates, how="left", indicator=True)["_merge"] == "both"
+            ).to_numpy()
+            duplicate_indicators = duplicate_indicators | (is_y & in_view_with_duplicates)
+
             # 1. Get indicator IDs for duplicates! The way a duplicate works, is by referencing the variable ID (does not work with catalogPath). E.g. `duplicate 123`.
             catalog_paths = df_columns.loc[duplicate_indicators, "catalogPath"].unique().tolist()
             mapping = get_mapping_paths_to_id(catalog_paths)

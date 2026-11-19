@@ -1,3 +1,4 @@
+import io
 import re
 from pathlib import Path
 from typing import Any
@@ -247,6 +248,7 @@ def write_to_dag_file(
     comments: dict[str, str] | None = None,
     indent_step=2,
     indent_dependency=4,
+    separate_new_blocks: bool = False,
 ):
     """Update the content of a dag file, respecting the comments above the steps.
 
@@ -266,6 +268,8 @@ def write_to_dag_file(
         Number of spaces to use as indentation for steps in the dag.
     indent_dependency : int, optional
         Number of spaces to use as indentation for dependencies in the dag.
+    separate_new_blocks : bool, optional
+        If True, a blank line is added above each new step that starts a new block (see `_starts_new_block`).
 
     """
 
@@ -291,7 +295,9 @@ def write_to_dag_file(
     has_nested_steps = bool(nested_only_steps or nested_top_level_steps)
     has_new_step = any(step not in existing_steps for step in dag_part)
     if steps_that_need_nested_writer or (has_nested_steps and has_new_step):
-        _write_to_nested_dag_file(dag_file=dag_file, dag_part=dag_part, comments=comments)
+        _write_to_nested_dag_file(
+            dag_file=dag_file, dag_part=dag_part, comments=comments, separate_new_blocks=separate_new_blocks
+        )
         return
 
     # Read the lines in the original dag file.
@@ -325,6 +331,8 @@ def write_to_dag_file(
     skip_until_next_step = False
     # Initialize a set to keep track of the steps that were found in the original dag file.
     steps_found = set()
+    # Keep track of the last step in the file, to know whether a new step starts a new block.
+    last_step = None
     for line in section_steps:
         # Remove leading and trailing whitespace from the line.
         stripped_line = line.strip()
@@ -336,6 +344,7 @@ def write_to_dag_file(
                 comments_next_step = []
             # Extract the name of the step (without the ":" at the end).
             current_step = ":".join(stripped_line.split(":")[:-1])
+            last_step = current_step
             if current_step in dag_part:
                 # This step was in dag_part, which means it needs to be updated.
                 # First add the step itself.
@@ -371,6 +380,15 @@ def write_to_dag_file(
     # Append new steps that weren't found in the original content.
     for step, dependencies in dag_part.items():
         if step not in steps_found:
+            # Separate the start of a new block from the previous step with a blank line.
+            if (
+                separate_new_blocks
+                and _starts_new_block(previous_step=last_step, dependencies=dependencies)
+                and updated_lines
+                and updated_lines[-1].strip()
+            ):
+                updated_lines.append("\n")
+            last_step = step
             # Add the comment for this step, if any was given.
             if step in comments:
                 updated_lines.append(
@@ -399,6 +417,15 @@ def write_to_dag_file(
         file.writelines(updated_lines)
 
 
+def _starts_new_block(previous_step: str | None, dependencies: Any) -> bool:
+    """Return true if a step appended after ``previous_step`` should be separated from it by a blank line.
+
+    A step that depends on the step right above it continues the same block (e.g. `etl update` writes the new meadow,
+    garden and grapher steps one by one), so only the first step of a new chain gets the blank line.
+    """
+    return previous_step is not None and previous_step not in (dependencies or [])
+
+
 def _dependencies_contain_nested_step(dependencies: Any) -> bool:
     """Return true if a dependency list declares nested DAG steps."""
     if not isinstance(dependencies, list):
@@ -406,7 +433,9 @@ def _dependencies_contain_nested_step(dependencies: Any) -> bool:
     return any(isinstance(dependency, dict) for dependency in dependencies)
 
 
-def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments: dict[str, str]) -> None:
+def _write_to_nested_dag_file(
+    dag_file: Path, dag_part: dict[str, Any], comments: dict[str, str], separate_new_blocks: bool = False
+) -> None:
     """Update a DAG file that already uses compact nested syntax.
 
     The historical writer is line-based and can only update top-level step
@@ -414,11 +443,7 @@ def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments
     existing structure and comments are preserved while replacing dependency
     lists structurally.
     """
-    yaml_rt = YAML(typ="rt")
-    yaml_rt.preserve_quotes = True
-    yaml_rt.indent(mapping=2, sequence=2, offset=2)
-    yaml_rt.width = 4096
-    yaml_rt.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
+    yaml_rt = _dag_round_trip_yaml()
 
     with open(dag_file) as istream:
         doc = yaml_rt.load(istream)
@@ -438,14 +463,80 @@ def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments
     dag_part_dependencies = {dependency for dependencies in dag_part.values() for dependency in dependencies}
     new_roots = [step for step in dag_part if step not in original_steps and step not in dag_part_dependencies]
     for step in new_roots:
+        new_block = separate_new_blocks and _starts_new_block(
+            previous_step=next(reversed(steps), None), dependencies=dag_part[step]
+        )
         steps[step] = _build_dependency_sequence(dag_part[step], dag_part, declared_steps, {step})
-        if comments.get(step):
-            steps.yaml_set_comment_before_after_key(step, before=_normalise_ruamel_comment(comments[step]), indent=2)
+        comment = _normalise_ruamel_comment(comments[step]) if comments.get(step) else ""
+        if new_block or comment:
+            # A leading line break in the comment makes ruamel write a blank line above the step.
+            steps.yaml_set_comment_before_after_key(step, before=("\n" if new_block else "") + comment, indent=2)
         declared_steps.add(step)
         declared_steps.update(_collect_declared_steps(steps[step]))
 
     with open(dag_file, "w") as ostream:
         yaml_rt.dump(doc, ostream)
+
+
+def _dag_round_trip_yaml() -> YAML:
+    """Return the ruamel loader/dumper that defines the standard DAG file format."""
+    yaml_rt = YAML(typ="rt")
+    yaml_rt.preserve_quotes = True
+    yaml_rt.indent(mapping=2, sequence=2, offset=2)
+    yaml_rt.width = 4096
+    yaml_rt.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
+    return yaml_rt
+
+
+def _standardize_dag_text(text: str) -> str:
+    """Return ``text`` in the standard DAG format.
+
+    Indentation is what ``_dag_round_trip_yaml`` emits, so ``write_to_dag_file`` can later rewrite the file without
+    touching unrelated lines. Ruamel keeps comments at their original column, so each comment line is then indented
+    like the next non-blank, non-comment line (the step or dependency it describes).
+    """
+    yaml_rt = _dag_round_trip_yaml()
+    ostream = io.StringIO()
+    yaml_rt.dump(yaml_rt.load(text), ostream)
+    lines = ostream.getvalue().split("\n")
+
+    next_indent = None
+    for i in range(len(lines) - 1, -1, -1):
+        stripped = lines[i].lstrip()
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
+            if next_indent is not None:
+                lines[i] = " " * next_indent + stripped
+        else:
+            next_indent = len(lines[i]) - len(stripped)
+
+    return "\n".join(lines)
+
+
+def standardize_dag_file(dag_file: Path, dry_run: bool = False) -> bool:
+    """Rewrite ``dag_file`` in the standard DAG format, without changing its content.
+
+    Returns ``True`` if the file was (or, with ``dry_run``, would be) changed.
+    """
+    dag_file = Path(dag_file)
+    original = dag_file.read_text()
+    standardized = _standardize_dag_text(original)
+    if standardized == original:
+        return False
+    if yaml.safe_load(standardized) != yaml.safe_load(original):
+        raise ValueError(f"Standardizing {dag_file} would change its content.")
+    if not dry_run:
+        dag_file.write_text(standardized)
+    return True
+
+
+def standardize_dag_files(dag_dir: Path = paths.DAG_DIR, dry_run: bool = False) -> list[Path]:
+    """Standardize every active DAG file in ``dag_dir`` (archive files are left as they are).
+
+    Returns the files that were (or, with ``dry_run``, would be) changed.
+    """
+    return [dag_file for dag_file in sorted(Path(dag_dir).glob("*.yml")) if standardize_dag_file(dag_file, dry_run)]
 
 
 def _normalise_ruamel_comment(comment: str) -> str:

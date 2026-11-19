@@ -10,7 +10,7 @@ metadata:
 
 A chart config can pin its default time window to literal values — `maxTime: 2023` instead of `"latest"` (or simply omitting the field). Nothing fails when the dataset later gains 2024–2025 data: the pipeline is green, the indicator carries the new years, and the chart still opens at 2023. Readers never see the update unless they drag the timeline, and the chart's edit history (admin → chart → History; `chart_revisions` on a live DB — the table is not in the public Datasette mirror) shows a human bumping the year by hand every update cycle. This skill finds every such pin, grades it against the data's real time range, and routes each finding to the fix that sticks.
 
-> **Called from:** `/update-dataset` step 7 (author side — standard, run after all remaps) and `/review-data-pr` §8e (reviewer side — verify the outcome). Keep those pointers in sync with this file.
+> **Called from:** `/update-dataset` step 7 (author side — mandatory, run after all remaps) and `/review-data-pr` §8e (reviewer side — verify the outcome). Keep those pointers in sync with this file.
 
 ## Inputs / modes
 
@@ -144,7 +144,7 @@ for p in Path("etl/steps").rglob("*.yml"):
             print(f"UNPARSED (likely Jinja-templated): {p} — inspect its map: block manually")
 ```
 
-Don't drop the unparsed files silently — Jinja-templated garden metas fail `safe_load`, and one of them can be exactly the file carrying the pin (e.g. `pisa.meta.yml` nests `map: time: 2022` under `presentation.grapher_config`).
+Don't drop the unparsed files silently — Jinja-templated garden metas fail `safe_load`, and one of them can be exactly the file carrying the pin (a garden `.meta.yml` can nest `map: time: <year>` under `presentation.grapher_config`).
 
 ## Script skeleton
 

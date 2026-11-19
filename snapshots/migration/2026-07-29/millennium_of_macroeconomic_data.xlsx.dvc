@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: A millennium of macroeconomic data for the UK
+    description: |-
+      A research dataset compiled by Bank of England staff, bringing together historical macroeconomic and financial statistics for the United Kingdom — national accounts, population, migration, money and credit, fiscal data, interest rates, exchange rates, trade, and labor market data. Some series reach back to the 13th century, with a few benchmark estimates for 1086.
+
+      The dataset splices together estimates from the academic literature, historical administrative records, and official statistics into continuous long-run series, and documents the underlying sources and assumptions in each worksheet. The Bank describes it as a "best endeavours" research resource rather than official Bank of England data or National Statistics.
+
+      Version 3.1 was finalized on 30 April 2017 and extended in September and October 2017, with corrections to the historical data made in August 2018 and August 2024. It covers data up to 2016.
+    date_published: "2017-04-30"
+    version_producer: Version 3.1
+
+    # Citation
+    producer: Bank of England
+    citation_full: |-
+      Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, http://www.bankofengland.co.uk/research/Pages/onebank/threecenturies.aspx
+
+      The Bank of England asks users to also cite the original sources of individual series. The migration series used by Our World in Data (worksheet A19a) draws on: Mitchell, B. R. (1988). British Historical Statistics. Cambridge University Press; and the Office for National Statistics (International Passenger Survey and Long-Term International Migration estimates).
+
+    # Files
+    url_main: https://www.bankofengland.co.uk/statistics/research-datasets
+    url_download: https://www.bankofengland.co.uk/-/media/boe/files/statistics/research-datasets/a-millennium-of-macroeconomic-data-for-the-uk.xlsx
+    date_accessed: "2026-07-29"
+
+    # License
+    license:
+      name: © Bank of England
+      url: https://www.bankofengland.co.uk/legal
+outs:
+  - md5: de399fab8c99a7475e1a773e7437f004
+    size: 27533690
+    path: millennium_of_macroeconomic_data.xlsx

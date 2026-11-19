@@ -18,7 +18,7 @@ The channel of a viz step says what it produces:
 Chart and explorer steps also write their expanded config to the gitignored `viz/<channel>/...` folder, like `data/` for data steps.
 
 ```bash
-etlr viz://explorer/minerals/latest/minerals --grapher
+etlr viz://chart/minerals/latest/minerals --grapher
 ```
 
 The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `paths.create_chart(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
