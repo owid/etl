@@ -183,7 +183,9 @@ def _check_annotation_dimension_names(annotation: catalog.Annotation, dim_names:
     if unknown:
         raise ValueError(
             f"Annotation of column '{column}' is scoped to dimensions {sorted(unknown)}, which the table does not have "
-            f"(its dimensions are {sorted(dim_names)}): {annotation.text!r}"
+            f"(its dimensions are {sorted(dim_names)}): {annotation.text!r}. Fix the dimension name or, if the "
+            f"annotation comes from another dataset this step is built from, set `annotations` in this step's metadata, "
+            f"which replaces the inherited ones."
         )
 
 
@@ -859,7 +861,9 @@ def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> N
     meta = tab[col].m
     display = meta.display or {}
     assert "entityAnnotationsMap" not in display, (
-        f"Column `{col}` sets both `annotations` and `display.entityAnnotationsMap`. Use only one of them."
+        f"Column `{col}` sets both `annotations` and `display.entityAnnotationsMap`, which is deprecated. Use only "
+        f"`annotations`. If they come from another dataset this step is built from, set `annotations` in this step's "
+        f"metadata, which replaces the inherited ones."
     )
     rows = entity_times[tab[col].notna().to_numpy()]
     entities = set(rows["country"])
@@ -867,7 +871,8 @@ def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> N
     for annotation in meta.annotations:
         assert not (annotation.dimensions and flattened), (
             f"Annotation of column `{col}` is scoped to dimensions {annotation.dimensions}, but the column has none: "
-            f"{annotation.text!r}"
+            f"{annotation.text!r}. If it comes from another dataset this step is built from, set `annotations` in "
+            f"this step's metadata, which replaces the inherited ones."
         )
         missing = sorted(set(annotation.entities) - entities)
         assert not missing, f"Annotation of column `{col}` names entities without data {missing}: {annotation.text!r}"
