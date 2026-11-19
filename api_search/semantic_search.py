@@ -7,7 +7,8 @@ import sentry_sdk
 from owid.catalog.core import CatalogPath
 from owid.catalog.schema_org import DEFAULT_CATALOG_BASE_URL
 
-from apps.wizard.app_pages.indicator_search.data import Indicator, _get_data_indicators_from_db
+from api_search.indicators import load_indicators
+from apps.wizard.app_pages.indicator_search.data import Indicator
 from apps.wizard.utils.embeddings import EmbeddingsModel, get_model
 
 # Global variables to store preloaded data and initialization state
@@ -40,10 +41,7 @@ def _initialize_semantic_search():
     global _indicators, _embeddings_model, _initialization_complete, _initialization_error
 
     try:
-        # Fetch all data indicators.
-        # NOTE: we could avoid fetching indicators from DB (and hence not needing credentials on server)
-        #  by fetching them from Datasette with ".csv?_stream=on"
-        _indicators = _get_data_indicators_from_db()
+        _indicators = load_indicators()
 
         # Get embedding model.
         model = get_model()
