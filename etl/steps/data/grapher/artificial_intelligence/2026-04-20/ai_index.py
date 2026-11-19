@@ -39,5 +39,6 @@ def run() -> None:
             tb_generative,
             tb_companies,
         ],
+        default_metadata=ds_garden.metadata,
     )
     ds_grapher.save()

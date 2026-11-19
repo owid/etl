@@ -215,6 +215,8 @@ definitions:
 dataset:
   update_period_days: 365
   title: UNESCO Institute for Statistics (UIS) - Education (SDGs)
+  owners:
+    - Tuna Acisu
 
 tables:
   education_sdgs:
