@@ -30,6 +30,11 @@ definitions:
     - config:
         originUrl: https://ourworldindata.org/crop-yields
         hasMapTab: true
+        # The explorer hid the time span and entity from its titles.
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
         yAxis:
           min: 0
     - dimensions:
