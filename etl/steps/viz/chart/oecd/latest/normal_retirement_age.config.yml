@@ -31,8 +31,13 @@ definitions:
         matchingEntitiesOnly: true
         map:
           hideTimeline: true
+          # Open-ended brackets at both ends: 60 and below, so the few countries with much lower ages (down to 47) don't
+          # stretch the scale, and above 66. Grapher only opens an end bracket when the data goes beyond its outer edge
+          # and then hides that edge, so 58 and 66.5 never show; they only need to be inside the data's range.
           colorScale:
             baseColorScheme: Purples
+            binningStrategy: manual
+            customNumericValues: [58, 60, 62, 64, 65, 66, 66.5]
 
 # NOTE: Update the year (2024) in the subtitle of the comparison view to the new edition's.
 dimensions:
