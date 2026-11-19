@@ -20,6 +20,7 @@ on production, and `api-staging.owid.io/<env>` on a staging server or a laptop.
 
 import json
 
+from owid.catalog.core.docs import attribution_label
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
@@ -95,9 +96,16 @@ def run() -> None:
     metadata = {
         "method": METHOD,
         # TODO: Remove "sources" once the waterfall (owid/owid-grapher#7324) stops reading it: grapher builds the
-        #  source line from the metadata's origins (owid/owid-grapher#7484). This list misses the origins that have
-        #  no attribution field (the nutrient conversion table and Feedipedia).
-        "sources": sorted({origin.attribution for origin in reference["food"].metadata.origins if origin.attribution}),
+        #  source line from the metadata's origins (owid/owid-grapher#7484).
+        # Each origin of the shown columns, named as grapher names it under a chart: its attribution, or "Producer (year)".
+        "sources": sorted(
+            {
+                attribution_label(origin)
+                for nutrient in NUTRIENTS
+                for key, _, _ in STAGES
+                for origin in tables[nutrient][key].metadata.origins
+            }
+        ),
         "timeRange": {"start": int(reference["year"].min()), "end": int(reference["year"].max())},
         "units": {nutrient: tables[nutrient]["food"].metadata.unit for nutrient in NUTRIENTS},
         "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in STAGES],
