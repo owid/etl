@@ -99,8 +99,12 @@ tables:
   owid_co2:
     title: CO₂ and greenhouse gas emissions dataset
     description: |-
-      Our World in Data's complete CO₂ and greenhouse gas emissions dataset: one wide table with, for each country and year, CO₂ emissions (in total, by source, per person, cumulative, as shares of the global total, and adjusted for trade), emissions of methane, nitrous oxide, and all greenhouse gases, and each country's contribution to global warming. Total energy supply, population, and GDP are included so that indicators per unit of energy, per person, and per GDP can be recalculated.
+      On this page you can find Our World in Data's dataset on CO₂ and greenhouse gas emissions, which is behind most of our charts on this topic.
 
-      It is compiled from the Global Carbon Project's [Global Carbon Budget](https://globalcarbonbudget.org/) (CO₂ emissions) and Jones et al.'s [national contributions to climate change](https://zenodo.org/records/7636699/latest) (methane, nitrous oxide, all greenhouse gases, and contributions to global warming), with total energy supply from our [energy dataset](https://catalog.ourworldindata.org/energy/owid_energy/), population from [Our World in Data's population dataset](https://ourworldindata.org/population-sources), and GDP from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/).
+      It brings together two main sources. Data on CO₂ emissions comes from the Global Carbon Project's [Global Carbon Budget](https://globalcarbonbudget.org/). Data on methane, nitrous oxide, all greenhouse gases, and each country's contribution to global warming comes from Jones et al.'s [national contributions to climate change](https://zenodo.org/records/7636699/latest).
 
-      Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the Global Carbon Project are also included, marked "(GCP)", for example "Africa (GCP)".
+      We combine these with data on population, GDP, and total energy supply to calculate emissions per person, per unit of GDP, and per unit of energy. Population comes from [Our World in Data's population dataset](https://ourworldindata.org/population-sources), GDP from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/), and total energy supply from our [energy dataset](https://catalog.ourworldindata.org/energy/owid_energy/). These three are also included in the dataset, so you can recalculate those indicators.
+
+      The dataset includes annual and cumulative emissions, emissions by source and adjusted for trade, and each country's share of the global total. CO₂ data covers most countries from 1950, and some from as early as 1750. Data on other greenhouse gases starts in 1850.
+
+      It also includes world regions, following [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the Global Carbon Project are also included, marked "(GCP)", for example "Africa (GCP)".
