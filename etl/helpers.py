@@ -133,6 +133,9 @@ def create_dataset(
     # it (its grapher step, which keeps the short name, does).
     if inherited_short_name and inherited_short_name != ds.metadata.short_name:
         ds.metadata.changelog = []
+    # Only the metadata file of the step itself opts the dataset into a dataset page: a dataset built from another
+    # one's metadata (even its own grapher step) doesn't inherit the flag.
+    ds.metadata.dataset_page = False
 
     meta_path = get_metadata_path(str(dest_dir))
 

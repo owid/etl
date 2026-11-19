@@ -1,7 +1,8 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Poverty multidim from the Luxembourg Income Study, shown as a data explorer (replaces the poverty-lis explorer)."""
+
+from copy import deepcopy
 
 from etl.helpers import PathFinder
-from etl.viz.chart.model.dimension import DimensionPresentation
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -26,6 +27,18 @@ AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
 EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
+# Settings every view gets, grouped ones included (they are created after `common_views` would apply).
+# The explorer's text block below the chart only pointed readers to the related article.
+ALL_VIEWS_CONFIG = {
+    "originUrl": "https://ourworldindata.org/poverty",
+    "relatedQuestions": [
+        {
+            "url": "https://ourworldindata.org/owid-data-collection-inequality-and-poverty",
+            "text": "OWID Data Collection: Inequality and Poverty",
+        }
+    ],
+}
+
 
 def run() -> None:
     #
@@ -39,20 +52,14 @@ def run() -> None:
     tb = ds.read("poverty", load_data=False)
 
     #
-    # Create chart object
+    # Create the multidim, one view per indicator column
     #
-    c = paths.create_explorer(
+    c = paths.create_chart(
         config=config,
-        short_name="poverty-lis",
+        short_name="poverty_lis",
         tb=tb,
         indicator_names=INDICATOR_NAMES,
-        # dimensions=DIMENSIONS_CONFIG,
     )
-
-    # Make the equivalence_scale dimension a checkbox
-    for dimension in c.dimensions:
-        if dimension.slug == "equivalence_scale":
-            dimension.presentation = DimensionPresentation(type="checkbox", choice_slug_true="square root")
 
     # Add After tax vs. Before tax dimension
     c.group_views(
@@ -61,10 +68,10 @@ def run() -> None:
                 "dimension": "welfare_type",
                 "choice_new_slug": "after_vs_before_tax",
                 "view_config": {
-                    "hideRelativeToggle": "false",
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
-                    "hasMapTab": "false",
-                    "type": "LineChart",
+                    "hasMapTab": False,
+                    "chartTypes": ["LineChart"],
                 },
             },
             {
@@ -72,10 +79,10 @@ def run() -> None:
                 "choices": ["1", "3", "4.20", "8.30", "10", "20", "30", "40"],
                 "choice_new_slug": "multiple_lines",
                 "view_config": {
-                    "hideRelativeToggle": "false",
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
-                    "hasMapTab": "false",
-                    "type": "LineChart",
+                    "hasMapTab": False,
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
@@ -88,6 +95,7 @@ def run() -> None:
         # Initialize config if it's None
         if view.config is None:
             view.config = {}
+        view.config.update(deepcopy(ALL_VIEWS_CONFIG))
 
         if view.dimensions["welfare_type"] in ["dhi", "mi"]:
             # Set tab as map
@@ -152,12 +160,13 @@ def run() -> None:
                     if col_meta.presentation and col_meta.presentation.grapher_config:
                         existing_note = col_meta.presentation.grapher_config.get("note", "")
 
-                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
                         # Remove EQUIVALENCE_SCALE_NOTE if present
                         new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
 
-                        # Set note in view config
-                        view.config["note"] = new_note
+                        # NOTE: an empty note isn't set, so the view keeps the indicator's note, as the explorer
+                        # did (an empty explorer note falls back to it).
+                        if new_note:
+                            view.config["note"] = new_note
 
             # Add EQUIVALENCE_SCALE_SUBTITLE at the end
             if existing_subtitle:
@@ -165,16 +174,5 @@ def run() -> None:
             else:
                 view.config["subtitle"] = EQUIVALENCE_SCALE_SUBTITLE
 
-        # Set default view
-        if (
-            view.dimensions["indicator"] == "headcount_ratio"
-            and view.dimensions["poverty_line"] == "30"
-            and view.dimensions["welfare_type"] == "dhi"
-            and view.dimensions["equivalence_scale"] == "per capita"
-        ):
-            view.config["defaultView"] = True
-
-    #
-    # Save garden dataset.
-    #
+    # The default view is set in the config (`default_dimensions`).
     c.save()

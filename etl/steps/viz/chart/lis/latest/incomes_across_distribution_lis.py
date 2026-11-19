@@ -1,4 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Incomes across the distribution (Luxembourg Income Study), a multidim shown as a data explorer.
+
+Replaces the incomes-across-distribution-lis explorer, with the same views.
+"""
 
 from etl.helpers import PathFinder
 from etl.viz.chart.model.dimension import DimensionPresentation
@@ -24,6 +27,18 @@ AFTER_TAX_SUBTITLE = "Income here is measured after taxes and benefits."
 BEFORE_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income before taxes and benefits."
 AFTER_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income after taxes and benefits."
 
+# Set on every view, grouped ones included (the config's common_views don't reach the views that
+# group_views creates). The related link is the one the explorer showed in a block below the chart.
+COMMON_VIEW_CONFIG = {
+    "originUrl": "https://ourworldindata.org/economic-inequality",
+    "relatedQuestions": [
+        {
+            "url": "https://ourworldindata.org/owid-data-collection-inequality-and-poverty",
+            "text": "OWID Data Collection: Inequality and Poverty",
+        }
+    ],
+}
+
 EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
@@ -39,24 +54,29 @@ def run() -> None:
     ds = paths.load_dataset("luxembourg_income_study")
     tb = ds.read("incomes", load_data=False)
 
+    # Use the decile number as its choice slug (1, not 1.0).
+    for column in tb.columns:
+        dims = tb[column].metadata.dimensions
+        if dims and isinstance(dims.get("decile"), (int, float)):
+            dims["decile"] = str(int(dims["decile"]))
+
     #
     # Create chart object
     #
-    c = paths.create_explorer(
+    c = paths.create_chart(
         config=config,
-        short_name="incomes-across-distribution-lis",
+        short_name="incomes_across_distribution_lis",
         tb=tb,
         indicator_names=INDICATOR_NAMES,
         # dimensions=DIMENSIONS_CONFIG,
     )
 
-    # Make the equivalence_scale dimension a checkbox
+    # Show the equivalence scale (a checkbox in the explorer) as toggle buttons, and the period as a dropdown.
     for dimension in c.dimensions:
         if dimension.slug == "equivalence_scale":
-            dimension.presentation = DimensionPresentation(type="checkbox", choice_slug_true="square root")
-
-        if dimension.slug == "period":
-            dimension.presentation = DimensionPresentation(type="radio")
+            dimension.presentation = DimensionPresentation(type="toggle-buttons")
+        elif dimension.slug == "period":
+            dimension.presentation = DimensionPresentation(type="dropdown")
 
     # Add After tax vs. Before tax dimension
     c.group_views(
@@ -65,21 +85,21 @@ def run() -> None:
                 "dimension": "welfare_type",
                 "choice_new_slug": "after_vs_before_tax",
                 "view_config": {
-                    "hideRelativeToggle": "false",
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
-                    "hasMapTab": "false",
-                    "type": "LineChart",
+                    "hasMapTab": False,
+                    "chartTypes": ["LineChart"],
                 },
             },
             {
                 "dimension": "decile",
                 "choice_new_slug": "all",
-                "choices": ["1.0", "2.0", "3.0", "4.0", "5.0", "6.0", "7.0", "8.0", "9.0", "10.0"],
+                "choices": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
                 "view_config": {
-                    "hideRelativeToggle": "false",
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
-                    "hasMapTab": "false",
-                    "type": "LineChart",
+                    "hasMapTab": False,
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
@@ -92,9 +112,10 @@ def run() -> None:
         # Initialize config if it's None
         if view.config is None:
             view.config = {}
+        view.config = {**COMMON_VIEW_CONFIG, **view.config}
 
-        if view.dimensions["welfare_type"] in ["dhi", "mi"]:
-            # Set tab as map
+        # Open on the map, in views that have one (grouped views don't).
+        if view.dimensions["welfare_type"] in ["dhi", "mi"] and view.config.get("hasMapTab") is not False:
             view.config["tab"] = "map"
 
         if view.dimensions["welfare_type"] == "after_vs_before_tax":
@@ -158,12 +179,13 @@ def run() -> None:
                     if col_meta.presentation and col_meta.presentation.grapher_config:
                         existing_note = col_meta.presentation.grapher_config.get("note", "")
 
-                        # NOTE: I can't override the note if new_note is empty, because it falls back to the default indicator note.
                         # Remove EQUIVALENCE_SCALE_NOTE if present
                         new_note = existing_note.replace(f"{EQUIVALENCE_SCALE_NOTE}", "").strip()
 
-                        # Set note in view config
-                        view.config["note"] = new_note
+                        # NOTE: when nothing else is left, keep the indicator's note (as the explorer did, which
+                        # fell back to it): an empty note here would remove it from the chart.
+                        if new_note:
+                            view.config["note"] = new_note
 
             # Add EQUIVALENCE_SCALE_SUBTITLE at the end
             if existing_subtitle:
@@ -235,17 +257,7 @@ def run() -> None:
                                     indicator.display = {}
                                 indicator.display["name"] = new_name
 
-        # Set default view
-        if (
-            view.dimensions["indicator"] == "thr"
-            and view.dimensions["decile"] == "9.0"
-            and view.dimensions["welfare_type"] == "dhi"
-            and view.dimensions["period"] == "year"
-            and view.dimensions["equivalence_scale"] == "per capita"
-        ):
-            view.config["defaultView"] = True
-
     #
-    # Save garden dataset.
+    # Save multidim.
     #
     c.save()

@@ -1,11 +1,10 @@
-"""What the all-charts block shows for a topic, and how terms are chosen to cover it.
+"""What the all-charts block shows for a topic, and what each candidate term would reveal of it.
 
-The suggestion line under a topic's search box should reveal as much of that
-topic's chart list as a few terms can, most-revealing first, with charts counted
-by how much they are actually viewed. That makes term selection a weighted
-maximum-coverage problem, and this module holds the three pieces it needs: the
-topic's records ("the universe"), a weight per record, and which records each
-candidate term would actually put on screen.
+The suggestion line under a topic's search box is chosen by the model from
+measured candidates, and this module does the measuring: the topic's records
+("the universe"), a weight per record by how much it is viewed, which records each
+candidate term would actually put on screen, and what a chosen line shows and
+adds term by term.
 
 Everything here models the *rendered* list rather than Algolia's matching, which
 is looser in every direction that matters (synonyms, typo tolerance, and `tags` /
@@ -21,11 +20,14 @@ import json
 import os
 import re
 from dataclasses import dataclass, field
+from functools import cache
 from urllib.parse import parse_qsl
 
 import httpx
+import yaml
 
 from etl.config import OWID_ENV  # ty: ignore
+from etl.paths import LATEST_REGIONS_YML  # ty: ignore
 
 # The charts index the block searches, and the public search-only credentials the
 # site ships in its own client bundle (owid-grapher commits the same pair in
@@ -117,9 +119,7 @@ def record_matches_term(record: dict, term: str) -> bool:
     leading, last = term_words[:-1], term_words[-1]
     for text in record_subject_texts(record):
         text_words = split_into_match_words(text)
-        if all(word in text_words for word in leading) and any(
-            word.startswith(last) for word in text_words
-        ):
+        if all(word in text_words for word in leading) and any(word.startswith(last) for word in text_words):
             return True
     return False
 
@@ -137,9 +137,7 @@ def record_identity(record: dict) -> str:
 # -------------------------------------------------------------------- universe
 
 
-async def fetch_topic_universe(
-    client: httpx.AsyncClient, topic_name: str, semaphore: asyncio.Semaphore
-) -> list[dict]:
+async def fetch_topic_universe(client: httpx.AsyncClient, topic_name: str, semaphore: asyncio.Semaphore) -> list[dict]:
     """Every record the all-charts block lists for a topic.
 
     The same facets the block's baseline query uses (see `buildChartsFacetFilters`
@@ -150,6 +148,7 @@ async def fetch_topic_universe(
     the same title, subtitle and producers as its plain twin, so it matches
     identically and keys identically.
     """
+
     async def fetch_page(page: int) -> dict:
         async with semaphore:
             response = await client.post(
@@ -179,15 +178,11 @@ async def fetch_topic_universe(
     # its explorers) need two or three.
     pages = first.get("nbPages") or 1
     if pages > 1:
-        for payload in await asyncio.gather(
-            *(fetch_page(page) for page in range(1, pages))
-        ):
+        for payload in await asyncio.gather(*(fetch_page(page) for page in range(1, pages))):
             hits.extend(payload.get("hits") or [])
 
     if first.get("nbHits", 0) > len(hits):
-        raise RuntimeError(
-            f"{topic_name}: {first['nbHits']} records but only {len(hits)} fetched"
-        )
+        raise RuntimeError(f"{topic_name}: {first['nbHits']} records but only {len(hits)} fetched")
 
     # One record per identity. Where an FM copy and its plain twin both appear,
     # either will do: they render the same text.
@@ -244,12 +239,8 @@ def load_view_analytics(views_column: str = DEFAULT_VIEWS_COLUMN) -> ViewAnalyti
         elif row.chart_slug:
             by_slug[row.chart_slug] = views
 
-    average_by_slug = {
-        slug: round(sum(counts) / len(counts)) for slug, counts in slug_totals.items()
-    }
-    return ViewAnalytics(
-        by_config_id=by_config_id, average_by_slug=average_by_slug, by_slug=by_slug
-    )
+    average_by_slug = {slug: round(sum(counts) / len(counts)) for slug, counts in slug_totals.items()}
+    return ViewAnalytics(by_config_id=by_config_id, average_by_slug=average_by_slug, by_slug=by_slug)
 
 
 def load_mdim_view_config_ids() -> dict[tuple[str, frozenset], str]:
@@ -261,9 +252,7 @@ def load_mdim_view_config_ids() -> dict[tuple[str, frozenset], str]:
     the encoded string, which sidesteps every encoding discrepancy between
     Python's urlencode and the browser's URLSearchParams.
     """
-    rows = OWID_ENV.read_sql(
-        "SELECT slug, config FROM multi_dim_data_pages WHERE published = 1"
-    )
+    rows = OWID_ENV.read_sql("SELECT slug, config FROM multi_dim_data_pages WHERE published = 1")
     mapping: dict[tuple[str, frozenset], str] = {}
     for row in rows.itertuples(index=False):
         config = json.loads(row.config) if isinstance(row.config, str) else row.config
@@ -288,6 +277,9 @@ class WeightedUniverse:
     @property
     def total_weight(self) -> float:
         return sum(self.weights.values())
+
+    def weight_of(self, identities: frozenset[str] | set[str]) -> float:
+        return sum(self.weights.get(identity, 0.0) for identity in identities)
 
     def resolution_counts(self) -> dict[str, int]:
         counts: dict[str, int] = {}
@@ -363,11 +355,7 @@ def weigh_universe(
 
 def match_identities(universe: WeightedUniverse, term: str) -> frozenset[str]:
     """The records the block would show for a term, within this topic."""
-    return frozenset(
-        identity
-        for identity, record in universe.records.items()
-        if record_matches_term(record, term)
-    )
+    return frozenset(identity for identity, record in universe.records.items() if record_matches_term(record, term))
 
 
 # ------------------------------------------------------------------- selection
@@ -416,136 +404,112 @@ class TopicSelection:
         return self.selected[-1].cumulative_weight if self.selected else 0.0
 
 
-def offerable_candidates(candidates: list[str], topic_name: str) -> list[str]:
-    """Drop the candidates that could never be worth a slot: places.
+# The prompt asks for no places, and this catches the ones that slip through
+# anyway, since a country named in many chart titles can otherwise win a slot on
+# coverage alone ("Sweden" on Smallpox). Region names are compared as written
+# (see _place_spellings), and these few in any case, "america" included, which
+# isn't a region of its own.
+_COMMON_PLACE_WORDS = frozenset({"world", "africa", "asia", "europe", "america", "oceania", "antarctica"})
 
-    Nothing else. A term the topic's own name contains used to be dropped here
-    too, which cost the topics whose charts are simply called after them —
-    Religion reached 39% of its traffic without being allowed to say "religious".
-    Whether a term is too blunt to suggest turns out not to be answerable from
-    its text at all: "religious" is not a substring of "Religion" and covers 81%
-    of it, while "poverty line" contains the whole of "Poverty" and covers 12%.
-    It is answerable from what the term covers, which is what
-    select_terms_by_coverage does with SUBSUMING_CHART_SHARE.
+
+@cache
+def regions_definitions() -> list[dict]:
+    """OWID's regions definitions: every country, continent, aggregate and historical region."""
+    return yaml.safe_load(LATEST_REGIONS_YML.read_text())
+
+
+def region_spellings(region: dict) -> list[str]:
+    """Every name a region goes by: its name, short name and aliases."""
+    return [
+        spelling for spelling in [region["name"], region.get("short_name"), *(region.get("aliases") or [])] if spelling
+    ]
+
+
+@cache
+def _place_spellings() -> frozenset[str]:
+    """Every spelling of every region, as written.
+
+    Compared as written because place names are proper nouns and many are also
+    ordinary words: "Turkey" is a country and "turkey" a bird with charts of its
+    own, as "CAR" (Central African Republic) is not "car".
     """
-    return [candidate for candidate in candidates if not _is_place_name(candidate)]
-
-
-# Region names are the site's business, and it filters them itself with the
-# lookup that knows every variant name; this is a cheap first pass so an obvious
-# one can't win a slot on coverage alone.
-_COMMON_PLACE_WORDS = frozenset(
-    {"world", "africa", "asia", "europe", "america", "oceania", "antarctica"}
-)
+    return frozenset(spelling for region in regions_definitions() for spelling in region_spellings(region))
 
 
 def _is_place_name(term: str) -> bool:
-    return term.strip().lower() in _COMMON_PLACE_WORDS
+    term = term.strip()
+    return term in _place_spellings() or term.casefold() in _COMMON_PLACE_WORDS
 
 
 # A term matching this share of a topic's charts narrows nothing: a reader
-# clicking it is shown the page they are already on. "malaria" matches all 20
-# charts on Malaria, "poverty" all but a handful of Poverty's 250 — offering them
-# spends the line's first slot to stand still, and, since everything else is then
-# a subset that adds nothing, the line stops there. Held back, those topics
-# suggest "cases, deaths, children, funding" and "extreme poverty, relative
-# poverty, national poverty lines" instead.
-#
-# Counted in charts, not views, and set where terms stop narrowing rather than
-# where they start being broad. Both of those were wrong before, and together
-# they made the rule a coin toss:
-#
-# - It read views, so the *same* term on the same charts changed category as
-#   traffic moved. "sex ratio" matches 6 of Gender Ratio's 15 charts and sat at
-#   53% of its views — just over the old bar — so it was withheld, and the topic
-#   suggested six terms reaching half of it while five charts named "Sex ratio …"
-#   had nothing pointing at them. A week earlier the same code had suggested it
-#   first and reached 99%. A chart count only moves when charts are published, so
-#   the decision now holds still.
-# - The bar was half the topic, which is where useful terms live, not useless
-#   ones: a term matching six charts in fifteen is the most narrowing thing on
-#   offer. Anywhere in 80–95% the outcome is near enough identical (median
-#   coverage 94.3%, 95.0%, 95.7%), because almost nothing real sits there — which
-#   is the point of putting the bar there.
+# clicking it is shown the page they are already on ("malaria" matches all 20
+# charts on Malaria, "poverty" all but a handful of Poverty's 250), so it is not
+# offered to the model. Counted in charts rather than views, so the same term on
+# the same charts doesn't change category as traffic moves; a chart count only
+# moves when charts are published. The bar sits where terms stop narrowing, not
+# where they start being broad: a term matching six charts in fifteen is the most
+# narrowing thing on offer, and anywhere in 80-95% almost nothing real sits. When
+# every candidate is that broad, they are all offered (see measure_candidates).
 SUBSUMING_CHART_SHARE = 0.9
 
 
-def select_terms_by_coverage(
-    universe: WeightedUniverse,
-    candidates: list[str],
-    max_terms: int,
-    min_marginal_share: float,
-) -> TopicSelection:
-    """Pick the terms that reveal the most of a topic, most-revealing first.
+@dataclass
+class CandidateReach:
+    """What clicking one candidate term would put on screen."""
 
-    Greedy weighted maximum coverage: take the term covering the most, then
-    repeatedly take whichever term adds the most that is still uncovered. That is
-    the requirement stated directly — the first term has the largest coverage and
-    each next one the largest addition — and it comes with the standard
-    (1 - 1/e) approximation bound. It does *not* find the optimal set: a pair of
-    terms that between them cover everything can be missed because one of them
-    lost the first round.
+    term: str
+    records: frozenset[str]
+    weight: float
 
-    Two things fall out of it that used to need a second LLM pass. A term whose
-    rows are all covered already has zero marginal weight and is never taken, so
-    near-synonyms can't stack up — the old line offering "missing women",
-    "sex-selective abortion" and "excess female mortality", three terms and two
-    charts. And a term the block would show nothing for covers nothing, so it
-    can't be taken at all.
 
-    The one thing withheld from the competition is a term that matches nearly
-    every chart, because it narrows nothing (SUBSUMING_CHART_SHARE). Coverage is
-    otherwise the only criterion: a term revealing most of a topic is taken if it
-    reveals the most, which is what the line is supposed to open with.
+def measure_candidates(universe: WeightedUniverse, candidates: list[str]) -> list[CandidateReach]:
+    """What each candidate would show, for the ones worth offering the model to choose from.
+
+    Left out are places, terms that show nothing, and terms
+    matching nearly every chart, which narrow nothing (SUBSUMING_CHART_SHARE) —
+    unless every candidate does, as on a topic whose charts are all named after it
+    (Energy Mix), where a term that narrows nothing still beats no suggestion.
     """
-    candidates = offerable_candidates(candidates, universe.topic_name)
-    matches = {term: match_identities(universe, term) for term in candidates}
-    total_weight = universe.total_weight
+    measured: list[CandidateReach] = []
+    seen: set[str] = set()
+    for term in candidates:
+        if _is_place_name(term) or term.casefold() in seen:
+            continue
+        seen.add(term.casefold())
+        records = match_identities(universe, term)
+        if records:
+            measured.append(CandidateReach(term, records, universe.weight_of(records)))
     total_count = len(universe.records)
-    weight_of = universe.weights
+    narrowing = [c for c in measured if len(c.records) / total_count <= SUBSUMING_CHART_SHARE]
+    return narrowing or measured
 
-    def weight(identities: frozenset[str]) -> float:
-        return sum(weight_of.get(identity, 0.0) for identity in identities)
 
-    self_named = match_identities(universe, universe.topic_name)
-    # Terms that match nearly every chart narrow nothing, so they are not offered
-    # — see SUBSUMING_CHART_SHARE. Everything else competes on coverage as usual,
-    # however much of the topic it happens to reveal.
-    narrowing = [
-        term
-        for term in candidates
-        if not (
-            total_count and len(matches[term]) / total_count > SUBSUMING_CHART_SHARE
-        )
-    ]
-
-    selection = _greedy(
-        universe, narrowing, matches, weight, max_terms, min_marginal_share
+def _term_coverage(
+    universe: WeightedUniverse, candidate: CandidateReach, covered: set[str], covered_weight: float
+) -> TermCoverage:
+    """What a candidate shows, and what it adds to the records already covered (worth `covered_weight`)."""
+    new = candidate.records - covered
+    marginal = universe.weight_of(new)
+    return TermCoverage(
+        term=candidate.term,
+        own_weight=candidate.weight,
+        own_count=len(candidate.records),
+        marginal_weight=marginal,
+        marginal_count=len(new),
+        cumulative_weight=covered_weight + marginal,
     )
-    if not selection.selected:
-        # Every candidate matches the whole topic. That happens on a topic whose
-        # charts are all named after it — Energy Mix, whose ten charts are all
-        # about the energy mix — where a term that narrows nothing is still better
-        # than no suggestion at all.
-        selection = _greedy(
-            universe, candidates, matches, weight, max_terms, min_marginal_share
-        )
-    selection.topic_name_share = (
-        weight(self_named) / total_weight if total_weight else 0.0
-    )
-    selection.uncovered = _uncovered(universe, selection, matches)
-    return selection
 
 
-def _greedy(
-    universe: WeightedUniverse,
-    candidates: list[str],
-    matches: dict[str, frozenset[str]],
-    weight,
-    max_terms: int,
-    min_marginal_share: float,
+def measure_line(
+    universe: WeightedUniverse, line: list[CandidateReach], candidates: list[CandidateReach]
 ) -> TopicSelection:
-    """One pass of greedy weighted maximum coverage over `candidates`."""
+    """Measure a chosen line in its order: what each term shows, and what it adds to the ones before it.
+
+    Every chosen term is kept, including one adding no chart to those before it:
+    a narrower term ("wine" after "alcohol consumption") is still a useful click,
+    and whether it is worth its slot is the chooser's call. The near misses are
+    the unchosen candidates that would have added the most.
+    """
     total_weight = universe.total_weight
     selection = TopicSelection(
         topic_name=universe.topic_name,
@@ -553,94 +517,25 @@ def _greedy(
         total_count=len(universe.records),
     )
     covered: set[str] = set()
-    remaining = list(candidates)
-    floor = min_marginal_share * total_weight
+    for candidate in line:
+        term = _term_coverage(universe, candidate, covered, selection.covered_weight)
+        selection.selected.append(term)
+        covered |= candidate.records
 
-    while remaining and len(selection.selected) < max_terms:
-        scored = []
-        for index, term in enumerate(remaining):
-            new = matches[term] - covered
-            if not new:
-                continue
-            scored.append(
-                (
-                    -weight(new),  # most additional weight
-                    -len(new),  # then most additional charts
-                    -weight(matches[term]),  # then describes more of the list
-                    len(split_into_match_words(term)),  # then fewer words
-                    index,  # then the order the candidates arrived in
-                    term,
-                )
-            )
-        if not scored:
-            break
-        scored.sort()
-        best = scored[0]
-        term = best[-1]
-        new = matches[term] - covered
-        marginal = weight(new)
-
-        # A term revealing less than the floor isn't worth one of five slots on a
-        # single line. Stop without recording it here — it stays in `remaining`,
-        # so the near-miss pass below reports it (first, since it has the largest
-        # remaining gain) along with whatever else just missed out.
-        if marginal < floor and selection.selected:
-            break
-
-        selection.selected.append(
-            TermCoverage(
-                term=term,
-                own_weight=weight(matches[term]),
-                own_count=len(matches[term]),
-                marginal_weight=marginal,
-                marginal_count=len(new),
-                cumulative_weight=selection.covered_weight + marginal,
-            )
-        )
-        covered |= new
-        remaining.remove(term)
-
-    # The best few terms that didn't make it, for the same reason.
-    for _, _, _, _, _, term in sorted(
-        (
-            (
-                -weight(matches[term] - covered),
-                -len(matches[term] - covered),
-                0.0,
-                0,
-                index,
-                term,
-            )
-            for index, term in enumerate(remaining)
-            if matches[term] - covered
-        )
-    )[:3]:
-        new = matches[term] - covered
-        selection.near_misses.append(
-            TermCoverage(
-                term=term,
-                own_weight=weight(matches[term]),
-                own_count=len(matches[term]),
-                marginal_weight=weight(new),
-                marginal_count=len(new),
-                cumulative_weight=selection.covered_weight + weight(new),
-            )
-        )
+    chosen = {term.term for term in selection.selected}
+    misses = [
+        _term_coverage(universe, candidate, covered, selection.covered_weight)
+        for candidate in candidates
+        if candidate.term not in chosen
+    ]
+    selection.near_misses = sorted(
+        (miss for miss in misses if miss.marginal_count), key=lambda miss: -miss.marginal_weight
+    )[:3]
 
     selection.covered = frozenset(covered)
-    return selection
-
-
-def _uncovered(
-    universe: WeightedUniverse,
-    selection: TopicSelection,
-    matches: dict[str, frozenset[str]],
-) -> list[tuple[str, float]]:
-    """The records no selected term reaches, most-viewed first."""
-    covered: set[str] = set()
-    for term in selection.selected:
-        covered |= matches.get(term.term, frozenset())
-    return sorted(
+    self_named = match_identities(universe, universe.topic_name)
+    selection.topic_name_share = universe.weight_of(self_named) / total_weight if total_weight else 0.0
+    selection.uncovered = sorted(
         (
             (universe.records[identity].get("title") or identity, universe.weights[identity])
             for identity in universe.records
@@ -648,3 +543,4 @@ def _uncovered(
         ),
         key=lambda pair: -pair[1],
     )
+    return selection

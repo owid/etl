@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Economic damages from natural disasters
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on the economic damages from natural disasters.
 default_selection:
   - World
 topic_tags:

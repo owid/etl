@@ -113,6 +113,21 @@ tables:
                 baseColorScheme: PuBu
               tooltipUseCustomLabels: true
 
+      democracy_recod_bti:
+        title: Democracy score (recoded 0-9)
+        description_short: |-
+          Captures the extent of democratic features — political participation, rule of law, stable democratic institutions, political and social integration, and a capable state. It ranges from 0 to 9 (most democratic).
+        description_processing: |-
+          To compare it with other sources' democracy indices, we subtract 1 from the BTI's democracy score, so it ranges from 0 to 9 instead of 1 to 10.
+        unit: ""
+        presentation:
+          title_public: Democracy score
+          title_variant: recoded 0–9
+          grapher_config:
+            yAxis:
+              max: 9
+              min: 0
+
       regime_bti:
         # The categories are shown as a Swimlane, not with the slope/discrete-bar/Marimekko toggles the other `bti`
         # indicators expose. Override the table-level common chartTypes here.
@@ -149,11 +164,17 @@ tables:
         title: Political regime (score)
         unit: ""
         description_short: |-
-          Identifies the political regime of a country. It distinguishes between hard-line autocracies (1), moderate autocracies (2), highly defective democracies (3), defective democracies (4), and consolidating democracies (5).
+          Identifies the political regime of a country. It distinguishes between hard-line autocracies (0), moderate autocracies (1), highly defective democracies (2), defective democracies (3), and consolidating democracies (4).
         description_key: *regime_bti_key
+        description_processing: |-
+          The BTI codes these categories from 1 (consolidating democracy) to 5 (hard-line autocracy). To compare them with other sources' classifications, we reverse the order and start it at 0, so the categories run from 0 (hard-line autocracy) to 4 (consolidating democracy).
         presentation:
           title_public: Political regime
           title_variant: score
+          grapher_config:
+            yAxis:
+              max: 4
+              min: 0
         display:
           numDecimalPlaces: 0
 

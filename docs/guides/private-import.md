@@ -78,7 +78,7 @@ etl run [step-name] --public-only
 
 ## Making public data private
 
-Set `meta.is_public` to `false` in the snapshot DVC file, and switch the steps to `data-private://` in the DAG. If the dataset has a public catalog page (`jsonld: true` in its garden `.meta.yml`), the page is not removed for you: its CSV, Excel and parquet files stay public under `catalog.ourworldindata.org/<namespace>/<short_name>/` until you delete that folder from the catalog bucket (`r2:owid-catalog/<namespace>/<short_name>/`).
+Set `meta.is_public` to `false` in the snapshot DVC file, and switch the steps to `data-private://` in the DAG. If the dataset has a public dataset page (`dataset_page: true` in its `.meta.yml`), the page is not removed for you: its CSV, Excel and parquet files stay public under `catalog.ourworldindata.org/<namespace>/<short_name>/` until you delete that folder from the catalog bucket (`r2:owid-catalog/<namespace>/<short_name>/`).
 
 ## Bringing private data to public
 

@@ -1,21 +1,43 @@
-config:
-  explorerTitle: "Poverty - Luxembourg Income Study"
-  explorerSubtitle: "Explore Luxembourg Income Study data on poverty."
-  selection:
-    - Brazil
-    - Chile
-    - China
-    - France
-    - South Africa
-    - United States
-  wpBlockId: 57755
-  isPublished: true
-  originUrl: https://ourworldindata.org/poverty
-  pickerColumnSlugs: []
+grapher_schema: "012"
+
+title:
+  title: Poverty - Luxembourg Income Study
+  title_variant: ""
+slug: poverty-lis
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore Luxembourg Income Study data on poverty.
+# The explorer's tag: keeps it out of listings, as the explorer was.
+topic_tags:
+  - Unlisted
+default_selection:
+  - Brazil
+  - Chile
+  - China
+  - France
+  - South Africa
+  - United States
+# The explorer's default view (its `defaultView` row).
+default_dimensions:
+  indicator: headcount_ratio
+  poverty_line: "30"
+  welfare_type: dhi
+  equivalence_scale: per capita
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/poverty
+        # The explorer's text block below the chart only pointed readers to this article.
+        relatedQuestions:
+          - url: https://ourworldindata.org/owid-data-collection-inequality-and-poverty
+            text: "OWID Data Collection: Inequality and Poverty"
 
 dimensions:
   - name: Indicator
     slug: indicator
+    presentation:
+      type: dropdown
     choices:
       - slug: headcount_ratio
         name: Share in poverty
@@ -37,6 +59,8 @@ dimensions:
         description: Share of population in poverty multiplied by the average shortfall as a percentage of the poverty line
   - name: Poverty line
     slug: poverty_line
+    presentation:
+      type: dropdown-with-search
     choices:
       - slug: "1"
         name: "$1 per day"
@@ -68,6 +92,8 @@ dimensions:
         name: "Relative poverty: 60% of median"
   - name: Income measure
     slug: welfare_type
+    presentation:
+      type: dropdown
     choices:
       - slug: "dhi"
         name: "After tax"
@@ -75,12 +101,17 @@ dimensions:
         name: "Before tax"
       - slug: "after_vs_before_tax"
         name: "After vs. before tax"
-  - name: Adjust for cost sharing within households (equivalized income)
+  - name: Household size adjustment
     slug: equivalence_scale
+    presentation:
+      type: toggle-buttons
     choices:
       - slug: "per capita"
         name: "Per capita"
+        description: Each person, including children, is attributed an equal share of the total income received by all members of their household.
       - slug: "square root"
         name: "Equivalized"
+        description: Income is adjusted for household size, since people sharing a household can split costs like rent and heating. LIS divides the total household income by the square root of the number of people in the household.
 
+# Views are generated from the table in the .py.
 views: []
