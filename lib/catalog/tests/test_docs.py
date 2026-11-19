@@ -128,6 +128,36 @@ def test_sources_deduplicates_and_orders_by_usage():
     assert ei["date_accessed"] == "2026-07-02"
 
 
+def test_sources_tell_apart_files_of_one_product_by_title_snapshot():
+    fossil = Origin(
+        producer="Global Carbon Project",
+        title="Global Carbon Budget",
+        title_snapshot="Global Carbon Budget – Fossil CO2 emissions",
+        date_published="2026-11-13",
+        url_download="https://example.org/fossil.csv",
+    )
+    land_use = copy.deepcopy(fossil)
+    land_use.title_snapshot = "Global Carbon Budget – Land-use change emissions"
+    land_use.url_download = "https://example.org/land_use.xlsx"
+    tb = make_table()
+    tb["hydro_energy_twh"].metadata.origins = [fossil, land_use]
+    gcb = tb.sources.set_index("title_snapshot").loc[
+        ["Global Carbon Budget – Fossil CO2 emissions", "Global Carbon Budget – Land-use change emissions"]
+    ]
+    # Both files keep the product's label, which is how the codebook names them.
+    assert gcb["label"].tolist() == ["Global Carbon Project – Global Carbon Budget (2026)"] * 2
+    assert gcb["url_download"].tolist() == ["https://example.org/fossil.csv", "https://example.org/land_use.xlsx"]
+
+
+def test_sources_keep_files_that_differ_only_in_title_snapshot():
+    annual = Origin(producer="Jones et al.", title="National contributions", title_snapshot="Annual emissions")
+    cumulative = copy.deepcopy(annual)
+    cumulative.title_snapshot = "Cumulative emissions"
+    tb = make_table()
+    tb["hydro_energy_twh"].metadata.origins = [annual, cumulative]
+    assert {"Annual emissions", "Cumulative emissions"} <= set(tb.sources["title_snapshot"])
+
+
 def test_codebook_labels_match_sources_labels():
     tb = make_table()
     labels = {label for cell in tb.codebook["source"] for label in cell.split("; ") if label}

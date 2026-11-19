@@ -88,6 +88,9 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.4.1`
+- The sources table (`Table.sources`, and the `sources.csv` of a dataset page) has a `title_snapshot` column, which tells apart several files of one data product: those share a `label`, the one the codebook uses
+
 ### `v1.4.0`
 - **`DatasetMeta.jsonld` is renamed `DatasetMeta.dataset_page`** (`dataset: dataset_page: true` in a step's `.meta.yml`). The flag opts a dataset into a whole public page (data files, codebook, sources, README, manifest), of which the Schema.org JSON-LD is one file. An `index.json` that still has `jsonld` loads without error, with `dataset_page` false until the dataset is rebuilt
 
