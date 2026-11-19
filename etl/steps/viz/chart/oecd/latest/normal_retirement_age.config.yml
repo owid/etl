@@ -31,13 +31,14 @@ definitions:
         matchingEntitiesOnly: true
         map:
           hideTimeline: true
-          # Open-ended brackets at both ends: 60 and below, so the few countries with much lower ages (down to 47) don't
-          # stretch the scale, and above 66. Grapher only opens an end bracket when the data goes beyond its outer edge
-          # and then hides that edge, so 58 and 66.5 never show; they only need to be inside the data's range.
+          # Grapher's automated equal-size brackets between 59 and 67 give one-year steps. The lowest bracket opens
+          # (60 and below), because a few countries have much lower ages (down to 47); the highest opens on its own
+          # if a country goes above 67.
           colorScale:
             baseColorScheme: Purples
-            binningStrategy: manual
-            customNumericValues: [58, 60, 62, 64, 65, 66, 66.5]
+            binningStrategy: equalSizeBins-normal
+            minValue: 59
+            maxValue: 67
 
 # NOTE: Update the year (2024) in the subtitle of the comparison view to the new edition's.
 dimensions:
