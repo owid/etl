@@ -40,7 +40,13 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+        # NOTE: Scatter plots don't show range annotations yet, so this note is missing from
+        # maternal-mortality-vs-female-labor-force-participation until they do.
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values from 2003–2017 affected by measurement change.
         description_key:
           - "{definitions.description_maternal_mortality}"
 
@@ -52,6 +58,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values from 2003–2017 affected by measurement change.
         description_key:
           - "{definitions.description_maternal_mortality}"
       maternal_deaths:
@@ -63,6 +74,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values from 2003–2017 affected by measurement change.
       live_births:
         title: Live births
         description_short: Estimated number of births from birth certificates, large-scale surveys and statistical modeling.
