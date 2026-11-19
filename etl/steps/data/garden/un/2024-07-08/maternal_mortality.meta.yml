@@ -63,7 +63,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values from 2003–2017 affected by measurement change.
         description_from_producer: |-
           {definitions.description_methodology}
 
@@ -75,7 +79,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values from 2003–2017 affected by measurement change.
 
         description_from_producer: |-
           {definitions.description_methodology}
@@ -150,7 +158,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+        annotations:
+          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values from 2003–2017 affected by measurement change.
         description_from_producer: |-
           {definitions.description_methodology}
 
