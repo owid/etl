@@ -128,46 +128,31 @@ def test_sources_deduplicates_and_orders_by_usage():
     assert ei["date_accessed"] == "2026-07-02"
 
 
+def test_sources_tell_apart_files_of_one_product_by_title_snapshot():
+    fossil = Origin(
+        producer="Global Carbon Project",
+        title="Global Carbon Budget",
+        title_snapshot="Global Carbon Budget – Fossil CO2 emissions",
+        date_published="2026-11-13",
+        url_download="https://example.org/fossil.csv",
+    )
+    land_use = copy.deepcopy(fossil)
+    land_use.title_snapshot = "Global Carbon Budget – Land-use change emissions"
+    land_use.url_download = "https://example.org/land_use.xlsx"
+    tb = make_table()
+    tb["hydro_energy_twh"].metadata.origins = [fossil, land_use]
+    gcb = tb.sources.set_index("title_snapshot").loc[
+        ["Global Carbon Budget – Fossil CO2 emissions", "Global Carbon Budget – Land-use change emissions"]
+    ]
+    # Both files keep the product's label, which is how the codebook names them.
+    assert gcb["label"].tolist() == ["Global Carbon Project – Global Carbon Budget (2026)"] * 2
+    assert gcb["url_download"].tolist() == ["https://example.org/fossil.csv", "https://example.org/land_use.xlsx"]
+
+
 def test_codebook_labels_match_sources_labels():
     tb = make_table()
     labels = {label for cell in tb.codebook["source"] for label in cell.split("; ") if label}
     assert labels == set(tb.sources["label"])
-
-
-def test_sources_with_the_same_label_are_told_apart_by_title_snapshot(tmp_path):
-    gcb = dict(
-        producer="Global Carbon Project",
-        title="Global Carbon Budget",
-        attribution="Global Carbon Budget (2026)",
-        date_published="2026-11-13",
-    )
-    fossil = Origin(**gcb, title_snapshot="Global Carbon Budget – Fossil CO2 emissions", url_download="a.csv")
-    land_use = Origin(**gcb, title_snapshot="Global Carbon Budget – Land-use change emissions", url_download="b.xlsx")
-    tb = make_table()
-    tb["hydro_energy_twh"].metadata.origins = [EI, fossil]
-    tb["hydro_energy_per_capita_kwh"].metadata.origins = [land_use]
-
-    # Labels are distinct only where they would clash: the Energy Institute keeps its usual label.
-    fossil_label = "Global Carbon Project – Global Carbon Budget – Fossil CO2 emissions (2026)"
-    land_use_label = "Global Carbon Project – Global Carbon Budget – Land-use change emissions (2026)"
-    assert set(tb.sources["label"]) == {
-        "Energy Institute – Statistical Review of World Energy (2026)",
-        fossil_label,
-        land_use_label,
-    }
-    codebook = tb.codebook.set_index("column")
-    assert codebook.loc["hydro_energy_twh", "source"] == (
-        f"Energy Institute – Statistical Review of World Energy (2026); {fossil_label}"
-    )
-    assert codebook.loc["hydro_energy_per_capita_kwh", "source"] == land_use_label
-
-    # The README names them the same way.
-    ds = make_dataset(tmp_path / "owid_energy")
-    ds.add(tb)
-    ds.save()
-    readme = ds.readme()
-    assert f"##### {fossil_label}" in readme
-    assert f"Sources: {land_use_label}" in readme
 
 
 def test_readme_sections(tmp_path):

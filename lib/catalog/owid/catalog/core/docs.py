@@ -7,7 +7,6 @@ hand-written text living in step code.
 
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -28,6 +27,7 @@ SOURCES_COLUMNS = [
     "label",
     "producer",
     "title",
+    "title_snapshot",
     "description",
     "date_published",
     "date_accessed",
@@ -108,33 +108,6 @@ def _origin_key(origin: Origin) -> tuple[Any, ...]:
     )
 
 
-def distinct_origin_labels(origins: list[Origin]) -> dict[tuple[Any, ...], str]:
-    """Label of each origin, keyed by ``_origin_key``.
-
-    Origins that would share a label, like several files of one data product, are labeled with their
-    ``title_snapshot`` instead, e.g. "Global Carbon Project – Global Carbon Budget – Fossil CO2 emissions (2026)".
-    """
-    unique = {_origin_key(origin): origin for origin in origins}
-    counts = Counter(origin_label(origin) for origin in unique.values())
-    labels = {}
-    for key, origin in unique.items():
-        label = origin_label(origin)
-        if counts[label] > 1 and origin.title_snapshot:
-            label = f"{origin.producer} – {origin.title_snapshot}"
-            year = _year(origin.date_published)
-            if year:
-                label += f" ({year})"
-        labels[key] = label
-    return labels
-
-
-def table_origin_labels(table: Table) -> dict[tuple[Any, ...], str]:
-    """Labels of all the origins of a table, so that its codebook, sources and README name them the same way."""
-    return distinct_origin_labels(
-        [origin for column in table.all_columns for origin in table.get_column_or_index(column).metadata.origins]
-    )
-
-
 def unique_origins(origins_by_column: dict[str, list[Origin]]) -> list[Origin]:
     """Deduplicate origins across columns, most-referenced first, ties by first appearance."""
     origins: dict[tuple[Any, ...], Origin] = {}
@@ -150,14 +123,14 @@ def unique_origins(origins_by_column: dict[str, list[Origin]]) -> list[Origin]:
 
 def sources_frame(origins_by_column: dict[str, list[Origin]]) -> pd.DataFrame:
     """One row per unique origin, with the fields that document it."""
-    labels = distinct_origin_labels([origin for origins in origins_by_column.values() for origin in origins])
     rows = []
     for origin in unique_origins(origins_by_column):
         rows.append(
             {
-                "label": labels[_origin_key(origin)],
+                "label": origin_label(origin),
                 "producer": origin.producer,
                 "title": origin.title or origin.title_snapshot,
+                "title_snapshot": origin.title_snapshot,
                 "description": origin.description or origin.description_snapshot,
                 "date_published": str(origin.date_published) if origin.date_published else None,
                 "date_accessed": str(origin.date_accessed) if origin.date_accessed else None,
@@ -169,17 +142,14 @@ def sources_frame(origins_by_column: dict[str, list[Origin]]) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=SOURCES_COLUMNS)
 
 
-def column_source_labels(origins: list[Origin], labels: dict[tuple[Any, ...], str]) -> str:
-    """Labels of a column's origins, deduplicated and joined with "; ".
-
-    ``labels`` are the labels of the whole table (``table_origin_labels``), so they match its sources.
-    """
-    column_labels: list[str] = []
+def column_source_labels(origins: list[Origin]) -> str:
+    """Labels of a column's origins, deduplicated and joined with "; "."""
+    labels: list[str] = []
     for origin in origins:
-        label = labels[_origin_key(origin)]
-        if label not in column_labels:
-            column_labels.append(label)
-    return "; ".join(column_labels)
+        label = origin_label(origin)
+        if label not in labels:
+            labels.append(label)
+    return "; ".join(labels)
 
 
 def attribution_label(origin: Origin) -> str:
@@ -287,9 +257,7 @@ def year_range(table: Table, column: str) -> str | None:
     return None
 
 
-def _indicator_section(
-    name: str, meta: VariableMeta, table: Table, level: int, labels: dict[tuple[Any, ...], str]
-) -> str:
+def _indicator_section(name: str, meta: VariableMeta, table: Table, level: int) -> str:
     heading = "#" * level
     lines = [f"{heading} {variable_title(name, meta)}", ""]
     description = _clean_text(meta.description_short)
@@ -303,7 +271,7 @@ def _indicator_section(
     if date_range:
         facts.append(f"Date range: {date_range}")
     if meta.origins:
-        facts.append(f"Sources: {column_source_labels(meta.origins, labels)}")
+        facts.append(f"Sources: {column_source_labels(meta.origins)}")
     lines += [f"{fact}  " for fact in facts]
     lines.append("")
     key = description_key_text(meta)
@@ -318,8 +286,8 @@ def _indicator_section(
     return "\n".join(lines)
 
 
-def _source_section(origin: Origin, label: str, level: int = 3) -> str:
-    lines = [f"{'#' * level} {label}", ""]
+def _source_section(origin: Origin, level: int = 3) -> str:
+    lines = [f"{'#' * level} {origin_label(origin)}", ""]
     description = _clean_text(origin.description or origin.description_snapshot)
     if description:
         lines += [description, ""]
@@ -400,16 +368,15 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
         if citation:
             parts += ["#### How to cite this data", "", f"{citation}.", ""]
         parts += ["#### Indicators", ""]
-        labels = table_origin_labels(table)
         origins_by_column: dict[str, list[Origin]] = {}
         for column in table.all_columns:
             column_meta = table.get_column_or_index(column).metadata
-            parts.append(_indicator_section(column, column_meta, table, 5, labels))
+            parts.append(_indicator_section(column, column_meta, table, 5))
             origins_by_column[column] = list(column_meta.origins)
         origins = unique_origins(origins_by_column)
         parts += ["#### Sources", ""]
         if origins:
-            parts += [_source_section(origin, labels[_origin_key(origin)], level=5) for origin in origins]
+            parts += [_source_section(origin, level=5) for origin in origins]
         else:
             parts += ["This table has no external sources: its columns document the dataset itself.", ""]
 

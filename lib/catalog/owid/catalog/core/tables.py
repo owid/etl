@@ -388,7 +388,6 @@ class Table(pd.DataFrame):
             print(codebook.to_markdown())
             ```
         """
-        labels = docs.table_origin_labels(self)
         rows = []
         for column in self.all_columns:
             md = self.get_column_or_index(column).metadata
@@ -399,7 +398,7 @@ class Table(pd.DataFrame):
                     "description": utils.remove_details_on_demand(md.description_short or ""),
                     "unit": docs.unit_label(md),
                     "date_range": docs.year_range(self, column) or "",
-                    "source": docs.column_source_labels(list(md.origins), labels),
+                    "source": docs.column_source_labels(list(md.origins)),
                     "description_key": docs.description_key_text(md) or "",
                     "description_from_producer": utils.remove_details_on_demand(md.description_from_producer or ""),
                     "description_processing": utils.remove_details_on_demand(md.description_processing or ""),
@@ -412,9 +411,10 @@ class Table(pd.DataFrame):
         """One row per unique origin used by any column of this table.
 
         Columns: ``label`` (as printed in the codebook's ``source`` column), ``producer``, ``title``,
-        ``description``, ``date_published``, ``date_accessed``, ``url_main``, ``url_download``,
-        ``citation_full``, ``license_name``, ``license_url``. Origins that render identically are
-        one row; rows are ordered by how many columns reference them.
+        ``title_snapshot``, ``description``, ``date_published``, ``date_accessed``, ``url_main``,
+        ``url_download``, ``citation_full``, ``license_name``, ``license_url``. Origins that render
+        identically are one row; rows are ordered by how many columns reference them. Several files
+        of one data product share a ``label`` and are told apart by their ``title_snapshot``.
         """
         origins = {column: list(self.get_column_or_index(column).metadata.origins) for column in self.all_columns}
         return docs.sources_frame(origins)
