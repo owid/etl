@@ -8,7 +8,7 @@ views:
   - dimensions: {}
     indicators:
       # Cash benefits for old age and survivors from SOCX, the series Pensions at a Glance uses for public spending.
-      # Tolerance lets the bars of the latest year use 2021 or 2022 for countries without newer data.
+      # Tolerance lets the map and bars of the latest year use 2021 or 2022 for countries without newer data.
       y:
         - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age_and_survivors__programme_type_total
           display:
@@ -20,23 +20,21 @@ views:
       subtitle: Spending on pensions and other cash benefits for older people and survivors as a share of [gross domestic product (GDP)](#dod:gdp).
       note: Private pensions (whether mandatory or voluntary) are not included.
       tab: chart
-      hasMapTab: false
+      hasMapTab: true
       chartTypes:
+        - LineChart
         - DiscreteBar
-      # The OECD average and countries across the range of spending.
+      # The OECD average and large economies across the range of spending, as in the chart of shares of government spending.
       selectedEntityNames:
         - OECD countries
-        - Greece
         - Italy
         - France
         - Germany
         - Japan
-        - Sweden
-        - Denmark
-        - United States
         - United Kingdom
-        - Switzerland
+        - United States
         - South Korea
-        - Chile
-        - Australia
       addCountryMode: add-country
+      map:
+        colorScale:
+          baseColorScheme: Blues
