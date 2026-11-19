@@ -40,7 +40,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-        annotations:
+        annotations: &annotations_us_measurement
           - entities: [United States]
             time: 2003
             time_end: 2017
@@ -56,11 +56,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-        annotations:
-          - entities: [United States]
-            time: 2003
-            time_end: 2017
-            text: Values affected by a change in measurement.
+        annotations: *annotations_us_measurement
         description_key:
           - "{definitions.description_maternal_mortality}"
       maternal_deaths:
@@ -72,11 +68,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
-        annotations:
-          - entities: [United States]
-            time: 2003
-            time_end: 2017
-            text: Values affected by a change in measurement.
+        annotations: *annotations_us_measurement
       live_births:
         title: Live births
         description_short: Estimated number of births from birth certificates, large-scale surveys and statistical modeling.
