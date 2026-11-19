@@ -57,7 +57,7 @@ views:
       color: regions#owid_region
     config:
       title: Average income of people aged 66 and older, relative to the whole population
-      subtitle: Average disposable income of people aged 66 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+      subtitle: Average disposable income of people aged 66 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and [adjusted for household size](#dod:equivalization).
 
   - dimensions:
       age: aged_66_to_75
@@ -67,7 +67,7 @@ views:
       color: regions#owid_region
     config:
       title: Average income of people aged 66 to 75, relative to the whole population
-      subtitle: Average disposable income of people aged 66 to 75, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+      subtitle: Average disposable income of people aged 66 to 75, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and [adjusted for household size](#dod:equivalization).
 
   - dimensions:
       age: aged_76_and_older
@@ -77,7 +77,7 @@ views:
       color: regions#owid_region
     config:
       title: Average income of people aged 76 and older, relative to the whole population
-      subtitle: Average disposable income of people aged 76 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+      subtitle: Average disposable income of people aged 76 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and [adjusted for household size](#dod:equivalization).
 
   # Comparison view: one line per group, one panel per country.
   - dimensions:
@@ -96,4 +96,4 @@ views:
       chartTypes: ["LineChart", "DiscreteBar"]
       selectedFacetStrategy: entity
       title: Average income of people aged 66 to 75 and 76 and older, relative to the whole population
-      subtitle: Average disposable income of people aged 66 to 75 and of people aged 76 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and adjusted for household size.
+      subtitle: Average disposable income of people aged 66 to 75 and of people aged 76 and older, as a share of the average disposable income of the whole population. Income is measured after taxes and benefits and [adjusted for household size](#dod:equivalization).

@@ -48,6 +48,38 @@ definitions:
     This data covers people aged 76 and older
     <%- endif %>
 
+  # People covered by each age group, for the poverty indicators' text.
+  age_people: |-
+    <% if age == "Total" %>
+    people
+    <%- elif age == "Working population" %>
+    people aged 18 to 65
+    <%- elif age == "Over 65 years" %>
+    people aged 66 and older
+    <%- elif age == "Under 18 years" %>
+    people under 18
+    <%- elif age == "18 to 25 years" %>
+    people aged 18 to 25
+    <%- elif age == "26 to 40 years" %>
+    people aged 26 to 40
+    <%- elif age == "41 to 50 years" %>
+    people aged 41 to 50
+    <%- elif age == "51 to 65 years" %>
+    people aged 51 to 65
+    <%- elif age == "66 to 75 years" %>
+    people aged 66 to 75
+    <%- elif age == "76 years and older" %>
+    people aged 76 and older
+    <%- endif %>
+  poverty_50_definition: |-
+    This indicator shows the share of {definitions.age_people} whose income is less than half of the [median](#dod:median) income in their country.
+  poverty_relative: |-
+    This is a measure of relative poverty — it captures the share of people whose income is low by the standards typical in their own country.
+  poverty_only_income: |-
+    Only income is included. Savings, investments, home ownership and other forms of wealth are not, so income alone can understate their living standards.
+  poverty_source: |-
+    The data comes from the OECD Income Distribution Database, which draws on national household surveys and tax records.
+
   source_gini: |-
     The Gini coefficient is based on the comparison of cumulative proportions of the population against cumulative proportions of income they receive, and it ranges between 0 in the case of perfect equality and 1 in the case of perfect inequality.
   source_gini_market: |-
@@ -242,12 +274,13 @@ tables:
         title: 50% of median - Share of population in poverty (disposable income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with an income per person below 50% of median.
+        description_short: Share of {definitions.age_people} living in households with an income below 50% of their country’s median income.
         description_key:
-          - "{definitions.disposable_income}"
+          - "{definitions.poverty_50_definition}"
+          - "{definitions.poverty_relative}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
+          - "{definitions.poverty_only_income}"
+          - "{definitions.poverty_source}"
         description_from_producer: |-
           {definitions.source_recommended_uses_and_limitations}
         display:
@@ -279,7 +312,7 @@ tables:
         title: 60% of median - Share of population in poverty (disposable income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with an income per person below 60% of median.
+        description_short: Share of {definitions.age_people} living in households with an income below 60% of their country’s median income.
         description_key:
           - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
@@ -296,7 +329,7 @@ tables:
         title: 50% of median - Share of population in poverty (market income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with an income per person below 50% of median.
+        description_short: Share of {definitions.age_people} living in households with an income below 50% of their country’s median income.
         description_key:
           - "{definitions.market_income}"
           - "{definitions.equivalization}"
@@ -315,7 +348,7 @@ tables:
         title: 60% of median - Share of population in poverty (market income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with an income per person below 60% of median.
+        description_short: Share of {definitions.age_people} living in households with an income below 60% of their country’s median income.
         description_key:
           - "{definitions.market_income}"
           - "{definitions.equivalization}"
