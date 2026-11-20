@@ -39,6 +39,11 @@ steps:
         - data://meadow/faostat/2025-03-17/faostat_qcl:
           - snapshot://faostat/2025-03-17/faostat_qcl.zip
 
+  # Global food multidim (shown as a data explorer).
+  viz://chart/faostat/latest/global_food:
+    - data://grapher/faostat/2026-02-25/faostat_qcl
+    - data://grapher/faostat/2026-02-25/faostat_fbsc
+
   # Global food explorer.
   viz://explorer/faostat/latest/global_food:
     - data://grapher/faostat/2026-02-25/faostat_qcl:
