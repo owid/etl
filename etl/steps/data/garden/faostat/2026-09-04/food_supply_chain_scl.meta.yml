@@ -1,0 +1,84 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Food Supply
+      grapher_config:
+        note: |-
+          Calories and protein are estimated by Our World in Data from FAOSTAT data in tonnes. Imports and exports include animal products. Feed excludes grass, and animal products include wild-caught fish. Food available for consumption does not account for food waste at the consumer level.
+    description_processing: |-
+      - FAOSTAT's Supply Utilization Accounts (SCL) dataset gives only the food available in calories and protein; every other part of the chain is in tonnes. We convert those tonnes into calories and protein using FAOSTAT's own nutrient densities: each product's food calories (or protein) divided by its food tonnes.
+      - For products that people rarely eat, such as oilseed cake and bran, we take the densities from FAO's nutrient conversion table and from Feedipedia's animal feed tables.
+      - For crops that are mostly processed, such as sugar cane and oil palm fruit, we use what the world's factories make from them, because FAOSTAT's densities only count the part that people eat.
+      - We subtract processed products, such as flour and oils, from processing, so that the crops they come from are not counted twice.
+      - We leave out products that are never food, such as fuel ethanol. The crops it's made from stay in the chain, and leave it as other uses or processing.
+      - The SCL dataset doesn't include fish and seafood, so we take that data from FAOSTAT's Food Balance Sheets.
+      - "Data adjustments" collect the differences needed to make the chain add up to the food available. These include FAOSTAT's residuals and rounding errors, and numerical discrepancies caused during the conversion of tonnes into calories and protein.
+      - We divide all values by population and by 365 days. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources). Regions are the sum of their countries.
+      - We describe the method in full in [this technical publication](https://docs.owid.io/projects/etl/analyses/food_supply_chain/food_supply_chain.html).
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+    - Hannah Ritchie
+
+tables:
+  energy:
+    title: Food supply chain in kilocalories
+    common:
+      unit: kilocalories per person per day
+      short_unit: kcal
+    variables: &variables
+      crop_production:
+        title: Crop production
+        description_short: Crops harvested in the country, before they are made into products such as flour or oils.
+      imports:
+        title: Imports
+        description_short: Food products bought from other countries.
+      exports:
+        title: Exports
+        description_short: Food products sold to other countries.
+      stock_variation:
+        title: Stock variation
+        description_short: Food products added to stocks, minus those taken out. Positive values mean stocks grew, so that food was not available for other uses that year.
+      seed:
+        title: Seed
+        description_short: Crops set aside as seed for the next harvest.
+      losses:
+        title: Losses
+        description_short: Food lost in storage, transport and processing, between the farm and the shop.
+      other_uses:
+        title: Other uses
+        description_short: Food products used for purposes other than food or feed, such as biofuels and soap.
+      processing_net:
+        title: Processing, net
+        description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as flour, oils, sugar and beer.
+      feed:
+        title: Feed
+        description_short: Food products fed to animals, including by-products of processing such as oilseed cake and bran.
+      animal_products:
+        title: Animal products
+        description_short: Meat, offal, animal fats, milk, eggs, honey, fish and seafood produced in the country.
+      tourist_consumption:
+        title: Tourist consumption
+        description_short: Food eaten by visitors from other countries.
+      data_adjustments:
+        title: Data adjustments
+        description_short: Differences needed to make the stages add up to the food available to eat. They include FAOSTAT's residuals and rounding errors and, in calories and protein, numerical discrepancies from converting tonnes. For the world, they also include the gap between imports and exports, and tourist consumption. Values can be negative.
+      food:
+        title: Food available for consumption
+        description_short: Food available for people to eat, before waste in shops and households.
+  protein:
+    title: Food supply chain in grams of protein
+    common:
+      unit: grams of protein per person per day
+      short_unit: g
+    variables: *variables
+  mass:
+    title: Food supply chain in kilograms
+    common:
+      unit: kilograms per person per day
+      short_unit: kg
+    variables: *variables
