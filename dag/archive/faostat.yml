@@ -1751,3 +1751,7 @@ steps:
   export://explorers/faostat/latest/global_food:
     - data://grapher/faostat/2026-02-25/faostat_qcl
     - data://grapher/faostat/2026-02-25/faostat_fbsc
+  # archived; last active in e79c547db073 on 2026-11-20
+  viz://explorer/faostat/latest/global_food:
+    - data://grapher/faostat/2026-02-25/faostat_qcl
+    - data://grapher/faostat/2026-02-25/faostat_fbsc
