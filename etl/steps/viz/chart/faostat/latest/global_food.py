@@ -524,18 +524,18 @@ def run():
             config["dimensions"][dropdown_i]["choices"], key=lambda x: x["name"]
         )
 
-    # Show per capita (a checkbox in the explorer) and unit (radio buttons) as toggle buttons.
+    # Show per capita (a checkbox in the explorer) as toggle buttons, and unit (radio buttons) as a dropdown.
     # Views whose metric has a single unit have none, shown as "Not applicable".
+    presentations = {"item": "dropdown-with-search", "per_capita": "toggle-buttons", "unit": "dropdown"}
     choice_names = {
         "per_capita": {"False": "Total", "True": "Per capita"},
         "unit": {"not_applicable": "Not applicable"},
     }
     for dimension in config["dimensions"]:
         # The item dropdown is long (one choice per food), so let readers search it.
-        if dimension["slug"] == "item":
-            dimension["presentation"] = {"type": "dropdown-with-search"}
+        if dimension["slug"] in presentations:
+            dimension["presentation"] = {"type": presentations[dimension["slug"]]}
         if dimension["slug"] in choice_names:
-            dimension["presentation"] = {"type": "toggle-buttons"}
             for choice in dimension["choices"]:
                 choice["name"] = choice_names[dimension["slug"]].get(choice["slug"], choice["name"])
 
