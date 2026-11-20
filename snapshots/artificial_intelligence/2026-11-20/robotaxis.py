@@ -1,7 +1,8 @@
 """Script to create a snapshot of dataset.
 
-This snapshot processes multiple zip files from CPUC containing deployment reports from 2022-2025,
-extracting CSV files that contain TotalPMT (Total Passenger Miles Traveled) data.
+This snapshot processes the zip files of CPUC's Deployment program reports (2022 onward), keeping the
+month-level CSV files that carry TotalPMT (Total Passenger Miles Traveled) values. Rows are kept as
+the carriers filed them: blank rows and the carrier mapping are handled in meadow and garden.
 """
 
 import re
@@ -122,32 +123,11 @@ def download_and_extract_csv_files(urls: list[str]) -> list[pd.DataFrame]:
 
                     df = df[available_cols].copy()
 
-                    # Clean empty strings and whitespace
-                    df = df.replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True)
-
-                    # Remove rows with NaNs in key columns
-                    key_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
-                    cols_to_check = [col for col in key_cols if col in df.columns]
-                    df = df.dropna(subset=cols_to_check)
-
-                    # Skip if no data remains after cleaning
-                    if df.empty:
-                        continue
-
                     # Extract TCPID from filename if missing
                     if "TCPID" not in df.columns:
                         tcpid_match = re.search(r"(PSG\d+)", csv_file.name)
                         if tcpid_match:
                             df["TCPID"] = tcpid_match.group(1)
-
-                    # Add carrier name based on TCPID
-                    carrier_names = {
-                        "PSG0038152": "Waymo",
-                        "PSG0032513": "Waymo",  # Waymo's earlier permit ID (Dec 2022–Feb 2023)
-                        "PSG0039080": "Cruise",
-                    }
-                    if "TCPID" in df.columns:
-                        df["carrier_name"] = df["TCPID"].map(carrier_names).fillna("Unknown")
 
                     # Add source file info for tracking
                     df["source_file"] = csv_file.name
