@@ -525,6 +525,8 @@ def run():
     presentations = {"item": "dropdown-with-search", "per_capita": "toggle-buttons", "unit": "dropdown"}
     choice_names = {
         "per_capita": {"False": "Total", "True": "Per capita"},
+        # The food choice "eggs" is renamed "Eggs, total"; the unit keeps its plain name.
+        "unit": {"eggs": "Eggs"},
     }
     for dimension in config["dimensions"]:
         # The item dropdown is long (one choice per food), so let readers search it.
