@@ -99,7 +99,7 @@ tables:
   owid_co2:
     title: CO₂ and greenhouse gas emissions dataset
     description: |-
-      Our World in Data publishes more than 250 charts on CO₂ and other greenhouse gas emissions. These can help you understand where emissions come from, how they have changed over time, and the impact this is having on global warming.
+      Our World in Data publishes nearly 200 charts on CO₂ and other greenhouse gas emissions. These can help you understand where emissions come from, how they have changed over time, and the impact this is having on global warming.
 
       This is the dataset we use to make most of these charts. It is free for anyone to download and use.
 
