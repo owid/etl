@@ -362,13 +362,10 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
             [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
         )
         if (item_code in item_codes) and (element_code in element_codes):
+            # Per capita is its own dimension, so the unit doesn't repeat it. Metrics outside the
+            # food supply have a single unit, which the (then disabled) unit dropdown still shows.
             unit = unit.replace(" per capita", "")
-            if unit in UNITS_IN_RADIO_BUTTONS:
-                pass
-            elif unit in UNITS_NOT_IN_RADIO_BUTTONS:
-                # These metrics have a single unit: no unit choice to make (a multidim slug can't be empty).
-                unit = "not_applicable"
-            else:
+            if unit not in UNITS_IN_RADIO_BUTTONS + UNITS_NOT_IN_RADIO_BUTTONS:
                 raise ValueError(f"Unexpected unit {unit}")
             tb[column].metadata.dimensions = {
                 "item": underscore(item),
@@ -513,7 +510,7 @@ def run():
     config["default_dimensions"] = {
         "item": "maize",
         "metric": "production",
-        "unit": "not_applicable",
+        "unit": "tonnes",
         "per_capita": "False",
     }
 
@@ -525,11 +522,9 @@ def run():
         )
 
     # Show per capita (a checkbox in the explorer) as toggle buttons, and unit (radio buttons) as a dropdown.
-    # Views whose metric has a single unit have none, shown as "Not applicable".
     presentations = {"item": "dropdown-with-search", "per_capita": "toggle-buttons", "unit": "dropdown"}
     choice_names = {
         "per_capita": {"False": "Total", "True": "Per capita"},
-        "unit": {"not_applicable": "Not applicable"},
     }
     for dimension in config["dimensions"]:
         # The item dropdown is long (one choice per food), so let readers search it.
