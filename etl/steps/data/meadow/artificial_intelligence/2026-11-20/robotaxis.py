@@ -1,12 +1,14 @@
 """Load a snapshot and create a meadow dataset."""
 
-import numpy as np
 import pandas as pd
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+NUMERIC_COLS = ["TotalTrips", "TotalPassengersCarried", "TotalPMT"]
 
 
 def run() -> None:
@@ -18,36 +20,39 @@ def run() -> None:
 
     # Load data from snapshot.
     tb = snap.read(low_memory=False)
+
     #
     # Process data.
     #
+    # Parse the value columns. Recent files write numbers with thousands separators ("1,528,823").
+    for col in NUMERIC_COLS:
+        blank = tb[col].isna() | tb[col].astype("string").str.strip().eq("")
+        tb[col] = pr.to_numeric(
+            tb[col].replace(",", "", regex=True).replace(r"^\s*$", None, regex=True), errors="coerce"
+        )
+        # Anything non-blank that fails to parse is an unexpected token (e.g. a redaction marker).
+        unparsed = tb[col].isna() & ~blank
+        assert not unparsed.any(), f"Non-numeric values in {col} (possible redactions) — investigate before publishing."
 
-    numeric_cols = ["TotalTrips", "TotalPassengersCarried", "TotalPMT"]
+    # Drop rows the carriers left blank on every metric (e.g. Cruise's months after its suspension).
+    tb = tb.dropna(subset=NUMERIC_COLS, how="all")
 
-    if "Year" in tb.columns and "Month" in tb.columns:
-        # Convert columns to numeric, first removing commas from thousands separators
-        for col in numeric_cols:
-            if col in tb.columns:
-                tb[col] = tb[col].astype(str).str.replace(",", "")
-                tb[col] = tb[col].replace("", np.nan)
-                tb[col] = pd.to_numeric(tb[col], errors="coerce")
-                # The snapshot already drops rows with empty values in these columns, so anything
-                # that fails to parse here is an unexpected token (e.g. a redaction marker) that would
-                # otherwise flow into garden's sum() as a silent zero — fail loudly instead.
-                assert tb[col].notna().all(), (
-                    f"Non-numeric values in {col} (possible redactions) — investigate before publishing."
-                )
-                tb[col].metadata.origins = tb["Year"].metadata.origins
-        # Drop rows that are completely identical across all columns
-        tb = tb.drop_duplicates()
-        # Create date column from year and month (using last day of month)
-        tb["date"] = pd.to_datetime(tb[["Year", "Month"]].assign(day=1)) + pd.offsets.MonthEnd(1)
-        tb = tb.drop(columns=["Year", "Month"])
+    # A row with only some metrics filled would turn into a silent zero in garden's sum — fail instead.
+    partial = tb[NUMERIC_COLS].isna().any(axis=1)
+    assert not partial.any(), f"Rows with only some metrics reported:\n{tb[partial]}"
+    assert tb[["Year", "Month", "TCPID"]].notna().all().all(), "Rows with values but no Year, Month or TCPID."
 
-    # Keep per-carrier rows so values can be verified before aggregation in garden
-    tb = tb[["carrier_name", "date"] + numeric_cols]
-    # Improve tables format.
-    tables = [tb.format(["carrier_name", "date"])]
+    # Drop rows that are completely identical across all columns.
+    tb = tb.drop_duplicates()
+
+    # Create a date column from year and month (last day of the month).
+    first_of_month = tb["Year"].astype(int) * 10000 + tb["Month"].astype(int) * 100 + 1
+    tb["date"] = pr.to_datetime(first_of_month.astype(str), format="%Y%m%d") + pd.offsets.MonthEnd(1)
+    tb = tb.rename(columns={"TCPID": "tcpid"})
+
+    # Keep per-carrier rows so values can be verified before aggregation in garden.
+    tb = tb[["tcpid", "date"] + NUMERIC_COLS]
+    tables = [tb.format(["tcpid", "date"])]
 
     #
     # Save outputs.

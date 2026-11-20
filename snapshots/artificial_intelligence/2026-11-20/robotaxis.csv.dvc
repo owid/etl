@@ -15,6 +15,6 @@ meta:
       name: Public domain
       url: https://www.cpuc.ca.gov/about-cpuc/conditions-of-use
 outs:
-  - md5: 09ed093d5d0ae368cd6cc3f6f11ad1df
-    size: 18510
+  - md5: 65784c6360a46db17bb0fa636a65ecc8
+    size: 18257
     path: robotaxis.csv
