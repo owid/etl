@@ -383,20 +383,20 @@ def test_owid_alone_is_not_credited_as_processing_its_own_data():
     assert get_source("Our World in Data", col) == "Our World in Data"
 
 
-def _build_wide(used: dict, datasets: dict):
+def _build_wide(used: dict, datasets: dict, chart=None):
     with (
         patch("etl.viz.chart.download_package._used_indicators", return_value=used),
         patch("etl.viz.chart.download_package.CatalogDataset", return_value=datasets),
     ):
-        return build_wide_table_for_chart(chart=None)  # ty: ignore[invalid-argument-type]
+        return build_wide_table_for_chart(chart)  # ty: ignore[invalid-argument-type]
 
 
 def test_weekly_and_monthly_on_one_date_axis_stack_rather_than_join():
     """Test build_wide_table_for_chart - two intervals on one date axis are two frequencies.
 
     WHO's flu data has the weekly and monthly "Share of positive tests" on many of the
-    same country-dates. Grouped by axis alone they were joined into one table, and the
-    merge by name then found two values for one metric in one row and refused.
+    same country-dates. Joined as one frequency, a shared date would hold two values of
+    one metric in one cell; stacked, each keeps its own row.
     """
     from etl.viz.chart.download_package import _merge_columns_by_name
 
@@ -485,15 +485,8 @@ def test_data_finer_than_its_declared_interval_is_refused():
     used = {"grapher/c/latest/d/q#sea_level": [{}], "grapher/c/latest/d/a#ohc": [{}]}
     chart = type("Chart", (), {"catalog_path": "climate/latest/climate_change#climate_change"})()
 
-    with (
-        patch("etl.viz.chart.download_package._used_indicators", return_value=used),
-        patch(
-            "etl.viz.chart.download_package.CatalogDataset",
-            return_value={"q": tb.set_index(["country", "date"]), "a": annual.set_index(["country", "year"])},
-        ),
-        pytest.raises(ValueError, match="share a \\(country, frequency, time\\) key"),
-    ):
-        build_wide_table_for_chart(chart)  # ty: ignore[invalid-argument-type]
+    with pytest.raises(ValueError, match="quarterly rows share a \\(country, time\\) key"):
+        _build_wide(used, {"q": tb.set_index(["country", "date"]), "a": annual.set_index(["country", "year"])}, chart)
 
 
 _SOURCE_DIMENSIONS = [
@@ -583,12 +576,45 @@ def test_collision_no_dimension_separates_is_left_for_the_uniqueness_check():
         _check_column_names_unique("conflict-data", renamed, frequency)  # ty: ignore[invalid-argument-type]
 
 
+def test_dimension_must_give_same_named_series_at_other_frequencies_one_choice():
+    """Test _disambiguate_colliding_names - no suffix a same-named series doesn't have.
+
+    The suffix goes on every indicator with the name, at any frequency, so the monthly
+    series can merge with its source's annual one. A monthly series shown under both
+    sources has no single "Data source", so naming it after its first view would merge
+    it into that source's column. "Data source" therefore doesn't qualify, and the
+    dimension that does is used.
+    """
+    from etl.viz.chart.download_package import _disambiguate_colliding_names
+
+    indicators = [("u#d", "Deaths", 1, None), ("p#d", "Deaths", 2, None), ("m#d", "Deaths", 3, None)]
+    column_to_dimensions = {
+        "u#d": [{"conflict_type": "all", "data_source": "ucdp"}],
+        "p#d": [{"conflict_type": "state", "data_source": "prio"}],
+        "m#d": [{"conflict_type": "all", "data_source": "prio"}, {"conflict_type": "all", "data_source": "ucdp"}],
+    }
+    frequency = {"u#d": "annual", "p#d": "annual", "m#d": "monthly"}
+
+    renamed = _disambiguate_colliding_names(
+        indicators,  # ty: ignore[invalid-argument-type]
+        column_to_dimensions,
+        frequency,
+        _SOURCE_DIMENSIONS,
+    )
+
+    assert [name for _, name, _, _ in renamed] == [
+        "Deaths - Conflict type: All armed conflicts",
+        "Deaths - Conflict type: State-based",
+        "Deaths - Conflict type: All armed conflicts",
+    ], "only Conflict type gives every 'Deaths' one choice"
+
+
 def test_indicators_shown_only_by_grouped_views_are_included():
     """Test _used_indicators - a grouped view counts for indicators no regular view shows.
 
-    conflict-data-source replaces most of its views with grouped ones, so skipping
-    grouped views outright left 242 of its 358 indicators out of the package. An
-    indicator a regular view also shows keeps only its regular combinations.
+    conflict-data-source replaces most of its views with grouped ones, so those
+    indicators appear nowhere else. An indicator a regular view also shows keeps only
+    its regular combinations.
     """
     from types import SimpleNamespace
 

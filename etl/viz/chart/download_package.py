@@ -159,9 +159,7 @@ def _check_column_names_unique(
     # into one column told apart by its rows. Sharing a name at the *same* frequency is
     # the real collision -- two series that would occupy one column with no way to tell
     # which is which.
-    seen: dict[tuple[str, str], list[str]] = defaultdict(list)
-    for catalog_path, long_name, _variable_id, _col in columns:
-        seen[(long_name, column_to_frequency.get(catalog_path, ""))].append(catalog_path)
+    seen = _paths_by_name_and_frequency(columns, column_to_frequency)
     collisions = {key: cols for key, cols in seen.items() if len(cols) > 1}
     if not collisions:
         return
@@ -174,6 +172,17 @@ def _check_column_names_unique(
         f"name(s): {detail}. See _check_column_names_unique in "
         "etl/viz/chart/download_package.py."
     )
+
+
+def _paths_by_name_and_frequency(
+    indicators: list[tuple[str, str, int, IndicatorColumn]],
+    column_to_frequency: dict[str, str],
+) -> dict[tuple[str, str], list[str]]:
+    """Catalog paths keyed by (column name, frequency) -- more than one under a key is a collision."""
+    grouped: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for catalog_path, name, _variable_id, _col in indicators:
+        grouped[(name, column_to_frequency.get(catalog_path, ""))].append(catalog_path)
+    return grouped
 
 
 def _disambiguate_colliding_names(
@@ -192,15 +201,13 @@ def _disambiguate_colliding_names(
 
     The dimension used has to *separate* the group: each indicator sits under one
     choice of it in every view that shows it, and no two indicators share that
-    choice. Comparing views instead -- the dimensions of the first view that shows
-    each indicator -- picks up every dimension those views happen to differ on, and
-    the conflict names grew three suffixes long. Where several dimensions separate a
-    group, the one that separates the most groups in the chart wins (ties go to
-    chart order), so a package names its collisions one way throughout. Chart order
-    alone would not do: conflict-data puts "Conflict type" first, which separates
-    UCDP's "all" from PRIO's only because PRIO files it under a different choice,
-    and gave "... - Conflict type: all - Conflict type: All armed conflicts". A group
-    no single dimension separates is left alone, for `_check_column_names_unique` to
+    choice. A single separating dimension, rather than every dimension the views
+    differ on, keeps the suffix to one "Dimension: choice". Where several separate a
+    name's collisions, the one that separates the most collisions in the chart wins
+    (ties go to chart order), so a package names its collisions one way throughout;
+    chart order alone can pick a dimension that separates a pair only by accident,
+    such as a "Conflict type" one source files under a different choice. A name no
+    single dimension separates is left alone, for `_check_column_names_unique` to
     refuse.
 
     Only colliding names change. Renaming every column would churn the packages that
@@ -209,26 +216,40 @@ def _disambiguate_colliding_names(
     source of an indicator to an MDIM renames the first one's column.
 
     The suffix is applied to every indicator with that name, at any frequency, so the
-    same source's annual and monthly series still merge into one column.
+    same source's annual and monthly series still merge into one column. That is why a
+    dimension qualifies only if it separates the name's collisions at every frequency
+    and gives every indicator with that name exactly one choice: otherwise a series at
+    another frequency would take a suffix it does not have and merge into another
+    source's column.
     """
-    by_key: dict[tuple[str, str], list[str]] = defaultdict(list)
-    for catalog_path, name, _variable_id, _col in indicators:
-        by_key[(name, column_to_frequency.get(catalog_path, ""))].append(catalog_path)
+    by_key = _paths_by_name_and_frequency(indicators, column_to_frequency)
 
     def choices(catalog_path: str, slug: str) -> set:
         return {combination.get(slug) for combination in column_to_dimensions[catalog_path]}
 
+    def has_one_choice(catalog_path: str, slug: str) -> bool:
+        c = choices(catalog_path, slug)
+        return len(c) == 1 and None not in c
+
     def separates(paths: list[str], slug: str) -> bool:
-        per_indicator = [choices(path, slug) for path in paths]
-        if not all(len(c) == 1 and None not in c for c in per_indicator):
-            return False
-        return len({next(iter(c)) for c in per_indicator}) == len(paths)
+        return len({next(iter(choices(path, slug))) for path in paths}) == len(paths)
+
+    paths_by_name: dict[str, list[list[str]]] = defaultdict(list)
+    for (name, _frequency), paths in by_key.items():
+        paths_by_name[name].append(paths)
 
     # Separating dimensions per colliding name, in chart order.
     candidates: dict[str, list[str]] = {}
-    for (name, _frequency), paths in by_key.items():
-        if len(paths) > 1 and name not in candidates:
-            candidates[name] = [d["slug"] for d in dimensions if separates(paths, d["slug"])]
+    for name, groups in paths_by_name.items():
+        colliding = [paths for paths in groups if len(paths) > 1]
+        if not colliding:
+            continue
+        candidates[name] = [
+            d["slug"]
+            for d in dimensions
+            if all(has_one_choice(path, d["slug"]) for paths in groups for path in paths)
+            and all(separates(paths, d["slug"]) for paths in colliding)
+        ]
     reach = Counter(slug for slugs in candidates.values() for slug in slugs)
     separating = {name: max(slugs, key=lambda s: reach[s]) for name, slugs in candidates.items() if slugs}
     if not separating:
@@ -350,10 +371,8 @@ def _column_time_interval(tb: Table, column: str, axis: str) -> str | None:
     nothing finer to mistake it for. A date axis does need one -- the dates alone
     cannot say whether they are days, weeks or months, and guessing is how monthly
     data ends up labelled `daily` and written `1999-01-01`, which reads as the 1st
-    of January. `electricity_mix_monthly` was exactly that case (its display carried
-    only a name), while `energy_prices_monthly` declares `month` and comes out
-    right. So return None and let the caller decide whether it can proceed without
-    knowing.
+    of January. So return None and let the caller decide whether it can proceed
+    without knowing.
 
     Read per column rather than per table, because one table can hold several
     resolutions: `climate_change_impacts_monthly` has daily, monthly and quarterly
@@ -489,8 +508,8 @@ def _used_indicators(chart: Chart) -> dict[str, list[dict]]:
     choice, and listing that combination beside the indicator's own would point
     its column at a stacked view. But a grouped view can be the only place an
     indicator appears: conflict-data-source replaces most of its views with
-    grouped ones (`replace=True`), so skipping them outright left 242 of its 358
-    indicators out of the package.
+    grouped ones (`replace=True`). The cost is that a series a chart builds only
+    for a stacked view (electricity-mix's zero-filled bioenergy) is published too.
 
     KNOWN GAP -- only the views' y indicators are read. An indicator that appears
     nowhere but on a map tab, like the "all disasters combined" total that
@@ -624,22 +643,22 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
         joined = _outer_join_on_key(tables)
         joined["frequency"] = FREQUENCY_LABELS[interval]
         joined["time"] = _format_time_labels(joined[axis], interval)
+        # A label is coarser than the value it renders (a quarter written as "2026-Q2"),
+        # so two values the interval does not tell apart would land on one key. Refuse
+        # rather than publish a file whose keys don't identify its rows.
+        duplicated = joined.duplicated(subset=["country", "time"], keep=False)
+        if duplicated.any():
+            sample = joined.loc[duplicated, ["country", axis, "time"]].head(4).to_dict("records")
+            raise ValueError(
+                f"{chart.catalog_path}: {int(duplicated.sum())} {FREQUENCY_LABELS[interval]} rows share a "
+                f"(country, time) key after labelling, e.g. {sample}. Either some indicator's data is "
+                "finer than the display.timeInterval it declares, or two tables at this frequency date "
+                "the same period differently (Monday vs Sunday weeks, first vs last day of the month)."
+            )
         frames.append(joined.drop(columns=[axis]))
 
     stacked = pr.concat(frames, ignore_index=True)
     key = ["country", "frequency", "time"]
-    # A label is coarser than the value it renders (a quarter written as "2026-Q2"), so
-    # two values that the interval does not tell apart would land on one key -- e.g. a
-    # column declared `quarter` whose data is really monthly. Refuse rather than
-    # publish a file whose keys don't identify its rows.
-    duplicated = stacked.duplicated(subset=key, keep=False)
-    if duplicated.any():
-        sample = stacked.loc[duplicated, key].drop_duplicates().head(3).to_dict("records")
-        raise ValueError(
-            f"{chart.catalog_path}: {int(duplicated.sum())} rows share a (country, frequency, time) key "
-            f"after labelling, e.g. {sample}. Some indicator's data is finer than the "
-            "display.timeInterval it declares."
-        )
     return WideTable(
         table=stacked.sort_values(key).reset_index(drop=True),
         time_column="time",
