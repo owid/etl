@@ -19,6 +19,11 @@ def normalize_metadata_annotations(chart: Chart | Explorer) -> None:
                 f"Annotations in the metadata of '{chart.catalog_path}' set `dimensions`, which only applies to "
                 "indicators of long tables."
             )
+        if any(annotation.time_end == "latest" for annotation in annotations):
+            raise ValueError(
+                f"Annotations in the metadata of '{chart.catalog_path}' set `time_end: latest`, which only applies to "
+                "indicators of a dataset. Give the year or date instead."
+            )
         metadata["annotations"] = [annotation.to_dict() for annotation in annotations]  # ty: ignore[invalid-assignment]
 
 

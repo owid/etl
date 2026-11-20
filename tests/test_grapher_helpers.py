@@ -364,9 +364,37 @@ def _annotated_table(annotation: Annotation, display: dict | None = None) -> Tab
     return tb
 
 
-def test_grapher_checks_accepts_valid_annotations():
-    annotation = Annotation(text="Note.", entities=["France"], time=2000, time_end=2010)
+@pytest.mark.parametrize("time_end", [2010, "latest"])
+def test_grapher_checks_accepts_valid_annotations(time_end):
+    annotation = Annotation(text="Note.", entities=["France"], time=2000, time_end=time_end)
     gh.grapher_checks(_FakeDataset([_annotated_table(annotation)]))
+
+
+def test_yield_wide_table_fills_in_latest_time_end():
+    df = pd.DataFrame(
+        {
+            "entityId": [1, 1, 2, 2, 3, 3],
+            "entityName": ["France", "France", "Spain", "Spain", "Italy", "Italy"],
+            "year": [2000, 2010, 2000, 2020, 2000, 2020],
+            "value": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        }
+    )
+    tb = Table(df.set_index(["entityId", "entityName", "year"]))
+    tb["value"].metadata = VariableMeta(  # ty: ignore[unresolved-attribute]
+        title="Value",
+        unit="",
+        annotations=[
+            Annotation(text="Countries.", entities=["France", "Spain", "Italy"], time=2000, time_end="latest"),
+            Annotation(text="Whole indicator.", time=2000, time_end="latest"),
+        ],
+    )
+    (wide,) = gh._yield_wide_table(tb)
+    # Entities whose data end in different years get one annotation each
+    assert wide["value"].m.annotations == [
+        Annotation(text="Countries.", entities=["France"], time=2000, time_end=2010),
+        Annotation(text="Countries.", entities=["Spain", "Italy"], time=2000, time_end=2020),
+        Annotation(text="Whole indicator.", time=2000, time_end=2020),
+    ]
 
 
 @pytest.mark.parametrize(

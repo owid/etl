@@ -339,3 +339,8 @@ class TestNormalizeMetadataAnnotations:
         chart = self._chart_with_view_annotations([{"text": "Note.", "dimensions": {"sex": "female"}}])
         with pytest.raises(ValueError, match="only applies to indicators of long tables"):
             normalize_metadata_annotations(chart)
+
+    def test_rejects_latest_time_end(self):
+        chart = self._chart_with_view_annotations([{"text": "Note.", "time": 2020, "time_end": "latest"}])
+        with pytest.raises(ValueError, match="Give the year or date instead"):
+            normalize_metadata_annotations(chart)

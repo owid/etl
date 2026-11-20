@@ -127,6 +127,12 @@ def _yield_wide_table(
                 tab[short_name].metadata, dim_dict, column, dim_names
             )
 
+            # Replace `time_end: latest` with the last time of the indicator's data
+            meta = tab[short_name].metadata
+            if any(annotation.time_end == "latest" for annotation in meta.annotations):
+                rows = tab.index.to_frame(index=False).rename(columns={"entityName": "country"})
+                meta.annotations = _resolve_latest_times(meta.annotations, rows, meta.display or {})
+
             yield tab
 
 
@@ -200,6 +206,28 @@ def _annotations_for_dimensions(
         if _annotation_in_scope(annotation, dim_dict):
             kept.append(replace(annotation, dimensions=None))
     return kept
+
+
+def _resolve_latest_times(
+    annotations: list[catalog.Annotation], rows: pd.DataFrame, display: dict[str, Any]
+) -> list[catalog.Annotation]:
+    """Replace `time_end: latest` with the last time of each annotated entity's data.
+
+    Entities whose data end at different times get one annotation each.
+    """
+    resolved = []
+    for annotation in annotations:
+        if annotation.time_end != "latest":
+            resolved.append(annotation)
+            continue
+        entities_by_last_time = {}
+        for entity in annotation.entities or [None]:
+            last = _time_range(rows if entity is None else rows[rows["country"] == entity], display)[1]
+            entities_by_last_time.setdefault(last if isinstance(last, str) else int(last), []).append(entity)
+        for last, entities in entities_by_last_time.items():
+            entities = [] if entities == [None] else entities
+            resolved.append(replace(annotation, entities=entities, time_end=last))
+    return resolved
 
 
 def has_scoped_annotations(table: catalog.Table) -> bool:
@@ -935,7 +963,7 @@ def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> N
         )
         missing = sorted(set(annotation.entities) - entities)
         assert not missing, f"Annotation of column `{col}` names entities without data {missing}: {annotation.text!r}"
-        times = [t for t in (annotation.time, annotation.time_end) if t is not None]
+        times = [t for t in (annotation.time, annotation.time_end) if t not in (None, "latest")]
         if times:
             first, last = _time_range(rows, display)
             yearly = not isinstance(first, str)

@@ -570,7 +570,8 @@ class Annotation(MetaBase):
     # Entities the note applies to; empty means the whole indicator.
     entities: list[str] = field(default_factory=list)
     # A year, or a "YYYY-MM-DD" date for daily, weekly, monthly or quarterly data. With `time_end` it is the start
-    # of a range; neither means the whole series.
+    # of a range; neither means the whole series. `time_end: latest` ends the range at the last time of each
+    # entity's data, filled in when the indicator is upserted.
     time: int | str | None = None
     time_end: int | str | None = None
     # Only for long garden tables: the values of extra index levels the note applies to. The grapher step
@@ -581,10 +582,11 @@ class Annotation(MetaBase):
         if isinstance(self.entities, str):
             raise TypeError(f"Annotation `entities` must be a list, got the string {self.entities!r}.")
         self.time = _parse_annotation_time(self.time, self.text)
-        self.time_end = _parse_annotation_time(self.time_end, self.text)
-        if self.time_end is not None:
-            if self.time is None:
-                raise ValueError(f"Annotation sets `time_end` without `time`: {self.text!r}")
+        if self.time_end != "latest":
+            self.time_end = _parse_annotation_time(self.time_end, self.text)
+        if self.time_end is not None and self.time is None:
+            raise ValueError(f"Annotation sets `time_end` without `time`: {self.text!r}")
+        if self.time_end not in (None, "latest"):
             if type(self.time) is not type(self.time_end):
                 raise ValueError(f"Annotation mixes a year and a date in `time` and `time_end`: {self.text!r}")
             if self.time_end < self.time:  # ty: ignore[unsupported-operator]

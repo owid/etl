@@ -1296,6 +1296,10 @@ class Variable(Base):
         assert not any(a.dimensions for a in metadata.annotations), (
             f"Unresolved annotation dimensions in {catalog_path}"
         )
+        # `time_end: latest` is replaced with a time when the table is flattened
+        assert not any(a.time_end == "latest" for a in metadata.annotations), (
+            f"Unresolved annotation `time_end: latest` in {catalog_path}"
+        )
 
         return cls(
             shortName=short_name,

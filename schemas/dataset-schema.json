@@ -720,7 +720,7 @@
                       "Omit `entities` for a note on the whole indicator."
                     ],
                     [
-                      "`time` alone is one year; with `time_end` it is a range of years. Omit both for a note on the whole series."
+                      "`time` alone is one year; with `time_end` it is a range of years. Use `time_end: latest` for a range that runs to the end of the data, rather than a year that goes stale at the next update. Omit both for a note on the whole series."
                     ],
                     [
                       "Write times as years for yearly data, and as YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
@@ -752,8 +752,8 @@
                       },
                       "time_end": {
                         "type": ["integer", "string"],
-                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
-                        "description": "End of the range that starts at `time`, in the same form."
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\}|latest)$",
+                        "description": "End of the range that starts at `time`, in the same form, or `latest` for a range that ends at the last time of each entity's data (filled in when the indicator is upserted, so it keeps up with new data)."
                       },
                       "dimensions": {
                         "type": "object",
