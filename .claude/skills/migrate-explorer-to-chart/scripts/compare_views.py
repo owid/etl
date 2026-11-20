@@ -181,9 +181,14 @@ def sample_views(pairs: list[dict], dims: list[str], max_rendered: int) -> list[
     return sorted(chosen[:max_rendered])
 
 
+# Times a page is loaded before a timeout is reported as a rendering difference.
+RENDER_ATTEMPTS = 3
+
+
 def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
     import glob
 
+    from playwright.sync_api import TimeoutError as PlaywrightTimeout
     from playwright.sync_api import sync_playwright
 
     exe = sorted(glob.glob(str(Path(CHROMIUM_GLOB).expanduser())))
@@ -225,10 +230,18 @@ def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
                 res = {}
                 for side, url in urls.items():
                     shot = shots / f"v{p_['id']:03d}_{key}_{side}.jpg"
-                    try:
-                        res[side] = {"url": url, "facts": capture(url, shot), "shot": f"shots/{shot.name}"}
-                    except Exception as e:  # a page that fails to render is a finding, not a crash
-                        res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                    # A timeout is usually a slow page, not a broken one: retry it before reporting it.
+                    for attempt in range(RENDER_ATTEMPTS):
+                        try:
+                            res[side] = {"url": url, "facts": capture(url, shot), "shot": f"shots/{shot.name}"}
+                            break
+                        except PlaywrightTimeout as e:
+                            res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                            if attempt + 1 < RENDER_ATTEMPTS:
+                                print(f"  view {p_['id']} {key} {side}: timed out, retrying")
+                        except Exception as e:  # a page that fails to render is a finding, not a crash
+                            res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                            break
                 p_["rendered"][key] = res
             print(f"  rendered view {p_['id']}")
         browser.close()

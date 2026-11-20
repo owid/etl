@@ -500,6 +500,10 @@ Common practice in OWID charts, not a hard rule:
 
 [`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the other scheme families (diverging, perceptual, binary, categorical, `SingleColorGradient*`) are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
 
+### Map brackets
+
+Map brackets follow a regular pattern, like axis ticks: linear, log or log-like steps, 5 to 8 of them, never edges moved to make particular countries stand out. Prefer Grapher's automated brackets (the default `binningStrategy: auto`, or an `equalSizeBins-*` or `log-*` strategy, with `minValue` and `maxValue` when the default range is awkward), and use `manual` only for real-world thresholds such as poverty lines. An end bracket opens when data lies beyond its outer edge, and then starts at the next edge in; an open top in a manual scale takes one extra value, below the last edge. Patterns, strategies and examples: [`MAP_BRACKETS.md`](MAP_BRACKETS.md).
+
 ## Common dimension patterns
 
 | Domain | Dimension | Typical choices |
