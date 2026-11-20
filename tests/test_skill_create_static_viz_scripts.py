@@ -123,6 +123,30 @@ def test_scaffold_draws_tick_marks_at_grapher_size(sketch):
     )
 
 
+@pytest.mark.parametrize(
+    "dates",
+    [
+        ["2024-01-01", "2024-02-01", "2024-03-01"],
+        # A cross-sectional snapshot, and a single dated row: no span to lay grapher's calendar grid over.
+        ["2024-03-01", "2024-03-01", "2024-03-01"],
+        ["2024-03-01"],
+    ],
+)
+def test_scaffold_renders_iso_dates(tmp_path, dates):
+    csv = tmp_path / "dated.csv"
+    pd.DataFrame({"country": ["France"] * len(dates), "year": dates, "value": range(len(dates))}).to_csv(
+        csv, index=False
+    )
+    result = run(
+        NEW_SKETCH,
+        *("--slug", "dated", "--data", csv, "--template", "horizontal"),
+        *("--out-root", tmp_path / "sketches", "--author", "A. Tester"),
+    )
+    assert result.returncode == 0, result.stderr
+    render = run(tmp_path / "sketches" / "dated" / "sketch.py")
+    assert render.returncode == 0, render.stderr
+
+
 # --- verify_static_viz.py: named marks --------------------------------------------------------------
 
 SVG_HEAD = (
@@ -1365,3 +1389,64 @@ def test_a_count_axis_keeps_its_own_tick_marks(tmp_path):
     plt.close(fig)
     result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
     assert "tick marks differ" not in result.stdout and "axis line differs" not in result.stdout, result.stdout
+
+
+def test_a_category_axis_naming_a_month_is_not_a_date_axis(tmp_path):
+    """`May improve` holds a month name, `Marching` starts with one; neither makes the axis a date axis."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.bar(["May improve", "Marching", "Stays"], [1, 2, 3], gid="bar__value")
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", color="#000000", length=8, width=2)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert "write dates as" not in result.stdout, result.stdout
+    assert "tick marks differ" not in result.stdout and "axis line differs" not in result.stdout, result.stdout
+
+
+@pytest.mark.parametrize(
+    "spine, message",
+    [
+        # The #999 spine is drawn over the y=0 gridline, which it hides.
+        (True, None),
+        # With no spine the gridline is the axis line, and it is grapher's gridline, not its axis.
+        (False, "the time-axis line differs from grapher's 1px #999"),
+    ],
+)
+def test_a_zero_gridline_under_the_axis_line(tmp_path, spine, message):
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame, style_time_axis, year_axis_ticks
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([2000, 2024], [0, 20], gid="line__value")
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    ax.yaxis.grid(True, color="#dddddd", linewidth=0.72)
+    ax.set_axisbelow(True)
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="y", length=0)
+    ticks = year_axis_ticks(2000, 2024, plot_width_px=470)
+    ax.set_xticks(ticks)
+    style_time_axis(ax, ticks[0], ticks[-1])
+    ax.set_ylim(0, 20)
+    ax.spines["bottom"].set_visible(spine)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    if message is None:
+        assert "axis line differs" not in result.stdout, result.stdout
+    else:
+        assert message in result.stdout, result.stdout

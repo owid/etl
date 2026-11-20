@@ -61,6 +61,7 @@ checks just that pair. Exits non-zero on the first failing pair, listing every f
 
 import argparse
 import datetime as dt
+import math
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -588,11 +589,29 @@ PATH_POINTS = re.compile(r"[ML]\s*([-+0-9.eE]+)[\s,]+([-+0-9.eE]+)")
 MONTH_NAMES = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
 # Grapher's sub-yearly tick labels (`timeAxisTicks.ts`): `MMM`, `MMM YYYY`, `MMM D`, `MMM D, YYYY`.
 GRAPHER_DATE_LABEL = re.compile(rf"(?:{MONTH_NAMES})(?: \d{{1,2}})?(?: \d{{4}}|, \d{{4}})?")
-# A label that reads as a date in any other form: a month name anywhere, or numeric dates.
-DATE_LIKE = re.compile(
-    rf"(?i)\b(?:{MONTH_NAMES}|January|February|March|April|June|July|August|September|October|November|December)"
-    r"[a-z]*\b|\b\d{4}-\d{1,2}(?:-\d{1,2})?\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b|\bQ[1-4]\b"
+# A label that reads as a date in any other form: made only of month names, quarters, numbers and date
+# punctuation (`24 Feb 2023`, `2023-02-24`, `24/02/2023`, `Q1 2023`), with at least one of them not a bare
+# number. A category that merely contains a month name (`May improve`, `Marching`) is not a date.
+MONTH_WORD = (
+    r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sep(?:t(?:ember)?)?"
+    r"|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?(?![a-z])"
 )
+DATE_PARTS = re.compile(rf"(?i)(?:{MONTH_WORD}|Q[1-4]|\d+(?:st|nd|rd|th)?|[\s,./'’-])+")
+DATE_SIGNAL = re.compile(
+    rf"(?i)\b{MONTH_WORD}|\b\d{{4}}-\d{{1,2}}(?:-\d{{1,2}})?\b|\b\d{{1,2}}/\d{{1,2}}/\d{{2,4}}\b|\bQ[1-4]\b"
+)
+
+
+def is_date_label(text: str) -> bool:
+    """Whether a tick label is a whole date, in grapher's form or any other (US order, ISO, numeric)."""
+    text = text.strip()
+    return bool(text and DATE_PARTS.fullmatch(text) and DATE_SIGNAL.search(text))
+
+
+def is_date_axis(texts: list[str]) -> bool:
+    """Whether an axis reads as dates throughout: some labels dates, every other one a year."""
+    drawn = [t.strip() for t in texts if t.strip()]
+    return any(is_date_label(t) for t in drawn) and all(is_date_label(t) or YEAR_LABEL.fullmatch(t) for t in drawn)
 
 
 def _hex(color: str | None) -> str | None:
@@ -628,14 +647,22 @@ def is_sub_yearly_axis(texts: list[str]) -> bool:
 
 
 def date_label_failures(labels: list[TickLabel]) -> list[str]:
-    """Failures for x tick labels that read as dates but not in grapher's formats (US order, `Feb 24, 2023`)."""
-    bad: dict[str, list[str]] = {}
+    """Failures for x tick labels that read as dates but not in grapher's formats (US order, `Feb 24, 2023`).
+
+    Judged only on an x axis that reads as dates throughout (`is_date_axis`), so a category axis whose
+    labels happen to hold a month name is the step's own.
+    """
+    texts_of: dict[str, list[str]] = {}
     for label in labels:
-        text = label.text.strip()
-        if label.axis != "x" or not text or not DATE_LIKE.search(text):
+        if label.axis == "x" and label.text.strip():
+            texts_of.setdefault(label.subject, []).append(label.text.strip())
+    bad: dict[str, list[str]] = {}
+    for subject, texts in texts_of.items():
+        if not is_date_axis(texts):
             continue
-        if not (GRAPHER_DATE_LABEL.fullmatch(text) or YEAR_LABEL.fullmatch(text)):
-            bad.setdefault(label.subject, []).append(text)
+        for text in texts:
+            if is_date_label(text) and not (GRAPHER_DATE_LABEL.fullmatch(text) or YEAR_LABEL.fullmatch(text)):
+                bad.setdefault(subject, []).append(text)
     return [
         f"the x-axis tick labels of {subject} write dates as {', '.join(repr(t) for t in texts[:4])}. Grapher labels a "
         "sub-yearly axis 'Feb', 'Feb 2023', 'Feb 24' or 'Feb 24, 2023' (month first, as the style guide asks), and "
@@ -749,6 +776,14 @@ def _strokes(paint: dict[str, str]) -> bool:
     return paint.get("stroke", "none") != "none" and wide
 
 
+def _stroke_px(paint: dict[str, str], px: float) -> float:
+    """A stroke's width in template px; infinite when it cannot be read, so nothing is excused by it."""
+    try:
+        return float(paint.get("stroke-width", "1").replace("px", "")) * px
+    except ValueError:
+        return math.inf
+
+
 def _stroke_problems(paint: dict[str, str], px: float) -> list[str]:
     """How a stroke differs from grapher's axis furniture: #999 and 1px."""
     problems = []
@@ -767,9 +802,11 @@ def x_axis_furniture_failures(svg: str) -> list[str]:
     """Failures where a time axis' line or tick marks differ from grapher's: 1px, #999, marks 5px long.
 
     Judged on each x axis whose labels read as years or dates (`is_year_axis`, `is_sub_yearly_axis`,
-    or any date written another way). The axis line is any horizontal stroke lying along the tops of
-    its tick marks across most of their range — the bottom spine, a zero gridline, or a line the step
-    drew itself — so a hand-drawn axis in the text color is caught whatever it is called.
+    or `is_date_axis` for dates written another way). The axis line is any horizontal stroke lying
+    along the tops of its tick marks across most of their range — the bottom spine, a zero gridline,
+    or a line the step drew itself — so a hand-drawn axis in the text color is caught whatever it is
+    called. A stroke drawn under a conforming axis line, and no wider, is hidden by it (a y=0 gridline
+    under the bottom spine), so it is let through.
     """
     try:
         root = ET.fromstring(svg)
@@ -782,7 +819,7 @@ def x_axis_furniture_failures(svg: str) -> list[str]:
     off_lines: list[str] = []
     for axis in _x_axes(root, defs):
         texts = [m.label for m in axis]
-        if not (is_year_axis(texts) or is_sub_yearly_axis(texts) or any(DATE_LIKE.search(t) for t in texts)):
+        if not (is_year_axis(texts) or is_sub_yearly_axis(texts) or is_date_axis(texts)):
             continue
         marks = [m for m in axis if m.length > 0 and _strokes(m.paint)]
         for mark in marks:
@@ -795,14 +832,21 @@ def x_axis_furniture_failures(svg: str) -> list[str]:
             continue
         xs = sorted(m.x for m in marks)
         top = sorted(m.y for m in marks)[len(marks) // 2]
-        for name, x0, x1, y, paint in strokes:
-            if not _strokes(paint) or abs(y - top) * px > 1.5:
+        # In document order, so a later stroke is drawn over an earlier one.
+        along = [
+            (name, paint, _stroke_problems(paint, px))
+            for name, x0, x1, y, paint in strokes
+            if _strokes(paint)
+            and abs(y - top) * px <= 1.5
+            and min(x1, xs[-1]) - max(x0, xs[0]) >= 0.9 * (xs[-1] - xs[0])
+        ]
+        for i, (name, paint, problems) in enumerate(along):
+            if not problems:
                 continue
-            if min(x1, xs[-1]) - max(x0, xs[0]) < 0.9 * (xs[-1] - xs[0]):
+            covered = any(not later for _, _, later in along[i + 1 :])
+            if covered and _stroke_px(paint, px) <= 1 + FURNITURE_TOLERANCE_PX / 2:
                 continue
-            problems = _stroke_problems(paint, px)
-            if problems:
-                off_lines.append(f"{name or 'a line'} ({', '.join(problems)})")
+            off_lines.append(f"{name or 'a line'} ({', '.join(problems)})")
     failures = []
     if off_marks:
         failures.append(

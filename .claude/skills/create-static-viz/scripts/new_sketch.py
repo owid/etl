@@ -329,8 +329,9 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
         ax.set_xticks(ticks)
         # From the first year to the last, end labels inside the ends, on a 1px #999 butt-capped line.
         style_time_axis(ax, ticks[0], ticks[-1])
-    elif dates:
-        # Grapher's calendar grid for the indicator's display.timeInterval, with no dated ends.
+    elif dates and min(dates) < max(dates):
+        # Grapher's calendar grid for the indicator's display.timeInterval, with no dated ends. A single
+        # date has no span to lay a grid over, so it keeps matplotlib's own ticks and still renders.
         interval = time_interval(dates)
         ticks, labels = time_axis_ticks(
             min(dates), max(dates), interval, plot_width_px=plot_w, font_px=body_px(width_px)
