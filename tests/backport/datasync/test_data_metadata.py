@@ -193,6 +193,17 @@ def test_variable_metadata_ordinal():
     }
 
 
+def test_variable_metadata_annotations():
+    variable_df = pd.DataFrame(
+        {"value": ["1"], "year": [2020], "entityId": [273], "entityName": ["Africa"], "entityCode": [None]}
+    )
+    variable_meta = _variable_meta()
+    variable_meta["annotations"] = json.dumps([{"text": "Note.", "entities": ["Africa"], "time": 2020}])
+
+    meta = _call_variable_metadata(525715, variable_df, variable_meta)
+    assert meta["annotations"] == [{"text": "Note.", "entities": ["Africa"], "time": 2020}]
+
+
 def test_variable_data_df_from_s3():
     engine = mock.Mock()
     entities = pd.DataFrame(

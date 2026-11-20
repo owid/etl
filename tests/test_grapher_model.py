@@ -1,3 +1,5 @@
+from owid.catalog import Annotation, VariableMeta
+
 from etl.grapher import model as gm
 
 
@@ -98,3 +100,17 @@ def test_chart_load_patch_config_reads_the_authored_layer():
         select(ChartConfig.config).join(Chart, ChartConfig.id == Chart.patchConfigId).where(Chart.id == 7118)
     )
     assert compiled == expected
+
+
+def test_variable_from_metadata_writes_annotations_in_camel_case():
+    meta = VariableMeta(unit="", annotations=[Annotation(text="Note.", entities=["France"], time=2003, time_end=2017)])
+    variable = gm.Variable.from_variable_metadata(
+        meta,
+        short_name="a",
+        timespan="",
+        dataset_id=1,
+        source_id=None,
+        catalog_path="grapher/a/2020/a/a#a",
+        dimensions=None,
+    )
+    assert variable.annotations == [{"text": "Note.", "entities": ["France"], "time": 2003, "timeEnd": 2017}]

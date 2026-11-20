@@ -88,6 +88,15 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.4.2`
+- **Indicator annotations:** new `VariableMeta.annotations`, a list of `Annotation(text, entities, time, time_end, dimensions)` set from `annotations` in `.meta.yml`. Each annotation is a short note shown on charts, optionally tied to some entities and to a point or range in time
+  - `time` and `time_end` are years for yearly data, and `YYYY-MM-DD` dates for daily, weekly, monthly or quarterly data. YAML dates and years given as strings are normalized to these forms
+  - `time_end` also accepts `latest`, for a range that runs to the end of the data. ETL replaces it with the last time of each entity's data when it upserts the indicator
+  - A string in `entities`, a malformed time, a `time_end` without `time`, a mix of a year and a date, or a range that ends before it starts raises where the annotation is set
+  - `dimensions` scopes an annotation to some values of the extra index levels of a long table
+- Combining indicators keeps the annotations of all of them, without duplicates
+- `update_variable_metadata` drops annotations whose text renders empty through Jinja
+
 ### `v1.4.1`
 - The sources table (`Table.sources`, and the `sources.csv` of a dataset page) has a `title_snapshot` column, which tells apart several files of one data product: those share a `label`, the one the codebook uses
 
