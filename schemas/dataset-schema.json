@@ -757,7 +757,7 @@
                       },
                       "dimensions": {
                         "type": "object",
-                        "description": "Only for long tables: values of the extra index levels the note applies to, e.g. `{cause: Maternal disorders}`. The grapher step keeps the note on the indicators of matching dimensions and removes this field when flattening the table."
+                        "description": "Only for long tables: values of the extra index levels the note applies to, e.g. `{cause: Maternal disorders}`. The grapher step keeps the note on the indicators of matching dimensions and removes this field when flattening the table. A step fails if no table of its dataset has data for these values."
                       }
                     }
                   },

@@ -328,6 +328,27 @@ def test_yield_wide_table_drops_annotations_that_match_no_data():
     assert all(not t.iloc[:, 0].m.annotations for t in gh._yield_wide_table(tb))
 
 
+def test_check_annotation_scopes_match_rejects_values_without_data():
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions={"cause": "Typo"})])
+    with pytest.raises(ValueError, match="no data in any table of the dataset"):
+        gh.check_annotation_scopes_match([tb])
+
+
+def test_check_annotation_scopes_match_ignores_rows_without_values():
+    tb = _long_table_with_annotations([Annotation(text="Note.", dimensions={"cause": "A"})])
+    tb.loc[tb.index.get_level_values("cause") == "A", "deaths"] = None
+    with pytest.raises(ValueError, match="no data in any table of the dataset"):
+        gh.check_annotation_scopes_match([tb])
+
+
+def test_check_annotation_scopes_match_across_tables():
+    # Tables that share metadata need data for the annotation's values in only one of them
+    annotation = Annotation(text="Note.", dimensions={"cause": "C"})
+    tb_without = _long_table_with_annotations([annotation])
+    tb_with = _long_table_with_annotations([annotation]).rename(index={"A": "C"}, level="cause")
+    gh.check_annotation_scopes_match([tb_without, tb_with])
+
+
 def _annotated_table(annotation: Annotation, display: dict | None = None) -> Table:
     df = pd.DataFrame(
         {

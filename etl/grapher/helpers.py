@@ -1,3 +1,4 @@
+import json
 from collections.abc import Iterable
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -199,6 +200,64 @@ def _annotations_for_dimensions(
         if _annotation_in_scope(annotation, dim_dict):
             kept.append(replace(annotation, dimensions=None))
     return kept
+
+
+def has_scoped_annotations(table: catalog.Table) -> bool:
+    """Check whether any column of a table has annotations scoped to dimensions."""
+    return any(annotation.dimensions for column in table.columns for annotation in table[column].m.annotations)
+
+
+def tables_with_scoped_annotations(ds: catalog.Dataset) -> list[catalog.Table]:
+    """Load the tables of a saved dataset that have annotations scoped to dimensions, reading metadata files first."""
+    tables = []
+    for name in ds.table_names:
+        with open(Path(ds.path) / f"{name}.meta.json") as f:
+            fields = json.load(f).get("fields", {})
+        if any(
+            annotation.get("dimensions") for meta in fields.values() for annotation in meta.get("annotations") or []
+        ):
+            tables.append(ds[name])
+    return tables
+
+
+def check_annotation_scopes_match(tables: Iterable[catalog.Table]) -> None:
+    """Check that each annotation scoped to dimensions applies to data in at least one of the tables.
+
+    The tables of a dataset often share metadata, so an annotation only needs data in one of them. Otherwise, a typo in
+    a dimension value would drop the annotation silently when the tables are flattened.
+    """
+    matched = set()
+    unmatched = {}
+    for table in tables:
+        dim_names = [k for k in table.primary_key if k not in ("year", "country", "date", "entityId", "entityCode")]
+        index = table.index.to_frame(index=False)
+        for column in table.columns:
+            for annotation in table[column].m.annotations:
+                if not annotation.dimensions:
+                    continue
+                _check_annotation_dimension_names(annotation, dim_names, column)
+                key = json.dumps(annotation.to_dict(), sort_keys=True, default=str)
+                if key in matched:
+                    continue
+                in_scope = table[column].notna().to_numpy(copy=True)
+                for name, value in annotation.dimensions.items():
+                    in_scope &= (index[name].astype(str) == str(value)).to_numpy()
+                if in_scope.any():
+                    matched.add(key)
+                    unmatched.pop(key, None)
+                else:
+                    unmatched.setdefault(key, (column, annotation))
+
+    if unmatched:
+        notes = "\n".join(
+            f"- column '{column}', dimensions {annotation.dimensions}: {annotation.text!r}"
+            for column, annotation in unmatched.values()
+        )
+        raise ValueError(
+            "These annotations are scoped to dimension values that have no data in any table of the dataset. Check the "
+            "values for typos or, if an annotation comes from another dataset this step is built from, set "
+            f"`annotations` in this step's metadata, which replaces the inherited ones:\n{notes}"
+        )
 
 
 def _create_dim_dict(dim_names: list[str], dim_values: list[Any]) -> dict[str, Any]:

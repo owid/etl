@@ -166,6 +166,31 @@ def test_create_dataset_does_not_inherit_another_datasets_changelog(tmp_path):
     assert [entry.date for entry in ds.metadata.changelog] == ["2026-09-10"]
 
 
+def _long_table(short_name: str, causes: list[str], annotation: catalog.Annotation) -> catalog.Table:
+    tb = catalog.Table(
+        {"country": ["Spain"] * len(causes), "year": [2020] * len(causes), "cause": causes, "deaths": 1.0},
+        short_name=short_name,
+    ).format(["country", "year", "cause"])
+    tb["deaths"].metadata = catalog.VariableMeta(title="Deaths", unit="deaths", annotations=[annotation])  # ty: ignore[unresolved-attribute]
+    return tb
+
+
+def test_create_dataset_checks_annotation_scopes_across_tables(tmp_path):
+    meta = catalog.DatasetMeta(short_name="deaths", version="2026-11-20")
+    dest_dir = tmp_path / "garden/example/2026-11-20/deaths"
+    # Only one of the tables that share the annotation has data for its values
+    annotation = catalog.Annotation(text="Note.", dimensions={"cause": "B"})
+    create_dataset(dest_dir, [_long_table("a", ["A"], annotation), _long_table("b", ["B"], annotation)], meta)
+    # None has data for a value with a typo
+    annotation = catalog.Annotation(text="Note.", dimensions={"cause": "Typo"})
+    with pytest.raises(ValueError, match="no data in any table of the dataset"):
+        create_dataset(dest_dir, [_long_table("a", ["A"], annotation), _long_table("b", ["B"], annotation)], meta)
+    # Also when a grapher dataset is flattened before it is saved
+    dest_dir = tmp_path / "grapher/example/2026-11-20/deaths"
+    with pytest.raises(ValueError, match="no data in any table of the dataset"):
+        create_dataset(dest_dir, [_long_table("a", ["A"], annotation)], meta, run_grapher_checks=False)
+
+
 def test_create_dataset_does_not_inherit_another_datasets_page_opt_in(tmp_path):
     parent = catalog.DatasetMeta(short_name="owid_energy", version="2026-09-10", dataset_page=True)
     tb = catalog.Table({"country": ["Spain"], "year": [2020], "a": [1.0]}, short_name="owid_energy").format(
