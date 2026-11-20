@@ -422,7 +422,9 @@ def humanize_dimension_names_in_config(
 def append_to_config(config, tb):
     table_config = expand_config(
         tb=tb,
-        dimensions=["item", "metric", "unit", "per_capita"],
+        # Per capita goes before unit: grapher limits each dimension to the choices left by the ones before it,
+        # so the toggle stays usable and the unit follows from it.
+        dimensions=["item", "metric", "per_capita", "unit"],
         common_view_config={"tab": "map"},
     )
     config = deepcopy(config)
