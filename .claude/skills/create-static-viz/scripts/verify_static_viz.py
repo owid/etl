@@ -24,6 +24,14 @@ plausible, and the problem only shows up once a designer opens the SVG:
   as in "12,000 BCE"). Judged on the ``<subject>__<axis>-tick-label-<value>`` and
   ``<subject>__x-tick-<value>`` gids ``etl.viz.static.name_furniture`` gives every axis, reading a
   label's text however deeply it is nested (MathText labels such as ``$10^5$`` are)
+- a time axis (years, or dates however they are written) whose furniture differs from grapher's: tick
+  marks not 5px long, 1px and ``#999``, or a horizontal stroke along the tick tops (the spine, a zero
+  gridline, or a line the step drew itself) that is not 1px ``#999``. The marks are found by where
+  matplotlib puts them (``xtick_<n>`` groups), not by gid, so a mark or line named by the step is judged
+  too. Dates written in any form but grapher's (``Feb``, ``Feb 2023``, ``Feb 24``, ``Feb 24, 2023``)
+  fail, as ``24 Feb 2023`` or ``2023-02-24`` would. A sub-yearly axis on grapher's calendar grid, marked
+  ``<subject>__x-axis-calendar`` by ``style_time_axis(..., inset_ends=False)``, needs tick marks but is
+  spared the year axis' end checks below, since grapher adds no first and last date to it
 - a year axis that stops short of the data: a ``line__<Entity>`` series running on past the axis' last
   labelled tick. Grapher's time axis shows the data's first and last year as ticks, so the last tick
   is the last year plotted, never a round year before it
@@ -53,6 +61,7 @@ checks just that pair. Exits non-zero on the first failing pair, listing every f
 
 import argparse
 import datetime as dt
+import math
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -569,6 +578,291 @@ def mathtext_past_plot_edge(labels: list[TickLabel], edge: float | None) -> bool
     )
 
 
+# Grapher's x-axis furniture (`grapher/src/axis/AxisViews.tsx`): the axis line and tick marks are 1px,
+# `SOLID_TICK_COLOR`, and the marks 5px long.
+AXIS_COLOR = "#999999"
+TICK_MARK_PX = 5.0
+FURNITURE_TOLERANCE_PX = 0.5
+XTICK_GROUP = re.compile(r"^xtick_\d+$")
+CALENDAR_AXIS = re.compile(r"^(.+)__x-axis-calendar$")
+PATH_POINTS = re.compile(r"[ML]\s*([-+0-9.eE]+)[\s,]+([-+0-9.eE]+)")
+MONTH_NAMES = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
+# Grapher's sub-yearly tick labels (`timeAxisTicks.ts`): `MMM`, `MMM YYYY`, `MMM D`, `MMM D, YYYY`.
+GRAPHER_DATE_LABEL = re.compile(rf"(?:{MONTH_NAMES})(?: \d{{1,2}})?(?: \d{{4}}|, \d{{4}})?")
+# A label that reads as a date in any other form: made only of month names, quarters, numbers and date
+# punctuation (`24 Feb 2023`, `2023-02-24`, `24/02/2023`, `Q1 2023`), with at least one of them not a bare
+# number. A category that merely contains a month name (`May improve`, `Marching`) is not a date.
+MONTH_WORD = (
+    r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sep(?:t(?:ember)?)?"
+    r"|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?(?![a-z])"
+)
+DATE_PARTS = re.compile(rf"(?i)(?:{MONTH_WORD}|Q[1-4]|\d+(?:st|nd|rd|th)?|[\s,./'’-])+")
+DATE_SIGNAL = re.compile(
+    rf"(?i)\b{MONTH_WORD}|\b\d{{4}}-\d{{1,2}}(?:-\d{{1,2}})?\b|\b\d{{1,2}}/\d{{1,2}}/\d{{2,4}}\b|\bQ[1-4]\b"
+)
+
+
+def is_date_label(text: str) -> bool:
+    """Whether a tick label is a whole date, in grapher's form or any other (US order, ISO, numeric)."""
+    text = text.strip()
+    return bool(text and DATE_PARTS.fullmatch(text) and DATE_SIGNAL.search(text))
+
+
+def is_date_axis(texts: list[str]) -> bool:
+    """Whether an axis reads as dates throughout: some labels dates, every other one a year."""
+    drawn = [t.strip() for t in texts if t.strip()]
+    return any(is_date_label(t) for t in drawn) and all(is_date_label(t) or YEAR_LABEL.fullmatch(t) for t in drawn)
+
+
+def _hex(color: str | None) -> str | None:
+    """A paint value as lowercase #rrggbb, or None for none, a url or a named color it cannot read."""
+    if not color:
+        return None
+    color = color.strip().lower()
+    if re.fullmatch(r"#[0-9a-f]{3}", color):
+        return "#" + "".join(c * 2 for c in color[1:])
+    return color if re.fullmatch(r"#[0-9a-f]{6}", color) else None
+
+
+def _svg_px(root: ET.Element) -> float:
+    """Template px per SVG unit: matplotlib writes points (0.72 to a template px) unless told otherwise."""
+    return 1 / 0.72 if re.search(r"pt$", root.get("width") or "") else 1.0
+
+
+def calendar_axes(root: ET.Element) -> set[str]:
+    """Subjects whose x axis is on grapher's calendar grid (`style_time_axis(..., inset_ends=False)`).
+
+    A sub-yearly series labelled on January ticks reads `2024`, `2025`, `2026` like a year axis, but
+    grapher adds no first and last date to a calendar grid, so the year axis' end checks skip it.
+    """
+    return {m.group(1) for node in root.iter() if (m := CALENDAR_AXIS.match(node.get("id") or ""))}
+
+
+def is_sub_yearly_axis(texts: list[str]) -> bool:
+    """Whether an axis' labels read as grapher's sub-yearly time axis: its date forms, with bare years allowed."""
+    drawn = [t.strip() for t in texts if t.strip()]
+    if not drawn or not any(GRAPHER_DATE_LABEL.fullmatch(t) for t in drawn):
+        return False
+    return all(GRAPHER_DATE_LABEL.fullmatch(t) or YEAR_LABEL.fullmatch(t) for t in drawn)
+
+
+def date_label_failures(labels: list[TickLabel]) -> list[str]:
+    """Failures for x tick labels that read as dates but not in grapher's formats (US order, `Feb 24, 2023`).
+
+    Judged only on an x axis that reads as dates throughout (`is_date_axis`), so a category axis whose
+    labels happen to hold a month name is the step's own.
+    """
+    texts_of: dict[str, list[str]] = {}
+    for label in labels:
+        if label.axis == "x" and label.text.strip():
+            texts_of.setdefault(label.subject, []).append(label.text.strip())
+    bad: dict[str, list[str]] = {}
+    for subject, texts in texts_of.items():
+        if not is_date_axis(texts):
+            continue
+        for text in texts:
+            if is_date_label(text) and not (GRAPHER_DATE_LABEL.fullmatch(text) or YEAR_LABEL.fullmatch(text)):
+                bad.setdefault(subject, []).append(text)
+    return [
+        f"the x-axis tick labels of {subject} write dates as {', '.join(repr(t) for t in texts[:4])}. Grapher labels a "
+        "sub-yearly axis 'Feb', 'Feb 2023', 'Feb 24' or 'Feb 24, 2023' (month first, as the style guide asks), and "
+        "a quarter by its months; etl.viz.static.time_axis_ticks writes them (WRITING-THE-STEP.md)."
+        for subject, texts in sorted(bad.items())
+    ]
+
+
+def _stroke_of(node: ET.Element, inherited: dict[str, str], defs: dict[str, ET.Element]) -> dict[str, str]:
+    """The paint of a `<path>` or of the def a `<use>` points to, after inheritance."""
+    paint = _paint(node, inherited)
+    if node.tag.rsplit("}", 1)[-1] == "use":
+        ref = (node.get("{http://www.w3.org/1999/xlink}href") or node.get("href") or "").lstrip("#")
+        target = defs.get(ref)
+        if target is not None:
+            for prop, value in STYLE_DECL.findall(target.get("style") or ""):
+                paint.setdefault(prop, value.strip())
+            paint.setdefault("stroke-width", "1")
+    return paint
+
+
+class XTickMark(NamedTuple):
+    gid: str  # the mark's own group id, the step's or name_furniture's
+    x: float  # where the mark meets the axis, in SVG units
+    y: float
+    length: float
+    paint: dict[str, str]
+    label: str  # the text of its tick label, "" when it has none
+
+
+def _x_axes(root: ET.Element, defs: dict[str, ET.Element]) -> list[list[XTickMark]]:
+    """The drawn bottom tick marks of each x axis (each `matplotlib.axis_<n>` holding `xtick_<n>` groups).
+
+    A mark is found by where matplotlib puts it (the first child group of an `xtick_<n>` group, whose
+    `<use>` is the mark), not by gid, so a mark a step named itself (`timeline__tick-2024`) is judged too.
+    """
+    axes: list[list[XTickMark]] = []
+
+    def mark_of(tick: ET.Element, inherited: dict[str, str]) -> XTickMark | None:
+        paint = _paint(tick, inherited)
+        groups = [child for child in tick if child.tag.rsplit("}", 1)[-1] == "g"]
+        label = "".join("".join(g.itertext()) for g in groups[1:]).strip()
+        if not groups:
+            return None
+        mark = groups[0]
+        for use in mark.iter():
+            if use.tag.rsplit("}", 1)[-1] != "use":
+                continue
+            ref = (use.get("{http://www.w3.org/1999/xlink}href") or use.get("href") or "").lstrip("#")
+            target = defs.get(ref)
+            ys = [float(y) for _, y in PATH_POINTS.findall(target.get("d") or "")] if target is not None else []
+            try:
+                x, y = float(use.get("x") or 0), float(use.get("y") or 0)
+            except ValueError:
+                return None
+            # A mark pointing up is the top side's (tick2line), not the axis' own.
+            if not ys or max(ys) <= 0:
+                return None
+            return XTickMark(
+                mark.get("id") or "", x, y, max(ys) - min(ys), _stroke_of(use, _paint(mark, paint), defs), label
+            )
+        return None
+
+    def walk(node: ET.Element, inherited: dict[str, str]) -> None:
+        paint = _paint(node, inherited)
+        ticks = [c for c in node if c.tag.rsplit("}", 1)[-1] == "g" and XTICK_GROUP.match(c.get("id") or "")]
+        if ticks:
+            marks = [m for m in (mark_of(t, paint) for t in ticks) if m is not None]
+            if marks:
+                axes.append(marks)
+        for child in node:
+            if child not in ticks:
+                walk(child, paint)
+
+    walk(root, {})
+    return axes
+
+
+def _horizontal_strokes(root: ET.Element) -> list[tuple[str, float, float, float, dict[str, str]]]:
+    """Every two-point horizontal stroked `<path>`: nearest named id, x0, x1, y (SVG units) and paint."""
+    found = []
+
+    def walk(node: ET.Element, inherited: dict[str, str], name: str) -> None:
+        tag = node.tag.rsplit("}", 1)[-1]
+        if tag == "defs":
+            return
+        node_id = node.get("id") or ""
+        if node_id and not GENERATED_ID.match(node_id):
+            name = node_id
+        paint = _paint(node, inherited)
+        if tag == "path" and paint.get("stroke", "none") != "none":
+            points = [(float(a), float(b)) for a, b in PATH_POINTS.findall(node.get("d") or "")]
+            if len(points) == 2 and abs(points[0][1] - points[1][1]) < 1e-6 and points[0][0] != points[1][0]:
+                (x0, y), (x1, _) = points
+                found.append((name or node_id, min(x0, x1), max(x0, x1), y, paint))
+        for child in node:
+            walk(child, paint, name)
+
+    walk(root, {}, "")
+    return found
+
+
+def _strokes(paint: dict[str, str]) -> bool:
+    """Whether a line puts a stroke down: not none, not transparent, wider than 0 (`tick_params(width=0)`)."""
+    if paint.get("opacity", "1") in ("0", "0.0") or paint.get("stroke-opacity", "1") in ("0", "0.0"):
+        return False
+    try:
+        wide = float(paint.get("stroke-width", "1").replace("px", "")) > 0
+    except ValueError:
+        wide = True
+    return paint.get("stroke", "none") != "none" and wide
+
+
+def _stroke_px(paint: dict[str, str], px: float) -> float:
+    """A stroke's width in template px; infinite when it cannot be read, so nothing is excused by it."""
+    try:
+        return float(paint.get("stroke-width", "1").replace("px", "")) * px
+    except ValueError:
+        return math.inf
+
+
+def _stroke_problems(paint: dict[str, str], px: float) -> list[str]:
+    """How a stroke differs from grapher's axis furniture: #999 and 1px."""
+    problems = []
+    if _hex(paint.get("stroke")) != AXIS_COLOR:
+        problems.append(f"stroke {paint.get('stroke')}")
+    try:
+        width = float(paint.get("stroke-width", "1").replace("px", "")) * px
+    except ValueError:
+        return [*problems, "an unreadable width"]
+    if abs(width - 1) > FURNITURE_TOLERANCE_PX / 2:
+        problems.append(f"{width:.3g}px wide")
+    return problems
+
+
+def x_axis_furniture_failures(svg: str) -> list[str]:
+    """Failures where a time axis' line or tick marks differ from grapher's: 1px, #999, marks 5px long.
+
+    Judged on each x axis whose labels read as years or dates (`is_year_axis`, `is_sub_yearly_axis`,
+    or `is_date_axis` for dates written another way). The axis line is any horizontal stroke lying
+    along the tops of its tick marks across most of their range — the bottom spine, a zero gridline,
+    or a line the step drew itself — so a hand-drawn axis in the text color is caught whatever it is
+    called. A stroke drawn under a conforming axis line, and no wider, is hidden by it (a y=0 gridline
+    under the bottom spine), so it is let through.
+    """
+    try:
+        root = ET.fromstring(svg)
+    except ET.ParseError:
+        return []
+    defs = {node.get("id"): node for node in root.iter() if node.get("id")}
+    px = _svg_px(root)
+    strokes = _horizontal_strokes(root)
+    off_marks: list[str] = []
+    off_lines: list[str] = []
+    for axis in _x_axes(root, defs):
+        texts = [m.label for m in axis]
+        if not (is_year_axis(texts) or is_sub_yearly_axis(texts) or is_date_axis(texts)):
+            continue
+        marks = [m for m in axis if m.length > 0 and _strokes(m.paint)]
+        for mark in marks:
+            problems = _stroke_problems(mark.paint, px)
+            if abs(mark.length * px - TICK_MARK_PX) > FURNITURE_TOLERANCE_PX:
+                problems.append(f"{mark.length * px:.3g}px long")
+            if problems:
+                off_marks.append(f"{mark.gid or mark.label or 'a mark'} ({', '.join(problems)})")
+        if len(marks) < 2:
+            continue
+        xs = sorted(m.x for m in marks)
+        top = sorted(m.y for m in marks)[len(marks) // 2]
+        # In document order, so a later stroke is drawn over an earlier one.
+        along = [
+            (name, paint, _stroke_problems(paint, px))
+            for name, x0, x1, y, paint in strokes
+            if _strokes(paint)
+            and abs(y - top) * px <= 1.5
+            and min(x1, xs[-1]) - max(x0, xs[0]) >= 0.9 * (xs[-1] - xs[0])
+        ]
+        for i, (name, paint, problems) in enumerate(along):
+            if not problems:
+                continue
+            covered = any(not later for _, _, later in along[i + 1 :])
+            if covered and _stroke_px(paint, px) <= 1 + FURNITURE_TOLERANCE_PX / 2:
+                continue
+            off_lines.append(f"{name or 'a line'} ({', '.join(problems)})")
+    failures = []
+    if off_marks:
+        failures.append(
+            f"time-axis tick marks differ from grapher's 5px long, 1px, #999: {'; '.join(off_marks[:4])}"
+            f"{' and more' if len(off_marks) > 4 else ''}. etl.viz.static.style_time_axis sets them; keep "
+            "matplotlib's own ticks rather than drawing marks yourself (WRITING-THE-STEP.md)."
+        )
+    if off_lines:
+        failures.append(
+            f"the time-axis line differs from grapher's 1px #999: {'; '.join(off_lines[:3])}. Draw it with the "
+            "bottom spine and etl.viz.static.style_time_axis, never a line of your own, and don't thicken it to "
+            "stress time (WRITING-THE-STEP.md)."
+        )
+    return failures
+
+
 def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[str]:
     """Return failures where the axes differ from grapher's own download (module docstring)."""
     failures = []
@@ -595,6 +889,7 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             f"the x-axis tick labels of {', '.join(top)} are drawn at the top (labeltop). Grapher puts them below the "
             "plot, over its tick marks; draw them there (labelbottom=True, labeltop=False)."
         )
+    failures += date_label_failures(labels)
     labels_left = [label for label in labels if not (label.axis == "y" and label.second)]
     anchors = {label.anchor for label in labels_left if label.axis == "y" and label.anchor is not None}
     # A MathText label declares no anchor, so its axis' alignment is read off where the labels sit,
@@ -652,7 +947,7 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             key = (mark.group(1), mark.group(2))
             drawn[key] = drawn.get(key, False) or _tick_draws(group, defs)
     for subject in sorted(x_texts):
-        if not is_year_axis(x_texts[subject]):
+        if not (is_year_axis(x_texts[subject]) or is_sub_yearly_axis(x_texts[subject])):
             continue
         # matplotlib leaves an empty group for a zero-length mark, none at all for a hidden one
         # (`bottom=False`, an invisible tick1line) and a fully transparent one for an alpha of 0;
@@ -670,7 +965,7 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
             )
     # A year axis opens on the data's first year and closes on its last: no series line starts before
     # its first labelled tick or runs on past its last.
-    year_axes = {subject for subject in x_texts if is_year_axis(x_texts[subject])}
+    year_axes = {subject for subject in x_texts if is_year_axis(x_texts[subject])} - calendar_axes(root)
     for side, subject, label, lines, year in year_axis_overruns(root, year_axes):
         # With a single labelled tick there is no scale to read a year from.
         if side == "start":
@@ -701,6 +996,7 @@ def axis_failures(svg: str, target: tuple[str, tuple[int, int]] | None) -> list[
                     f"{want:g}px, grapher's own download size (WRITING-THE-STEP.md). Changing it means rebalancing "
                     "the template's type with the design team."
                 )
+    failures += x_axis_furniture_failures(svg)
     return failures
 
 
@@ -1016,6 +1312,7 @@ def year_axis_end_warnings(svg: str) -> list[str]:
 
     warnings = []
     year_axes = {subject for subject in labels if is_year_axis([text for text, *_ in labels[subject].values()])}
+    year_axes -= calendar_axes(root)
     # Labelled past the data: every line opens after the first labelled year, or closes before the last.
     short = {(subject, side): (label, year) for side, subject, label, year in year_axis_shortfalls(root, year_axes)}
     for subject in sorted(year_axes):
