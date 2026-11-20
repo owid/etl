@@ -670,7 +670,7 @@ def write_axes_frame(
         '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" '
         'style="fill-opacity: 0; stroke: #000000; stroke-opacity: 0; stroke-width: 0.8"/></g></g>'
         if tick_marks == "transparent"
-        else '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" style="stroke: #999999"/></g></g>'
+        else '<g id="axes__x-tick-{v}"><g><use xlink:href="#m1" x="10" y="300" style="stroke: #999999; stroke-width: 0.72"/></g></g>'
         if tick_marks
         else '<g id="axes__x-tick-{v}"/>'
         if tick_marks is False
@@ -696,7 +696,7 @@ def write_axes_frame(
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
         'width="388.8pt" height="388.8pt">'
     )
-    defs = '<defs><path id="m1" d="M 0 0 L 0 5"/></defs>'
+    defs = '<defs><path id="m1" d="M 0 0 L 0 3.6"/></defs>'
     stem.with_suffix(".svg").write_text(f'{head}{defs}<g id="title"><text>Title</text></g>{xs}{ys}</svg>')
     Image.new("RGB", (1620, 1620), "white").save(stem.with_suffix(".png"))
     return stem
@@ -1171,14 +1171,14 @@ def test_a_year_axis_with_one_labelled_tick_still_spans_the_line(tmp_path, line_
     [
         # style_year_axis: end labels on their ticks, a 1px butt-capped line stopping at the end ticks.
         ("grapher", []),
-        # matplotlib's defaults: centered end labels, a 0.8pt line whose square cap overhangs both ends.
+        # matplotlib's defaults under apply_svg_rcparams: centered end labels, and a 1px line whose
+        # square cap overhangs both ends.
         (
             "default",
             [
                 "its first label, 2000, is centered on its tick, not left-aligned",
                 "its last label, 2024, is centered on its tick, not right-aligned",
-                "its axis line runs 0.6px past the end ticks, from its square cap",
-                "its axis line is 1.1px wide, not 1px",
+                "its axis line runs 0.5px past the end ticks, from its square cap",
             ],
         ),
         # Range padding past the end ticks, which a butt cap does not fix.
@@ -1283,3 +1283,85 @@ def test_a_year_axis_labelled_past_the_data_warns(tmp_path, ticks, line, warning
         assert "warning" not in result.stdout, result.stdout
     else:
         assert warning in result.stdout and result.stdout.count("! warning") == 1, result.stdout
+
+
+def _date_axis_frame(tmp_path: Path, drawn_as: str) -> Path:
+    """A daily series over Feb 24, 2023 to Nov 19, 2026, its x axis drawn the way `drawn_as` names."""
+    import datetime as dt
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame, style_time_axis, time_axis_ticks
+
+    apply_svg_rcparams()
+    start, end = dt.date(2023, 2, 24), dt.date(2026, 11, 19)
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.plot([start, end], [0, 20], gid="line__value")
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="y", length=0)
+    if drawn_as == "grapher":
+        dates, labels = time_axis_ticks(start, end, "day", plot_width_px=470, font_px=15)
+        ax.set_xticks(dates, labels)
+        style_time_axis(ax, start, end, inset_ends=False)
+    elif drawn_as == "grapher-ends":
+        dates, labels = time_axis_ticks(start, end, "day", plot_width_px=470, font_px=15, label_ends=True)
+        ax.set_xticks(dates, labels)
+        style_time_axis(ax, start, end)
+    else:
+        # The sketch that prompted the check: its own axis line and marks in the text color, 2px, 8px
+        # marks, and day-month-year labels.
+        ticks = [start, dt.date(2024, 1, 1), dt.date(2025, 1, 1), dt.date(2026, 1, 1), end]
+        ax.set_xticks(ticks, ["24 Feb 2023", "2024", "2025", "2026", "19 Nov 2026"])
+        ax.set_xlim(start, end)
+        ax.set_ylim(0, 20)
+        ax.spines["bottom"].set_visible(False)
+        ax.axhline(0, color="#5b5b5b", linewidth=1.44, gid="timeline__axis")
+        ax.tick_params(axis="x", color="#5b5b5b", length=8 * 0.72, width=1.44)
+        for tick, text in zip(ax.xaxis.get_major_ticks(), ["24-Feb-2023", "2024", "2025", "2026", "19-Nov-2026"]):
+            tick.tick1line.set_gid(f"timeline__tick-{text}")
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    return tmp_path / "frame_square"
+
+
+@pytest.mark.parametrize("drawn_as", ["grapher", "grapher-ends"])
+def test_a_date_axis_drawn_with_the_helpers_passes(tmp_path, drawn_as):
+    result = run(VERIFY, _date_axis_frame(tmp_path, drawn_as), "--template", "mobile-square")
+    assert result.returncode == 0, result.stdout
+
+
+def test_a_hand_drawn_date_axis_fails_whatever_its_names(tmp_path):
+    """The marks and line are judged by where matplotlib puts them, so custom gids hide nothing."""
+    result = run(VERIFY, _date_axis_frame(tmp_path, "hand-drawn"), "--template", "mobile-square")
+    assert result.returncode == 1, result.stdout
+    assert "write dates as '24 Feb 2023', '19 Nov 2026'" in result.stdout, result.stdout
+    assert "time-axis tick marks differ from grapher's 5px long, 1px, #999: timeline__tick-" in result.stdout
+    assert "stroke #5b5b5b, 2px wide, 8px long" in result.stdout, result.stdout
+    assert "the time-axis line differs from grapher's 1px #999: timeline__axis (stroke #5b5b5b, 2px wide)" in (
+        result.stdout
+    ), result.stdout
+
+
+def test_a_count_axis_keeps_its_own_tick_marks(tmp_path):
+    """Only time axes are held to grapher's furniture: a category or count axis is the step's to style."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from etl.viz.static import SketchPaths, apply_svg_rcparams, export_frame
+
+    apply_svg_rcparams()
+    fig, ax = plt.subplots(figsize=(5.4, 5.4))
+    ax.bar(["Low", "Middle", "High"], [1, 2, 3], gid="bar__value")
+    ax.tick_params(labelsize=15 * 0.72)
+    ax.tick_params(axis="x", color="#000000", length=8, width=2)
+    export_frame(SketchPaths(tmp_path / "sketch.py"), fig, "frame_square", template="mobile-square")
+    plt.close(fig)
+    result = run(VERIFY, tmp_path / "frame_square", "--template", "mobile-square")
+    assert "tick marks differ" not in result.stdout and "axis line differs" not in result.stdout, result.stdout
