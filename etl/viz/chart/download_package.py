@@ -658,9 +658,11 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
         frames.append(joined.drop(columns=[axis]))
 
     stacked = pr.concat(frames, ignore_index=True)
-    key = ["country", "frequency", "time"]
+    # Not sorted on "time": it is a text label, so annual years would sort as strings
+    # ("-1", "-100022", ..., "1979", "983"). Each frame is already in time order from
+    # `_outer_join_on_key`, and a stable sort on the other keys keeps that order.
     return WideTable(
-        table=stacked.sort_values(key).reset_index(drop=True),
+        table=stacked.sort_values(["country", "frequency"], kind="stable").reset_index(drop=True),
         time_column="time",
         time_header="Time",
         frequency_column="frequency",

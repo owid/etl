@@ -636,3 +636,28 @@ def test_indicators_shown_only_by_grouped_views_are_included():
         "t#low": [{"estimate": "_ci"}],
         "t#high": [{"estimate": "_ci"}],
     }
+
+
+def test_stacked_rows_are_in_time_order_not_label_order():
+    """Test build_wide_table_for_chart - stacked rows follow the time value, not its text label.
+
+    "time" is a string in the stacked shape, so sorting on it put climate-change's
+    long-run annual World series in the order "-1", "-100022", ..., "1979", "983".
+    """
+    annual = Table({"country": ["World"] * 4, "year": [983, -100022, 1979, -1], "co2": [1.0, 2.0, 3.0, 4.0]})
+    monthly = Table({"country": ["World"] * 2, "date": ["2000-02-01", "2000-01-01"], "co2": [5.0, 6.0]})
+    monthly["co2"].metadata.display = {"timeInterval": "month"}
+    used = {"grapher/c/latest/d/annual#co2": [{}], "grapher/c/latest/d/monthly#co2": [{}]}
+
+    result = _build_wide(
+        used, {"annual": annual.set_index(["country", "year"]), "monthly": monthly.set_index(["country", "date"])}
+    )
+
+    assert list(zip(result.table["frequency"], result.table["time"])) == [
+        ("annual", "-100022"),
+        ("annual", "-1"),
+        ("annual", "983"),
+        ("annual", "1979"),
+        ("monthly", "2000-01"),
+        ("monthly", "2000-02"),
+    ]
