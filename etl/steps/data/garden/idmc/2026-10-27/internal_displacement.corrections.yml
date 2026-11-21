@@ -1,0 +1,14 @@
+# Known errors in the IDMC data, patched locally until IDMC publishes the fix.
+# See etl/data_corrections.py for the format.
+- indicator: [disaster_new_displacement, disaster_new_displacement_rounded]
+  entity: Vanuatu
+  years: [2015]
+  action: override
+  value: 100000
+  expect: {gt: 590000} # still the wrong ~600,000; fails once IDMC ships the corrected figure
+  reason: >-
+    Vanuatu's 2015 disaster displacements (Cyclone Pam) are given as about 600,000, more than twice the
+    country's population. IDMC confirmed this is an upload error in their database and that the correct
+    figure is 100,000.
+  producer: Internal Displacement Monitoring Centre
+  status: acknowledged
