@@ -1,0 +1,39 @@
+chart_config_id: 01a18dd8-7cb7-7e67-bd62-d7e3dc6354e2
+slug: public-pension-spending-share-of-gdp
+grapher_schema: "011"
+topic_tags:
+  - Government Spending
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Cash benefits for old age and survivors from SOCX, the series Pensions at a Glance uses for public spending.
+      # Tolerance lets the map and bars of the latest year use 2021 or 2022 for countries without newer data.
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age_and_survivors__programme_type_total
+          display:
+            name: Public spending on pensions
+            tolerance: 2
+    config:
+      title: Public spending on pensions as a share of GDP
+      subtitle: Government spending on pensions and other cash benefits for older people and for survivors, such as widows and widowers, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Private pensions and services such as care are not included.
+      note: Government includes central, state, and local governments and social security funds. Spending is measured before any taxes that people might pay back on these benefits.
+      tab: chart
+      hasMapTab: true
+      chartTypes:
+        - LineChart
+        - DiscreteBar
+      # The OECD average and large economies across the range of spending, as in the chart of shares of government spending.
+      selectedEntityNames:
+        - OECD countries
+        - Italy
+        - France
+        - Germany
+        - Japan
+        - United Kingdom
+        - United States
+        - South Korea
+      addCountryMode: add-country
+      map:
+        colorScale:
+          baseColorScheme: Blues

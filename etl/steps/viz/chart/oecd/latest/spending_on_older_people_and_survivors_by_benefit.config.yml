@@ -1,0 +1,856 @@
+grapher_schema: "011"
+slug: spending-on-older-people-and-survivors-by-benefit
+
+title:
+  title: Spending on older people and survivors as a share of GDP, by type of benefit
+  title_variant: ""
+topic_tags:
+  - Government Spending
+
+default_selection:
+  - OECD countries
+  - Italy
+  - France
+  - Germany
+  - Japan
+  - United Kingdom
+  - United States
+  - Switzerland
+  - Iceland
+  - Australia
+  - Denmark
+  - Chile
+
+default_dimensions:
+  source: public
+  group: old_age_and_survivors
+  benefit_type: cash_and_in_kind
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: false
+        tab: chart
+        chartTypes: ["StackedDiscreteBar"]
+        stackMode: absolute
+        hideRelativeToggle: false
+
+dimensions:
+  - slug: source
+    name: Source
+    choices:
+      - slug: public
+        name: Public
+        description: Spending by governments and social security funds
+      - slug: mandatory_private
+        name: Mandatory private
+        description: Spending by private schemes that people are required to join
+      - slug: public_and_mandatory_private
+        name: Public and mandatory private
+        description: Both together
+  - slug: group
+    name: Group
+    choices:
+      - slug: old_age
+        name: Older people
+      - slug: survivors
+        name: Survivors
+      - slug: old_age_and_survivors
+        name: Older people and survivors
+  - slug: benefit_type
+    name: Benefit type
+    choices:
+      - slug: cash
+        name: Cash
+      - slug: in_kind
+        name: In kind
+      - slug: cash_and_in_kind
+        name: Cash and in kind
+
+# Each benefit has a fixed OWID color (OwidDistinctColors in owid-grapher): blues for cash benefits for older people,
+# teals for services for older people, purples for cash benefits for survivors, and the adjacent dark copper and
+# peach of OWID categorical E for services for survivors.
+views:
+  - dimensions:
+      source: public
+      group: old_age
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+    config:
+      title: Public spending on cash benefits for older people as a share of GDP, by type of benefit
+      subtitle: Public spending on cash benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: public
+      group: old_age
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+    config:
+      title: Public spending on services for older people as a share of GDP, by type of benefit
+      subtitle: Public spending on in-kind benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as care homes and help at home.
+  - dimensions:
+      source: public
+      group: old_age
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+    config:
+      title: Public spending on older people as a share of GDP, by type of benefit
+      subtitle: Public spending on benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as care homes and help at home.
+  - dimensions:
+      source: public
+      group: survivors
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+    config:
+      title: Public spending on cash benefits for survivors as a share of GDP, by type of benefit
+      subtitle: Public spending on cash benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: public
+      group: survivors
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public spending on services for survivors as a share of GDP, by type of benefit
+      subtitle: Public spending on in-kind benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as funeral expenses.
+  - dimensions:
+      source: public
+      group: survivors
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public spending on survivors as a share of GDP, by type of benefit
+      subtitle: Public spending on benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as funeral expenses.
+  - dimensions:
+      source: public
+      group: old_age_and_survivors
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+    config:
+      title: Public spending on cash benefits for older people and survivors as a share of GDP, by type of benefit
+      subtitle: Public spending on cash benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: public
+      group: old_age_and_survivors
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public spending on services for older people and survivors as a share of GDP, by type of benefit
+      subtitle: Public spending on in-kind benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as care homes, help at home, and funeral expenses.
+  - dimensions:
+      source: public
+      group: old_age_and_survivors
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public spending on older people and survivors as a share of GDP, by type of benefit
+      subtitle: Public spending on benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as care homes, help at home, and funeral expenses.
+  - dimensions:
+      source: mandatory_private
+      group: old_age
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on cash benefits for older people as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on cash benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: mandatory_private
+      group: old_age
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on services for older people as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on in-kind benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as care homes and help at home.
+  - dimensions:
+      source: mandatory_private
+      group: old_age
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on older people as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as care homes and help at home.
+  - dimensions:
+      source: mandatory_private
+      group: survivors
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on cash benefits for survivors as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on cash benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: mandatory_private
+      group: survivors
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on services for survivors as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on in-kind benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as funeral expenses.
+  - dimensions:
+      source: mandatory_private
+      group: survivors
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on survivors as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as funeral expenses.
+  - dimensions:
+      source: mandatory_private
+      group: old_age_and_survivors
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on cash benefits for older people and survivors as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on cash benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: mandatory_private
+      group: old_age_and_survivors
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on services for older people and survivors as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on in-kind benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as care homes, help at home, and funeral expenses.
+  - dimensions:
+      source: mandatory_private
+      group: old_age_and_survivors
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Mandatory private spending on older people and survivors as a share of GDP, by type of benefit
+      subtitle: Mandatory private spending on benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as care homes, help at home, and funeral expenses.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: old_age
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on cash benefits for older people as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on cash benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: old_age
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on services for older people as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on in-kind benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as care homes and help at home.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: old_age
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on older people as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on benefits for older people, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as care homes and help at home.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: survivors
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on cash benefits for survivors as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on cash benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: survivors
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on services for survivors as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on in-kind benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as funeral expenses.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: survivors
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on survivors as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on benefits for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as funeral expenses.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: old_age_and_survivors
+      benefit_type: cash
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on cash benefits for older people and survivors as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on cash benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. Cash benefits are mostly pensions.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: old_age_and_survivors
+      benefit_type: in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on services for older people and survivors as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on in-kind benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. In-kind benefits are services, such as care homes, help at home, and funeral expenses.
+  - dimensions:
+      source: public_and_mandatory_private
+      group: old_age_and_survivors
+      benefit_type: cash_and_in_kind
+    indicators:
+      y:
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_pension
+          display:
+            name: Old-age pensions
+            color: "#286BBB"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_early_retirement_pension
+          display:
+            name: Early retirement pensions
+            color: "#00295B"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_old_age__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for older people
+            color: "#4C6A9C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_residential_care_and_home_help_services
+          display:
+            name: Care homes and help at home
+            color: "#00847E"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_old_age__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for older people
+            color: "#58AC8C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_pension
+          display:
+            name: Survivors’ pensions
+            color: "#6D3E91"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_cash_spending__programme_type_category_survivors__programme_type_other_cash_benefits
+          display:
+            name: Other cash benefits for survivors
+            color: "#A2559C"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_funeral_expenses
+          display:
+            name: Funeral expenses
+            color: "#9A5129"
+            tolerance: 2
+        - catalogPath: social_expenditure#share_gdp__expenditure_source_public_and_mandatory_private__spending_type_in_kind_spending__programme_type_category_survivors__programme_type_other_benefits_in_kind
+          display:
+            name: Other services for survivors
+            color: "#E56E5A"
+            tolerance: 2
+    config:
+      title: Public and mandatory private spending on older people and survivors as a share of GDP, by type of benefit
+      subtitle: Public and mandatory private spending on benefits for older people and for the partners and other dependants of people who have died, divided by [gross domestic product](#dod:gdp), expressed as a percentage. It includes cash benefits, such as pensions, and in-kind benefits, which are services such as care homes, help at home, and funeral expenses.
