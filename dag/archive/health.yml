@@ -1295,3 +1295,7 @@ steps:
       - data://meadow/cdc/2025-03-14/polio_deaths:
         - snapshot://cdc/2025-03-14/polio_deaths.csv
       - data://meadow/public_health_reports/2025-03-14/polio_deaths
+  # archived; last active in 93f948f920e6 on 2026-11-13
+  data://garden/cdc/2025-01-26/measles_state_level:
+    - data://meadow/cdc/2025-01-26/measles_state_level:
+      - snapshot://cdc/2025-01-26/measles_state_level.txt

@@ -389,6 +389,9 @@ steps:
   data://garden/demography/2025-01-23/us_state_population:
     - data://meadow/demography/2025-01-23/us_state_population:
       - snapshot://demography/2025-01-23/us_state_population.csv
+  data://garden/demography/2026-11-06/us_state_population:
+    - data://meadow/demography/2026-11-06/us_state_population:
+      - snapshot://demography/2026-11-06/us_state_population.csv
 
   # UN WPP data for Cologne
   data://external/demography/latest/un_wpp_subset:
