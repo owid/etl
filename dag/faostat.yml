@@ -41,11 +41,6 @@ steps:
 
   # Global food multidim (shown as a data explorer).
   viz://chart/faostat/latest/global_food:
-    - data://grapher/faostat/2026-02-25/faostat_qcl
-    - data://grapher/faostat/2026-02-25/faostat_fbsc
-
-  # Global food explorer.
-  viz://explorer/faostat/latest/global_food:
     - data://grapher/faostat/2026-02-25/faostat_qcl:
       - data://garden/faostat/2026-02-25/faostat_qcl
     - data://grapher/faostat/2026-02-25/faostat_fbsc:
