@@ -55,6 +55,8 @@ dataset:
     For a more detailed description_short of the HMD data, including week date definitions, the coverage (of individuals, locations, and time), whether dates are for death occurrence or registration, the original national source information, and important caveats, see the HMD metadata file at https://www.mortality.org/Public/STMF_DOC/STMFmetadata.pdf.
 
     For a more detailed description_short of the WMD data, including original source information, see their GitHub page at https://github.com/akarlinsky/world_mortality.
+  owners:
+    - Lucas Rodés-Guirao
 
 tables:
   excess_mortality:
