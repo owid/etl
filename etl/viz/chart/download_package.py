@@ -53,7 +53,7 @@ anyway -- but a manual edit made directly in the admin will not propagate.
 from __future__ import annotations
 
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import date, timezone
 from pathlib import Path
@@ -146,22 +146,20 @@ def _check_column_names_unique(
         `<name>.1` -- which is why this began life as a warning.
 
     Nothing upstream guarantees uniqueness, which is why this is checked rather
-    than assumed. It holds across all 32 published MDIMs today, and the likely
-    way to break it is an MDIM that joins two producers' versions of the same
-    metric -- two indicators genuinely named "Population". If that happens the
-    fix is a judgement call about those indicators (rename one upstream, or
-    start folding the attribution into the column name), so it wants a human
-    rather than a generated `_1` suffix, which is exactly the unhelpful thing
-    DuckDB already does on its own.
+    than assumed. The common way to break it -- an MDIM that joins several
+    producers' versions of the same metric under one title, as the conflict MDIMs
+    do with UCDP, UCDP + PRIO and PRIO -- is resolved before this runs, by
+    `_disambiguate_colliding_names`. What reaches here is a collision the chart's
+    own dimensions cannot tell apart either, which is a judgement call about those
+    indicators (rename one upstream), so it wants a human rather than a generated
+    `_1` suffix, which is exactly the unhelpful thing DuckDB already does on its own.
     """
     # Keyed by (name, frequency): two indicators sharing a name at *different*
     # frequencies are the same metric at two resolutions, which the stacked shape merges
     # into one column told apart by its rows. Sharing a name at the *same* frequency is
     # the real collision -- two series that would occupy one column with no way to tell
     # which is which.
-    seen: dict[tuple[str, str], list[str]] = defaultdict(list)
-    for catalog_path, long_name, _variable_id, _col in columns:
-        seen[(long_name, column_to_frequency.get(catalog_path, ""))].append(catalog_path)
+    seen = _paths_by_name_and_frequency(columns, column_to_frequency)
     collisions = {key: cols for key, cols in seen.items() if len(cols) > 1}
     if not collisions:
         return
@@ -174,6 +172,99 @@ def _check_column_names_unique(
         f"name(s): {detail}. See _check_column_names_unique in "
         "etl/viz/chart/download_package.py."
     )
+
+
+def _paths_by_name_and_frequency(
+    indicators: list[tuple[str, str, int, IndicatorColumn]],
+    column_to_frequency: dict[str, str],
+) -> dict[tuple[str, str], list[str]]:
+    """Catalog paths keyed by (column name, frequency) -- more than one under a key is a collision."""
+    grouped: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for catalog_path, name, _variable_id, _col in indicators:
+        grouped[(name, column_to_frequency.get(catalog_path, ""))].append(catalog_path)
+    return grouped
+
+
+def _disambiguate_colliding_names(
+    indicators: list[tuple[str, str, int, IndicatorColumn]],
+    column_to_dimensions: dict[str, list[dict]],
+    column_to_frequency: dict[str, str],
+    dimensions: list[dict],
+) -> list[tuple[str, str, int, IndicatorColumn]]:
+    """Tell apart indicators that share a name at one frequency, the way the chart does.
+
+    The conflict MDIMs show the same measures from several sources (UCDP, UCDP + PRIO
+    and PRIO) under identical indicator titles, and a reader tells them apart on the
+    page with the "Data source" drop-down. So the name gets what that drop-down
+    shows, as "<name> - Data source: Uppsala Conflict Data Program", which matches how
+    ETL already names dimensioned indicators ("... - Conflict type: interstate").
+
+    The dimension used has to *separate* the group: each indicator sits under one
+    choice of it in every view that shows it, and no two indicators share that
+    choice. A single separating dimension, rather than every dimension the views
+    differ on, keeps the suffix to one "Dimension: choice". Where several separate a
+    name's collisions, the one that separates the most collisions in the chart wins
+    (ties go to chart order), so a package names its collisions one way throughout;
+    chart order alone can pick a dimension that separates a pair only by accident,
+    such as a "Conflict type" one source files under a different choice. A name no
+    single dimension separates is left alone, for `_check_column_names_unique` to
+    refuse.
+
+    Only colliding names change. Renaming every column would churn the packages that
+    have no collision, and the indicator names are what the charts and data pages
+    show. The cost is that a column's name depends on its neighbours: adding a second
+    source of an indicator to an MDIM renames the first one's column.
+
+    The suffix is applied to every indicator with that name, at any frequency, so the
+    same source's annual and monthly series still merge into one column. That is why a
+    dimension qualifies only if it separates the name's collisions at every frequency
+    and gives every indicator with that name exactly one choice: otherwise a series at
+    another frequency would take a suffix it does not have and merge into another
+    source's column.
+    """
+    by_key = _paths_by_name_and_frequency(indicators, column_to_frequency)
+
+    def choices(catalog_path: str, slug: str) -> set:
+        return {combination.get(slug) for combination in column_to_dimensions[catalog_path]}
+
+    def has_one_choice(catalog_path: str, slug: str) -> bool:
+        c = choices(catalog_path, slug)
+        return len(c) == 1 and None not in c
+
+    def separates(paths: list[str], slug: str) -> bool:
+        return len({next(iter(choices(path, slug))) for path in paths}) == len(paths)
+
+    paths_by_name: dict[str, list[list[str]]] = defaultdict(list)
+    for (name, _frequency), paths in by_key.items():
+        paths_by_name[name].append(paths)
+
+    # Separating dimensions per colliding name, in chart order.
+    candidates: dict[str, list[str]] = {}
+    for name, groups in paths_by_name.items():
+        colliding = [paths for paths in groups if len(paths) > 1]
+        if not colliding:
+            continue
+        candidates[name] = [
+            d["slug"]
+            for d in dimensions
+            if all(has_one_choice(path, d["slug"]) for paths in groups for path in paths)
+            and all(separates(paths, d["slug"]) for paths in colliding)
+        ]
+    reach = Counter(slug for slugs in candidates.values() for slug in slugs)
+    separating = {name: max(slugs, key=lambda s: reach[s]) for name, slugs in candidates.items() if slugs}
+    if not separating:
+        return indicators
+
+    labels = {d["slug"]: (d["name"], {c["slug"]: c["name"] for c in d["choices"]}) for d in dimensions}
+    renamed = []
+    for catalog_path, name, variable_id, col in indicators:
+        slug = separating.get(name)
+        choice = column_to_dimensions[catalog_path][0].get(slug) if slug else None
+        if choice:
+            dimension_name, choice_names = labels[slug]
+            name = f"{name} - {dimension_name}: {choice_names.get(choice, choice)}"
+        renamed.append((catalog_path, name, variable_id, col))
+    return renamed
 
 
 def _check_package_size(
@@ -273,29 +364,23 @@ def _format_time_labels(values: pd.Series, interval: str) -> pd.Series:
     return dates.dt.strftime("%Y-%m-%d")
 
 
-def _table_time_interval(tb: Table, axis: str) -> str | None:
-    """The interval declared by a table's value columns, as one value, or None.
+def _column_time_interval(tb: Table, column: str, axis: str) -> str | None:
+    """The interval a column declares in `display.timeInterval`, or None.
 
     A year axis needs no declaration: the schema's default is "year" and there is
     nothing finer to mistake it for. A date axis does need one -- the dates alone
     cannot say whether they are days, weeks or months, and guessing is how monthly
     data ends up labelled `daily` and written `1999-01-01`, which reads as the 1st
-    of January. `electricity_mix_monthly` is exactly that case (its display carries
-    only a name), while `energy_prices_monthly` declares `month` and comes out
-    right. So return None and let the caller decide whether it can proceed without
-    knowing.
+    of January. So return None and let the caller decide whether it can proceed
+    without knowing.
 
-    A table whose columns disagree has no single answer, and every caller needs one.
+    Read per column rather than per table, because one table can hold several
+    resolutions: `climate_change_impacts_monthly` has daily, monthly and quarterly
+    columns side by side on one day-offset axis.
     """
-    value_cols = [c for c in tb.columns if c not in ("country", "year", "date")]
-    declared = {(getattr(tb[c].metadata, "display", None) or {}).get("timeInterval") for c in value_cols} - {None}
-    if len(declared) > 1:
-        raise ValueError(
-            f"Table declares several display.timeInterval values ({sorted(declared)}); "
-            "it needs splitting before it can be labelled with one frequency."
-        )
+    declared = (getattr(tb[column].metadata, "display", None) or {}).get("timeInterval")
     if declared:
-        return declared.pop()  # ty: ignore[invalid-return-type]
+        return declared
     return None if axis == "date" else "year"
 
 
@@ -381,13 +466,14 @@ def _outer_join_on_key(tables: list[Table]) -> Table:
 class WideTable:
     """The joined data plus what the output layer needs to lay its key columns out.
 
-    Two shapes come out of here. A chart whose indicators all share one time axis
+    Two shapes come out of here. A chart whose indicators all share one frequency
     gets the familiar one: a `country` + `year`/`date` key, and no frequency column. A
-    chart that mixes axes -- an integer-year series and a calendar-date one, which
-    cannot share a column without inventing precision -- gets its frequencies stacked
-    instead: one row per (entity, frequency, time), with `frequency` as an ordinary key
-    column. That keeps it to one file and one column per metric, since the same metric at
-    two frequencies is one column distinguished by a row value rather than two columns
+    chart that mixes frequencies -- an integer-year series and a calendar-date one,
+    which cannot share a column without inventing precision, or a weekly and a
+    monthly one, whose dates can coincide -- gets its frequencies stacked instead: one
+    row per (entity, frequency, time), with `frequency` as an ordinary key column.
+    That keeps it to one file and one column per metric, since the same metric at two
+    frequencies is one column distinguished by a row value rather than two columns
     that would collide on their name.
     """
 
@@ -410,34 +496,35 @@ class WideTable:
 def _used_indicators(chart: Chart) -> dict[str, list[dict]]:
     """Map each distinct indicator's catalog path to every dimension
     combination it is shown under -- keys and combinations both in first-seen
-    order -- skipping views created by group_views(), since those just
-    re-display already-included indicators under a synthetic comparison
-    dimension and don't add new data.
+    order, with indicators that only grouped views show after the rest.
 
     Usually a one-element list, but an indicator reachable from several views
     (a choice that doesn't affect that particular indicator) genuinely has
     more than one, and metadata.json reports all of them. Only the first is
     used to name the wide column, so column names stay stable regardless.
 
-    KNOWN GAP -- the group_views() assumption above isn't always true. A spot-check
-    (2026-07-23) of natural-disasters-deaths found its "all disasters
-    combined" view is missing from the "complete" package. That MDIM calls
-    add_total_indicator_for_map() to add a genuinely NEW total indicator
-    that exists only on a grouped view's map tab, not on any regular view --
-    skipping all grouped views here means this function never sees it, so
-    the wide table silently ends up incomplete for any MDIM using that
-    pattern. Not fixed yet: doing so means telling apart "grouped view that
-    only re-displays existing indicators" from "grouped view that also
-    introduces a new one," which isn't something `view.is_grouped` alone
-    can answer."""
+    Views created by group_views() count only for indicators that no regular
+    view shows. Mostly they re-display indicators under a synthetic comparison
+    choice, and listing that combination beside the indicator's own would point
+    its column at a stacked view. But a grouped view can be the only place an
+    indicator appears: conflict-data-source replaces most of its views with
+    grouped ones (`replace=True`). The cost is that a series a chart builds only
+    for a stacked view (electricity-mix's zero-filled bioenergy) is published too.
+
+    KNOWN GAP -- only the views' y indicators are read. An indicator that appears
+    nowhere but on a map tab, like the "all disasters combined" total that
+    natural-disasters-deaths adds with add_total_indicator_for_map(), is still
+    missing from the package."""
     used: dict[str, list[dict]] = {}
+    grouped_only: dict[str, list[dict]] = {}
     for view in chart.views:
-        if view.is_grouped:
-            continue
+        target = grouped_only if view.is_grouped else used
         for ind in view.indicators.y or []:
-            combinations = used.setdefault(ind.catalogPath, [])
+            combinations = target.setdefault(ind.catalogPath, [])
             if view.dimensions not in combinations:
                 combinations.append(view.dimensions)
+    for catalog_path, combinations in grouped_only.items():
+        used.setdefault(catalog_path, combinations)
     return used
 
 
@@ -453,12 +540,20 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
     chart's own views, and loads each underlying table fresh from the
     on-disk catalog (no dependency on any script's in-memory tables).
 
-    Tables are grouped by time axis before joining. Within an axis they are
-    outer-joined into one wide table, as before. Across axes they are *stacked*:
-    an integer-year series and a calendar-date series cannot share a time column
-    without stamping the annual figures with a month and a day they do not have,
-    so frequency becomes a key column and each row carries its own resolution.
-    See `WideTable` for what that buys.
+    Columns are grouped by frequency -- their time axis plus the interval they
+    declare -- before joining. Within a frequency they are outer-joined into one
+    wide table. Across frequencies they are *stacked*: an integer-year series and a
+    calendar-date series cannot share a time column without stamping the annual
+    figures with a month and a day they do not have, so frequency becomes a key
+    column and each row carries its own resolution. See `WideTable` for what that
+    buys.
+
+    The axis alone is not enough to group by. Weekly and monthly series both sit on
+    a date axis and can share dates -- WHO's flu data has the weekly and monthly
+    "Share of positive tests" on 2,363 of the same country-dates -- so joining them
+    as one frequency puts two values of one metric in one cell, and the merge by name
+    downstream would have to drop one. A table is split the same way when its own
+    columns declare different intervals, as `climate_change_impacts_monthly` does.
 
     **The wide table's columns are named by catalog path**, which is the one name
     guaranteed to be unique: it is the key `_used_indicators` returns, so one
@@ -486,8 +581,8 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
         by_table[(dataset_dir, table_name)].append((column, combinations))
 
     dataset_cache: dict[str, CatalogDataset] = {}
-    by_axis: dict[str, list[Table]] = defaultdict(list)
-    axis_intervals: dict[str, set[str | None]] = defaultdict(set)
+    # Keyed by (time axis, declared interval) -- one entry per frequency in the package.
+    by_frequency: dict[tuple[str, str | None], list[Table]] = defaultdict(list)
     column_to_dimensions: dict[str, list[dict]] = {}
     column_to_frequency: dict[str, str] = {}
     for (dataset_dir, table_name), cols in by_table.items():
@@ -495,10 +590,9 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
             dataset_cache[dataset_dir] = CatalogDataset(DATA_DIR / dataset_dir)
         tb = dataset_cache[dataset_dir][table_name].reset_index()
         tb, time_col = _resolve_time_column(tb)
-        interval = _table_time_interval(tb, time_col)
 
         rename = {}
-        keep = ["country", time_col]
+        columns_by_interval: dict[str | None, list[str]] = defaultdict(list)
         for column, combinations in cols:
             if column not in tb.columns:
                 log.warning(
@@ -509,15 +603,23 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
                 )
                 continue
             catalog_path = f"{dataset_dir}/{table_name}#{column}"
+            interval = _column_time_interval(tb, column, time_col)
             rename[column] = catalog_path
             column_to_dimensions[catalog_path] = combinations
             column_to_frequency[catalog_path] = FREQUENCY_LABELS[interval] if interval else ""
-            keep.append(column)
-        by_axis[time_col].append(tb[keep].rename(columns=rename))
-        axis_intervals[time_col].add(interval)
+            columns_by_interval[interval].append(column)
 
-    if len(by_axis) == 1:
-        axis, tables = next(iter(by_axis.items()))
+        for interval, columns in columns_by_interval.items():
+            part = tb[["country", time_col] + columns].rename(columns=rename)
+            if len(columns_by_interval) > 1:
+                # A table split by interval shares one row index across its resolutions, so
+                # each part keeps only the rows it has values for -- otherwise every frequency
+                # would repeat the others' timepoints as empty rows.
+                part = part.dropna(subset=[rename[c] for c in columns], how="all")
+            by_frequency[(time_col, interval)].append(part)
+
+    if len(by_frequency) == 1:
+        (axis, _interval), tables = next(iter(by_frequency.items()))
         return WideTable(
             table=_outer_join_on_key(tables),
             time_column=axis,
@@ -527,23 +629,13 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
             column_to_frequency=column_to_frequency,
         )
 
-    # Mixed axes: join within each, label it, then stack. Each axis needs one label, so
-    # an axis carrying several intervals (daily and monthly on one date column) has no
-    # answer -- it has never happened, and guessing one is worse than saying so.
+    # Several frequencies: join within each, label it, then stack.
     frames = []
-    for axis, tables in by_axis.items():
-        intervals = axis_intervals[axis]
-        if len(intervals) > 1:
-            raise ValueError(
-                f"The {axis!r} axis carries several time intervals ({sorted(intervals)}), so its rows "
-                "cannot be labelled with one frequency. Splitting them needs a decision about how the "
-                "resolutions relate."
-            )
-        interval = intervals.pop()
+    for (axis, interval), tables in by_frequency.items():
         if interval is None:
             raise UndeclaredTimeIntervalError(
-                f"The {axis!r} axis of {chart.catalog_path} declares no display.timeInterval, so "
-                "its rows cannot be labelled with a frequency or written at the right resolution. "
+                f"Some {axis!r}-axis indicators of {chart.catalog_path} declare no display.timeInterval, so "
+                "their rows cannot be labelled with a frequency or written at the right resolution. "
                 "Declare it on those indicators (`timeInterval: month`, as energy_prices does) rather "
                 "than having this guess -- guessing publishes monthly figures as daily ones, dated to "
                 "the 1st of the month."
@@ -551,12 +643,26 @@ def build_wide_table_for_chart(chart: Chart) -> WideTable:
         joined = _outer_join_on_key(tables)
         joined["frequency"] = FREQUENCY_LABELS[interval]
         joined["time"] = _format_time_labels(joined[axis], interval)
+        # A label is coarser than the value it renders (a quarter written as "2026-Q2"),
+        # so two values the interval does not tell apart would land on one key. Refuse
+        # rather than publish a file whose keys don't identify its rows.
+        duplicated = joined.duplicated(subset=["country", "time"], keep=False)
+        if duplicated.any():
+            sample = joined.loc[duplicated, ["country", axis, "time"]].head(4).to_dict("records")
+            raise ValueError(
+                f"{chart.catalog_path}: {int(duplicated.sum())} {FREQUENCY_LABELS[interval]} rows share a "
+                f"(country, time) key after labelling, e.g. {sample}. Either some indicator's data is "
+                "finer than the display.timeInterval it declares, or two tables at this frequency date "
+                "the same period differently (Monday vs Sunday weeks, first vs last day of the month)."
+            )
         frames.append(joined.drop(columns=[axis]))
 
     stacked = pr.concat(frames, ignore_index=True)
-    key = ["country", "frequency", "time"]
+    # Not sorted on "time": it is a text label, so annual years would sort as strings
+    # ("-1", "-100022", ..., "1979", "983"). Each frame is already in time order from
+    # `_outer_join_on_key`, and a stable sort on the other keys keeps that order.
     return WideTable(
-        table=stacked.sort_values(key).reset_index(drop=True),
+        table=stacked.sort_values(["country", "frequency"], kind="stable").reset_index(drop=True),
         time_column="time",
         time_header="Time",
         frequency_column="frequency",
@@ -1049,14 +1155,16 @@ def build_download_package_for_chart(
     for catalog_path, variable_id in resolved:
         col = IndicatorColumn(metadata_by_id[variable_id])
         indicators.append((catalog_path, _long_column_name(col), variable_id, col))
+    dimension_definitions = _dimension_definitions(chart)
+    indicators = _disambiguate_colliding_names(
+        indicators, column_to_dimensions, wide_table.column_to_frequency, dimension_definitions
+    )
     _check_column_names_unique(page_slug, indicators, wide_table.column_to_frequency)
 
     # Indicators that share a name are the same metric at different frequencies -- the
     # stacked shape exists so they can be one column, told apart by the frequency of the
     # row rather than by a suffix on the name.
     columns = _merge_columns_by_name(wide, indicators, column_to_dimensions)
-
-    dimension_definitions = _dimension_definitions(chart)
 
     #
     # metadata.json + readme.md

@@ -241,14 +241,17 @@ single row can be re-checked without opening all four.
 | Property | Value | Source |
 |---|---|---|
 | Gridlines | **dashed** `4,4`, `#ddd` | `GRID_LINE_DASH_PATTERN`, `TICK_COLOR` |
-| Tick labels | `#5b5b5b` | `GRAPHER_DARK_TEXT` = `GRAY_80` |
+| Tick labels | `#5b5b5b`; `#767676` on a timeline of segments, as grapher's swimlane chart labels its axis | `GRAPHER_DARK_TEXT` = `GRAY_80`; `GRAPHER_LIGHT_TEXT` in `SwimlaneChart` |
 | Tick label size | **15px** on the 540-wide templates, **14px** on the 850-wide ones: grapher's own download once placed (16px on its 540 square, 13.5 on its 850 default) | measured on grapher's SVG downloads |
 | y-axis tick labels | **right-aligned** against the plot (`text-anchor: end`), a column whose right edge is the plot's left; never left-aligned at the margin | `VerticalAxisComponent` |
 | Axis label | **bold** (`fontWeight: 700`) | `Axis.ts` |
-| x-axis tick marks | 5px long, 1px wide, `#999`, butt-capped, hanging below the axis — **draw them on every year axis** (`style_year_axis` sets the size, or `ax.tick_params(axis="x", length=5 * 0.72, width=0.72)`, in points like every stroke; matplotlib's tick marks are butt-capped already); `verify_static_viz.py` fails a year axis without them | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
+| x-axis tick marks | 5px long, 1px wide, `#999`, butt-capped, hanging below the axis — **draw them on every time axis**, years or dates (`apply_svg_rcparams` makes them the default and `style_time_axis` sets them; by hand, `ax.tick_params(axis="x", length=5 * 0.72, width=0.72, color="#999999")`, in points like every stroke); `verify_static_viz.py` fails a time axis without them, or with marks of another color, width or length, whatever the marks are named | `HorizontalAxisComponent`, `SOLID_TICK_COLOR`; `LineChart` passes `showTickMarks={true}` |
 | Ticks on a year axis | round years on a **round step** (every 5 or 10 years), **plus the data's first and last year** as ticks of their own; a round year is dropped only where its label would collide with an end's (below) | `HorizontalAxis.baseTicks` adds the domain's start and end at top priority to the round ticks |
+| Ticks on a sub-yearly axis | grapher's **calendar grid** for the indicator's `display.timeInterval` (`day`, `week`, `month`, `quarter`), with **no** first and last date: January-anchored months (1, 2, 3, 6, 12, then 2, 5, 10… years; a quarter axis from 3 months), or days, every other day, and Mondays weekly or biweekly, moving to the month grid on long spans (below) | `timeAxisTicks.ts`; `HorizontalAxis.baseTicks` adds no ends to a time-interval axis |
+| Sub-yearly tick labels | `2024` when every tick is a January; else `Apr` / `Apr 2024`, or `Mar 16` / `Mar 16, 2024`, the year on the first tick and wherever it changes, on all once half carry it. Month first, never `24 Feb 2023` or `2023-02-24`; `verify_static_viz.py` fails any other date form | `labelGridWithYearOnChange`, `formatDay` |
 | Outermost tick labels | anchored **inwards**: the first **left-aligned to its tick** (`ha="left"`, `text-anchor: start`), the last **right-aligned** (`ha="right"`, `end`), every one between centered — so no end label hangs past the axis | `HorizontalAxisComponent` |
 | Line along a year axis | 1px (`0.72`pt), `#999`, **butt-capped**, running from the first tick to the last and **no further**: matplotlib's default projecting cap overhangs each end tick by half its width | grapher's rendered x axis |
+| Line along any time axis | the same 1px `#999`, drawn as the **bottom spine** — never a line of your own, and never thickened or darkened to stress time; on a sub-yearly calendar grid it runs to the data's first and last date, past the outermost ticks. `verify_static_viz.py` fails any horizontal stroke along the tick tops that is not 1px `#999` | `SOLID_TICK_COLOR`; `HorizontalAxisDomainLine` in `SwimlaneChart` |
 | y-axis line | **none** — the gridlines carry the reading | no component exists |
 | y domain | `[lowest tick, highest tick]` — the extreme gridlines land **on** the plot's edges | verified on a rendered SVG |
 | The gridline on the baseline | drawn **solid** in the tick color, not dashed — it *is* the axis line | `t.solid` in `VerticalAxisGridLines` |
@@ -287,6 +290,26 @@ By hand, that is `ax.set_xlim(first, last)`, `ax.spines["bottom"].set_capstyle("
 `.set_linewidth(0.72)`, then `ticks = ax.xaxis.get_major_ticks(); ticks[0].label1.set_ha("left");
 ticks[-1].label1.set_ha("right")`. A bar chart over years is the exception: its bars need half a bar
 of range past each end tick, and its labels sit centered under the bars.
+
+**A sub-yearly axis (dates) follows the indicator's `display.timeInterval`, as grapher does.** Plot
+the series against real dates, and take the ticks and labels from `time_axis_ticks`: it ports grapher's
+calendar grid and its label rules, and drops a label that would collide, mark and all. Unlike a year
+axis, grapher adds no first and last date to it, so a daily series from Feb 24, 2023 to Nov 19, 2026
+reads `2024 2025 2026` under a line that runs to both edges of the plot. Style it with
+`style_time_axis(..., inset_ends=False)`, which centers every label and marks the axis
+`<subject>__x-axis-calendar`, so the verifier and Figma's restyle skip the year axis' end checks. When
+the last date is the point (an "as of" chart), pass `label_ends=True`: the first and last date become
+ticks of their own, labelled as grapher labels a thumbnail's ends (`Feb 24, 2023`, `Feb 2023`), and
+the axis takes the default `style_time_axis(ax, start, end)`, ends inset:
+
+```python
+from etl.viz.static import style_time_axis, time_axis_ticks
+
+# The indicator's metadata says the interval: tb["value"].metadata.display.get("timeInterval").
+dates, labels = time_axis_ticks(start, end, "day", plot_width_px=plot_w, font_px=14)
+ax.set_xticks(dates, labels)
+style_time_axis(ax, start, end, inset_ends=False)
+```
 
 **Keep the round step; don't re-space the ticks from the first year to the last.** Five even ticks
 over 2000..2024 come out 2000, 2006, 2012, 2018, 2024, years nobody reads a chart by. Drop the round

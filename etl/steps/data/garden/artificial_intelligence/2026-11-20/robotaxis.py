@@ -7,9 +7,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Carriers approved to operate paid driverless services in California. If a new carrier is
-# approved, the TCPID→carrier map in the snapshot script must be extended and this set updated.
-KNOWN_CARRIERS = {"Waymo", "Cruise"}
+# CPUC permit ids (TCPID) of the carriers in the Deployment program, which the monthly totals sum
+# over. If a new carrier is approved, add its permit id here.
+CARRIERS = {"PSG0038152": "Waymo", "PSG0039080": "Cruise"}
 
 # First month covered by the CPUC deployment reports. If the earliest date moves forward,
 # a previous report stopped being scraped — a coverage regression, not a real change.
@@ -60,20 +60,17 @@ def run() -> None:
 
 
 def sanity_check_inputs(tb: Table) -> None:
-    expected_cols = {"carrier_name", "date"} | set(NUMERIC_COLS)
+    expected_cols = {"tcpid", "date"} | set(NUMERIC_COLS)
     missing_cols = expected_cols - set(tb.columns)
     assert not missing_cols, f"Missing expected columns in meadow table: {missing_cols}"
 
-    unknown_carriers = set(tb["carrier_name"]) - KNOWN_CARRIERS
-    assert not unknown_carriers, (
-        f"Unknown carriers in the data: {unknown_carriers}. "
-        "Extend the TCPID→carrier map in the snapshot script and this step's KNOWN_CARRIERS."
-    )
+    unknown_ids = set(tb["tcpid"]) - set(CARRIERS)
+    assert not unknown_ids, f"Unknown carrier permit ids in the data: {unknown_ids}. Add them to CARRIERS."
 
     negative = {col: tb[col].min() for col in NUMERIC_COLS if (tb[col] < 0).any()}
     assert not negative, f"Negative values found: {negative}"
 
-    assert not tb.duplicated(subset=["carrier_name", "date"]).any(), "Duplicate (carrier, month) rows in meadow table."
+    assert not tb.duplicated(subset=["tcpid", "date"]).any(), "Duplicate (carrier, month) rows in meadow table."
 
     assert str(tb["date"].min().date()) == FIRST_MONTH, (
         f"Earliest month is {tb['date'].min().date()}, expected {FIRST_MONTH} — "
