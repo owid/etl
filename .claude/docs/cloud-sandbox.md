@@ -90,7 +90,7 @@ For agent sessions running in a Claude Code cloud sandbox
   public copy of the grapher DB; `/query-grapher-db` has the recipe):
 
   ```bash
-  # /admin/variables/<id> — indicator metadata, including unpublished
+  # /admin/variables/<id> — indicator metadata, also for indicators in no chart
   curl -s "https://api.ourworldindata.org/v1/indicators/<id>.metadata.json"
 
   # /admin/charts/<id>/edit — config arrives as a JSON string, so unwrap it
