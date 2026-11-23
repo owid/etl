@@ -355,12 +355,8 @@ ELEMENT_UNITS = {
     "kilograms per year per capita": ["0645pc"],
     "tonnes": [code for code in ELEMENTS if code not in PER_CAPITA_ELEMENTS],
 }
-# FAO's aggregate items ("Grand Total", "Vegetal Products", "Animal Products"), used only to check that the
-# included items reproduce FAO's totals (checks assumption 7).
+# FAO's aggregate item "Grand Total", used only in the checks against FAO's own totals.
 TOTAL_ITEM_CODE = "00002901"
-VEGETAL_ITEM_CODE = "00002903"
-ANIMAL_ITEM_CODE = "00002941"
-PARTITION_TOLERANCE = 0.01
 # The three units the chain is built in. `numerator` is the column holding the food nutrient total per year, already
 # in the density's own unit (kilocalories, or grams of protein); dividing it by the number of 100 g portions of food
 # eaten per year gives the density per 100 g. `ceiling` is the physical maximum density. Mass needs neither.
@@ -488,13 +484,9 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
 
 def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], groups: dict[str, str]) -> None:
     """Check assumption 7 (every FBS item code is in the items file, with its curated name) and the element units."""
-    assert {"name", "role"} <= set(items.columns) <= {"name", "role", "fao_group"}, (
-        f"Unexpected keys in included items: {sorted(items.columns)}"
-    )
+    assert set(items.columns) == {"name", "role"}, f"Unexpected keys in included items: {sorted(items.columns)}"
     assert items["name"].notnull().all(), "An included item has no name."
     assert items["role"].isin(ROLES).all(), f"Invalid roles: {sorted(set(items['role']) - ROLES)}"
-    if "fao_group" in items.columns:
-        assert items["fao_group"].dropna().isin({"vegetal", "animal"}).all(), "Invalid fao_group in an included item."
 
     elements = tb[["element_code", "unit"]].drop_duplicates().set_index("element_code")["unit"]
     for unit, codes in ELEMENT_UNITS.items():
@@ -803,28 +795,17 @@ def per_person_per_day(chain: Table) -> Table:
 # Output checks.
 # --------------------------------------------------------------------------------------------------------------------
 def sanity_check_partition(tb_fbsc: Table, items: Table) -> None:
-    """Check assumption 7: food supply (kcal) summed over chain items reproduces FAO's own totals, for World."""
-    # The comparison needs every item classified as vegetal or animal ("fao_group"). By default the role decides:
-    # crops and processed items count as vegetal, animal items as animal. A few items carry an explicit "fao_group"
-    # in the items file because FAO classifies them differently from that default: butter, cream and fish oils are
-    # processed items that FAO counts as animal, honey is an animal item that FAO counts as vegetal, and seaweed is
-    # a crop that FAO counts as animal. The classification is used only by this check.
-    fao_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
-    if "fao_group" in items.columns:
-        fao_group = items["fao_group"].fillna(fao_group)
-    fao_group = fao_group.rename("fao_group")
-
+    """Check assumption 7: food supply (kcal) summed over chain items reproduces FAO's own total, for World."""
     world = tb_fbsc[(tb_fbsc["country"] == "World") & (tb_fbsc["element_code"] == "0664pc")]
     world = world[["year", "item_code", "value"]].astype({"item_code": str, "value": float})
-    fao = world.pivot(index="year", columns="item_code", values="value")
-    curated = world[world["item_code"].isin(items.index)].merge(fao_group.reset_index(), on="item_code")
-    ours = curated.pivot_table(index="year", columns="fao_group", values="value", aggfunc="sum")
-    ours["total"] = ours["vegetal"] + ours["animal"]
-    for group, code in {"total": TOTAL_ITEM_CODE, "vegetal": VEGETAL_ITEM_CODE, "animal": ANIMAL_ITEM_CODE}.items():
-        deviation = ((ours[group] - fao[code]) / fao[code]).abs()
-        assert deviation.max() < PARTITION_TOLERANCE, (
-            f"Chain items do not reproduce FAO's {group} food supply for World; max deviation {100 * deviation.max():.2f}%."
-        )
+    fao_total = world[world["item_code"] == TOTAL_ITEM_CODE].set_index("year")["value"]
+    ours = world[world["item_code"].isin(items.index)].groupby("year")["value"].sum()
+    # With the right items, the sum is within 0.02% of FAO's total in every year; 0.1% catches any item mislisted
+    # down to about 2 kcal per person per day.
+    deviation = ((ours - fao_total) / fao_total).abs()
+    assert deviation.max() < 0.001, (
+        f"Chain items do not reproduce FAO's total food supply for World; max deviation {100 * deviation.max():.2f}%."
+    )
 
 
 def sanity_check_world_against_fao(tb: Table, tb_fbsc: Table, items: Table) -> None:

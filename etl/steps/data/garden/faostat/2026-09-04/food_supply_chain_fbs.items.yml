@@ -1,5 +1,5 @@
 # Items of the FAOSTAT Food Balance Sheets (FBS) for the food supply chain step (FBS method).
-# The lists, the roles and the optional field "fao_group" are explained in `food_supply_chain_fbs.py`.
+# The lists and the roles are explained in `food_supply_chain_fbs.py`.
 # Every FBS item code must appear in exactly one of the three lists below; the step asserts this.
 included:
   # Cereals.
@@ -89,8 +89,8 @@ included:
   # through trade.
   - {code: 2680, name: "Infant food", role: processed}
   - {code: 2899, name: "Miscellaneous", role: processed}
-  # Aquatic plants (seaweed). FAO groups them with animal products ("Aquatic Products, Other").
-  - {code: 2775, name: "Aquatic Plants", role: crop, fao_group: animal}
+  # Aquatic plants (seaweed).
+  - {code: 2775, name: "Aquatic Plants", role: crop}
   # Meat and offal.
   - {code: 2731, name: "Bovine Meat", role: animal}
   - {code: 2732, name: "Mutton & Goat Meat", role: animal}
@@ -100,12 +100,12 @@ included:
   - {code: 2736, name: "Offals, Edible", role: animal}
   # Animal fats and dairy. Butter, ghee and cream are made from milk, so they are netted against processing.
   - {code: 2737, name: "Fats, Animals, Raw", role: animal}
-  - {code: 2740, name: "Butter, Ghee", role: processed, fao_group: animal}
-  - {code: 2743, name: "Cream", role: processed, fao_group: animal}
+  - {code: 2740, name: "Butter, Ghee", role: processed}
+  - {code: 2743, name: "Cream", role: processed}
   - {code: 2848, name: "Milk - Excluding Butter", role: animal}
   - {code: 2744, name: "Eggs", role: animal}
-  # Honey. FAO groups it with vegetal products ("Sugar & Sweeteners").
-  - {code: 2745, name: "Honey", role: animal, fao_group: vegetal}
+  # Honey.
+  - {code: 2745, name: "Honey", role: animal}
   # Fish and seafood.
   - {code: 2761, name: "Freshwater Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
@@ -116,8 +116,8 @@ included:
   - {code: 2767, name: "Molluscs, Other", role: animal}
   - {code: 2769, name: "Aquatic Animals, Others", role: animal}
   # Fish oils (made from fish).
-  - {code: 2781, name: "Fish, Body Oil", role: processed, fao_group: animal}
-  - {code: 2782, name: "Fish, Liver Oil", role: processed, fao_group: animal}
+  - {code: 2781, name: "Fish, Body Oil", role: processed}
+  - {code: 2782, name: "Fish, Liver Oil", role: processed}
 
 # Individual items deliberately left out of the chain. Each is asserted to exist in the input table, so that a
 # change at FAO does not go unnoticed, but contributes to no stage.
