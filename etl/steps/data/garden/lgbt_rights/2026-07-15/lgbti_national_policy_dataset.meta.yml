@@ -30,6 +30,9 @@ definitions:
   description_regions_processing: |-
     We calculate regional totals from the country data, using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and, for population totals, our [consolidated population data](https://ourworldindata.org/population-sources).
 
+  description_regions_processing_population: |-
+    We calculate regional totals from the country data, using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and, for population totals, our [consolidated population data](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
+
   description_key_full_implementation: |-
     A country is counted as having full implementation when the policy score equals 1. Subnational adoption (scores below 1 in countries with federal or decentralized systems such as the United States, Australia, Canada, Mexico, Brazil, or the United Kingdom) is treated as not fully implemented.
 
@@ -278,7 +281,7 @@ tables:
           - "{definitions.description_key_adoption_year}"
         processing_level: major
         description_processing: |-
-          From the country-level policy scores, we identified countries where the score equals 1 (full national implementation) and summed their populations within each region. {definitions.description_regions_processing}
+          From the country-level policy scores, we identified countries where the score equals 1 (full national implementation) and summed their populations within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -297,7 +300,7 @@ tables:
           - "{definitions.description_key_adoption_year}"
         processing_level: major
         description_processing: |-
-          From the country-level policy scores, we identified countries where the score is below 1 (no policy, or subnational adoption only) and summed their populations within each region. {definitions.description_regions_processing}
+          From the country-level policy scores, we identified countries where the score is below 1 (no policy, or subnational adoption only) and summed their populations within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1087,7 +1090,7 @@ tables:
           Total population of countries where the age of consent is equal for same-sex and different-sex partners.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Equal" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Equal" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1100,7 +1103,7 @@ tables:
           Total population of countries where the age of consent for same-sex and different-sex partners differs between subnational jurisdictions.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1113,7 +1116,7 @@ tables:
           Total population of countries where national law sets no age of consent for same-sex sexual activity, mostly because same-sex sexual acts are criminalized.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1126,7 +1129,7 @@ tables:
           Total population of countries with unequal age of consent for same-sex and different-sex partners.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Unequal" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Unequal" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1206,7 +1209,7 @@ tables:
           Total population of countries where same-sex marriage is legal and fully implemented (civil unions may also exist).
         processing_level: major
         description_processing: |-
-          {definitions.derivation_marriage} We then summed the populations of countries classified as "Legal" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Legal" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1219,7 +1222,7 @@ tables:
           Total population of countries where same-sex couples have a legal status short of marriage, such as a civil union, a registered partnership or recognition as cohabiting partners, but cannot marry.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_marriage} We then summed the populations of countries classified as "Civil unions only" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Civil unions only" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1232,7 +1235,7 @@ tables:
           Total population of countries where same-sex marriage, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_marriage} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1245,7 +1248,7 @@ tables:
           Total population of countries where the law neither allows same-sex marriage or civil unions nor defines marriage as a union of a man and a woman.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_marriage} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1258,7 +1261,7 @@ tables:
           Total population of countries where the law defines marriage as a union of a man and a woman, and there are no civil unions.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_marriage} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1312,7 +1315,7 @@ tables:
           Total population of countries where lesbian, gay, and bisexual people are allowed to serve in the military.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1325,7 +1328,7 @@ tables:
           Total population of countries with no policy allowing or banning LGB people from serving in the military.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1338,7 +1341,7 @@ tables:
           Total population of countries where lesbian, gay, and bisexual people are banned from serving in the military.
         processing_level: major
         description_processing: |-
-          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}
+          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing_population}
         unit: people
         short_unit: ""
         display:
@@ -1361,7 +1364,7 @@ tables:
         title: Same-sex sexual acts — No legal provisions (population)
         description_short: Total population of countries classified as "No legal provisions" on the indicator on consensual same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1383,7 +1386,7 @@ tables:
         title: Same-sex sexual acts — Legal (population)
         description_short: Total population of countries classified as "Legal" on the indicator on consensual same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Legal" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Legal" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1405,7 +1408,7 @@ tables:
         title: Same-sex sexual acts — Criminalized (population)
         description_short: Total population of countries classified as "Criminalized" on the indicator on consensual same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Criminalized" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Criminalized" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1427,7 +1430,7 @@ tables:
         title: Same-sex sexual acts — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on consensual same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1449,7 +1452,7 @@ tables:
         title: Blood donations by men who have sex with men — No policy (population)
         description_short: Total population of countries classified as "No policy" on the indicator on blood donations by men who have sex with men.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1471,7 +1474,7 @@ tables:
         title: Blood donations by men who have sex with men — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on blood donations by men who have sex with men.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1493,7 +1496,7 @@ tables:
         title: Blood donations by men who have sex with men — No MSM restrictions (population)
         description_short: Total population of countries classified as "No MSM restrictions" on the indicator on blood donations by men who have sex with men.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No MSM restrictions" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No MSM restrictions" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1515,7 +1518,7 @@ tables:
         title: Blood donations by men who have sex with men — Deferral or ban (population)
         description_short: Total population of countries classified as "Deferral or ban" on the indicator on blood donations by men who have sex with men.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Deferral or ban" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Deferral or ban" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1537,7 +1540,7 @@ tables:
         title: Transgender military service — No policy (population)
         description_short: Total population of countries classified as "No policy" on the indicator on transgender military service.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1559,7 +1562,7 @@ tables:
         title: Transgender military service — Allowed (population)
         description_short: Total population of countries classified as "Allowed" on the indicator on transgender military service.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1581,7 +1584,7 @@ tables:
         title: Transgender military service — Banned (population)
         description_short: Total population of countries classified as "Banned" on the indicator on transgender military service.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1603,7 +1606,7 @@ tables:
         title: Civil unions or registered partnerships — Not recognized (population)
         description_short: Total population of countries classified as "Not recognized" on the indicator on civil unions or registered partnerships for same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not recognized" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not recognized" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1625,7 +1628,7 @@ tables:
         title: Civil unions or registered partnerships — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on civil unions or registered partnerships for same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1647,7 +1650,7 @@ tables:
         title: Civil unions or registered partnerships — Legally recognized (population)
         description_short: Total population of countries classified as "Legally recognized" on the indicator on civil unions or registered partnerships for same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Legally recognized" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Legally recognized" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1669,7 +1672,7 @@ tables:
         title: Joint adoption by same-sex couples — Not allowed (population)
         description_short: Total population of countries classified as "Not allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not allowed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not allowed" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1691,7 +1694,7 @@ tables:
         title: Joint adoption by same-sex couples — Varies by region (population)
         description_short: Total population of countries where joint adoption by same-sex couples is allowed in some parts of the country but not others.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1713,7 +1716,7 @@ tables:
         title: Joint adoption by same-sex couples — Allowed (population)
         description_short: Total population of countries classified as "Allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1735,7 +1738,7 @@ tables:
         title: Constitutional protections based on sexual orientation — Not protected (population)
         description_short: Total population of countries classified as "Not protected" on the indicator on constitutional protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1757,7 +1760,7 @@ tables:
         title: Constitutional protections based on sexual orientation — Constitutionally protected (population)
         description_short: Total population of countries classified as "Constitutionally protected" on the indicator on constitutional protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1779,7 +1782,7 @@ tables:
         title: Constitutional protections based on gender identity — Not protected (population)
         description_short: Total population of countries classified as "Not protected" on the indicator on constitutional protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1801,7 +1804,7 @@ tables:
         title: Constitutional protections based on gender identity — Constitutionally protected (population)
         description_short: Total population of countries classified as "Constitutionally protected" on the indicator on constitutional protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1823,7 +1826,7 @@ tables:
         title: Hate crime protections based on sexual orientation — Not covered (population)
         description_short: Total population of countries classified as "Not covered" on the indicator on hate crime protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1845,7 +1848,7 @@ tables:
         title: Hate crime protections based on sexual orientation — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on hate crime protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1867,7 +1870,7 @@ tables:
         title: Hate crime protections based on sexual orientation — Covered by hate crime laws (population)
         description_short: Total population of countries classified as "Covered by hate crime laws" on the indicator on hate crime protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1889,7 +1892,7 @@ tables:
         title: Hate crime protections based on gender identity — Not covered (population)
         description_short: Total population of countries classified as "Not covered" on the indicator on hate crime protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1911,7 +1914,7 @@ tables:
         title: Hate crime protections based on gender identity — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on hate crime protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1933,7 +1936,7 @@ tables:
         title: Hate crime protections based on gender identity — Covered by hate crime laws (population)
         description_short: Total population of countries classified as "Covered by hate crime laws" on the indicator on hate crime protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1955,7 +1958,7 @@ tables:
         title: Incitement to hatred protections — Not prohibited (population)
         description_short: Total population of countries classified as "Not prohibited" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not prohibited" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not prohibited" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1977,7 +1980,7 @@ tables:
         title: Incitement to hatred protections — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -1999,7 +2002,7 @@ tables:
         title: Incitement to hatred protections — Prohibited (population)
         description_short: Total population of countries classified as "Prohibited" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Prohibited" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Prohibited" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2021,7 +2024,7 @@ tables:
         title: Legal recognition of a third gender — Not recognized (population)
         description_short: Total population of countries classified as "Not recognized" on the indicator on legal recognition of a third gender.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not recognized" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not recognized" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2043,7 +2046,7 @@ tables:
         title: Legal recognition of a third gender — Varies by region (population)
         description_short: Total population of countries where a third gender marker or non-binary category is legally recognized on identity documents in some parts of the country but not others.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2065,7 +2068,7 @@ tables:
         title: Legal recognition of a third gender — Recognized (population)
         description_short: Total population of countries classified as "Recognized" on the indicator on legal recognition of a third gender.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Recognized" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Recognized" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2087,7 +2090,7 @@ tables:
         title: Employment discrimination based on sexual orientation — No protection (population)
         description_short: Total population of countries classified as "No protection" on the indicator on employment discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2109,7 +2112,7 @@ tables:
         title: Employment discrimination based on sexual orientation — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on employment discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2131,7 +2134,7 @@ tables:
         title: Employment discrimination based on sexual orientation — Discrimination prohibited (population)
         description_short: Total population of countries classified as "Discrimination prohibited" on the indicator on employment discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2153,7 +2156,7 @@ tables:
         title: Employment discrimination based on gender identity — No protection (population)
         description_short: Total population of countries classified as "No protection" on the indicator on employment discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2175,7 +2178,7 @@ tables:
         title: Employment discrimination based on gender identity — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on employment discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2197,7 +2200,7 @@ tables:
         title: Employment discrimination based on gender identity — Discrimination prohibited (population)
         description_short: Total population of countries classified as "Discrimination prohibited" on the indicator on employment discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2219,7 +2222,7 @@ tables:
         title: Goods and services discrimination based on sexual orientation — No protection (population)
         description_short: Total population of countries classified as "No protection" on the indicator on goods and services discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2241,7 +2244,7 @@ tables:
         title: Goods and services discrimination based on sexual orientation — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on goods and services discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2263,7 +2266,7 @@ tables:
         title: Goods and services discrimination based on sexual orientation — Discrimination prohibited (population)
         description_short: Total population of countries classified as "Discrimination prohibited" on the indicator on goods and services discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2285,7 +2288,7 @@ tables:
         title: Goods and services discrimination based on gender identity — No protection (population)
         description_short: Total population of countries classified as "No protection" on the indicator on goods and services discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2307,7 +2310,7 @@ tables:
         title: Goods and services discrimination based on gender identity — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on goods and services discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2329,7 +2332,7 @@ tables:
         title: Goods and services discrimination based on gender identity — Discrimination prohibited (population)
         description_short: Total population of countries classified as "Discrimination prohibited" on the indicator on goods and services discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2351,7 +2354,7 @@ tables:
         title: Conversion therapy — Not banned (population)
         description_short: Total population of countries classified as "Not banned" on the indicator on conversion therapy bans.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2373,7 +2376,7 @@ tables:
         title: Conversion therapy — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on conversion therapy bans.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2395,7 +2398,7 @@ tables:
         title: Conversion therapy — Banned (population)
         description_short: Total population of countries classified as "Banned" on the indicator on conversion therapy bans.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2417,7 +2420,7 @@ tables:
         title: Non-consensual gender assignment surgeries on intersex children — Not banned (population)
         description_short: Total population of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2439,7 +2442,7 @@ tables:
         title: Non-consensual gender assignment surgeries on intersex children — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2461,7 +2464,7 @@ tables:
         title: Non-consensual gender assignment surgeries on intersex children — Banned (population)
         description_short: Total population of countries classified as "Banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2483,7 +2486,7 @@ tables:
         title: Death penalty for same-sex acts — No death penalty (population)
         description_short: Total population of countries classified as "No death penalty" on the indicator on the death penalty for same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No death penalty" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No death penalty" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2505,7 +2508,7 @@ tables:
         title: Death penalty for same-sex acts — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on the death penalty for same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2527,7 +2530,7 @@ tables:
         title: Death penalty for same-sex acts — Death penalty applies (population)
         description_short: Total population of countries classified as "Death penalty applies" on the indicator on the death penalty for same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Death penalty applies" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Death penalty applies" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2549,7 +2552,7 @@ tables:
         title: Anti-LGBTI "propaganda" or morality laws — No restrictions (population)
         description_short: Total population of countries classified as "No restrictions" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No restrictions" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No restrictions" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2571,7 +2574,7 @@ tables:
         title: Anti-LGBTI "propaganda" or morality laws — Laws vary by region (population)
         description_short: Total population of countries classified as "Laws vary by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Laws vary by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Laws vary by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2593,7 +2596,7 @@ tables:
         title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist (population)
         description_short: Total population of countries classified as "Restrictions exist" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions exist" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions exist" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2615,7 +2618,7 @@ tables:
         title: Restrictions on LGBTQ+ civil society — No restrictions (population)
         description_short: Total population of countries classified as "No restrictions" on the indicator on restrictions on LGBTQ+ civil society organizations.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No restrictions" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No restrictions" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2637,7 +2640,7 @@ tables:
         title: Restrictions on LGBTQ+ civil society — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on restrictions on LGBTQ+ civil society organizations.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2659,7 +2662,7 @@ tables:
         title: Restrictions on LGBTQ+ civil society — Restrictions in effect (population)
         description_short: Total population of countries classified as "Restrictions in effect" on the indicator on restrictions on LGBTQ+ civil society organizations.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2681,7 +2684,7 @@ tables:
         title: Religious exemption laws — No religious exemptions (population)
         description_short: Total population of countries classified as "No religious exemptions" on the indicator on religious exemption laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No religious exemptions" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No religious exemptions" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2703,7 +2706,7 @@ tables:
         title: Religious exemption laws — Varies by region (population)
         description_short: Total population of countries where religious exemptions allowing refusal of services to LGBTQ+ people differ between subnational jurisdictions.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2725,7 +2728,7 @@ tables:
         title: Religious exemption laws — Religious exemptions in effect (population)
         description_short: Total population of countries classified as "Religious exemptions in effect" on the indicator on religious exemption laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Religious exemptions in effect" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Religious exemptions in effect" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2748,7 +2751,7 @@ tables:
         title: Employment discrimination protections (sexual orientation and gender identity) — Both protected (population)
         description_short: Total population of countries classified as "Both protected" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2770,7 +2773,7 @@ tables:
         title: Employment discrimination protections (sexual orientation and gender identity) — Sexual orientation only (population)
         description_short: Total population of countries classified as "Sexual orientation only" on the indicator on employment discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2792,7 +2795,7 @@ tables:
         title: Employment discrimination protections (sexual orientation and gender identity) — Gender identity only (population)
         description_short: Total population of countries classified as "Gender identity only" on the indicator on employment discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Gender identity only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Gender identity only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2814,7 +2817,7 @@ tables:
         title: Employment discrimination protections (sexual orientation and gender identity) — No protection (population)
         description_short: Total population of countries classified as "No protection" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2836,7 +2839,7 @@ tables:
         title: Employment discrimination protections (sexual orientation and gender identity) — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2858,7 +2861,7 @@ tables:
         title: Goods and services discrimination protections (sexual orientation and gender identity) — Both protected (population)
         description_short: Total population of countries classified as "Both protected" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2880,7 +2883,7 @@ tables:
         title: Goods and services discrimination protections (sexual orientation and gender identity) — Sexual orientation only (population)
         description_short: Total population of countries classified as "Sexual orientation only" on the indicator on goods and services discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2902,7 +2905,7 @@ tables:
         title: Goods and services discrimination protections (sexual orientation and gender identity) — Gender identity only (population)
         description_short: Total population of countries classified as "Gender identity only" on the indicator on goods and services discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Gender identity only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Gender identity only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2924,7 +2927,7 @@ tables:
         title: Goods and services discrimination protections (sexual orientation and gender identity) — No protection (population)
         description_short: Total population of countries classified as "No protection" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2946,7 +2949,7 @@ tables:
         title: Goods and services discrimination protections (sexual orientation and gender identity) — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2968,7 +2971,7 @@ tables:
         title: Hate crime protections (sexual orientation and gender identity) — Both covered (population)
         description_short: Total population of countries classified as "Both covered" on the indicator on hate crime protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both covered" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both covered" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -2990,7 +2993,7 @@ tables:
         title: Hate crime protections (sexual orientation and gender identity) — Sexual orientation only (population)
         description_short: Total population of countries classified as "Sexual orientation only" on the indicator on hate crime protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3012,7 +3015,7 @@ tables:
         title: Hate crime protections (sexual orientation and gender identity) — Not covered (population)
         description_short: Total population of countries classified as "Not covered" on the indicator on hate crime protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3034,7 +3037,7 @@ tables:
         title: Hate crime protections (sexual orientation and gender identity) — Varies by region (population)
         description_short: Total population of countries classified as "Varies by region" on the indicator on hate crime protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3056,7 +3059,7 @@ tables:
         title: Constitutional protections (sexual orientation and gender identity) — Both protected (population)
         description_short: Total population of countries classified as "Both protected" on the indicator on constitutional protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3078,7 +3081,7 @@ tables:
         title: Constitutional protections (sexual orientation and gender identity) — Sexual orientation only (population)
         description_short: Total population of countries classified as "Sexual orientation only" on the indicator on constitutional protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3100,7 +3103,7 @@ tables:
         title: Constitutional protections (sexual orientation and gender identity) — Not protected (population)
         description_short: Total population of countries classified as "Not protected" on the indicator on constitutional protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3123,7 +3126,7 @@ tables:
         title: Gender-affirming care (adults and minors) — Covered for adults and minors (population)
         description_short: Total population of countries classified as "Covered for adults and minors" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for adults and minors" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for adults and minors" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3145,7 +3148,7 @@ tables:
         title: Gender-affirming care (adults and minors) — Covered for adults or minors only (population)
         description_short: Total population of countries classified as "Covered for adults or minors only" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for adults or minors only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for adults or minors only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3167,7 +3170,7 @@ tables:
         title: Gender-affirming care (adults and minors) — Adults covered, minors restricted (population)
         description_short: Total population of countries classified as "Adults covered, minors restricted" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Adults covered, minors restricted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Adults covered, minors restricted" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3189,7 +3192,7 @@ tables:
         title: Gender-affirming care (adults and minors) — Neither covered nor restricted (population)
         description_short: Total population of countries classified as "Neither covered nor restricted" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Neither covered nor restricted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Neither covered nor restricted" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3211,7 +3214,7 @@ tables:
         title: Gender-affirming care (adults and minors) — Varies by region or other (population)
         description_short: Total population of countries classified as "Varies by region or other" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Varies by region or other" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Varies by region or other" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3233,7 +3236,7 @@ tables:
         title: Gender-affirming care (adults and minors) — Restricted for both (population)
         description_short: Total population of countries classified as "Restricted for both" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Restricted for both" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Restricted for both" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3260,7 +3263,7 @@ tables:
         title: Legal change of gender marker — Court order required (population)
         description_short: Total population of countries classified as "Court order required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Court order required" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Court order required" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3282,7 +3285,7 @@ tables:
         title: Legal change of gender marker — Diagnosis required (population)
         description_short: Total population of countries classified as "Diagnosis required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Diagnosis required" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Diagnosis required" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3304,7 +3307,7 @@ tables:
         title: Legal change of gender marker — Not legally possible (population)
         description_short: Total population of countries classified as "Not legally possible" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Not legally possible" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Not legally possible" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3326,7 +3329,7 @@ tables:
         title: Legal change of gender marker — Self-declaration is enough (population)
         description_short: Total population of countries classified as "Self-declaration is enough" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration is enough" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration is enough" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3348,7 +3351,7 @@ tables:
         title: Legal change of gender marker — Varies by region (population)
         description_short: Total population of countries where legal change of the gender marker is possible in some parts of the country but not others.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3370,7 +3373,7 @@ tables:
         title: Legal change of gender marker — Legally possible, requirement unknown (population)
         description_short: Total population of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3392,7 +3395,7 @@ tables:
         title: Legal change of gender marker — Surgery and sterilization required (population)
         description_short: Total population of countries classified as "Surgery and sterilization required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Surgery and sterilization required" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Surgery and sterilization required" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3414,7 +3417,7 @@ tables:
         title: Legal change of gender marker — Surgery required (population)
         description_short: Total population of countries classified as "Surgery required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Surgery required" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Surgery required" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3436,7 +3439,7 @@ tables:
         title: LGBT military service — Open service permitted (population)
         description_short: Total population of countries where both lesbian, gay, and bisexual people and transgender people are allowed to serve openly in the military.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Open service permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Open service permitted" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3458,7 +3461,7 @@ tables:
         title: LGBT military service — Allowed for LGB only (population)
         description_short: Total population of countries where lesbian, gay, and bisexual people are allowed to serve openly in the military; there is no national policy on transgender military service.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for LGB only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for LGB only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3480,7 +3483,7 @@ tables:
         title: LGBT military service — Allowed for transgender only (population)
         description_short: Total population of countries where transgender people are allowed to serve openly in the military; there is no national policy on LGB military service.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for transgender only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for transgender only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3502,7 +3505,7 @@ tables:
         title: LGBT military service — Mixed (LGB allowed, transgender banned) (population)
         description_short: Total population of countries where lesbian, gay, and bisexual people can serve openly while transgender people are banned from serving.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Mixed (LGB allowed, transgender banned)" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Mixed (LGB allowed, transgender banned)" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3524,7 +3527,7 @@ tables:
         title: LGBT military service — No policy (population)
         description_short: Total population of countries where there is no national policy on either LGB or transgender military service.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3546,7 +3549,7 @@ tables:
         title: LGBT military service — Banned for transgender only (population)
         description_short: Total population of countries where transgender people are banned from serving openly in the military and there is no national policy on LGB service.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Banned for transgender only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Banned for transgender only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3568,7 +3571,7 @@ tables:
         title: LGBT military service — Banned for LGB only (population)
         description_short: Total population of countries where lesbian, gay, and bisexual people are banned from serving openly; there is no national policy on transgender military service.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Banned for LGB only" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Banned for LGB only" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3590,7 +3593,7 @@ tables:
         title: LGBT military service — Service banned (population)
         description_short: Total population of countries where both lesbian, gay, and bisexual people and transgender people are banned from serving openly in the military.
         processing_level: major
-        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Service banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Service banned" within each region. {definitions.description_regions_processing_population}'
         unit: people
         short_unit: ""
         display:
@@ -3605,7 +3608,7 @@ tables:
           Summary measure of a country's LGBTI-related laws, calculated by subtracting the sum of its regressive policy scores from the sum of its progressive policy scores.
         processing_level: major
         description_processing: |-
-          Values for world regions are population-weighted averages of the countries in each region, computed by Our World in Data using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). Country values come directly from the producer.
+          Values for world regions are population-weighted averages of the countries in each region, computed by Our World in Data using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN. Country values come directly from the producer.
         description_key:
           - "{definitions.description_key_dataset}"
           - The index combines 35 measures drawn from the dataset's 27 policy areas — 23 that expand rights (such as marriage equality, protections from discrimination, or legal gender recognition) and 12 that restrict them (such as the criminalization of same-sex acts, the death penalty, "propaganda" laws, or military service bans). Measures that expand rights add to the score; measures that restrict them subtract from it.

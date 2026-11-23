@@ -36,6 +36,8 @@ definitions:
         - Democracy
   aux:
     polyarchy_fulldem: &polyarchy_fulldem_proc We have replaced the term "polyarchy" with "full democracy".
+    description_population: &description_population |-
+      We calculate the number of people living in each group of countries using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -765,6 +767,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
       pop_group_age_electdem_lied:
         title: |-
           <%- if category == '-1' -%>
@@ -776,6 +779,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
       pop_group_age_polyarchy_lied:
         title: |-
           <%- if category == '-1' -%>
@@ -787,6 +791,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
       pop_regime_lied:
         title: |-
           <%- if category == '-1' -%>
@@ -798,6 +803,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
       pop_suffrage_lied:
         title: |-
           <%- if category == '-1' -%>
@@ -807,6 +813,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
 
       pop_is_electoral_democracy:
         title: |-
@@ -819,6 +826,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
       pop_is_full_democracy:
         title: |-
           <%- if category == '-1' -%>
@@ -830,6 +838,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
 
       pop_exe_leg_elec_lied:
         title: |-
@@ -841,6 +850,7 @@ tables:
           People living in countries that have elections for the chief executive and the legislature
           <%- endif -%>
         unit: "people"
+        description_processing: *description_population
 
       pop_suffrage_in_practice_lied:
         title: |-
@@ -852,6 +862,7 @@ tables:
           People living in countries with universal voting rights in practice (binary)
           <%- endif -%>
         unit: "people"
+        description_processing: *description_population
 
       pop_suffrage_in_practice_trich_lied:
         title: |-
@@ -865,6 +876,7 @@ tables:
           People living in countries with universal voting rights in practice
           <%- endif -%>
         unit: "people"
+        description_processing: *description_population
 
       pop_turnover_event:
         title: |-
@@ -877,6 +889,7 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "people"
+        description_processing: *description_population
 
       pop_turnover_period:
         title: |-
@@ -888,6 +901,7 @@ tables:
           People living in countries in an electoral turnover period
           <%- endif -%>
         unit: "people"
+        description_processing: *description_population
 
       pop_recent_turnover_event_lied:
         title: |-
@@ -899,6 +913,7 @@ tables:
           People living in countries with recent electoral turnover
           <%- endif -%>
         unit: "people"
+        description_processing: *description_population
 
       pop_transition_type:
         title: |-
@@ -924,6 +939,7 @@ tables:
 
         # description_short:
         unit: "people"
+        description_processing: *description_population
 
       pop_breakdown_type:
         title: |-
@@ -951,3 +967,4 @@ tables:
 
         # description_short:
         unit: "people"
+        description_processing: *description_population
