@@ -133,17 +133,13 @@ steps:
   data://grapher/agriculture/2026-03-02/long_term_crop_yields:
     - data://garden/agriculture/2026-03-02/long_term_crop_yields
 
-  # Crop yields explorer (uses attainable yields).
-  viz://explorer/agriculture/latest/crop_yields:
+  # Crop yields multidim (shown as a data explorer).
+  viz://chart/agriculture/latest/crop_yields:
     # Attainable yields.
     - data://grapher/agriculture/2026-03-02/attainable_yields:
       - data://garden/agriculture/2026-03-02/attainable_yields:
         - data://garden/papers/2024-03-26/mueller_et_al_2012
         - data://garden/agriculture/2026-03-02/long_term_crop_yields
-
-  # Crop yields multidim (shown as a data explorer).
-  viz://chart/agriculture/latest/crop_yields:
-    - data://grapher/agriculture/2026-03-02/attainable_yields
 
   # Fertilizers multidim (shown as a data explorer).
   viz://chart/agriculture/latest/fertilizers:
