@@ -62,14 +62,20 @@ def text_runs(doc: dict) -> list[dict]:
 
 
 def text_occurrences(run: dict, url: str) -> list[int]:
-    """Offsets of `url` in the run's text where it is the whole URL, not the start of a longer one."""
+    """Offsets of `url` in the run's text where it is the whole URL, not part of a longer one."""
     found, i = [], run["text"].find(url)
     while i != -1:
+        before = run["text"][i - 1 : i] if i else ""
         after = run["text"][i + len(url) : i + len(url) + 1]
-        if not after or after not in URL_CHARS:
+        if (not before or before not in URL_CHARS) and (not after or after not in URL_CHARS):
             found.append(i)
         i = run["text"].find(url, i + 1)
     return found
+
+
+def without_scheme(url: str) -> str:
+    """A URL as docs often write it in text: `ourworldindata.org/...`, without `https://`."""
+    return url.split("://", 1)[1] if "://" in url else url
 
 
 def build_requests(doc: dict, swaps: dict[str, str]) -> tuple[list[dict], list[dict]]:
@@ -84,14 +90,16 @@ def build_requests(doc: dict, swaps: dict[str, str]) -> tuple[list[dict], list[d
                 rng = {"startIndex": run["start"], "endIndex": run["end"], "tabId": run["tab"]}
                 req = {"updateTextStyle": {"range": rng, "textStyle": {"link": {"url": new}}, "fields": "link"}}
                 edits.append((run["start"], [req], {"kind": "link", "text": run["text"], "old": old, "new": new}))
-            for off in text_occurrences(run, old):
-                start = run["start"] + off
-                end = start + len(old)
-                reqs = [
-                    {"insertText": {"text": new, "location": {"index": end, "tabId": run["tab"]}}},
-                    {"deleteContentRange": {"range": {"startIndex": start, "endIndex": end, "tabId": run["tab"]}}},
-                ]
-                edits.append((start, reqs, {"kind": "text", "old": old, "new": new}))
+            # As text, a URL may be written with or without its scheme; keep the doc's form.
+            for old_text, new_text in {(old, new), (without_scheme(old), without_scheme(new))}:
+                for off in text_occurrences(run, old_text):
+                    start = run["start"] + off
+                    end = start + len(old_text)
+                    reqs = [
+                        {"insertText": {"text": new_text, "location": {"index": end, "tabId": run["tab"]}}},
+                        {"deleteContentRange": {"range": {"startIndex": start, "endIndex": end, "tabId": run["tab"]}}},
+                    ]
+                    edits.append((start, reqs, {"kind": "text", "old": old, "new": new_text}))
     edits.sort(key=lambda e: e[0], reverse=True)
     return [r for _, reqs, _ in edits for r in reqs], [log for _, _, log in edits]
 
