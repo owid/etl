@@ -39,18 +39,31 @@ CONFIG_IGNORE = {"$schema", "adminBaseUrl", "bakedGrapherURL", "dimensions", "is
 # Read the same parts of the grapher figure on both pages (they share the grapher component).
 FACTS_JS = """() => {
   const g = document.querySelector('.GrapherComponent');
-  const t = e => e ? e.innerText.replace(/\\s+/g, ' ').trim() : null;
+  // Read text the way it reads, not the way it wraps. Grapher breaks long text into one element per
+  // line and drops the space at each break, and it sets the time span after the title with a margin;
+  // so put a space back after every line and block, and before every margin-spaced element. Otherwise the same
+  // text wrapped one word apart (the two pages differ slightly in width) reads as a difference.
+  const t = e => {
+    if (!e) return null;
+    const c = e.cloneNode(true);
+    c.querySelectorAll('button, [role=button]').forEach(x => x.remove());
+    c.querySelectorAll('.markdown-text-wrap__line, p, div').forEach(x => x.append(' '));
+    c.querySelectorAll('[style*="inline-block"]').forEach(x => x.prepend(' '));
+    return c.textContent.replace(/\\s+/g, ' ').trim();
+  };
   return {
     header: t(g.querySelector('.HeaderHTML')),
     // Footer content without its action buttons, whose labels show only when the footer wraps.
-    footer: (() => { const f = g.querySelector('.SourcesFooterHTML'); if (!f) return null;
-      const c = f.cloneNode(true); c.querySelectorAll('button, [role=button]').forEach(x => x.remove()); return t(c); })(),
+    footer: t(g.querySelector('.SourcesFooterHTML')),
     tabs: Array.from(g.querySelectorAll('.Tabs__Tab')).map(x => x.innerText.trim()),
     activeTab: t(g.querySelector('.Tabs__Tab[aria-selected="true"]')),
     legend: Array.from(g.querySelectorAll('.numericColorLegend text, .categoricalColorLegend text'))
       .map(x => x.textContent.trim()).filter(Boolean),
+    // Swatches carry their color in `style` (categorical) or the `fill` attribute (numeric); the
+    // transparent hover areas (opacity 0, fill #fff) are not swatches.
     legendColors: Array.from(g.querySelectorAll('.numericColorLegend rect, .categoricalColorLegend rect'))
-      .map(x => (x.getAttribute('fill') || '').toLowerCase().replace(/nodatapattern-\\d+/, 'nodatapattern'))
+      .filter(x => x.getAttribute('opacity') !== '0')
+      .map(x => (x.style.fill || x.getAttribute('fill') || '').toLowerCase().replace(/nodatapattern-\\d+/, 'nodatapattern'))
       .filter(c => c && c !== 'none'),
   };
 }"""
@@ -168,9 +181,14 @@ def sample_views(pairs: list[dict], dims: list[str], max_rendered: int) -> list[
     return sorted(chosen[:max_rendered])
 
 
+# Times a page is loaded before a timeout is reported as a rendering difference.
+RENDER_ATTEMPTS = 3
+
+
 def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
     import glob
 
+    from playwright.sync_api import TimeoutError as PlaywrightTimeout
     from playwright.sync_api import sync_playwright
 
     exe = sorted(glob.glob(str(Path(CHROMIUM_GLOB).expanduser())))
@@ -198,6 +216,9 @@ def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
                 key = "default" if tab is None else "other"
                 urls = {"explorer": p_["explorer_url"], "multidim": p_["multidim_url"]}
                 if tab == "other":
+                    # The default render failed (reported as a page error): no tabs to pick from.
+                    if "facts" not in p_["rendered"]["default"]["explorer"]:
+                        break
                     default_tab = (p_["rendered"]["default"]["explorer"]["facts"]["activeTab"] or "").lower()
                     if "map" in default_tab:
                         other = "chart"
@@ -209,10 +230,18 @@ def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
                 res = {}
                 for side, url in urls.items():
                     shot = shots / f"v{p_['id']:03d}_{key}_{side}.jpg"
-                    try:
-                        res[side] = {"url": url, "facts": capture(url, shot), "shot": f"shots/{shot.name}"}
-                    except Exception as e:  # a page that fails to render is a finding, not a crash
-                        res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                    # A timeout is usually a slow page, not a broken one: retry it before reporting it.
+                    for attempt in range(RENDER_ATTEMPTS):
+                        try:
+                            res[side] = {"url": url, "facts": capture(url, shot), "shot": f"shots/{shot.name}"}
+                            break
+                        except PlaywrightTimeout as e:
+                            res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                            if attempt + 1 < RENDER_ATTEMPTS:
+                                print(f"  view {p_['id']} {key} {side}: timed out, retrying")
+                        except Exception as e:  # a page that fails to render is a finding, not a crash
+                            res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                            break
                 p_["rendered"][key] = res
             print(f"  rendered view {p_['id']}")
         browser.close()
@@ -257,6 +286,22 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
     tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %s", params=(slug,)).iloc[0, 0]
     graphers = parse_tsv_section(tsv, "graphers")
     columns = {c.get("catalogPath") or c.get("slug"): c for c in parse_tsv_section(tsv, "columns")}
+    # Rows can list indicators as `ySlugs` instead of `yVariableIds`: slugs of columns that
+    # duplicate a variable (`transform: duplicate <id>`), often to restyle it. Resolve each to
+    # its variable's catalog path, keeping the column (and its name) for the display check.
+    dup_ids = {
+        slug: int(c["transform"].split()[1])
+        for slug, c in columns.items()
+        if (c.get("transform") or "").startswith("duplicate ")
+    }
+    id_paths = (
+        prod.read_sql("SELECT id, catalogPath FROM variables WHERE id IN %s", params=(tuple(set(dup_ids.values())),))
+        .set_index("id")["catalogPath"]
+        .to_dict()
+        if dup_ids
+        else {}
+    )
+    slug_path = {slug: id_paths.get(i) for slug, i in dup_ids.items()}
     dcols = dim_columns(list(graphers[0].keys()))
 
     # Multidim side (staging): views, indicators and full view configs.
@@ -277,6 +322,9 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
         row = next(g for g in graphers if all(g[c].strip() == src.get(name, "") for c, name in dcols.items()))
         e_paths = [full_catalog_path(x) for x in row.get("yVariableIds", "").split()]
         e_names = [columns.get(x, {}).get("name") or None for x in e_paths]
+        for col in row.get("ySlugs", "").split():
+            e_paths.append(slug_path.get(col) or col)
+            e_names.append(columns.get(col, {}).get("name") or None)
         mv = mviews.get(tuple(sorted((tgt or {}).get("dimensions", {}).items()))) if tgt else None
         m_full = json.loads(full[mv["fullConfigId"]]) if mv else {}
         m_paths = [y.get("catalogPath") for y in (mv or {}).get("indicators", {}).get("y", [])]

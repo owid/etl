@@ -1,6 +1,5 @@
 dataset:
-  # Opt in to the public catalog page (rendered from this dataset's metadata) and its JSON-LD side product.
-  jsonld: true
+  dataset_page: true
   title: Energy dataset
   description: |-
     Our complete energy data in one table. For every country and year, it has total energy supply, the energy mix by source, electricity generation and trade, emissions and carbon intensity, and fossil fuel production.
@@ -122,11 +121,17 @@ tables:
   owid_energy:
     title: Energy dataset
     description: |-
-      Population and GDP are included so that per capita and per GDP indicators can be recomputed.
+      Our World in Data publishes more than 400 charts on energy. These can help you understand how much energy countries use, which sources it comes from, and how this has changed over time.
 
-      It is compiled from the Energy Institute's [Statistical Review of World Energy](https://www.energyinst.org/statistical-review/), [Ember's electricity data](https://ember-energy.org/data/yearly-electricity-data/), the [U.S. Energy Information Administration](https://www.eia.gov/international/data/world) and several historical reconstructions, with population from [Our World in Data's population dataset](https://ourworldindata.org/population-sources) and GDP from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/). Population estimates from 2024 onwards are projections released by the UN.
+      This is the dataset we use to make most of these charts. It is free for anyone to download.
 
-      Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the original sources are also included, with the source in brackets: for example, "Europe (EI)" is Europe as defined by the [Energy Institute](https://ourworldindata.org/world-region-map-definitions#energy-institute-ei), and "Europe (Ember)" as defined by [Ember](https://ourworldindata.org/world-region-map-definitions#ember).
+      It brings together three main sources. Most data on energy comes from the Energy Institute's [Statistical Review of World Energy](https://www.energyinst.org/statistical-review/), and most data on electricity comes from [Ember](https://ember-energy.org/data/yearly-electricity-data/). We fill gaps with data from the [U.S. Energy Information Administration](https://www.eia.gov/international/data/world) and, for earlier years, with historical estimates.
+
+      We combine these with data on population and GDP (also included in the dataset for reference) to calculate figures per person and energy use per unit of GDP. Population estimates from 2024 onwards are projections released by the UN.
+
+      The dataset includes total energy supply and how it breaks down by source, as amounts, as shares of the total, and as changes from one year to the next. It also includes electricity generation by source, electricity demand and net imports, the emissions and carbon intensity of electricity, and the production of coal, oil, and gas. Data on energy covers most countries from 1980, and data on electricity from 2000. Some series go back much further: the global total energy supply starts in 1800.
+
+      It also includes figures for world regions, following [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the original sources are also included, marked with the source in brackets, for example "Europe (EI)" for the [Energy Institute](https://ourworldindata.org/world-region-map-definitions#energy-institute-ei) and "Europe (Ember)" for [Ember](https://ourworldindata.org/world-region-map-definitions#ember).
 
       Energy is now measured as total energy supply, in line with the methodology adopted by our sources. Previous releases of this dataset used the substitution method, so figures from the two releases are not directly comparable. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change). The previous release remains available in the [energy-data GitHub repository](https://github.com/owid/energy-data).
     variables:

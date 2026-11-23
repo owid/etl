@@ -86,12 +86,14 @@ Then read the PNG.
 
 Figma handoff
 -------------
-Filled in by /owid-staff:create-figma-chart's sketch mode when the SVG is imported. The step it becomes
-inherits it in its docstring, so record names, not just ids:
+Paste the figma_handoff.md that /owid-staff:create-figma-chart's `local-svg` stage writes when the SVG
+is imported. The step it becomes inherits it in its docstring, so record names, not just ids. A
+Render size line is the size to lay that frame's chart out at, from its first render on:
 - File: Charts (YYYY), key <fileKey>
 - Page: <YYYYMMDD Title (Creator) [sketch]>
 - Frames: <frame name> -> <node id>, cloned from <template name> <template node id>
 - Deep link: <url>
+- Render size: <frame name> at <W>x<H>px, when the chart did not fill the frame's band
 
 Scaffolded $DATE by new_sketch.py.
 """
@@ -107,7 +109,16 @@ from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.patches import Rectangle
 from owid.catalog import Table
 
-from etl.viz.static import PIXELS_PER_INCH, TEMPLATES, SketchPaths, apply_svg_rcparams, export_frame, nice_year_ticks
+from etl.viz.static import (
+    PIXELS_PER_INCH,
+    TEMPLATES,
+    SketchPaths,
+    apply_svg_rcparams,
+    export_frame,
+    style_time_axis,
+    time_axis_ticks,
+    year_axis_ticks,
+)
 
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()
@@ -308,12 +319,25 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
     )
     ax.tick_params(axis="y", length=0)
     x, y = placeholder_series(tb)
-    ax.plot(x, y, color="C0", linewidth=2, gid="line__placeholder")
     years = integer_years(x) if "year" in tb.columns else None
+    dates = iso_dates(x) if "year" in tb.columns and not years else None
+    ax.plot(dates or x, y, color="C0", linewidth=2, gid="line__placeholder")
+    plot_w = content_w - Y_TICK_COLUMN
     if years:
-        ticks = nice_year_ticks(min(years), max(years))
+        # Round years plus the data's first and last, as grapher; the plot's width says what collides.
+        ticks = year_axis_ticks(min(years), max(years), plot_width_px=plot_w)
         ax.set_xticks(ticks)
-        ax.set_xlim(min(ticks[0], min(years)), max(ticks[-1], max(years)))
+        # From the first year to the last, end labels inside the ends, on a 1px #999 butt-capped line.
+        style_time_axis(ax, ticks[0], ticks[-1])
+    elif dates and min(dates) < max(dates):
+        # Grapher's calendar grid for the indicator's display.timeInterval, with no dated ends. A single
+        # date has no span to lay a grid over, so it keeps matplotlib's own ticks and still renders.
+        interval = time_interval(dates)
+        ticks, labels = time_axis_ticks(
+            min(dates), max(dates), interval, plot_width_px=plot_w, font_px=body_px(width_px)
+        )
+        ax.set_xticks(ticks, labels)
+        style_time_axis(ax, min(dates), max(dates), inset_ends=False)
 
     # Guides: the band's outline and a label saying what to replace. They leave with the placeholder.
     band_h = layout["chart_bottom_y"] - layout["chart_top_y"]
@@ -360,6 +384,22 @@ def integer_years(values: list) -> list[int] | None:
             return None
         years.append(int(year))
     return years or None
+
+
+def iso_dates(values: list) -> list | None:
+    """`values` as dates when every one is an ISO 8601 date (`2024-03-01`), else None."""
+    try:
+        parsed = pd.to_datetime(pd.Series(values).astype(str), format="ISO8601")
+    except (TypeError, ValueError):
+        return None
+    return [d.date() for d in parsed] or None
+
+
+def time_interval(dates: list) -> str:
+    """The display.timeInterval the dates' spacing implies; set it from the indicator's metadata when it has one."""
+    gaps = sorted((b - a).days for a, b in zip(sorted(dates), sorted(dates)[1:]) if b != a)
+    gap = gaps[0] if gaps else 365
+    return "day" if gap < 7 else "week" if gap < 28 else "month" if gap < 89 else "quarter" if gap < 365 else "month"
 
 
 def placeholder_series(tb: Table) -> tuple[list, list]:

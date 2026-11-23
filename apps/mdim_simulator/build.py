@@ -21,6 +21,7 @@ from pathlib import Path
 
 import yaml
 
+from etl.analytics.config import OWID_DATASETTE_JSON_URL
 from etl.config import DEFAULT_GRAPHER_SCHEMA, DEFAULT_GRAPHER_SCHEMA_VERSION
 from etl.files import get_schema_from_url
 from etl.http import session as http_session
@@ -37,7 +38,9 @@ DATASET_SCHEMA = REPO / "schemas" / "dataset-schema.json"
 EXAMPLE_INDICATOR = ("worldbank_wdi", "wdi", "wdi", "it_net_user_zs_number")  # namespace, dataset, table, indicator
 PACKAGE_BASE = "https://owid-packages.tail6e23.ts.net/ourworldindata/grapher/v0.2.0"
 DEFAULT_SELECTION = ["World", "Africa", "Asia", "Europe", "North America", "South America", "Oceania"]
-DATASETTE = "https://datasette-public.owid.io/owid.json"
+# The internal Datasette, reachable only over Tailscale (which the page needs for Grapher anyway).
+DATASETTE = OWID_DATASETTE_JSON_URL
+DATASETTE_VARIABLES = DATASETTE.replace(".json", "/variables.json")
 API = "https://api.ourworldindata.org/v1/indicators"
 CATALOG = "https://catalog.ourworldindata.org"
 
@@ -101,7 +104,7 @@ def indicator_id(catalog_path: str) -> int:
             f"Use full catalog paths in the setup (grapher/<namespace>/<version>/<dataset>/<table>#<indicator>): {catalog_path}"
         )
     rows = http_session.get(
-        DATASETTE.replace(".json", "/variables.json"),
+        DATASETTE_VARIABLES,
         params={"catalogPath__exact": catalog_path, "_shape": "array", "_col": "id"},
     ).json()
     if not rows:
@@ -277,6 +280,7 @@ def build(out: Path, setup_path: Path | None = None) -> None:
         TEMPLATE.read_text()
         .replace("__SCRIPT__", SCRIPT.read_text())
         .replace("__PACKAGE_BASE__", PACKAGE_BASE)
+        .replace("__DATASETTE_VARIABLES__", DATASETTE_VARIABLES)
         .replace("__FONT_FACES__", "\n".join(font_faces))
         .replace("__INITIAL_STATE__", as_js(state))
         .replace("__INITIAL_INDICATORS__", as_js(indicators))

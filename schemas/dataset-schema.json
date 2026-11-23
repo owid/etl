@@ -406,10 +406,10 @@
           "title": "Non-redistribution of dataset ",
           "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart."
         },
-        "jsonld": {
+        "dataset_page": {
           "type": "boolean",
-          "title": "Publish catalog landing page / JSON-LD",
-          "description": "Opt this dataset into a public catalog page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD (`etl d publish --jsonld`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand."
+          "title": "Publish a dataset page",
+          "description": "Opt this dataset into a public dataset page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD that lets search engines list the dataset (`etl d publish --dataset-pages`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand. A garden step or a grapher step can opt in, only through its own `.meta.yml`: a dataset built from another one's metadata (like a grapher step from its garden step) does not inherit the flag. Only one step at each `<namespace>/<short_name>` can set it. The page of a grapher step automatically shows the charts that use the step's indicators. To also show the charts of indicators in other grapher datasets that hold the same data as a column, list those indicators in a `<short_name>.indicator_links.yml` file next to the step (format in `etl/catalog_pages/links.py`); the step's own indicators do not need to be listed there. The page of a garden step shows charts only for the columns listed in such a file, because a garden step has no grapher indicators of its own."
         },
         "changelog": {
           "type": "array",
@@ -1069,7 +1069,7 @@
                       "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         [
-                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name)."
+                          "Must be an existing topic tag, and be spelled correctly: one of the values in this field's `enum`. That list is a snapshot; the live one is the topic-tag query in the [create-chart skill](https://github.com/owid/etl/blob/master/.claude/skills/create-chart/SKILL.md)."
                         ],
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."

@@ -4,10 +4,12 @@ import threading
 from typing import Any
 
 import sentry_sdk
+from owid.catalog.core import CatalogPath
+from owid.catalog.schema_org import DEFAULT_CATALOG_BASE_URL
 
-from apps.wizard.app_pages.indicator_search.data import Indicator, _get_data_indicators_from_db
+from api_search.indicators import load_indicators
+from apps.wizard.app_pages.indicator_search.data import Indicator
 from apps.wizard.utils.embeddings import EmbeddingsModel, get_model
-from owid_mcp.data_utils import build_catalog_info
 
 # Global variables to store preloaded data and initialization state
 _indicators: list[Indicator] | None = None
@@ -16,15 +18,30 @@ _initialization_complete: bool = False
 _initialization_error: str | None = None
 
 
+def build_catalog_info(catalog_path: str) -> dict[str, str]:
+    """Build Parquet URL & example SQL template from catalogPath.
+
+    Args:
+        catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
+    """
+    p = CatalogPath.from_str(catalog_path)
+    assert p.variable
+
+    parquet_url = f"{DEFAULT_CATALOG_BASE_URL}/{p.table_path}.parquet"
+    sql_tpl = f"SELECT country, year, {p.variable} FROM '{parquet_url}' WHERE country = '??' LIMIT 100"
+    return {
+        "parquet_url": parquet_url,
+        "run_sql_template": sql_tpl,
+        "column": p.variable,
+    }
+
+
 def _initialize_semantic_search():
     """Initialize indicators and embeddings model. Runs in background thread."""
     global _indicators, _embeddings_model, _initialization_complete, _initialization_error
 
     try:
-        # Fetch all data indicators.
-        # NOTE: we could avoid fetching indicators from DB (and hence not needing credentials on server)
-        #  by fetching them from Datasette with ".csv?_stream=on"
-        _indicators = _get_data_indicators_from_db()
+        _indicators = [Indicator(**row) for row in load_indicators().to_dict(orient="records")]  # ty: ignore
 
         # Get embedding model.
         model = get_model()

@@ -54,7 +54,7 @@ Assumptions:
 - [ ] Run `/check-metadata-typos` and `/check-metadata-style` on the new steps (see 6b)
 - [ ] Changelog: decide whether this release deserves an entry in `dataset.changelog` of the garden `.meta.yml`, dated with the new version, whether or not the dataset has a changelog yet. Entries are optional. They are release notes for the people who use the data, so capture only changes that matter to them, briefly. Show the user the draft before committing it.
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c)
-- [ ] Run the adversarial review (`/fact-check-dataset`) as a background agent once the garden step is built, with effort scaled to the update (see 6c-bis)
+- [ ] Run the adversarial review (`/fact-check-dataset`) once the garden step is built: its `prepare.py` command, then its two lanes as background agents, then the assembled report (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Pull admin edits of the dataset's ETL-authored single charts into ETL (`/pull-chart`) before pushing their `viz://chart` steps: pull admin drift into the YAML, list it in the PR description, and confirm `in sync` on staging afterwards (see step 7)
@@ -64,7 +64,7 @@ Assumptions:
 - [ ] Run the referencing-prose audit — read the prose of every surface the sweep found for quantitative claims this update invalidates, and hand the recomputed numbers to content — never edit published prose yourself (see step 7)
 - [ ] Post `@codex review` as a separate PR comment once the last data or metadata change is pushed, then address its comments (fix valid ones + resolve all threads). Request it again after every later push that changes the PR's own content (step code, metadata, snapshots, DAG entries), including fixes from the QA review, so the merged and announced version is the reviewed one; merging master or deleting the old version's files doesn't need one
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green, then triage the data-diff report's data-point losses and 🔴-tier datasets and run the full-report audit probes (see "Silent-breakage check" section)
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment/etl-build` PR check is green, then triage the data-diff report's data-point losses and 🔴-tier datasets and run the full-report audit probes (see "Silent-breakage check" section)
 - [ ] Ask the user whether to remove the old version; if yes, remove+archive its DAG entries now and relocate the new entries into the old slot, but KEEP the old step files until review sign-off — the consecutive-version review diffs them from disk; deleting the files is the final commit before merge (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff + Metadata Diff on the staging branch, plus the data-diff report) together with the staging links to the 5 most-viewed data pages, and **wait for the user's sign-off** — they read those pages themselves, and the announcements below wait for it (see "Final QA hand-off")
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
@@ -142,7 +142,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       ```
       It lists every step of the chain (including older-version upstream steps and same-version siblings such as extra snapshots or helper gardens), each step's files, the inputs from outside the chain, the direct consumers (other data steps, `viz://` charts/MDims/explorers, `export://`; readers of a shared sibling such as a common snapshot are listed apart, as they don't consume this dataset), the garden `owners`, the commit that created the garden step (= the last update), and the previous version (archived, or still active mid-update). It also warns when a newer version is already active, which means you have the wrong `old_version`.
    2. Skim the step scripts: the docstrings, `run()`, and the helper names are usually enough. Don't read every line of a 1,000-line garden.
-   3. Tell the user in **about 5–8 lines**, no more:
+   3. Tell the user briefly:
       - the chain in one line (`snapshot (xlsx) → meadow → garden (+ income_groups_aggregations) → grapher`), plus the number of snapshots if there's more than one;
       - what each non-trivial step does, in plain words ("meadow reshapes wide → long; garden harmonizes countries, adds population-weighted regional aggregates and per-capita columns");
       - key external inputs (population, regions, income groups, other datasets) and who consumes the output (counted by type; name the `viz://` ones). The script only sees DAG steps, so when it lists none, say that admin-built charts still read the grapher dataset directly — don't let "no consumers" read as "unused";
@@ -168,7 +168,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Either way, run `etl update` **once**. Don't call it separately per channel — that leaves stale version references in the DAG (e.g., new garden pointing to old meadow).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify the dag file**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow) — a garden still on the old meadow or old snapshot silently loads stale data.
-   - **Check every dependency that shares the dataset's short_name.** `etl update` points it at the step's own predecessor: right for a rolling accumulator (each release builds on the last), wrong for a fixed historical vintage (restore the version the old step used). Read the step code; ask if unclear. Also check by hand any nested-form steps it reports as "not found in dag file".
+   - **Check every dependency that shares the dataset's short_name.** `etl update` points it at the step's own predecessor: right for a rolling accumulator (each release builds on the last), wrong for a fixed historical vintage (restore the version the old step used). Read the step code; ask if unclear. Also check by hand any nested-form steps it reports as "not found in dag file": on a nested DAG it can re-indent the whole file, so run `git diff --stat dag/`, and if blocks of other datasets changed, revert the file and add the new nested block by hand.
    - **`etl update` writes the new entries in the *flat* DAG form — convert them to the nested (compact) form now**, while you're in the file, rather than leaving it until archiving (otherwise the flat block tends to survive the whole update unnoticed). See the example and `load_dag()` parse-check under "Removing the old version & reordering the DAG" step 4.
 
 1a-bis) Add yourself to `dataset.owners` in the new garden `.meta.yml`
@@ -196,7 +196,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    Sanity checks live in two different forms — detect **both**:
 
    - **Function form** — `def sanity_check…` / `sanity_check…(` call sites. Often gated by a module-level boolean flag (`DEBUG`, `SHOW_SANITY_CHECK_LOGS`, `LONG_FORMAT`) that defaults to `False` to keep normal runs quiet. Examples: `etl/steps/data/garden/wb/.../world_bank_pip.py` (`SHOW_SANITY_CHECK_LOGS`), `etl/steps/data/garden/wid/.../world_inequality_database.py` (`DEBUG` + `LONG_FORMAT`), `etl/steps/data/garden/lis/.../luxembourg_income_study.py` (no flag; prints unconditionally via `tabulate`).
-   - **Inline comment form** — `# Sanity check` / `# Sanity checks` / `# sanity check` marking an inline assertion block that isn't wrapped in a dedicated function. Very common: `etl/steps/data/garden/emdat/.../natural_disasters.py`, `etl/steps/data/garden/emissions/.../national_contributions.py`, `etl/steps/data/garden/irena/.../renewable_capacity_statistics.py`. These usually have no log flag — the block simply runs on every step execution and either passes or raises.
+   - **Inline comment form** — `# Sanity check` / `# Sanity checks` / `# sanity check` marking an inline assertion block that isn't wrapped in a dedicated function. Very common: `etl/steps/data/garden/emdat/.../natural_disasters.py`, `etl/steps/data/garden/emissions/.../national_contributions.py`. These usually have no log flag — the block simply runs on every step execution and either passes or raises.
 
    Run a combined sweep:
    ```bash
@@ -215,6 +215,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
 3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
+   - Before the first upload, check whether the data must stay private: the producer's terms restrict redistribution, or it isn't meant for public sharing (a draft, a file supplied privately); ask the user when unclear. If so, apply every control in "Make your dataset completely private" (`docs/guides/private-import.md`), including the dag's `snapshot-private://` dependencies, which `etl update` carries forward as `snapshot://`. A public upload can't be undone from our side (see `/create-snapshot`, `is_private`).
 
    **Producer documentation for the new release.** While the snapshot runs, find the producer's latest documentation per `.claude/rules/producer-documentation.md`. The links carried over in the `.dvc` and `.meta.yml` point at the previous edition, so search for the current one. The what's-new notes tell you which changes to expect in the snapshot, meadow and garden diffs, and they feed the changelog. The methodology is what §6b contrasts the carried-over text against.
 
@@ -313,7 +314,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 5c) Country harmonization audit
    Run after the garden step completes (and after 5b if it ran). Verifies that the country entities reaching the garden output are canonical, and that the mappings/exclusions consumed by `paths.regions.harmonize_names(...)` are well-formed. Output: `workbench/<short_name>/harmonization_audit.md`.
 
-   **Modern API.** Garden steps should be calling `paths.regions.harmonize_names(tb, country_col=..., countries_file=..., excluded_countries_file=...)` — the wrapper in `etl/data_helpers/geo.py:1874`. If you find a step still using the deprecated `geo.harmonize_countries(...)` directly, step 1b's `/check-outdated-practices` should already have flagged it; treat that as a separate cleanup. The audit below is API-agnostic — both call sites end up emitting the same three warning strings.
+   **Modern API.** Garden steps should be calling `paths.regions.harmonize_names(tb, country_col=..., countries_file=..., excluded_countries_file=...)` — the wrapper in `etl/data_helpers/geo.py`. If you find a step still using the deprecated `geo.harmonize_countries(...)` directly, step 1b's `/check-outdated-practices` should already have flagged it; treat that as a separate cleanup. The audit below is API-agnostic — both call sites end up emitting the same three warning strings.
 
    **Source of truth.** Canonical names come from **two** datasets, both consulted by the harmonizer:
 
@@ -462,17 +463,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    - Identify what the workaround does (read the surrounding code).
    - Load the affected step's output with `owid.catalog.Dataset` (or inspect the raw snapshot) and compare **corrected vs. uncorrected** values. Cross-check the producer's release notes / changelog if available.
-   - If the upstream issue is fixed → delete the workaround **and** its `# NOTE:` / `# TODO:` comments **in the same commit**, then re-run the affected step (use `--force --only`, add `--grapher` for grapher) so downstream artifacts pick up the change.
+   - If the upstream issue is fixed → delete the workaround **and** its `# NOTE:` / `# TODO:` comments **in the same commit**, then re-run the affected step (the edit is enough for `etlr` to re-run it; add `--grapher` for grapher) so downstream artifacts pick up the change.
    - If the workaround is still needed → leave it and add a one-line status under a PR-description section titled **"Not covered in this PR"** (e.g. "Sierra Leone ×1000 correction still required — raw value in the 2026 file is still ~1/1000 of plausible"). These are deliberately deferred items the next updater should re-check. Delete the whole section if its last item gets resolved mid-PR.
    - If you're uncertain → keep it, flag it in the PR description, and ask the user.
 
    Do this **before** step 6b (metadata checks) so any re-runs triggered by comment-removal happen before the metadata sweep, not after.
 
 6b) Metadata quality checks (mandatory) — run after all ETL steps are built
-   Run all four checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on. These four read the text **as authored**; seeing it **as rendered**, on every chart, MDim view and explorer view each edit lands on, is Metadata Diff in the final QA hand-off below.
+   Run all the checks below on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on. These read the text **as authored**; seeing it **as rendered**, on every chart, MDim view and explorer view each edit lands on, is Metadata Diff in the final QA hand-off below.
 
    - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
-   - **Jinja spacing and style guide** — `/check-metadata-style` on the grapher step. A mechanical pass first catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering; then it audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is usually needed — the skill checks the file's `Last synced from Notion` date and refreshes it from Notion (in a separate PR) when it is more than two months old.
+   - **Jinja spacing and style guide** — `/check-metadata-style` on the grapher step. A mechanical pass first catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering; then it audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is usually needed — the skill checks the file's `Last synced from Notion` date and refreshes it from Notion (in a separate PR) when it is more than two weeks old.
    - **Clarity for a general audience** — read every user-facing field with non-specialist eyes. The other two skills enforce structure and style; this one judges whether the text is *understandable*.
    - **Contrast the carried-over text with the new documentation** — `etl update` copies every `.meta.yml` and `.dvc` field verbatim, so read each indicator's text against the documentation found in step 3 (methodology, what's new) and propose a fix, citing the passage, for each claim that is wrong, stale or missing a caveat (`.claude/rules/producer-documentation.md`, "Contrast what's already written"). For the metadata you write or change, tell the user and the PR description which documentation each indicator's text rests on and where in it, or that it is inferred from the data (same rule, "Say what the metadata rests on").
    - **Dimension sweep** (dimensional indicators only) — a sentence written for one breakdown renders on all the sibling views, where the view's own filtering can make it false: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Render the text per dimension value (the grapher channel already has it flattened) and read each output as a reader of that chart. Prefer qualifying the wording so it holds everywhere over adding a Jinja branch. Full version: check 5 of the canonical suite in `/generate-metadata`.
@@ -596,13 +597,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    ```
    Or after the staging upload:
    ```bash
-   make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
+   .venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql(\"SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE %(p)s\", params={'p': '%<ns>/<v>/<short_name>%'}))"
    ```
 
 6c-bis) Adversarial data & metadata review (mandatory — run it in the background)
    Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<new_version>/<short_name>`. Step 6c verified that the links *resolve*; this step actually **reads the producer's documentation behind them** and cross-checks the data against independent sources online — it's the only step that can catch a mistake made by the source itself (unit slips, wrong-year values, stale pre-revision numbers).
 
-   **Run it as a background agent once the garden step is built**, and fold its findings in before 6d, the commit and the PR description, so the fixes land in this PR. Go deeper on red flags: large unexplained churn, an in-place source revision, a new producer, editorial claims riding on specific values.
+   **Run it once the garden step is built, as two background lanes:**
+   ```bash
+   .venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<new_version>/<short_name> --context update
+   ```
+   The command prints a dossier (steps, origins, the producer's documentation saved as text, the indicators ranked by chart views, the anomaly candidates, the DoDs) and writes two briefs. Start both briefs as background agents **in one message**, each with the prompt `Read <brief> and do what it says.`, and go on with 6d while they run. When both are back, settle the notes each lane left for the other and run the `assemble_report.py` command the dossier prints. Fold the findings in before the commit and the PR description, so the fixes land in this PR. Go deeper on red flags (large unexplained churn, an in-place source revision, a new producer, editorial claims riding on specific values): run the command again with a larger `--top` or with `--indicators`; the documentation is reused.
 
    **For sources that compile national-office figures (OECD, Eurostat, UN agencies), compare a few countries' new years with the national office.** A series shifted by one year at the source passes every diff and bound check.
 
@@ -646,16 +651,16 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 7) Indicator upgrade (mandatory, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
      ```bash
-     STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher
+     STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
-     **Then confirm the variables actually landed in MySQL** — `data://grapher/... --grapher` sometimes only builds the feather without upserting, leaving 0 rows in `variables`. If the count is 0, run the separate `grapher://` step, which does the MySQL upsert:
+     **Then confirm the variables landed in MySQL** (a `data://grapher/...` step only builds the feather; the `grapher://` step above is the upsert). If the count is 0, re-run it:
      ```bash
      # verify
      STAGING=<branch> .venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql(\"SELECT COUNT(*) n FROM variables WHERE catalogPath LIKE %(p)s\", params={'p':'%<namespace>/<new_version>/<short_name>%'}).n[0])"
-     # if 0, force the upsert:
+     # if 0, re-run the upsert (the checksum is written only after a complete upsert, so it is not skipped):
      STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
-   - **Locally, this upload can fail with `AccessDenied` on `PutObject`** (no write access to the staging R2 bucket). Push and let the staging rebuild upload it. The variable count doesn't prove the upload worked (rows are written before it fails): before the indicator upgrade, wait for a green `buildkite/etl-automated-staging-environment` on your latest push and check that `<indicators_url>/<new_variable_id>.metadata.json` is served (`OWID_ENV.indicators_url` with `STAGING=<branch>`).
+   - **Locally, this upload can fail with `AccessDenied` on `PutObject`** (no write access to the staging R2 bucket). Push and let the staging rebuild upload it. The variable count doesn't prove the upload worked (rows are written before it fails): before the indicator upgrade, wait for a green `buildkite/etl-automated-staging-environment/etl-build` on your latest push and check that `<indicators_url>/<new_variable_id>.metadata.json` is served (`OWID_ENV.indicators_url` with `STAGING=<branch>`).
    - Then run the automatic upgrader:
      ```bash
      STAGING=<branch> .venv/bin/etl indicator-upgrade auto
@@ -674,7 +679,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      Don't filter to published charts — drafts count too: the upgrader remaps them as well, a draft left on ghost variables can be published later with stale data, and its variable references block archiving the old version exactly like a published chart's.
      **Scope the predicate to the namespace, and escape literal underscores in every substituted component — the namespace as well as the short name** (`LIKE 'worldbank\_wdi/%/fertility\_rate'`) — short names recur across namespaces (`fertility_rate` exists under both `demography` and `gapminder`), a suffix-only `LIKE '%<short_name>'` sweeps unrelated datasets into the results, and an unescaped `_` is a single-character wildcard in MySQL `LIKE`, so it can quietly match a similarly named dataset or namespace too; since the follow-on mapping pairs variables by `shortName` alone, either slip would redirect another dataset's charts onto your new variables. Anything on an older version is remappable the same way (one `WizardDB.add_variable_mapping` per old dataset id, paired by `shortName`). This matters beyond tidiness: the flagship chart for the very indicator an update exists to fix can be sitting on a version from months earlier and receive none of the new data. Whatever remains after the sweep is charts whose indicators have no `shortName` twin in the new version — which means **renamed or retired**, not automatically retired: a rename in an earlier cycle breaks the twin too, so first check the unpaired new-version shortNames and the producer's release notes for a successor, and map any true rename by hand (same `WizardDB.add_variable_mapping` mechanics, paired semantically instead of by `shortName`). Only the genuinely retired ones need a replace-or-retire decision and are the reason those old versions can't be archived.
    - **Set `GRAPHER_USER_ID` alongside `STAGING`.** `cli_upgrade_indicators(dry_run=False)` asserts on it (`AssertionError: GRAPHER_USER_ID is not set!`) only *after* computing the whole mapping and listing the affected charts, so a missing value fails late and looks like a mapping bug. The value is the human's own grapher user id — the repo's main `.env` has it; `SELECT id, fullName FROM users` confirms which is theirs (other `.env.*` files may carry a colleague's).
-   - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging:
+   - After the upgrader finishes, verify it worked by querying staging:
      ```bash
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
@@ -972,6 +977,8 @@ It doesn't announce itself — CI is green, the chart renders, and the diff look
 
 The fix is to merge `master` in, rebuild, and remap only the affected charts' foreign dimensions. Two scoping notes: chart-diff only covers charts your branch's datasets touch, so charts using *only* the other dataset are stale on staging but never sync — leave them, they're not yours to fix and repointing them adds review load. And remap by editing those chart configs directly rather than via a variable-level mapping, which would sweep in other charts sharing the same variables and pull them into the review queue.
 
+A chart *config* edited on production after the staging server was created (by hand, or by another PR's chart sync) is the same problem without a dataset: staging still holds the old config, so Chart Diff flags a conflict and approving it would revert the production edit. Refresh the staging database from production ("Refresh the Staging Server MySQL Database" in `docs/guides/environment.md`), then redo the indicator upgrade and any staging-only chart or DoD edits.
+
 ## Downstream dependency check
 
 After completing the update, check if any other datasets depend on the **old** version of the updated dataset:
@@ -1002,7 +1009,7 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 .venv/bin/etlr --modified --continue-on-failure  # add --dry-run to list scope first
 ```
 
-`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment`** PR check red. That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
+`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment/etl-build`** PR check red (that step's own status; the whole build's goes red later). That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
 
 **Size the fan-out first** (`--dry-run` lists the scope). Small (≲50 steps): the local run gives you the crash check in minutes, before burning a staging cycle. Foundational-dataset scale (hundreds of steps — an income-groups bump is ~560): skip the local build and rely on the staging check — locally it costs ~35 min and ~7 GB of `data/` to duplicate what the bake does anyway (if you do run it, delete the builds afterwards; `data/` is regenerable cache). Skip the **local** `etl diff` at that scale too — another ~25 min and a JSON in the hundreds of MB; owidbot's hosted report on the PR is the same comparison for free.
 
@@ -1040,7 +1047,7 @@ The samples cap at ~100 rows/diff, so pair the probes with the mechanism argumen
 
 **Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
 
-**Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist-chart-diff-and-data-diff)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (the last step before the announcements) covers all three. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
+**Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist-chart-diff-metadata-diff-and-data-diff)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (the last step before the announcements) covers all three. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
 
 - **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`.venv/bin/etlr --modified --dry-run` shows the affected set).
 
@@ -1090,9 +1097,9 @@ Workflow when the user agrees:
    "
    ```
 5. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
-6. Run `make check` and commit with `🔨🤖 Remove old <name> entries and reorder DAG`.
+6. Commit with `🔨🤖 Remove old <name> entries and reorder DAG` (the pre-commit hook runs `make check`).
 
-**Expect a Codex false-positive on the archive edit.** Because this step touches `dag/archive/*.yml`, Codex often flags it ("avoid updating archived DAG entries" — the AGENTS.md rule against editing archived files). This is expected: archiving *is* the explicitly-requested workflow step, and the rule's own "unless explicitly asked" exception applies. Reply citing that and resolve the thread — don't revert the archive. A second recurring flag on this step: Codex warns that removing the old chain will "leave the published chart on archived variables" / "remap charts before versioning the grapher step". If the indicator upgrade already ran on staging (step 7) and the old-variable scan came back empty, reply with that verification (the remapped configs sync to production on merge) and resolve.
+**Expect a Codex false-positive on the archive edit.** Because this step touches `dag/archive/*.yml`, Codex often flags it ("avoid updating archived DAG entries" — the AGENTS.md rule against editing archived files). This is expected: the entries are `etl archive-dag` output, which is how `CLAUDE.md` says to archive a step. Reply citing that and resolve the thread — don't revert the archive. A second recurring flag on this step: Codex warns that removing the old chain will "leave the published chart on archived variables" / "remap charts before versioning the grapher step". If the indicator upgrade already ran on staging (step 7) and the old-variable scan came back empty, reply with that verification (the remapped configs sync to production on merge) and resolve.
 
 ## Final QA hand-off — Anomalist, Chart Diff, Metadata Diff and data-diff
 
@@ -1251,7 +1258,7 @@ In the same message, remind the user that when the dataset is important and the 
 - **`description_key` in `definitions.common` propagates only to indicators without their own list**: if you want a bullet to appear on every indicator, either keep it on `common.description_key` and don't define per-indicator lists (it inherits), or prepend it explicitly to each per-indicator list (treats it as a "first bullet" pattern).
 - **Phantom-category audit on categorical indicators**: after building categorical indicators, sweep every indicator and compare YAML `sort:` labels against the unique values that actually appear in the data. Phantom labels (declared in `sort:` or in a category map but never produced) clutter chart legends with empty buckets. Either drop them from `sort:` and `description_key`, or remove them from the map if they can never occur given the data shape. Re-run the audit on every data refresh — phantoms can reappear when a category is dropped upstream.
 - **`NOTE:` comments for the next maintainer when behaviour is data-conditional**: when something in the code holds only because of the current data shape (e.g. "only 4 indicators have an EoE=0 row", "only Brazil 2025 is a transition-year artefact"), leave a `# NOTE:` comment near the relevant block asking the next data update to re-audit. Helps future maintainers spot which assumptions might decay before they bite.
-- **Indicator Upgrader CLI for one-shot chart remaps**: when v1 → v2 short_names change so much that the auto-upgrader can't match them, drive the remap manually. Write a small script that calls `WizardDB.add_variable_mapping(mapping={old_id: new_id, ...}, dataset_id_old=..., dataset_id_new=..., comments="...")` with the explicit pairs, then run `from apps.indicator_upgrade.upgrade import cli_upgrade_indicators; cli_upgrade_indicators(dry_run=True)` to preview affected charts, and `(dry_run=False)` to apply. Mappings stay in the wizard DB until `WizardDB.delete_variable_mapping()` is called, so a slug-collision failure can be recovered by fixing the slug and rerunning the upgrade — only un-upgraded charts get reattempted. The active staging DB is inferred from the current git branch.
+- **Indicator Upgrader CLI for one-shot chart remaps**: when v1 → v2 short_names change so much that the auto-upgrader can't match them, drive the remap manually. Write a small script that calls `WizardDB.add_variable_mapping(mapping={old_id: new_id, ...}, dataset_id_old=..., dataset_id_new=..., comments="...")` with the explicit pairs, then run `from apps.indicator_upgrade.upgrade import cli_upgrade_indicators; cli_upgrade_indicators(dry_run=True)` to preview affected charts, and `(dry_run=False)` to apply. Mappings stay in the wizard DB until `WizardDB.delete_variable_mapping()` is called, so a slug-collision failure can be recovered by fixing the slug and rerunning the upgrade — only un-upgraded charts get reattempted. Run it with `STAGING=<branch>` so it reads and writes that branch's staging DB.
 
 When the update is review-heavy and you need iterative back-and-forth with a topic owner over staging, see the [`report-indicator-changes`](../report-indicator-changes/SKILL.md) skill for drafting the message.
 
@@ -1272,14 +1279,14 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 
 ## Example usage
 
-- Minimal catalog URI with explicit old version:
-  - `update-dataset data://snapshot/irena/2024-11-15/renewable_power_generation_costs 2023-11-15 update-irena-costs`
+- With an explicit branch:
+  - `update-dataset irena/2026-07-28/renewable_power_generation_costs update-irena-costs`
 
 ---
 
 ### Common issues when data structure changes
 
-- SILENT FAILURES WARNING: Never return empty tables or comment code as workarounds — fix the parsing/transformations instead!
+- Don't return empty tables or comment out code as a workaround: it hides the breakage. Fix the parsing or transformation instead.
 - Column name changes: If columns are renamed/split (e.g., single cost → local currency + PPP), update:
   - Python code references in the garden step
   - Garden metadata YAML (e.g., `food_prices_for_nutrition.meta.yml`)

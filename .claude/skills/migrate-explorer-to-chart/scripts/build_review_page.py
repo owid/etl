@@ -5,6 +5,7 @@ Inputs, all from earlier steps of the migration:
 - `<review>/references_full.json` from `scan_references.py`;
 - `<mapping-dir>/mapping.json` and `admin_bulk_payload.json` from `map-explorer-to-mdim`;
 - optional `--notes notes.json`: `{"<check>:<field prefix>": "why this difference is expected"}`.
+  The key `rendered:footer-link` explains a footer that differs only by the multidim's originUrl link.
   A difference with a note counts as explained, not as a mismatch. Write one only after checking
   the difference against the rendered pages.
 
@@ -19,35 +20,87 @@ Usage:
 
 import argparse
 import json
-from collections import defaultdict
+import re
 from pathlib import Path
 
 READER_CHECKS = ["mapping", "indicators", "data", "metadata", "rendered"]
 
 
+def _slugify(text: str) -> str:
+    return "".join(ch if ch.isalnum() else "_" for ch in text.lower()).strip("_")
+
+
 def dimension_summary(mapping: dict) -> list[dict]:
-    """Per explorer dimension: the multidim dimension it became and each choice's slug."""
-    pairs = [(r["source"]["dimensions"], (r["target"] or {}).get("dimensions") or {}) for r in mapping["redirects"]]
+    """Per multidim dimension and choice: the explorer selections whose redirect lands on it.
+
+    Reads from the multidim side because explorer and multidim dimensions need not pair up: two
+    checkboxes can become one toggle, and a dimension an explorer view leaves out (not in its URL)
+    can land on a different multidim choice depending on another dimension. Each choice gets the
+    shortest conditions that pick out exactly its views: `Per capita = true`, or `Sub-metric` not
+    set, or `Animal = Cattle` *or* `Metric = Bans on bullfighting`.
+    """
+    names = mapping["explorer"]["dimensions"]
+    rows = [(r["source"]["dimensions"], r["target"]) for r in mapping["redirects"] if r["target"]]
+    several = len({t["mdim"] for _, t in rows}) > 1
     out = []
-    for name in mapping["explorer"]["dimensions"]:
-        best = None
-        for slug in {k for _, t in pairs for k in t}:
-            rel = defaultdict(set)
-            for s, t in pairs:
-                rel[s.get(name, "")].add(t.get(slug))
-            if all(len(v) == 1 for v in rel.values()):
-                choices = {k: next(iter(v)) for k, v in rel.items()}
-                score = len(set(choices.values()))
-                if best is None or score > best[0]:
-                    best = (score, slug, choices)
-        out.append(
-            {
-                "explorer": name,
-                "multidim": best[1] if best else None,
-                "choices": [{"explorer": k, "multidim": v} for k, v in (best[2] if best else {}).items()],
-            }
-        )
+    for target in mapping["targets"]:
+        mrows = [({n: s.get(n, "") for n in names}, t["dimensions"]) for s, t in rows if t["mdim"] == target["mdim"]]
+        for slug in target["dimensions"]:
+            # Prefer the explorer dimension named like this one, then explorer order, to break ties.
+            order = sorted(names, key=lambda n: (_slugify(n) != slug, names.index(n)))
+            choices = list(dict.fromkeys(t.get(slug) for _, t in mrows if t.get(slug) is not None))
+            # Conditions are one or two explorer dimensions, in tie-break order.
+            keysets = [(n,) for n in order] + [(a, b) for i, a in enumerate(order) for b in order[i + 1 :]]
+            summary = []
+            for choice in choices:
+                pos = [s for s, t in mrows if t.get(slug) == choice]
+                # A condition is valid when no view landing elsewhere matches it: look it up in the
+                # values those views take on its dimensions, instead of scanning them per condition.
+                taken = {ks: {tuple(s[n] for n in ks) for s, t in mrows if t.get(slug) != choice} for ks in keysets}
+
+                rules: list[dict] = []
+                left = pos
+                while left:
+                    # One or two conditions, whichever covers the most views left (ties: fewer
+                    # conditions, then the first found, as candidates are listed view by view).
+                    covers: dict[tuple, int] = {}
+                    for s in left:
+                        for ks in keysets:
+                            vals = tuple(s[n] for n in ks)
+                            if vals not in taken[ks]:
+                                covers[(ks, vals)] = covers.get((ks, vals), 0) + 1
+                    if covers:
+                        ks, vals = max(covers, key=lambda c: (covers[c], -len(c[0])))
+                        best = dict(zip(ks, vals))
+                    else:
+                        best = dict(left[0])
+                    rules.append(best)
+                    left = [s for s in left if not all(s[n] == v for n, v in best.items())]
+                # One-condition rules on the same dimension read as one: Metric = A, B or C.
+                merged: list[list[dict]] = []
+                for rule in rules:
+                    if len(rule) == 1:
+                        (n, v) = next(iter(rule.items()))
+                        same = next((m for m in merged if len(m) == 1 and m[0]["dim"] == n), None)
+                        if same:
+                            same[0]["values"].append(v)
+                            continue
+                    merged.append([{"dim": n, "values": [v]} for n, v in rule.items()])
+                summary.append({"choice": choice, "when": merged})
+            used = list(dict.fromkeys(c["dim"] for ch in summary for rule in ch["when"] for c in rule))
+            out.append(
+                {
+                    "multidim": f"{target['mdim']}.{slug}" if several else slug,
+                    "explorer": sorted(used, key=names.index),
+                    "choices": summary,
+                }
+            )
     return out
+
+
+def _strip_footer_link(text: str) -> list[str]:
+    """Footer words without the origin link (`OurWorldinData.org/<page> |`) and the license."""
+    return re.sub(r"OurWorldinData\.org/\S+\s*\|?", " ", text).replace("CC BY", " ").split()
 
 
 def classify(pairs: list[dict], notes: dict) -> None:
@@ -56,6 +109,11 @@ def classify(pairs: list[dict], notes: dict) -> None:
         for c in p["checks"]:
             key = f"{c['check'].split(':')[0]}:{c['field']}"
             c["note"] = next((v for k, v in notes.items() if key.startswith(k)), None)
+            # `rendered:footer-link` explains a footer that differs only by the multidim's added
+            # originUrl link (which also moves "CC BY" after the note), never any other change.
+            if c["check"].startswith("rendered") and c["field"] == "footer" and "rendered:footer-link" in notes:
+                if _strip_footer_link(c["multidim"] or "") == _strip_footer_link(c["explorer"] or ""):
+                    c["note"] = notes["rendered:footer-link"]
         visible = [c for c in p["checks"] if c["check"].split(":")[0] in READER_CHECKS and not c["note"]]
         other = [c for c in p["checks"] if c["check"].split(":")[0] not in READER_CHECKS and not c["note"]]
         p["verdict"] = "differs" if visible else ("config" if other else "match")
@@ -201,6 +259,7 @@ button.mini{font-size:.72rem;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .dimcard{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .dimcard h3{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .arrow{color:var(--muted)}
+.dimcard td.mono{overflow-wrap:anywhere}
 pre{margin:0;max-height:420px;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:.74rem;line-height:1.45}
 .banner{border-radius:8px;padding:10px 14px;font-size:.9rem}
 .banner.bad{background:var(--bad-bg);color:var(--bad)} .banner.ok{background:var(--ok-bg);color:var(--ok)}
@@ -246,7 +305,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="payload">
-    <div class="sec-head"><h2>Redirects to create</h2><p>Paste into <b>Bulk-create redirects from JSON</b> at <a href="https://admin.owid.io/admin/multi-dim-redirects" target="_blank" rel="noopener">admin.owid.io/admin/multi-dim-redirects</a>. Creating them takes the explorer offline at once, and they can only be removed one at a time.</p></div>
+    <div class="sec-head"><h2>Redirects to create</h2><p>Paste into <b>Bulk-create redirects from JSON</b> at <a href="https://admin.owid.io/admin/multi-dim-redirects" target="_blank" rel="noopener">admin.owid.io/admin/multi-dim-redirects</a>. They take the explorer offline as soon as the deploy the paste queues goes out, and they can only be removed one at a time.</p></div>
     <div id="pbanner"></div>
     <div class="row"><button id="copyPayload">Copy JSON</button><span class="small" id="pstats"></span></div>
     <pre id="pjson"></pre>
@@ -395,8 +454,10 @@ document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async ()
 
 // Dimension mapping.
 $("dimtext").innerHTML = `Explorer URLs name dimensions and choices by their labels (<code>?Measure=Conflict+deaths</code>); multidim URLs by slug (<code>?measure=deaths</code>). Each redirect rewrites one into the other and keeps every other parameter (<code>country</code>, <code>time</code>, <code>tab</code>). A bare <code>/explorers/${esc(E.explorer.slug)}</code> goes to the multidim's default view.`;
-$("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3>${esc(d.explorer)} <span class="arrow">→</span> <code>${esc(d.multidim||"?")}</code></h3>
-  <div class="tablebox"><table><thead><tr><th>Explorer choice</th><th>Multidim choice</th></tr></thead><tbody>${d.choices.map(c=>`<tr><td>${c.explorer===""?'<span class="small">(blank: not in the URL)</span>':esc(c.explorer)}</td><td class="mono">${esc(c.multidim)}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
+const cond = c => c.values.length===1 && c.values[0]==="" ? `<b>${esc(c.dim)}</b> <span class="small">not in the URL</span>`
+  : `<b>${esc(c.dim)}</b> = ${c.values.map(v=>v===""?'<span class="small">not in the URL</span>':esc(v)).join(c.values.length>2?", ":" or ").replace(/, ([^,]*)$/," or $1")}`;
+$("dimgrid").innerHTML = D.dims.map(d => `<div class="dimcard"><h3><code>${esc(d.multidim)}</code> <span class="arrow">←</span> ${d.explorer.map(esc).join(", ") || '<span class="small">no explorer dimension (one choice)</span>'}</h3>
+  <div class="tablebox"><table><thead><tr><th>Multidim choice</th><th>When the explorer URL has</th></tr></thead><tbody>${d.choices.map(c=>`<tr><td class="mono">${esc(c.choice)}</td><td>${c.when.map(r=>r.map(cond).join(" and ")).join('<br><span class="small">or</span> ')}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
 
 // Payload.
 const prodPayload = D.payloadEnv === "production";

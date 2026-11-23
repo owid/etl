@@ -375,7 +375,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
     tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
-    # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
+    # Estimate the mean only if at least THRESHOLD_SHARE_COUNTRIES of the region's 1900 countries have data (10% for Europe)
     # Get list of countries in regions in 1900
     tb_1900 = tb_.loc[tb_["year"] == REFERENCE_YEAR, ["country"]]
     countries_to_continent = geo.countries_to_continent_mapping(
@@ -615,26 +615,27 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
         **kwargs_agg,
     )
 
-    # Normalize by region's population
-    columns_index = ["year", "country"]
-    columns_indicators = [col for col in tb_.columns if col not in columns_index + ["population"]]
-    tb_[columns_indicators] = tb_[columns_indicators].div(tb_["population"], axis=0)
-    tb_ = tb_.drop(columns="population")
-
-    # Rename columns
-    # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
-    # Sanity check on output shape
-    assert tb_.shape[1] == N_EXPECTED, f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_.shape[1]}"
-
-    # Filter by coverage of people
-    ## Get dummy table
+    # Get the population of the countries with data for each indicator
     tb_pop = add_population_in_dummies(tb_pop, **kwargs_dummies)
-    # tb_pop = tb_pop.drop(columns=["population"])
-    ## Get population covered (absolute)
     tb_pop = add_regions_and_global_aggregates(
         tb=tb_pop,
         **kwargs_agg,
     )
+    assert tb_pop[["country", "year"]].equals(tb_[["country", "year"]]), (
+        "Population coverage and averages don't line up."
+    )
+
+    # Normalize by the population of the countries with data for each indicator (as in the original Stata script), not by the region's total population
+    columns_index = ["year", "country"]
+    columns_indicators = [col for col in tb_.columns if col not in columns_index + ["population"]]
+    population_with_data = tb_pop[columns_indicators].astype("float64")
+    tb_[columns_indicators] = tb_[columns_indicators].div(population_with_data.where(population_with_data > 0))
+    tb_ = tb_.drop(columns="population")
+
+    # Sanity check on output shape
+    assert tb_.shape[1] == N_EXPECTED, f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_.shape[1]}"
+
+    # Filter by coverage of people
     ## Get population covered (%)
     tb_pop.loc[:, columns_indicators] = tb_pop.loc[:, columns_indicators].div(tb_pop["population"], axis=0)
     tb_pop = tb_pop.drop(columns="population")

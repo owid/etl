@@ -18,7 +18,7 @@ RESERVED_ROOT_NAMES = {"robots.txt", "jsonld_quality_report.json"}
 
 
 # Blockers that also stop the dataset page files (not just the JSON-LD side product).
-PAGE_BLOCKERS = {"private_dataset", "non_redistributable", "reserved_namespace", "duplicate_short_key"}
+PAGE_BLOCKERS = {"private_dataset", "non_redistributable", "reserved_namespace"}
 
 
 @dataclass
@@ -38,7 +38,7 @@ class DatasetQualityResult:
         """Whether the dataset page files may be published.
 
         Only the gates about the dataset itself apply: it must be public, redistributable, and not collide with
-        another dataset or a reserved name. Gates about metadata completeness (title, description,
+        a reserved name. Gates about metadata completeness (title, description,
         provenance) only decide whether ``dataset.jsonld`` is emitted; the page renders whatever metadata exists.
         """
         return not (set(self.blockers) & PAGE_BLOCKERS)
@@ -90,7 +90,6 @@ def assess_dataset_quality(
     namespace: str,
     dataset_meta: DatasetMeta,
     tables: list[TableSchemaInput],
-    duplicate_short_key: bool = False,
 ) -> DatasetQualityResult:
     result = DatasetQualityResult(catalog_path=catalog_path)
 
@@ -102,9 +101,6 @@ def assess_dataset_quality(
 
     if is_reserved_namespace(namespace):
         result.blockers.append("reserved_namespace")
-
-    if duplicate_short_key:
-        result.blockers.append("duplicate_short_key")
 
     if not _has_title(dataset_meta, tables):
         result.blockers.append("missing_title")

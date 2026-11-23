@@ -1,6 +1,8 @@
 ---
 name: snapshot-runner
-description: Use this agent when you need to update a dataset's snapshot step, compare it with the previous version, and manage the update process with user confirmation. Examples: <example>Context: User wants to update a dataset snapshot and needs to see what changed before proceeding. user: "Update the World Bank food prices snapshot" assistant: "I'll use the snapshot-runner agent to run the snapshot step, compare it with the old version, and get your approval before proceeding." <commentary>Since the user wants to update a snapshot with comparison and approval workflow, use the snapshot-runner agent.</commentary></example> <example>Context: User is working on a dataset update and mentions they want to refresh the raw data. user: "The source data has been updated, let's pull the latest snapshot and see what changed" assistant: "I'll use the snapshot-runner agent to fetch the new snapshot data, compare it with the current version, and show you the differences before we proceed with any updates." <commentary>The user wants to update snapshot data with comparison, so use the snapshot-runner agent.</commentary></example>
+description: >-
+  Update a dataset's snapshot step, compare the new snapshot with the previous version,
+  and summarize what changed for the user to approve before the update continues.
 model: sonnet
 ---
 

@@ -179,7 +179,13 @@ def load_STAGING() -> str | None:
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
-        branch_name = git.Repo(BASE_DIR).active_branch.name
+        repo = git.Repo(BASE_DIR)
+        if repo.head.is_detached:
+            # No branch, so no branch's staging server to target.
+            if not is_run_python_step:
+                log.warning("HEAD is detached, using local env instead of a staging server")
+            return None
+        branch_name = repo.active_branch.name
         if branch_name == "master":
             if not is_run_python_step:
                 log.warning("You're on master branch, using local env instead of STAGING=master")
@@ -229,6 +235,9 @@ else:
 
 # Override URLs from env variables if set
 SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
+
+# Where the Search API reads the indicators it ranks: MySQL when unset, else this published copy (api_search/indicators.py).
+SEARCH_INDICATORS_URL = env.get("SEARCH_INDICATORS_URL")
 
 
 def variable_data_url(variable_id):
@@ -685,9 +694,9 @@ class OWIDEnv:
     def thumb_url(self, slug: str):
         """
         Turn https://ourworldindata.org/grapher/life-expectancy"
-        Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
+        Into https://ourworldindata.org/grapher/life-expectancy.png
         """
-        return f"{self.site}/grapher/thumbnail/{slug}.png"
+        return f"{self.site}/grapher/{slug}.png"
 
     def indicator_metadata_url(self, variable_id):
         return f"{self.indicators_url}/{variable_id}.metadata.json"

@@ -13,9 +13,9 @@ so the two compose:
 Without `--emit`, only the human-readable report is printed (stdout stays clean of JSON).
 The report goes to stderr so it stays visible when piping.
 
-Configs are read from the PUBLIC DATASETTE, i.e. production — which is the state a
-staging DB was cloned from. That is deliberate: it reflects the pre-run baseline even if
-an earlier run already touched staging.
+Configs are read from the internal Datasette's copy of production (reachable only over
+Tailscale) — which is the state a staging DB was cloned from. That is deliberate: it
+reflects the pre-run baseline even if an earlier run already touched staging.
 """
 
 import argparse
@@ -23,6 +23,7 @@ import json
 import sys
 import urllib.parse
 
+from etl.analytics.config import OWID_DATASETTE_JSON_URL
 from etl.http import session
 
 # Any GDP-per-capita variable, current or superseded: a source's non-GDP indicator is
@@ -37,7 +38,7 @@ def chart_id_from_url(url: str) -> int:
 
 
 def datasette(sql: str) -> list[dict]:
-    url = "https://datasette-public.owid.io/owid.json?" + urllib.parse.urlencode({"sql": sql, "_shape": "array"})
+    url = f"{OWID_DATASETTE_JSON_URL}?" + urllib.parse.urlencode({"sql": sql, "_shape": "array"})
     r = session.get(url, timeout=90)
     r.raise_for_status()
     return r.json()

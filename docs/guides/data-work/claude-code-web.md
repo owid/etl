@@ -24,10 +24,11 @@ power users).
 1. Open <https://claude.ai/code>.
     - **First-time users** are redirected to an onboarding flow: use the name
       `etl` and **`Full`** network access. `Trusted` blocks our own hosts —
-      `datasette-public.owid.io`, `api.ourworldindata.org` and
-      `catalog.ourworldindata.org` are all refused — which quietly breaks
-      indicator lookups and `etl diff`, and the failure looks like an
-      authentication error rather than a network one.
+      `api.ourworldindata.org`, `catalog.ourworldindata.org` and
+      `files.ourworldindata.org` are all refused, as is `extensions.duckdb.org`,
+      which DuckDB needs to read `public.duckdb`. That quietly breaks indicator
+      lookups and `etl diff`, and the failure looks like an authentication
+      error rather than a network one.
     - **Existing users** won't see onboarding: click the environment selector
       (":cloud: Default") above the chat input and create a new `etl`
       environment with the same settings.
@@ -67,7 +68,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # hard-codes absolute paths — but sessions rebuild it in seconds from cache.)
 git clone --depth 1 https://github.com/owid/etl /opt/etl-setup
 cd /opt/etl-setup
-uv sync --all-extras --group dev
+uv sync --frozen --all-extras --group dev
 ```
 
 Sessions still build their own `.venv` via `scripts/remote_setup.sh`, wired as a

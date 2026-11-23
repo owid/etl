@@ -14,10 +14,11 @@ Surfaces scanned:
     guided chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show
     one of them in their `grapher-url` or `narrative-chart` front matter
 
-References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
-mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
-merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead (needs the
-staging network); entries whose staging text differs from the production mirror are flagged.
+References and DoD text are read from the internal Datasette's copy of production (no DB credentials needed, but
+reachable only over Tailscale; the copy holds only published charts and can lag production by a few days). A DoD
+edited on the branch's staging server reaches production only on merge, so pass `--staging <branch>` to read the DoD
+text from that staging server's MySQL instead (needs the staging network); entries whose staging text differs from the
+production copy are flagged.
 
 Usage:
     .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <namespace>/<version>/<short_name>
@@ -31,9 +32,9 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from etl.analytics.config import OWID_DATASETTE_JSON_URL
 from etl.http import session
 
-DATASETTE = "https://datasette-public.owid.io/owid.json"
 REPO = Path(__file__).resolve().parents[4]
 # A DoD link is `[text](#dod:<name>)`; names can contain colons, so match up to the closing parenthesis.
 DOD_RE = re.compile(r"#dod:\s*([^\s)\]\"'\\]+)")
@@ -50,6 +51,12 @@ def main() -> None:
     args = parser.parse_args()
     parts = args.step.replace("data://", "").strip("/").split("/")
     namespace, version, short_name = parts[-3:]
+    print(collect(namespace, version, short_name, args.staging))
+
+
+def collect(namespace: str, version: str, short_name: str, staging: str | None = None) -> str:
+    """The Markdown listing of every DoD the dataset's readers see (see the module docstring)."""
+    out: list[str] = []
 
     # DoD name -> set of surfaces that reference it.
     refs: dict[str, set[str]] = defaultdict(set)
@@ -60,7 +67,7 @@ def main() -> None:
         for name in _dods_in_local_dataset(local):
             refs[name].add(f"indicator metadata (local build of {namespace}/{version}/{short_name})")
     else:
-        print(f"Note: no local grapher build at {local}; only published text is scanned.\n")
+        out.append(f"Note: no local grapher build at {local}; only published text is scanned.\n")
 
     # Indicator metadata and charts on production, for any version of the dataset.
     variables = _query(
@@ -138,7 +145,7 @@ def main() -> None:
     # Slugs posts can use for those charts: the current one, old slugs that redirect to it, the slugs of the MDims
     # whose views show the dataset (an MDim embed targets the MDim's slug, not a standalone chart's), the slugs of
     # those explorers, and retired chart or explorer slugs that redirect into one of the MDim views.
-    redirect_slugs, gap = _mdim_redirect_slugs(view_config_ids, args.staging)
+    redirect_slugs, gap = _mdim_redirect_slugs(view_config_ids, staging)
     gaps = [gap] if gap else []
     dataset_slugs = (
         f"SELECT c.slug FROM charts c WHERE c.id IN ({dataset_charts}) "
@@ -203,44 +210,44 @@ def main() -> None:
         refs[row["dod"].strip()].add(f"data-insight {row['gdoc']}")
 
     if not refs:
-        print("No DoD references found.")
-        return
+        return "\n".join(out + ["No DoD references found."])
 
     # Fetch the DoD text from production, and from the staging server when asked.
     names = ",".join(f"'{n}'" for n in sorted(refs))
     dods = {r["name"]: r for r in _query(f"SELECT name, updatedAt, content FROM dods WHERE name IN ({names})")}
     source = "production"
-    if args.staging:
+    if staging:
         from etl.config import OWIDEnv
 
         production = dods
-        staging = OWIDEnv.from_staging(args.staging)
-        df = staging.read_sql(
+        staging_env = OWIDEnv.from_staging(staging)
+        df = staging_env.read_sql(
             "SELECT name, updatedAt, content FROM dods WHERE name IN %(n)s", params={"n": tuple(refs)}
         )
         dods = {r["name"]: r for r in df.to_dict("records")}
         for name, row in dods.items():
             if production.get(name, {}).get("content", "").strip() != (row["content"] or "").strip():
                 row["note"] = "staging text differs from the production mirror"
-        source = f"staging server {staging.conf.DB_HOST}"
+        source = f"staging server {staging_env.conf.DB_HOST}"
 
-    print(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
-    print(f"DoD text from {source}.\n")
+    out.append(f"# DoDs referenced by {namespace}/{short_name} ({len(refs)} names, {len(charts)} published charts)\n")
+    out.append(f"DoD text from {source}.\n")
     for note in gaps:
-        print(f"Not scanned: {note}\n")
+        out.append(f"Not scanned: {note}\n")
     missing = sorted(set(refs) - set(dods))
     if missing:
-        print("## Referenced but missing from the dods table (broken links)\n")
+        out.append("## Referenced but missing from the dods table (broken links)\n")
         for name in missing:
-            print(f"- {name}: {', '.join(sorted(refs[name])[:5])}")
-        print()
+            out.append(f"- {name}: {', '.join(sorted(refs[name])[:5])}")
+        out.append("")
     for name in sorted(dods):
         surfaces = sorted(refs[name])
         shown = ", ".join(surfaces[:5]) + (f", and {len(surfaces) - 5} more" if len(surfaces) > 5 else "")
         note = f"; {dods[name]['note']}" if dods[name].get("note") else ""
-        print(f"## {name} (last edited {dods[name]['updatedAt']}{note})\n")
-        print(f"Referenced from: {shown}\n")
-        print(dods[name]["content"].strip() + "\n")
+        out.append(f"## {name} (last edited {dods[name]['updatedAt']}{note})\n")
+        out.append(f"Referenced from: {shown}\n")
+        out.append(dods[name]["content"].strip() + "\n")
+    return "\n".join(out)
 
 
 def _dods_in_local_dataset(path: Path) -> set[str]:
@@ -283,7 +290,7 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
 def _mdim_redirect_slugs(view_config_ids: set[str], staging: str | None) -> tuple[set[str], str]:
     """Retired chart or explorer slugs that redirect into the given MDim views, and a gap note if unreadable.
 
-    `multi_dim_redirects` is not in the public Datasette mirror, so it is read from the staging server's MySQL
+    `multi_dim_redirects` is not in the Datasette copy, so it is read from the staging server's MySQL
     (a copy of production from when the server was created) when `--staging` is given.
     """
     if not view_config_ids:
@@ -291,7 +298,7 @@ def _mdim_redirect_slugs(view_config_ids: set[str], staging: str | None) -> tupl
     if not staging:
         return set(), (
             "posts that still use a retired chart or explorer slug redirecting into an MDim view "
-            "(`multi_dim_redirects` is not in the public mirror; pass `--staging <branch>` to include them)."
+            "(`multi_dim_redirects` is not in the Datasette copy; pass `--staging <branch>` to include them)."
         )
     from etl.config import OWIDEnv
 
@@ -346,20 +353,25 @@ def _sql_list(values) -> str:
 
 
 def _query(sql: str) -> list[dict]:
-    """Run a read-only query against the public Datasette mirror of production.
+    """Run a read-only query against the internal Datasette's copy of production.
 
-    Datasette returns at most 1,000 rows per query (and flags the result as truncated), so page through it.
+    Datasette returns at most 1,000 rows per query (and flags the result as truncated), so page through it. Each page
+    re-runs the query, and each run must finish within Datasette's 1 s time limit.
     """
     rows: list[dict] = []
     page_size = 1000
     while True:
         paged = f"SELECT * FROM ({sql}) AS q ORDER BY 1 LIMIT {page_size} OFFSET {len(rows)}"
-        response = session.get(DATASETTE, params={"sql": paged, "_shape": "objects"}, timeout=120)
-        response.raise_for_status()
-        data = response.json()
-        # A failed query still returns `rows: []`, so check the error flag, not just the key.
-        if data.get("ok") is False or data.get("error") or "rows" not in data:
-            raise RuntimeError(f"Datasette query failed: {data.get('error', data)}")
+        response = session.get(OWID_DATASETTE_JSON_URL, params={"sql": paged, "_shape": "objects"}, timeout=120)
+        try:
+            data = response.json()
+        except ValueError:
+            response.raise_for_status()
+            raise
+        # A failed query (an SQL error, or "SQL Interrupted" at the time limit) comes back as JSON with `rows: []`
+        # and HTTP 400, so check the error flag, not just the key, and keep Datasette's message.
+        if not response.ok or data.get("ok") is False or data.get("error") or "rows" not in data:
+            raise RuntimeError(f"Datasette query failed ({data.get('title', response.status_code)}): {data.get('error', data)}")
         rows.extend(data["rows"])
         if len(data["rows"]) < page_size:
             return rows

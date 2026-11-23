@@ -104,12 +104,12 @@ jobs:
         echo "✅ Version $CURRENT_VERSION not found on PyPI, proceeding with publish"
 
     - name: Set up Python
-      uses: actions/setup-python@v7.0.0
+      uses: actions/setup-python@v7.1.0
       with:
         python-version: '3.x'
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@v10.3.0
+      uses: astral-sh/setup-uv@v10.3.3
       with:
         # Caching is disabled in this release pipeline to avoid cache-poisoning
         # of the published package artifact (zizmor cache-poisoning audit).

@@ -33,7 +33,7 @@ The admin host that gets written to is `OWID_ENV.admin_api`, which auto-resolves
 
 ## Pre-flight: GDP version check
 
-Before processing any rows, the script queries `variables` for the latest id matching each canonical GDP-per-capita `catalogPath` pattern (`worldbank_wdi/.../ny_gdp_pcap_pp_kd`, `ggdc/.../maddison_project_database#gdp_per_capita`, `ggdc/.../penn_world_table#rgdpo_pc`). If the latest id differs from the one hardcoded in `GDP_SOURCES`, a `WARN` is printed at the top of stdout with the newer id and catalogPath. The script does NOT auto-switch — update `GDP_SOURCES` (and the `feedback_scatter_gdp_picker` memory) deliberately if the new version is the one we want.
+Before processing any rows, the script queries `variables` for the latest id matching each canonical GDP-per-capita `catalogPath` pattern (`worldbank_wdi/.../ny_gdp_pcap_pp_kd`, `ggdc/.../maddison_project_database#gdp_per_capita`, `ggdc/.../penn_world_table#rgdpo_pc`). If the latest id differs from the one hardcoded in `GDP_SOURCES`, a `WARN` is printed at the top of stdout with the newer id and catalogPath. The script does NOT auto-switch — update `GDP_SOURCES` deliberately if the new version is the one we want.
 
 **Read that WARN before the run, not after.** These ids go stale on every WDI update, and the "target already has `x` → leave it" guard means a re-run will **not** repair a target that already received the stale variable — the `x` dimension has to be rewritten directly, chart by chart. Cross-check against the id the source scatters actually plot: if the sources are on a newer version than `GDP_SOURCES`, the newer one is what you want, and bumping first saves a repair pass.
 
@@ -194,7 +194,7 @@ compound case where the loss lands where no query string reaches.
 
 ## Run this as a checklist in the chat
 
-**Create a `TodoWrite` list covering the WHOLE migration on the first step, before touching anything** — not just the part being worked on now. This migration's failure mode is not getting a step wrong, it is losing a step: the work spans two scripts, a human review round, a merge, and a production run, with days between them. Anything not on the list from the start gets discovered later by a reader hitting a 404 or an article rendering the wrong tab.
+**Write a task list covering the WHOLE migration on the first step, before touching anything** — not just the part being worked on now. This migration's failure mode is not getting a step wrong, it is losing a step: the work spans two scripts, a human review round, a merge, and a production run, with days between them. Anything not on the list from the start gets discovered later by a reader hitting a 404 or an article rendering the wrong tab.
 
 So **the reference sweep and Part 2 go on the list as pending from the very beginning**, even when the request is only "add the scatter views". They are the two that get forgotten, and they are the two that break things for readers.
 
@@ -228,7 +228,7 @@ Keep the list alive across turns: carry the untouched items forward rather than 
    echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py
    ```
 
-   It reads each target's **production** config (the state a staging DB was cloned from, so the baseline holds even if an earlier run already touched staging) and checks the four conditions from "Picking targets": published, not already a `ScatterPlot`, not stacked-family, exactly one `y` dimension, and that `y` is the source's non-GDP indicator. Report the blocked rows to the user and drop them. Add `--emit` to pipe the runnable subset straight into the applier:
+   It reads each target's **production** config from the internal Datasette, so it needs Tailscale (the state a staging DB was cloned from, so the baseline holds even if an earlier run already touched staging) and checks the four conditions from "Picking targets": published, not already a `ScatterPlot`, not stacked-family, exactly one `y` dimension, and that `y` is the source's non-GDP indicator. Report the blocked rows to the user and drop them. Add `--emit` to pipe the runnable subset straight into the applier:
 
    ```bash
    echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py --emit \
@@ -259,7 +259,7 @@ Keep the list alive across turns: carry the untouched items forward rather than 
 
 - **Stacked-family chartTypes** (`StackedArea` / `StackedBar` / `StackedDiscreteBar`) without any line-family entry → `SKIPPED`. The user must redesign the chart manually.
 - **Target already has `x`/`color`/`size`** → leave it, like the admin's `if (!hasX)` does. The script will not overwrite an existing dimension.
-- **Target is itself already a `ScatterPlot`** → the row is worthless and can be actively harmful, so **screen these out of the input before running**. A chart config holds exactly one `x` dimension, so a chart already scattering against some other variable can never also plot GDP: the guard above leaves `x` alone, the row still reports `OK`, and no GDP dimension is added. Worse, if the target's y differs from the source's, step 7 stamps the source's y `display.name` onto a different indicator. This is not a status the script reports — verify it yourself.
+- **Target is itself already a `ScatterPlot`** → the row is worthless and can be actively harmful, so **screen these out of the input before running**. A chart config holds exactly one `x` dimension, so a chart already scattering against some other variable can never also plot GDP: the guard above leaves `x` alone, the row still reports `OK`, and no GDP dimension is added. Worse, if the target's y differs from the source's, item 6 stamps the source's y `display.name` onto a different indicator. This is not a status the script reports — verify it yourself.
 
 ## Picking targets
 

@@ -133,8 +133,8 @@ steps:
   data://grapher/agriculture/2026-03-02/long_term_crop_yields:
     - data://garden/agriculture/2026-03-02/long_term_crop_yields
 
-  # Crop yields explorer (uses attainable yields).
-  viz://explorer/agriculture/latest/crop_yields:
+  # Crop yields multidim (shown as a data explorer).
+  viz://chart/agriculture/latest/crop_yields:
     # Attainable yields.
     - data://grapher/agriculture/2026-03-02/attainable_yields:
       - data://garden/agriculture/2026-03-02/attainable_yields:
@@ -203,3 +203,9 @@ steps:
       - data://meadow/sea_around_us/2026-10-24/fish_catch:
         - snapshot://sea_around_us/2026-10-24/fish_catch.csv
       - data://garden/regions/2023-01-01/regions
+
+  # Global Hunger Index.
+  data://grapher/food/2026-11-12/global_hunger_index:
+    - data://garden/food/2026-11-12/global_hunger_index:
+      - data://meadow/food/2026-11-12/global_hunger_index:
+        - snapshot://food/2026-11-12/global_hunger_index.xlsx

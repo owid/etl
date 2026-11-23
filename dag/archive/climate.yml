@@ -3491,3 +3491,7 @@ steps:
   # archived; last active in 29917e47d58b on 2026-11-11
   data://grapher/climate/2026-10-12/climate_change_impacts_monthly:
     - data://garden/climate/2026-10-12/climate_change_impacts
+  # archived; last active in 512cf07630dc on 2026-11-17
+  viz://explorer/climate/latest/climate_change:
+    - data://grapher/climate/2026-11-11/climate_change_impacts_monthly
+    - data://grapher/climate/2026-11-11/climate_change_impacts_annual

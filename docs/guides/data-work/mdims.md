@@ -17,7 +17,7 @@ MDIMs and Explorer (simply referred t as "MDIMs" from now on) steps are [viz ste
 These have a similar structure to regular steps. They write to the grapher DB with the `--grapher` flag (without it, the step only writes the expanded config under `viz/`):
 
 ```bash
-etlr viz://explorer/minerals/latest/minerals --grapher
+etlr viz://chart/minerals/latest/minerals --grapher
 ```
 
 Instead of creating a `Dataset` object, these create `Chart` or `Explorer` objects and save them to the database. Both share the same data structure (class `Chart`, see [:fontawesome-brands-github: `etl.viz.chart.model`](https://github.com/owid/etl/blob/master/etl/viz/chart/model/core.py)); `Explorer` is a subclass with minor differences due to legacy reasons.
@@ -46,8 +46,8 @@ MDIMs can be crafted in various ways, going from totally manual to fully automat
 
 Below is a simple MDIM configuration file (modified for demo purposes):
 
-```yaml title="etl/steps/viz/chart/covid/latest/covid.deaths.yml"
-grapher_schema: "011"
+```yaml title="etl/steps/viz/chart/covid/latest/deaths.config.yml"
+grapher_schema: "012"
 title:
   title: COVID-19 confirmed deaths
   title_variant: ""
@@ -114,9 +114,11 @@ In this example, we note that we can group together indicators from any dataset.
     Two forms are accepted — the short version, or the full URL:
 
     ```yaml
-    grapher_schema: "011"
-    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json
+    grapher_schema: "012"
+    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.012.json
     ```
+
+    A new MDIM pins the current version, `DEFAULT_GRAPHER_SCHEMA_VERSION` in `etl/config.py`.
 
     **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
 
@@ -130,10 +132,10 @@ In this example, we note that we can group together indicators from any dataset.
 
     | Where | Key | Value |
     |---|---|---|
-    | config YAML | `grapher_schema` | `"011"` |
-    | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"011"` |
-    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
-    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.011.json` |
+    | config YAML | `grapher_schema` | `"012"` |
+    | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"012"` |
+    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.012.json` |
+    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.012.json` |
 
     The generated JSON keeps the authored short form because `ChartSet.read()` loads it back through `Chart.from_dict`; only the upsert payload is camelized and resolved to a full URL. So grepping the generated JSON for `grapherConfigSchema` finds nothing even when the pin is working perfectly.
 
@@ -330,7 +332,6 @@ The same helpers work for explorers: call `paths.create_explorer` instead of `pa
 - [:fontawesome-brands-github:  Population and Demography](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/un/latest/un_wpp.py): Configuration automatically generated (mostly) from dimensions, using `expand_config` and other tools. This one is a good example for explorers with a large number of views.
 - [:fontawesome-brands-github:  COVID-19](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/covid/latest/covid.config.yml): Manually crafted.
 - [:fontawesome-brands-github:  Monkeypox](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/monkeypox.py): Manually crafted.
-- [:fontawesome-brands-github:  Climate change](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/climate/latest/climate_change.config.yml): Manually crafted.
 
 ### How are explorers saved in admin?
 Like MDIMs, explorers are upserted to the grapher DB when calling `.save()`. Staging servers write to their own DB, and production is updated when the PR is merged.
