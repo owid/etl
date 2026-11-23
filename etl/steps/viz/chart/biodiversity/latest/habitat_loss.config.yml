@@ -27,6 +27,11 @@ definitions:
         hasMapTab: true
         tab: map
         baseColorScheme: owid-distinct
+        # The explorer hides the time span and entity in its titles.
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
     # Map color scales, from the explorer's colorScaleScheme and colorScaleNumericBins
     # (the first value is the minimum of the first bin).
     - dimensions:
