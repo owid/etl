@@ -1,5 +1,6 @@
 # Force re-run
 from etl.helpers import PathFinder
+from etl.viz.chart.download_link import add_download_link
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -14,6 +15,11 @@ MOBILITY_CONFIG_DEFAULT = {
     "hideAnnotationFieldsInTitle": {"time": True},
     "addCountryMode": "change-country",
 }
+
+
+# Interim download link for the COVID-19 data explorer (see etl/viz/chart/download_link.py).
+COVID_DOWNLOAD_URL = "https://docs.owid.io/projects/etl/api/covid/"
+COVID_DOWNLOAD_TEXT = "Download our complete COVID-19 dataset [from our data catalog]({url})."
 
 
 def run() -> None:
@@ -39,6 +45,10 @@ def run() -> None:
 
         ## Create and save chart
         c = paths.create_chart(config=config, short_name=fname_to_short_name(fname))
+        if fname == "covid.explorer.yml":
+            # The explorer it replaces has a download button; keep pointing at the same page
+            # until grapher links to the multidim's own download package.
+            add_download_link(c, url=COVID_DOWNLOAD_URL, text=COVID_DOWNLOAD_TEXT)
         c.save()
 
     # PART 2: Chart hybridly generated (YAML file + programmatic config)
