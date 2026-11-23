@@ -35,7 +35,7 @@ They don't work in the ETL, and that holds from the first message to the last, a
 
 Start from any chart links, catalog paths or indicator IDs they gave; otherwise build an empty page. Indicators described only in words are not looked up: ask for a chart link. The page only knows indicators that are already live.
 
-**Look for an MDim that already uses these indicators** before building the page: of the `viz://chart` steps in `dag/` that depend on each one's grapher dataset, check which have views on it; a step with a `.py` builds its views from table columns, so searching for `<table>#<indicator>` alone misses it. An MDim that was merged but never published shows up nowhere else, since the public Datasette and the live site only know published ones. If there is one, tell the person what it contains and who made it, and ask whether to build on it (change that step in a new PR, from step 5c on, since the page can't open it) or to make a separate MDim.
+**Look for an MDim that already uses these indicators** before building the page: of the `viz://chart` steps in `dag/` that depend on each one's grapher dataset, check which have views on it; a step with a `.py` builds its views from table columns, so searching for `<table>#<indicator>` alone misses it. An MDim that was merged but never published shows up nowhere else, since the internal Datasette and the live site only know published ones. If there is one, tell the person what it contains and who made it, and ask whether to build on it (change that step in a new PR, from step 5c on, since the page can't open it) or to make a separate MDim.
 
 Write the draft to `ai/mdim_simulator/<name>.setup.yml` (`<name>` a short kebab-case name) in the format the page copies out: the multidim config of `/create-chart`, but with full catalog paths (`grapher/<namespace>/<version>/<dataset>/<table>#<indicator>`) and a `slug:`. `state_from_setup` in `build.py` shows what the page reads, and the build stops with a clear message on anything it can't use.
 
@@ -43,7 +43,7 @@ Write the draft to `ai/mdim_simulator/<name>.setup.yml` (`<name>` a short kebab-
 - **Without a chart link,** set `default_selection` to countries or regions every indicator has data for (`dimensions.entities` in the metadata JSON). Left out, the page ticks World and the six continents, which many indicators don't have.
 - **Topic tags** come from the indicators' `presentation.topicTagsLinks`.
 
-**Agree the web address before building the page.** Propose one from the title, checked free: absent from `chart_configs.slug`, `chart_slug_redirects.slug`, `multi_dim_data_pages.slug` and `redirects.source` (as `/grapher/<slug>`) in the public Datasette, and `https://ourworldindata.org/grapher/<slug>` returning 404, which also catches redirects to other MDims (`multi_dim_redirects`, not in the public Datasette). It goes in the draft as `slug:` and pre-fills the page's "Web address" field, where they can still change it.
+**Agree the web address before building the page.** Propose one from the title, checked free: absent from `chart_configs.slug`, `chart_slug_redirects.slug`, `multi_dim_data_pages.slug` and `redirects.source` (as `/grapher/<slug>`) in the internal Datasette, and `https://ourworldindata.org/grapher/<slug>` returning 404, which also catches redirects to other MDims (`multi_dim_redirects`, not in the internal Datasette). It goes in the draft as `slug:` and pre-fills the page's "Web address" field, where they can still change it.
 
 ## 3. Build and open the page
 

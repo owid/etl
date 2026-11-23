@@ -228,7 +228,7 @@ so the DB path reports *"Staging server … is not reachable. Run `etl pr` first
 staging build to finish"* — which invites waiting for something that will never arrive here. Don't
 wait, and don't run `etl pr` for it. Fall back to the read-only routes in
 [cloud-sandbox.md](../../docs/cloud-sandbox.md) —
-`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, the public Datasette
+`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, public.duckdb
 for `variables` and `chart_dimensions` — or ask the user to run the resolver locally and paste the
 output. This is a fallback for one environment, not a replacement: use the resolver with its DB
 wherever MySQL is reachable, since it does strictly more than the fallbacks do.
@@ -236,8 +236,8 @@ wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
 1. The grapher `static_viz` table carries a **`grapherSlug`** column. That gives a slug, and the
-   slug goes through the resolver above. Note this table is **not** mirrored to the public
-   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
+   slug goes through the resolver above. Note this table is **not** in the internal Datasette or public.duckdb,
+   so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
    cloud session cannot reach it either, and the slug has to come from the user.
 2. `ai/static_viz_popularity/static_viz_popular.csv` gives rank, the pages it appears on, views,
    authors and tags — useful context, but it has **no slug or indicator column**, so it cannot

@@ -338,7 +338,7 @@ Silent data corruption is one of the easier bugs to miss: a step can run cleanly
 
 ## Querying MySQL, and verifying charts on staging
 
-Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the public Datasette, and the staging indicator/SVG endpoints.
+Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the internal Datasette (over Tailscale; `public.duckdb` off the tailnet), and the staging indicator/SVG endpoints.
 
 ## Package Management
 
