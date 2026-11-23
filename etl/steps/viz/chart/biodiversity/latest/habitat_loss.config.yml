@@ -87,8 +87,17 @@ dimensions:
         name: Optimise trade
     presentation:
       type: dropdown
+  - slug: projected_change_by_2050
+    name: Projected change by 2050
+    choices:
+      - slug: species_habitat_loss
+        name: Species habitat loss
+      - slug: cropland_area
+        name: Cropland area
+    presentation:
+      type: toggle-buttons
   - slug: species_group
-    name: Species Group
+    name: Species group
     choices:
       - slug: all_vertebrates
         name: All vertebrates
@@ -99,18 +108,10 @@ dimensions:
       - slug: amphibians
         name: Amphibians
       - slug: na
-        name: ''
+        name: Not applicable
+        description: Cropland area is not broken down by species.
     presentation:
-      type: toggle-buttons
-  - slug: projected_change_by_2050
-    name: Projected change by 2050
-    choices:
-      - slug: species_habitat_loss
-        name: Species habitat loss
-      - slug: cropland_area
-        name: Cropland area
-    presentation:
-      type: toggle-buttons
+      type: dropdown
 views:
   - dimensions:
       scenario: business_as_usual
