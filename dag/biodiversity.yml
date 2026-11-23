@@ -45,7 +45,11 @@ steps:
     - data://garden/biodiversity/2026-09-30/living_planet_index_completeness:
       - snapshot://biodiversity/2026-09-30/living_planet_index_completeness.csv
 
-  # Habitat loss
+  # Habitat loss multidim (shown as a data explorer).
+  viz://chart/biodiversity/latest/habitat_loss:
+    - data://grapher/biodiversity/2021-01-01/habitat_loss
+
+  # Habitat loss explorer.
   viz://explorer/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss:
       - data://garden/biodiversity/2021-01-01/habitat_loss:
