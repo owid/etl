@@ -312,7 +312,7 @@ THE WORLD IN 1968
 -----------------
 This dataset provides historical data for the World waterfall in 1968. The calculated food supply is about
 2,330 kcal per person per day. Recorded feed is about 1,120 kcal per person per day, and animal production is
-about 440 kcal per person per day.
+about 450 kcal per person per day.
 
 The limitations described above also apply to 1968: feed excludes grass and oilseed cakes, and the net processing
 stage includes nutrients in cakes that are used as feed.

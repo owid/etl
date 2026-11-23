@@ -115,9 +115,10 @@ included:
   - {code: 2766, name: "Cephalopods", role: animal}
   - {code: 2767, name: "Molluscs, Other", role: animal}
   - {code: 2769, name: "Aquatic Animals, Others", role: animal}
-  # Fish oils (made from fish).
-  - {code: 2781, name: "Fish, Body Oil", role: processed}
-  - {code: 2782, name: "Fish, Liver Oil", role: processed}
+  # Fish oils. FBS records no fish going into processing, so they count as animal products, like the fish they come
+  # from (as in the SCL chain).
+  - {code: 2781, name: "Fish, Body Oil", role: animal}
+  - {code: 2782, name: "Fish, Liver Oil", role: animal}
 
 # Individual items deliberately left out of the chain. Each is asserted to exist in the input table, so that a
 # change at FAO does not go unnoticed, but contributes to no stage.
