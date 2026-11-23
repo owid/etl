@@ -39,18 +39,23 @@ definitions:
           - "This is a reasonable measure of whether someone is of a healthy metabolic weight, but it has limitations. Someone's body composition can affect their weight; for example, athletes with a high muscle mass may be defined as overweight on the BMI scale, despite having relatively low levels of body fat, and being metabolically healthy. The BMI scale is also not appropriate for pregnant women."
           - "Alternative measures that capture metabolic health include waist circumference."
     # Each metric gets its own map palette, avoiding blues and greens since higher is worse.
+    # Bins are fixed per metric, so maps for men, women and all adults (and both age measures) are comparable.
     - dimensions:
         metric: obesity
       config:
         map:
           colorScale:
             baseColorScheme: "OrRd"
+            binningStrategy: "manual"
+            customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
     - dimensions:
         metric: overweight
       config:
         map:
           colorScale:
             baseColorScheme: "RdPu"
+            binningStrategy: "manual"
+            customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 dimensions:
   - slug: metric
     name: "Metric"
