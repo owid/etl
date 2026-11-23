@@ -4,9 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Food Supply
-      grapher_config:
-        note: |-
-          Calories and protein are estimated by Our World in Data from FAOSTAT data in tonnes. Imports and exports include animal products. Feed excludes grass, and animal products include wild-caught fish. Food available for consumption does not account for food waste at the consumer level.
     description_processing: |-
       - FAOSTAT's Food Balance Sheets (FBS) dataset gives only the food available in calories and protein; every other part of the chain is in tonnes. We convert those tonnes into calories and protein using FAOSTAT's own nutrient densities: each product's food calories (or protein) divided by its food tonnes, for each country and year.
       - Where a density can't be calculated, or is impossible (more calories than pure fat), we use the median density of that product in the same country, or else in all countries.
