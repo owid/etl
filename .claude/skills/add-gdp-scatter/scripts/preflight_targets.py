@@ -13,17 +13,20 @@ so the two compose:
 Without `--emit`, only the human-readable report is printed (stdout stays clean of JSON).
 The report goes to stderr so it stays visible when piping.
 
-Configs are read from the PUBLIC DATASETTE, i.e. production — which is the state a
+Configs are read from PUBLIC.DUCKDB, the nightly copy of production — which is the state a
 staging DB was cloned from. That is deliberate: it reflects the pre-run baseline even if
 an earlier run already touched staging.
+
+Run it with `uv run --no-sync --with duckdb python ...`: the etl venv has no duckdb.
 """
 
 import argparse
 import json
 import sys
-import urllib.parse
 
-from etl.http import session
+import duckdb
+
+from etl.http import HEADERS
 
 # Any GDP-per-capita variable, current or superseded: a source's non-GDP indicator is
 # whatever is NOT in here. Kept deliberately broad so an older source still resolves.
@@ -36,11 +39,12 @@ def chart_id_from_url(url: str) -> int:
     return int(url.split(CHART_ID_SEP)[1].split("/")[0])
 
 
-def datasette(sql: str) -> list[dict]:
-    url = "https://datasette-public.owid.io/owid.json?" + urllib.parse.urlencode({"sql": sql, "_shape": "array"})
-    r = session.get(url, timeout=90)
-    r.raise_for_status()
-    return r.json()
+def public_db(sql: str) -> list[dict]:
+    con = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
+    con.execute("ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid")
+    cur = con.execute(sql)
+    cols = [c[0] for c in cur.description]
+    return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
 def log(msg: str) -> None:
@@ -58,7 +62,7 @@ def main() -> int:
     ids = sorted({i for src, tgt, _ in pairs for i in (src, tgt)})
     cfgs = {
         r["id"]: r
-        for r in datasette(
+        for r in public_db(
             "select c.id, cc.slug, json_extract_string(cc.config,'$.chartTypes') as types, "
             "json_extract_string(cc.config,'$.dimensions') as dims, "
             "json_extract_string(cc.config,'$.isPublished') as pub "

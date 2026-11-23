@@ -605,7 +605,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    **Run it once the garden step is built, as two background lanes:**
    ```bash
-   .venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<new_version>/<short_name> --context update
+   uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<new_version>/<short_name> --context update
    ```
    The command prints a dossier (steps, origins, the producer's documentation saved as text, the indicators ranked by chart views, the anomaly candidates, the DoDs) and writes two briefs. Start both briefs as background agents **in one message**, each with the prompt `Read <brief> and do what it says.`, and go on with 6d while they run. When both are back, settle the notes each lane left for the other and run the `assemble_report.py` command the dossier prints. Fold the findings in before the commit and the PR description, so the fixes land in this PR. Go deeper on red flags (large unexplained churn, an in-place source revision, a new producer, editorial claims riding on specific values): run the command again with a larger `--top` or with `--indicators`; the documentation is reused.
 

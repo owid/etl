@@ -7,9 +7,9 @@ One agent, a handful of turns: a first check fits in about ten, a re-check of ch
 ## 1. Prepare, in the first message
 
 ```bash
-.venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py --brief <path to check_facts.md>
+uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/prepare.py --brief <path to check_facts.md>
 # or, without a brief:
-.venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py --chart <slug or link> --strings <file> [--data <csv>]
+uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/prepare.py --chart <slug or link> --strings <file> [--data <csv>]
 ```
 
 Send it together with the `ToolSearch` that loads `WebSearch` and `WebFetch`. The dossier holds the chart's own texts, the indicators behind it with their metadata, the steps and `.dvc` origins, the producer's documentation saved as text, the live check of the source files, the corrections on these indicators, each string with the numbers it states matched against the displayed data, and each series' first and last value with the change between them.

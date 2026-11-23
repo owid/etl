@@ -1,0 +1,7 @@
+# Decisions: query-grapher-db
+
+Calls still in force, each with its reason and the case that caused it. Read before changing the skill.
+
+- **A skill, not a section of the root `CLAUDE.md`.** Querying MySQL and verifying charts on staging matter only in some sessions, so the guidance loads on demand and only a one-line pointer stays in `CLAUDE.md`. Case: #6542, which moved it out to trim always-loaded context.
+- **Production goes through `public.duckdb`, read in place over HTTP, not through a hosted query service.** The public Datasette that served the same tables was stopped after a security incident, and every consumer was moved off it so that bringing it back is a separate decision. `public.duckdb` is a static file on `files.ourworldindata.org`, with the same tables and the same DuckDB dialect, so existing SQL keeps working. Case: the PR that adds this file (ops#884's independence step).
+- **Python runs with `uv run --no-sync --with duckdb`, and duckdb stays out of the etl venv.** Adding it to `pyproject.toml` is a dependency change for everyone; the overlay costs nothing, and `--no-sync` keeps `uv run` from pruning the venv's optional extras (see "Package Management" in `CLAUDE.md`). Case: the same PR.

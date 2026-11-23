@@ -225,13 +225,13 @@ Keep the list alive across turns: carry the untouched items forward rather than 
 2. **Pre-flight every row before writing anything** with `scripts/preflight_targets.py`. The applier does not validate that a target *can* take a scatter view — it returns `OK` on rows that change nothing useful — so this check has to happen first:
 
    ```bash
-   echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py
+   echo '<JSON>' | uv run --no-sync --with duckdb python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py
    ```
 
-   It reads each target's **production** config (the state a staging DB was cloned from, so the baseline holds even if an earlier run already touched staging) and checks the four conditions from "Picking targets": published, not already a `ScatterPlot`, not stacked-family, exactly one `y` dimension, and that `y` is the source's non-GDP indicator. Report the blocked rows to the user and drop them. Add `--emit` to pipe the runnable subset straight into the applier:
+   It reads each target's **production** config from public.duckdb (the state a staging DB was cloned from, so the baseline holds even if an earlier run already touched staging; `--with duckdb` because the etl venv has none, `--no-sync` so it leaves the venv untouched) and checks the four conditions from "Picking targets": published, not already a `ScatterPlot`, not stacked-family, exactly one `y` dimension, and that `y` is the source's non-GDP indicator. Report the blocked rows to the user and drop them. Add `--emit` to pipe the runnable subset straight into the applier:
 
    ```bash
-   echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py --emit \
+   echo '<JSON>' | uv run --no-sync --with duckdb python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py --emit \
      | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/apply_scatter_defaults.py
    ```
 

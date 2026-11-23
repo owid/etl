@@ -14,26 +14,30 @@ Surfaces scanned:
     guided chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show
     one of them in their `grapher-url` or `narrative-chart` front matter
 
-References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
-mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
+References and DoD text are read from public.duckdb, the public copy of production (no DB credentials needed; it is
+exported nightly, so it lags production). A DoD edited on the branch's staging server reaches production only on
 merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead (needs the
 staging network); entries whose staging text differs from the production mirror are flagged.
 
-Usage:
-    .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <namespace>/<version>/<short_name>
-    .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<version>/<short_name> --staging <branch>
+Usage (the etl venv has no duckdb: `--with duckdb` layers it on top, and `--no-sync` leaves the venv untouched):
+    uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<ver>/<name>
+    uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<ver>/<name> \
+        --staging <branch>
 """
 
 import argparse
 import json
 import re
+import threading
 from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from etl.http import session
+import duckdb
 
-DATASETTE = "https://datasette-public.owid.io/owid.json"
+from etl.http import HEADERS
+
+PUBLIC_DB = "https://files.ourworldindata.org/public.duckdb"
 REPO = Path(__file__).resolve().parents[4]
 # A DoD link is `[text](#dod:<name>)`; names can contain colons, so match up to the closing parenthesis.
 DOD_RE = re.compile(r"#dod:\s*([^\s)\]\"'\\]+)")
@@ -153,7 +157,6 @@ def collect(namespace: str, version: str, short_name: str, staging: str | None =
         f"UNION SELECT explorerSlug AS slug FROM ({dataset_explorers}) AS ex"
     )
     if redirect_slugs:
-        # A VALUES list: the mirror rewrites `[...]` list literals as quoted identifiers.
         values = ",".join("('" + s.replace("'", "''") + "')" for s in sorted(redirect_slugs))
         dataset_slugs += f" UNION SELECT slug FROM (VALUES {values}) AS t(slug)"
     slugs = {row["slug"] for row in _query(dataset_slugs)}
@@ -289,7 +292,7 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
 def _mdim_redirect_slugs(view_config_ids: set[str], staging: str | None) -> tuple[set[str], str]:
     """Retired chart or explorer slugs that redirect into the given MDim views, and a gap note if unreadable.
 
-    `multi_dim_redirects` is not in the public Datasette mirror, so it is read from the staging server's MySQL
+    `multi_dim_redirects` is not in public.duckdb, so it is read from the staging server's MySQL
     (a copy of production from when the server was created) when `--staging` is given.
     """
     if not view_config_ids:
@@ -341,7 +344,7 @@ def _grapher_slug(url: str) -> str:
 
 
 def _json(value) -> dict:
-    """A JSON column as a dict (Datasette returns some JSON columns as text)."""
+    """A JSON column as a dict (public.duckdb stores JSON columns as text)."""
     return json.loads(value) if isinstance(value, str) else (value or {})
 
 
@@ -351,24 +354,26 @@ def _sql_list(values) -> str:
     return ",".join(quoted) or "NULL"
 
 
-def _query(sql: str) -> list[dict]:
-    """Run a read-only query against the public Datasette mirror of production.
+_db: duckdb.DuckDBPyConnection | None = None
+_db_lock = threading.Lock()
 
-    Datasette returns at most 1,000 rows per query (and flags the result as truncated), so page through it.
+
+def _query(sql: str) -> list[dict]:
+    """Run a read-only query against public.duckdb, read in place over HTTP, as dict rows in a stable order.
+
+    One connection per run (each ATTACH refetches the file's metadata); `prepare.py` calls this from several
+    threads, so each call gets its own cursor, and `USE owid` is per cursor.
     """
-    rows: list[dict] = []
-    page_size = 1000
-    while True:
-        paged = f"SELECT * FROM ({sql}) AS q ORDER BY 1 LIMIT {page_size} OFFSET {len(rows)}"
-        response = session.get(DATASETTE, params={"sql": paged, "_shape": "objects"}, timeout=120)
-        response.raise_for_status()
-        data = response.json()
-        # A failed query still returns `rows: []`, so check the error flag, not just the key.
-        if data.get("ok") is False or data.get("error") or "rows" not in data:
-            raise RuntimeError(f"Datasette query failed: {data.get('error', data)}")
-        rows.extend(data["rows"])
-        if len(data["rows"]) < page_size:
-            return rows
+    global _db
+    with _db_lock:
+        if _db is None:
+            _db = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
+            _db.execute(f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY)")
+    cursor = _db.cursor()
+    cursor.execute("USE owid")
+    cursor.execute(f"SELECT * FROM ({sql}) AS q ORDER BY 1")
+    columns = [column[0] for column in cursor.description]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
 if __name__ == "__main__":

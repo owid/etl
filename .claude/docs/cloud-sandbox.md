@@ -61,7 +61,7 @@ For agent sessions running in a Claude Code cloud sandbox
   (`--output-html` writes a report). Needs no MySQL.
 
 - **OWID hosts require `Full` network access.** Under `Trusted` the gateway
-  refuses snapshots, the catalog and Datasette together — a setting to fix, not
+  refuses snapshots, the catalog and `public.duckdb` together — a setting to fix, not
   to work around, so ask the user to switch it. Creating snapshots with `etls`
   needs the `R2_*` variables (in 1Password — never scrape credentials elsewhere).
 
@@ -85,23 +85,29 @@ For agent sessions running in a Claude Code cloud sandbox
 
   `"kind": "connect_rejected"` means the gateway refused it before TLS.
 
-- **Resolve `admin.owid.io` links through the public Datasette instead of opening
-  them:**
+- **Resolve `admin.owid.io` links through the public indicator API and
+  `public.duckdb` instead of opening them** (`public.duckdb` is the nightly
+  public copy of the grapher DB; `/query-grapher-db` has the recipe):
 
   ```bash
   # /admin/variables/<id> — indicator metadata, including unpublished
-  curl -s "https://datasette-public.owid.io/owid/variables.json?id__in=<id>&_shape=array"
+  curl -s "https://api.ourworldindata.org/v1/indicators/<id>.metadata.json"
 
   # /admin/charts/<id>/edit — config arrives as a JSON string, so unwrap it
-  curl -s "https://datasette-public.owid.io/owid/charts.json?id__exact=<id>&_shape=array&_col=config" \
-    | .venv/bin/python -c "import json,sys; print(json.dumps(json.loads(json.load(sys.stdin)[0]['config']), indent=2))"
+  uvx --from duckdb-cli duckdb -noheader -list -c \
+    "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid;
+     SELECT config FROM charts WHERE id = <id>" \
+    | .venv/bin/python -m json.tool
   ```
 
-  `chart_dimensions?chartId__exact=<id>` maps a chart to its indicators; if you
-  have the slug, `https://ourworldindata.org/grapher/<slug>.config.json` does it
-  in one call. Prefer `?<col>__exact=` filters over `?sql=`, which 403s
-  intermittently on long queries. Charts and gdocs are published-only, so an
-  empty result usually means a draft — ask the user to paste
+  `SELECT variableId, property FROM chart_dimensions WHERE chartId = <id>` maps
+  a chart to its indicators; if you have the slug,
+  `https://ourworldindata.org/grapher/<slug>.config.json` does it in one call.
+  On first use DuckDB fetches its `httpfs` extension from
+  `extensions.duckdb.org`; where only `files.ourworldindata.org` is reachable,
+  download `public.duckdb.gz` from there (~80 MB, ~1 GB unzipped) and `ATTACH`
+  the local file. Charts and gdocs are published-only, so an empty result
+  usually means a draft — ask the user to paste
   `admin.owid.io/admin/api/charts/<id>.config.json` rather than guessing.
 
 - **MCP connectors are not the reason a session feels slow.** Figma, Slack, Notion

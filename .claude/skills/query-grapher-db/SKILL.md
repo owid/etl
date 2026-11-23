@@ -1,6 +1,6 @@
 ---
 name: query-grapher-db
-description: Query the grapher MySQL database (local dev, a branch's staging server, or production via the public Datasette) and verify indicators and charts on a staging server. Use when you need to run SQL against grapher, find which charts use an indicator, assess the blast radius of a data fix, or check that a chart/indicator renders correctly on staging-site-<branch>.
+description: Query the grapher MySQL database (local dev, a branch's staging server, or production via public.duckdb, its nightly public copy) and verify indicators and charts on a staging server. Use when you need to run SQL against grapher, find which charts use an indicator, assess the blast radius of a data fix, or check that a chart/indicator renders correctly on staging-site-<branch>.
 metadata:
   internal: true
   owner: Marigold
@@ -27,13 +27,27 @@ df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 
 **`OWID_ENV` targets your local dev DB even when you're on a branch.** To query the branch's staging DB from Python, use `OWIDEnv.from_staging('<branch>')` (`from etl.config import OWIDEnv`) — e.g. `OWIDEnv.from_staging('my-branch').read_sql(...)`. Also note `make query` shells out to the `mysql` CLI, which may not be installed; if it errors with `mysql: command not found`, use the Python `from_staging(...).read_sql(...)` path instead.
 
-## Production queries via public Datasette
+## Production queries via public.duckdb
 
-When you need production data (which charts use an indicator, chart configs, gdoc links) and local/prod MySQL isn't reachable, query the public Datasette over HTTP:
+When you need production data (which charts use an indicator, chart configs, gdoc links) and local/prod MySQL isn't reachable, query `https://files.ourworldindata.org/public.duckdb`, the nightly public export of the grapher DB. DuckDB reads it in place over HTTP range requests, so a query fetches a few MB, not the ~1 GB file:
 
 ```bash
-curl -s "https://datasette-public.owid.io/owid.json?sql=<url-encoded SQL>"
+duckdb -json -c "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid;
+SELECT id, slug FROM charts WHERE isPublished LIMIT 5"
 ```
+
+- **No local `duckdb`:** `uvx --from duckdb-cli duckdb -json -c "..."`.
+- **Python:** the etl venv has no duckdb, so run with `uv run --no-sync --with duckdb python <script>` (`--no-sync` leaves the venv untouched). Open one connection and reuse it, since each `ATTACH` refetches the file's metadata:
+
+  ```python
+  import duckdb
+
+  con = duckdb.connect()
+  con.execute("ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid")
+  df = con.sql("SELECT id, slug FROM charts WHERE isPublished").df()
+  ```
+- **It is DuckDB SQL, not MySQL.** JSON columns (`config`, `content`, `descriptionKey`) are text: read them with `->>'$.path'` or `json_extract_string`. It is exported nightly, so it lags production.
+- **On first use DuckDB downloads its `httpfs` extension from `extensions.duckdb.org`**, so a sandbox with a host allow-list needs that host as well as `files.ourworldindata.org`. Without it, download `https://files.ourworldindata.org/public.duckdb.gz` (~80 MB), gunzip it (~1 GB) and `ATTACH` the local file instead.
 
 `chart_dimensions` + `charts` + `chart_configs` answer "which charts use variable X"; `narrative_charts` and `posts_gdocs_links` cover derived charts and article references — together they answer the full "what does this dataset affect?" question when assessing the blast radius of a data fix.
 
