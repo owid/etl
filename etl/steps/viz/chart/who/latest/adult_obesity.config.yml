@@ -1,0 +1,197 @@
+grapher_schema: "012"
+slug: "adult-obesity"
+title:
+  title: "Adult obesity"
+  title_variant: ""
+topic_tags:
+  - "Obesity"
+default_selection:
+  - "Vietnam"
+  - "United States"
+  - "United Kingdom"
+  - "Japan"
+  - "India"
+  - "Brazil"
+  - "Nigeria"
+default_dimensions:
+  metric: obesity
+  sex: all_adults
+  age: age_standardized
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+          - "SlopeChart"
+          - "Marimekko"
+        hasMapTab: true
+        tab: "line"
+        hideAnnotationFieldsInTitle:
+          time: true
+        yAxis:
+          min: 0
+      metadata:
+        description_key:
+          - "Adult obesity is measured using the metric Body Mass Index (BMI). This is a person's weight in kilograms, divided by the square of their height in meters."
+          - "On standard BMI scales, someone is defined as being overweight if they have a BMI over 25."
+          - "Someone is defined as being obese if they have a BMI over 30."
+          - "This is a reasonable measure of whether someone is of a healthy metabolic weight, but it has limitations. Someone's body composition can affect their weight; for example, athletes with a high muscle mass may be defined as overweight on the BMI scale, despite having relatively low levels of body fat, and being metabolically healthy. The BMI scale is also not appropriate for pregnant women."
+          - "Alternative measures that capture metabolic health include waist circumference."
+dimensions:
+  - slug: metric
+    name: "Metric"
+    choices:
+      - slug: obesity
+        name: "Obesity"
+      - slug: overweight
+        name: "Overweight"
+  - slug: sex
+    name: "Sex"
+    choices:
+      - slug: all_adults
+        name: "All adults"
+      - slug: men
+        name: "Men"
+      - slug: women
+        name: "Women"
+  - slug: age
+    name: "Age"
+    choices:
+      - slug: age_standardized
+        name: "Age-standardized"
+      - slug: crude
+        name: "Crude"
+views:
+  - dimensions:
+      metric: obesity
+      sex: all_adults
+      age: age_standardized
+    indicators:
+      y:
+        - catalogPath: "obesity_among_adults__bmi__gt__30_kg_m2__age_standardized_estimate__pct#obesity_among_adults__bmi__gt__30_kg_m2__age_standardized_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age"
+    config:
+      title: "Share of adults who are obese"
+      subtitle: "[Obesity](#dod:obesity) is defined here as a body mass index (BMI) above 30. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  - dimensions:
+      metric: obesity
+      sex: all_adults
+      age: crude
+    indicators:
+      y:
+        - catalogPath: "obesity_among_adults__bmi__gt__30_kg_m2__crude_estimate__pct#obesity_among_adults__bmi__gt__30_kg_m2__crude_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age"
+    config:
+      title: "Share of adults who are obese"
+      subtitle: "[Obesity](#dod:obesity) is defined here as a body mass index (BMI) above 30. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "This is the crude rate: the share across all adults, without adjusting for differences in age structure between countries or over time."
+  - dimensions:
+      metric: obesity
+      sex: men
+      age: age_standardized
+    indicators:
+      y:
+        - catalogPath: "obesity_among_adults__bmi__gt__30_kg_m2__age_standardized_estimate__pct#obesity_among_adults__bmi__gt__30_kg_m2__age_standardized_estimate__pct__sex_male__age_group_18plus__years_of_age"
+    config:
+      title: "Share of men who are obese"
+      subtitle: "[Obesity](#dod:obesity) is defined here as a body mass index (BMI) above 30. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  - dimensions:
+      metric: obesity
+      sex: men
+      age: crude
+    indicators:
+      y:
+        - catalogPath: "obesity_among_adults__bmi__gt__30_kg_m2__crude_estimate__pct#obesity_among_adults__bmi__gt__30_kg_m2__crude_estimate__pct__sex_male__age_group_18plus__years_of_age"
+    config:
+      title: "Share of men who are obese"
+      subtitle: "[Obesity](#dod:obesity) is defined here as a body mass index (BMI) above 30. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "This is the crude rate: the share across all adults, without adjusting for differences in age structure between countries or over time."
+  - dimensions:
+      metric: obesity
+      sex: women
+      age: age_standardized
+    indicators:
+      y:
+        - catalogPath: "obesity_among_adults__bmi__gt__30_kg_m2__age_standardized_estimate__pct#obesity_among_adults__bmi__gt__30_kg_m2__age_standardized_estimate__pct__sex_female__age_group_18plus__years_of_age"
+    config:
+      title: "Share of women who are obese"
+      subtitle: "[Obesity](#dod:obesity) is defined here as a body mass index (BMI) above 30. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  - dimensions:
+      metric: obesity
+      sex: women
+      age: crude
+    indicators:
+      y:
+        - catalogPath: "obesity_among_adults__bmi__gt__30_kg_m2__crude_estimate__pct#obesity_among_adults__bmi__gt__30_kg_m2__crude_estimate__pct__sex_female__age_group_18plus__years_of_age"
+    config:
+      title: "Share of women who are obese"
+      subtitle: "[Obesity](#dod:obesity) is defined here as a body mass index (BMI) above 30. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "This is the crude rate: the share across all adults, without adjusting for differences in age structure between countries or over time."
+  - dimensions:
+      metric: overweight
+      sex: all_adults
+      age: age_standardized
+    indicators:
+      y:
+        - catalogPath: "overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct#overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age"
+    config:
+      title: "Share of adults who are overweight or obese"
+      subtitle: "Overweight is defined here as a body mass index (BMI) above 25. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  - dimensions:
+      metric: overweight
+      sex: all_adults
+      age: crude
+    indicators:
+      y:
+        - catalogPath: "overweight_among_adults__bmi__gt__25_kg_m2__crude_estimate__pct#overweight_among_adults__bmi__gt__25_kg_m2__crude_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age"
+    config:
+      title: "Share of adults who are overweight or obese"
+      subtitle: "Overweight is defined here as a body mass index (BMI) above 25. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "This is the crude rate: the share across all adults, without adjusting for differences in age structure between countries or over time."
+  - dimensions:
+      metric: overweight
+      sex: men
+      age: age_standardized
+    indicators:
+      y:
+        - catalogPath: "overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct#overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct__sex_male__age_group_18plus__years_of_age"
+    config:
+      title: "Share of men who are overweight or obese"
+      subtitle: "Overweight is defined here as a body mass index (BMI) above 25. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  - dimensions:
+      metric: overweight
+      sex: men
+      age: crude
+    indicators:
+      y:
+        - catalogPath: "overweight_among_adults__bmi__gt__25_kg_m2__crude_estimate__pct#overweight_among_adults__bmi__gt__25_kg_m2__crude_estimate__pct__sex_male__age_group_18plus__years_of_age"
+    config:
+      title: "Share of men who are overweight or obese"
+      subtitle: "Overweight is defined here as a body mass index (BMI) above 25. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "This is the crude rate: the share across all adults, without adjusting for differences in age structure between countries or over time."
+  - dimensions:
+      metric: overweight
+      sex: women
+      age: age_standardized
+    indicators:
+      y:
+        - catalogPath: "overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct#overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct__sex_female__age_group_18plus__years_of_age"
+    config:
+      title: "Share of women who are overweight or obese"
+      subtitle: "Overweight is defined here as a body mass index (BMI) above 25. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  - dimensions:
+      metric: overweight
+      sex: women
+      age: crude
+    indicators:
+      y:
+        - catalogPath: "overweight_among_adults__bmi__gt__25_kg_m2__crude_estimate__pct#overweight_among_adults__bmi__gt__25_kg_m2__crude_estimate__pct__sex_female__age_group_18plus__years_of_age"
+    config:
+      title: "Share of women who are overweight or obese"
+      subtitle: "Overweight is defined here as a body mass index (BMI) above 25. BMI is a person's weight in kilograms divided by the square of their height in meters."
+      note: "This is the crude rate: the share across all adults, without adjusting for differences in age structure between countries or over time."
