@@ -38,6 +38,19 @@ definitions:
           - "Someone is defined as being obese if they have a BMI over 30."
           - "This is a reasonable measure of whether someone is of a healthy metabolic weight, but it has limitations. Someone's body composition can affect their weight; for example, athletes with a high muscle mass may be defined as overweight on the BMI scale, despite having relatively low levels of body fat, and being metabolically healthy. The BMI scale is also not appropriate for pregnant women."
           - "Alternative measures that capture metabolic health include waist circumference."
+    # Each metric gets its own map palette, avoiding blues and greens since higher is worse.
+    - dimensions:
+        metric: obesity
+      config:
+        map:
+          colorScale:
+            baseColorScheme: "OrRd"
+    - dimensions:
+        metric: overweight
+      config:
+        map:
+          colorScale:
+            baseColorScheme: "RdPu"
 dimensions:
   - slug: metric
     name: "Metric"
