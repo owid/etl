@@ -1,37 +1,92 @@
-grapher_schema: "011"
-
-definitions:
-  common_views:
-    - config:
-        originUrl: ourworldindata.org/coronavirus
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
-        hasMapTab: true
-        yAxis:
-          min: 0
-
+# COVID-19 data explorer, ported from the explorer step (viz://explorer/covid/latest/covid).
+grapher_schema: '012'
 slug: covid
-
 title:
   title: COVID-19
-  title_variant: Explore global data on COVID-19.
-
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore global data on COVID-19.
 default_selection:
   - United States
   - Brazil
   - Japan
   - Germany
-
 default_dimensions:
   metric: xm
   interval: cum
   relative: relative
-
 topic_tags:
   - COVID-19
-
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        yAxis:
+          min: 0
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+    - dimensions:
+        metric: deaths
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-jhu-who
+            text: Since 8 March, we rely on data from the WHO for confirmed cases and deaths
+    - dimensions:
+        metric: cases
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-jhu-who
+            text: Since 8 March, we rely on data from the WHO for confirmed cases and deaths
+    - dimensions:
+        metric: cases_deaths
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-jhu-who
+            text: Since 8 March, we rely on data from the WHO for confirmed cases and deaths
+    - dimensions:
+        metric: cfr
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-jhu-who
+            text: Since 8 March, we rely on data from the WHO for confirmed cases and deaths
+    - dimensions:
+        metric: r
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-jhu-who
+            text: Since 8 March, we rely on data from the WHO for confirmed cases and deaths
+    - dimensions:
+        metric: stringency
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/metrics-explained-covid19-stringency-index
+            text: What is the COVID-19 Stringency Index?
+    - dimensions:
+        metric: tests
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-testing-data-archived
+            text: Data on tests is no longer updated since June 2022
+    - dimensions:
+        metric: tests_cases
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-testing-data-archived
+            text: Data on tests is no longer updated since June 2022
+    - dimensions:
+        metric: tests_pos
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-testing-data-archived
+            text: Data on tests is no longer updated since June 2022
+    - dimensions:
+        metric: cases_tests_pos_r
+      config:
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-testing-data-archived
+            text: Data on tests is no longer updated since June 2022
 dimensions:
   - slug: metric
     name: Metric
@@ -96,7 +151,8 @@ dimensions:
         name: Cases, tests, positive and reproduction rate
       - slug: stringency
         name: Stringency Index
-
+    presentation:
+      type: dropdown
   - slug: interval
     name: Interval
     choices:
@@ -110,6 +166,8 @@ dimensions:
         name: Biweekly
       - slug: cum
         name: Cumulative
+      - slug: cum_12
+        name: Cumulative (last 12 months)
       - slug: avg_7d
         name: 7-day rolling average
       - slug: weekly_ch
@@ -122,7 +180,8 @@ dimensions:
         name: 9-month rolling total
       - slug: roll_12m
         name: 12-month rolling total
-
+    presentation:
+      type: dropdown
   - slug: relative
     name: Relative to population
     choices:
@@ -130,28 +189,27 @@ dimensions:
         name: Total
       - slug: relative
         name: Per 100,000 people
-
+    presentation:
+      type: toggle-buttons
 views:
-  #######################
-  # Excess Mortality (estimates)
-  #######################
   - dimensions:
       metric: xm
       interval: cum
       relative: absolute
     indicators:
       y:
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top
-        - cases_deaths#total_deaths
+        - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths
+        - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot
+        - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top
+        - catalogPath: cases_deaths#total_deaths
     config:
       title: Estimated cumulative excess deaths during COVID-19
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown.
       hasMapTab: false
       selectedFacetStrategy: entity
       note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
-
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: xm
       interval: cum
@@ -166,9 +224,10 @@ views:
       title: Estimated cumulative excess deaths per 100,000 people during COVID-19
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. On the map, only the central estimate is shown.
       selectedFacetStrategy: entity
-      tab: map
       note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
-
+      tab: map
+      yAxis:
+        facetDomain: shared
   - dimensions:
       metric: xm
       interval: avg_7d
@@ -185,7 +244,8 @@ views:
       hasMapTab: false
       selectedFacetStrategy: entity
       note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
-
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: xm
       interval: avg_7d
@@ -201,44 +261,32 @@ views:
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. On the map, only the central estimate is shown.
       selectedFacetStrategy: entity
       note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
-
-  #######################
-  # Excess mortality (count)
-  #######################
+      yAxis:
+        facetDomain: shared
   - dimensions:
       metric: xm_count
       interval: cum
       relative: absolute
     indicators:
       y: excess_mortality#cum_excess_proj_all_ages
-
   - dimensions:
       metric: xm_count
       interval: cum
       relative: relative
     indicators:
       y: excess_mortality#cum_excess_per_million_proj_all_ages
-
-  #######################
-  # Excess mortality (%)
-  #######################
   - dimensions:
       metric: xm_perc
       interval: cum
       relative: absolute
     indicators:
       y: excess_mortality#cum_p_proj_all_ages
-
   - dimensions:
       metric: xm_perc
       interval: weekly
       relative: absolute
     indicators:
       y: excess_mortality#p_proj_all_ages
-
-  #######################
-  # Deaths
-  #######################
   - dimensions:
       metric: deaths
       interval: cum
@@ -251,6 +299,18 @@ views:
       relative: relative
     indicators:
       y: cases_deaths#total_deaths_per_million
+  - dimensions:
+      metric: deaths
+      interval: cum_12
+      relative: absolute
+    indicators:
+      y: cases_deaths#total_deaths_last12m
+  - dimensions:
+      metric: deaths
+      interval: cum_12
+      relative: relative
+    indicators:
+      y: cases_deaths#total_deaths_per_million_last12m
   - dimensions:
       metric: deaths
       interval: avg_7d
@@ -311,10 +371,6 @@ views:
       relative: absolute
     indicators:
       y: cases_deaths#biweekly_pct_growth_deaths
-
-  #######################
-  # Cases
-  #######################
   - dimensions:
       metric: cases
       interval: cum
@@ -387,10 +443,6 @@ views:
       relative: absolute
     indicators:
       y: cases_deaths#biweekly_pct_growth_cases
-
-  #######################
-  # Cases and Deaths
-  #######################
   - dimensions:
       metric: cases_deaths
       interval: avg_7d
@@ -404,26 +456,24 @@ views:
       subtitle: 7-day rolling average. Limited testing and challenges in the attribution of cause of death means the cases and deaths counts may not be accurate.
       hasMapTab: false
       selectedFacetStrategy: metric
-
-  #######################
-  # Hospital patients
-  #######################
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: patients
       interval: daily
       relative: absolute
     indicators:
       y: hospital#daily_occupancy_hosp
+    config:
+      subtitle: ' '
   - dimensions:
       metric: patients
       interval: daily
       relative: relative
     indicators:
       y: hospital#daily_occupancy_hosp_per_1m
-
-  #######################
-  # Hospital admissions
-  #######################
+    config:
+      subtitle: ' '
   - dimensions:
       metric: admissions
       interval: weekly
@@ -436,26 +486,22 @@ views:
       relative: relative
     indicators:
       y: hospital#weekly_admissions_hosp_per_1m
-
-  #######################
-  # ICU patients
-  #######################
   - dimensions:
       metric: icu_patients
       interval: daily
       relative: absolute
     indicators:
       y: hospital#daily_occupancy_icu
+    config:
+      subtitle: ' '
   - dimensions:
       metric: icu_patients
       interval: daily
       relative: relative
     indicators:
       y: hospital#daily_occupancy_icu_per_1m
-
-  #######################
-  # ICU admissions
-  #######################
+    config:
+      subtitle: ' '
   - dimensions:
       metric: icu_admissions
       interval: daily_new
@@ -468,10 +514,6 @@ views:
       relative: relative
     indicators:
       y: hospital#weekly_admissions_icu_per_1m
-
-  #######################
-  # Cases, hospital admissions, ICU patients, and deaths
-  #######################
   - dimensions:
       metric: cases_deaths_hospital
       interval: avg_7d
@@ -487,10 +529,8 @@ views:
       subtitle: Limited testing and challenges in the attribution of cause of death means the cases and deaths counts may not be accurate.
       hasMapTab: false
       selectedFacetStrategy: metric
-
-  #######################
-  # CFR
-  #######################
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: cfr
       interval: cum
@@ -503,10 +543,6 @@ views:
       relative: absolute
     indicators:
       y: cases_deaths#cfr_short_term
-
-  #######################
-  # Vaccine doses
-  #######################
   - dimensions:
       metric: doses
       interval: cum
@@ -573,10 +609,6 @@ views:
       relative: relative
     indicators:
       y: vaccinations_global#rolling_vaccinations_12m_per_hundred
-
-  #######################
-  # Vaccine booster doses
-  #######################
   - dimensions:
       metric: boosters
       interval: cum
@@ -589,10 +621,6 @@ views:
       relative: relative
     indicators:
       y: vaccinations_global#total_boosters_per_hundred
-
-  #######################
-  # Vaccine doses (by type)
-  #######################
   - dimensions:
       metric: doses_type
       interval: cum
@@ -621,10 +649,6 @@ views:
       hasMapTab: false
       chartTypes:
         - StackedDiscreteBar
-
-  #######################
-  # People vaccinated
-  #######################
   - dimensions:
       metric: people_vax
       interval: cum
@@ -649,10 +673,6 @@ views:
       relative: relative
     indicators:
       y: vaccinations_global#daily_people_vaccinated_smoothed_per_hundred
-
-  #######################
-  # People fully vaccinated
-  #######################
   - dimensions:
       metric: people_fully_vax
       interval: cum
@@ -665,10 +685,6 @@ views:
       relative: relative
     indicators:
       y: vaccinations_global#people_fully_vaccinated_per_hundred
-
-  #######################
-  # Vaccine doses, people vaccinated, and booster doses
-  #######################
   - dimensions:
       metric: vax_people
       interval: cum
@@ -681,13 +697,11 @@ views:
         - vaccinations_global#total_boosters_per_hundred
     config:
       title: COVID-19 vaccine doses, people with at least one dose, people with a full initial protocol, and boosters per 100 people
-      subtitle: ""
+      subtitle: ' '
       hasMapTab: false
       selectedFacetStrategy: metric
-
-  #######################
-  # Vaccine doses and confirmed deaths
-  #######################
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: vax_deaths
       interval: avg_7d
@@ -701,10 +715,8 @@ views:
       subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
       hasMapTab: false
       selectedFacetStrategy: metric
-
-  #######################
-  # Vaccine doses, cases, ICU patients, and deaths
-  #######################
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: vax_cases_icu_deaths
       interval: avg_7d
@@ -720,10 +732,8 @@ views:
       subtitle: Limited testing and challenges in the attribution of cause of death means the cases and deaths counts may not be accurate.
       hasMapTab: false
       selectedFacetStrategy: metric
-
-  #######################
-  # Variants
-  #######################
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: variants
       interval: biweekly
@@ -747,14 +757,12 @@ views:
       title: SARS-CoV-2 sequences by variant
       subtitle: Share of analyzed sequences in the preceding two weeks that correspond to each variant group.
       hasMapTab: false
+      sortBy: column
+      sortColumnSlug: variants#perc_sequences__variant_omicron
       hideTotalValueLabel: true
+      note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
       chartTypes:
         - StackedDiscreteBar
-      note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
-
-  #######################
-  # Omicron variant (share)
-  #######################
   - dimensions:
       metric: omicron
       interval: biweekly
@@ -765,10 +773,6 @@ views:
       title: Share of SARS-CoV-2 sequences that are the omicron variant
       subtitle: Share of omicron variant in all analyzed sequences in the preceding two weeks.
       timelineMinTime: 600
-
-  #######################
-  # Delta variant (share)
-  #######################
   - dimensions:
       metric: delta
       interval: biweekly
@@ -778,20 +782,12 @@ views:
     config:
       title: Share of SARS-CoV-2 sequences that are the delta variant
       subtitle: Share of delta variant in all analyzed sequences in the last two weeks.
-
-  #######################
-  # Cases sequenced
-  #######################
   - dimensions:
       metric: cases_sequenced
       interval: biweekly
       relative: absolute
     indicators:
       y: combined#share_cases_sequenced
-
-  #######################
-  # Stringency Index
-  #######################
   - dimensions:
       metric: stringency
       interval: daily
@@ -802,23 +798,17 @@ views:
         - oxcgrt_policy#stringency_index_vax
         - oxcgrt_policy#stringency_index_weighted_average
     config:
-      title: "COVID-19: Stringency Index"
+      title: 'COVID-19: Stringency Index'
       subtitle: The stringency index is a composite measure based on nine response indicators including school closures, workplace closures, and travel bans, rescaled to a value from 0 to 100 (100 = strictest).
       selectedFacetStrategy: entity
-
-  #######################
-  # Reproduction rate
-  #######################
+      yAxis:
+        facetDomain: independent
   - dimensions:
       metric: r
       interval: avg_7d
       relative: absolute
     indicators:
       y: tracking_r#r
-
-  #######################
-  # Tests
-  #######################
   - dimensions:
       metric: tests
       interval: cum
@@ -855,30 +845,18 @@ views:
       relative: relative
     indicators:
       y: testing#new_tests_per_thousand
-
-  #######################
-  # Tests per case
-  #######################
   - dimensions:
       metric: tests_cases
       interval: avg_7d
       relative: absolute
     indicators:
       y: combined#short_term_tests_per_case
-
-  #######################
-  # Share of positive tests
-  #######################
   - dimensions:
       metric: tests_pos
       interval: avg_7d
       relative: absolute
     indicators:
       y: combined#short_term_positivity_rate
-
-  #######################
-  # Cases, tests, positive and reproduction rate
-  #######################
   - dimensions:
       metric: cases_tests_pos_r
       interval: avg_7d
@@ -894,3 +872,5 @@ views:
       subtitle: 7-day rolling average. Due to limited testing, the number of confirmed cases is lower than the true number of infections. Comparisons across countries are affected by differences in testing policies and reporting methods.
       hasMapTab: false
       selectedFacetStrategy: metric
+      yAxis:
+        facetDomain: independent
