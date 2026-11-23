@@ -23,10 +23,6 @@ definitions:
         hasMapTab: true
         yAxis:
           min: 0
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
     - dimensions:
         metric: deaths
       config:
