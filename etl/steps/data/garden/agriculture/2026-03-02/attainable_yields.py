@@ -8,8 +8,8 @@ The resulting dataset contains:
 Elements 2 and 3 are provided only for items that were included in Mueller et al. (2012), whereas element 1 is
 provided also for other items.
 
-This dataset will be imported by the crop_yields explorers step, which feeds our Crop Yields explorer:
-https://ourworldindata.org/explorers/crop-yields
+This dataset feeds the crop_yields chart step, our Crop Yields data explorer:
+https://ourworldindata.org/grapher/crop-yields
 """
 
 from etl.helpers import PathFinder
