@@ -5,6 +5,7 @@ Inputs, all from earlier steps of the migration:
 - `<review>/references_full.json` from `scan_references.py`;
 - `<mapping-dir>/mapping.json` and `admin_bulk_payload.json` from `map-explorer-to-mdim`;
 - optional `--notes notes.json`: `{"<check>:<field prefix>": "why this difference is expected"}`.
+  The key `rendered:footer-link` explains a footer that differs only by the multidim's originUrl link.
   A difference with a note counts as explained, not as a mismatch. Write one only after checking
   the difference against the rendered pages.
 
@@ -19,6 +20,7 @@ Usage:
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 READER_CHECKS = ["mapping", "indicators", "data", "metadata", "rendered"]
@@ -47,22 +49,31 @@ def dimension_summary(mapping: dict) -> list[dict]:
             # Prefer the explorer dimension named like this one, then explorer order, to break ties.
             order = sorted(names, key=lambda n: (_slugify(n) != slug, names.index(n)))
             choices = list(dict.fromkeys(t.get(slug) for _, t in mrows if t.get(slug) is not None))
+            # Conditions are one or two explorer dimensions, in tie-break order.
+            keysets = [(n,) for n in order] + [(a, b) for i, a in enumerate(order) for b in order[i + 1 :]]
             summary = []
             for choice in choices:
                 pos = [s for s, t in mrows if t.get(slug) == choice]
-                neg = [s for s, t in mrows if t.get(slug) != choice]
-
-                def valid(cond: dict) -> bool:
-                    return not any(all(s[n] == v for n, v in cond.items()) for s in neg)
+                # A condition is valid when no view landing elsewhere matches it: look it up in the
+                # values those views take on its dimensions, instead of scanning them per condition.
+                taken = {ks: {tuple(s[n] for n in ks) for s, t in mrows if t.get(slug) != choice} for ks in keysets}
 
                 rules: list[dict] = []
                 left = pos
                 while left:
-                    # One or two conditions, whichever covers the most views left (ties: fewer conditions).
-                    cands = [{n: s[n]} for s in left for n in order]
-                    cands += [{a: s[a], b: s[b]} for s in left for i, a in enumerate(order) for b in order[i + 1 :]]
-                    cands = [c for c in cands if valid(c)] or [dict(left[0])]
-                    best = max(cands, key=lambda c: (sum(all(s[n] == v for n, v in c.items()) for s in left), -len(c)))
+                    # One or two conditions, whichever covers the most views left (ties: fewer
+                    # conditions, then the first found, as candidates are listed view by view).
+                    covers: dict[tuple, int] = {}
+                    for s in left:
+                        for ks in keysets:
+                            vals = tuple(s[n] for n in ks)
+                            if vals not in taken[ks]:
+                                covers[(ks, vals)] = covers.get((ks, vals), 0) + 1
+                    if covers:
+                        ks, vals = max(covers, key=lambda c: (covers[c], -len(c[0])))
+                        best = dict(zip(ks, vals))
+                    else:
+                        best = dict(left[0])
                     rules.append(best)
                     left = [s for s in left if not all(s[n] == v for n, v in best.items())]
                 # One-condition rules on the same dimension read as one: Metric = A, B or C.
@@ -87,12 +98,22 @@ def dimension_summary(mapping: dict) -> list[dict]:
     return out
 
 
+def _strip_footer_link(text: str) -> list[str]:
+    """Footer words without the origin link (`OurWorldinData.org/<page> |`) and the license."""
+    return re.sub(r"OurWorldinData\.org/\S+\s*\|?", " ", text).replace("CC BY", " ").split()
+
+
 def classify(pairs: list[dict], notes: dict) -> None:
     """Mark each difference as explained (has a note) or not, and give each view a verdict."""
     for p in pairs:
         for c in p["checks"]:
             key = f"{c['check'].split(':')[0]}:{c['field']}"
             c["note"] = next((v for k, v in notes.items() if key.startswith(k)), None)
+            # `rendered:footer-link` explains a footer that differs only by the multidim's added
+            # originUrl link (which also moves "CC BY" after the note), never any other change.
+            if c["check"].startswith("rendered") and c["field"] == "footer" and "rendered:footer-link" in notes:
+                if _strip_footer_link(c["multidim"] or "") == _strip_footer_link(c["explorer"] or ""):
+                    c["note"] = notes["rendered:footer-link"]
         visible = [c for c in p["checks"] if c["check"].split(":")[0] in READER_CHECKS and not c["note"]]
         other = [c for c in p["checks"] if c["check"].split(":")[0] not in READER_CHECKS and not c["note"]]
         p["verdict"] = "differs" if visible else ("config" if other else "match")
@@ -284,7 +305,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="payload">
-    <div class="sec-head"><h2>Redirects to create</h2><p>Paste into <b>Bulk-create redirects from JSON</b> at <a href="https://admin.owid.io/admin/multi-dim-redirects" target="_blank" rel="noopener">admin.owid.io/admin/multi-dim-redirects</a>. Creating them takes the explorer offline at once, and they can only be removed one at a time.</p></div>
+    <div class="sec-head"><h2>Redirects to create</h2><p>Paste into <b>Bulk-create redirects from JSON</b> at <a href="https://admin.owid.io/admin/multi-dim-redirects" target="_blank" rel="noopener">admin.owid.io/admin/multi-dim-redirects</a>. They take the explorer offline as soon as the deploy the paste queues goes out, and they can only be removed one at a time.</p></div>
     <div id="pbanner"></div>
     <div class="row"><button id="copyPayload">Copy JSON</button><span class="small" id="pstats"></span></div>
     <pre id="pjson"></pre>

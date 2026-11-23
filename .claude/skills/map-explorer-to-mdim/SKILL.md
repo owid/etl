@@ -8,11 +8,9 @@ description: >-
   on) plus the featured metrics pointing at it, preflights every validation the endpoint
   performs — including site redirects that would block it — and covers retiring the
   explorer's ETL step afterwards.
-  Trigger when the user says "map explorer <slug> to mdim(s) <...>", "suggest
-  explorer->MDIM redirects", "we're sunsetting the <slug> explorer, map its views to
-  the new multidims", "redirect these explorers to MDIMs", "review the explorer->MDIM
-  mapping", "build a review tool for the <slug> migration", "make a side-by-side HTML so
-  <reviewer> can sign off", or similar.
+  Use when an explorer is being retired in favor of MDIMs that already exist and its views need
+  mapping or redirecting to theirs, or when someone needs to review or sign off such a mapping.
+  To build the replacement MDIM from an ETL explorer, use migrate-explorer-to-chart.
 metadata:
   internal: true
   owner: paarriagadap
@@ -45,8 +43,8 @@ scripts only work where that DB actually contains both the explorer and the publ
 MDIMs. There are three ways to point `OWID_ENV` at such a DB — **figure out which one
 applies before running, and don't assume `.env.prod` exists:**
 
-1. **Staging branch** (often easiest): if you're on a `staging-site-<branch>` branch,
-   `OWID_ENV` already points at that prod-clone DB — run the commands as-is, no prefix.
+1. **Staging branch** (often easiest): prefix commands with `STAGING=1` to read the current
+   branch's `staging-site-<branch>` prod-clone DB (`STAGING=<branch>` for another branch's).
 2. **Production, read-only, via an env file**: prefix commands with
    `ENV_FILE=<prod creds> DATA_API_ENV=production`. Don't assume the file name — check
    what exists (`ls -la .env*`); on some machines it is `.env.prod`, on others `.env.live`.
@@ -377,10 +375,11 @@ Non-zero exit means **do not post anything**.
 ### 7. Apply — the admin bulk endpoint (GATED, production)
 
 > [!WARNING]
-> **Creating the redirect darkens the explorer immediately.** It is checked on *every*
-> `/explorers/*` request, ahead of `env.ASSETS.fetch`, so it beats the baked explorer page and
-> any `_redirects` entry, and fires while the explorer is still published. There is no staged
-> rollout and no bulk undo — removal is one row at a time.
+> **Creating the redirect darkens the explorer as soon as the deploy it queues goes out.** The
+> paste queues a deploy (admin *Deploys*) that bakes the redirect map; from then on the redirect is
+> checked on *every* `/explorers/*` request, ahead of `env.ASSETS.fetch`, so it beats the baked
+> explorer page and any `_redirects` entry, and fires while the explorer is still published. There
+> is no staged rollout and no bulk undo — removal is one row at a time.
 
 Preflight reads the DB, not the site: first confirm `curl -s -o /dev/null -w '%{http_code}'
 https://ourworldindata.org/grapher/<mdim slug>` returns 200. A multidim published moments ago can
@@ -392,7 +391,7 @@ Paste each `admin_bulk_payload.json` into *Bulk-create redirects from JSON* at
 is the catch-all when present and index `i` is `redirects[i-1]`. Expect
 `created + skipped + errors == entries`.
 
-Then wait for the bake **plus ~2 minutes** (the redirect map is fetched with a 2-minute edge
+Then wait for that deploy to finish **plus ~2 minutes** (the redirect map is fetched with a 2-minute edge
 TTL) and verify:
 
 ```bash
@@ -409,7 +408,7 @@ that is not the route (and no explorer config in the repo carries `isPublished: 
 
 Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
 (see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, so a config left behind stays
-on disk as an orphan), remove the `dag/*.yml` entry, `make check`, **commit**; then run
+on disk as an orphan), remove the `dag/*.yml` entry, **commit** (the pre-commit hook runs `make check`); then run
 `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
 upstream — a garden step that existed only to feed this explorer — in a second round. If any of

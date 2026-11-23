@@ -250,29 +250,56 @@ steps:
   # MULTIDIM
   ##########
 
+  # COVID-19 data explorer, as a multidim (replaces viz://explorer/covid/latest/covid).
   viz://chart/covid/latest/covid:
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
     - data://grapher/covid/latest/hospital
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
+  # Topic multidims (unpublished).
+  viz://chart/covid/latest/cases:
+    - data://grapher/covid/latest/cases_deaths
+  viz://chart/covid/latest/deaths:
+    - data://grapher/covid/latest/cases_deaths
+  viz://chart/covid/latest/cases_and_tests:
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/testing
+    - data://grapher/regions/2023-01-01/regions
+  viz://chart/covid/latest/hospitalizations:
+    - data://grapher/covid/latest/hospital
+  viz://chart/covid/latest/vaccinations:
+    - data://grapher/covid/latest/vaccinations_global
+  viz://chart/covid/latest/vaccinations_by_manufacturer:
     - data://grapher/covid/latest/vaccinations_global
     - data://grapher/covid/latest/vaccinations_manufacturer:
       - data://garden/covid/latest/vaccinations_manufacturer:
         - data://meadow/covid/latest/vaccinations_manufacturer:
           - snapshot://covid/latest/vaccinations_manufacturer.csv
         - data://garden/regions/2023-01-01/regions
-    - data://grapher/covid/latest/testing
+  viz://chart/covid/latest/excess_mortality:
     - data://grapher/excess_mortality/latest/excess_mortality
+  viz://chart/covid/latest/excess_mortality_models:
+    - data://grapher/covid/latest/cases_deaths
     - data-private://grapher/excess_mortality/latest/excess_mortality_economist
     # Excess Mortality (WHO)
     - data://grapher/covid/latest/xm_who:
       - data://garden/covid/latest/xm_who:
         - data://meadow/covid/latest/xm_who:
           - snapshot://covid/latest/xm_who.zip
-    - data://grapher/covid/latest/cases_deaths
-    # COVAX
+  viz://chart/covid/latest/covax:
     - data://grapher/covid/latest/covax:
       - data://garden/covid/latest/covax:
         - data://meadow/covid/latest/covax:
           - snapshot://covid/latest/covax.csv
-    # Model estimates (ICL, IHME, LSHTM, YYG)
+  # Model estimates (ICL, IHME, LSHTM, YYG)
+  viz://chart/covid/latest/infection_models:
+    - data://grapher/covid/latest/cases_deaths
     - data://grapher/covid/latest/infections_model:
       - data://garden/covid/latest/infections_model:
         - data://meadow/covid/latest/infections_model:
@@ -280,14 +307,9 @@ steps:
           - snapshot://covid/latest/infections_model_ihme.csv
           - snapshot://covid/latest/infections_model_lshtm.csv
           - snapshot://covid/latest/infections_model_yyg.csv
-    # Google mobility
+  # Google mobility
+  viz://chart/covid/latest/mobility:
     - data://grapher/covid/latest/google_mobility:
       - data://garden/covid/latest/google_mobility:
         - data://meadow/covid/latest/google_mobility:
           - snapshot://covid/latest/google_mobility.csv
-    - data://grapher/regions/2023-01-01/regions
-    # Extras for covid.explorer multidim (covers the same indicators as the explorer)
-    - data-private://grapher/covid/latest/sequence
-    - data://grapher/covid/latest/oxcgrt_policy
-    - data://grapher/covid/latest/tracking_r
-    - data://grapher/covid/latest/combined

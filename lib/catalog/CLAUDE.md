@@ -18,7 +18,7 @@ This library is part of the larger `etl` repository under `lib/catalog/` and is 
 
 ### Virtual Environment
 
-**CRITICAL:** This project uses a Python virtual environment (`.venv/`). All Python commands must use the virtual environment binaries:
+This project uses a Python virtual environment (`.venv/`). Run Python commands through its binaries, since the global ones fail here:
 
 ```bash
 # CORRECT - Use .venv binaries

@@ -14,10 +14,11 @@ Surfaces scanned:
     guided chart or a pasted URL) or their narrative charts (their own DoD links), including data insights that show
     one of them in their `grapher-url` or `narrative-chart` front matter
 
-References and DoD text are read from the public Datasette mirror of production (no DB credentials needed; the
-mirror can lag production by a few days). A DoD edited on the branch's staging server reaches production only on
-merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead (needs the
-staging network); entries whose staging text differs from the production mirror are flagged.
+References and DoD text are read from the internal Datasette's copy of production (no DB credentials needed, but
+reachable only over Tailscale; the copy holds only published charts and can lag production by a few days). A DoD
+edited on the branch's staging server reaches production only on merge, so pass `--staging <branch>` to read the DoD
+text from that staging server's MySQL instead (needs the staging network); entries whose staging text differs from the
+production copy are flagged.
 
 Usage:
     .venv/bin/python .claude/skills/fact-check-dataset/scripts/collect_dods.py <namespace>/<version>/<short_name>
@@ -31,9 +32,9 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from etl.analytics.config import OWID_DATASETTE_JSON_URL
 from etl.http import session
 
-DATASETTE = "https://datasette-public.owid.io/owid.json"
 REPO = Path(__file__).resolve().parents[4]
 # A DoD link is `[text](#dod:<name>)`; names can contain colons, so match up to the closing parenthesis.
 DOD_RE = re.compile(r"#dod:\s*([^\s)\]\"'\\]+)")
@@ -289,7 +290,7 @@ def _viz_configs_using(namespace: str, short_name: str) -> list[Path]:
 def _mdim_redirect_slugs(view_config_ids: set[str], staging: str | None) -> tuple[set[str], str]:
     """Retired chart or explorer slugs that redirect into the given MDim views, and a gap note if unreadable.
 
-    `multi_dim_redirects` is not in the public Datasette mirror, so it is read from the staging server's MySQL
+    `multi_dim_redirects` is not in the Datasette copy, so it is read from the staging server's MySQL
     (a copy of production from when the server was created) when `--staging` is given.
     """
     if not view_config_ids:
@@ -297,7 +298,7 @@ def _mdim_redirect_slugs(view_config_ids: set[str], staging: str | None) -> tupl
     if not staging:
         return set(), (
             "posts that still use a retired chart or explorer slug redirecting into an MDim view "
-            "(`multi_dim_redirects` is not in the public mirror; pass `--staging <branch>` to include them)."
+            "(`multi_dim_redirects` is not in the Datasette copy; pass `--staging <branch>` to include them)."
         )
     from etl.config import OWIDEnv
 
@@ -352,20 +353,25 @@ def _sql_list(values) -> str:
 
 
 def _query(sql: str) -> list[dict]:
-    """Run a read-only query against the public Datasette mirror of production.
+    """Run a read-only query against the internal Datasette's copy of production.
 
-    Datasette returns at most 1,000 rows per query (and flags the result as truncated), so page through it.
+    Datasette returns at most 1,000 rows per query (and flags the result as truncated), so page through it. Each page
+    re-runs the query, and each run must finish within Datasette's 1 s time limit.
     """
     rows: list[dict] = []
     page_size = 1000
     while True:
         paged = f"SELECT * FROM ({sql}) AS q ORDER BY 1 LIMIT {page_size} OFFSET {len(rows)}"
-        response = session.get(DATASETTE, params={"sql": paged, "_shape": "objects"}, timeout=120)
-        response.raise_for_status()
-        data = response.json()
-        # A failed query still returns `rows: []`, so check the error flag, not just the key.
-        if data.get("ok") is False or data.get("error") or "rows" not in data:
-            raise RuntimeError(f"Datasette query failed: {data.get('error', data)}")
+        response = session.get(OWID_DATASETTE_JSON_URL, params={"sql": paged, "_shape": "objects"}, timeout=120)
+        try:
+            data = response.json()
+        except ValueError:
+            response.raise_for_status()
+            raise
+        # A failed query (an SQL error, or "SQL Interrupted" at the time limit) comes back as JSON with `rows: []`
+        # and HTTP 400, so check the error flag, not just the key, and keep Datasette's message.
+        if not response.ok or data.get("ok") is False or data.get("error") or "rows" not in data:
+            raise RuntimeError(f"Datasette query failed ({data.get('title', response.status_code)}): {data.get('error', data)}")
         rows.extend(data["rows"])
         if len(data["rows"]) < page_size:
             return rows

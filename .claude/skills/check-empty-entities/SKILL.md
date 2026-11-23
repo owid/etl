@@ -8,7 +8,7 @@ metadata:
 
 # Check Empty Entities
 
-After an indicator upgrade, a view can end up pinned to entities that have no data in the new indicators. Grapher drops those entities silently: the chart renders with series missing (a WHO-regions chart showing only `World`), or **empty** when every pin is dead. Chart-diff now flags edited charts with dead pins and the grapher step fails when an upsert removes pinned entities (`etl/grapher/entity_selection.py`), but neither covers MDim views, explorer views, narrative charts, article links, or charts whose config wasn't edited. This skill audits every surface that stores an entity selection against the entities that actually have data, and grades each finding against production so regressions and pre-existing gaps aren't conflated.
+After an indicator upgrade, a view can end up pinned to entities that have no data in the new indicators. Grapher drops those entities silently: the chart renders with series missing (a WHO-regions chart showing only `World`), or **empty** when every pin is dead. Chart Diff flags edited charts with dead pins and the grapher step fails when an upsert removes pinned entities (`etl/grapher/entity_selection.py`), but neither covers MDim views, explorer views, narrative charts, article links, or charts whose config wasn't edited. This skill audits every surface that stores an entity selection against the entities that actually have data, and grades each finding against production so regressions and pre-existing gaps aren't conflated.
 
 > **Called from:** `/update-dataset` step 7 (author side — fix regressions before merge) and `/review-data-pr` §8d (reviewer side — verify the outcome). Keep those pointers in sync with this file.
 
@@ -59,7 +59,7 @@ For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`
 - Every entity in `selectedEntityNames` must have data in at least one of the chart's y-variables. **Each dead pin is a finding**, even when the rest of the selection still renders: the chart silently loses that series, and a reader can't tell. Zero overlap is the extreme case, where the chart renders empty. `dead_selected_entities` in `etl/grapher/entity_selection.py` implements this check.
 - **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities). Detect them by shape, not by the `type` field: a chart with an `x` dimension renders as a scatter even when `type` is absent (reporting as the `LineChart` default). An **empty selection means every entity renders, not none** — so a bad value in such a chart is maximally visible, not hidden. Phrasing a report line as "corrected entity not in selection" for these charts is actively misleading.
 - **Skip map-only charts** — `chartTypes: []` with `hasMapTab: true` has no chart tab, so `selectedEntityNames` never renders and a dead or partly dead selection is harmless. Note that `[]` is *not* the absent-field case: an absent `chartTypes` defaults to `LineChart` and must still be checked. The map itself is still covered by §2.
-- A **missing/empty selection** on other chart types is only a finding if production's config differs — the upgrader never touches entity selections, so an empty selection is almost always pre-existing. Verify via public Datasette before flagging.
+- A **missing/empty selection** on other chart types is only a finding if production's config differs — the upgrader never touches entity selections, so an empty selection is almost always pre-existing. Verify via the internal Datasette before flagging.
 - Also flag any y-variable whose entity list is entirely empty (a broken indicator, not just a broken view).
 
 ### 2. Map tabs
@@ -85,15 +85,15 @@ Article rows come back from the sweep with their `query_string`; the ones carryi
 - Every dead entity in `country=` is a finding, as for charts: the link opens the chart without it, or empty when none survive. Report fully dead links first, since they open an empty chart.
 - **Editing the gdoc:** Google Docs' Find & Replace cannot touch hyperlink *targets*, and most stale `country=` references are exactly that — URLs on words, sometimes split across several adjacent anchors by formatting runs. The handoff must say to click each link → edit → paste the corrected URL (only `{.chart}` `url:` lines are plain text and F&R-able). When building the corrected URL, edit at **token level** and anchor deletions on the leading `~` — entity names prefix-overlap (`DAC+countries+%28OECD%29` is a substring of `Non-DAC+countries+%28OECD%29`), so a naive substring replace corrupts both.
 - For content hand-off, link each citation with a scroll-to-highlight URL — reuse `find_chart_citations_in_content` from `apps/wizard/app_pages/chart_diff/citations.py`. Caveats: its embedded-chart pass only scans **top-level** body blocks (recurse yourself for charts nested in layout containers), most `country=` references turn out to be *hyperlinks* (its second pass, which does recurse), and data insights may store the chart reference where neither pass looks — fall back to the data-insight page URL. Wrap fragment URLs in `<angle brackets>` in markdown (they can contain parentheses).
-- **Verifying a gdoc fix: check the live article page, not the mirror.** Public Datasette's `posts_gdocs_links` lags and can show the stale `queryString` well after the edit is live — fetch the published article URL and grep its grapher URLs / `country=` params instead.
+- **Verifying a gdoc fix: check the live article page, not the mirror.** The internal Datasette's `posts_gdocs_links` lags and can show the stale `queryString` well after the edit is live — fetch the published article URL and grep its grapher URLs / `country=` params instead.
 
 ### 5. Grade against production
 
-For every finding, fetch the same chart's **production** y-variables (chart ids are shared; get prod `chart_dimensions` via public Datasette) and their entity lists from the production API:
+For every finding, fetch the same chart's **production** y-variables (chart ids are shared; get prod `chart_dimensions` via the internal Datasette) and their entity lists from the production API:
 
 - Pin had data on production, none on staging → **regression from this update**. Author: fix before merge (remap the view or restore the entities). Reviewer: 🔴.
 - Gap identical on production → **pre-existing**. It still needs fixing — it just doesn't block this PR. For **chart and narrative-chart selections** the fix is a one-line config edit that rides the same Chart Diff as the rest of the update, so *offer to apply it in the session* rather than deferring; only gdoc references genuinely need content follow-up. Rename vs. drop follows "Fixing a dead selection" above. And keep every deferred finding on an explicit tracked list until someone acts on it — "pre-existing, documented" findings that fall off the follow-up list resurface as user-reported empty charts. Reviewer: 🟡, confirm the fix is documented or underway.
-- Public Datasette covers only ~80% of chart ids — when a chart has no baseline, say so instead of silently classifying it as pre-existing.
+- The internal Datasette holds only published charts, so a chart with no row there is a draft or unpublished on production — when a chart has no baseline, say so instead of silently classifying it as pre-existing.
 
 ## Script skeleton
 
@@ -108,6 +108,7 @@ from etl.http import session as http_session
 env = OWIDEnv.from_staging("<branch>")
 PREFIX = env.indicators_url  # normalized container name — never hand-build staging-site-<branch>
 cache = {}
+unknown = []
 
 def entities(var_id, prefix=PREFIX):
     key = (prefix, var_id)

@@ -1,7 +1,7 @@
 ---
 name: fact-check-dataset
 description: >-
-  Adversarially review an ETL dataset's data and metadata for factual accuracy — verifies metadata claims against the producer's own documentation (fetched from the links in snapshot .dvc files and metadata texts) and cross-checks anomalous plus anchor values against independent sources online, to catch unit errors, wrong-year values, and hard-to-detect mistakes made by the source itself. Also checks the texts of a static chart (a Figma frame or a static viz) against the indicator and its producer. Use when the user asks to "adversarially review a dataset", "fact-check this dataset", "fact-check this chart's text", "verify the data against the source", "cross-check the values", or as the factual-accuracy step inside /update-dataset, /create-dataset, /review-data-pr, /create-static-viz and /owid-staff:create-figma-chart.
+  Adversarially review an ETL dataset's data and metadata for factual accuracy — verifies metadata claims against the producer's own documentation (fetched from the links in snapshot .dvc files and metadata texts) and cross-checks anomalous plus anchor values against independent sources online, to catch unit errors, wrong-year values, and hard-to-detect mistakes made by the source itself. Also checks the texts of a static chart (a Figma frame or a static viz) against the indicator and its producer. Use when someone wants a dataset's values or metadata, or a static chart's text, checked against the producer and independent sources, or as the factual-accuracy step inside /update-dataset, /create-dataset, /review-data-pr, /create-static-viz and /owid-staff:create-figma-chart.
 metadata:
   internal: true
   owner: paarriagadap
@@ -56,6 +56,7 @@ A review's time goes on turns, not on the web: each turn re-reads the whole cont
    ```bash
    .venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <target and options>
    ```
+   It reads production from the internal Datasette (`/query-grapher-db`), so it needs Tailscale.
    It resolves the steps, reads the `.dvc` origins, renders the metadata, fetches the producer's documentation in parallel as plain text, re-checks the source files, and (for a dataset) ranks the indicators, scans for anomalies and lists the DoDs. It prints a dossier and says what to do next. Any section it marks `FAILED` or `NOT RUN` is yours to do by hand; never skip one.
 2. **Read the producer's documentation from the dossier's `docs/` folder** with Grep (Read only the passage you need: the files can be long), and quote from that text with the file's fetch date. Fetch a page yourself only when a claim under review rests on it and the table marks it `unreachable`, `thin` or `not-fetched`, or when a claim needs a source the table lacks.
 3. **Batch what is independent.** Every WebSearch you already know you need goes in one message; then every WebFetch of the hits in one message. Same for file reads and local checks. One call per message only when the next call depends on the last result.

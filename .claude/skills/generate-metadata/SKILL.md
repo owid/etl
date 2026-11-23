@@ -235,9 +235,10 @@ tables:
   undp_hdr_sex:
     variables:
       gni_pc:
-        description_key:
-          - "{definitions.description_key_gni}"
-          - "{definitions.description_key_gni_per_capita_total_or_by_sex}"
+        description_key: |-
+          {definitions.description_key_gni}
+
+          {definitions.description_key_gni_per_capita_total_or_by_sex}
 ```
 
 ❌ `- "<% if sex == 'total' %>{definitions.a}<% else %>{definitions.b}<% endif %>"`, a one-line conditional inside the variable.
@@ -270,7 +271,7 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 3. **Research sources**: Starting from the snapshot `.dvc` origin URLs, find the producer's latest documentation (dataset page, methodology, indicator definitions, codebook, main report, what's new) per `.claude/rules/producer-documentation.md`, and show the user its links before writing. Use it to fill the fields and to contrast any text already written, and ask the user when it is missing, insufficient or inaccessible. Check what you write against the passages it comes from, and in the handoff say which source and section or page each indicator's text rests on, or that it is inferred from the data ("Say what the metadata rests on")
 4. **Write top-down**: Start with `definitions:` and `common:` to identify shared patterns before individual variables
 5. **Fill systematically**: For each variable: title -> units -> description_short -> description_key -> processing_level -> display
-6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr data://grapher/<ns>/<ver>/<ds> --grapher --only`
+6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (INSTANT speeds up the garden step, which `--only` would skip; the named `grapher://` step brings it along and runs the MySQL upsert)
 7. **Run the metadata quality checks** (next section)
 
 ## Metadata quality checks
@@ -290,7 +291,7 @@ Run all of these after the metadata is written and the steps are built, so every
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that; agencies revise methodology
    - Scope qualifiers present in the origin title but absent from user-facing text (private-only, adults-only, market-exchange-rate-only)
    - Text that adds nothing to what the reader has already read — a bullet repeating another bullet, `description_short`, or the title at the same level of detail (see the `description_key` guidance above).
-4. **Link verification** — every URL and `[term](#dod:term)` in the text: URLs must resolve (curl as the batch primary; on a 4xx from an OWID link, double-check with WebFetch + Wayback before acting, and offer to open a page that blocks both in the user's Chrome through the Claude in Chrome extension); dod slugs checked against the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`); a missing dod → keep the link and list it as a "create in admin" follow-up in the PR body.
+4. **Link verification** — every URL and `[term](#dod:term)` in the text: URLs must resolve (curl as the batch primary; on a 4xx from an OWID link, double-check with WebFetch + Wayback before acting, and offer to open a page that blocks both in the user's Chrome through the Claude in Chrome extension); dod slugs checked against the `dods` table via the internal Datasette (`SELECT name FROM dods WHERE name LIKE ...`); a missing dod → keep the link and list it as a "create in admin" follow-up in the PR body.
 5. **Dimension sweep** — for dimensional indicators (Jinja over a dimension, or a `definitions:` key several variants reference), every sentence must hold at *every* value it renders on, not just the one it was written for. Render the text per dimension value and read each output as a reader of that chart, asking what the view already restricts: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X; a scope word like "all employees" overclaims on a variant filtered to a subgroup; a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Prefer qualifying the wording so it holds everywhere (often one word, nothing extra to maintain) over adding a Jinja branch or a view-level override. Automated reviewers catch this class reliably, so sweeping first saves a review round.
 6. **Adversarial claims verification** — `/fact-check-dataset` scoped to the newly written or edited metadata text only: treat each added/changed sentence as a claim and verify it against the producer's documentation (read what's behind the links — check 4 only proves they resolve). Start with `.venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <ns>/<version>/<short_name> --context claims`, which saves that documentation as text and lists the DoDs. Catches text that is well-formed but factually wrong: stale methodology attributions, scope overclaims, misread units in prose. Scope by context: **mandatory in `/edit-faust-metadata`** (claims-only, no data cross-checks — cheap); the full-dataset review including data-value cross-checks is the separate step described in `/update-dataset` §6c-bis.
 

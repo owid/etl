@@ -236,6 +236,9 @@ else:
 # Override URLs from env variables if set
 SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
 
+# Where the Search API reads the indicators it ranks: MySQL when unset, else this published copy (api_search/indicators.py).
+SEARCH_INDICATORS_URL = env.get("SEARCH_INDICATORS_URL")
+
 
 def variable_data_url(variable_id):
     return f"{DATA_API_URL}/{variable_id}.data.json"
