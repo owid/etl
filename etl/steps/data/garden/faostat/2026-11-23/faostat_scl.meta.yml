@@ -1,0 +1,20 @@
+dataset:
+  owners:
+    - Pablo Rosado
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: UN FAO
+
+# NOTE: You can modify all indicators' metadata below.
+# However, it is preferable to change unit and short_unit in the custom_elements_and_units.csv.
+# After any modifications to the `custom_*.csv` files, remember to run the `faostat_metadata` garden step again.
+tables:
+  faostat_scl_flat:
+    variables:
+      {}
