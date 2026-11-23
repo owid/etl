@@ -43,7 +43,9 @@ SELECT id, slug FROM charts WHERE isPublished LIMIT 5"
   ```python
   import duckdb
 
-  con = duckdb.connect()
+  from etl.http import HEADERS
+
+  con = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
   con.execute(
       "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); "
       "SET enable_external_access=false; SET lock_configuration=true; USE owid"

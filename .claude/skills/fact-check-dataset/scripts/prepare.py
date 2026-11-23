@@ -1404,7 +1404,11 @@ def _as_number(value) -> float:
 def section_dods(result, dossier: Path) -> list[str]:
     out = ["## Details on Demand", ""]
     if not ok(result):
-        return out + [f"FAILED ({result}): run `scripts/collect_dods.py` by hand.", ""]
+        return out + [
+            f"FAILED ({result}): run `{collect_dods.RUN} .claude/skills/fact-check-dataset/scripts/collect_dods.py"
+            " <ns>/<version>/<short_name>` by hand.",
+            "",
+        ]
     (dossier / "dods.md").write_text(result)
     names = re.findall(r"^## (\S+) \(last edited", result, re.MULTILINE)
     if not names:

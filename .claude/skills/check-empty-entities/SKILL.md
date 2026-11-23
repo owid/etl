@@ -93,7 +93,7 @@ For every finding, fetch the same chart's **production** y-variables (chart ids 
 
 - Pin had data on production, none on staging → **regression from this update**. Author: fix before merge (remap the view or restore the entities). Reviewer: 🔴.
 - Gap identical on production → **pre-existing**. It still needs fixing — it just doesn't block this PR. For **chart and narrative-chart selections** the fix is a one-line config edit that rides the same Chart Diff as the rest of the update, so *offer to apply it in the session* rather than deferring; only gdoc references genuinely need content follow-up. Rename vs. drop follows "Fixing a dead selection" above. And keep every deferred finding on an explicit tracked list until someone acts on it — "pre-existing, documented" findings that fall off the follow-up list resurface as user-reported empty charts. Reviewer: 🟡, confirm the fix is documented or underway.
-- public.duckdb covers only ~80% of chart ids — when a chart has no baseline, say so instead of silently classifying it as pre-existing.
+- public.duckdb holds only published charts, so a chart with no row there is a draft or unpublished on production — when a chart has no baseline, say so instead of silently classifying it as pre-existing.
 
 ## Script skeleton
 

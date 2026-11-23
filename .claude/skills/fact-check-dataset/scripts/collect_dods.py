@@ -40,6 +40,8 @@ if TYPE_CHECKING:
     import duckdb
 
 PUBLIC_DB = "https://files.ourworldindata.org/public.duckdb"
+# How to run this script, and `prepare.py`, which imports it: the etl venv has no duckdb.
+RUN = "uv run --no-sync --python .venv/bin/python --with duckdb python"
 REPO = Path(__file__).resolve().parents[4]
 # A DoD link is `[text](#dod:<name>)`; names can contain colons, so match up to the closing parenthesis.
 DOD_RE = re.compile(r"#dod:\s*([^\s)\]\"'\\]+)")
@@ -367,18 +369,27 @@ def _query(sql: str) -> list[dict]:
     threads, so each call gets its own cursor, and `USE owid` is per cursor. duckdb is imported here, not at the
     top, so `prepare.py` and its tests load in the etl venv, which has no duckdb.
     """
-    import duckdb
+    try:
+        import duckdb
+    except ImportError as e:
+        raise ImportError(f"duckdb is not installed: run the script with `{RUN} <script>`") from e
 
     global _db
     with _db_lock:
         if _db is None:
-            _db = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
+            db = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
             # READ_ONLY doesn't stop a view or macro in the file from reading local files or URLs, so turn external
             # access off (after the ATTACH, which needs httpfs) and lock it.
-            _db.execute(
-                f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY); "
-                "SET enable_external_access=false; SET lock_configuration=true"
-            )
+            try:
+                db.execute(
+                    f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY); "
+                    "SET enable_external_access=false; SET lock_configuration=true"
+                )
+            except duckdb.Error:
+                # Keep `_db` unset, so the next call retries instead of querying a connection with nothing attached.
+                db.close()
+                raise
+            _db = db
     cursor = _db.cursor()
     cursor.execute("USE owid")
     cursor.execute(f"SELECT * FROM ({sql}) AS q ORDER BY 1")
