@@ -225,7 +225,8 @@ Merging creates the multidim on production **unpublished**: the user publishes i
 
 ## 7. Cut over on production
 
-In this order, because creating the redirects darkens the explorer at once:
+In this order, because the redirects darken the explorer, published or not, as soon as the deploy
+they queue goes out:
 
 1. **Links.** Rebuild the page with `--stage links`. The user (or the doc's author)
    swaps the links from its "Links to replace" section and republishes each doc; never edit a
@@ -238,7 +239,8 @@ In this order, because creating the redirects darkens the explorer at once:
    carries each view's config id, which differs from staging), then its `audit_references.py` and
    `preflight.py`. Rebuild the page with `--payload-env production --stage redirects`: only that
    version of the JSON is pasteable. Confirm `/grapher/<slug>` returns 200
-   (preflight reads the DB, not the site). After the user pastes it, poll a few views with
+   (preflight reads the DB, not the site). The paste queues a deploy (admin *Deploys*), and the
+   rules go live when it finishes. Then poll a few views with
    `curl -s -o /dev/null -w '%{http_code} %{redirect_url}'` until they return 302, including one
    with a `country=` param to check it is carried over.
 4. **External embeds.** Re-run the referrer query from
