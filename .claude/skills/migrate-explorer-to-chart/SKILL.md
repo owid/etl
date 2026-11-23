@@ -45,6 +45,9 @@ Ask first, every time, and wait for a yes that names the action:
 - **Posting to Slack**, in any channel or DM, including drafts. Give the user the text, and they
   post it.
 - **Anything on production**: redirects, featured metrics, gdoc edits, unpublishing the explorer.
+  The one standing exception is step 7.1: once the multidim is merged and published, add the
+  link swaps to the Google Docs as **suggestions**, without asking. Never a direct edit, never
+  accepting a suggestion, never republishing a doc.
 - **Contacting anyone outside OWID**, such as the sites that embed the explorer. Draft the
   message; the user sends it.
 
@@ -228,11 +231,26 @@ Merging creates the multidim on production **unpublished**: the user publishes i
 In this order, because the redirects darken the explorer, published or not, as soon as the deploy
 they queue goes out:
 
-1. **Links.** Rebuild the page with `--stage links`. The user (or the doc's author)
-   swaps the links from its "Links to replace" section and republishes each doc; never edit a
-   Google Doc yourself. Featured metrics go through `/map-explorer-to-mdim` step 5b with the
-   topic owner. Then re-run `scan_references.py`: no reference that breaks on redirect may remain,
-   and check the live pages (they re-bake a few minutes after the DB changes).
+1. **Links.** Once `/grapher/<slug>` returns 200, re-run `scan_references.py` (docs change
+   between the review and the merge) and rebuild the page with `--stage links`. Then add every
+   Google Doc link from "Links to replace" to its doc as a suggestion, so the user keeps control of
+   the text and of republishing. Per doc, with the Google Docs connector (if it isn't connected,
+   ask the user to run `/mcp` and pick "claude.ai Google Docs"):
+   - `read_doc` the doc (a large one is saved to a file);
+   - `scripts/gdoc_suggestions.py --doc <that file> --references <review>/references_full.json
+     --out <requests.json>` builds the requests: a URL written as text is replaced, a link
+     target is restyled to the new URL with its text kept. It lists any reference it can't find;
+   - `update_doc` with those requests and `writeControl: {"requiredRevisionId": <from the
+     file>, "writeMode": "SUGGEST"}`. A revision mismatch means the doc changed since the read:
+     read it again. Never send without `"writeMode": "SUGGEST"`: the default edits the doc.
+
+   Read one doc back to check the changes show as suggestions (`suggestedInsertionIds`,
+   `suggestedTextStyleChanges`), then tell the user which docs have suggestions. The user accepts
+   them and republishes each doc. References that aren't Google Docs (site redirects, legacy
+   WordPress, repo files) are not touched this way. Featured metrics go through
+   `/map-explorer-to-mdim` step 5b with the topic owner. After the user has republished, re-run
+   `scan_references.py`: no reference that breaks on redirect may remain, and check the live
+   pages (they re-bake a few minutes after the DB changes).
 2. **Site redirects** that end on `/explorers/<slug>` (admin `/redirects`): repoint them to the
    multidim, so they don't chain.
 3. **Redirect JSON.** Re-run `/map-explorer-to-mdim` steps 1–3 against production (the payload
