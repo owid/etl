@@ -46,7 +46,7 @@ MDIMs can be crafted in various ways, going from totally manual to fully automat
 
 Below is a simple MDIM configuration file (modified for demo purposes):
 
-```yaml title="etl/steps/viz/chart/covid/latest/covid.deaths.yml"
+```yaml title="etl/steps/viz/chart/covid/latest/deaths.config.yml"
 grapher_schema: "012"
 title:
   title: COVID-19 confirmed deaths
