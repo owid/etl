@@ -49,22 +49,31 @@ def dimension_summary(mapping: dict) -> list[dict]:
             # Prefer the explorer dimension named like this one, then explorer order, to break ties.
             order = sorted(names, key=lambda n: (_slugify(n) != slug, names.index(n)))
             choices = list(dict.fromkeys(t.get(slug) for _, t in mrows if t.get(slug) is not None))
+            # Conditions are one or two explorer dimensions, in tie-break order.
+            keysets = [(n,) for n in order] + [(a, b) for i, a in enumerate(order) for b in order[i + 1 :]]
             summary = []
             for choice in choices:
                 pos = [s for s, t in mrows if t.get(slug) == choice]
-                neg = [s for s, t in mrows if t.get(slug) != choice]
-
-                def valid(cond: dict) -> bool:
-                    return not any(all(s[n] == v for n, v in cond.items()) for s in neg)
+                # A condition is valid when no view landing elsewhere matches it: look it up in the
+                # values those views take on its dimensions, instead of scanning them per condition.
+                taken = {ks: {tuple(s[n] for n in ks) for s, t in mrows if t.get(slug) != choice} for ks in keysets}
 
                 rules: list[dict] = []
                 left = pos
                 while left:
-                    # One or two conditions, whichever covers the most views left (ties: fewer conditions).
-                    cands = [{n: s[n]} for s in left for n in order]
-                    cands += [{a: s[a], b: s[b]} for s in left for i, a in enumerate(order) for b in order[i + 1 :]]
-                    cands = [c for c in cands if valid(c)] or [dict(left[0])]
-                    best = max(cands, key=lambda c: (sum(all(s[n] == v for n, v in c.items()) for s in left), -len(c)))
+                    # One or two conditions, whichever covers the most views left (ties: fewer
+                    # conditions, then the first found, as candidates are listed view by view).
+                    covers: dict[tuple, int] = {}
+                    for s in left:
+                        for ks in keysets:
+                            vals = tuple(s[n] for n in ks)
+                            if vals not in taken[ks]:
+                                covers[(ks, vals)] = covers.get((ks, vals), 0) + 1
+                    if covers:
+                        ks, vals = max(covers, key=lambda c: (covers[c], -len(c[0])))
+                        best = dict(zip(ks, vals))
+                    else:
+                        best = dict(left[0])
                     rules.append(best)
                     left = [s for s in left if not all(s[n] == v for n, v in best.items())]
                 # One-condition rules on the same dimension read as one: Metric = A, B or C.
@@ -296,7 +305,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="payload">
-    <div class="sec-head"><h2>Redirects to create</h2><p>Paste into <b>Bulk-create redirects from JSON</b> at <a href="https://admin.owid.io/admin/multi-dim-redirects" target="_blank" rel="noopener">admin.owid.io/admin/multi-dim-redirects</a>. Creating them takes the explorer offline at once, and they can only be removed one at a time.</p></div>
+    <div class="sec-head"><h2>Redirects to create</h2><p>Paste into <b>Bulk-create redirects from JSON</b> at <a href="https://admin.owid.io/admin/multi-dim-redirects" target="_blank" rel="noopener">admin.owid.io/admin/multi-dim-redirects</a>. They take the explorer offline as soon as the deploy the paste queues goes out, and they can only be removed one at a time.</p></div>
     <div id="pbanner"></div>
     <div class="row"><button id="copyPayload">Copy JSON</button><span class="small" id="pstats"></span></div>
     <pre id="pjson"></pre>

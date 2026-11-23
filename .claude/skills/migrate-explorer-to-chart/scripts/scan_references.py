@@ -133,7 +133,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
         the one dimension that offers its value.
         """
         out, notes = {}, []
-        for k, v in q.items():
+        for k, v in list(q.items()):
+            # A `;` instead of `&` ("…ZAF;hideControls=false") glues the next param onto the value.
+            if ";" in v and "=" in v.split(";", 1)[1]:
+                v, rest = v.split(";", 1)
+                rk, rv = rest.split("=", 1)
+                out.setdefault(rk, rv)
+                notes.append(f"split “{rk}={rv}” off “{k}”")
             if k in choices and v not in choices[k]:
                 head = next((c for c in sorted(choices[k], key=len, reverse=True) if c and v.startswith(c)), None)
                 if head:
@@ -143,6 +149,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         rk, rv = rest.split("=", 1)
                         out[rk] = rv
                     notes.append(f"cut “{v}” to “{head}”")
+                    continue
+                # A renamed choice ("Protein per day" → "Grams of protein per day"): the one choice
+                # whose name contains the old one.
+                named = [c for c in choices[k] if c and v.lower() in c.lower()]
+                if len(named) == 1:
+                    out[k] = named[0]
+                    notes.append(f"renamed choice “{v}” to “{named[0]}”")
                     continue
             if k not in choices and k not in {
                 "country",
@@ -171,18 +184,21 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
 
         Like the explorer (and the multidim), keep the dimensions in order and, at the first one
         whose value no view offers alongside the earlier ones, take the first view's value. A
-        dimension the link leaves out is filled only when the views left allow a single value.
+        dimension the link leaves out also gets the first remaining view's value, as the explorer
+        does.
         """
         out, notes, pool = dict(q), [], views
+        if not any(d in q for d in dim_names):
+            return q, []
         for d in dim_names:
             if d not in out:
-                vals = {v[d] for v in pool}
-                if len(vals) != 1:
+                if not pool:
                     return q, []
-                (val,) = vals
+                val = pool[0][d]
                 if val:
                     out[d] = val
-                    notes.append(f"added the missing “{d}={val}” (the only value the explorer can show)")
+                    notes.append(f"added the missing “{d}={val}” (what the explorer shows)")
+                pool = [v for v in pool if v[d] == val]
                 continue
             if not any(v[d] == out[d] for v in pool):
                 if not pool:
