@@ -41,7 +41,12 @@ def chart_id_from_url(url: str) -> int:
 
 def public_db(sql: str) -> list[dict]:
     con = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
-    con.execute("ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid")
+    # External access off (after the ATTACH, which needs httpfs): READ_ONLY alone lets a view in the file read
+    # local files or URLs.
+    con.execute(
+        "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); "
+        "SET enable_external_access=false; SET lock_configuration=true; USE owid"
+    )
     cur = con.execute(sql)
     cols = [c[0] for c in cur.description]
     return [dict(zip(cols, row)) for row in cur.fetchall()]

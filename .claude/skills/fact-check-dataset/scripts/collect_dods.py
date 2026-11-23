@@ -368,7 +368,11 @@ def _query(sql: str) -> list[dict]:
     with _db_lock:
         if _db is None:
             _db = duckdb.connect(config={"custom_user_agent": HEADERS["User-Agent"]})
-            _db.execute(f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY)")
+            # READ_ONLY doesn't stop a view or macro in the file from reading local files or URLs, so turn external
+            # access off (after the ATTACH, which needs httpfs) and lock it.
+            _db.execute(
+                f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY); SET enable_external_access=false; SET lock_configuration=true"
+            )
     cursor = _db.cursor()
     cursor.execute("USE owid")
     cursor.execute(f"SELECT * FROM ({sql}) AS q ORDER BY 1")

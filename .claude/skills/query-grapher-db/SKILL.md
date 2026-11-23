@@ -32,7 +32,8 @@ df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 When you need production data (which charts use an indicator, chart configs, gdoc links) and local/prod MySQL isn't reachable, query `https://files.ourworldindata.org/public.duckdb`, the nightly public export of the grapher DB. DuckDB reads it in place over HTTP range requests, so a query fetches a few MB, not the ~1 GB file:
 
 ```bash
-duckdb -json -c "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid;
+duckdb -json -c "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY);
+SET enable_external_access=false; SET lock_configuration=true; USE owid;
 SELECT id, slug FROM charts WHERE isPublished LIMIT 5"
 ```
 
@@ -43,9 +44,13 @@ SELECT id, slug FROM charts WHERE isPublished LIMIT 5"
   import duckdb
 
   con = duckdb.connect()
-  con.execute("ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid")
+  con.execute(
+      "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); "
+      "SET enable_external_access=false; SET lock_configuration=true; USE owid"
+  )
   df = con.sql("SELECT id, slug FROM charts WHERE isPublished").df()
   ```
+- **Keep the two `SET`s right after every `ATTACH`**, a local file's included. `READ_ONLY` doesn't stop a view or macro inside the file from reading local files (`read_text('~/.ssh/...')`) or fetching URLs, so a tampered export could pull them into what you see; the `SET`s turn that off for the session and lock it. They must come after the `ATTACH`, which needs httpfs to load.
 - **It is DuckDB SQL, not MySQL.** JSON columns (`config`, `content`, `descriptionKey`) are text: read them with `->>'$.path'` or `json_extract_string`. It is exported nightly, so it lags production.
 - **On first use DuckDB downloads its `httpfs` extension from `extensions.duckdb.org`**, so a sandbox with a host allow-list needs that host as well as `files.ourworldindata.org`. Without it, download `https://files.ourworldindata.org/public.duckdb.gz` (~80 MB), gunzip it (~1 GB) and `ATTACH` the local file instead.
 

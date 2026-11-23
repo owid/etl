@@ -95,7 +95,8 @@ For agent sessions running in a Claude Code cloud sandbox
 
   # /admin/charts/<id>/edit — config arrives as a JSON string, so unwrap it
   uvx --from duckdb-cli duckdb -noheader -list -c \
-    "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY); USE owid;
+    "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY);
+     SET enable_external_access=false; SET lock_configuration=true; USE owid;
      SELECT config FROM charts WHERE id = <id>" \
     | .venv/bin/python -m json.tool
   ```
@@ -106,7 +107,7 @@ For agent sessions running in a Claude Code cloud sandbox
   On first use DuckDB fetches its `httpfs` extension from
   `extensions.duckdb.org`; where only `files.ourworldindata.org` is reachable,
   download `public.duckdb.gz` from there (~80 MB, ~1 GB unzipped) and `ATTACH`
-  the local file. Charts and gdocs are published-only, so an empty result
+  the local file, with the same two `SET`s after it. Charts and gdocs are published-only, so an empty result
   usually means a draft — ask the user to paste
   `admin.owid.io/admin/api/charts/<id>.config.json` rather than guessing.
 
