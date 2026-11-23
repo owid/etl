@@ -1069,7 +1069,7 @@
                       "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         [
-                          "Must be an existing topic tag, and be spelled correctly: one of the values in this field's `enum`. That list is a snapshot; the live one is the topic-tag query in the [create-chart skill](https://github.com/owid/etl/blob/master/.claude/skills/create-chart/SKILL.md), run against `https://files.ourworldindata.org/public.duckdb`."
+                          "Must be an existing topic tag, and be spelled correctly: one of the values in this field's `enum`. That list is a snapshot; the live one is the topic-tag query in the [create-chart skill](https://github.com/owid/etl/blob/master/.claude/skills/create-chart/SKILL.md)."
                         ],
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."

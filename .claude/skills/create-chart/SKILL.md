@@ -385,12 +385,11 @@ Rules:
 
 Valid topic tags (from `topic_tags` in `schemas/dataset-schema.json`):
 
-The schema enum is a static snapshot; if a tag seems missing, the canonical live list comes from this query against public.duckdb (see `/query-grapher-db`; `uvx --from duckdb-cli duckdb` without a local `duckdb`):
+The schema enum is a static snapshot; if a tag seems missing, the canonical live list comes from this query against the internal Datasette (over Tailscale; `/query-grapher-db` has it and the `public.duckdb` route off the tailnet):
 
 ```bash
-duckdb -json -c "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY);
-SET enable_external_access=false; SET lock_configuration=true; USE owid;
-SELECT DISTINCT t.name FROM tag_graph tg LEFT JOIN tags t ON tg.childId = t.id
+curl -s -G http://analytics.owid.io/owid.json -d _shape=array --data-urlencode "sql=SELECT DISTINCT t.name
+FROM tag_graph tg LEFT JOIN tags t ON tg.childId = t.id
 LEFT JOIN posts_gdocs p ON t.slug = p.slug AND p.published = 1 AND p.type IN ('article', 'topic-page', 'linear-topic-page')
 WHERE p.slug IS NOT NULL UNION SELECT 'Uncategorized' ORDER BY t.name"
 ```

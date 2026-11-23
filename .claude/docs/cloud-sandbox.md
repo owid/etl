@@ -87,7 +87,9 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **Resolve `admin.owid.io` links through the public indicator API and
   `public.duckdb` instead of opening them** (`public.duckdb` is the nightly
-  public copy of the grapher DB; `/query-grapher-db` has the recipe):
+  public copy of the grapher DB; `/query-grapher-db` has the recipe). It also
+  stands in wherever a skill queries the internal Datasette
+  (`analytics.owid.io`), which is reachable only over Tailscale:
 
   ```bash
   # /admin/variables/<id> — indicator metadata, also for indicators in no chart

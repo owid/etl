@@ -236,7 +236,7 @@ wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
 1. The grapher `static_viz` table carries a **`grapherSlug`** column. That gives a slug, and the
-   slug goes through the resolver above. Note this table is **not** in public.duckdb,
+   slug goes through the resolver above. Note this table is **not** in the internal Datasette or public.duckdb,
    so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
    cloud session cannot reach it either, and the slug has to come from the user.
 2. `ai/static_viz_popularity/static_viz_popular.csv` gives rank, the pages it appears on, views,
