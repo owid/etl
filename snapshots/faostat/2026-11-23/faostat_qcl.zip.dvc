@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Production: Crops and livestock products'
+    description: |-
+      This dataset provides annual statistics on crop and livestock production across countries and territories. For crops, data are provided on area harvested, production quantities and yields. For livestock, data are provided on animal stocks, numbers of producing and slaughtered animals, and the production of meat, milk, eggs and other livestock products. The dataset also includes information on production quantities for selected processed products, such as vegetable oils, sugar, fibres, beer, wine and major dairy products.
+    citation_full: 'Food and Agriculture Organization of the United Nations – Production: Crops and livestock products (2025).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/QCL
+    url_download: https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip
+    date_accessed: '2026-11-23'
+    date_published: '2025-12-31'
+    license:
+      name: CC BY 4.0
+      url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 1a202c5674dce152f1134fa87b220b82
+    size: 33921825
+    path: faostat_qcl.zip
