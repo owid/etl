@@ -19,10 +19,10 @@ exported nightly, so it lags production). A DoD edited on the branch's staging s
 merge, so pass `--staging <branch>` to read the DoD text from that staging server's MySQL instead (needs the
 staging network); entries whose staging text differs from the production mirror are flagged.
 
-Usage (the etl venv has no duckdb: `--with duckdb` layers it on top, and `--no-sync` leaves the venv untouched):
-    uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<ver>/<name>
-    uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<ver>/<name> \
-        --staging <branch>
+Usage, from the repo root (the etl venv has no duckdb: `--with duckdb` layers it on top, `--no-sync` leaves the venv
+untouched, and `--python .venv/bin/python` fails loudly when there is no venv yet instead of creating an empty one):
+    uv run --no-sync --python .venv/bin/python --with duckdb \
+        python .claude/skills/fact-check-dataset/scripts/collect_dods.py <ns>/<ver>/<name> [--staging <branch>]
 """
 
 import argparse
@@ -31,11 +31,13 @@ import re
 import threading
 from collections import defaultdict
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlsplit
 
-import duckdb
-
 from etl.http import HEADERS
+
+if TYPE_CHECKING:
+    import duckdb
 
 PUBLIC_DB = "https://files.ourworldindata.org/public.duckdb"
 REPO = Path(__file__).resolve().parents[4]
@@ -354,7 +356,7 @@ def _sql_list(values) -> str:
     return ",".join(quoted) or "NULL"
 
 
-_db: duckdb.DuckDBPyConnection | None = None
+_db: "duckdb.DuckDBPyConnection | None" = None
 _db_lock = threading.Lock()
 
 
@@ -362,8 +364,11 @@ def _query(sql: str) -> list[dict]:
     """Run a read-only query against public.duckdb, read in place over HTTP, as dict rows in a stable order.
 
     One connection per run (each ATTACH refetches the file's metadata); `prepare.py` calls this from several
-    threads, so each call gets its own cursor, and `USE owid` is per cursor.
+    threads, so each call gets its own cursor, and `USE owid` is per cursor. duckdb is imported here, not at the
+    top, so `prepare.py` and its tests load in the etl venv, which has no duckdb.
     """
+    import duckdb
+
     global _db
     with _db_lock:
         if _db is None:
@@ -371,7 +376,8 @@ def _query(sql: str) -> list[dict]:
             # READ_ONLY doesn't stop a view or macro in the file from reading local files or URLs, so turn external
             # access off (after the ATTACH, which needs httpfs) and lock it.
             _db.execute(
-                f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY); SET enable_external_access=false; SET lock_configuration=true"
+                f"ATTACH '{PUBLIC_DB}' AS owid (READ_ONLY); "
+                "SET enable_external_access=false; SET lock_configuration=true"
             )
     cursor = _db.cursor()
     cursor.execute("USE owid")

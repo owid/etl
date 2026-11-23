@@ -17,7 +17,8 @@ Configs are read from PUBLIC.DUCKDB, the nightly copy of production — which is
 staging DB was cloned from. That is deliberate: it reflects the pre-run baseline even if
 an earlier run already touched staging.
 
-Run it with `uv run --no-sync --with duckdb python ...`: the etl venv has no duckdb.
+Run it with `uv run --no-sync --python .venv/bin/python --with duckdb python ...`: the etl venv
+has no duckdb (see fact-check-dataset's collect_dods.py for why each flag).
 """
 
 import argparse

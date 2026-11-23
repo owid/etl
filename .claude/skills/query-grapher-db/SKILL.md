@@ -38,7 +38,7 @@ SELECT id, slug FROM charts WHERE isPublished LIMIT 5"
 ```
 
 - **No local `duckdb`:** `uvx --from duckdb-cli duckdb -json -c "..."`.
-- **Python:** the etl venv has no duckdb, so run with `uv run --no-sync --with duckdb python <script>` (`--no-sync` leaves the venv untouched). Open one connection and reuse it, since each `ATTACH` refetches the file's metadata:
+- **Python:** the etl venv has no duckdb, so run with `uv run --no-sync --python .venv/bin/python --with duckdb python <script>` (`--no-sync` leaves the venv untouched; `--python .venv/bin/python` fails loudly when there is no venv yet, where plain `uv run` would create an empty `.venv` that `make .venv` then takes as up to date). Open one connection and reuse it, since each `ATTACH` refetches the file's metadata:
 
   ```python
   import duckdb

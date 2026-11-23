@@ -190,7 +190,7 @@ Confirm the upsert actually succeeded before moving on: it should print the data
 Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>` once the garden step is built:
 
 ```bash
-uv run --no-sync --with duckdb python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<version>/<short_name> --context create
+uv run --no-sync --python .venv/bin/python --with duckdb python .claude/skills/fact-check-dataset/scripts/prepare.py <namespace>/<version>/<short_name> --context create
 ```
 
 The command prints a dossier and writes two briefs. Start both as background agents in one message, each with the prompt `Read <brief> and do what it says.`, and carry on; when both are back, settle the notes each lane left for the other and run the `assemble_report.py` command the dossier prints. Skip the review only on the user's explicit request, and say so in the PR body. Scale the effort: the main indicators with a few value cross-checks each, more where the build raised red flags. The empty-entity audit doesn't apply yet (no charts).
