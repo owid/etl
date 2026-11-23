@@ -801,9 +801,11 @@ def summarize_title_llm(title) -> str:
 CLEAN_HELP = """Clean up local branches whose pull request was merged or closed on GitHub.
 
 Lists every local branch whose latest GitHub PR is **merged** or **closed** (using GitHub's PR
-state, not `git branch --merged`, so squash-merges are detected). Branches that have a git worktree
-are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`, and the
-tool will:
+state, not `git branch --merged`, so squash-merges are detected). A branch with no PR of its own is
+also listed as merged when its last commit is part of a merged PR, e.g. a temporary copy of a PR
+branch, or a branch whose work was merged from a branch with another name. Branches that have a git
+worktree are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`,
+and the tool will:
 
 1. (Worktree branches only) Check the worktree for uncommitted changes that would block
    `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
@@ -877,16 +879,16 @@ def clean_cli() -> None:
             f"  cd to main and re-run:\n    cd {main_worktree_path}"
         )
 
-    # Candidate branches: every local branch except master.
-    candidate_branches = [b.name for b in repo.branches if b.name != "master"]
-    if not candidate_branches:
+    # Candidate branches: every local branch except master, with the last commit of each.
+    candidate_tips = {b.name: b.commit.hexsha for b in repo.branches if b.name != "master"}
+    if not candidate_tips:
         print("No local branches to clean (only 'master' found).")
         return
 
-    # Resolve each branch's PR state from GitHub (parallelised — one API call per branch).
-    log.info(f"Checking GitHub PR state for {len(candidate_branches)} local branch(es)...")
+    # Resolve each branch's PR state from GitHub (parallelised — one or two API calls per branch).
+    log.info(f"Checking GitHub PR state for {len(candidate_tips)} local branch(es)...")
     with ThreadPoolExecutor(max_workers=8) as executor:
-        states = dict(zip(candidate_branches, executor.map(fetch_pr_state, candidate_branches)))
+        states = dict(zip(candidate_tips, executor.map(fetch_pr_state, candidate_tips, candidate_tips.values())))
 
     # Keep only branches whose PR was merged or closed; active (open / no-PR) branches are left alone.
     cleanable = {b: s for b, s in states.items() if s in ("merged", "closed")}
@@ -1007,26 +1009,47 @@ def worktree_blocking_changes(worktree_path: Path) -> list[str]:
     return [line for line in lines if line[3:] not in share_data_links]
 
 
-def fetch_pr_state(branch: str) -> str | None:
+def fetch_pr_state(branch: str, tip_sha: str | None = None) -> str | None:
     """Return the GitHub PR state for a branch: 'open', 'merged', 'closed', or None.
 
     None means either no PR exists for the branch or the GitHub request failed (logged as a warning);
     in both cases the branch is treated as not-cleanable and left alone. Uses GitHub's PR state rather
     than git ancestry so squash-merged PRs are correctly seen as merged.
+
+    When no PR has the branch's name, the PRs containing its last commit (`tip_sha`) are used instead.
+    If one of them was merged, the branch holds nothing that isn't on master. This fallback never
+    returns 'closed', so a branch whose last commit is only in unmerged PRs is left alone.
     """
+    prs = _fetch_prs(f"{GITHUB_API_BASE}/pulls", branch, params={"state": "all", "head": f"owid:{branch}"})
+    if prs:
+        return _pr_state(prs)
+    if prs is None or tip_sha is None:
+        return None
+    # GitHub answers 422 for a commit it doesn't have (one that was never pushed): no PR contains it.
+    prs = _fetch_prs(f"{GITHUB_API_BASE}/commits/{tip_sha}/pulls", branch, no_pr_statuses=(422,))
+    if not prs:
+        return None
+    state = _pr_state(prs)
+    return state if state != "closed" else None
+
+
+def _fetch_prs(url: str, branch: str, params: dict | None = None, no_pr_statuses: tuple[int, ...] = ()) -> list | None:
+    """Fetch a list of PRs from GitHub, or None if the request failed (logged as a warning)."""
     headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-    params = {"state": "all", "head": f"owid:{branch}", "per_page": 50}
     try:
-        response = requests.get(f"{GITHUB_API_BASE}/pulls", params=params, headers=headers, timeout=30)
+        response = requests.get(url, params={**(params or {}), "per_page": 50}, headers=headers, timeout=30)
     except requests.RequestException as e:
         log.warning(f"Could not fetch PR state for '{branch}': {e}")
         return None
+    if response.status_code in no_pr_statuses:
+        return []
     if response.status_code != 200:
         log.warning(f"Could not fetch PR state for '{branch}' (HTTP {response.status_code}).")
         return None
-    prs = response.json()
-    if not prs:
-        return None
+    return response.json()
+
+
+def _pr_state(prs: list) -> str:
     # An open PR means the branch is still active. A merged PR (state 'closed' with merged_at set)
     # wins over a plain closed one. Otherwise the branch's PRs were closed without merging.
     if any(pr.get("state") == "open" for pr in prs):

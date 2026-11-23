@@ -17,6 +17,7 @@ from apps.pr.cli import (
     _CLEAN_ALL_CLOSED,
     _CLEAN_ALL_MERGED,
     clean_branch,
+    fetch_pr_state,
     remove_worktree,
     resolve_branches_to_clean,
     worktree_blocking_changes,
@@ -129,6 +130,66 @@ def test_resolve_branches_to_clean_no_sentinel_collision():
     """A real branch literally named like a sentinel marker must be treated as that one branch."""
     cleanable = {"__all_merged__": "closed", "other-merged": "merged"}
     assert resolve_branches_to_clean("__all_merged__", cleanable) == ["__all_merged__"]
+
+
+class _FakeResponse:
+    def __init__(self, status_code: int, prs: list | None = None):
+        self.status_code = status_code
+        self._prs = prs or []
+
+    def json(self):
+        return self._prs
+
+
+def _fake_github(monkeypatch, by_name: _FakeResponse, by_commit: _FakeResponse | None = None) -> list[str]:
+    """Answer the PR lookup by branch name with `by_name`, and by commit with `by_commit`; return the URLs asked."""
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append(url)
+        if "/commits/" in url:
+            assert by_commit is not None, "The lookup by commit should not have been made."
+            return by_commit
+        return by_name
+
+    monkeypatch.setattr("apps.pr.cli.requests.get", fake_get)
+    return calls
+
+
+MERGED_PR = {"state": "closed", "merged_at": "2026-11-10T00:00:00Z"}
+CLOSED_PR = {"state": "closed", "merged_at": None}
+OPEN_PR = {"state": "open", "merged_at": None}
+
+
+def test_fetch_pr_state_by_branch_name(monkeypatch):
+    calls = _fake_github(monkeypatch, by_name=_FakeResponse(200, [MERGED_PR]))
+    assert fetch_pr_state("feature", tip_sha="abc") == "merged"
+    assert len(calls) == 1
+
+
+def test_fetch_pr_state_by_last_commit_when_no_pr_has_the_name(monkeypatch):
+    """A branch with no PR of its own, whose last commit is part of a merged PR, counts as merged."""
+    _fake_github(monkeypatch, by_name=_FakeResponse(200, []), by_commit=_FakeResponse(200, [MERGED_PR]))
+    assert fetch_pr_state("tmp-copy", tip_sha="abc") == "merged"
+
+
+def test_fetch_pr_state_by_last_commit_keeps_branches_of_open_or_closed_prs(monkeypatch):
+    _fake_github(monkeypatch, by_name=_FakeResponse(200, []), by_commit=_FakeResponse(200, [OPEN_PR]))
+    assert fetch_pr_state("tmp-copy", tip_sha="abc") == "open"
+    # A last commit that is only in unmerged PRs is not enough to call the branch cleanable.
+    _fake_github(monkeypatch, by_name=_FakeResponse(200, []), by_commit=_FakeResponse(200, [CLOSED_PR]))
+    assert fetch_pr_state("tmp-copy", tip_sha="abc") is None
+
+
+def test_fetch_pr_state_unpushed_last_commit(monkeypatch):
+    """GitHub answers 422 for a commit it doesn't have, which means no PR contains it."""
+    _fake_github(monkeypatch, by_name=_FakeResponse(200, []), by_commit=_FakeResponse(422))
+    assert fetch_pr_state("local-only", tip_sha="abc") is None
+
+
+def test_fetch_pr_state_failed_name_lookup_skips_commit_lookup(monkeypatch):
+    _fake_github(monkeypatch, by_name=_FakeResponse(500))
+    assert fetch_pr_state("feature", tip_sha="abc") is None
 
 
 def test_clean_branch_cleans_manually_deleted_worktree(repo_with_worktree, tmp_path):
