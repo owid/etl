@@ -22,8 +22,9 @@ import json
 import re
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from etl.config import OWIDEnv
 from etl.paths import BASE_DIR
@@ -208,14 +209,23 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
             pool = [v for v in pool if v[d] == out[d]]
         return out, notes
 
+    def clean(r):
+        """The URL to paste in a doc: without explorer params the matched view doesn't use
+        (the redirect carries them along, and the multidim ignores them)."""
+        if not r.leftover_params:
+            return r
+        parts = urlsplit(r.url)
+        q = [(k, v) for k, v in parse_qsl(parts.query) if k not in r.leftover_params]
+        return replace(r, url=urlunsplit(parts._replace(query=urlencode(q))))
+
     def new_url(old: str) -> dict:
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
-        r = resolve_explorer_url(rules, q, SITE, choices, dim_names)
+        r = clean(resolve_explorer_url(rules, q, SITE, choices, dim_names))
         if r.match != "view" and q:
             fixed, notes = repair(q)
             fixed, more = fall_back(fixed)
             notes += more
-            r2 = resolve_explorer_url(rules, fixed, SITE, choices, dim_names) if notes else None
+            r2 = clean(resolve_explorer_url(rules, fixed, SITE, choices, dim_names)) if notes else None
             if r2 and r2.match == "view":
                 # The redirect still sends the broken link to the default view; the doc edit fixes it.
                 return {
