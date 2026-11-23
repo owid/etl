@@ -113,6 +113,20 @@ def gdoc_uses(content: dict, pat: re.Pattern) -> list[dict]:
     return found
 
 
+def unwrap(url: str) -> str:
+    """The real target of a link pasted from Google's redirect wrapper (`google.com/url?q=<url>&sa=...`).
+
+    Docs keep these when text is copied from a Google search or another doc. Resolving the wrapper
+    itself would read Google's params (`q`, `sa`, `usg`) as explorer params.
+    """
+    parts = urlsplit(url)
+    if parts.netloc.endswith("google.com") and parts.path == "/url":
+        target = dict(parse_qsl(parts.query)).get("q")
+        if target:
+            return target
+    return url
+
+
 def breaks_on_redirect(how: str) -> bool:
     # Embeds and cards render by fetching the explorer page itself; a redirect breaks them at once.
     return how in {"chart", "prominent-link", "all-charts", "key-indicator", "explorer-tiles"}
@@ -219,6 +233,7 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
         return replace(r, url=urlunsplit(parts._replace(query=urlencode(q))))
 
     def new_url(old: str) -> dict:
+        old = unwrap(old)
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
         r = clean(resolve_explorer_url(rules, q, SITE, choices, dim_names))
         if r.match != "view" and q:
