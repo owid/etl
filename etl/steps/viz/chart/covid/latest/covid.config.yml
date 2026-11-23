@@ -461,7 +461,6 @@ views:
     indicators:
       y: hospital#daily_occupancy_hosp
     config:
-      subtitle: ' '
   - dimensions:
       metric: patients
       interval: daily
@@ -469,7 +468,6 @@ views:
     indicators:
       y: hospital#daily_occupancy_hosp_per_1m
     config:
-      subtitle: ' '
   - dimensions:
       metric: admissions
       interval: weekly
@@ -489,7 +487,6 @@ views:
     indicators:
       y: hospital#daily_occupancy_icu
     config:
-      subtitle: ' '
   - dimensions:
       metric: icu_patients
       interval: daily
@@ -497,7 +494,6 @@ views:
     indicators:
       y: hospital#daily_occupancy_icu_per_1m
     config:
-      subtitle: ' '
   - dimensions:
       metric: icu_admissions
       interval: daily_new
@@ -693,7 +689,6 @@ views:
         - vaccinations_global#total_boosters_per_hundred
     config:
       title: COVID-19 vaccine doses, people with at least one dose, people with a full initial protocol, and boosters per 100 people
-      subtitle: ' '
       hasMapTab: false
       selectedFacetStrategy: metric
       yAxis:
