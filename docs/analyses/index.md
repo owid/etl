@@ -72,7 +72,7 @@ This is just a sneak peek into some of our data work. But note that all our code
 !!! note ""
 
     ## [Food balances in calories and protein, from crops to food](food_supply_chain/food_supply_chain.html)
-    Technical companion to the article ["The world produces enough calories to feed a global population twice the size. Where do they go?"](https://ourworldindata.org/the-world-produces-enough-calories-to-feed-a-global-population-twice-the-size-where-do-they-go), and to our chart that follows each country's food from the crops it grows to the food available to eat.
+    Technical companion to the article ["The world produces enough calories to feed a global population twice the size. Where do they go?"](https://ourworldindata.org/the-world-produces-enough-calories-to-feed-a-global-population-twice-the-size-where-do-they-go), and in particular to its chart that follows each country's food from the crops it grows to the food available to eat.
     It explains how we convert FAOSTAT's food balances from tonnes into calories and protein, using two FAOSTAT datasets: the *Supply Utilization Accounts* (from 2010) and the *Food Balance Sheets* (from 1961).
 
     [:material-notebook: View notebook](food_supply_chain/food_supply_chain.html){ .md-button }
