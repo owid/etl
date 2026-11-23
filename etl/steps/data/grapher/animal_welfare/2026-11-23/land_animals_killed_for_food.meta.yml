@@ -1,0 +1,25 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
+dataset:
+  title: Land animals killed for food
+
+tables:
+  land_animals_killed_for_food:
+    # title: Land animals killed for food
+    variables:
+      n_animals_killed:
+        title: &title-animals-killed Number of << animal >> slaughtered to produce meat
+        description_short: This data is based on the country of production, not consumption.
+        description_key:
+          - Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.
+          - <% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>
+        unit: animals
+        short_unit: ""
+        display:
+          name: << animal.capitalize() >>
+        presentation:
+          title_public: *title-animals-killed

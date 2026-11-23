@@ -136,15 +136,17 @@ steps:
   # Crop yields multidim (shown as a data explorer).
   viz://chart/agriculture/latest/crop_yields:
     # Attainable yields.
-    - data://grapher/agriculture/2026-03-02/attainable_yields:
-      - data://garden/agriculture/2026-03-02/attainable_yields:
-        - data://garden/papers/2024-03-26/mueller_et_al_2012
-        - data://garden/agriculture/2026-03-02/long_term_crop_yields
+    - data://grapher/agriculture/2026-11-23/attainable_yields
+  # Previous version of attainable yields.
+  data://grapher/agriculture/2026-03-02/attainable_yields:
+    - data://garden/agriculture/2026-03-02/attainable_yields:
+      - data://garden/papers/2024-03-26/mueller_et_al_2012
+      - data://garden/agriculture/2026-03-02/long_term_crop_yields
 
   # Fertilizers multidim (shown as a data explorer).
   viz://chart/agriculture/latest/fertilizers:
-    - data://grapher/faostat/2026-02-25/faostat_rfn
-    - data://grapher/faostat/2026-05-22/additional_variables
+    - data://grapher/faostat/2026-11-23/faostat_rfn
+    - data://grapher/faostat/2026-11-23/additional_variables
     - data-private://grapher/agriculture/2014/excess_fertilizers__west_et_al__2014
     - data-private://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014
 
@@ -209,3 +211,89 @@ steps:
     - data://garden/food/2026-11-12/global_hunger_index:
       - data://meadow/food/2026-11-12/global_hunger_index:
         - snapshot://food/2026-11-12/global_hunger_index.xlsx
+
+  data://garden/agriculture/2026-11-23/livestock_counts:
+    - data://garden/faostat/2026-11-23/faostat_qcl
+    - data://meadow/hyde/2005-08-29/historical_livestock_mammals
+
+  data://garden/agriculture/2026-11-23/meat_projections:
+    - data://meadow/agriculture/2026-07-03/future_of_food_and_agriculture_regions
+    - data://garden/faostat/2026-11-23/faostat_fbsc
+
+  data://garden/agriculture/2026-11-23/long_term_wheat_yields:
+    - data://garden/faostat/2026-11-23/faostat_qcl
+    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+
+  data://garden/agriculture/2026-11-23/long_term_food_and_agriculture_trends:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-11-23/faostat_fbsc
+    - data://garden/faostat/2026-11-23/faostat_rl
+
+  data://garden/agriculture/2026-11-23/daily_calories_per_person:
+    - data://meadow/agriculture/2024-05-23/fao_2000
+    - data://meadow/agriculture/2024-05-23/grigg_1995
+    - data://meadow/usda_ers/2025-03-26/food_availability
+    - data://garden/faostat/2026-11-23/faostat_fbsc
+    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
+    - data://meadow/agriculture/2024-05-23/fao_1949
+    - data://meadow/agriculture/2024-05-23/fogel_2004
+    - data://meadow/agriculture/2024-05-23/jonsson_1998
+
+  data://garden/agriculture/2026-11-23/decoupling_food_supply_and_land_use:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-11-23/faostat_fbsc
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-11-23/faostat_rl
+
+  data://garden/agriculture/2026-11-23/uk_long_term_yields:
+    - data://garden/faostat/2026-11-23/faostat_qcl
+    - data://garden/papers/2024-03-26/brassley_2000
+    - data://garden/papers/2024-03-26/broadberry_et_al_2015
+
+  data://garden/agriculture/2026-11-23/decoupling_food_production_and_land_use:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-11-23/faostat_fbsc
+    - data://garden/faostat/2026-11-23/faostat_rl
+
+  data://grapher/agriculture/2026-11-23/livestock_counts:
+    - data://garden/agriculture/2026-11-23/livestock_counts
+
+  # FAO - Global meat consumption, with projections to 2050.
+  data://grapher/agriculture/2026-11-23/meat_projections:
+    - data://garden/agriculture/2026-11-23/meat_projections
+
+  # Long-term food and agriculture trends
+  data://grapher/agriculture/2026-11-23/long_term_food_and_agriculture_trends:
+    - data://garden/agriculture/2026-11-23/long_term_food_and_agriculture_trends
+
+  # Agriculture - Long-run daily calorie supply per person.
+  data://grapher/agriculture/2026-11-23/daily_calories_per_person:
+    - data://garden/agriculture/2026-11-23/daily_calories_per_person
+
+  # Decoupling of food supply and land use
+  # TODO: The following steps are experiments; clean up once we make a decision on this. For more details:
+  # https://github.com/owid/owid-issues/issues/2057
+  data://grapher/agriculture/2026-11-23/decoupling_food_supply_and_land_use:
+    - data://garden/agriculture/2026-11-23/decoupling_food_supply_and_land_use
+
+  # Long-term crop yields.
+  data://garden/agriculture/2026-11-23/long_term_crop_yields:
+    - data://garden/faostat/2026-11-23/faostat_qcl
+    - data://garden/agriculture/2026-11-23/long_term_wheat_yields
+    - data://garden/agriculture/2026-11-23/uk_long_term_yields
+    - data://garden/usda_nass/2026-03-02/us_corn_yields
+
+  # Decoupling of agricultural production and land use (with feed correction)
+  data://grapher/agriculture/2026-11-23/decoupling_food_production_and_land_use:
+    - data://garden/agriculture/2026-11-23/decoupling_food_production_and_land_use
+
+  data://garden/agriculture/2026-11-23/attainable_yields:
+    - data://garden/agriculture/2026-11-23/long_term_crop_yields
+    - data://garden/papers/2024-03-26/mueller_et_al_2012
+
+  data://grapher/agriculture/2026-11-23/long_term_crop_yields:
+    - data://garden/agriculture/2026-11-23/long_term_crop_yields
+
+  data://grapher/agriculture/2026-11-23/attainable_yields:
+    - data://garden/agriculture/2026-11-23/attainable_yields

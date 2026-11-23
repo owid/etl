@@ -1,0 +1,35 @@
+# Known errors in FAOSTAT's Food Balance Sheets (FBS) that this step patches until FAO fixes them. One entry per cell.
+# Format: etl/data_corrections.py. Applied to the FBS input table at the start of the step, before the balance table
+# and the region aggregates are built, so that regions inherit the corrected country rows.
+#
+# Iraq, wheat and products (item 2511), 2010. FAOSTAT reports exports of -62,000 t, the only negative export in FBS
+# and SCL. It closes the wheat balance: production plus imports minus stock variation is 62,000 t short of the uses.
+# Exports are set to zero and the gap is moved to FAO's residuals, so that it ends up in "data_adjustments". Domestic
+# supply is lowered by the same amount, because this step derives stock variation from it (assumption 2); without
+# that, the gap would move to stock variation instead. The guards fail the step if FAO revises the figures.
+- indicator: value
+  match: {country: Iraq, year: 2010, item_code: "00002511", element_code: "005911"}
+  action: override
+  value: 0
+  expect: {eq: -62000}
+  reason: Negative exports (-62,000 t), which are impossible; the figure equals the gap that closes the wheat balance.
+  producer: FAOSTAT
+  status: open
+
+- indicator: value
+  match: {country: Iraq, year: 2010, item_code: "00002511", element_code: "005170"}
+  action: override
+  value: -62000
+  expect: {eq: 0}
+  reason: Residuals take over the gap that FAOSTAT closed with negative exports (-62,000 t).
+  producer: FAOSTAT
+  status: open
+
+- indicator: value
+  match: {country: Iraq, year: 2010, item_code: "00002511", element_code: "005301"}
+  action: override
+  value: 5970000
+  expect: {eq: 6032000}
+  reason: Domestic supply lowered by the 62,000 t moved from exports to residuals, so that derived stock variation is unchanged.
+  producer: FAOSTAT
+  status: open
