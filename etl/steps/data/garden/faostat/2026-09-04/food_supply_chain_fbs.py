@@ -675,7 +675,10 @@ def add_densities(tb: Table, nutrient: str) -> Table:
     # for items that truly have none of the nutrient and as the usual value otherwise.
     accepted = within_ceiling.where(within_ceiling > 0)
     country_median = within_ceiling.groupby([tb["country"], tb["item_code"]], observed=True).transform("median")
-    item_median = within_ceiling.groupby(tb["item_code"], observed=True).transform("median")
+    # The item's median is taken over countries only, since regions are sums of countries, not further observations;
+    # region rows can still use it.
+    is_country = ~tb["country"].isin(REGIONS)
+    item_median = within_ceiling.where(is_country).groupby(tb["item_code"], observed=True).transform("median")
     tb["density_raw"] = raw
     tb["density"] = accepted.fillna(country_median).fillna(item_median)
     tb["density_source"] = np.select(
