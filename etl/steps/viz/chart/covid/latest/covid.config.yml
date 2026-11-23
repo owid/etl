@@ -12,6 +12,8 @@ definitions:
         yAxis:
           min: 0
 
+slug: covid
+
 title:
   title: COVID-19
   title_variant: Explore global data on COVID-19.

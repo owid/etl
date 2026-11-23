@@ -74,8 +74,11 @@ ending on them. Read the flags before committing to one:
 - `checkbox` — becomes a two-choice `toggle-buttons` dimension. Easy.
 - `picker` (`pickerColumnSlugs`) and `related` (`wpBlockId`) — no known multidim equivalent.
   Ask the user how to handle them before porting; don't drop them silently.
-- `download` (`downloadDataLink`) — multidims build their own `download_package` on save; the
-  grapher download UI may still be pending (owid/owid-grapher#6784).
+- `download` (`downloadDataLink`) — multidims build their own `download_package` on save, but
+  grapher doesn't link to it yet. Ask the user whether the download must stay. If it must, call
+  `add_download_link(c, url=..., text=...)` (`etl/viz/chart/download_link.py`) in the step,
+  between `create_chart` and `save`: it appends the link to every view's key points, after the
+  ones each view shows today. Drop the link when it points at a stale copy of the data.
 - `py` (long Python step) — views are generated in code; the port touches the code too.
 - A **twin**: some explorers already have an unpublished multidim mirror in
   `etl/steps/viz/chart/` (search `dag/` for the same namespace). Ask whether to build on it or
