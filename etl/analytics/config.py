@@ -11,6 +11,9 @@ DATASETTE_URL = "http://analytics.owid.io"
 ANALYTICS_URL = f"{DATASETTE_URL}/analytics"
 ANALYTICS_CSV_URL = f"{ANALYTICS_URL}.csv"
 ANALYTICS_JSON_URL = f"{ANALYTICS_URL}.json"
+# The grapher DB on the same internal Datasette: a copy of production's public tables (published charts only), with
+# 1,000 rows per page and a 1 s limit per query. Reachable only over Tailscale.
+OWID_DATASETTE_JSON_URL = f"{DATASETTE_URL}/owid.json"
 
 # Maximum number of rows that a single Datasette csv call can return.
 MAX_DATASETTE_N_ROWS = 10000

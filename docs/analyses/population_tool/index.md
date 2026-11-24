@@ -1,7 +1,3 @@
----
-status: new
----
-
 # Population projection tool: how will populations across the world change in the 21st century?
 
 !!! info ""

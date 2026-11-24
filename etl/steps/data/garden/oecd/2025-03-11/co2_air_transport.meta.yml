@@ -17,7 +17,7 @@ definitions:
   desc_short_dom: &desc_short_dom |-
     Domestic aviation represents flights which depart and arrive within the same country. CO₂ emissions from commercial passenger flights only.
   desc_process_per_capita: &desc_process_per_capita |-
-    CO₂ emissions per capita from aviation are calculated by dividing emissions from aviation by the total population of the country. This allows us to understand the average amount of CO₂ emissions attributed to each individual as a result of air travel.
+    CO₂ emissions per capita from aviation are calculated by dividing emissions from aviation by the total population of the country, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN. This allows us to understand the average amount of CO₂ emissions attributed to each individual as a result of air travel.
   description_processing_tour_adj: &description_processing_tour_adj |-
     - CO₂ emission footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes - much of the departures will result from travelers rather than local residents.
 

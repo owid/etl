@@ -150,6 +150,7 @@ definitions:
       The default regional aggregates are averages of the country values. They are only estimated since 1900. For each continent, we take the countries we have data for in 1900 as a reference, and only estimate an average when enough of them have data (usually two-thirds).
 
       In addition, regional aggregates with names like "Region (population-weighted)" are averages of the country values weighted by population, counting only the countries with data. We use Our World in Data's population data, which combines several sources ([learn more](https://ourworldindata.org/population-sources)). These averages are only estimated when the countries with data are home to at least two-thirds of the region's population in that year.
+      Population estimates from 2024 onwards are projections released by the UN.
     description_imputes: |-
       ### Data imputation
       We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
@@ -171,7 +172,7 @@ definitions:
     key_regions: &key_regions |-
       V-Dem covers many more countries since 1900, which affects regional averages.
     key_regions_agg: &key_regions_agg |-
-      We provide two kinds of regional averages: **country averages** and **population-weighted averages**. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience.
+      We provide two kinds of regional averages: **country averages** and **population-weighted averages**. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience. These population-weighted averages use our [long-term population estimates](https://ourworldindata.org/population-sources). From 2024 onwards, these population estimates are projections released by the UN.
   common:
     presentation:
       topic_tags:
@@ -228,6 +229,7 @@ tables:
         The default regional aggregates (including values for the World) are averages of the country values. For each continent, we take the countries we have data for in 1900 as a reference, and only estimate an average when enough of them have data (usually two-thirds).
 
         In addition, regional aggregates with names like "Region (population-weighted)" (including values for World) are averages of the country values weighted by population, counting only the countries with data. We use Our World in Data's population data, which combines several sources ([learn more](https://ourworldindata.org/population-sources)). These averages are only estimated when the countries with data are home to at least two-thirds of the region's population in that year.
+        Population estimates from 2024 onwards are projections released by the UN.
 
         {definitions.aux.description_imputes}
       description_key:
@@ -3217,6 +3219,8 @@ tables:
   vdem_population:
     common:
       unit: "people"
+      description_processing: &description_population |-
+        We calculate the number of people living under each type of regime using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
     variables:
       population_regime:
         title: |-

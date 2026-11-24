@@ -245,7 +245,7 @@ references it".
   name; the sweep maps the URL's id to the name. Other forms are missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside
   layout containers may not produce a row.
-- Public Datasette's `posts_gdocs_links` lags; verify article fixes against the
+- The internal Datasette's `posts_gdocs_links` lags; verify article fixes against the
   live page, not the mirror.
 
 ## Notes for skills that consume this

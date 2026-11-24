@@ -11,7 +11,7 @@ const TOPIC_TAGS = __TOPIC_TAGS__;
 const TAG_SLUGS = __TAG_SLUGS__;
 const STORAGE_KEY = __STORAGE_KEY__;
 const API = "https://api.ourworldindata.org/v1/indicators";
-const DATASETTE = "https://datasette-public.owid.io/owid/variables.json";
+const DATASETTE = "__DATASETTE_VARIABLES__";
 const CATALOG = "https://catalog.ourworldindata.org";
 
 // ---------------------------------------------------------------------------
