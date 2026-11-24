@@ -1,8 +1,8 @@
 {
   "name": "compare-previous-version",
   "displayName": "Compare Previous Version",
-  "description": "Compare current file with its previous version by finding the highest date version that's lower than current",
-  "version": "0.0.2",
+  "description": "Compare files with their previous version (date folders), and review a branch's changes against previous versions with the noise of each update hidden and the reviewed files synced with GitHub",
+  "version": "0.2.0",
   "publisher": "owid",
   "engines": {
     "vscode": "^1.93.0"
@@ -17,8 +17,143 @@
       {
         "command": "extension.comparePreviousVersion",
         "title": "Compare Previous Version"
+      },
+      {
+        "command": "owidVersionDiff.refresh",
+        "title": "Refresh",
+        "category": "Changes vs Previous Versions",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "owidVersionDiff.next",
+        "title": "Open Next Changed File",
+        "category": "Changes vs Previous Versions",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "owidVersionDiff.previous",
+        "title": "Open Previous Changed File",
+        "category": "Changes vs Previous Versions",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "owidVersionDiff.toggleHideNoise",
+        "title": "Toggle Hiding Noise in Diffs",
+        "category": "Changes vs Previous Versions",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "owidVersionDiff.openDiff",
+        "title": "Open Diff",
+        "category": "Changes vs Previous Versions"
+      },
+      {
+        "command": "owidVersionDiff.openRawDiff",
+        "title": "Open Diff Including Noise",
+        "category": "Changes vs Previous Versions"
       }
     ],
+    "views": {
+      "owidVersionDiffContainer": [
+        {
+          "id": "owidVersionDiff",
+          "name": "Changes vs Previous Versions"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "owidVersionDiff.previous",
+          "when": "view == owidVersionDiff",
+          "group": "navigation@1"
+        },
+        {
+          "command": "owidVersionDiff.next",
+          "when": "view == owidVersionDiff",
+          "group": "navigation@2"
+        },
+        {
+          "command": "owidVersionDiff.toggleHideNoise",
+          "when": "view == owidVersionDiff",
+          "group": "navigation@3"
+        },
+        {
+          "command": "owidVersionDiff.refresh",
+          "when": "view == owidVersionDiff",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "owidVersionDiff.openRawDiff",
+          "when": "view == owidVersionDiff && viewItem == file-meaningful"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "owidVersionDiff.openDiff",
+          "when": "false"
+        },
+        {
+          "command": "owidVersionDiff.openRawDiff",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Changes vs Previous Versions",
+      "properties": {
+        "owidVersionDiff.baseRef": {
+          "type": "string",
+          "default": "origin/master",
+          "description": "Git ref the branch is compared with, to find its changed files."
+        },
+        "owidVersionDiff.hideNoise": {
+          "type": "boolean",
+          "default": true,
+          "description": "Hide noise changes (see owidVersionDiff.noiseRules) in the diffs of files with meaningful changes."
+        },
+        "owidVersionDiff.noiseRules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "version-dates",
+              "dvc-outs",
+              "dvc-date-accessed",
+              "dvc-date-published",
+              "dvc-citation-dates"
+            ],
+            "enumDescriptions": [
+              "One version date of the branch replaced by another (any old or new version folder date of the compared files, as a whole token).",
+              "md5, size and nfiles values under outs: in a .dvc file.",
+              "The value of date_accessed in a .dvc file.",
+              "The value of date_published in a .dvc file.",
+              "Years, and the date after \"accessed\", in the attribution or citation_full of a .dvc file."
+            ]
+          },
+          "default": [
+            "version-dates",
+            "dvc-outs",
+            "dvc-date-accessed",
+            "dvc-date-published",
+            "dvc-citation-dates"
+          ],
+          "description": "Changes treated as noise. A line that differs only by these is hidden; any other difference on the line keeps it visible."
+        },
+        "owidVersionDiff.githubSync": {
+          "type": "boolean",
+          "default": true,
+          "description": "Sync the reviewed checkboxes with GitHub's \"Viewed\" state on the branch's open pull request, using the GitHub CLI (gh) and its login."
+        },
+        "owidVersionDiff.ghPath": {
+          "type": "string",
+          "default": "gh",
+          "description": "Path to the GitHub CLI. With \"gh\", it is looked up on the PATH, then in /opt/homebrew/bin and /usr/local/bin."
+        }
+      }
+    },
     "keybindings": [
       {
         "command": "extension.comparePreviousVersion",
@@ -28,7 +163,16 @@
         "command": "extension.comparePreviousVersion",
         "key": "cmd+shift+d"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "owidVersionDiffContainer",
+          "title": "Changes vs Previous Versions",
+          "icon": "media/versions.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "esbuild": "node esbuild.config.js",
