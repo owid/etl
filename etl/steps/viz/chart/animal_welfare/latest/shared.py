@@ -33,8 +33,7 @@ EXTRA_ANIMALS = [
         "description": "Animals farmed for their fur, such as minks and foxes.",
     },
     {"slug": "laying_hens", "name": "Laying hens"},
-    {"slug": "male_chicks", "name": "Male chicks"},
-    {"slug": "laying_hens_and_male_chicks", "name": "Laying hens and male chicks"},
+    {"slug": "chickens_killed_for_eggs", "name": "Chickens killed for eggs"},
     {"slug": "milk_cattle", "name": "Cattle used for milk"},
 ]
 
@@ -48,13 +47,13 @@ INDICATORS_KILLED_FOR_CONSUMPTION = {
 }
 ANIMALS_KILLED_IN_COUNTRY_GROUPS = ["cattle_and_buffaloes", "sheep_and_goats"]
 
-# Chickens killed in egg production, from chickens_killed_for_eggs (counted where the eggs are produced).
-# For each animal choice, its column in that table.
+# Chickens killed in egg production (hens and male chicks), from chickens_killed_for_eggs (counted where the eggs are
+# produced). For each animal choice, its column in that table.
+# NOTE: Hens and male chicks are shown together, because the data assumes one male chick killed per hen. Show them
+# separately once the data accounts for in-ovo sexing.
 # NOTE: These are not added to any total: laying hens are also counted among the chickens slaughtered for meat.
 ANIMALS_KILLED_FOR_EGGS = {
-    "laying_hens": "hens_killed",
-    "male_chicks": "male_chickens_killed",
-    "laying_hens_and_male_chicks": "chickens_killed",
+    "chickens_killed_for_eggs": "chickens_killed",
 }
 
 # Live animals that are not in the animals_used_for_food data, from FAOSTAT.
