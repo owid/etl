@@ -2335,8 +2335,8 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     # No generic comparability sentence: it named no comparison a reader could act on. The one country
     # the OECD flags as not comparable is left off the chart (`NOT_COMPARABLE`).
     text += (
-        "Averages cover everyone aged 15 to 64, on weekdays and weekends alike. Days off and people not "
-        "working or studying count as zero hours of paid work and study. Unpaid work also includes religious "
+        "Averages cover everyone aged 15 to 64, on weekdays and weekends alike. They include days and "
+        "people with no paid work or study. Unpaid work also includes religious "
         "and civic activities, and time the OECD doesn't assign to another category, including some travel."
     )
     # Against the narrower of the Note's own slot and the content width — the slot is the template's,

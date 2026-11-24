@@ -1339,10 +1339,10 @@ z
    <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="22.608984" y="785.80755" transform="rotate(-0 22.608984 785.80755)">Note:</text>
   </g>
   <g id="note--rest">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="785.91285" transform="rotate(-0 36.098438 785.91285)">Averages cover everyone aged 15 to 64, on weekdays and weekends alike. Days off and people not working or studying count as zero hours of paid</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="785.8332" transform="rotate(-0 36.098438 785.8332)">Averages cover everyone aged 15 to 64, on weekdays and weekends alike. They include days and people with no paid work or study. Unpaid work</text>
   </g>
   <g id="note--line-2">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="795.99825" transform="rotate(-0 11.52 795.99825)">work and study. Unpaid work also includes religious and civic activities, and time the OECD doesn't assign to another category, including some travel.</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="795.99825" transform="rotate(-0 11.52 795.99825)">also includes religious and civic activities, and time the OECD doesn't assign to another category, including some travel.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="808.95825" transform="rotate(-0 11.52 808.95825)">Data source: OECD Time Use Database (2026)</text>
