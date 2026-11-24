@@ -32,24 +32,19 @@ EXTRA_ANIMALS = [
         "name": "Fur animals",
         "description": "Animals farmed for their fur, such as minks and foxes.",
     },
-    {"slug": "cattle_and_buffaloes", "name": "Cattle and buffaloes"},
-    {"slug": "sheep_and_goats", "name": "Sheep and goats"},
     {"slug": "laying_hens", "name": "Laying hens"},
     {"slug": "male_chicks", "name": "Male chicks"},
     {"slug": "laying_hens_and_male_chicks", "name": "Laying hens and male chicks"},
     {"slug": "milk_cattle", "name": "Cattle used for milk"},
 ]
 
-# Animals killed in the country and for the country's consumption, from animals_killed_for_domestic_consumption.
-# For each animal choice, the prefix of its columns in that table.
-# NOTE: The groups of all land animals, pigs and poultry, killed in the country, come from animals_used_for_food instead.
-# The consumption-based total of land animals covers only these four groups (see its description_key).
-ANIMALS_KILLED_FOR_CONSUMPTION = {
-    "all_land_animals": "land_animals",
-    "cattle_and_buffaloes": "cattle_and_buffaloes",
-    "sheep_and_goats": "sheep_and_goats",
-    "pigs": "pigs",
-    "poultry": "poultry",
+# Metric of each indicator of animals_killed_for_domestic_consumption shown in the multidims (by its name without the
+# animal dimension). Animals killed in the country come from animals_used_for_food, except for the groups it lacks.
+INDICATORS_KILLED_FOR_CONSUMPTION = {
+    "killed_for_domestic_supply": "animals_killed_for_consumption",
+    "killed_for_domestic_supply_per_capita": "animals_killed_for_consumption",
+    "killed_in_country": "animals_killed",
+    "killed_in_country_per_capita": "animals_killed",
 }
 ANIMALS_KILLED_IN_COUNTRY_GROUPS = ["cattle_and_buffaloes", "sheep_and_goats"]
 
@@ -123,14 +118,19 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
             )
 
     # Add views of animals killed for the country's consumption, and of groups of animals killed in the country.
-    for per_capita in [False, True]:
-        suffix = "_per_capita" if per_capita else ""
-        for animal, prefix in ANIMALS_KILLED_FOR_CONSUMPTION.items():
-            catalog_path = f"animals_killed_for_domestic_consumption#{prefix}_killed_for_domestic_supply{suffix}"
-            views.append(_view("animals_killed_for_consumption", animal, catalog_path, per_capita))
-        for animal in ANIMALS_KILLED_IN_COUNTRY_GROUPS:
-            catalog_path = f"animals_killed_for_domestic_consumption#{animal}_killed_in_country{suffix}"
-            views.append(_view("animals_killed", animal, catalog_path, per_capita))
+    if {"animals_killed", "animals_killed_for_consumption"} & set(metrics):
+        name = "animals_killed_for_domestic_consumption"
+        tb_consumption = paths.load_dataset(name).read(name)
+        for column in tb_consumption.columns:
+            if column in tb_consumption.metadata.primary_key:
+                continue
+            indicator = tb_consumption[column].metadata.original_short_name
+            animal = underscore(tb_consumption[column].metadata.dimensions["animal"])
+            metric = INDICATORS_KILLED_FOR_CONSUMPTION.get(indicator)
+            if metric is None or (metric == "animals_killed" and animal not in ANIMALS_KILLED_IN_COUNTRY_GROUPS):
+                continue
+            animals.setdefault(animal, {"slug": animal, "name": animal.replace("_", " ").capitalize()})
+            views.append(_view(metric, animal, f"{name}#{column}", per_capita=indicator.endswith("_per_capita")))
 
     # Add views of chickens killed in egg production.
     for per_capita in [False, True]:
