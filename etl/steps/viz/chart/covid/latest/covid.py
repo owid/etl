@@ -19,7 +19,4 @@ def run() -> None:
     add_download_link(c, url=DOWNLOAD_URL, text=DOWNLOAD_TEXT)
 
     # The variants view sorts its stacked bars by the total Omicron share, which it doesn't plot.
-    # NOTE: No download package until the date-axis indicators declare `display.timeInterval`
-    # (several of them don't, so the package can't label their rows with a frequency). Readers
-    # get the complete dataset from the link above meanwhile.
-    c.save(tolerate_extra_indicators=True, download_package=False)
+    c.save(tolerate_extra_indicators=True)

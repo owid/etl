@@ -8,6 +8,7 @@ definitions:
         - Global Health
     display:
       numDecimalPlaces: 0
+      timeInterval: day
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
