@@ -804,17 +804,17 @@ Lists every local branch whose latest GitHub PR is **merged** or **closed** (usi
 state, not `git branch --merged`, so squash-merges are detected). A branch with no PR of its own is
 also listed as merged when its last commit is part of a merged PR, e.g. a temporary copy of a PR
 branch, or a branch whose work was merged from a branch with another name. Branches that have a git
-worktree are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`.
-The tool then lists what it will do to each branch (which worktrees it removes, what it copies into
-the main repo, which branches it deletes, and which it skips and why) and changes nothing until you
-confirm. For each branch it will:
+worktree have it removed too. Before you pick, the tool lists what cleaning each branch will do
+(which worktree it removes, what it copies into the main repo, which branch it deletes), and which
+branches it will skip and why. Then pick a single branch, `all`, `all merged`, or `all closed`:
+that pick is the only confirmation. For each branch it will:
 
 1. (Worktree branches only) Check the worktree for uncommitted changes that would block
    `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
    symlinks, which are handled in step 4. A dirty worktree is skipped with a warning *before
    anything is copied or modified*, so the worktree stays fully intact; commit/discard the changes
-   (or `git worktree remove --force` it) and re-run. Dirty worktrees are flagged `(dirty)` in the
-   selection list.
+   (or `git worktree remove --force` it) and re-run. Dirty worktrees are listed as skipped before
+   you pick, and left out of the selection list.
 2. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
    their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
    repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
@@ -898,13 +898,20 @@ def clean_cli() -> None:
         print("Nothing to clean: no local branch has a merged or closed PR.")
         return
 
-    # Flag worktrees with blocking uncommitted changes in the selection list, so the user knows
-    # before picking that those branches will be skipped (clean_branch re-checks before mutating).
+    # Worktrees with uncommitted changes are skipped (clean_branch re-checks before changing anything).
     dirty = {
         b: bool(worktree_blocking_changes(worktrees[b]))
         for b in cleanable
         if b in worktrees and worktrees[b] != main_worktree_path
     }
+
+    # Show what cleaning each branch will do before the user picks, so picking is the only confirmation.
+    to_clean, to_skip = plan_clean(sorted(cleanable), worktrees, dirty, main_worktree_path)
+    print(format_clean_plan(to_clean, to_skip, cleanable) + "\n")
+    if not to_clean:
+        print("Nothing to clean.")
+        return
+    selectable = {b: cleanable[b] for b in to_clean}
 
     # Build the selection list ('all' / 'all merged' / 'all closed' first, then one entry per branch).
     choices = [
@@ -912,40 +919,28 @@ def clean_cli() -> None:
         questionary.Choice(title="all merged", value=_CLEAN_ALL_MERGED),
         questionary.Choice(title="all closed", value=_CLEAN_ALL_CLOSED),
     ]
-    for branch in sorted(cleanable):
-        choices.append(
-            questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees, dirty), value=branch)
-        )
+    for branch, state in selectable.items():
+        choices.append(questionary.Choice(title=f"{branch}  [{state}]", value=branch))
 
     selected = questionary.select(
-        message="Select a branch to clean (or 'all' / 'all merged' / 'all closed')",
+        message="Select what to clean, as listed above (or 'all' / 'all merged' / 'all closed')",
         choices=choices,
         style=SHELL_FORM_STYLE,
-        instruction="(Use arrow keys, Enter to select)",
+        instruction="(Use arrow keys, Enter to clean, Ctrl-C to cancel)",
     ).unsafe_ask()
 
     if selected is None:
         return
 
-    branches_to_clean = resolve_branches_to_clean(selected, cleanable)
+    branches_to_clean = resolve_branches_to_clean(selected, selectable)
     if not branches_to_clean:
         state = {_CLEAN_ALL_MERGED: "merged", _CLEAN_ALL_CLOSED: "closed"}[selected]
         print(f"Nothing to clean: no local branch has a {state} PR.")
         return
 
-    # Show what will happen to each branch, and change nothing until the user confirms.
-    to_clean, to_skip = plan_clean(branches_to_clean, worktrees, dirty, main_worktree_path)
-    print(format_clean_plan(to_clean, to_skip, cleanable))
-    if not to_clean:
-        print("\nNothing to clean.")
-        return
-    if not questionary.confirm("Go ahead?", default=False, style=SHELL_FORM_STYLE).unsafe_ask():
-        print("Cancelled: nothing was changed.")
-        return
-
     main_project_dir = claude_project_dir(main_worktree_path)
 
-    for branch in to_clean:
+    for branch in branches_to_clean:
         clean_branch(
             repo=repo,
             branch=branch,
@@ -1013,12 +1008,12 @@ def format_clean_plan(to_clean: dict[str, list[str]], to_skip: dict[str, str], s
     """Write the plan from plan_clean as the message the user confirms."""
     lines = []
     if to_clean:
-        lines.append(f"pr-clean will clean {len(to_clean)} branch(es):")
+        lines.append("Cleaning each of these branches will:")
         for branch, actions in to_clean.items():
             lines.append(f"\n  {branch}  [{states[branch]}]")
             lines.extend(f"    - {action}" for action in actions)
     if to_skip:
-        lines.append(f"\nIt will skip {len(to_skip)} branch(es):")
+        lines.append("\nThese branches will be skipped:")
         lines.extend(f"  {branch}  [{states[branch]}]: {reason}" for branch, reason in to_skip.items())
     return "\n".join(lines).strip()
 
@@ -1121,16 +1116,6 @@ def _pr_state(prs: list) -> str:
     if any(pr.get("merged_at") for pr in prs):
         return "merged"
     return "closed"
-
-
-def _branch_label(branch: str, state: str, worktrees: dict[str, Path], dirty: dict[str, bool]) -> str:
-    """Build the questionary label for a branch, e.g. 'data-foo  [merged]  <- worktree (dirty)'."""
-    label = f"{branch}  [{state}]"
-    if branch in worktrees:
-        label += "  <- worktree"
-        if dirty.get(branch):
-            label += " (dirty)"
-    return label
 
 
 def claude_project_dir(repo_path: Path) -> Path:

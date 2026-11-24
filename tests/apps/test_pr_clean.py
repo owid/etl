@@ -262,13 +262,13 @@ def test_format_clean_plan():
         {"a": "merged", "b": "closed"},
     )
     assert text == (
-        "pr-clean will clean 1 branch(es):\n"
+        "Cleaning each of these branches will:\n"
         "\n"
         "  a  [merged]\n"
         "    - remove the worktree /wt/a\n"
         "    - delete the local branch 'a'\n"
         "\n"
-        "It will skip 1 branch(es):\n"
+        "These branches will be skipped:\n"
         "  b  [closed]: its worktree /wt/b has uncommitted changes"
     )
 
