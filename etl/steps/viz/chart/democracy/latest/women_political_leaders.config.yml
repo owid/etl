@@ -34,9 +34,6 @@ definitions:
     tab: map
     chartTypes:
       - Swimlane
-    yAxis:
-      min: 0
-      max: 1
     map:
       colorScale:
         baseColorScheme: BinaryMapPaletteE
@@ -121,7 +118,6 @@ views:
         - catalogPath: vdem_uni_without_regions#wom_hoe_vdem
           display:
             name: ""
-            numDecimalPlaces: 0
     config:
       <<: *by_year_country
       title: Gender of the chief executive
@@ -207,7 +203,6 @@ views:
         - catalogPath: vdem_uni_without_regions#wom_hog_vdem
           display:
             name: ""
-            numDecimalPlaces: 0
     config:
       <<: *by_year_country
       title: Gender of the head of government
@@ -293,7 +288,6 @@ views:
         - catalogPath: vdem_uni_without_regions#wom_hos_vdem
           display:
             name: ""
-            numDecimalPlaces: 0
     config:
       <<: *by_year_country
       title: Gender of the head of state
