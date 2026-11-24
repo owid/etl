@@ -78,7 +78,7 @@ views:
       y:
         - catalogPath: fh#regime
     config:
-      colorVariableId: fh#regime
+      type: Swimlane
   - dimensions:
       metric: freedom
       sub_metric: political_rights_score
@@ -148,7 +148,7 @@ views:
       y:
         - catalogPath: fh#electdem
     config:
-      colorVariableId: fh#electdem
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: democratic_electoral_institutions

@@ -1,0 +1,223 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Migration
+      grapher_config:
+        chartTypes:
+          - LineChart
+        hasMapTab: false
+        selectedEntityNames:
+          - United Kingdom
+        addCountryMode: disabled
+        hideAnnotationFieldsInTitle:
+          entity: true
+        hideSeriesLabels: true
+        originUrl: https://ourworldindata.org/migration
+
+  # The construction of the series: five sources, five periods. Shared by all six indicators.
+  uk_sources: |-
+    Our World in Data maintains this long-run series on British migration by combining five sources. The Bank of England joined the first four into a continuous series in its research dataset "A millennium of macroeconomic data". We added the fifth from the Office for National Statistics.
+
+    - **1850s–1963 — ship passenger counts.** Passengers traveling by ship between the United Kingdom and ports outside Europe and the Mediterranean.
+      - The UK Passenger Acts required ship captains to file lists of their passengers, and officials counted everyone on board, whatever their nationality and whatever the reason for their journey — tourists and business travelers as well as migrants.
+      - These statistics miss people moving to or from other European countries, and anyone traveling by air.
+      - Early records of arrivals are less complete than records of departures, and the Bank of England filled a few missing years of arrivals (1856, 1857, 1862, and 1868) by carrying over or averaging neighboring years.
+      - Before 1922, the United Kingdom included all of Ireland. From 1923 onward, the data covers the United Kingdom in its current borders — Great Britain and Northern Ireland.
+      - There is no data for 1939 to 1946, during and just after the Second World War.
+    - **1964–1974 — total migration counts.** Migrants — people intending to change their country of residence for at least a year — moving between the United Kingdom and all countries, including the rest of Europe.
+    - **1975–1990 — International Passenger Survey.** A sample survey of passengers at UK air and sea ports, run by the Office for National Statistics, using the same definition of a migrant.
+    - **1991–2011 — Long-Term International Migration estimates.** The same survey, adjusted by the Office for National Statistics to also count asylum seekers, people who end up staying longer or shorter than they first intended, and migration to and from Northern Ireland.
+    - **2012–2025 — estimates based on administrative records.** The Office for National Statistics' current estimates, built mainly from visa, border, and registration records rather than surveys.
+      - These replaced the survey-based estimates as the official measure of UK migration, and are considerably higher: the survey undercounted people moving in both directions.
+      - The figures for recent years are provisional. The Office for National Statistics classifies its administrative estimates as official statistics in development, and revises them — sometimes substantially — as more data becomes available.
+      - The source also changed how it counts British nationals in mid-2021: its earlier figures for them still drew on survey data, adjusted against the census.
+
+  uk_joins: |-
+    Because these sources measure different things, the series shifts level where they join. In 1964, the older passenger count gives 245,000 arrivals while the newer migrant count gives 211,000. In 1991, the unadjusted survey gives 255,000 immigrants while the adjusted estimate gives 329,000. In 2012, the survey-based estimate gives 498,000 immigrants while the administrative estimate gives 643,000.
+
+  uk_net_sign: |-
+    Positive values mean more people arrived than left; negative values mean more people left than arrived.
+
+  uk_share_denominator: |-
+    This indicator divides the number of people migrating in a year by the population of the United Kingdom in the same year. Up to 2011, the Bank of England makes this calculation, using its own population estimates, which match the borders of the time — including all of Ireland before 1922. From 2012 onward, we divide the Office for National Statistics' migration estimates by [our own population estimates](https://ourworldindata.org/population-sources) for the United Kingdom.
+
+  uk_processing_flows: |-
+    We combined two sources into one series:
+
+    - Up to 2011, the data comes from the Bank of England's research dataset "A millennium of macroeconomic data" (worksheet A19a), which splices historical passenger statistics and survey-based estimates into a continuous series. We converted the figures from thousands of people to people.
+    - From 2012 onward, the data comes from the Office for National Statistics' administrative estimates of long-term international migration. We use the year-ending-December estimates, which cover calendar years.
+
+    We chose 2012 as the junction because it is the first year covered by the administrative estimates, which the Office for National Statistics considers more accurate than the survey-based method used at the end of the Bank of England dataset. That dataset continues to 2016 using the older survey-based estimates; we discarded those years in favor of the administrative figures.
+
+  england_method: |-
+    This data is not a direct count of migrants — no migration records exist for most of this period. Wrigley and Schofield reconstructed England's population from the registers of baptisms and burials kept by Church of England parishes, and estimated net migration as a residual: the part of the change in population that births and deaths cannot explain.
+
+    Because it is a residual, the estimate counts everyone who crossed England's borders — including people who moved to or from Wales, Scotland, or Ireland, not only those who moved to or from other countries. It also absorbs any errors in the registration of baptisms and burials.
+
+    The original estimates are totals for five-year periods, which the Bank of England interpolated to annual values. Year-to-year changes are therefore smooth by construction, and the data is best read as showing broad levels and trends rather than what happened in any single year.
+
+  england_producer_note: |-
+    Net Emigration - England (excluding Monmouthshire). Source: Wrigley and Schofield (1989), interpolated quinquennial estimates. These estimates naturally cover migration flows to and from other parts of the UK as well as to overseas countries.
+
+  england_processing: |-
+    The source publishes this series as net emigration, where positive values mean more people leaving. We flipped the sign to show net migration, and converted the figures from thousands of people to people.
+
+  england_processing_share: |-
+    The source publishes this series as net emigration per 1,000 people, where positive values mean more people leaving. We flipped the sign to show net migration, and expressed the rate as a percentage of the population. The population estimates in the denominator come from the same reconstruction by Wrigley and Schofield.
+
+  uk_processing_shares: |-
+    We combined two sources into one series:
+
+    - Up to 2011, the share comes from the Bank of England's research dataset "A millennium of macroeconomic data" (worksheet A19a), which calculates it from its own migration and population series.
+    - From 2012 onward, we calculated the share by dividing the Office for National Statistics' administrative estimates of long-term international migration (year-ending-December, covering calendar years) by [our long-run population estimates](https://ourworldindata.org/population-sources) for the United Kingdom.
+
+    We chose 2012 as the junction because it is the first year covered by the administrative estimates, which the Office for National Statistics considers more accurate than the survey-based method used at the end of the Bank of England dataset. That dataset continues to 2016 using the older survey-based estimates; we discarded those years in favor of the administrative figures.
+
+dataset:
+  title: Long-run migration flows for the United Kingdom and England
+  update_period_days: 365
+  owners:
+    - Edouard Mathieu
+
+tables:
+  uk_migration_flows:
+    title: Migration flows, United Kingdom
+    variables:
+      immigration:
+        title: People immigrating to the United Kingdom
+        unit: people
+        short_unit: ""
+        description_short: Number of people moving to the United Kingdom each year.
+        description_key: |-
+          {definitions.uk_sources}
+
+          {definitions.uk_joins}
+        description_processing: "{definitions.uk_processing_flows}"
+        display:
+          numDecimalPlaces: 0
+
+      emigration:
+        title: People emigrating from the United Kingdom
+        unit: people
+        short_unit: ""
+        description_short: Number of people leaving the United Kingdom each year.
+        description_key: |-
+          {definitions.uk_sources}
+
+          {definitions.uk_joins}
+        description_processing: "{definitions.uk_processing_flows}"
+        display:
+          numDecimalPlaces: 0
+
+      net_migration:
+        title: Net migration to the United Kingdom
+        unit: people
+        short_unit: ""
+        description_short: Number of people moving to the United Kingdom each year, minus the number leaving.
+        description_key: |-
+          {definitions.uk_sources}
+
+          {definitions.uk_joins}
+        description_processing: "{definitions.uk_processing_flows}"
+        presentation:
+          grapher_config:
+            note: "{definitions.uk_net_sign}"
+        display:
+          numDecimalPlaces: 0
+
+      immigration_share_of_population:
+        title: People immigrating to the United Kingdom as a share of the population
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of people moving to the United Kingdom each year, as a share of the population.
+        description_key: |-
+          {definitions.uk_share_denominator}
+
+          {definitions.uk_sources}
+
+          {definitions.uk_joins}
+        description_processing: "{definitions.uk_processing_shares}"
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+          numDecimalPlaces: 2
+
+      emigration_share_of_population:
+        title: People emigrating from the United Kingdom as a share of the population
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of people leaving the United Kingdom each year, as a share of the population.
+        description_key: |-
+          {definitions.uk_share_denominator}
+
+          {definitions.uk_sources}
+
+          {definitions.uk_joins}
+        description_processing: "{definitions.uk_processing_shares}"
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+          numDecimalPlaces: 2
+
+      net_migration_share_of_population:
+        title: Net migration to the United Kingdom as a share of the population
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of people moving to the United Kingdom each year, minus the number leaving, as a share of the population.
+        description_key: |-
+          {definitions.uk_share_denominator}
+
+          {definitions.uk_sources}
+
+          {definitions.uk_joins}
+        description_processing: "{definitions.uk_processing_shares}"
+        presentation:
+          grapher_config:
+            note: "{definitions.uk_net_sign}"
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+          numDecimalPlaces: 2
+
+  england_net_migration:
+    title: Net migration to England
+    variables:
+      net_migration:
+        title: Net migration to England
+        unit: people
+        short_unit: ""
+        description_short: Estimated number of people moving to England each year, minus the number leaving. Negative values mean more people left than arrived.
+        description_key: |-
+          {definitions.england_method}
+        description_from_producer: "{definitions.england_producer_note}"
+        description_processing: "{definitions.england_processing}"
+        processing_level: minor
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - England
+        display:
+          numDecimalPlaces: 0
+
+      net_migration_share_of_population:
+        title: Net migration to England as a share of the population
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated number of people moving to England each year, minus the number leaving, as a share of the population. Negative values mean more people left than arrived.
+        description_key: |-
+          {definitions.england_method}
+        description_from_producer: "{definitions.england_producer_note}"
+        description_processing: "{definitions.england_processing_share}"
+        processing_level: minor
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - England
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+          numDecimalPlaces: 2

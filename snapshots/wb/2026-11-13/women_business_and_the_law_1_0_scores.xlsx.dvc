@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: World Bank
+    title: Women, Business and the Law
+    title_snapshot: Women, Business and the Law 1.0 - Latest report year
+    description: |-
+      Women, Business and the Law is a World Bank project that tracks laws affecting women's economic opportunities in 190 economies.
+
+      Since its 2026 edition, the project uses a broader framework (known as WBL 2.0). To keep the long-run series comparable, the World Bank also recalculates the latest report year under the original framework (known as WBL 1.0). This file contains that recalculation: for each economy, it answers 35 yes-or-no questions about the law across eight topics (mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension). It also gives a score from 0 to 100 for each topic, and an overall index score, which is the average of the eight topic scores. A higher score means laws treat women and men more equally.
+
+      The file also lists every answer that changed since the 2024 report. Some are reforms (changes in the law), and some are revisions (corrections of earlier answers). For each change, it gives the first report year it applies to. Our World in Data asked the World Bank which year each change applies from, and the World Bank's Women, Business and the Law team sent this version of the file with that column added. The rest of the file is identical to the one published on the WBL website.
+
+      Each report describes the laws in force in the year before it is published (on October 1, in recent reports).
+    date_published: '2026-02-23'
+    citation_full: 'World Bank (2026). Women, Business and the Law 2026 - 1.0 scores for comparison purposes [dataset]. Washington, DC: World Bank. https://doi.org/10.57966/gtdw-yp27'
+    attribution: World Bank – Women, Business and the Law (2026)
+    url_main: https://wbl.worldbank.org/en/wbl-data
+    date_accessed: '2026-11-13'
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/search/dataset/0038489
+outs:
+  - md5: 1eb202820c3b6d783a06d0de36172ee6
+    size: 73977
+    path: women_business_and_the_law_1_0_scores.xlsx

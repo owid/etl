@@ -65,7 +65,7 @@ views:
       y:
         - catalogPath: eiu#regime_eiu
     config:
-      colorVariableId: eiu#regime_eiu
+      type: Swimlane
   - dimensions:
       metric: democracy
       sub_metric: number_and_share_of_democracies

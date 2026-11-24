@@ -192,9 +192,7 @@ The dependency is the upstream `grapher` step whose dataset contains the indicat
 
 ## Step 6: Run and verify
 
-**Always run the step after creating it** — schema validation only happens at runtime, so errors (like
-invalid fields in `config`, or a missing `chart_config_id`) won't surface until the step is executed. CI
-will catch these, but fix them locally first.
+**Always run the step after creating it, with `--grapher`** — ETL checks only its own structure (dimensions, views, a missing `chart_config_id`); the view `config` blocks are validated by the grapher admin API on upsert. A run without `--grapher` therefore passes a misspelled or invalid `config` field, and the upsert is where it fails, with a 400 naming the path (e.g. `/titel: must NOT have additional properties`). Valid fields and values are in the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
 ```bash
 # Chart steps write to the grapher DB, so they need the --grapher flag
@@ -202,8 +200,21 @@ will catch these, but fix them locally first.
 ```
 
 Editing the YAML is enough to trigger a re-run — ETL's change detection picks it up, so no extra flags are
-needed. Reserve `--force --only` for re-pushing when *nothing* changed, and note that `--only` skips
-dependency resolution, so it fails unless the upstream datasets are already built locally.
+needed. Reserve `--force --only` for re-pushing when *nothing* changed.
+
+`--only` skips the upstream steps. A chart defined only by its `.config.yml` then needs no dataset on disk:
+when the grapher dataset isn't there, the step reads the names of its tables from the grapher DB it writes
+to. A chart with a `.py` that loads tables still needs them built or downloaded.
+
+**Preview edits in seconds with `--watch`.** This re-runs the step each time the file is saved, and pushes
+the chart to the branch's staging server without a commit:
+
+```bash
+STAGING=1 .venv/bin/etlr viz://chart/{namespace}/latest/{short_name} --grapher --only --watch
+```
+
+The staging server must already have the indicators, so push the branch once first. Its build rewrites the
+chart from the committed file on every push, so commit what you want to keep.
 
 On success the step prints where to look:
 
@@ -216,7 +227,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ## Config YAML: single chart
 
 ```yaml
-grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
+grapher_schema: "012"  # QUOTED — a bare 012 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
 slug: banning-of-chick-culling
 topic_tags:
@@ -246,7 +257,7 @@ Key fields:
 
 - `grapher_schema` — **required**, and there is no fallback: the grapher chart-config schema version this
   config is written against, which becomes the chart's `$schema` and is what lets grapher migrate the
-  config after a breaking schema change. Use the version in `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`) when
+  config after a breaking schema change. Use `DEFAULT_GRAPHER_SCHEMA_VERSION` (`etl/config.py`) when
   authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required** for single charts, the chart's identity in grapher (`charts.configId`).
   See Step 4.
@@ -285,10 +296,10 @@ Key fields:
 
 ```yaml
 # REQUIRED — grapher chart-config schema the view configs below are written against, as a
-# QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
-# current DEFAULT_GRAPHER_SCHEMA version (etl/config.py) when authoring a new chart, then leave it
+# QUOTED string (a bare `012` is YAML octal). There is no fallback: ETL fails without it. Use the
+# current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
-grapher_schema: "011"
+grapher_schema: "012"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
 # chart-level pin, so the two silently disagree. ETL warns when that happens.
 
@@ -332,6 +343,8 @@ dimensions:
         name: Females
       - slug: male
         name: Males
+      # Quote a slug YAML could read as a number (`"5_14"`, `"2020"`) here, in `views` and in `default_dimensions`:
+      # unquoted, 5_14 loads as the int 514 and the step fails because the views no longer match the choices.
 
 views:
   - dimensions:
@@ -372,7 +385,14 @@ Rules:
 
 Valid topic tags (from `topic_tags` in `schemas/dataset-schema.json`):
 
-The schema enum is a static snapshot; if a tag seems missing, the canonical live list is this [Datasette query](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name).
+The schema enum is a static snapshot; if a tag seems missing, the canonical live list comes from this query against the internal Datasette (over Tailscale; `/query-grapher-db` has it and the `public.duckdb` route off the tailnet):
+
+```bash
+curl -s -G http://analytics.owid.io/owid.json -d _shape=array --data-urlencode "sql=SELECT DISTINCT t.name
+FROM tag_graph tg LEFT JOIN tags t ON tg.childId = t.id
+LEFT JOIN posts_gdocs p ON t.slug = p.slug AND p.published = 1 AND p.type IN ('article', 'topic-page', 'linear-topic-page')
+WHERE p.slug IS NOT NULL UNION SELECT 'Uncategorized' ORDER BY t.name"
+```
 
 `Access to Energy`, `Age Structure`, `Agricultural Production`, `Air Pollution`, `Alcohol Consumption`, `Animal Welfare`, `Antibiotics & Antibiotic Resistance`, `Artificial Intelligence`, `Biodiversity`, `Books`, `Burden of Disease`, `CO2 & Greenhouse Gas Emissions`, `COVID-19`, `Cancer`, `Cardiovascular Diseases`, `Causes of Death`, `Child & Infant Mortality`, `Child Labor`, `Clean Water`, `Clean Water & Sanitation`, `Climate Change`, `Corruption`, `Crop Yields`, `Democracy`, `Diarrheal Diseases`, `Diet Compositions`, `Economic Growth`, `Economic Inequality`, `Economic Inequality by Gender`, `Education Spending`, `Electricity Mix`, `Employment in Agriculture`, `Energy`, `Energy Mix`, `Environmental Impacts of Food Production`, `Eradication of Diseases`, `Famines`, `Farm Size`, `Fertility Rate`, `Fertilizers`, `Fish & Overfishing`, `Food Prices`, `Food Supply`, `Foreign Aid`, `Forests & Deforestation`, `Fossil Fuels`, `Gender Ratio`, `Global Education`, `Global Health`, `Government Spending`, `HIV/AIDS`, `Happiness & Life Satisfaction`, `Healthcare Spending`, `Homelessness`, `Homicides`, `Housing`, `Human Development Index (HDI)`, `Human Height`, `Human Rights`, `Hunger & Undernourishment`, `Illicit Drug Use`, `Indoor Air Pollution`, `Influenza`, `Internet`, `LGBT+ Rights`, `Land Use`, `Lead Pollution`, `Life Expectancy`, `Light at Night`, `Literacy`, `Loneliness & Social Connections`, `Malaria`, `Marriages & Divorces`, `Maternal Mortality`, `Meat & Dairy Production`, `Medicine & Biotechnology`, `Mental Health`, `Metals & Minerals`, `Micronutrient Deficiency`, `Migration`, `Military Personnel & Spending`, `Mpox (monkeypox)`, `Natural Disasters`, `Neglected Tropical Diseases`, `Nuclear Energy`, `Nuclear Weapons`, `Obesity`, `Oil Spills`, `Outdoor Air Pollution`, `Ozone Layer`, `Pandemics`, `Pesticides`, `Plastic Pollution`, `Pneumonia`, `Polio`, `Population Growth`, `Poverty`, `Religion`, `Renewable Energy`, `Research & Development`, `Sanitation`, `Smallpox`, `Smoking`, `Space Exploration & Satellites`, `State Capacity`, `Suicides`, `Taxation`, `Technological Change`, `Terrorism`, `Tetanus`, `Time Use`, `Tourism`, `Trade & Globalization`, `Transport`, `Trust`, `Tuberculosis`, `Uncategorized`, `Urbanization`, `Vaccination`, `Violence Against Children & Children's Rights`, `War & Peace`, `Waste Management`, `Water Use & Stress`, `Wildfires`, `Women's Employment`, `Women's Rights`, `Work & Employment`, `Working Hours`
 
@@ -400,8 +420,7 @@ views:
       hasMapTab: false                # Map doesn't work well with multiple indicators
 ```
 
-Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`,
-`numSignificantFigures`, `tolerance`, `zeroDay`.
+Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`, `numSignificantFigures`, `tolerance`, `zeroDay`. `numSignificantFigures` does nothing without `roundingMode: significantFigures`, and even then Grapher cuts values below 1 to `numDecimalPlaces` decimals (the view's, else the indicator's own, else 2): 2 significant figures with 2 decimals shows 0.031% as 0.03%. So a share that can go below 1% needs a higher `numDecimalPlaces` as well, while a count of people can keep 0.
 
 ### Dimension-specific common_views overrides
 
@@ -434,13 +453,29 @@ Inheritance is from `grapher_config` only — there is no fallback to the indica
 template), rebuild the grapher step, and leave the view configs thin. To verify what will actually render,
 read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
+Write FAUST, wherever it lives, from the producer's documentation (`.claude/rules/producer-documentation.md`): show the user its links before you write, check each claim against it, and when you hand the chart over, say which passage each title, subtitle and note rests on, or that it is inferred.
+
+### Data page of a view that combines different indicators
+
+A multidim view's data page shows the metadata of its **first y indicator only**, with the view's
+`metadata:` merged on top. So a view that combines different indicators (a scatter's y and x; a dumbbell or
+line chart of gross vs. net rates or past vs. projected spending; a stacked bar of several components) needs
+its own `metadata:` block (not `config:`) whose text covers all of them. Set at least
+`presentation.title_public`, `description_short` and `description_key`, and check `presentation.attribution_short`
+and `presentation.title_variant` (they render with the title), `description_processing`,
+`description_from_producer`, the unit and the origins on the rendered page. A view comparing one indicator
+across a dimension (men vs. women) needs none, unless the indicator's text names the split value. A `size`
+or `color` slot that holds regions, income groups or population is left out of the text; one that is a
+measure of its own is covered. How to write the text and keep it in sync: [`COMBINED_VIEW_METADATA.md`](COMBINED_VIEW_METADATA.md).
+
 ## Chart config options
 
 Key fields for `config` in views or `common_views`:
 
 | What | Field | Notes |
 |---|---|---|
-| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko` |
+| Chart type | `chartTypes: ["LineChart"]` | `LineChart`, `ScatterPlot`, `StackedArea`, `DiscreteBar`, `StackedDiscreteBar`, `SlopeChart`, `StackedBar`, `Marimekko`, `Dumbbell` |
+| Dumbbell connector | `dumbbell: { connectorStyle: line }` | The default arrow reads as a change from the first series to the second, so keep it only for a before and after (two dates, before vs. after tax). Use `line` for categories with no order, such as men vs. women |
 | Default tab | `tab: "chart"` | `chart`, `map`, `table`, `line`, `slope`, `discrete-bar`, `marimekko` |
 | Map tab visible? | `hasMapTab: true` | Set with `tab: "map"` for map-by-default charts; avoid with multi-indicator views |
 | Facet strategy | `selectedFacetStrategy: entity` | `entity`, `metric`, `none` — how to facet multi-indicator charts |
@@ -454,6 +489,14 @@ Key fields for `config` in views or `common_views`:
 
 For the authoritative list, see the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
+### Chart colors
+
+Use OWID's own color schemes wherever one fits, following OWID's decision tree in [`CHART_COLORS.md`](CHART_COLORS.md). In short: a semantic scheme first (binary data, world regions, income groups, energy sources), then a sequential or diverging scale for ordered numbers, one OWID color for a bar chart or scatter plot without subgroups, and otherwise an `OwidCategorical*` scheme picked by the number of categories. A map of categories with no order uses `OwidCategoricalMap`. The admin's color dropdown lists the schemes Grapher prefers for the chart type first; `CHART_COLORS.md` has that list for each chart type.
+
+### Color groups for Marimekkos and scatter plots
+
+When a chart or view offers a `Marimekko` or `ScatterPlot`, color it by continent: add `color: regions#owid_region` next to `y` in the view's `indicators`, and `data://grapher/regions/2023-01-01/regions` to the viz step's dependencies in the dag. Also set `matchingEntitiesOnly: true` by default, so entities that belong to no group (regions, the world, income groups and other aggregates) drop out instead of appearing uncolored. It only affects the Marimekko and scatter plot; bar, line, slope and dumbbell tabs keep their selected regions. Offer the user income groups as an alternative coloring: `income_groups#classification`, with the latest `data://grapher/wb/<version>/income_groups` as the dependency. Both get their colors from Grapher's `continents` scheme, which colors continents and the four income groups by name.
+
 ### Map palettes
 
 Common practice in OWID charts, not a hard rule:
@@ -463,6 +506,10 @@ Common practice in OWID charts, not a hard rule:
 - **Give each indicator its own palette** when several maps sit together, e.g. charts from the same dataset or for the same article. Then readers can tell the maps apart at a glance.
 
 [`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the other scheme families (diverging, perceptual, binary, categorical, `SingleColorGradient*`) are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
+
+### Map brackets
+
+Map brackets follow a regular pattern, like axis ticks: linear, log or log-like steps, 5 to 8 of them, never edges moved to make particular countries stand out. Prefer Grapher's automated brackets (the default `binningStrategy: auto`, or an `equalSizeBins-*` or `log-*` strategy, with `minValue` and `maxValue` when the default range is awkward), and use `manual` only for real-world thresholds such as poverty lines. An end bracket opens when data lies beyond its outer edge, and then starts at the next edge in; an open top in a manual scale takes one extra value, below the last edge. Patterns, strategies and examples: [`MAP_BRACKETS.md`](MAP_BRACKETS.md).
 
 ## Common dimension patterns
 
@@ -527,7 +574,7 @@ UUID.
 and that the file is included from `dag/main.yml`.
 
 **Preview URL shows errors**: verify that the catalogPaths in your config match actual indicators in the
-grapher dataset. Check by running the grapher step first: `.venv/bin/etlr data://grapher/{namespace}/{version}/{dataset} --grapher`.
+grapher dataset. Check by running the grapher step first: `.venv/bin/etlr grapher://grapher/{namespace}/{version}/{dataset} --grapher`.
 
 **`config must not contain {'description_key'}` or similar**: view-level metadata like `description_key`,
 `description_short`, and `presentation` belong under `metadata`, not `config`. The `config` block is for

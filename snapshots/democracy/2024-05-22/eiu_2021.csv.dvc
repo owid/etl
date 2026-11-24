@@ -1,6 +1,7 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
+  is_public: false
   origin:
     # Data product / Snapshot
     title: "Democracy Index 2021: The China challenge"
@@ -23,7 +24,7 @@ meta:
 
     # License
     license:
-      name: The Economist Intelligence Unit Limited
+      name: © 2022 The Economist Intelligence Unit Limited
       url: https://www.eiu.com/n/terms/
 outs:
   - md5: 1f10b7f7ded75333a24fb7131377ef5c

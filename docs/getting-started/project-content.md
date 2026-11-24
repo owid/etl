@@ -22,7 +22,6 @@ You don't need to understand all of them to get started, but as you work more wi
 | `export/`    | Similar to `data/` but for `export` steps. |
 | `viz/`    | Similar to `data/` but for `viz` steps (charts, explorers, static images, bespoke visualizations). |
 | `lib/`    | Other OWID sub-packages. |
-| `owid_mcp/`    | OWID's MCP server code. |
 | `schemas/`    | Metadata schemas for ETL datasets. |
 | `scripts/`    | Various scripts. |
 | `snapshots/`       | This is the entry point to ETL. This folder contains metadata and code to get external data and import it to our pipeline. |

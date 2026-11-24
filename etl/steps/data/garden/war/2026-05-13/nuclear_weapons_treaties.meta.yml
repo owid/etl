@@ -7,8 +7,15 @@ definitions:
     The status "Not signed" means that the country has neither signed nor committed to a treaty.
   definition_russia_ctbt: |-
     Russia ratified the Comprehensive Nuclear-Test-Ban Treaty in 2000, but withdrew its ratification in 2023. Since it remains a signatory, with the same obligations as countries that have signed but not approved the treaty, it is classified as "Signed" from 2023 onward.
+  definition_north_korea_npt: |-
+    North Korea joined the Nuclear Non-Proliferation Treaty in 1985 and announced its withdrawal in 2003. The treaty’s other member countries continue to disagree about North Korea’s status under the treaty, and UNODA still lists its 1985 accession, so it is classified as "Approved" from 1985 onward. See [UNODA’s notes on the treaty](https://treaties.unoda.org/t/npt/declarations).
   definition_all_statuses: |-
     A country's position on a treaty can be ["Not signed"](#dod:treaty-status-not-signed), ["Signed"](#dod:treaty-status-signed), or ["Approved"](#dod:treaty-status-committed).
+  # Order of the statuses, from no commitment to a legal commitment.
+  status_sort: &status_sort
+    - Not signed
+    - Signed
+    - Approved
   common:
     unit: ""
     short_unit: ""
@@ -48,6 +55,8 @@ tables:
           - "{definitions.definition_russia_ctbt}"
         display:
           name: Comprehensive Test Ban
+        type: ordinal
+        sort: *status_sort
         presentation:
           title_public: Status of countries regarding the Comprehensive Nuclear-Test-Ban Treaty
       geneva_protocol:
@@ -56,14 +65,23 @@ tables:
           The goal of the Geneva Protocol is to prohibit the use of chemical and biological weapons in international armed conflicts. {definitions.definition_all_statuses}
         display:
           name: Geneva Protocol
+        type: ordinal
+        sort: *status_sort
         presentation:
           title_public: Status of countries regarding the Geneva Protocol
       nuclear_non_proliferation_treaty:
         title: Nuclear Non-Proliferation Treaty
         description_short: |-
           The treaty's objective is to prevent the spread of nuclear weapons, to promote cooperation in the peaceful uses of nuclear energy, and to pursue nuclear and general disarmament. {definitions.definition_all_statuses}
+        description_key:
+          - "{definitions.definition_status_signed}"
+          - "{definitions.definition_status_committed}"
+          - "{definitions.definition_status_not_signed}"
+          - "{definitions.definition_north_korea_npt}"
         display:
           name: Non-Proliferation Treaty
+        type: ordinal
+        sort: *status_sort
         presentation:
           title_public: Status of countries regarding the Nuclear Non-Proliferation Treaty
       partial_test_ban_treaty:
@@ -72,6 +90,8 @@ tables:
           The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, and under water. {definitions.definition_all_statuses}
         display:
           name: Partial Test Ban
+        type: ordinal
+        sort: *status_sort
         presentation:
           title_public: Status of countries regarding the Partial Test Ban Treaty
       treaty_on_the_prohibition_of_nuclear_weapons:
@@ -80,6 +100,8 @@ tables:
           The treaty's objective is to stop developing, testing, producing, acquiring, possessing, stockpiling, deploying, using, and threatening nuclear weapons, as well as assisting other countries in these actions. {definitions.definition_all_statuses}
         display:
           name: Prohibition
+        type: ordinal
+        sort: *status_sort
         presentation:
           title_public: Status of countries regarding the Treaty on the Prohibition of Nuclear Weapons
   nuclear_weapons_treaties_country_counts:
@@ -106,6 +128,11 @@ tables:
           title_public: Number of countries with a given status on the Geneva Protocol
       nuclear_non_proliferation_treaty:
         title: Number of countries with a given status on the Nuclear Non-Proliferation Treaty
+        description_key:
+          - "{definitions.definition_status_signed}"
+          - "{definitions.definition_status_committed}"
+          - "{definitions.definition_status_not_signed}"
+          - "{definitions.definition_north_korea_npt}"
         display:
           name: Non-Proliferation Treaty
           numDecimalPlaces: 0

@@ -272,7 +272,7 @@
 - country: Kazakhstan
   country_impute: Russia
   year_min: 1789
-  year_max: 1990
+  year_max: 1989
   annotation: |-
     1789-1989: imperial power Russia 1730-1990 (Wimmer and Min 2006), part of Russia 1886-1991 (Cshapes 2.0); not colonized (Ertan et al. 2016).
 
@@ -577,7 +577,7 @@
 # TURKMENISTAN (1789-1989)
 - country: Turkmenistan
   country_impute: Russia
-  year_min: 1896
+  year_min: 1886
   year_max: 1989
   annotation: |-
     Imperial power Russia 1897-1990 (Wimmer and Min 2006), (mostly) part of Russia since 1886-1991, part protectorate Khiva 1886-1920 (Cshapes 2.0), not colonized (Ertan et al. 2016), resistance against Russia broken in 1881 (Encyclopedia Britannica).

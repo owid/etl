@@ -36,7 +36,7 @@ def get_us_deflator() -> dict[int, float]:
 
 
 def convert_to_latest_usd(tb: Table, unit_pattern: str, us_deflator: dict[int, float]) -> Table:
-    columns = [column for column in tb.columns if column not in ["country", "year"]]
+    columns = [column for column in tb.columns if column not in ["country", "year", "technology"]]
     years = set()
     for column in columns:
         match = re.fullmatch(unit_pattern, tb[column].metadata.unit)
@@ -77,6 +77,10 @@ def run() -> None:
     tb_solar_pv = paths.load_dataset("renewable_power_generation_costs", version=MODULE_PRICES_VERSION).read(
         "solar_photovoltaic_module_prices", safe_types=False
     )
+    # Releases after MODULE_PRICES_VERSION give module prices by technology instead (yearly, from 2020 onwards).
+    tb_solar_pv_by_technology = paths.load_dataset("renewable_power_generation_costs", version=versions[-1]).read(
+        "solar_photovoltaic_module_prices", safe_types=False
+    )
     us_deflator = get_us_deflator()
 
     #
@@ -96,12 +100,20 @@ def run() -> None:
     sanity_check_outputs(tb=tb)  # ty: ignore
 
     tb_solar_pv = convert_to_latest_usd(tb=tb_solar_pv, unit_pattern=MODULE_PRICE_UNIT_PATTERN, us_deflator=us_deflator)
+    tb_solar_pv_by_technology = convert_to_latest_usd(
+        tb=tb_solar_pv_by_technology, unit_pattern=MODULE_PRICE_UNIT_PATTERN, us_deflator=us_deflator
+    )
 
     tb = tb.format()
     tb_solar_pv = tb_solar_pv.format(short_name="solar_photovoltaic_module_prices")
+    tb_solar_pv_by_technology = tb_solar_pv_by_technology.format(
+        keys=["country", "year", "technology"], short_name="solar_photovoltaic_module_prices_by_technology"
+    )
 
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb, tb_solar_pv], yaml_params={"LATEST_YEAR": LATEST_YEAR})
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_solar_pv, tb_solar_pv_by_technology], yaml_params={"LATEST_YEAR": LATEST_YEAR}
+    )
     ds_garden.save()

@@ -8,6 +8,20 @@ from owid.catalog import Table
 
 from etl.data_helpers import geo
 
+# The three leadership offices, and for each the V-Dem flag giving the gender of whoever held it at
+# any point during the year, plus the flag saying whether the office was filled through multi-party
+# elections. Used to build the "ever had a woman leader" indicators.
+OFFICES = {
+    "hos": {"gender": "v2exfemhos", "elected": "v2elmulpar_osp_hos"},
+    "hog": {"gender": "v2exfemhog", "elected": "v2elmulpar_osp_hog"},
+    "hoe": {"gender": "femhoe_owid", "elected": "electmulpar_hoe_row_owid"},
+}
+
+
+def _column_anytime(office: str) -> str:
+    """Name of the working column holding the gender of an office's holder at any point in the year."""
+    return f"wom_{office}_anytime"
+
 
 def run(tb: Table, country_mapping_path) -> Table:
     # %% Initial cleaning
@@ -69,11 +83,13 @@ def run(tb: Table, country_mapping_path) -> Table:
     tb = estimate_gender_hoe_indicator(tb)
     # Estimate gender of HOG. Basically, when missing and HOS=HOG, then use the gender of HOS.
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
+    # Same, for the flags that refer to any point during the year rather than to December 31.
+    tb = estimate_gender_leaders_anytime(tb)
     tb = tb.drop(columns=["v2exhoshog"])
 
     # %% Gender indicators (2)
-    # Estimate if a country ever had a female HOE
-    tb = estimate_hoe_ever_female(tb)
+    # Estimate if a country ever had a female HOS, HOG or HOE (and whether she was elected)
+    tb = estimate_ever_female_indicators(tb)
 
     return tb
 
@@ -150,7 +166,6 @@ def correct_female_flag(tb: Table) -> Table:
     """v2exfemhos and v2exfemhog refer to whether the country had a female hog/hos during the year. There are some errors in V-Dem, so we correct them here."""
     ## HOG
     # Moldova: 2019: Female
-    # Mali: 2012 Male
     # Canada: 1993: Female
     # Norway:: 1981 Female
     # Ukraine:: 2005 Female
@@ -164,8 +179,7 @@ def correct_female_flag(tb: Table) -> Table:
     # Lesotho: 1990, 1996, 1960, 1970 Female
     # Ivory Coast: 1932 male (for "Dieudonné François Joseph Marie Reste")
 
-    ## HOG
-    tb.loc[(tb["year"] == 2012) & (tb["country"] == "Mali"), "v2exfemhog"] = 0
+    # NOTE: Mali 2012 is not corrected here: V-Dem's 1 is right for "at any point in the year" (Cissé Mariam Kaïdama Sidibé was prime minister until March 2012). Only the December 31 flag (add_female_flag_31d) sets it to 0.
     ## HOS
     tb.loc[(tb["year"] == 1990) & (tb["country"] == "Lesotho"), "v2exfemhos"] = 1
     tb.loc[(tb["year"] == 1932) & (tb["country"] == "Ivory Coast"), "v2exfemhos"] = 0
@@ -181,6 +195,7 @@ def estimate_mulpar_indicators(tb: Table) -> Table:
         "v2elmulpar_osp_codehigh": "v2elmulpar_osp_high",
         "v2elmulpar_osp_codelow": "v2elmulpar_osp_low",
         # Create indicators for free and fair elections with imputed values between election-years
+        # NOTE: The original Stata script (L90, L93) builds the high and low versions from the central estimate, which looks like a typo; we use the bounds, as for multi-party elections.
         "v2elfrfair_osp": "v2elfrfair_osp",
         "v2elfrfair_osp_codehigh": "v2elfrfair_osp_high",
         "v2elfrfair_osp_codelow": "v2elfrfair_osp_low",
@@ -188,18 +203,35 @@ def estimate_mulpar_indicators(tb: Table) -> Table:
     columns_old = list(columns.keys())
     columns_new = list(columns.values())
 
-    ## Forward fill indicators when there are regularly scheduled national elections on course, as stipulated by election law or well-established precedent
-    mask = tb["v2x_elecreg"] == 1
+    ## Carry indicators forward when there are regularly scheduled national elections on course, as stipulated by election law or well-established precedent
     tb[columns_new] = tb[columns_old].copy()
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
-    # condition = (tb['v2x_elecreg'] == 1) & (tb['v2elmulpar_osp_imp'].isna())
-    # tb.loc[:, columns_new] = tb.groupby(["country"])[columns_old].transform(lambda x: x.ffill().where(x.bfill().eq(1)))
+    tb = fill_from_previous_year(tb, columns_new, tb["v2x_elecreg"] == 1)
+    return tb
+
+
+def fill_from_previous_year(tb: Table, columns: list[str], condition) -> Table:
+    """Fill missing values with the previous year's value, in years where `condition` holds.
+
+    This is Stata's `replace x = l.x if x == . & condition`: the value is carried forward one year at a time, so the chain stops at any year where the condition doesn't hold (e.g. elections were suspended) or that doesn't follow the previous year. A pandas `ffill()` would instead skip over those years and reach back to the last value before the break.
+
+    Expects `tb` sorted by country and year.
+    """
+    follows_previous_year = (tb.groupby("country", observed=True)["year"].diff() == 1).fillna(False)
+    can_fill = (condition.fillna(False) & follows_previous_year).astype(bool)
+    for column in columns:
+        while True:
+            previous = tb.groupby("country", observed=True)[column].shift(1)
+            to_fill = tb[column].isna() & previous.notna() & can_fill
+            if not to_fill.any():
+                break
+            tb.loc[to_fill, column] = previous[to_fill]
     return tb
 
 
 def estimate_ex_indicators(tb: Table) -> Table:
     """Create indicators for multi-party executive elections, and multi-party executive elections with imputed values between election-years."""
-    MASK_PRESIDENTIAL = (tb["v2eltype_6"] == 1) | (tb["v2eltype_7"] == 1)
+    # A missing election type counts as no election, as in Stata (where `. == 1` is false).
+    MASK_PRESIDENTIAL = ((tb["v2eltype_6"] == 1) | (tb["v2eltype_7"] == 1)).fillna(False).astype(bool)
     columns = {
         "v2elmulpar_osp": "v2elmulpar_osp_ex",
         "v2elmulpar_osp_codehigh": "v2elmulpar_osp_ex_high",
@@ -210,16 +242,20 @@ def estimate_ex_indicators(tb: Table) -> Table:
     tb[columns_new] = tb[columns_old].copy()
     tb.loc[~MASK_PRESIDENTIAL, columns_new] = np.nan
 
-    ## Forward fill indicators when there are regularly scheduled national elections on the executive on course, as stipulated by election law or well-established precedent
-    mask = tb["v2xex_elecreg"] == 1
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
+    ## Carry indicators forward when there are regularly scheduled national elections on the executive on course, as stipulated by election law or well-established precedent
+    tb = fill_from_previous_year(tb, columns_new, tb["v2xex_elecreg"] == 1)
     return tb
 
 
 def estimate_leg_indicators(tb: Table) -> Table:
     """Create indicators for multi-party legislative elections, and multi-party legislative elections with imputed values between election-years."""
     ## v2eltype_4 and v2eltype_5 excluded in Marcus Tannenberg and Anna Lührmann's Stata code; included here to align coding with code in V-Dem's data pipeline.
-    MASK_LEG = (tb["v2eltype_0"] == 1) | (tb["v2eltype_1"] == 1) | (tb["v2eltype_4"] == 1) | (tb["v2eltype_5"] == 1)
+    ## A missing election type counts as no election, as in Stata (where `. == 1` is false).
+    MASK_LEG = (
+        ((tb["v2eltype_0"] == 1) | (tb["v2eltype_1"] == 1) | (tb["v2eltype_4"] == 1) | (tb["v2eltype_5"] == 1))
+        .fillna(False)
+        .astype(bool)
+    )
     columns = {
         "v2elmulpar_osp": "v2elmulpar_osp_leg",
         "v2elmulpar_osp_codehigh": "v2elmulpar_osp_leg_high",
@@ -230,9 +266,8 @@ def estimate_leg_indicators(tb: Table) -> Table:
     tb[columns_new] = tb[columns_old].copy()
     tb.loc[~MASK_LEG, columns_new] = np.nan
 
-    ## Forward fill indicators when there are regularly scheduled national elections on the legislature on course, as stipulated by election law or well-established precedent
-    mask = tb["v2xlg_elecreg"] == 1
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
+    ## Carry indicators forward when there are regularly scheduled national elections on the legislature on course, as stipulated by election law or well-established precedent
+    tb = fill_from_previous_year(tb, columns_new, tb["v2xlg_elecreg"] == 1)
     return tb
 
 
@@ -301,46 +336,15 @@ def estimate_hos_indicators(tb: Table) -> Table:
 
 def estimate_hog_indicators(tb: Table) -> Table:
     """Create indicators for multi-party head of government elections with imputed values between election-years."""
-    tb["v2elmulpar_osp_hog"] = 0
-    tb.loc[tb["v2x_elecreg"].isna(), "v2elmulpar_osp_hog"] = np.nan
-
-    # Define mask
-    mask = (
-        (
-            # If head of government is directly elected, elections for executive must be multi-party
-            (tb["v2expathhs"] == 8)
-            & (tb["v2xex_elecreg"] == 1)
-            & (tb["v2elmulpar_osp_ex"] > 1)
-            & (tb["v2elmulpar_osp_ex"].notna())
-        )
-        | (
-            # If head of government is appointed by legislature, elections for legislature must be multi-party.
-            (tb["v2expathhs"] == 7)
-            & (tb["v2xex_elecreg"] == 1)
-            & (tb["v2elmulpar_osp_leg"] > 1)
-            & (tb["v2elmulpar_osp_leg"].notna())
-        )
-        | (
-            # If head of government is appointed by the head of state, elections for the head of state must be multi-party
-            (tb["v2expathhs"] == 6) & (tb["v2elmulpar_osp_hos"] == 1)
-        )
-    )
-    tb.loc[mask, "v2elmulpar_osp_hog"] = 1
-
-    ## If head of government is appointed otherwise, but approval by the legislature is necessary, elections for legislature must be multi-party
-    tb.loc[
-        (tb["v2ex_legconhog"] == 1)
-        & (tb["v2xlg_elecreg"] == 1)
-        & (tb["v2elmulpar_osp_leg"] > 1)
-        & tb["v2elmulpar_osp_leg"].notna(),
-        "v2elmulpar_osp_hog",
-    ] = 1
 
     def _set_mulpar_hog(tb: Table, column_new: str, column_ex: str, column_leg: str, column_hos: str) -> Table:
-        # Iniitalize new column
+        # Initialize new column
         tb[column_new] = 0
         tb.loc[tb["v2x_elecreg"].isna(), column_new] = np.nan
         # Define mask
+        # NOTE: every branch below asks how the head of GOVERNMENT came to office, so it reads
+        # `v2expathhg`. Until 2026 these branches read `v2expathhs`, the head of state's route,
+        # which is what the head-of-state function above legitimately uses.
         mask = (
             (
                 # If head of government is directly elected, elections for executive must be multi-party.
@@ -348,11 +352,11 @@ def estimate_hog_indicators(tb: Table) -> Table:
             )
             | (
                 # If head of government is appointed by legislature, elections for legislature must be multi-party.
-                (tb["v2expathhs"] == 7) & (tb["v2xlg_elecreg"] == 1) & (tb[column_leg] > 1) & (tb[column_leg].notna())
+                (tb["v2expathhg"] == 7) & (tb["v2xlg_elecreg"] == 1) & (tb[column_leg] > 1) & (tb[column_leg].notna())
             )
             | (
                 # If head of government is appointed by the head of state, elections for the head of state must be multi-party.
-                (tb["v2expathhs"] == 6) & (tb[column_hos] == 1)
+                (tb["v2expathhg"] == 6) & (tb[column_hos] == 1)
             )
             |
             # If head of government is appointed otherwise, but approval by the legislature is necessary, elections for legislature must be multi-party.
@@ -361,8 +365,16 @@ def estimate_hog_indicators(tb: Table) -> Table:
         # Set 1 when mask is True
         tb.loc[mask, column_new] = 1
 
+        # Where one person is both head of state and head of government, V-Dem leaves every
+        # head-of-government column empty, so `v2expathhg` is missing and none of the branches above
+        # can fire. That person is the head of government, so carry their head-of-state value over —
+        # the same thing the chief-executive indicator below does for this case.
+        mask_same_person = (tb["v2exhoshog"] == 1) & (tb[column_hos].notna())
+        tb.loc[mask_same_person, column_new] = tb.loc[mask_same_person, column_hos]
+
         return tb
 
+    tb = _set_mulpar_hog(tb, "v2elmulpar_osp_hog", "v2elmulpar_osp_ex", "v2elmulpar_osp_leg", "v2elmulpar_osp_hos")
     tb = _set_mulpar_hog(
         tb, "v2elmulpar_osp_hog_high", "v2elmulpar_osp_ex_high", "v2elmulpar_osp_leg_high", "v2elmulpar_osp_hos_high"
     )
@@ -544,6 +556,13 @@ def estimate_row_indicators(tb: Table) -> Table:
         column_new,
     ] = 1
 
+    # Without regularly scheduled legislative elections on course, there are no multi-party elections for the legislature, which makes a country a closed autocracy (as V-Dem's codebook defines RoW). This holds even where other criteria are missing, and even where V-Dem's released data says otherwise.
+    mask_no_leg_elections = tb["v2xlg_elecreg"] == 0
+    assert not tb.loc[mask_no_leg_elections, column_new].isin([2, 3]).any(), (
+        "Some democracies have no legislative elections on course; decide which criterion should win."
+    )
+    tb.loc[mask_no_leg_elections, column_new] = 0
+
     return tb
 
 
@@ -566,37 +585,38 @@ def compare_with_row_coding(tb: Table) -> Table:
         == 0
     )
 
-    # 17 observations own classification identifies as closed autocracies, whereas RoW does not provide data
+    # 49 observations own classification identifies as closed autocracies, whereas RoW does not provide data
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 0) & (tb["v2x_regime"].isna()) & (tb["year"] > 1900),
             ["country", "year", "v2x_polyarchy"],
         ].shape[0]
-        == 17  # NOTE: went from 18 (2024) to 17 (2025)
+        == 49  # NOTE: went from 18 (2024) to 17 (2025); 17 -> 49 on coding countries without legislative elections on course as closed autocracies
     )
     # Libya in 1911, 1914, and 1922-1933 can be coded because I use information from v2exhoshog in addition to information from v2ex_hosw to identify head of the executive
+    # Albania 1912-1913, Lebanon 1918, Libya 1912-1921, Montenegro 1918, Republic of Vietnam 1901, Slovakia 1939-1944, Tanzania 1914, and Uzbekistan 1901-1911 can be coded because they had no legislative elections on course (v2xlg_elecreg == 0)
     # Honduras in 1934 and 1935, Kazakhstan in 1990, and Turkmenistan in 1990 can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
-    # 13 observations own classification identifies as electoral autocracies, whereas RoW does not provide data
+    # 12 observations own classification identifies as electoral autocracies, whereas RoW does not provide data
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 1) & (tb["v2x_regime"].isna() & (tb["year"] > 1900)),
             ["country", "year", "v2x_polyarchy"],
         ].shape[0]
-        == 13
+        == 12  # NOTE: 13 -> 12 on carrying election scores forward year by year, as the Stata script does (Dominican Republic 1905 can no longer be coded)
     )
     # Observations can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
-    # 137 bservations own classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
+    # Observations our classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
     assert (
-        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 139
-    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026)
+        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 237
+    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026); 139 -> 143 on fixing the head-of-government election path; 143 -> 238 on coding countries without legislative elections on course as closed autocracies; 238 -> 237 on treating a missing election type as no election and carrying election scores forward year by year, as the Stata script does
 
     # Belgium in 1919 is hard-recoded in RoW code, though Marcus Tannenberg does not know why that happens even if the errors in a previous version of the V-Dem dataset should by now be remedied; it only continues to make a difference for Belgium in 1919; I keep the recode.
     # replace regime_row_owid = 1 if country_name == "Belgium" & year == 1919
     tb.loc[(tb["country"] == "Belgium") & (tb["year"] == 1919), "regime_row_owid"] = 1
 
-    # 105 observations with multi-party elections for legislature and executive (hence the RoW coding); but which had chief executive which were heads of state that were neither directly or indirectly chosen through multiparty elections, nor were they accountable to a legislature chosen through multi-party elections; I therefore do not recode them.
+    # 178 observations with chief executives that were heads of state, which RoW codes higher than we do. Most had multi-party elections for legislature and executive (hence the RoW coding); but their chief executive was neither directly or indirectly chosen through multiparty elections, nor accountable to a legislature chosen through multi-party elections. The rest had no legislative elections on course (v2xlg_elecreg == 0). I therefore do not recode them.
     assert (
         tb.loc[
             (tb["regime_row_owid"] < tb["v2x_regime"])
@@ -605,11 +625,11 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] > 0.5),
             ["country", "year", "v2exnamhos"],
         ].shape[0]
-        == 106  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026)
+        == 178  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026); 106 -> 179 on coding countries without legislative elections on course as closed autocracies; 179 -> 178 on following the Stata script's election-score rules
     )
     # Examples include many prominent heads of state which came to office in coup d'etats or rebellions, such as Boumedienne (Algeria 1965), Anez (Bolivia 2019), Buyoya (Burundi 1987), Batista (Cuba 1952), Ankrah (Ghana 1966), Khomeini (Iran 1980), Buhari (Nigeria 1983), Jammeh (The Gambia 1994), and Eyadema (1967 Togo)
 
-    # 8 observations which had multi-party elections for legislature and executive (hence the RoW coding); but which had chief executives which were heads of government that were neither directly or indirectly chosen through multiparty elections, nor were they accountable to a legislature chosen through multi-party elections:
+    # 34 observations which had multi-party elections for legislature and executive (hence the RoW coding); but which had chief executives which were heads of government that were neither directly or indirectly chosen through multiparty elections, nor were they accountable to a legislature chosen through multi-party elections:
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 0)
@@ -618,29 +638,24 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] <= 0.5),
             ["country", "year", "v2elmulpar_osp_exleg", "v2expathhg", "v2ex_legconhog", "v2expathhs", "v2ex_legconhos"],
         ].shape[0]
-        == 8
+        == 34  # NOTE: went from 8 to 34 on fixing the head-of-government election path
     )
     # Examples include prominent heads of government which came to office in a rebellion or were appointed by a foreign power, such as Castro (Cuba 1959)
 
     # NOTE: 3 (2023) -> 21 (2024) observations coded differently because I use v2ex_legconhog above for consistency, while RoW uses v2exaphogp instead. I defer to RoW coding in these cases. It may be that their data pipeline uses date-specific data which are superior to the year-end data used here.
     # NOTE: Then up to 23 in 2025
-    assert (
-        tb.loc[
-            (tb["regime_row_owid"] == 0)
-            & (tb["v2x_regime"] == 1)
-            & (tb["v2elmulpar_osp_exleg"] == 0)
-            & (tb["v2ex_hosw"] <= 0.5),
-            ["country", "year", "v2expathhg", "v2ex_legconhog", "v2exaphogp"],
-        ].shape[0]
-        == 24  # NOTE: went from 21 (2024) to 23 (2025) to 24 (2026)
-    )
-    tb.loc[
+    # Where there are no legislative elections on course (v2xlg_elecreg == 0), I do not defer and keep our closed autocracy instead (see estimate_row_indicators).
+    mask_defer = (
         (tb["regime_row_owid"] == 0)
         & (tb["v2x_regime"] == 1)
         & (tb["v2elmulpar_osp_exleg"] == 0)
-        & (tb["v2ex_hosw"] <= 0.5),
-        "regime_row_owid",
-    ] = 1
+        & (tb["v2ex_hosw"] <= 0.5)
+    )
+    mask_no_leg_elections = tb["v2xlg_elecreg"] == 0
+    # NOTE: went from 21 (2024) to 23 (2025) to 24 (2026); 24 -> 2 on fixing the head-of-government election path
+    assert (mask_defer & ~mask_no_leg_elections).sum() == 2
+    assert (mask_defer & mask_no_leg_elections).sum() == 22
+    tb.loc[mask_defer & ~mask_no_leg_elections, "regime_row_owid"] = 1
 
     # NOTE: 136 -> 270 bservations own classification identifies as electoral autocracies, whereas RoW identifies them as closed autocracies:
     # tb.loc[(tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0), ["country", "year"]]
@@ -659,11 +674,11 @@ def compare_with_row_coding(tb: Table) -> Table:
             (tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0) & (tb["v2ex_hosw"] <= 0.5),
             ["v2elmulpar_osp_leg", "v2elmulpar_osp_hoe", "v2elmulpar_osp", "v2xlg_elecreg"],
         ].shape[0]
-        == 81  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026)
+        == 10  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026); 81 -> 16 on fixing the head-of-government election path; 16 -> 10 on following the Stata script's election-score rules
     )
 
-    # 43 observations which RoW identifies as electoral autocracies, but which own classification identifies as missing:
-    # All observations have missing values for multi-party legislative elections, sometimes also for free and fair as well as multi-party elections in general. One could say that if v2x_elecreg == 0 — or v2eltype_0/1/4/5 are all zero — this means that were no (multi-party legislative) elections - but this would make these regimes closed autocracies, not electoral autociraces. So this better stay as is.
+    # No observations which RoW identifies as electoral autocracies, but which own classification identifies as missing:
+    # The observations that used to be here had missing values for multi-party legislative elections because there were no legislative elections on course (v2xlg_elecreg == 0). That makes them closed autocracies according to V-Dem's codebook, even though V-Dem's data codes them as electoral autocracies. We follow the codebook (see estimate_row_indicators).
     assert (
         tb.loc[
             (tb["regime_row_owid"].isna()) & (tb["v2x_regime"] == 1),
@@ -682,11 +697,11 @@ def compare_with_row_coding(tb: Table) -> Table:
                 "v2eltype_5",
             ],
         ].shape[0]
-        == 43  # NOTE: went from 34 (2024) to 43 (2025)
+        == 0  # NOTE: went from 34 (2024) to 43 (2025); 43 -> 63 on fixing the head-of-government election path; 63 -> 0 on coding countries without legislative elections on course as closed autocracies
     )
 
-    # 5 observation which RoW identifies as closed autocracy, but which own classification identifies as missing:
-    # Slovakia in 1993 had not held legislative elections yet. This can stay as is.
+    # No observations which RoW identifies as closed autocracy, but which own classification identifies as missing:
+    # The five that used to be here (Democratic Republic of Congo 1993-1996, and Slovakia in 1993, which had not held legislative elections yet) had no legislative elections on course, and are now closed autocracies as well.
     assert (
         tb.loc[
             (tb["regime_row_owid"].isna()) & (tb["v2x_regime"] == 0),
@@ -700,7 +715,7 @@ def compare_with_row_coding(tb: Table) -> Table:
                 "v2elmulpar_osp_leg_dich",
             ],
         ].shape[0]
-        == 5
+        == 0  # NOTE: 5 -> 0 on coding countries without legislative elections on course as closed autocracies
     )
 
     # 1 observation which RoW identifies as electoral democracy, but which own classification identifies as missing:
@@ -841,8 +856,9 @@ def drop_columns(tb: Table) -> Table:
             "v2elmulpar_osp_ex",
             "v2elmulpar_osp_ex",
             "v2elmulpar_osp_leg",
-            "v2elmulpar_osp_hos",
-            "v2elmulpar_osp_hog",
+            # NOTE: v2elmulpar_osp_hos and v2elmulpar_osp_hog used to be dropped here, but the
+            # "ever had a woman leader" indicators need them. They are dropped in
+            # estimate_ever_female_indicators instead, once those are built.
             "v2elmulpar_osp_exleg",
             "v2cltrnslw_osp",
             "v2clacjstm_osp",
@@ -1119,7 +1135,7 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
     tb = _estimate_indicator(tb, "wom_hoe_vdem", "wom_hos_vdem", "wom_hog_vdem")
 
     # 2/ Was HOE female anytime of the year? (then use the original gender flags by V-Dem)
-    tb = _estimate_indicator(tb, "v2exfemhoe", "v2exfemhos", "v2exfemhog")
+    tb = _estimate_indicator(tb, "femhoe_owid", "v2exfemhos", "v2exfemhog")
 
     # Drop columns
     tb = tb.drop(
@@ -1131,35 +1147,133 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
     return tb
 
 
-def estimate_hoe_ever_female(tb):
-    tb["wom_hoe_ever"] = tb["v2exfemhoe"].fillna(0.5)
-    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_ever"].cummax()
-    tb["wom_hoe_ever"] = tb["wom_hoe_ever"].replace(0.5, np.nan).astype("Int64")
+def estimate_gender_leaders_anytime(tb: Table) -> Table:
+    """Gender of each leader at any point during the year, with unclear cases read as a man.
 
-    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `v2exfemhoe`
-    # Create masks for the conditions
-    regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
-    regime_is_not_democratic = tb["regime_row_owid"].isin([0, 1])  # Non-democratic regimes
-    mask_both_1 = (tb["v2exfemhoe"] == 1) & regime_is_democratic
-    mask_both_0 = regime_is_not_democratic | (tb["v2exfemhoe"] == 0)
+    The `wom_*_vdem` indicators refer to whoever held the office on December 31. These working
+    columns are their counterparts referring to any point during the year, so that a woman who held
+    the office for only part of a year still counts.
 
-    # Initialize with NaN
-    tb["wom_hoe_ever_dem"] = np.nan
+    Two adjustments are needed. First, V-Dem only fills the head-of-government columns when the head
+    of government is a different person from the head of state; when they are the same person
+    (`v2exhoshog` = 1) it codes that person under the head-of-state columns only. So the
+    head-of-state gender is carried over, exactly as it already is for the December 31 flags.
 
-    # Set values based on masks
-    tb.loc[mask_both_1, "wom_hoe_ever_dem"] = 1
-    tb.loc[mask_both_0, "wom_hoe_ever_dem"] = 0
+    Second, whatever gender is still unrecorded is read as a man, which keeps the cumulative
+    indicators decisive and can only understate how many countries had a woman leader. Most such
+    years name the officeholder but leave the gender field empty — 70 people in all, every one of
+    them a man; the rest are collective bodies or successions of short-lived officeholders that
+    V-Dem could not code. This is applied to these working columns alone, so the published
+    year-by-year gender indicators still report an unrecorded gender as missing.
+    """
+    for office, columns in OFFICES.items():
+        tb[_column_anytime(office)] = tb[columns["gender"]].astype("float64")
 
-    # Fill forward
-    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].fillna(0.5)
-    tb["wom_hoe_ever_dem"] = tb.groupby("country")["wom_hoe_ever_dem"].cummax()
-    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].replace(0.5, np.nan).astype("Int64")
+    # Carry the head-of-state gender over to the head of government where one person holds both.
+    mask = (tb[_column_anytime("hos")].notna()) & (tb["v2exhoshog"] == 1)
+    tb.loc[mask, _column_anytime("hog")] = tb.loc[mask, _column_anytime("hos")]
 
-    # Set old countries to NaN
-    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
-    tb.loc[~tb["country"].isin(countries_last), ["wom_hoe_ever", "wom_hoe_ever_dem"]] = np.nan
+    # V-Dem's own head-of-state and head-of-government flags never contradict each other when the
+    # two offices are held by the same person, so the carry-over cannot overwrite anything.
+    both = (tb["v2exhoshog"] == 1) & tb["v2exfemhos"].notna() & tb["v2exfemhog"].notna()
+    assert (tb.loc[both, "v2exfemhos"] == tb.loc[both, "v2exfemhog"]).all(), (
+        "V-Dem reports different genders for the head of state and head of government while the two are the same person."
+    )
+
+    # Without that carry-over most head-of-government years would be missing, and the fill below
+    # would silently turn them all into men.
+    missing = tb[_column_anytime("hog")].isna().mean()
+    assert missing < 0.1, f"Gender of the head of government is still missing for {missing:.0%} of observations."
+
+    for office in OFFICES:
+        tb[_column_anytime(office)] = tb[_column_anytime(office)].fillna(0)
 
     return tb
+
+
+def _flag_ever_female(tb: Table, column_src: str, column_out: str) -> Table:
+    """Turn a yearly 0/1 flag into "a woman had held the office by this year", per country.
+
+    The input carries no missing values, since every unclear case is read conservatively upstream,
+    so a plain running maximum settles each country-year as either yes or no.
+    """
+    assert not tb[column_src].isna().any(), f"`{column_src}` has missing values, which would spread."
+    tb[column_out] = tb.groupby("country", observed=True)[column_src].cummax().astype("Int64")
+    return tb
+
+
+def estimate_ever_female_indicators(tb: Table) -> Table:
+    """Estimate whether a country ever had a woman leader, for each of the three offices.
+
+    Two indicators per office:
+
+    - `wom_<office>_ever`: a woman held the office in that year or any earlier one.
+    - `wom_<office>_ever_dem`: same, but only counting years where the office was filled through
+      multi-party elections *and* the country was an electoral or liberal democracy. Both conditions
+      are needed. Requiring only democracy would count hereditary monarchs — Elizabeth II in the
+      United Kingdom, Margrethe II in Denmark — as democratically elected women heads of state.
+      Requiring only multi-party elections would count Isabella II of Spain, who reigned by
+      inheritance alongside an elected legislature.
+
+    Every unclear case is read conservatively, so each country-year comes out as either yes or no,
+    and the indicators can only understate how many countries had a woman leader.
+    """
+    # An unrecorded regime counts as non-democratic, so test for democracy rather than against it.
+    is_democracy = tb["regime_row_owid"].isin([2, 3])
+
+    columns = []
+    for office, office_columns in OFFICES.items():
+        column_woman = _column_anytime(office)
+        column_ever = f"wom_{office}_ever"
+        column_ever_dem = f"{column_ever}_dem"
+
+        tb = _flag_ever_female(tb, column_woman, column_ever)
+
+        # Likewise, an unrecorded way of filling the office counts as not elected.
+        was_elected = tb[office_columns["elected"]] == 1
+        tb[column_ever_dem] = ((tb[column_woman] == 1) & was_elected & is_democracy).astype("float64")
+        tb = _flag_ever_female(tb, column_ever_dem, column_ever_dem)
+
+        columns += [column_ever, column_ever_dem]
+
+    # Only report for countries that V-Dem still lists in the last year of the data, since the
+    # question is about the history of countries that exist today.
+    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
+    tb.loc[~tb["country"].isin(countries_last), columns] = np.nan
+
+    sanity_check_ever_female(tb, columns)
+
+    # These only existed to build the indicators above.
+    tb = tb.drop(columns=[_column_anytime(office) for office in OFFICES] + ["v2elmulpar_osp_hos", "v2elmulpar_osp_hog"])
+
+    return tb
+
+
+def sanity_check_ever_female(tb: Table, columns: list[str]) -> None:
+    """Check the "ever had a woman leader" indicators."""
+    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
+    is_current = tb["country"].isin(countries_last)
+
+    for column in columns:
+        assert set(tb[column].dropna().unique()) <= {0, 1}, f"`{column}` has values other than 0 and 1."
+
+        # Reading every unclear case conservatively leaves no country-year undecided, so the only
+        # empty values belong to countries V-Dem no longer lists.
+        assert not tb.loc[is_current, column].isna().any(), f"`{column}` leaves country-years undecided."
+        assert tb.loc[~is_current, column].isna().all(), (
+            f"`{column}` reports countries that V-Dem does not list in the last year of the data."
+        )
+
+        # Once a woman has held the office, every later year must stay flagged.
+        flagged = tb[column].fillna(0).groupby(tb["country"], observed=True).cummax()
+        assert (tb.loc[flagged == 1, column] == 1).all(), f"`{column}` stops being 1 after a woman held the office."
+
+        # A woman cannot have been democratically elected to an office she never held.
+        if column.endswith("_ever_dem"):
+            column_plain = column.removesuffix("_dem")
+            assert not ((tb[column] == 1) & (tb[column_plain] == 0)).any(), (
+                f"`{column}` is 1 where `{column_plain}` is 0, which is impossible."
+            )
 
 
 # %%

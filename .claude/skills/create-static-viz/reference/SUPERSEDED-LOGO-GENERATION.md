@@ -35,8 +35,8 @@ it (the recipe below), and expect the answer to differ between the two frames of
 
 Calibrate any implementation against both ends — **but not against the figures below until they are
 re-measured.** They are the padded, logo-capped generation's: two-line/two-line reproducing **118.22**
-on either 850-wide frame (the current templates measure **118**), and a one-line/one-line clone
+on either 850-wide frame (the current templates measure **112**), and a one-line/one-line clone
 **82.48** on Vertical or **76.48** on Horizontal, where the
-current structure puts Static Vertical at **70**. Take the two-line/two-line end from
+current structure puts Static Vertical at **64**. Take the two-line/two-line end from
 `/owid-staff:create-figma-chart`'s node map, and measure the one-line/one-line end on a live clone before
 calibrating against it.

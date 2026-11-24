@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import uuid
@@ -491,9 +492,13 @@ class DataStep(Step):
 
         ds_idex_mtime = self._dataset_index_mtime()
 
+        # Taken before the step runs: a file saved while it runs must leave the step dirty, so the
+        # next run picks the edit up (`--watch` would otherwise report it as up to date).
+        checksum = self.checksum_input()
+
         # if INSTANT flag is set, just update the metadata
         if config.INSTANT and self.channel == "garden":
-            self._run_instant_metadata()
+            self._run_instant_metadata(checksum)
             return
 
         sp = self._search_path
@@ -517,7 +522,7 @@ class DataStep(Step):
 
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
-        dataset.metadata.source_checksum = self.checksum_input()
+        dataset.metadata.source_checksum = checksum
         dataset.save()
 
         self.after_run()
@@ -637,7 +642,7 @@ class DataStep(Step):
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
 
-    def _run_instant_metadata(self) -> None:
+    def _run_instant_metadata(self, checksum: str) -> None:
         """If INSTANT flag is set, instead of running the whole garden step, just load
         the existing dataset and update its metadata. This is useful for fast-tracking
         metadata changes without having to rerun the whole step.
@@ -661,7 +666,7 @@ class DataStep(Step):
         if meta_override_path.exists():
             ds.update_metadata(meta_override_path)
 
-        ds.metadata.source_checksum = self.checksum_input() + "_instant"
+        ds.metadata.source_checksum = checksum + "_instant"
         ds.save()
 
         # Read metadata after
@@ -1183,6 +1188,22 @@ class GrapherStep(Step):
         return success
 
 
+# Key under an export/viz output's `additional_info` that records where it was last published.
+PUBLISHED_TO = "published_to"
+
+
+def _this_machine_or(name: str) -> str:
+    """`name` as a publish target, with every name of this machine's own environment written the same way.
+
+    A staging server is cloned from staging-site-master, build outputs and database included, and then
+    targets itself by its own hostname. Recording that hostname would make every output inherited from
+    master look unpublished on the clone, although the cloned database holds what master published.
+    """
+    if name in ("localhost", "127.0.0.1", socket.gethostname()):
+        return "this-machine"
+    return name
+
+
 class ExportStep(DataStep):
     """
     A step which ships files to a shared, environment-less destination, e.g. committing to a
@@ -1224,7 +1245,15 @@ class ExportStep(DataStep):
         # Create folder for the dataset, the step can save files there
         ds = create_dataset(self._dest_dir, tables=[])
 
+        # Taken before the recipe runs, for the same reason as in DataStep.run.
+        checksum = self.checksum_input()
+
         self._run_recipe()
+
+        if self._writes_own_inputs:
+            # The recipe rewrote files that count as its own inputs; a checksum taken before it ran
+            # would leave the step dirty after every change to them.
+            checksum = self.checksum_input()
 
         if not self.publishes:
             # Leave the checksum unrecorded, so that the next run with the flag rebuilds and publishes.
@@ -1239,11 +1268,36 @@ class ExportStep(DataStep):
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the step)
-        ds.metadata.source_checksum = self.checksum_input()
+        ds.metadata.source_checksum = checksum
+        if self._publish_target is not None:
+            ds.metadata.additional_info = {**(ds.metadata.additional_info or {}), PUBLISHED_TO: self._publish_target}
         ds.metadata.save(ds._index_file)
+
+    def is_dirty(self) -> bool:
+        if super().is_dirty():
+            return True
+        if not self.publishes or self._publish_target is None:
+            return False
+        # The checksum says the step is built, but a run aimed at another environment (STAGING=1 after a
+        # local publish, another branch's staging server) still has to write there.
+        recorded = (self._output_dataset.metadata.additional_info or {}).get(PUBLISHED_TO)
+        # An output recorded before targets were tracked counts as current: treating it as stale would
+        # republish every step on the first production build, overwriting admin edits made since.
+        return recorded is not None and recorded != self._publish_target
 
     # The etlr flag that grants this step's write.
     permission_flag = "--export"
+
+    @property
+    def _publish_target(self) -> str | None:
+        """The environment this run writes to, for steps whose destination depends on it; None when it
+        doesn't. `export://` destinations (GitHub, public R2) are the same from every environment."""
+        return None
+
+    @property
+    def _writes_own_inputs(self) -> bool:
+        """Whether the recipe writes files next to itself, where `_step_files` counts them as inputs."""
+        return False
 
     @property
     def publishes(self) -> bool:
@@ -1301,6 +1355,20 @@ class VizStep(ExportStep):
     @property
     def publishes(self) -> bool:
         return config.GRAPHER_ENABLED or self.channel == "static"
+
+    @property
+    def _publish_target(self) -> str | None:
+        if self.channel in ("chart", "explorer"):
+            return f"{_this_machine_or(config.DB_HOST)}:{config.DB_PORT}/{config.DB_NAME}"
+        if self.channel == "bespoke":
+            # The feed's R2 folder, see `etl.viz.bespoke.feed_location`.
+            return _this_machine_or(config.DATA_API_ENV)
+        return None
+
+    @property
+    def _writes_own_inputs(self) -> bool:
+        # Static steps save their images next to the recipe (`PathFinder.export_fig`).
+        return self.channel == "static"
 
     def _publish(self) -> None:
         """Sync a bespoke feed to the environment's R2 path.

@@ -22,7 +22,7 @@ definitions:
   # Processing description for population indicator.
   description_processing_population: ""
   description_key_per_capita: &description_key_per_capita |-
-    Per capita figures are calculated by dividing total values by the population of the country or region. Population data is constructed by Our World in Data, based on [various sources](https://ourworldindata.org/grapher/population).
+    Per capita figures are calculated by dividing total values by the population of the country or region. Population data is constructed by Our World in Data, based on [various sources](https://ourworldindata.org/grapher/population). Population estimates from 2024 onwards are projections released by the UN.
 
   common:
     processing_level: major

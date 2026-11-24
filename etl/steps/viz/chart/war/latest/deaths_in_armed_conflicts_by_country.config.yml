@@ -1,0 +1,79 @@
+# NOTE: update on every UCDP update (stable and quarterly preview): the `subtitle` and `note` must name the
+# preliminary year and the quarters it covers, using the same wording as the multidim (ucdp.py, `_set_subtitle`)
+# and `ucdp_preview.meta.yml`. Also bump `map.time` to the last complete year
+# on the stable update.
+chart_config_id: 01935059-b43f-7ec7-9a55-4d06c8fbdd38
+grapher_schema: "012"
+slug: deaths-in-armed-conflicts-by-country
+topic_tags:
+  - War & Peace
+dimensions: []
+views:
+  - dimensions: {}
+    config:
+      map:
+        time: 2025
+        colorScale:
+          baseColorScheme: "OrRd"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#e8f4ea"
+            - 
+            - 
+            - 
+            - 
+            - 
+          customNumericLabels:
+            - "0"
+            - 
+            - 
+            - 
+            - 
+            - 
+            - 
+          customNumericValues:
+            - 0
+            - 0.99
+            - 10
+            - 100
+            - 1000
+            - 10000
+            - 10000
+          customNumericColorsActive: true
+        columnSlug: "ucdp_preview#number_deaths_ongoing_conflicts__conflict_type_all"
+      tab: "map"
+      note: "Data for 2026 is based on quarterly reports from the source, which come with a higher level of uncertainty, and in many cases can be underestimates."
+      title: "Deaths in armed conflicts based on where they occurred"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+      subtitle: "Reported deaths of combatants and civilians due to fighting in [armed conflicts](#dod:armed-conflict-ucdp). Deaths due to disease and starvation resulting from the conflict are not included. Data for 2026 is incomplete and includes deaths within the first three quarters."
+      hasMapTab: true
+      originUrl: "/war-and-peace"
+      chartTypes:
+        - "StackedBar"
+      variantName: "Country-level"
+      hideTimeline: true
+      hideFacetControl: false
+      relatedQuestions:
+        - url: "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths"
+          text: "How do different approaches measure armed conflicts and their deaths?"
+      selectedEntityNames:
+        - "World"
+        - "Afghanistan"
+        - "Democratic Republic of Congo"
+        - "Ethiopia"
+        - "Eritrea"
+        - "Mexico"
+        - "Rwanda"
+        - "Syria"
+        - "Ukraine"
+      selectedFacetStrategy: "entity"
+      hideAnnotationFieldsInTitle:
+        time: true
+    indicators:
+      y:
+        - catalogPath: "ucdp_preview#number_deaths_ongoing_conflicts__conflict_type_all"
+          display:
+            name: "Deaths in armed conflicts based on where they occurred"
+            unit: "deaths"

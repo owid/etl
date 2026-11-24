@@ -29,13 +29,23 @@ INDICATORS_AVOID_IMPUTE = [
     "corr_jud_vdem",
     "v2mecorrpt",
     "v2xnp_client",
+    # Who led a country is a fact about that country, not about the power that ruled it earlier, so
+    # imputing it from the predecessor state misleads. It is worst for the cumulative "ever had"
+    # indicators: imputing Ukraine from Russia made Ukraine count Catherine the Great, so it read as
+    # having had a woman head of state from its first year in the data.
+    "v2exfemhos",
+    "v2exfemhog",
+    "femhoe_owid",
+    "wom_hos_vdem",
+    "wom_hog_vdem",
+    "wom_hoe_vdem",
+    "wom_hos_ever",
+    "wom_hog_ever",
+    "wom_hoe_ever",
+    "wom_hos_ever_dem",
+    "wom_hog_ever_dem",
+    "wom_hoe_ever_dem",
 ]
-
-
-a = {
-    "lala",
-    "lele",
-}
 
 
 def run(tb: Table) -> Table:
@@ -98,7 +108,7 @@ def run(tb: Table) -> Table:
     # Fill NaNs with False
     tb["regime_imputed"] = tb["regime_imputed"].fillna(False).astype(bool)
 
-    # Check unique values
-    tb.format(underscore=False).reset_index()
+    # Check unique values, and sort by country and year (the imputed rows were appended at the top), since later steps count years in order
+    tb = tb.format(underscore=False).reset_index()
 
     return tb

@@ -101,7 +101,7 @@ views:
       y:
         - catalogPath: lexical_index#regime_lied
     config:
-      colorVariableId: lexical_index#regime_lied
+      type: Swimlane
   - dimensions:
       metric: political_regime
       sub_metric: number_and_share_of_democracies
@@ -166,7 +166,7 @@ views:
       y:
         - catalogPath: lexical_index#democracy_lied
     config:
-      colorVariableId: lexical_index#democracy_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: elections_for_legislature
@@ -174,7 +174,7 @@ views:
       y:
         - catalogPath: lexical_index#legelec_lied
     config:
-      colorVariableId: lexical_index#legelec_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: elections_for_chief_executive
@@ -182,7 +182,7 @@ views:
       y:
         - catalogPath: lexical_index#exelec_lied
     config:
-      colorVariableId: lexical_index#exelec_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: political_opposition
@@ -190,7 +190,7 @@ views:
       y:
         - catalogPath: lexical_index#opposition_lied
     config:
-      colorVariableId: lexical_index#opposition_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: competitive_elections
@@ -198,7 +198,7 @@ views:
       y:
         - catalogPath: lexical_index#competition_lied
     config:
-      colorVariableId: lexical_index#competition_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: universal_right_to_vote_for_men
@@ -206,7 +206,7 @@ views:
       y:
         - catalogPath: lexical_index#male_suffrage_lied
     config:
-      colorVariableId: lexical_index#male_suffrage_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: universal_right_to_vote_for_women
@@ -214,7 +214,7 @@ views:
       y:
         - catalogPath: lexical_index#female_suffrage_lied
     config:
-      colorVariableId: lexical_index#female_suffrage_lied
+      type: Swimlane
   - dimensions:
       metric: electoral_democracy
       sub_metric: age_of_electoral_democracy
@@ -258,7 +258,7 @@ views:
       y:
         - catalogPath: lexical_index#is_full_democracy
     config:
-      colorVariableId: lexical_index#is_full_democracy
+      type: Swimlane
   - dimensions:
       metric: full_democracy
       sub_metric: political_liberties
@@ -266,7 +266,7 @@ views:
       y:
         - catalogPath: lexical_index#poliberties_lied
     config:
-      colorVariableId: lexical_index#poliberties_lied
+      type: Swimlane
   - dimensions:
       metric: full_democracy
       sub_metric: age_of_full_democracy

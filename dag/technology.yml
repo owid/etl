@@ -11,23 +11,18 @@ steps:
       - data://meadow/technology/2026-03-09/mobile_money:
         - snapshot://technology/2026-03-09/mobile_money.xlsx
 
-  #
   # Findex 2021
-  #
   data://grapher/wb/2025-05-21/findex:
     - data://garden/wb/2025-05-21/findex:
       - data://meadow/wb/2025-05-21/findex:
         - snapshot://wb/2025-05-21/findex.xlsx
 
-  #
   # WIPO patents data
-  #
   data://grapher/research_development/2025-10-27/patents:
     - data://garden/research_development/2025-10-27/patents:
       - data://meadow/research_development/2025-10-27/patents:
         - snapshot://research_development/2025-10-27/patents.csv
         - snapshot://research_development/2025-10-27/historical_patents.csv
-
 
   # TOP500 Supercomputers
   data://grapher/technology/2026-02-01/top500_supercomputers:

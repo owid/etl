@@ -381,3 +381,283 @@ def test_owid_alone_is_not_credited_as_processing_its_own_data():
 
     col = IndicatorColumn({"processingLevel": "major"})
     assert get_source("Our World in Data", col) == "Our World in Data"
+
+
+def _build_wide(used: dict, datasets: dict, chart=None):
+    with (
+        patch("etl.viz.chart.download_package._used_indicators", return_value=used),
+        patch("etl.viz.chart.download_package.CatalogDataset", return_value=datasets),
+    ):
+        return build_wide_table_for_chart(chart)  # ty: ignore[invalid-argument-type]
+
+
+def test_weekly_and_monthly_on_one_date_axis_stack_rather_than_join():
+    """Test build_wide_table_for_chart - two intervals on one date axis are two frequencies.
+
+    WHO's flu data has the weekly and monthly "Share of positive tests" on many of the
+    same country-dates. Joined as one frequency, a shared date would hold two values of
+    one metric in one cell; stacked, each keeps its own row.
+    """
+    from etl.viz.chart.download_package import _merge_columns_by_name
+
+    weekly = Table({"country": ["Peru"] * 2, "date": ["2024-01-01", "2024-01-08"], "pcnt_pos": [10.0, 11.0]})
+    weekly["pcnt_pos"].metadata.display = {"timeInterval": "week"}
+    monthly = Table({"country": ["Peru"] * 2, "date": ["2024-01-01", "2024-02-01"], "pcnt_pos": [12.0, 13.0]})
+    monthly["pcnt_pos"].metadata.display = {"timeInterval": "month"}
+    used = {
+        "grapher/who/latest/flu/flu#pcnt_pos": [{"frequency": "weekly"}],
+        "grapher/who/latest/flu/flu_monthly#pcnt_pos": [{"frequency": "monthly"}],
+    }
+    result = _build_wide(
+        used, {"flu": weekly.set_index(["country", "date"]), "flu_monthly": monthly.set_index(["country", "date"])}
+    )
+
+    assert result.is_stacked
+    assert sorted(zip(result.table["frequency"], result.table["time"])) == [
+        ("monthly", "2024-01"),
+        ("monthly", "2024-02"),
+        ("weekly", "2024-W01"),
+        ("weekly", "2024-W02"),
+    ]
+    col = type("C", (), {"meta": {"name": "Share of positive tests"}})()
+    merged = _merge_columns_by_name(
+        result.table,
+        [(path, "Share of positive tests", i, col) for i, path in enumerate(used)],
+        result.column_to_dimensions,
+    )
+    assert len(merged) == 1
+    assert merged[0].values.notna().sum() == 4, "the shared 2024-01-01 keeps both its weekly and its monthly value"
+
+
+def test_table_with_several_intervals_is_split_by_column():
+    """Test build_wide_table_for_chart - one table's daily, monthly and quarterly columns become three frequencies.
+
+    climate_change_impacts_monthly keeps all three on one day-offset axis. Each part keeps
+    only the rows it has values for, so no frequency repeats another's timepoints as
+    empty rows.
+    """
+    display = {"zeroDay": "2000-01-01"}
+    tb = Table(
+        {
+            "country": ["World"] * 4,
+            # 2000-01-15, 2000-02-15, 2000-04-01 and 2000-04-02, as day offsets.
+            "year": [14, 45, 91, 92],
+            "co2": [370.0, 371.0, None, None],
+            "sea_level": [None, None, 5.0, None],
+            "ocean_ph": [None, None, None, 8.1],
+        }
+    )
+    for column, interval in [("co2", "month"), ("sea_level", "quarter"), ("ocean_ph", "day")]:
+        tb[column].metadata.display = {**display, "timeInterval": interval}
+    annual = Table({"country": ["World"], "year": [2000], "ohc": [1.0]})
+    used = {
+        "grapher/climate/latest/impacts/monthly#co2": [{"metric": "co2"}],
+        "grapher/climate/latest/impacts/monthly#sea_level": [{"metric": "sea_level"}],
+        "grapher/climate/latest/impacts/monthly#ocean_ph": [{"metric": "ocean_ph"}],
+        "grapher/climate/latest/impacts/annual#ohc": [{"metric": "ohc"}],
+    }
+    result = _build_wide(
+        used, {"monthly": tb.set_index(["country", "year"]), "annual": annual.set_index(["country", "year"])}
+    )
+
+    rows = sorted(zip(result.table["frequency"], result.table["time"]))
+    assert rows == [
+        ("annual", "2000"),
+        ("daily", "2000-04-02"),
+        ("monthly", "2000-01"),
+        ("monthly", "2000-02"),
+        ("quarterly", "2000-Q2"),
+    ]
+    assert result.column_to_frequency["grapher/climate/latest/impacts/monthly#sea_level"] == "quarterly"
+
+
+def test_data_finer_than_its_declared_interval_is_refused():
+    """Test build_wide_table_for_chart - two values on one rendered label raise.
+
+    A quarter is written "2000-Q1", so monthly data declared `quarter` would publish
+    three rows with the same key.
+    """
+    import pytest
+
+    tb = Table({"country": ["World"] * 2, "date": ["2000-01-01", "2000-02-01"], "sea_level": [1.0, 2.0]})
+    tb["sea_level"].metadata.display = {"timeInterval": "quarter"}
+    annual = Table({"country": ["World"], "year": [2000], "ohc": [1.0]})
+    used = {"grapher/c/latest/d/q#sea_level": [{}], "grapher/c/latest/d/a#ohc": [{}]}
+    chart = type("Chart", (), {"catalog_path": "climate/latest/climate_change#climate_change"})()
+
+    with pytest.raises(ValueError, match="quarterly rows share a \\(country, time\\) key"):
+        _build_wide(used, {"q": tb.set_index(["country", "date"]), "a": annual.set_index(["country", "year"])}, chart)
+
+
+_SOURCE_DIMENSIONS = [
+    {
+        "slug": "conflict_type",
+        "name": "Conflict type",
+        "choices": [{"slug": "all", "name": "All armed conflicts"}, {"slug": "state", "name": "State-based"}],
+    },
+    {
+        "slug": "data_source",
+        "name": "Data source",
+        "choices": [{"slug": "ucdp", "name": "UCDP"}, {"slug": "prio", "name": "PRIO"}],
+    },
+]
+
+
+def test_colliding_names_take_the_dimension_that_separates_them():
+    """Test _disambiguate_colliding_names - the drop-down that picks between them goes in the name.
+
+    The conflict MDIMs show UCDP and PRIO measures under one title. "Conflict type" also
+    separates this pair (PRIO files its total under another choice), but "Data source"
+    separates every collision in the chart, so it is the one used, everywhere.
+    """
+    from etl.viz.chart.download_package import _disambiguate_colliding_names
+
+    deaths, rate, other = "Deaths - Conflict type: all", "Death rate - Conflict type: all", "Population"
+    indicators = [
+        ("u#deaths", deaths, 1, None),
+        ("p#deaths", deaths, 2, None),
+        ("u#rate", rate, 3, None),
+        ("p#rate", rate, 4, None),
+        ("u#population", other, 5, None),
+    ]
+    column_to_dimensions = {
+        "u#deaths": [{"conflict_type": "all", "data_source": "ucdp"}],
+        "p#deaths": [{"conflict_type": "state", "data_source": "prio"}],
+        # Shown under both conflict types, so only "Data source" separates this pair.
+        "u#rate": [{"conflict_type": "all", "data_source": "ucdp"}, {"conflict_type": "state", "data_source": "ucdp"}],
+        "p#rate": [{"conflict_type": "state", "data_source": "prio"}],
+        "u#population": [{"conflict_type": "all", "data_source": "ucdp"}],
+    }
+    frequency = {path: "annual" for path in column_to_dimensions}
+
+    renamed = _disambiguate_colliding_names(
+        indicators,  # ty: ignore[invalid-argument-type]
+        column_to_dimensions,
+        frequency,
+        _SOURCE_DIMENSIONS,
+    )
+
+    assert [name for _, name, _, _ in renamed] == [
+        "Deaths - Conflict type: all - Data source: UCDP",
+        "Deaths - Conflict type: all - Data source: PRIO",
+        "Death rate - Conflict type: all - Data source: UCDP",
+        "Death rate - Conflict type: all - Data source: PRIO",
+        "Population",
+    ], "only colliding names change"
+
+
+def test_collision_no_dimension_separates_is_left_for_the_uniqueness_check():
+    """Test _disambiguate_colliding_names - indicators under the same choices keep their names.
+
+    There is nothing on the page that tells them apart either, so the uniqueness check
+    has to refuse the package rather than this inventing a suffix.
+    """
+    import pytest
+
+    from etl.viz.chart.download_package import (
+        DuplicateColumnNameError,
+        _check_column_names_unique,
+        _disambiguate_colliding_names,
+    )
+
+    indicators = [("a#x", "Deaths", 1, None), ("b#x", "Deaths", 2, None)]
+    same_view = [{"conflict_type": "all", "data_source": "ucdp"}]
+    column_to_dimensions = {"a#x": same_view, "b#x": same_view}
+    frequency = {"a#x": "annual", "b#x": "annual"}
+
+    renamed = _disambiguate_colliding_names(
+        indicators,  # ty: ignore[invalid-argument-type]
+        column_to_dimensions,
+        frequency,
+        _SOURCE_DIMENSIONS,
+    )
+    assert renamed == indicators
+    with pytest.raises(DuplicateColumnNameError):
+        _check_column_names_unique("conflict-data", renamed, frequency)  # ty: ignore[invalid-argument-type]
+
+
+def test_dimension_must_give_same_named_series_at_other_frequencies_one_choice():
+    """Test _disambiguate_colliding_names - no suffix a same-named series doesn't have.
+
+    The suffix goes on every indicator with the name, at any frequency, so the monthly
+    series can merge with its source's annual one. A monthly series shown under both
+    sources has no single "Data source", so naming it after its first view would merge
+    it into that source's column. "Data source" therefore doesn't qualify, and the
+    dimension that does is used.
+    """
+    from etl.viz.chart.download_package import _disambiguate_colliding_names
+
+    indicators = [("u#d", "Deaths", 1, None), ("p#d", "Deaths", 2, None), ("m#d", "Deaths", 3, None)]
+    column_to_dimensions = {
+        "u#d": [{"conflict_type": "all", "data_source": "ucdp"}],
+        "p#d": [{"conflict_type": "state", "data_source": "prio"}],
+        "m#d": [{"conflict_type": "all", "data_source": "prio"}, {"conflict_type": "all", "data_source": "ucdp"}],
+    }
+    frequency = {"u#d": "annual", "p#d": "annual", "m#d": "monthly"}
+
+    renamed = _disambiguate_colliding_names(
+        indicators,  # ty: ignore[invalid-argument-type]
+        column_to_dimensions,
+        frequency,
+        _SOURCE_DIMENSIONS,
+    )
+
+    assert [name for _, name, _, _ in renamed] == [
+        "Deaths - Conflict type: All armed conflicts",
+        "Deaths - Conflict type: State-based",
+        "Deaths - Conflict type: All armed conflicts",
+    ], "only Conflict type gives every 'Deaths' one choice"
+
+
+def test_indicators_shown_only_by_grouped_views_are_included():
+    """Test _used_indicators - a grouped view counts for indicators no regular view shows.
+
+    conflict-data-source replaces most of its views with grouped ones, so those
+    indicators appear nowhere else. An indicator a regular view also shows keeps only
+    its regular combinations.
+    """
+    from types import SimpleNamespace
+
+    from etl.viz.chart.download_package import _used_indicators
+
+    def view(dimensions, paths, grouped):
+        indicators = SimpleNamespace(y=[SimpleNamespace(catalogPath=p) for p in paths])
+        return SimpleNamespace(dimensions=dimensions, indicators=indicators, is_grouped=grouped)
+
+    chart = SimpleNamespace(
+        views=[
+            view({"estimate": "_ci"}, ["t#best", "t#low", "t#high"], grouped=True),
+            view({"estimate": "best"}, ["t#best"], grouped=False),
+        ]
+    )
+
+    assert _used_indicators(chart) == {  # ty: ignore[invalid-argument-type]
+        "t#best": [{"estimate": "best"}],
+        "t#low": [{"estimate": "_ci"}],
+        "t#high": [{"estimate": "_ci"}],
+    }
+
+
+def test_stacked_rows_are_in_time_order_not_label_order():
+    """Test build_wide_table_for_chart - stacked rows follow the time value, not its text label.
+
+    "time" is a string in the stacked shape, so sorting on it put climate-change's
+    long-run annual World series in the order "-1", "-100022", ..., "1979", "983".
+    """
+    annual = Table({"country": ["World"] * 4, "year": [983, -100022, 1979, -1], "co2": [1.0, 2.0, 3.0, 4.0]})
+    monthly = Table({"country": ["World"] * 2, "date": ["2000-02-01", "2000-01-01"], "co2": [5.0, 6.0]})
+    monthly["co2"].metadata.display = {"timeInterval": "month"}
+    used = {"grapher/c/latest/d/annual#co2": [{}], "grapher/c/latest/d/monthly#co2": [{}]}
+
+    result = _build_wide(
+        used, {"annual": annual.set_index(["country", "year"]), "monthly": monthly.set_index(["country", "date"])}
+    )
+
+    assert list(zip(result.table["frequency"], result.table["time"])) == [
+        ("annual", "-100022"),
+        ("annual", "-1"),
+        ("annual", "983"),
+        ("annual", "1979"),
+        ("monthly", "2000-01"),
+        ("monthly", "2000-02"),
+    ]

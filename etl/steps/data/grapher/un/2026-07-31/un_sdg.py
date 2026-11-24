@@ -29,6 +29,11 @@ PROCESSING_NOTES = {
     "SL_DOM_TSPDDC": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
 }
 
+# Indicators that garden stores as text categories (see CODED_INDICATORS in the garden step), with their order.
+ORDINAL_INDICATORS = {
+    "_16_a_1__sg_nhr_cmplnc": ["No status", "Partially compliant", "Fully compliant"],
+}
+
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
@@ -113,6 +118,10 @@ def run() -> None:
                 # table is generated for every column, use it as a table name
                 # shorten it under 255 characteres as this is the limit for file name
                 wide_table.metadata.short_name = wide_table.columns[0][:245]
+                if wide_table.columns[0] in ORDINAL_INDICATORS:
+                    wide_table = set_ordinal(
+                        wide_table, wide_table.columns[0], ORDINAL_INDICATORS[wide_table.columns[0]]
+                    )
 
                 # ds_grapher.add(wide_table)
                 all_tables.append(wide_table)
@@ -411,3 +420,15 @@ def value_convert(value: Any) -> Any:
             return value
     else:
         return value
+
+
+def set_ordinal(tb: Table, column: str, order: list[str]) -> Table:
+    """Mark a text indicator as ordinal, sorted like `order`."""
+    unknown = set(tb[column].dropna().unique()) - set(order)
+    assert not unknown, f"Column `{column}` has categories missing from its order: {unknown}"
+    metadata = tb[column].metadata
+    tb[column] = tb[column].astype("category")
+    tb[column].metadata = metadata
+    tb[column].metadata.type = "ordinal"
+    tb[column].metadata.sort = order
+    return tb

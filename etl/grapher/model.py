@@ -23,7 +23,7 @@ import json
 from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Literal, Optional, Union, get_args, overload
+from typing import Any, Literal, NamedTuple, Optional, Union, get_args, overload
 
 import humps
 import numpy as np
@@ -1724,6 +1724,36 @@ CHART_DIFF_STATUS = Literal[
 ]
 
 
+class TargetVersion(NamedTuple):
+    """The target chart's timestamps that a chart-diff review is checked against."""
+
+    updated_at: datetime
+    edited_at: datetime
+
+
+def review_still_holds(recorded_at: datetime | None, target: TargetVersion | None) -> bool:
+    """Whether a chart-diff review (approval or resolved conflict) still applies to the target chart.
+
+    A review records the target's `lastEditedAt` and holds until someone edits the target after it.
+    `updatedAt` is not a sign of an edit: grapher also moves it when it rebuilds a chart's config
+    from its indicators, which the production ETL does on every deploy that changes indicator
+    metadata, just before chart-sync runs. `lastEditedAt` moves only on real edits (admin saves,
+    tag changes, an ETL push that changes the rendered chart).
+
+    Reviews recorded before this rule hold the target's `updatedAt`, which sits below `lastEditedAt`
+    when the last edit was a tag change; for those an exact `updatedAt` match is taken to mean the
+    target is untouched, as it was before. That match can't see a tag change (it moves only
+    `lastEditedAt`), so a tag added after the review doesn't expire it when the two timestamps were
+    equal at review time — the old rule's blind spot, kept until reviews recorded before it are gone.
+
+    `target=None` means there was no target version to record (a chart the branch created), and
+    matches only reviews that recorded none.
+    """
+    if target is None or recorded_at is None:
+        return target is None and recorded_at is None
+    return recorded_at >= target.edited_at or recorded_at == target.updated_at
+
+
 class ChartDiffApprovals(Base):
     __tablename__ = "chart_diff_approvals"
     __table_args__ = (
@@ -1737,45 +1767,38 @@ class ChartDiffApprovals(Base):
     chartId: Mapped[int] = mapped_column(Integer)
     sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
+    # The target chart's `lastEditedAt` at review time (`updatedAt` in rows recorded before that rule)
     targetUpdatedAt: Mapped[datetime | None] = mapped_column(DateTime)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
     def latest_chart_approval_batch(
-        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
+        cls,
+        session: Session,
+        chart_ids: list[int],
+        source_updated_ats: list,
+        targets: list[TargetVersion | None],
     ) -> list[Optional["ChartDiffApprovals"]]:
-        """Load the latest approval of the charts.
+        """Load the latest approval of the charts that still applies (see `review_still_holds`).
 
         Returns: List of same length of chart_ids. First item in returned list corresponds to first chart_id in input list.
         """
-        if not (len(chart_ids) == len(source_updated_ats) == len(target_updated_ats)):
+        if not (len(chart_ids) == len(source_updated_ats) == len(targets)):
             raise ValueError("All input lists must have the same length")
 
-        # Get matches from DB
-        criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
+        criteria = dict(zip(chart_ids, zip(source_updated_ats, targets)))
 
         raw_results = session.scalars(
-            select(cls)
-            .where(
-                or_(
-                    *[
-                        and_(
-                            cls.chartId == chart_id,
-                            cls.sourceUpdatedAt == source_updated_at,
-                            cls.targetUpdatedAt == target_updated_at,
-                        )
-                        for chart_id, source_updated_at, target_updated_at in criteria
-                    ]
-                )
-            )
-            .order_by(cls.updatedAt.desc())
+            select(cls).where(cls.chartId.in_(chart_ids)).order_by(cls.updatedAt.desc())
         ).all()
 
-        # Take the latest approval for each chart - note that it's sorted by updatedAt, so we take just the
-        # first element
+        # Take the latest approval that still applies, for each chart (rows are sorted by updatedAt)
         results = {}
         for r in raw_results:
-            if r.chartId not in results:
+            if r.chartId in results:
+                continue
+            source_updated_at, target = criteria[r.chartId]
+            if r.sourceUpdatedAt == source_updated_at and review_still_holds(r.targetUpdatedAt, target):
                 results[r.chartId] = r
 
         # List with approval objects corresponding to charts specified by IDs in chart_ids
@@ -1814,48 +1837,35 @@ class ChartDiffConflicts(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     chartId: Mapped[int] = mapped_column(Integer)
+    # The target chart's `lastEditedAt` when the conflict was resolved (see `ChartDiffApprovals.targetUpdatedAt`)
     targetUpdatedAt: Mapped[datetime | None] = mapped_column(DateTime)
     conflict: Mapped[Literal["resolved", "pending"]] = mapped_column(VARCHAR(255))
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
     def get_conflict_batch(
-        cls, session: Session, chart_ids: list[int], target_updated_ats: list
+        cls, session: Session, chart_ids: list[int], targets: list[TargetVersion | None]
     ) -> list[Optional["ChartDiffConflicts"]]:
-        """Load the latest conflict of charts (if exist).
+        """Load the latest conflict of charts (if exist) that still applies (see `review_still_holds`).
 
         Returns: List of same length of chart_ids. First item in returned list corresponds to first chart_id in input list.
         """
-        if not (len(chart_ids) == len(target_updated_ats)):
+        if not (len(chart_ids) == len(targets)):
             raise ValueError("All input lists must have the same length")
 
-        # Get matches from DB
-        criteria = list(zip(chart_ids, target_updated_ats))
+        criteria = dict(zip(chart_ids, targets))
 
         raw_results = session.scalars(
-            select(cls)
-            .where(
-                or_(
-                    *[
-                        and_(
-                            cls.chartId == chart_id,
-                            cls.targetUpdatedAt == target_updated_at,
-                        )
-                        for chart_id, target_updated_at in criteria
-                    ]
-                )
-            )
-            .order_by(cls.updatedAt.desc())
+            select(cls).where(cls.chartId.in_(chart_ids)).order_by(cls.updatedAt.desc())
         ).all()
 
-        # Take the latest conflict for each chart - note that it's sorted by updatedAt, so we take just the
-        # first element
+        # Take the latest conflict that still applies, for each chart (rows are sorted by updatedAt)
         results = {}
         for r in raw_results:
-            if r.chartId not in results:
+            if r.chartId not in results and review_still_holds(r.targetUpdatedAt, criteria[r.chartId]):
                 results[r.chartId] = r
 
-        # List with conflicts objects corresponding to charts specified by IDs in chart_ids and timestamp in target_updated_ats
+        # List with conflicts objects corresponding to charts specified by IDs in chart_ids
         conflicts = []
         for chart_id in chart_ids:
             conflict = None
