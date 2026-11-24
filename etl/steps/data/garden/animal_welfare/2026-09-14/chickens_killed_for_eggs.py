@@ -1,0 +1,207 @@
+"""Estimate the number of chickens killed each year to produce eggs.
+
+Starting from the number of laying hens reported by FAOSTAT, this step estimates how many hens are killed each year to
+keep that flock in production, and how many male chickens (the brothers of those hens) are killed as well, either as
+day-old chicks or later on. In-ovo sexing, which removes some male embryos before they hatch, is not taken into account,
+since there are no figures of its use in each country.
+"""
+
+import owid.catalog.processing as pr
+import pandas as pd
+from owid.catalog import Table
+from structlog import get_logger
+
+from etl.helpers import PathFinder
+
+# Initialize logger.
+log = get_logger()
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# Columns to select from the flat table of FAOSTAT QCL, and how to rename them.
+COLUMNS = {
+    "eggs_from_hens__00001062__laying__005313__animals": "laying_hens",
+    "eggs_from_hens__00001062__eggs_produced__005513__eggs": "eggs_produced",
+}
+
+# Average number of weeks a hen spends in the laying flock before being replaced. A compromise between the commercial
+# flocks of the United States (where USDA's figures imply 64 to 75 weeks in recent years) and of China (54 to 59 weeks,
+# according to industry reports), as explained in the notebook docs/analyses/chickens_killed_in_egg_production. Unlike
+# the model of Faunalytics (https://faunalytics.org/global-chick-culling-2019-2024/), we ignore mortality before and
+# during the laying period (a few percent), as we do for animals slaughtered for meat.
+WEEKS_IN_LAY = 65
+
+# First year of our estimates. Until the late 1980s, a large share of the world's hens were in backyard flocks, which are
+# kept for much longer than WEEKS_IN_LAY, as explained in the notebook docs/analyses/chickens_killed_in_egg_production.
+FIRST_YEAR = 1990
+
+# Regions for which we compute aggregates (as the sum of their member countries).
+REGIONS = [
+    "World",
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    "European Union (27)",
+    "High-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "Low-income countries",
+]
+# Gaps of at most this many years in a country's series are filled with its latest reported value; longer gaps are left
+# empty. Many countries (in the latest year, 14 EU countries) have no data for some years, and a few have not reported
+# since 2020.
+# NOTE: FAOSTAT's own World and EU aggregates include the missing countries; when we compared them with the sum of
+# reported countries plus the carried-forward values of the missing ones, they agreed within 0.5% in every year, so
+# this is also (in effect) what FAOSTAT does.
+MAX_YEARS_TO_FILL = 5
+# Columns with counts, that are estimated from the number of laying hens.
+COUNT_COLUMNS = ["hens_killed", "male_chickens_killed", "chickens_killed"]
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Load FAOSTAT QCL dataset and read its flat table. Keep only the origins of its indicators, so that our estimates
+    # do not inherit the rest of FAOSTAT's metadata (e.g. the public title "Number of laying hens").
+    ds_qcl = paths.load_dataset("faostat_qcl")
+    tb_qcl = ds_qcl.read("faostat_qcl_flat", safe_types=False, reset_metadata="keep_origins")
+
+    #
+    # Process data.
+    #
+    # Select the number of laying hens and the number of eggs produced, in the years that have at least one of them.
+    tb_qcl = tb_qcl[["country", "year"] + list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    tb_qcl = tb_qcl.dropna(subset=list(COLUMNS.values()), how="all").astype({"country": str}).reset_index(drop=True)
+
+    # Fill gaps in country series with the latest reported value.
+    tb = fill_gaps(tb=tb_qcl)
+
+    # Keep only years from FIRST_YEAR on (after filling gaps, so that gaps in the first years are filled too).
+    tb = tb[tb["year"] >= FIRST_YEAR].reset_index(drop=True)
+
+    # Keep only countries: drop FAOSTAT's regions (whose names end in "(FAO)") and the OWID regions included in the
+    # FAOSTAT dataset, which are recomputed below.
+    tb = tb[~(tb["country"].str.endswith("(FAO)") | tb["country"].isin(REGIONS))].reset_index(drop=True)
+
+    # Estimate the number of hens and male chickens killed each year.
+    tb = estimate_chickens_killed(tb=tb)
+
+    # Add region aggregates.
+    tb_aggregates = paths.regions.add_aggregates(
+        tb=tb[["country", "year", "laying_hens", "eggs_produced"] + COUNT_COLUMNS],
+        regions=REGIONS,
+        min_num_values_per_year=1,
+    )
+    tb_aggregates = tb_aggregates[tb_aggregates["country"].isin(REGIONS)].reset_index(drop=True)
+    tb = pr.concat([tb, tb_aggregates], ignore_index=True)
+
+    # Add per capita indicators.
+    tb = paths.regions.add_per_capita(tb=tb, columns=COUNT_COLUMNS, warn_on_missing_countries=False)
+
+    # Run sanity checks on outputs.
+    sanity_check_outputs(tb=tb, tb_qcl=tb_qcl)
+
+    # Improve table format.
+    tb = tb.format(short_name=paths.short_name)
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb])
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def fill_gaps(tb: Table) -> Table:
+    """Fill gaps of at most MAX_YEARS_TO_FILL years in country series with the latest reported value.
+
+    Historical regions (e.g. USSR) are not filled, otherwise they would overlap with their successors.
+    """
+    tb_regions = paths.regions.tb_regions
+    historical = set(tb_regions[tb_regions["is_historical"]]["name"])
+    columns = ["laying_hens", "eggs_produced"]
+
+    tb_current = tb[~tb["country"].isin(historical)]
+    tb_current = (
+        tb_current.set_index(["country", "year"])
+        .reindex(
+            pd.MultiIndex.from_product(
+                [tb_current["country"].unique(), range(tb["year"].min(), tb["year"].max() + 1)],
+                names=["country", "year"],
+            )
+        )
+        .reset_index()
+        .sort_values(["country", "year"])
+    )
+    for column in columns:
+        missing = tb_current[column].isna()
+        gap_length = missing.groupby([tb_current["country"], (missing != missing.shift()).cumsum()]).transform("size")
+        short_gap = missing & (gap_length <= MAX_YEARS_TO_FILL)
+        tb_current.loc[short_gap, column] = tb_current.groupby("country")[column].ffill()[short_gap]
+
+    tb_filled = pr.concat([tb_current, tb[tb["country"].isin(historical)]], ignore_index=True)
+
+    # Only keep rows with a number of laying hens (eggs produced is a secondary variable). This is done after filling
+    # gaps, so that the eggs reported in years without a number of laying hens are kept, instead of being overwritten.
+    tb_filled = tb_filled.dropna(subset=["laying_hens"]).reset_index(drop=True)
+
+    return tb_filled
+
+
+def estimate_chickens_killed(tb: Table) -> Table:
+    """Estimate the number of hens and male chickens killed each year from the number of laying hens."""
+    # Hens killed each year: all hens in the flock are replaced (and killed) every WEEKS_IN_LAY weeks.
+    tb["hens_killed"] = tb["laying_hens"] * 52 / WEEKS_IN_LAY
+    # Male chickens killed: one for each hen killed, since as many males hatch as females. They are killed either as
+    # day-old chicks, or later on if they are raised for meat.
+    # NOTE: For now, this ignores in-ovo sexing, which removes male embryos before they hatch. Once we have data on
+    # its use in each country, subtract the male chicks that never hatched.
+    tb["male_chickens_killed"] = tb["hens_killed"]
+    # All chickens killed to produce eggs.
+    tb["chickens_killed"] = tb["hens_killed"] + tb["male_chickens_killed"]
+
+    return tb
+
+
+def sanity_check_outputs(tb: Table, tb_qcl: Table) -> None:
+    # Aggregates can be missing in years without country data; the checks below apply to informed rows.
+    tb = tb.dropna(subset=["laying_hens"] + COUNT_COLUMNS)
+    error = f"Estimates should start in {FIRST_YEAR}."
+    assert tb["year"].min() == FIRST_YEAR, error
+
+    error = "All numbers should be non-negative."
+    assert (tb[["laying_hens"] + COUNT_COLUMNS] >= 0).all().all(), error
+
+    error = "Total chickens killed should be the sum of hens and male chickens killed."
+    residual = (tb["chickens_killed"] - tb["hens_killed"] - tb["male_chickens_killed"]).abs()
+    assert (residual <= 1e-6 * tb["chickens_killed"] + 1e-6).all(), error
+
+    error = "Hens killed should be fewer than laying hens (the flock turns over in more than a year)."
+    assert (tb["hens_killed"] <= tb["laying_hens"]).all(), error
+
+    # A hen lays a few hundred eggs per year, so there should be roughly 10 chickens killed per 1,000 eggs. Much larger
+    # values point to inconsistent FAOSTAT data (e.g. Benin reports about 7 eggs per hen from 1991 to 2015).
+    error = "Chickens killed per 1,000 eggs should be a small number."
+    chickens_killed_per_1000_eggs = 1000 * tb["chickens_killed"] / tb["eggs_produced"]
+    assert chickens_killed_per_1000_eggs.dropna().between(0, 1000).all(), error
+    suspicious = tb[chickens_killed_per_1000_eggs > 100]
+    if not suspicious.empty:
+        log.warning(
+            "Countries with more than 100 chickens killed per 1,000 eggs (inconsistent FAOSTAT data on hens and eggs): "
+            f"{suspicious.groupby('country')['year'].agg(['min', 'max']).to_dict('index')}"
+        )
+
+    # Our World and EU aggregates should be close to FAOSTAT's own figures (which include missing countries).
+    for region in ["World", "European Union (27)"]:
+        fao = tb_qcl[tb_qcl["country"] == region].set_index("year")["laying_hens"]
+        owid = tb[tb["country"] == region].set_index("year")["laying_hens"]
+        ratio = (owid / fao).dropna()
+        error = f"Our {region} total of laying hens deviates by more than 5% from FAOSTAT's:\n{ratio[(ratio - 1).abs() > 0.05]}"
+        assert ((ratio - 1).abs() <= 0.05).all(), error

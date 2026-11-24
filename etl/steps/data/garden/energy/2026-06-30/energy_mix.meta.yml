@@ -21,6 +21,9 @@ definitions:
   # indicators: the EIA is only used to extend the total, and adds no breakdown by source.
   description_processing_eia: |-
     - Total energy supply is extended with total energy consumption from the U.S. Energy Information Administration (EIA), to cover countries and years for which the Statistical Review does not report a total. Where both sources report a value, we use the Statistical Review.
+  # Per capita indicators.
+  description_processing_per_capita: |-
+    - We calculate per capita figures by dividing by population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
   common:
     processing_level: major
     presentation:
@@ -79,6 +82,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Biofuels
         presentation:
@@ -140,6 +146,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
         presentation:
@@ -201,6 +210,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Fossil fuels
         presentation:
@@ -250,6 +262,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
         presentation:
@@ -311,6 +326,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Hydropower
         presentation:
@@ -372,6 +390,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Low-carbon energy
         presentation:
@@ -421,6 +442,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Nuclear
         presentation:
@@ -482,6 +506,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
         presentation:
@@ -543,6 +570,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Other renewables
         presentation:
@@ -604,6 +634,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Renewables
         presentation:
@@ -653,6 +686,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Solar and wind
         presentation:
@@ -702,6 +738,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Solar
         presentation:
@@ -766,6 +805,7 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Total energy supply
         presentation:
@@ -834,6 +874,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_smil_world}
+          {definitions.description_processing_per_capita}
         display:
           name: Wind
         presentation:

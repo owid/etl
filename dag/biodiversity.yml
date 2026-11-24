@@ -47,10 +47,6 @@ steps:
 
   # Habitat loss multidim (shown as a data explorer).
   viz://chart/biodiversity/latest/habitat_loss:
-    - data://grapher/biodiversity/2021-01-01/habitat_loss
-
-  # Habitat loss explorer.
-  viz://explorer/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss:
       - data://garden/biodiversity/2021-01-01/habitat_loss:
         - snapshot://biodiversity/2021-01-01/habitat_loss.feather

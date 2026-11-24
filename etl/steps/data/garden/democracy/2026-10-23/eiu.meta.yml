@@ -43,6 +43,7 @@ definitions:
     We classify each country’s regime from its overall score, using the Economist Intelligence Unit’s (EIU) bands (authoritarian regime below 4, hybrid regime 4 to 5.99, flawed democracy 6 to 7.99, full democracy 8 or higher), instead of the regime type EIU lists, which in some years doesn’t match its own score.
   description_processing_aggregates: |-
     For the world as a whole and for each region (as [defined by us](https://ourworldindata.org/grapher/continents-according-to-our-world-in-data)), we calculate both simple country averages and [population-weighted](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=%C2%AD%C2%AD%C2%AD%C2%ADDemocracy&Sub-metric=Main+index&tab=line&country=World+%28population-weighted%29~Africa+%28population-weighted%29~Asia+%28population-weighted%29~Europe+%28population-weighted%29~North+America+%28population-weighted%29~Oceania+%28population-weighted%29~South+America+%28population-weighted%29) averages. A population-weighted average assigns more weight to countries with larger populations, so that the results better reflect the experiences of the average person.
+    These averages use our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN. Countries that are not covered by the source are excluded from these totals.
   common:
     presentation:
       topic_tags:
