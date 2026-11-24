@@ -21,7 +21,7 @@ default_selection:
 
 default_dimensions:
   leader: chief_executive
-  time: by_year
+  period: by_year
   aggregation: country
 
 definitions:
@@ -81,7 +81,7 @@ dimensions:
         name: Head of government
       - slug: head_of_state
         name: Head of state
-  - slug: time
+  - slug: period
     name: Time
     choices:
       - slug: by_year
@@ -102,7 +102,7 @@ views:
   #
   - dimensions:
       leader: chief_executive
-      time: by_year
+      period: by_year
       aggregation: country
     indicators:
       y:
@@ -118,7 +118,7 @@ views:
 
   - dimensions:
       leader: chief_executive
-      time: ever
+      period: ever
       aggregation: country
     indicators:
       y:
@@ -133,7 +133,7 @@ views:
 
   - dimensions:
       leader: chief_executive
-      time: by_year
+      period: by_year
       aggregation: region
     indicators:
       y:
@@ -159,7 +159,7 @@ views:
 
   - dimensions:
       leader: chief_executive
-      time: ever
+      period: ever
       aggregation: region
     indicators:
       y:
@@ -190,7 +190,7 @@ views:
   #
   - dimensions:
       leader: head_of_government
-      time: by_year
+      period: by_year
       aggregation: country
     indicators:
       y:
@@ -206,7 +206,7 @@ views:
 
   - dimensions:
       leader: head_of_government
-      time: ever
+      period: ever
       aggregation: country
     indicators:
       y:
@@ -221,7 +221,7 @@ views:
 
   - dimensions:
       leader: head_of_government
-      time: by_year
+      period: by_year
       aggregation: region
     indicators:
       y:
@@ -247,7 +247,7 @@ views:
 
   - dimensions:
       leader: head_of_government
-      time: ever
+      period: ever
       aggregation: region
     indicators:
       y:
@@ -278,7 +278,7 @@ views:
   #
   - dimensions:
       leader: head_of_state
-      time: by_year
+      period: by_year
       aggregation: country
     indicators:
       y:
@@ -294,7 +294,7 @@ views:
 
   - dimensions:
       leader: head_of_state
-      time: ever
+      period: ever
       aggregation: country
     indicators:
       y:
@@ -309,7 +309,7 @@ views:
 
   - dimensions:
       leader: head_of_state
-      time: by_year
+      period: by_year
       aggregation: region
     indicators:
       y:
@@ -335,7 +335,7 @@ views:
 
   - dimensions:
       leader: head_of_state
-      time: ever
+      period: ever
       aggregation: region
     indicators:
       y:
