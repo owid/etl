@@ -682,6 +682,11 @@ PLAYFAIR_SLOT_SLACK = 0.968
 # property of the faces rather than of the string, so a re-worded row stays within a percent of it.
 LATO_BOLD_SLOT_SLACK = 1.066
 
+# The Note's own figure, at its 12px: between the 11px (2.4%) and 16px (0.8%) measurements above. The
+# general figure predicted the mobile Note at four lines where the frame sets it in three, which left the
+# chart 14px short of its band; this one predicts three, matching the frame.
+LATO_NOTE_SLACK = 1.02
+
 # A title line, in template px, in every one of these templates. Their titles set line height
 # explicitly where every other slot leaves it automatic, which is why this is a constant and the
 # other line heights are per-slot.
@@ -2385,7 +2390,7 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     note_pt = template["note_px"] * POINTS_PER_PIXEL
     bold_extra = text_advance_px(NOTE_LEAD, note_pt, bold=True) - text_advance_px(NOTE_LEAD, note_pt)
     slot_px = min(template["note_slot_px"], content_px) - bold_extra
-    wrapped = wrap_to_slot(text, slot_px, template["note_px"])
+    wrapped = wrap_to_slot(text, slot_px, template["note_px"], LATO_NOTE_SLACK)
     # Two lines on the desktop frame, whose footer grows DOWNWARD from a fixed top (see
     # `note_bottom_px`), so a third eats the template's bottom margin rather than the chart's band.
     # The mobile frame has no Note slot at all and draws this above its footer rows, where a line costs
