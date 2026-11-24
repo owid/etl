@@ -7,6 +7,11 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/democracy/2026-03-17/vdem:
     - data://garden/democracy/2026-03-17/vdem
+  #
+  # Women political leaders — MDim authored in ETL.
+  #
+  viz://chart/democracy/latest/women_political_leaders:
+    - data://grapher/democracy/2026-03-17/vdem
 
   # Episodes of Regime Transition (2026)
   data://grapher/democracy/2026-03-18/ert:

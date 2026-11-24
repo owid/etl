@@ -1,0 +1,362 @@
+grapher_schema: "012"
+slug: women-political-leaders
+
+title:
+  title: Women political leaders
+  title_variant: ""
+
+topic_tags:
+  - Women's Rights
+  - Women in Politics
+  - Democracy
+
+default_selection:
+  - Sri Lanka
+  - India
+  - United Kingdom
+  - Germany
+  - New Zealand
+  - Liberia
+  - Brazil
+
+default_dimensions:
+  leader: chief_executive
+  time: by_year
+  aggregation: country
+
+definitions:
+  # Colors of the old charts: purple for women, beige for men.
+  color_woman: &color_woman "#863d8c"
+  color_man: &color_man "#e2b99c"
+  # Whether a woman held the role on December 31: a map, plus a strip per country showing each year.
+  by_year_country: &by_year_country
+    hasMapTab: true
+    tab: map
+    chartTypes:
+      - Swimlane
+    yAxis:
+      min: 0
+      max: 1
+    map:
+      colorScale:
+        baseColorScheme: BinaryMapPaletteE
+        colorSchemeInvert: true
+        customCategoryColors:
+          Man: *color_man
+          Woman: *color_woman
+  # Whether a woman has ever held the role: the indicator is 0 or 1, so it gets labeled bins on the map.
+  ever_country: &ever_country
+    hasMapTab: true
+    tab: map
+    chartTypes: []
+  # Share of countries led by a man or a woman, stacked to 100%.
+  by_year_region: &by_year_region
+    chartTypes:
+      - StackedArea
+      - StackedDiscreteBar
+    stackMode: relative
+    hideRelativeToggle: false
+    entityType: region
+    selectedEntityNames:
+      - World
+  # Share of today's countries that have had a woman in the role, overall and democratically elected.
+  ever_region: &ever_region
+    chartTypes:
+      - LineChart
+    yAxis:
+      min: 0
+    selectedEntityNames:
+      - World
+  common_views:
+    - config:
+        originUrl: /women-rights
+
+dimensions:
+  - slug: leader
+    name: Leader
+    choices:
+      - slug: chief_executive
+        name: Chief executive
+      - slug: head_of_government
+        name: Head of government
+      - slug: head_of_state
+        name: Head of state
+  - slug: time
+    name: Time
+    choices:
+      - slug: by_year
+        name: By year
+      - slug: ever
+        name: Ever
+  - slug: aggregation
+    name: Country or region
+    choices:
+      - slug: country
+        name: By country
+      - slug: region
+        name: By region
+
+views:
+  #
+  # Chief executive
+  #
+  - dimensions:
+      leader: chief_executive
+      time: by_year
+      aggregation: country
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#wom_hoe_vdem
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      <<: *by_year_country
+      title: Gender of the chief executive
+      subtitle: '"Chief executive" is defined here as the head of state or the head of government, whoever has more power over the appointment and dismissal of cabinet ministers.'
+      note: This is recorded on December 31 of each year. When the head of state and head of government hold equal power, the head of government is considered the chief executive.
+
+  - dimensions:
+      leader: chief_executive
+      time: ever
+      aggregation: country
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#wom_hoe_ever
+          display:
+            colorScaleNumericBins: "0,#e2b99c,No;1,#863d8c,Yes"
+    config:
+      <<: *ever_country
+      title: Country has ever had a woman as chief executive
+      subtitle: Shows whether a country has had a woman as chief executive at any point since 1789.
+      note: '"Chief executive" is defined here as the head of state or the head of government, whoever has more power over the appointment and dismissal of cabinet ministers.'
+
+  - dimensions:
+      leader: chief_executive
+      time: by_year
+      aggregation: region
+    indicators:
+      y:
+        - catalogPath: vdem_num_countries#num_countries_hoe__category_man
+          display:
+            name: Man is chief executive
+            color: *color_man
+            numDecimalPlaces: 0
+        - catalogPath: vdem_num_countries#num_countries_hoe__category_woman
+          display:
+            name: Woman is chief executive
+            color: *color_woman
+            numDecimalPlaces: 0
+    config:
+      <<: *by_year_region
+      title: Share of countries with a woman as chief executive
+      subtitle: '"Chief executive" is defined here as the head of state or the head of government, whoever has more power over the appointment and dismissal of cabinet ministers.'
+      note: This is recorded on December 31 of each year. When the head of state and head of government hold equal power, the head of government is considered the chief executive.
+    metadata:
+      presentation:
+        title_public: Share of countries by gender of the chief executive
+      description_short: Share of countries in which the chief executive in office on December 31 is a man or a woman.
+
+  - dimensions:
+      leader: chief_executive
+      time: ever
+      aggregation: region
+    indicators:
+      y:
+        - catalogPath: vdem_share_countries#share_countries_wom_hoe_ever
+          display:
+            name: Any woman chief executive
+            color: "#b13507"
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+        - catalogPath: vdem_share_countries#share_countries_wom_hoe_ever_demelect
+          display:
+            name: Democratically elected woman chief executive
+            color: "#4c6a9c"
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+    config:
+      <<: *ever_region
+      title: Share of countries that have had a woman as chief executive
+      subtitle: Share of current countries that have had a woman as chief executive since 1789.
+      note: '"Chief executive" is defined here as the head of government (such as Germany''s Angela Merkel) or the head of state (such as Argentina''s Cristina Fernández de Kirchner), whoever has more power over the appointment and dismissal of cabinet ministers. A woman counts as democratically elected if she took office through multi-party elections while the country was an electoral or liberal democracy, as classified by V-Dem''s "Regimes of the World".'
+    metadata:
+      presentation:
+        title_public: Share of countries that have had a woman as chief executive
+      description_short: Share of today's countries that have had a woman as chief executive by the end of the given year, and the share that have had one who was elected democratically.
+
+  #
+  # Head of government
+  #
+  - dimensions:
+      leader: head_of_government
+      time: by_year
+      aggregation: country
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#wom_hog_vdem
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      <<: *by_year_country
+      title: Gender of the head of government
+      subtitle: The head of government is the chief officer of the executive branch of their country.
+      note: This is recorded on December 31 of each year.
+
+  - dimensions:
+      leader: head_of_government
+      time: ever
+      aggregation: country
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#wom_hog_ever
+          display:
+            colorScaleNumericBins: "0,#e2b99c,No;1,#863d8c,Yes"
+    config:
+      <<: *ever_country
+      title: Country has ever had a woman as head of government
+      subtitle: Shows whether a country has had a woman as head of government at any point since 1789.
+      note: The head of government is the chief officer of the executive branch of their country.
+
+  - dimensions:
+      leader: head_of_government
+      time: by_year
+      aggregation: region
+    indicators:
+      y:
+        - catalogPath: vdem_num_countries#num_countries_hog__category_man
+          display:
+            name: Man is head of government
+            color: *color_man
+            numDecimalPlaces: 0
+        - catalogPath: vdem_num_countries#num_countries_hog__category_woman
+          display:
+            name: Woman is head of government
+            color: *color_woman
+            numDecimalPlaces: 0
+    config:
+      <<: *by_year_region
+      title: Share of countries by gender of the head of government
+      subtitle: The head of government is the chief officer of the executive branch of their country.
+      note: This is recorded on December 31 of each year.
+    metadata:
+      presentation:
+        title_public: Share of countries by gender of the head of government
+      description_short: Share of countries in which the head of government in office on December 31 is a man or a woman.
+
+  - dimensions:
+      leader: head_of_government
+      time: ever
+      aggregation: region
+    indicators:
+      y:
+        - catalogPath: vdem_share_countries#share_countries_wom_hog_ever
+          display:
+            name: Any woman head of government
+            color: "#b13507"
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+        - catalogPath: vdem_share_countries#share_countries_wom_hog_ever_demelect
+          display:
+            name: Democratically elected woman head of government
+            color: "#4c6a9c"
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+    config:
+      <<: *ever_region
+      title: Share of countries that have had a woman as head of government
+      subtitle: Share of current countries that have had a woman as head of government since 1789.
+      note: The head of government is the chief officer of the executive branch of their country. A woman counts as democratically elected if she took office through multi-party elections while the country was an electoral or liberal democracy, as classified by V-Dem's "Regimes of the World".
+    metadata:
+      presentation:
+        title_public: Share of countries that have had a woman as head of government
+      description_short: Share of today's countries that have had a woman as head of government by the end of the given year, and the share that have had one who was elected democratically.
+
+  #
+  # Head of state
+  #
+  - dimensions:
+      leader: head_of_state
+      time: by_year
+      aggregation: country
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#wom_hos_vdem
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      <<: *by_year_country
+      title: Gender of the head of state
+      subtitle: The head of state is the chief public representative of their country.
+      note: This is recorded on December 31 of each year.
+
+  - dimensions:
+      leader: head_of_state
+      time: ever
+      aggregation: country
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#wom_hos_ever
+          display:
+            colorScaleNumericBins: "0,#e2b99c,No;1,#863d8c,Yes"
+    config:
+      <<: *ever_country
+      title: Country has ever had a woman as head of state
+      subtitle: Shows whether a country has had a woman as head of state at any point since 1789.
+      note: The head of state is the chief public representative of their country.
+
+  - dimensions:
+      leader: head_of_state
+      time: by_year
+      aggregation: region
+    indicators:
+      y:
+        - catalogPath: vdem_num_countries#num_countries_hos__category_man
+          display:
+            name: Man is head of state
+            color: *color_man
+            numDecimalPlaces: 0
+        - catalogPath: vdem_num_countries#num_countries_hos__category_woman
+          display:
+            name: Woman is head of state
+            color: *color_woman
+            numDecimalPlaces: 0
+    config:
+      <<: *by_year_region
+      title: Share of countries by gender of the head of state
+      subtitle: The head of state is the chief public representative of their country.
+      note: This is recorded on December 31 of each year.
+    metadata:
+      presentation:
+        title_public: Share of countries by gender of the head of state
+      description_short: Share of countries in which the head of state in office on December 31 is a man or a woman.
+
+  - dimensions:
+      leader: head_of_state
+      time: ever
+      aggregation: region
+    indicators:
+      y:
+        - catalogPath: vdem_share_countries#share_countries_wom_hos_ever
+          display:
+            name: Any woman head of state
+            color: "#b13507"
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+        - catalogPath: vdem_share_countries#share_countries_wom_hos_ever_demelect
+          display:
+            name: Democratically elected woman head of state
+            color: "#4c6a9c"
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+    config:
+      <<: *ever_region
+      title: Share of countries that have had a woman as head of state
+      subtitle: Share of current countries that have had a woman as head of state since 1789.
+      note: The head of state is the chief public representative of their country. A woman counts as democratically elected if she took office through multi-party elections while the country was an electoral or liberal democracy, as classified by V-Dem's "Regimes of the World".
+    metadata:
+      presentation:
+        title_public: Share of countries that have had a woman as head of state
+      description_short: Share of today's countries that have had a woman as head of state by the end of the given year, and the share that have had one who was elected democratically.
