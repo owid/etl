@@ -1330,7 +1330,7 @@ z
    <text xml:space="preserve" style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="47.7" transform="rotate(-0 11.52 47.7)"><tspan style="fill: #5b5b5b">Average time spent on different activities in a 24-hour day by people aged 15 to 64, according to each</tspan></text>
   </g>
   <g id="subtitle-1">
-   <text xml:space="preserve" style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="61.38" transform="rotate(-0 11.52 61.38)"><tspan style="fill: #5b5b5b">country's most recent time-use survey in the OECD database from 2010 to 2024.</tspan></text>
+   <text xml:space="preserve" style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="61.38" transform="rotate(-0 11.52 61.38)"><tspan style="fill: #5b5b5b">country’s most recent time-use survey in the OECD database from 2010 to 2024.</tspan></text>
   </g>
   <g id="subtitle-2">
    <text xml:space="preserve" style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="75.06" transform="rotate(-0 11.52 75.06)"><tspan style="fill: #5b5b5b">Activities are grouped into </tspan><tspan style="font-weight: 700; fill: #9a5129">paid work &amp; study</tspan><tspan style="fill: #5b5b5b">, </tspan><tspan style="font-weight: 700; fill: #18470f">unpaid work</tspan><tspan style="fill: #5b5b5b">, </tspan><tspan style="font-weight: 700; fill: #00295b">personal care</tspan><tspan style="fill: #5b5b5b">, and </tspan><tspan style="font-weight: 700; fill: #883039">leisure</tspan><tspan style="fill: #5b5b5b">.</tspan></text>
@@ -1342,7 +1342,7 @@ z
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="785.91285" transform="rotate(-0 36.098438 785.91285)">Averages cover everyone aged 15 to 64, weekends included. Days and people with no paid work or study count as zero hours of it. Unpaid work also</text>
   </g>
   <g id="note--line-2">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="795.99825" transform="rotate(-0 11.52 795.99825)">includes religious and civic activities, and time the OECD doesn't assign to another category, including some travel.</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="795.99825" transform="rotate(-0 11.52 795.99825)">includes religious and civic activities, and time the OECD doesn’t assign to another category, including some travel.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="808.95825" transform="rotate(-0 11.52 808.95825)">Data source: OECD Time Use Database (2026)</text>

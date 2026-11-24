@@ -497,10 +497,11 @@ TITLE = "How do people spend their time?"
 # (`subtitle_runs`). "In the OECD database" because the OECD does not refresh a country the moment it runs
 # a new survey: Korea is shown at 2014 while Statistics Korea has published 2019 and 2024 rounds. "From
 # {first} to {last}", not "over the period {first}–{last}": plainer, and short enough that both frames take
-# the same text, the mobile frame in four lines.
+# the same text, the mobile frame in four lines. Chart text takes curly apostrophes (the style guide), here
+# and in the Note.
 SUBTITLE = (
     "Average time spent on different activities in a 24-hour day by people aged 15 to 64, according to each "
-    "country's most recent time-use survey in the OECD database from {first} to {last}. "
+    "country’s most recent time-use survey in the OECD database from {first} to {last}. "
     "Activities are grouped into {categories}."
 )
 
@@ -2377,7 +2378,7 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     text += (
         "Averages cover everyone aged 15 to 64, weekends included. Days and people with no paid "
         "work or study count as zero hours of it. Unpaid work also includes religious and civic activities, "
-        "and time the OECD doesn't assign to another category, including some travel."
+        "and time the OECD doesn’t assign to another category, including some travel."
     )
     # Against the narrower of the Note's own slot and the content width — the slot is the template's,
     # but a mobile frame's content is narrower than it.

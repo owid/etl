@@ -1276,7 +1276,7 @@ z
    <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="42.76125" transform="rotate(-0 11.52 42.76125)"><tspan style="fill: #5b5b5b">Average time spent on different activities in a 24-hour day by</tspan></text>
   </g>
   <g id="subtitle-1">
-   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="55.72125" transform="rotate(-0 11.52 55.72125)"><tspan style="fill: #5b5b5b">people aged 15 to 64, according to each country's most recent time-use</tspan></text>
+   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="55.72125" transform="rotate(-0 11.52 55.72125)"><tspan style="fill: #5b5b5b">people aged 15 to 64, according to each country’s most recent time-use</tspan></text>
   </g>
   <g id="subtitle-2">
    <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="68.68125" transform="rotate(-0 11.52 68.68125)"><tspan style="fill: #5b5b5b">survey in the OECD database from 2010 to 2024. Activities are grouped</tspan></text>
@@ -1315,7 +1315,7 @@ z
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="585.16965" transform="rotate(-0 11.52 585.16965)">work or study count as zero hours of it. Unpaid work also includes religious and civic activities,</text>
   </g>
   <g id="chart__note--line-3">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="595.25505" transform="rotate(-0 11.52 595.25505)">and time the OECD doesn't assign to another category, including some travel.</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="595.25505" transform="rotate(-0 11.52 595.25505)">and time the OECD doesn’t assign to another category, including some travel.</text>
   </g>
  </g>
 </svg>
