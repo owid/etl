@@ -2356,9 +2356,11 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     # First, what the averages are over, and what that does to paid work. A reader who sees 2h 57m of
     # paid work in Italy reads it as a short working day; it is the average across everyone aged 15 to 64,
     # working or not. "Everyone" is not stated in the workbook but follows from the data: each country's
-    # categories add up to the whole day, which averages over participants only would not. "Weekdays and
-    # weekends" is the workbook's own phrase; it does not say how each survey weights its diary days, so
-    # the Note does not claim "all seven days". The zero sentence says "no paid work OR study": a day off
+    # categories add up to the whole day, which averages over participants only would not. "Weekends
+    # included" is all the source supports: the workbook says "both weekdays and weekends", and neither the
+    # dataset page nor its Data Explorer metadata says how the days are weighted (the metadata notes that
+    # "the number of diary days sampled" differs by country). So no "all seven days", nor "weekdays and
+    # weekends alike", which hints at equal weight. The zero sentence says "no paid work OR study": a day off
     # from a job that is spent studying still counts toward the category, which adds the two up.
     #
     # Then what the green segment holds beyond unpaid work: the source's code 5, folded in here (see
@@ -2373,7 +2375,7 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     # No generic comparability sentence: it named no comparison a reader could act on. The one country
     # the OECD flags as not comparable is left off the chart (`NOT_COMPARABLE`).
     text += (
-        "Averages cover everyone aged 15 to 64, on weekdays and weekends alike. Days and people with no paid "
+        "Averages cover everyone aged 15 to 64, weekends included. Days and people with no paid "
         "work or study count as zero hours of it. Unpaid work also includes religious and civic activities, "
         "and time the OECD doesn't assign to another category, including some travel."
     )

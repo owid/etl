@@ -1309,13 +1309,13 @@ z
    <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="22.608984" y="574.98435" transform="rotate(-0 22.608984 574.98435)">Note:</text>
   </g>
   <g id="chart__note--rest">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="575.01" transform="rotate(-0 36.098438 575.01)">Averages cover everyone aged 15 to 64, on weekdays and weekends alike. Days and</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="575.01" transform="rotate(-0 36.098438 575.01)">Averages cover everyone aged 15 to 64, weekends included. Days and people with no paid</text>
   </g>
   <g id="chart__note--line-2">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="585.16965" transform="rotate(-0 11.52 585.16965)">people with no paid work or study count as zero hours of it. Unpaid work also includes religious</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="585.16965" transform="rotate(-0 11.52 585.16965)">work or study count as zero hours of it. Unpaid work also includes religious and civic activities,</text>
   </g>
   <g id="chart__note--line-3">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="595.25505" transform="rotate(-0 11.52 595.25505)">and civic activities, and time the OECD doesn't assign to another category, including some travel.</text>
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="595.25505" transform="rotate(-0 11.52 595.25505)">and time the OECD doesn't assign to another category, including some travel.</text>
   </g>
  </g>
 </svg>
