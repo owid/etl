@@ -1,8 +1,9 @@
 """Draw the 'How do people spend their time?' chart from the OECD Time Use Database.
 
 One row per country, splitting the 1440 minutes of a day into the OECD's four top-level categories —
-paid work or study, personal care, unpaid work and other, leisure — ranked by the leading segment,
-paid work or study, as the original chart by Esteban Ortiz-Ospina ranked it (see `sort_rows`).
+paid work or study, unpaid work, personal care, leisure, with the two kinds of work side by side —
+ranked by the leading segment, paid work or study, as the original chart by Esteban Ortiz-Ospina ranked
+it (see `sort_rows`).
 
 **Four categories, not the source's ten display groups**, and that is the substantive decision in this
 step: the ten resolve more than the harmonization supports. Measured across the source's countries, the
@@ -15,9 +16,9 @@ this step, move the sums into garden so the four categories are in the catalog.
 
 **Each of the four IS one of the source's own top-level categories**, so nothing is aggregated here
 beyond a single addition. Codes 1, 3 and 4 are read straight off garden's `time_use` table as
-`paid_work_or_study`, `personal_care` and `leisure`; "Unpaid work & other" is code 2 plus code 5, the
-source's small religious/civic/uncategorized bucket, which is a presentation choice and so belongs
-here rather than in the catalog. A ten-display-group table used to sit in between and was summed back
+`paid_work_or_study`, `personal_care` and `leisure`; "Unpaid work" is code 2 plus code 5, the source's
+small religious/civic/uncategorized bucket, which is a presentation choice and so belongs here rather
+than in the catalog, and which the Note spells out (`build_note`). A ten-display-group table used to sit in between and was summed back
 up to these same numbers, which is a detour: it reconstructed the source's own totals to within
 3e-05 minutes, and no chart used any of its 33 indicators.
 
@@ -34,19 +35,18 @@ segments. Survey years differ by country, so each country label carries its year
 surveys spanned a narrower window and it named none of them. On desktop the name and the year take a
 line each, the name in bold.
 
-The desktop key sits above the bars and points at the top row: over each segment, the activities that
-category holds as one run-in list, and under it, nearest the bars, the category's name in its colour.
-Each block is aligned with the values under it — left at its segment's start, the last one right at the
-bar's end — and its line breaks are the design team's (`key_lines`, `label_lines`). A block that clears
-the subtitle sideways may rise beside it, which is what lets the four-line lists sit right of a
-subtitle balanced over two shorter lines (`key_header_px`); `key_blocks_collide` asserts that no block
-reaches into its neighbour's. The mobile frame is too narrow for that and takes one row of chips and
-names instead, with no member lists (`draw_inline_legend`).
+The legend is the subtitle: its last sentence names the four categories in bar order, each in bold and
+in its segment's colour (`subtitle_tokens`), on lines of its own where that costs no extra line
+(`wrap_runs`). On desktop, what each category holds then reads as an annotation rather than as part of
+a legend: a two-line run-in list over the top row, in gray, with a curved arrow down to its segment.
+Each block starts centred over its segment and is pushed sideways only as far as it must to clear its
+neighbours and stay in the content column (`key_blocks`). The mobile frame is too narrow for the lists
+and carries the coloured subtitle alone.
 
-This layout is the design team's rework of both frames, replicated here: their palette, the key's order
-and alignment, the two-line country labels, the segment gaps, the wider bar spacing and the taller
-desktop frame; and on mobile, the one-row legend, the column of years against the bars, the subtitle
-broken after its first sentence, and their sizes for the header and footer slots.
+The palette, the two-line country labels, the segment gaps, the wider bar spacing, the taller desktop
+frame, and on mobile the column of years against the bars and the header and footer sizes are the design
+team's rework of both frames. The coloured-subtitle legend, the annotations, the bar order and the Note's
+wording follow a later editorial review of that rework.
 
 Two frames are emitted: 850x1162 desktop, from the vertical static-chart template run 67px taller, and
 a mobile frame from the mobile template, also run taller, so the wider bar spacing does not thin the
@@ -159,7 +159,7 @@ with the chart at the bottom of the z-order the clone's identical cream sits ben
 size of the whole artboard, so appended last it covers the header and footer, and every double-click on
 the subtitle or the Note descends into the import's nested groups instead of selecting the text. Below
 them, a click over the subtitle lands on the header wrapper and the text is one double-click away, as it
-is in the template, while bars and legend names still resolve to the chart. Nothing moves: the frame is
+is in the template, while bars and annotations still resolve to the chart. Nothing moves: the frame is
 pixel-identical either way (checked, max channel difference 0), because the header and footer wrappers
 carry no fill and the figure patch is already gone.
 
@@ -167,8 +167,10 @@ carry no fill and the figure patch is already gone.
 subtitle carries `S:bd2b46c8f1ae73...`, which owns family, size and line height, and re-applying the
 face by hand with `setRangeFontName`/`setRangeFontSize` leaves the text looking right and the binding
 gone. `diff_against_template.js` is what catches it (`header[1] style (unbound) != template`); a
-screenshot cannot. Use `setTextStyleIdAsync` and let the style supply all three. A multi-run slot like
-the Note cannot be fully style-bound — a bolded range and a style binding are exclusive — so those
+screenshot cannot. Use `setTextStyleIdAsync` and let the style supply all three. The subtitle is the
+exception now: bind its style first, then colour and embolden the four category names by range
+(`setRangeFills` with the `Default Palette/*` style, `setRangeFontName` to Lato Bold), so the base style
+still owns family, size and line height. A multi-run slot like the Note cannot be fully style-bound — a bolded range and a style binding are exclusive — so those
 keep the per-run recipe: setting `characters` gives the WHOLE string the face of the old first
 character, so re-apply **every** run's face, not only the bold ones — the runs that silently go wrong are the
 *non-bold* ones. Three of the four footer rows shipped entirely bold from a pass that re-applied the
@@ -180,7 +182,7 @@ Note, Bold(0-12) + Regular for the source, Bold(0-18) + Medium for the tagline, 
 | Slot | Fills with | Bold |
 |---|---|---|
 | Title | `TITLE` | whole line (Playfair Display SemiBold, from the template) |
-| Subtitle | the layout's `subtitle`, `{years}` filled | none |
+| Subtitle | the layout's `subtitle`, years and categories filled, with the step's line breaks | each category name, in its segment's `Default Palette/*` colour |
 | `Note:` | `build_note` | the `Note:` label |
 | `Data source:` | `build_source_citation` | the `Data source:` label |
 | Tagline | `TAGLINE` | `OurWorldinData.org` |
@@ -192,12 +194,11 @@ which also removes the drift the anchor pass existed to undo, since a face chang
 its width change. Read the faces on arrival before trusting that; an import in **Inter** means the
 stack did not survive to the file, and then the old recipe applies (record each node's own
 `textAlignHorizontal`, set every run to Lato, put each node back on its anchor — in that order, because
-the middle step invalidates the first). The 25 country labels and the four member lists take
-`Text/Gray 80`.
+the middle step invalidates the first). The 25 country labels and the four annotation lists take
+`Text/Gray 80`; the arrows keep the gray the step draws them in.
 
 **Colors**, bound as library styles rather than pasted as hexes: `Default Palette/Dark Copper`,
-`Midnight Blue`, `Dark Olive Green` and `Maroon`, for the bars, the legend chips and the category names
-alike. Bars carry `SEGMENT_ALPHA` as *node* opacity, not paint opacity, so the binding survives; the
+`Dark Olive Green`, `Midnight Blue` and `Maroon`, for the bars and the subtitle's category names alike. Bars carry `SEGMENT_ALPHA` as *node* opacity, not paint opacity, so the binding survives; the
 names are full strength. Value labels are white on all four, which is what `value_label_color` picks
 measured against the composited fill at `SEGMENT_ALPHA`, and they stay unbound. Bind whatever hex the
 SVG carries rather than a colour named here — the step measures it and this comment cannot.
@@ -207,8 +208,8 @@ SVG carries rather than a colour named here — the step measures it and this co
 render to the library style the frame's current chart carries, which covers the fill-plus-darker-text
 pairs above that the script's `families` model has no place for. Its report must come back with empty
 `leftAsImported` and `orphanedBindings`: anything listed there is a style to rebind by hand. Keep
-`reflowLegend` off: it re-lays a row of runs from the leftmost, which collides this step's legend runs
-(doubled separators, overlapping names) where the step already spaced them by measured advance. Desktop
+`reflowLegend` off: it re-lays a row of runs from the leftmost, which collides runs the step already
+spaced by measured advance. Desktop
 and mobile go in one call, since they share a page; it also replaces each frame's parked reference copy.
 The template text slots are not touched by it, so a copy change still means editing them in the frame.
 A render that CHANGES a colour cannot inherit: the old chart never bound the new hex, and the script
@@ -216,28 +217,19 @@ refuses. Run it with `inheritStyles: false` and `families: []` instead (country 
 the body style through `bodyTextParent`), then bind each palette hex to its `Default Palette/*` style,
 moving the SVG's paint opacity onto the node first, and the Note to `Text/Gray 70`.
 
-**Then rebuild the key as auto-layout containers**, which an SVG cannot carry, with
+**Then merge each desktop annotation into one text node**, which an SVG cannot carry, with
 `/owid-staff:create-figma-chart`'s `scripts/group_text_blocks.js`, run after the restyle and again after
-every re-import (it replaces `chart`, and the containers with it). Desktop, one block per category:
+every re-import (it replaces `chart`, and the containers with it). One block per category, the arrow
+left as imported:
 
-    {"name": "key__<slug>", "direction": "VERTICAL", "itemSpacing": 3, "align": "MIN", "anchorY": "bottom",
-     "children": [{"merge": "key__<slug>-members", "lineHeight": 16}, {"merge": "category__<slug>", "lineHeight": null}]}
+    {"name": "key__<slug>", "direction": "VERTICAL", "itemSpacing": 0, "align": "MIN", "anchorY": "bottom",
+     "children": [{"merge": "key__<slug>-members", "lineHeight": 16}]}
 
-with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile, one `legend` row of items,
-then move it onto the 16px content edge and set its names to Lato Medium (the restyle maps a weight-500
-run to Regular):
-
-    {"name": "legend", "direction": "HORIZONTAL", "itemSpacing": 16, "align": "CENTER", "anchorY": "top",
-     "children": [{"block": {"name": "legend__<column>", "direction": "HORIZONTAL", "itemSpacing": 5, "align": "CENTER",
-       "children": [{"node": "legend__<column>-chip"}, {"merge": "legend__<column>", "lineHeight": null}]}}]}
-
-The containers also fix the gaps between runs, which the import lays out in this step's wider font. The
-legend names take `Data Insights/Annotations`, the chips their category's `Default Palette/*` style.
+with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile has no annotations.
 
 **On mobile, the Note then moves out of `chart` into the footer**, as the footer's first child: one Lato
 12 text joined from the `chart__note*` runs, `Note:` set bold, `Text/Gray 70`, width FILL and line height
-auto. Crop `chart` to its children's boxes (the legend container's box sits above the ink the restyle
-crops to) and re-pin the footer to the 16px bottom margin. Left in the chart, the imported runs keep this
+auto. Crop `chart` to its children's boxes and re-pin the footer to the 16px bottom margin. Left in the chart, the imported runs keep this
 step's ink-tight boxes, and the gap to `Data source:` no longer matches the gap between the footer's own
 rows. A re-import whose Note text is unchanged deletes the `chart__note*` runs from the copy to be styled
 before the restyle, since the footer already holds the Note.
@@ -249,16 +241,14 @@ on the 16px bottom margin. A rebuild clones the frame, which keeps them, and nee
 re-imported.
 
 **The gate's standing findings**, each accepted rather than open: the template's own 11px tagline and
-licence rows (`text-floor`, desktop); the desktop key rising beside the subtitle's shorter lines (`gap`
-top ~3.5px, the design team's layout); the
-two-author licence run (`diff_against_template`, mobile). `color_audit.py --separated` on the four
-composited fills fails under red-green colour-blindness (closest: Paid work against Unpaid work, dE 8.2
-for protanopia). Every segment sits in a fixed position under its own key block, so position rather than
-hue carries the category; the palette is the design team's call.
+licence rows (`text-floor`, desktop); the two-author licence run (`diff_against_template`, mobile).
+`color_audit.py --separated` on the four composited fills fails under red-green colour-blindness
+(closest: Paid work against Unpaid work, dE 8.2 for protanopia), and since the bar order now puts those
+two side by side, the 1px gap and the annotations over them carry the boundary rather than hue. The
+palette is the design team's call.
 """
 
 import logging
-import re
 from pathlib import Path
 
 import matplotlib
@@ -267,7 +257,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties, findfont
-from matplotlib.patches import Rectangle
+from matplotlib.patches import FancyArrowPatch
 from matplotlib.textpath import TextPath
 from owid.catalog import Table
 
@@ -320,6 +310,10 @@ VALUE_LABEL_COVERAGE = 0.75
 #
 # Which category carries which colour still follows width: Personal care is 44% of every bar, so it takes
 # the recessive Midnight Blue.
+#
+# Bar order puts the two kinds of work side by side — paid, then unpaid — and the subtitle names the
+# categories in that same order, in their colours, which is the chart's legend.
+#
 # `members` names what each category holds, in the source's own terms and ordered by the minutes each
 # takes. Two of them are worth not "correcting" back to "Other": the OECD's 3.3 is labelled *personal,
 # household, and medical services + travel related to personal care* — grooming and health, 61 min/day,
@@ -327,10 +321,10 @@ VALUE_LABEL_COVERAGE = 0.75
 # country mappings on the workbook's activity sheet it holds games, hobbies, arts and crafts, reading and
 # leisure travel, but also rest and relaxation (Japan, HETUS, Italy, Ireland) and computer and internet
 # use (Canada, HETUS, Ireland, New Zealand) — "Hobbies" alone would mislabel it, and at 96 min/day it is
-# the second-largest thing anyone does with their leisure. Unpaid work lists no "Other": its category
-# name already says "& other", which is this chart's fold of the source's fifth top-level category
-# (religious, civic and unclassified time, 18 min/day), and a second "Other" in the key read as the same
-# bucket as the one under Leisure.
+# the second-largest thing anyone does with their leisure. Unpaid work is named without "& other" and lists
+# no "Other": the source's fifth top-level category (religious, civic and unclassified time, 18 min/day)
+# that this chart folds into it is spelled out in the Note instead (`build_note`), where there is room to
+# say what it holds.
 MAIN_CATEGORY_GROUPS = [
     {
         "column": "main_paid_work_or_study",
@@ -338,14 +332,34 @@ MAIN_CATEGORY_GROUPS = [
         "source_columns": ["paid_work_or_study"],
         "members": ["Paid work", "Commuting", "School or classes", "Homework"],
         "compact": True,
-        # "&", not the source's "or": the segment is the sum of the two, and it matches "Unpaid work & other".
+        # "&", not the source's "or": the segment is the sum of the two.
         "label": "Paid work & study",
         # Dark Copper.
         "color": ("hex", "#9a5129"),
         "as_hours": True,
-        # The desktop key's line breaks, from the design team's frame. Asserted to spell out
-        # `run_in_list(members)`, so they cannot drift from the members.
+        # The desktop annotation's line breaks. Asserted to spell out `run_in_list(members)`, so they
+        # cannot drift from the members.
         "key_lines": ["Paid work, commuting, school", "or classes, homework"],
+    },
+    {
+        "column": "main_unpaid_work_and_other",
+        # Code 2 plus code 5 — the only addition this chart makes. Code 5 is religious and civic
+        # activities and uncategorized time, 18 min/day, too small to read as its own segment and
+        # closest in kind to unpaid work; folding it is a presentation call, which is why it is here,
+        # and the Note says what it holds.
+        "source_columns": ["unpaid_work", "other_activities"],
+        # "Household travel", not "Volunteering". Both are in here, but the list has to name the
+        # biggest things, and across the charted countries household travel is a median 17 min/day
+        # while volunteering is 3 — the list was naming the 7th-largest member and skipping the 4th.
+        # `check_members_are_the_largest` asserts it. Spelled out, not "Travel": on its own it reads
+        # as holidays, which the source counts under leisure.
+        "members": ["Housework", "Childcare", "Shopping", "Household travel"],
+        "compact": True,
+        "as_hours": True,
+        "label": "Unpaid work",
+        # Dark Olive Green.
+        "color": ("hex", "#18470f"),
+        "key_lines": ["Housework, childcare,", "shopping, household travel"],
     },
     {
         "column": "main_personal_care",
@@ -363,27 +377,6 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
     },
     {
-        "column": "main_unpaid_work_and_other",
-        # Code 2 plus code 5 — the only addition this chart makes. Code 5 is religious and civic
-        # activities and uncategorized time, 18 min/day, too small to read as its own segment and
-        # closest in kind to unpaid work; folding it is a presentation call, which is why it is here.
-        "source_columns": ["unpaid_work", "other_activities"],
-        # "Household travel", not "Volunteering". Both are in here, but the list has to name the
-        # biggest things, and across the charted countries household travel is a median 17 min/day
-        # while volunteering is 3 — the list was naming the 7th-largest member and skipping the 4th.
-        # `check_members_are_the_largest` asserts it. Spelled out, not "Travel": on its own it reads
-        # as holidays, which the source counts under leisure.
-        "members": ["Housework", "Childcare", "Shopping", "Household travel"],
-        "compact": True,
-        "as_hours": True,
-        "label": "Unpaid work & other",
-        # Dark Olive Green.
-        "color": ("hex", "#18470f"),
-        "key_lines": ["Housework,", "childcare,", "shopping,", "household travel"],
-        # The narrowest segment, so its name takes two lines.
-        "label_lines": ["Unpaid work", "& other"],
-    },
-    {
         "column": "main_leisure",
         # The source's own code 4.
         "source_columns": ["leisure"],
@@ -393,7 +386,7 @@ MAIN_CATEGORY_GROUPS = [
         "label": "Leisure",
         # Maroon.
         "color": ("hex", "#883039"),
-        "key_lines": ["TV & radio,", "seeing friends,", "sports, events,", "hobbies & other"],
+        "key_lines": ["TV & radio, seeing friends,", "sports, events, hobbies & other"],
     },
 ]
 
@@ -421,7 +414,7 @@ KEY_MEMBER_COLUMNS = {
         },
         "unnamed": [],
     },
-    "Unpaid work & other": {
+    "Unpaid work": {
         "named": {
             "Housework": "routine_housework",
             "Childcare": "child_care",
@@ -458,15 +451,19 @@ MAIN_CATEGORIES = [
         # What the segment holds, listed over its name.
         "members": group["members"],
         "key_lines": group["key_lines"],
-        "label_lines": group.get("label_lines", [group["label"]]),
     }
     for group in MAIN_CATEGORY_GROUPS
 ]
 
 TITLE = "How do people spend their time?"
+# One sentence for what a bar shows and over which surveys, then the chart's legend: `{categories}` is
+# filled with the four category names, in bar order, each in bold and in its segment's colour
+# (`subtitle_runs`). "In the OECD database" because the OECD does not refresh a country the moment it runs
+# a new survey: Korea is shown at 2014 while Statistics Korea has published 2019 and 2024 rounds.
 SUBTITLE = (
-    "Average time spent in a 24-hour day by people aged 15 to 64. Based on each country's most recent "
-    "time-use survey in the OECD data, from {first} to {last}."
+    "Average time spent on different activities in a 24-hour day by people aged 15 to 64, according to each "
+    "country's most recent time-use survey in the OECD database over the period {first}–{last}. "
+    "Activities are grouped into {categories}."
 )
 
 # The row labels set the width of the column they sit in, so the two longest names are shortened to
@@ -507,9 +504,9 @@ SEGMENT_ALPHA = 0.8
 # style the frame binds them to, so the render and the frame agree.
 DARK_VALUE_COLOR = "#2d2e2d"
 
-# The activities listed over each category name, in the body gray (`Text/Gray 80` in the frame) rather
-# than the category's colour. With both in colour the name and its list differed only by size and
-# weight, and the four names did not read as headings; the name keeps the colour that ties it to its bar.
+# The annotation lists and their arrows stay gray (`Text/Gray 80` in the frame), not in their category's
+# colour: the subtitle's coloured names are the legend, and coloured lists would read as a second one.
+# Each list already sits over its own segment, so colour would add nothing that position does not.
 MEMBER_TEXT_COLOR = TEXT_COLOR
 
 # The floors `check_contrast` holds every color to, measured over the canvas at `SEGMENT_ALPHA`.
@@ -667,21 +664,17 @@ SEGMENT_GAP_PX = 1
 # centred on its bar.
 COUNTRY_LINE_PX = 14
 
-# The desktop key, in template pixels: the least space two neighbouring blocks may leave between them, the
-# gap between a list and the category name under it, and the air between the name and the first bar's ink.
-HEADER_MIN_GAP = 8
-KEY_NAME_GAP = 3
-KEY_BAR_GAP = 10
-
-# The mobile legend, one row of chip-and-name items above the plot, in the design team's geometry and in
-# template pixels: the chip, the gap after it, the gap between items, the air between the header and the
-# row's box, the row's own line, and the air between the row and the first bar's ink.
-LEGEND_CHIP_PX = 12
-LEGEND_CHIP_GAP = 5
-LEGEND_ITEM_GAP = 16
-LEGEND_TOP_GAP = 12
-LEGEND_LINE_PX = 16
-LEGEND_BAR_GAP = 16
+# The desktop annotations, in template pixels: the least space two neighbouring blocks may leave between
+# them, and from a block's last line down to the first bar — the gap under the text, the arrow's own drop,
+# and the air its tip leaves above the bar. The arrow's tip keeps `ARROW_SEGMENT_INSET` inside its segment,
+# and its tail sits `ARROW_TAIL_OFFSET` to one side of the tip, which is what curves it.
+HEADER_MIN_GAP = 16
+KEY_ARROW_GAP = 5
+KEY_ARROW_PX = 24
+KEY_ARROW_BAR_GAP = 3
+ARROW_SEGMENT_INSET = 12
+ARROW_TAIL_OFFSET = 10
+ARROW_COLOR = "#858585"
 
 # A mobile country label: the name in bold, right-aligned against a column of years, which sits this far
 # from the bars, and this far from the name.
@@ -703,8 +696,7 @@ NOTE_LEAD = "Note:"
 # The mobile frame differs in more than size, and both differences are in `template_text`: its
 # footer is two rows (`Data source:` and the license, no Note and no tagline), and its content is
 # 508px against the desktop's 818. The first is why the step draws the Note as that footer's first row; the
-# second is why the key becomes a row of chips and names above the plot instead of names over the
-# segments.
+# second is why it carries no annotations over the top row, only the coloured names in the subtitle.
 #
 # Both frames run taller than their templates, by `*_EXTRA_PX`: the desktop by the 67px the design
 # team's rework added, the mobile frame by 60px. The desktop's footer is bottom-anchored, so its rows move
@@ -772,17 +764,13 @@ LAYOUTS = {
             "license_px": 11,
         },
         # In whole template pixels, like the template's own slots: the in-bar values at 13, the row
-        # labels at 12, and in the key the run-in lists at 12 on a 16px line and the bold category names
-        # at 14 on a 17px one — the design team's sizes.
+        # labels at 12, and the annotations' run-in lists at 12 on a 16px line.
         "country_font_px": 12,
         "value_font_px": 13,
-        # The design team's inset between a segment's edge and its value, which the key shares, so each
-        # key block lines up with the values under it.
+        # The design team's inset between a segment's edge and its value.
         "value_inset_px": 8,
         "key_font_px": 12,
         "key_line_px": 16,
-        "key_name_font_px": 14,
-        "key_name_line_px": 17,
         # The country's name and its survey year on a line each.
         "country_label": "two_lines",
         # Bars fill this share of a row's pitch: the design team's 25px bars on a 35px pitch, where it was
@@ -792,14 +780,14 @@ LAYOUTS = {
         "with_mins_suffix": True,
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
-        # The key over the top row, each block aligned with the values under it.
-        "group_labels": "aligned",
-        # The age group first, since it is what a reader needs to interpret any bar, then the survey
-        # scope, which is why the Note no longer carries it. "in a 24-hour day" earns its words: every bar
-        # is the same length, and nothing else on the frame says that the length is a whole day. "from X
-        # to Y", not "conducted between": the years are the ones the row labels show, and a survey labelled
-        # 2010 (France, Spain, New Zealand) ran over 2009/10.
+        # What each category holds, as an annotation over the top row with an arrow down to its segment.
+        "group_labels": "annotated",
+        # "in a 24-hour day" earns its words: every bar is the same length, and nothing else on the frame
+        # says that the length is a whole day. The years are the ones the row labels show; a survey
+        # labelled 2010 (France, Spain, New Zealand) ran over 2009/10.
         "subtitle": SUBTITLE,
+        # The legend sentence starts a line of its own (`wrap_runs`).
+        "subtitle_sentence_breaks": True,
     },
     "time_use_by_country_mobile": {
         "template": "mobile",
@@ -850,22 +838,18 @@ LAYOUTS = {
         # The desktop's 8px scaled to this frame's width, which keeps the values on the two narrowest
         # segments that the full inset would push out.
         "value_inset_px": 5,
-        # The legend's names, in the body gray at Lato Medium — the design team's choice: on a frame this
-        # narrow the member lists crowd the plot, and the chips carry the link to the bars.
-        "legend_font_px": 13,
         "with_mins_suffix": True,
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
-        # One row of chip-and-name items above the plot, not names attached to the segments: the
-        # narrowest category spans 56px against a 105px name, so names over the segments would overhang
-        # the bars they name by more than they cover.
-        "group_labels": "inline",
+        # No annotations: the subtitle's coloured names are the whole key. The member lists do not fit a
+        # frame this narrow — the narrowest top-row segment spans 56px against a list over 150px wide.
+        "group_labels": "none",
         # Name and year on one line, the years in a column of their own against the bars.
         "country_label": "year_column",
         # The design team's spacing here: 17px bars on a 26px pitch.
         "bar_fraction": 0.652,
         "note_in_band": True,
-        # The same sentence as the desktop frame, broken after its first sentence (`wrap_sentences`).
+        # The same text as the desktop frame, the legend sentence on lines of its own (`wrap_runs`).
         "subtitle": SUBTITLE,
         "subtitle_sentence_breaks": True,
     },
@@ -915,7 +899,7 @@ def sort_rows(tb: Table, layout: dict) -> Table:
 def add_main_category_totals(tb: Table) -> Table:
     """Build each drawn category from the source's own top-level columns.
 
-    Three of the four are a straight rename; "Unpaid work & other" is the one addition. The day has to
+    Three of the four are a straight rename; "Unpaid work" is the one addition. The day has to
     still close afterwards, which is what catches a source column read under the wrong name.
     """
     for group in MAIN_CATEGORY_GROUPS:
@@ -1021,14 +1005,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     fig = plt.figure(figsize=(width_px / PIXELS_PER_INCH, height_px / PIXELS_PER_INCH))
     fig.patch.set_facecolor("white")
 
-    # Step 1: Header — the template's title row, then its subtitle.
+    # Header — the template's title row, then its subtitle, whose category names are the legend.
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], PLAYFAIR_SLOT_SLACK)
-    subtitle_text = layout["subtitle"].format(first=tb["year"].min(), last=tb["year"].max())
+    tokens = subtitle_tokens(layout["subtitle"], layout["groups"], int(tb["year"].min()), int(tb["year"].max()))
     subtitle_box = subtitle_box_px(template, margin_px, lines_in(title))
-    subtitle = (
-        wrap_sentences(subtitle_text, subtitle_box, template["subtitle_px"])
-        if layout.get("subtitle_sentence_breaks")
-        else wrap_balanced(subtitle_text, subtitle_box, template["subtitle_px"])
+    subtitle_lines = wrap_runs(
+        tokens, subtitle_box, template["subtitle_px"], by_sentence=bool(layout.get("subtitle_sentence_breaks"))
     )
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
@@ -1036,24 +1018,25 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     draw_slot(
         fig, fx(margin_px), fy(template["origin_y"]), title, template["title_px"], TEMPLATE_TITLE_LINE_PX, "title"
     )
-    draw_slot(
+    draw_rich_lines(
         fig,
-        fx(margin_px),
-        fy(subtitle_y),
-        subtitle,
+        subtitle_lines,
+        margin_px,
+        subtitle_y,
         template["subtitle_px"],
         template["subtitle_line_px"],
         "subtitle",
-        color=TEXT_COLOR,
+        fx,
+        fy,
     )
 
-    # Step 2: Footer, in the slots the static-chart templates define. A frame with no Note slot draws its
+    # Footer, in the slots the static-chart templates define. A frame with no Note slot draws its
     # Note at the foot of the chart band instead, and the footer is told there is none.
     note = build_note(ages, layout)
     band_note = note if layout.get("note_in_band") else None
     draw_footer(fig, None if band_note else note, source_citation, layout, fx, fy)
 
-    # Step 3: The plot's horizontal extent, set by the country label column.
+    # The plot's horizontal extent, set by the country label column.
     countries = [str(SHORT_COUNTRY_NAMES.get(country, country)) for country in tb["country"].tolist()]
     years = [str(year) for year in tb["year"].tolist()]
     country_font = font_pt(layout, "country_font_px")
@@ -1070,36 +1053,32 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     plot_width_px = (width_px - margin_px) - plot_left_px
     px_per_min = plot_width_px / MINUTES_PER_DAY
 
-    # Step 4: The band between the subtitle's ink and the footer's, and the key's room in it.
+    # The band between the subtitle's ink and the footer's, and the key's room in it.
     label_mode = layout["group_labels"]
-    assert label_mode in {"aligned", "inline"}, f"Unknown group_labels {label_mode!r}."
-    band_top = subtitle_y + lines_in(subtitle) * template["subtitle_line_px"]
+    assert label_mode in {"annotated", "none"}, f"Unknown group_labels {label_mode!r}."
+    band_top = subtitle_y + len(subtitle_lines) * template["subtitle_line_px"]
     # The band stops at the Note, whether the template's slot holds it or the step draws it as the
-    # footer's first row. Under an inline legend the foot repeats the legend's top air, so the chart
-    # sits evenly in the band.
+    # footer's first row.
     band_bottom = template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
-    foot_px = LEGEND_TOP_GAP if label_mode == "inline" else BAND_INSET
     # Where the last bar's INK has to stop. A bar fills `bar_fraction` of its row, centred, so it stops
     # half an inter-bar gap short of the axes' own bottom edge, and starts the same share below its top.
-    ink_bottom_px = band_bottom - foot_px
+    ink_bottom_px = band_bottom - BAND_INSET
     bar_fraction = layout["bar_fraction"]
     bar_head_rows = (1 - bar_fraction) / 2
     n_rows = len(tb)
 
     key = []
-    if label_mode == "aligned":
-        key = key_blocks(segment_spans(tb.iloc[0], px_per_min, layout["groups"]), layout)
-        collision = key_blocks_collide(key)
-        assert not collision, f"The key blocks for {collision} would touch. Re-break their `key_lines`."
+    if label_mode == "annotated":
+        spans = segment_spans(tb.iloc[0], px_per_min, layout["groups"])
+        key = key_blocks(spans, layout, (margin_px - plot_left_px, width_px - margin_px - plot_left_px))
         # Where the first bar's ink has to start so every block fits above it, then the axes top that puts
         # it there: the pitch is solved from the axes top, so the two are one equation, not an iteration.
         subtitle_right_px = margin_px + max(
-            text_width_px(line, template["subtitle_px"] * POINTS_PER_PIXEL) for line in subtitle.split("\n")
+            rich_line_width_px(line, template["subtitle_px"]) for line in subtitle_lines
         )
         bars_top_px = key_header_px(key, plot_left_px, band_top, subtitle_right_px)
     else:
-        # The legend is one row above the plot, so the first bar starts under it and the air around it.
-        bars_top_px = band_top + LEGEND_TOP_GAP + LEGEND_LINE_PX + LEGEND_BAR_GAP
+        bars_top_px = band_top + BAND_INSET
     share = bar_head_rows / (n_rows - bar_head_rows)
     chart_top_px = (bars_top_px - share * ink_bottom_px) / (1 - share)
     row_pitch_px = (ink_bottom_px - chart_top_px) / (n_rows - bar_head_rows)
@@ -1120,9 +1099,9 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     ax.set_axis_off()
     ax.patch.set_visible(False)
     ax.set_xlim(0, plot_width_px / px_per_min)
-    ax.set_ylim(n_rows, 0)  # row 0 at the top; the key lives above it
+    ax.set_ylim(n_rows, 0)  # row 0 at the top; the annotations live above it
 
-    # Step 5: The bars, their values and the country labels.
+    # The bars, their values and the country labels.
     group_colors = {group["column"]: resolve_color(group["color"], palette) for group in layout["groups"]}
     draw_bars(
         ax,
@@ -1136,11 +1115,9 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         value_label_columns(tb, px_per_min, layout),
     )
 
-    # Step 6: The key.
-    if label_mode == "inline":
-        draw_inline_legend(fig, layout, palette, band_top + LEGEND_TOP_GAP, fx, fy)
-    else:
-        draw_key(fig, key, plot_left_px, chart_top_px + bar_head_rows * row_pitch_px, layout, palette, fx, fy)
+    # The annotations over the top row.
+    if key:
+        draw_key(fig, key, plot_left_px, chart_top_px + bar_head_rows * row_pitch_px, layout, fx, fy)
 
     if band_note is not None:
         # `chart__note`, not `note`: the Figma pass drops the step's copies of the template's own text
@@ -1167,35 +1144,118 @@ def subtitle_box_px(template: dict, margin_px: float, title_lines: int) -> float
     return template["subtitle_slot_px"]
 
 
-def wrap_balanced(text: str, slot_px: float, size_px: float) -> str:
-    """Wrap into the fewest lines the slot allows, then as evenly as those lines allow.
+def subtitle_tokens(text: str, groups: list[dict], first: int, last: int) -> list[list[tuple[str, bool, str]]]:
+    """The subtitle as words, each a list of (text, bold, color) pieces, with the legend filled in.
 
-    The design team breaks the subtitle into lines of about equal length rather than filling the first
-    one, which also leaves the desktop key room to rise beside its shorter lines. The breaks are
-    explicit, so the frame's subtitle takes the same text with the same `\\n`.
+    `{categories}` becomes the category names in bar order — "paid work & study, unpaid work, personal
+    care, and leisure" — each word in bold and in its segment's colour, which is what makes the sentence
+    the legend. Punctuation that follows a name rides in the same word as a plain piece, so a line can
+    never break between a name and its comma.
     """
-    fewest = lines_in(wrap_to_slot(text, slot_px, size_px))
-    low, high = 0.0, slot_px
-    for _ in range(30):
-        mid = (low + high) / 2
-        if lines_in(wrap_to_slot(text, mid, size_px)) <= fewest:
-            high = mid
-        else:
-            low = mid
-    return wrap_to_slot(text, high, size_px)
+    before, after = text.format(first=first, last=last, categories="\0").split("\0")
+    runs: list[tuple[str, bool, str]] = [(before, False, TEXT_COLOR)]
+    for index, group in enumerate(groups):
+        if index:
+            runs.append((", and " if index == len(groups) - 1 else ", ", False, TEXT_COLOR))
+        runs.append((lowercase_label(group["label"]), True, rgb_to_hex(header_text_color(group["color"], None))))
+    runs.append((after, False, TEXT_COLOR))
+
+    words: list[list[tuple[str, bool, str]]] = [[]]
+    for run_text, bold, color in runs:
+        for index, chunk in enumerate(run_text.split(" ")):
+            if index:
+                words.append([])
+            if chunk:
+                words[-1].append((chunk, bold, color))
+    return [word for word in words if word]
 
 
-def wrap_sentences(text: str, slot_px: float, size_px: float) -> str:
-    """Wrap each sentence on lines of its own, unless that costs a line over the plain wrap.
+def lowercase_label(label: str) -> str:
+    """A category name as it reads inside a sentence: "Paid work & study" -> "paid work & study"."""
+    return label if label[1:2].isupper() else label[:1].lower() + label[1:]
 
-    A sentence boundary outranks balance: a second sentence that starts mid-line reads as a run-on, so it
-    starts a line of its own wherever that adds no line. Otherwise this falls back to `wrap_balanced`.
+
+def rgb_to_hex(color) -> str:
+    """A color as `#rrggbb`, the form the SVG carries and Figma's styles are looked up by."""
+    return "#" + "".join(f"{round(channel * 255):02x}" for channel in to_rgb(color))
+
+
+def word_width_px(word: list[tuple[str, bool, str]], size_px: float) -> float:
+    """A word's advance: its pieces laid end to end, each in its own weight."""
+    return sum(text_advance_px(text, size_px * POINTS_PER_PIXEL, bold) for text, bold, _ in word)
+
+
+def rich_line_width_px(line: list[list[tuple[str, bool, str]]], size_px: float) -> float:
+    """A wrapped line's width: its words and one space between each pair."""
+    fontsize = size_px * POINTS_PER_PIXEL
+    space = text_advance_px("a ", fontsize) - text_advance_px("a", fontsize)
+    return sum(word_width_px(word, size_px) for word in line) + space * (len(line) - 1)
+
+
+def wrap_runs(
+    words: list[list[tuple[str, bool, str]]], slot_px: float, size_px: float, by_sentence: bool = False
+) -> list[list[list[tuple[str, bool, str]]]]:
+    """Wrap mixed-style words into the slot greedily; with `by_sentence`, each sentence on lines of its own.
+
+    A sentence boundary outranks filling the line, since a second sentence that starts mid-line reads as a
+    run-on — unless starting it afresh costs a line over the plain wrap. The line breaks are explicit, so
+    the frame's subtitle takes the same text with the same breaks.
     """
-    sentences = re.split(r"(?<=\.)\s+", text.strip())
-    by_sentence = "\n".join(wrap_to_slot(sentence, slot_px, size_px) for sentence in sentences)
-    if lines_in(by_sentence) <= lines_in(wrap_to_slot(text, slot_px, size_px)):
-        return by_sentence
-    return wrap_balanced(text, slot_px, size_px)
+
+    def greedy(chunk: list) -> list:
+        lines: list = [[]]
+        for word in chunk:
+            if lines[-1] and not fits_slot(rich_line_width_px([*lines[-1], word], size_px), slot_px):
+                lines.append([])
+            lines[-1].append(word)
+        return lines
+
+    plain = greedy(words)
+    if not by_sentence:
+        return plain
+    sentences: list = [[]]
+    for word in words:
+        sentences[-1].append(word)
+        if word[-1][0].endswith("."):
+            sentences.append([])
+    by_sentences = [line for sentence in sentences if sentence for line in greedy(sentence)]
+    return by_sentences if len(by_sentences) <= len(plain) else plain
+
+
+def draw_rich_lines(
+    fig, lines: list, x_px: float, y_px: float, size_px: float, line_height_px: float, gid: str, fx, fy
+) -> None:
+    """Draw wrapped mixed-style lines, one text object per run of same-styled pieces.
+
+    Runs carry their trailing space, never a leading one: `TextPath` cannot see a leading space, so a run
+    beginning with one would be laid out flush against the run before it. Each line sits on its own
+    baseline with its ink centred in its line box, so bold and regular runs share it exactly.
+    """
+    fontsize = size_px * POINTS_PER_PIXEL
+    for line_index, line in enumerate(lines):
+        runs: list[list] = []
+        for word_index, word in enumerate(line):
+            for piece_index, (text, bold, color) in enumerate(word):
+                trailing = " " if piece_index == len(word) - 1 and word_index < len(line) - 1 else ""
+                if runs and runs[-1][1:] == [bold, color]:
+                    runs[-1][0] += text + trailing
+                else:
+                    runs.append([text + trailing, bold, color])
+        baseline_px = y_px + line_index * line_height_px + line_height_px / 2 + cap_height_px(fontsize) / 2
+        cursor = x_px
+        for run_index, (text, bold, color) in enumerate(runs):
+            fig.text(
+                fx(cursor),
+                fy(baseline_px),
+                text.rstrip(),
+                ha="left",
+                va="baseline",
+                fontsize=fontsize,
+                fontweight="bold" if bold else "normal",
+                color=color,
+                gid=f"{gid}-{line_index}-{run_index}",
+            )
+            cursor += text_advance_px(text, fontsize, bold)
 
 
 def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str, int]:
@@ -1329,7 +1389,7 @@ def draw_bars(
             )
             if label:
                 # Left at the segment's start, and the last one right at the bar's end, so the values line
-                # up down each column with the key over them.
+                # up down each column.
                 ax.text(
                     left + minutes - inset / px_per_min if last else left + inset / px_per_min,
                     row + baseline(font_pt(layout, "value_font_px")),
@@ -1343,111 +1403,123 @@ def draw_bars(
             left += minutes
 
 
-def key_blocks(spans: dict, layout: dict) -> list[dict]:
-    """Measure the desktop key: per category, its list over its name, aligned with the values under it.
+def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[dict]:
+    """Place the desktop annotations: each category's run-in list over the top row, arrowed to its segment.
 
-    Each block is anchored where the top row's value sits — left at its segment's start plus
-    `value_inset_px`, and the last one right at the bar's end — and is as wide as its widest line.
+    Each block starts centred over its top-row segment, then is pushed sideways until neighbours clear
+    each other by `HEADER_MIN_GAP` and every block sits inside the frame's content column (`bounds`, in
+    plot px, so it may reach over the country labels). The last block is set right-aligned, the rest
+    left-aligned. The arrow's tip lands on its segment, as near the block's centre as the segment allows.
     """
-    plot_end = spans[layout["groups"][-1]["column"]][1]
-    list_font, name_font = font_pt(layout, "key_font_px"), font_pt(layout, "key_name_font_px")
+    list_font = font_pt(layout, "key_font_px")
     blocks = []
-    for index, category in enumerate(layout["categories"]):
-        last = index == len(layout["categories"]) - 1
-        start = spans[category["columns"][0]][0]
-        anchor = plot_end - layout["value_inset_px"] if last else start + layout["value_inset_px"]
-        width = max(
-            *(text_advance_px(line, list_font) for line in category["key_lines"]),
-            *(text_advance_px(line, name_font, bold=True) for line in category["label_lines"]),
-        )
+    for category in layout["categories"]:
+        start, end = spans[category["columns"][0]]
+        width = max(text_advance_px(line, list_font) for line in category["key_lines"])
+        centre = (start + end) / 2
         blocks.append(
             {
                 "category": category,
-                "anchor": anchor,
-                "align": "right" if last else "left",
-                "extent": (anchor - width, anchor) if last else (anchor, anchor + width),
-                # The block's box, from the bars up: the air over the bar, the name, the gap, the list.
-                "height": KEY_BAR_GAP
-                + len(category["label_lines"]) * layout["key_name_line_px"]
-                + KEY_NAME_GAP
-                + len(category["key_lines"]) * layout["key_line_px"],
+                "segment": (start, end),
+                "extent": [centre - width / 2, centre + width / 2],
+                "height": len(category["key_lines"]) * layout["key_line_px"]
+                + KEY_ARROW_GAP
+                + KEY_ARROW_PX
+                + KEY_ARROW_BAR_GAP,
             }
         )
+    low, high = bounds
+    # Left to right, push each block clear of the one before it and of the left edge; then right to left,
+    # pull each one back inside the right edge and clear of the one after it.
+    floor = low
+    for block in blocks:
+        shift = max(0.0, floor - block["extent"][0])
+        block["extent"] = [block["extent"][0] + shift, block["extent"][1] + shift]
+        floor = block["extent"][1] + HEADER_MIN_GAP
+    ceiling = high
+    for block in reversed(blocks):
+        shift = max(0.0, block["extent"][1] - ceiling)
+        block["extent"] = [block["extent"][0] - shift, block["extent"][1] - shift]
+        ceiling = block["extent"][0] - HEADER_MIN_GAP
+    for index, block in enumerate(blocks):
+        last = index == len(blocks) - 1
+        block["align"] = "right" if last else "left"
+        block["anchor"] = block["extent"][1] if last else block["extent"][0]
+        seg_start, seg_end = block["segment"]
+        centre = sum(block["extent"]) / 2
+        block["tip"] = min(max(centre, seg_start + ARROW_SEGMENT_INSET), seg_end - ARROW_SEGMENT_INSET)
+    collision = key_blocks_collide(blocks)
+    assert not collision, f"The annotations for {collision} would touch. Re-break their `key_lines`."
+    assert blocks[0]["extent"][0] >= low - 0.01, "The annotations overrun the frame's content column."
     return blocks
 
 
 def key_blocks_collide(blocks: list[dict]) -> str | None:
     """The first pair of neighbouring key blocks that touch, or None if they all clear each other."""
     for left, right in zip(blocks, blocks[1:]):
-        if overlaps(left["extent"], right["extent"], HEADER_MIN_GAP):
+        if overlaps(tuple(left["extent"]), tuple(right["extent"]), HEADER_MIN_GAP - 0.01):
             return f"{left['category']['name']} and {right['category']['name']}"
     return None
 
 
 def key_header_px(blocks: list[dict], plot_left_px: float, band_top: float, subtitle_right_px: float) -> float:
-    """Where the first bar's ink has to start so that every key block fits above it, in frame px.
+    """Where the first bar's ink has to start so that every annotation fits above it, in frame px.
 
     A block under the subtitle has to clear it by `BAND_INSET`, like any plot ink. One that clears the
-    subtitle SIDEWAYS may rise to the header's bottom edge instead, beside the subtitle's shorter lines —
-    which is where the design team put the two four-line lists.
+    subtitle SIDEWAYS may rise to the header's bottom edge instead, beside the subtitle's shorter lines.
     """
     needed = []
     for block in blocks:
-        start, end = (plot_left_px + x for x in block["extent"])
+        start = plot_left_px + block["extent"][0]
         beside = start >= subtitle_right_px + HEADER_MIN_GAP
         needed.append((band_top if beside else band_top + BAND_INSET) + block["height"])
     return max(needed)
 
 
-def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, layout: dict, palette, fx, fy) -> None:
-    """Draw the desktop key: each category's run-in list, and under it, nearest the bars, its name.
+def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, layout: dict, fx, fy) -> None:
+    """Draw the desktop annotations: each category's run-in list, and an arrow from it down to its segment.
 
-    One text node per line, each placed on its own baseline with its ink centred in its line box, as
-    the bars' values are; the line breaks are the design team's.
+    One text node per line, each on its own baseline with its ink centred in its line box, as the bars'
+    values are. The arrow curves: its tail sits beside the tip, towards the block's centre.
     """
-    list_font, name_font = font_pt(layout, "key_font_px"), font_pt(layout, "key_name_font_px")
+    list_font = font_pt(layout, "key_font_px")
+    line = layout["key_line_px"]
+    arrow_bottom = bars_top_px - KEY_ARROW_BAR_GAP
+    arrow_top = arrow_bottom - KEY_ARROW_PX
     for block in blocks:
         category = block["category"]
         slug = slugify(category["name"])
-        x = fx(plot_left_px + block["anchor"])
-        name_top = bars_top_px - KEY_BAR_GAP - len(category["label_lines"]) * layout["key_name_line_px"]
-        list_top = name_top - KEY_NAME_GAP - len(category["key_lines"]) * layout["key_line_px"]
-        rows = [
-            (
-                line,
-                list_top + index * layout["key_line_px"],
-                layout["key_line_px"],
-                list_font,
-                False,
-                f"key__{slug}-members",
-            )
-            for index, line in enumerate(category["key_lines"])
-        ] + [
-            (
-                line,
-                name_top + index * layout["key_name_line_px"],
-                layout["key_name_line_px"],
-                name_font,
-                True,
-                f"category__{slug}",
-            )
-            for index, line in enumerate(category["label_lines"])
-        ]
-        seen: dict[str, int] = {}
-        for text, top, line, fontsize, bold, gid in rows:
-            count = seen.get(gid, 0)
-            seen[gid] = count + 1
+        list_top = arrow_top - KEY_ARROW_GAP - len(category["key_lines"]) * line
+        for index, text in enumerate(category["key_lines"]):
             fig.text(
-                x,
-                fy(top + line / 2 + cap_height_px(fontsize) / 2),
+                fx(plot_left_px + block["anchor"]),
+                fy(list_top + index * line + line / 2 + cap_height_px(list_font) / 2),
                 text,
                 ha=block["align"],
                 va="baseline",
-                fontsize=fontsize,
-                fontweight="bold" if bold else "normal",
-                color=header_text_color(category["color"], palette) if bold else MEMBER_TEXT_COLOR,
-                gid=gid if count == 0 else f"{gid}-line{count}",
+                fontsize=list_font,
+                color=MEMBER_TEXT_COLOR,
+                gid=f"key__{slug}-members" if index == 0 else f"key__{slug}-members-line{index}",
             )
+        tip = block["tip"]
+        # The tail leans towards the block's centre, so a block placed off its segment points across to it.
+        lean = -1 if sum(block["extent"]) / 2 < tip else 1
+        tail = tip + lean * ARROW_TAIL_OFFSET
+        fig.add_artist(
+            FancyArrowPatch(
+                (fx(plot_left_px + tail), fy(arrow_top)),
+                (fx(plot_left_px + tip), fy(arrow_bottom)),
+                transform=fig.transFigure,
+                connectionstyle=f"arc3,rad={0.35 * lean}",
+                arrowstyle="-|>,head_length=4,head_width=2.5",
+                mutation_scale=1,
+                linewidth=0.9,
+                color=ARROW_COLOR,
+                shrinkA=0,
+                shrinkB=0,
+                gid=f"key__{slug}-arrow",
+            )
+        )
 
 
 def check_key_lines() -> None:
@@ -1457,70 +1529,19 @@ def check_key_lines() -> None:
             f"The key lines for {category['name']} no longer spell out its members: re-break "
             f"{run_in_list(category['members'])!r}."
         )
-        assert " ".join(category["label_lines"]) == category["name"], (
-            f"The name lines for {category['name']} no longer spell out its name."
-        )
 
 
 def run_in_list(members: list[str]) -> str:
     """The members as one comma-separated phrase, in sentence case: "Paid work, commuting, homework".
 
-    The desktop key stacks one name per line, where each is a label and keeps its capital; inline, they
-    are a list inside a phrase, which the style guide sets in sentence case. A word that opens with two
-    capitals is an abbreviation ("TV & radio") and keeps them.
+    They are a list inside a phrase, which the style guide sets in sentence case. A word that opens with
+    two capitals is an abbreviation ("TV & radio") and keeps them.
     """
 
     def lowered(name: str) -> str:
         return name if name[1:2].isupper() else name[:1].lower() + name[1:]
 
     return ", ".join([members[0], *(lowered(name) for name in members[1:])])
-
-
-def draw_inline_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
-    """The mobile key: one row of items, each a colour chip and the category's name, from the margin.
-
-    The names are the only text: the member lists crowd a frame this narrow, and the chip, at the bar's
-    own fill and opacity, carries the link to the segment. Asserted to fit the content width.
-    """
-    fontsize = font_pt(layout, "legend_font_px")
-    width_px, height_px = layout["size"]
-    centre_px = top_px + LEGEND_LINE_PX / 2
-    baseline_px = centre_px + cap_height_px(fontsize) / 2
-    cursor = layout["margin"]
-    for group in layout["groups"]:
-        column = slugify(group["column"])
-        fig.add_artist(
-            Rectangle(
-                (fx(cursor), fy(centre_px + LEGEND_CHIP_PX / 2)),
-                LEGEND_CHIP_PX / width_px,
-                LEGEND_CHIP_PX / height_px,
-                transform=fig.transFigure,
-                facecolor=resolve_color(group["color"], palette),
-                alpha=SEGMENT_ALPHA,
-                linewidth=0,
-                gid=f"legend__{column}-chip",
-            )
-        )
-        cursor += LEGEND_CHIP_PX + LEGEND_CHIP_GAP
-        drawn, ink_px, step_px = place_run(group["label"], fontsize)
-        # Ink-centred, the anchor that survives Figma's narrower face (see `draw_run_row`).
-        fig.text(
-            fx(cursor + ink_px / 2),
-            fy(baseline_px),
-            drawn,
-            ha="center",
-            va="baseline",
-            fontsize=fontsize,
-            fontweight="medium",
-            color=MEMBER_TEXT_COLOR,
-            gid=f"legend__{column}",
-        )
-        cursor += step_px + LEGEND_ITEM_GAP
-    content_end = width_px - layout["margin"]
-    assert fits_slot(cursor - LEGEND_ITEM_GAP - layout["margin"], content_end - layout["margin"]), (
-        f"The legend row needs {cursor - LEGEND_ITEM_GAP - layout['margin']:.0f}px of the frame's "
-        f"{content_end - layout['margin']:.0f}px."
-    )
 
 
 def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, fy) -> None:
@@ -2124,26 +2145,31 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     # spend on things said nowhere else. With the 2010 cutoff there are no exceptions left, so this is
     # normally empty — it exists for a release that adds an older survey back.
     ages_sentence = f"Estimates cover people aged 15 to 64, except in {exceptions}. " if exceptions else ""
-    # The survey scope is the subtitle's now ("each country's most recent time-use survey in the OECD
-    # data" — "in the OECD data" because the OECD does not refresh a country the moment it runs a new
-    # survey: Korea is shown at 2014 while Statistics Korea has published 2019 and 2024 rounds).
     text = f"{NOTE_LEAD} " + ages_sentence
-    # The Note's two lines go to what a reader needs to read a bar right, and only that.
+    # The Note's lines go to what a reader needs to read a bar right, and only that.
     #
-    # First, what the averages are over. A reader who sees 2h 57m of paid work in Italy reads it as a
-    # short working day; it is the average across everyone aged 15 to 64, working or not, and across all
-    # seven days (the workbook: "both weekdays and weekends").
+    # First, what the averages are over, and what that does to paid work. A reader who sees 2h 57m of
+    # paid work in Italy reads it as a short working day; it is the average across everyone aged 15 to 64,
+    # working or not. "Everyone" is not stated in the workbook but follows from the data: each country's
+    # categories add up to the whole day, which averages over participants only would not. "Weekdays and
+    # weekends" is the workbook's own phrase; it does not say how each survey weights its diary days, so
+    # the Note does not claim "all seven days".
     #
-    # Then the comparability caveat, in general terms. It used to name two countries. Mexico is now left
-    # off the chart (`NOT_COMPARABLE`). Japan's non-commuting travel ("11. Moving (excluding commuting)")
-    # is mapped to the source's 5.2 "other (no categories)", which this chart folds into "Unpaid work &
-    # other" — not into unpaid work, as the old sentence said — and at 37 min/day that bucket sits with
-    # Finland's and Turkey's 40, so no bar on the chart stands out for it. The workbook does not say
-    # "harmonizes"; what its activity sheet shows is each survey's codes mapped onto common categories.
+    # Then what the green segment holds beyond unpaid work: the source's code 5, folded in here (see
+    # `MAIN_CATEGORY_GROUPS`). Per the workbook's activity sheet, 5.1 is religious/spiritual activities and
+    # civic obligations, and 5.2 "other (no categories)" is whatever the OECD did not assign elsewhere,
+    # which differs by survey: diary filling and residual minutes; waiting, "doing nothing" and travel to
+    # leisure activities (Canada); all travel except commuting (Japan, per the footnote on the Total
+    # sheet — its mapping column still describes the 2016 survey); and unspecified travel (HETUS 2020
+    # countries, UK, Germany, Italy), which Belgium, Hungary and Luxembourg count under personal care
+    # instead. Hence "some travel", without naming a kind.
+    #
+    # No generic comparability sentence: it named no comparison a reader could act on. The one country
+    # the OECD flags as not comparable is left off the chart (`NOT_COMPARABLE`).
     text += (
-        "Figures are averaged across everyone aged 15 to 64, including people who don't work or study, and "
-        "across all days of the week. The OECD groups each country's survey activities into common "
-        "categories, but differences between the surveys can still affect comparisons."
+        "Averages cover everyone aged 15 to 64, on weekdays and weekends alike. Days off and people not "
+        "working or studying count as zero hours of paid work and study. Unpaid work also includes religious "
+        "and civic activities, and time the OECD doesn't assign to another category, including some travel."
     )
     # Against the narrower of the Note's own slot and the content width — the slot is the template's,
     # but a mobile frame's content is narrower than it.
