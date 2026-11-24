@@ -28,15 +28,9 @@ BEFORE_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income
 AFTER_TAX_INEQUALITY_SUBTITLE = "Inequality is measured here in terms of income after taxes and benefits."
 
 # Set on every view, grouped ones included (the config's common_views don't reach the views that
-# group_views creates). The related link is the one the explorer showed in a block below the chart.
+# group_views creates).
 COMMON_VIEW_CONFIG = {
     "originUrl": "https://ourworldindata.org/economic-inequality",
-    "relatedQuestions": [
-        {
-            "url": "https://ourworldindata.org/owid-data-collection-inequality-and-poverty",
-            "text": "OWID Data Collection: Inequality and Poverty",
-        }
-    ],
 }
 
 EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
