@@ -74,8 +74,6 @@ https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-
   https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29611-8
   A clone of `Static Chart Template_Mobile (example 2)` (`24590:32`, 540x824) run 60px taller, at
   x=2550, its own unstyled import parked at x=1930. The published 2023 image sits leftmost, at x=-860.
-  It still carries the chip legend and the previous subtitle and Note: the coloured-subtitle render
-  has been re-imported into the desktop frame only.
 
 **The node ids are a convenience; the frame NAME is the durable join.** It is the kebab-case slug the
 website exports the PNG by, so it is the one string shared by the layer panel, the exported file and
@@ -215,14 +213,14 @@ spaced by measured advance. Desktop
 and mobile go in one call, since they share a page; it also replaces each frame's parked reference copy.
 The template text slots are not touched by it, so a copy change still means editing them in the frame.
 A render that CHANGES a colour cannot inherit: the old chart never bound the new hex, and the script
-refuses. Inheritance is keyed by colour AND kind, so a new shape in a colour the old chart only used
-for text (the arrows' gray, first imported when the old chart had no arrows) is refused the same way.
-Run it then with `inheritStyles: false`, `families: []` and `bodyTextParent:
+refuses. Inheritance is keyed by colour AND kind, so a shape in a colour the old chart only used for
+text is refused the same way — and that is the desktop frame's standing case: its chart carries house
+arrows (below) rather than the step's, so the step's arrow shapes never have an old binding to join.
+Run the DESKTOP job with `inheritStyles: false`, `families: []` and `bodyTextParent:
 /(__label(-year)?$)|(^key__.*-members(-line\d+)?$)/` (country labels, years and lists to the body
 style), then bind each palette hex on the `__main-*` bars to its `Default Palette/*` style (the import
-already carries `SEGMENT_ALPHA` as node opacity, so there is none to move), and the arrows' fill and
-stroke to `Text/Gray 80`. The frame's chart now binds every colour the render uses, so the next re-import
-can inherit again.
+already carries `SEGMENT_ALPHA` as node opacity, so there is none to move). The MOBILE job inherits
+(`inheritStyles: true`); its one orphaned binding, the old chip legend's annotation style, is expected.
 
 After the restyle, **snap the chart box onto the 16..834 column and centre it in the band**, moving the
 children back so no ink shifts. The country labels' boxes end short of the margin in Lato (left edge
@@ -239,12 +237,26 @@ left as imported:
 
 with `"align": "MAX"` for `leisure`, the right-aligned last block. Mobile has no annotations.
 
+**Then swap the step's four arrows for house arrows**, with `/owid-staff:create-figma-chart`'s
+`scripts/aim_house_arrow.js`, one job per arrow in one call. The step draws each arrow as a curve
+(`key__<slug>-arrow`) and a dart (`key__<slug>-arrow-head`) to the house geometry, so it previews the
+frame; the house arrow is the library's own dart and 1px curve, bound to `Data Insights/Annotations`.
+Read each import's tail (the curve's start), control (the cubic's `(3(c1 + c2) - S - E) / 4`) and tip
+(the dart's vertex farthest from its centroid), and pass them with `name: annotation__arrow-<slug>` and
+`replaceIds` the curve and the dart. Pass the CHART's id as both `frameId` and `parentId`, with the
+points in the chart's own coordinates: `chart` is a clipping frame, not a group, and the script refuses
+points given in the outer frame's coordinates (the dart lands off by the chart's offset). Its gate
+reports `arrow-variety` for the two pairs that lean the same way at the same angle; the notes share one
+height and the house minimum length leaves no room for a third angle, so that row is a standing REVIEW.
+
 **On mobile, the Note then moves out of `chart` into the footer**, as the footer's first child: one Lato
 12 text joined from the `chart__note*` runs, `Note:` set bold, `Text/Gray 70`, width FILL and line height
 auto. Crop `chart` to its children's boxes and re-pin the footer to the 16px bottom margin. Left in the chart, the imported runs keep this
 step's ink-tight boxes, and the gap to `Data source:` no longer matches the gap between the footer's own
-rows. A re-import whose Note text is unchanged deletes the `chart__note*` runs from the copy to be styled
-before the restyle, since the footer already holds the Note.
+rows. A re-import deletes the `chart__note*` runs from the copy to be styled before the restyle, since
+the footer already holds the Note; when the Note's wording changed, set the footer row's text by hand
+(`Note:` Bold, the rest Regular) and re-pin the footer to the bottom margin before the restyle, so the
+fit measures the band the new Note leaves.
 
 **The mobile frame's own slots carry the design team's sizes**, which the template's styles do not: the
 header at y=12 with a 4px gap, the title at 24px and the subtitle at 15px (line height auto), its box
@@ -261,6 +273,9 @@ palette is the design team's call.
 """
 
 import logging
+import re
+from html import escape
+from math import atan2, degrees
 from pathlib import Path
 
 import matplotlib
@@ -269,7 +284,8 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties, findfont
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import PathPatch, Polygon
+from matplotlib.path import Path as MplPath
 from matplotlib.textpath import TextPath
 from owid.catalog import Table
 
@@ -677,17 +693,32 @@ SEGMENT_GAP_PX = 1
 COUNTRY_LINE_PX = 14
 
 # The desktop annotations, in template pixels: the least space two neighbouring blocks may leave between
-# them, and from a block's last line down to the first bar — the gap under the text, the arrow's own drop,
-# and the air its tip leaves above the bar. The arrow's tip keeps `ARROW_SEGMENT_INSET` inside its segment,
-# and its tail sits `ARROW_TAIL_OFFSET` to one side of the tip, which is what curves it.
+# them.
 HEADER_MIN_GAP = 16
-KEY_ARROW_GAP = 5
-KEY_ARROW_PX = 24
-KEY_ARROW_BAR_GAP = 3
+
+# The arrows from each annotation to its segment, in the house style of the Charts file's curvy arrows
+# (`/owid-staff:create-figma-chart`, ANNOTATIONS-AND-ARROWS.md), which the Figma frame swaps in for these:
+# a 1px curve bowed by a quarter of its chord, a filled dart about 1.4 times as long as it is wide, the
+# curve stopping inside the dart, and no arrow shorter than the library's shortest (45px on a 540-wide
+# frame, so 72 at 850). In template pixels: the clearance under the list, the drop from tail to tip, the
+# air the tip leaves above its bar, the tail's inset from the end of the list nearer the tip, the tip's
+# inset from its segment's ends, the bow as a share of the chord, the dart, and how far behind the tip
+# the curve stops.
+KEY_ARROW_GAP = 4
+ARROW_DROP_PX = 44
+ARROW_TIP_GAP = 5
+ARROW_MIN_LENGTH_PX = 72
+ARROW_TAIL_INSET = 20
 ARROW_SEGMENT_INSET = 12
-ARROW_TAIL_OFFSET = 10
+ARROW_BOW = 0.26
+ARROW_HEAD_LENGTH_PX = 11
+ARROW_HEAD_WIDTH_PX = 8
+ARROW_CURVE_BACK_PX = 7
+# The least angle the arrow may arrive at against the bar's top edge, so it reads as pointing down at the
+# segment rather than sliding along it.
+ARROW_MIN_ARRIVAL_DEG = 45
 # The arrows take their list's gray, which is a library style (`Text/Gray 80`): a gray the frame has no
-# style for would be left unbound, and a re-import could not inherit it from the previous chart.
+# style for would be left unbound.
 ARROW_COLOR = MEMBER_TEXT_COLOR
 
 # A mobile country label: the name in bold, right-aligned against a column of years, which sits this far
@@ -882,7 +913,7 @@ def run() -> None:
     paths.log.info(f"Source citation: {source_citation}")
 
     for short_name, layout in LAYOUTS.items():
-        fig = create_visualization(sort_rows(tb, layout), ages, source_citation, layout)
+        fig, subtitle_runs = create_visualization(sort_rows(tb, layout), ages, source_citation, layout)
         # `export_frame` sweeps the clipping, saves the PNG opaque and the SVG transparent, and — the
         # reason to pass `template` — asserts the figure really is the size of the frame it names. That
         # check is what stands behind a hand-measured `size`: the registry carries the design team's
@@ -890,6 +921,7 @@ def run() -> None:
         # too, which is how `/create-static-viz`'s `verify_static_viz.py` knows which template to hold
         # `..._mobile.svg` against. Both frames run taller than their templates, so the height is passed.
         export_frame(paths, fig, short_name, template=layout["template"], height_px=layout["size"][1])
+        merge_runs_in_svg(paths.directory / f"{short_name}.svg", "subtitle", subtitle_runs)
         plt.close(fig)
 
 
@@ -991,7 +1023,9 @@ def build_source_citation(tb: Table) -> str:
 # ---------------------------------------------------------------------------
 
 
-def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, layout: dict) -> plt.Figure:
+def create_visualization(
+    tb: Table, ages: dict[str, str], source_citation: str, layout: dict
+) -> tuple[plt.Figure, list[list[tuple[str, bool, str]]]]:
     """Build one version of the stacked-bar chart.
 
     Layout notes:
@@ -1032,7 +1066,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     draw_slot(
         fig, fx(margin_px), fy(template["origin_y"]), title, template["title_px"], TEMPLATE_TITLE_LINE_PX, "title"
     )
-    draw_rich_lines(
+    subtitle_runs = draw_rich_lines(
         fig,
         subtitle_lines,
         margin_px,
@@ -1143,7 +1177,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     # Clipping is swept in `export_frame`, on the way out, which is what lets the labels drawn
     # outside the axes box survive into the SVG whole.
-    return fig
+    return fig, subtitle_runs
 
 
 def subtitle_box_px(template: dict, margin_px: float, title_lines: int) -> float:
@@ -1238,14 +1272,16 @@ def wrap_runs(
 
 def draw_rich_lines(
     fig, lines: list, x_px: float, y_px: float, size_px: float, line_height_px: float, gid: str, fx, fy
-) -> None:
-    """Draw wrapped mixed-style lines, one text object per run of same-styled pieces.
+) -> list[list[tuple[str, bool, str]]]:
+    """Draw wrapped mixed-style lines, one text object per run of same-styled pieces; return the runs.
 
     Runs carry their trailing space, never a leading one: `TextPath` cannot see a leading space, so a run
     beginning with one would be laid out flush against the run before it. Each line sits on its own
-    baseline with its ink centred in its line box, so bold and regular runs share it exactly.
+    baseline with its ink centred in its line box, so bold and regular runs share it exactly. The runs
+    come back per line so `merge_runs_in_svg` can join each line into one text in the SVG.
     """
     fontsize = size_px * POINTS_PER_PIXEL
+    drawn: list[list[tuple[str, bool, str]]] = []
     for line_index, line in enumerate(lines):
         runs: list[list] = []
         for word_index, word in enumerate(line):
@@ -1270,6 +1306,48 @@ def draw_rich_lines(
                 gid=f"{gid}-{line_index}-{run_index}",
             )
             cursor += text_advance_px(text, fontsize, bold)
+        drawn.append([(text, bold, color) for text, bold, color in runs])
+    return drawn
+
+
+def merge_runs_in_svg(svg_path: Path, gid: str, lines: list[list[tuple[str, bool, str]]]) -> None:
+    """Join each line's runs into ONE `<text>` of `<tspan>`s in the written SVG, as `<gid>-<line>`.
+
+    matplotlib places each run at its own x, measured in this machine's Arial, and Figma sets them in
+    Lato, which runs about 1% narrower in regular and 6% in bold: each run then starts where Arial would
+    have put it, and the gap after every bold name opens by several pixels (`study ,`). A single text
+    whose runs are tspans flows in whatever face renders it, so the imported line spaces itself.
+    """
+    svg = svg_path.read_text()
+    for line_index, runs in enumerate(lines):
+        pattern = re.compile(
+            rf'(?P<indent>[ ]*)<g id="{gid}-{line_index}-(?P<run>\d+)">\s*<text style="(?P<style>[^"]*)" '
+            rf'x="(?P<x>[^"]*)" y="(?P<y>[^"]*)" transform="(?P<transform>[^"]*)">(?P<text>.*?)</text>\s*</g>\n?'
+        )
+        found = list(pattern.finditer(svg))
+        assert [m.group("text") for m in found] == [escape(text.rstrip(), quote=False) for text, _, _ in runs], (
+            f"The SVG's {gid} runs on line {line_index} are not the ones the step drew."
+        )
+        first = found[0]
+        # The face and size from the first run; weight and colour move onto each tspan.
+        base = "; ".join(
+            part
+            for part in (piece.strip() for piece in first.group("style").split(";"))
+            if part and not part.startswith(("fill", "font-weight"))
+        )
+        spans = "".join(
+            f'<tspan style="{"font-weight: 700; " if bold else ""}fill: {color}">{escape(text, quote=False)}</tspan>'
+            for text, bold, color in runs
+        )
+        indent = first.group("indent")
+        merged = (
+            f'{indent}<g id="{gid}-{line_index}">\n{indent} <text xml:space="preserve" style="{base}" '
+            f'x="{first.group("x")}" y="{first.group("y")}" transform="{first.group("transform")}">'
+            f"{spans}</text>\n{indent}</g>\n"
+        )
+        for match in reversed(found):
+            svg = svg[: match.start()] + (merged if match is first else "") + svg[match.end() :]
+    svg_path.write_text(svg)
 
 
 def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str, int]:
@@ -1423,7 +1501,7 @@ def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[d
     Each block starts centred over its top-row segment, then is pushed sideways until neighbours clear
     each other by `HEADER_MIN_GAP` and every block sits inside the frame's content column (`bounds`, in
     plot px, so it may reach over the country labels). The last block is set right-aligned, the rest
-    left-aligned. The arrow's tip lands on its segment, as near the block's centre as the segment allows.
+    left-aligned. Each then gets its arrow (`plan_arrow`).
     """
     list_font = font_pt(layout, "key_font_px")
     blocks = []
@@ -1438,8 +1516,8 @@ def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[d
                 "extent": [centre - width / 2, centre + width / 2],
                 "height": len(category["key_lines"]) * layout["key_line_px"]
                 + KEY_ARROW_GAP
-                + KEY_ARROW_PX
-                + KEY_ARROW_BAR_GAP,
+                + ARROW_DROP_PX
+                + ARROW_TIP_GAP,
             }
         )
     low, high = bounds
@@ -1455,17 +1533,78 @@ def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[d
         shift = max(0.0, block["extent"][1] - ceiling)
         block["extent"] = [block["extent"][0] - shift, block["extent"][1] - shift]
         ceiling = block["extent"][0] - HEADER_MIN_GAP
+    previous = -1
     for index, block in enumerate(blocks):
         last = index == len(blocks) - 1
         block["align"] = "right" if last else "left"
         block["anchor"] = block["extent"][1] if last else block["extent"][0]
-        seg_start, seg_end = block["segment"]
-        centre = sum(block["extent"]) / 2
-        block["tip"] = min(max(centre, seg_start + ARROW_SEGMENT_INSET), seg_end - ARROW_SEGMENT_INSET)
+        # Neighbouring arrows lean opposite ways where they can, so no two read as one curve repeated.
+        block["arrow"] = plan_arrow(block, prefer=-previous)
+        previous = block["arrow"]["direction"]
     collision = key_blocks_collide(blocks)
     assert not collision, f"The annotations for {collision} would touch. Re-break their `key_lines`."
     assert blocks[0]["extent"][0] >= low - 0.01, "The annotations overrun the frame's content column."
     return blocks
+
+
+def plan_arrow(block: dict, prefer: int) -> dict:
+    """Where an annotation's arrow leaves its list and lands on its segment, in plot px across.
+
+    The arrow drops `ARROW_DROP_PX` and runs sideways far enough that its chord is the house minimum,
+    leaning right (`direction` 1) or left (-1). Its tail sits on the list's bottom edge, at least
+    `ARROW_TAIL_INSET` in from either end, and its tip lands on the top-row segment as near its middle as
+    that allows: a tip near a segment's end reads as pointing at the boundary, or at the neighbour.
+    `prefer` wins unless the other lean lands the tip much nearer the middle.
+    """
+    run = (ARROW_MIN_LENGTH_PX**2 - ARROW_DROP_PX**2) ** 0.5
+    (left, right), (seg_start, seg_end) = block["extent"], block["segment"]
+    middle = (seg_start + seg_end) / 2
+    options = []
+    for direction in (prefer, -prefer):
+        # The tips this lean can reach from the list's bottom edge, within the segment.
+        low = max(seg_start + ARROW_SEGMENT_INSET, left + ARROW_TAIL_INSET + direction * run)
+        high = min(seg_end - ARROW_SEGMENT_INSET, right - ARROW_TAIL_INSET + direction * run)
+        if low <= high:
+            tip = min(max(middle, low), high)
+            # A lean against the preferred one costs this many px of distance from the middle.
+            cost = abs(tip - middle) + (0 if direction == prefer else ARROW_TAIL_INSET)
+            options.append((cost, {"direction": direction, "tail": tip - direction * run, "tip": tip}))
+    if options:
+        return min(options, key=lambda option: option[0])[1]
+    raise AssertionError(
+        f"No arrow of {ARROW_MIN_LENGTH_PX}px fits between the {block['category']['name']} list and its "
+        f"segment. Move the list, or shorten ARROW_DROP_PX."
+    )
+
+
+def arrow_shape(tail: tuple[float, float], tip: tuple[float, float], direction: int) -> dict:
+    """A house arrow from tail to tip, in frame px: the curve's three points and the dart's three.
+
+    The curve bows `ARROW_BOW` of its chord to the side that makes it leave the list near-flat and arrive
+    steeply; it ends `ARROW_CURVE_BACK_PX` behind the tip, inside the dart, which points along the
+    curve's end tangent.
+    """
+    (tx, ty), (ex, ey) = tail, tip
+    vx, vy = ex - tx, ey - ty
+    length = (vx**2 + vy**2) ** 0.5
+    nx, ny = direction * vy / length, -direction * vx / length
+    control = ((tx + ex) / 2 + ARROW_BOW * length * nx, (ty + ey) / 2 + ARROW_BOW * length * ny)
+    ux, uy = ex - control[0], ey - control[1]
+    norm = (ux**2 + uy**2) ** 0.5
+    ux, uy = ux / norm, uy / norm
+    arrival = abs(degrees(atan2(uy, ux)))
+    arrival = min(arrival, 180 - arrival)
+    assert arrival >= ARROW_MIN_ARRIVAL_DEG, (
+        f"An arrow arrives at {arrival:.0f} degrees to its bar, under {ARROW_MIN_ARRIVAL_DEG}: raise ARROW_DROP_PX."
+    )
+    rear = (ex - ARROW_HEAD_LENGTH_PX * ux, ey - ARROW_HEAD_LENGTH_PX * uy)
+    half = ARROW_HEAD_WIDTH_PX / 2
+    return {
+        "curve": [tail, control, (ex - ARROW_CURVE_BACK_PX * ux, ey - ARROW_CURVE_BACK_PX * uy)],
+        "head": [tip, (rear[0] - half * uy, rear[1] + half * ux), (rear[0] + half * uy, rear[1] - half * ux)],
+        "length": length,
+        "arrival": arrival,
+    }
 
 
 def key_blocks_collide(blocks: list[dict]) -> str | None:
@@ -1494,16 +1633,17 @@ def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, l
     """Draw the desktop annotations: each category's run-in list, and an arrow from it down to its segment.
 
     One text node per line, each on its own baseline with its ink centred in its line box, as the bars'
-    values are. The arrow curves: its tail sits beside the tip, towards the block's centre.
+    values are. Each arrow's points are logged in frame px, which is what the Figma frame aims its house
+    arrow at.
     """
     list_font = font_pt(layout, "key_font_px")
     line = layout["key_line_px"]
-    arrow_bottom = bars_top_px - KEY_ARROW_BAR_GAP
-    arrow_top = arrow_bottom - KEY_ARROW_PX
+    tip_y = bars_top_px - ARROW_TIP_GAP
+    tail_y = tip_y - ARROW_DROP_PX
     for block in blocks:
         category = block["category"]
         slug = slugify(category["name"])
-        list_top = arrow_top - KEY_ARROW_GAP - len(category["key_lines"]) * line
+        list_top = tail_y - KEY_ARROW_GAP - len(category["key_lines"]) * line
         for index, text in enumerate(category["key_lines"]):
             fig.text(
                 fx(plot_left_px + block["anchor"]),
@@ -1515,24 +1655,38 @@ def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, l
                 color=MEMBER_TEXT_COLOR,
                 gid=f"key__{slug}-members" if index == 0 else f"key__{slug}-members-line{index}",
             )
-        tip = block["tip"]
-        # The tail leans towards the block's centre, so a block placed off its segment points across to it.
-        lean = -1 if sum(block["extent"]) / 2 < tip else 1
-        tail = tip + lean * ARROW_TAIL_OFFSET
+        plan = block["arrow"]
+        shape = arrow_shape(
+            (plot_left_px + plan["tail"], tail_y), (plot_left_px + plan["tip"], tip_y), plan["direction"]
+        )
+        to_figure = [(fx(x), fy(y)) for x, y in shape["curve"]]
         fig.add_artist(
-            FancyArrowPatch(
-                (fx(plot_left_px + tail), fy(arrow_top)),
-                (fx(plot_left_px + tip), fy(arrow_bottom)),
+            PathPatch(
+                MplPath(to_figure, [MplPath.MOVETO, MplPath.CURVE3, MplPath.CURVE3]),
                 transform=fig.transFigure,
-                connectionstyle=f"arc3,rad={0.35 * lean}",
-                arrowstyle="-|>,head_length=4,head_width=2.5",
-                mutation_scale=1,
-                linewidth=0.9,
-                color=ARROW_COLOR,
-                shrinkA=0,
-                shrinkB=0,
+                fill=False,
+                edgecolor=ARROW_COLOR,
+                linewidth=POINTS_PER_PIXEL,
+                capstyle="butt",
                 gid=f"key__{slug}-arrow",
             )
+        )
+        fig.add_artist(
+            Polygon(
+                [(fx(x), fy(y)) for x, y in shape["head"]],
+                closed=True,
+                transform=fig.transFigure,
+                facecolor=ARROW_COLOR,
+                edgecolor="none",
+                linewidth=0,
+                gid=f"key__{slug}-arrow-head",
+            )
+        )
+        (tx, ty), (cx, cy), _ = shape["curve"]
+        paths.log.info(
+            f"arrow {slug}: tail ({tx:.1f}, {ty:.1f}), control ({cx:.1f}, {cy:.1f}), tip "
+            f"({shape['head'][0][0]:.1f}, {shape['head'][0][1]:.1f}); {shape['length']:.0f}px, arriving at "
+            f"{shape['arrival']:.0f} degrees"
         )
 
 
