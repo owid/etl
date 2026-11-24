@@ -107,14 +107,14 @@ included:
   # Honey.
   - {code: 2745, name: "Honey", role: animal}
   # Fish and seafood.
-  - {code: 2761, name: "Freshwater Fish", role: animal}
+  - {code: 2761, name: "Freshwater and Diadromous Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
   - {code: 2763, name: "Pelagic Fish", role: animal}
   - {code: 2764, name: "Marine Fish, Other", role: animal}
   - {code: 2765, name: "Crustaceans", role: animal}
   - {code: 2766, name: "Cephalopods", role: animal}
   - {code: 2767, name: "Molluscs, Other", role: animal}
-  - {code: 2769, name: "Aquatic Animals, Others", role: animal}
+  - {code: 2769, name: "Aquatic Animals, Other", role: animal}
   # Fish oils. FBS records no fish going into processing, so they count as animal products, like the fish they come
   # from (as in the SCL chain).
   - {code: 2781, name: "Fish, Body Oil", role: animal}
@@ -149,6 +149,7 @@ groups:
   - {code: 2914, name: "Vegetable Oils"}
   - {code: 2918, name: "Vegetables"}
   - {code: 2919, name: "Fruits - Excluding Wine"}
+  - {code: 2920, name: "Fruits and Vegetables - Excluding Wine"}
   - {code: 2922, name: "Stimulants"}
   - {code: 2923, name: "Spices"}
   - {code: 2924, name: "Alcoholic Beverages"}
@@ -159,5 +160,5 @@ groups:
   - {code: 2946, name: "Animal fats"}
   - {code: 2948, name: "Milk - Excluding Butter"}
   - {code: 2949, name: "Eggs"}
-  - {code: 2960, name: "Fish, Seafood"}
+  - {code: 2960, name: "Aquatic Animals"}
   - {code: 2961, name: "Aquatic Products, Other"}

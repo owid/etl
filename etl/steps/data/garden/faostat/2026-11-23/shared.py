@@ -310,8 +310,8 @@ FLAGS_RANKING = (
         data=[
             # FAO uses nan flag for official data; in our datasets we will replace nans by FLAG_OFFICIAL_DATA.
             (np.nan, "Official data"),
-            ("A", "Official figure"),
-            ("X", "Figure from external organization"),
+            ("A", "Official value"),
+            ("X", "Value from external organization"),
             ("C", "Aggregate, may include official, semi-official, estimated or calculated data"),
             ("P", "Provisional value"),
             ("I", "Value imputed by a receiving agency"),
@@ -322,7 +322,7 @@ FLAGS_RANKING = (
             ("N", "Not significant (negligible)"),
             ("U", "Low reliability"),
             ("G", "Experimental value"),
-            ("L", "Missing value; data exist"),
+            ("L", "Missing value; data exist but were not collected"),
             ("O", "Missing value"),
             ("M", "Missing value; data cannot exist"),
             ("Q", "Missing value; suppressed"),
@@ -333,6 +333,11 @@ FLAGS_RANKING = (
     .reset_index()
     .rename(columns={"index": "ranking"})
 )
+# Earlier wording of some flags, which FAOSTAT still uses in the domains it has not updated since rewording them.
+FLAGS_EARLIER_WORDING = {
+    "A": "Official figure",
+    "X": "Figure from external organization",
+}
 
 # Additional descriptions.
 
@@ -2520,6 +2525,10 @@ def run(dest_dir: str) -> None:
 
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
+
+    # Check that fertilizer quantities are never negative.
+    if dataset_short_name == "faostat_rfn":
+        assert not (tb["value"] < 0).any(), "Negative values found in faostat_rfn."
 
     # For convenience, create additional indicators in different units.
     tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)

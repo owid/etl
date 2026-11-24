@@ -205,8 +205,15 @@ def run() -> None:
     assert set(MISSING_COUNTRIES) & set(tb["area"]) == set(), error
     error = "Missing countries are not informed in the old snapshot (this should not happen)."
     assert set(MISSING_COUNTRIES) < set(tb_old["area"]), error
+    # FAOSTAT renamed some items since the old release (e.g. "Fish, Seafood" became "Aquatic Animals"), so give the
+    # appended rows the item names of the new release.
+    tb = tb.reset_index()
+    tb_old = tb_old[tb_old["area"].isin(MISSING_COUNTRIES)].reset_index()
+    new_item_names = dict(zip(tb["item_code"], tb["item"]))
+    in_new_release = tb_old["item_code"].isin(new_item_names)
+    tb_old.loc[in_new_release, "item"] = tb_old.loc[in_new_release, "item_code"].map(new_item_names)
     # Append data for missing countries to the new table.
-    tb = pr.concat([tb.reset_index(), tb_old[tb_old["area"].isin(MISSING_COUNTRIES)].reset_index()], ignore_index=True)
+    tb = pr.concat([tb, tb_old], ignore_index=True)
 
     # Improve table format.
     tb = tb.format(keys=["item_code", "year", "element_code", "area_code"])

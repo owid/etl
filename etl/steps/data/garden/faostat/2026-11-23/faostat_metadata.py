@@ -47,6 +47,7 @@ from owid.datautils import dataframes, io
 from shared import (
     CURRENT_DIR,
     ELEMENTS_IN_FBSH_MISSING_IN_FBS,
+    FLAGS_EARLIER_WORDING,
     FLAGS_RANKING,
     N_CHARACTERS_ELEMENT_CODE,
     N_CHARACTERS_ITEM_CODE,
@@ -321,13 +322,14 @@ def clean_global_items_table(tb_items: Table, tb_custom_items: Table) -> Table:
     """
     tb_items = tb_items.copy()
 
-    # Check that fbs and fbsh have the same contributions, remove one of them, and rename the other to fbsc.
+    # Check that items in both fbs and fbsh have the same names, remove one of them, and rename the other to fbsc.
+    # NOTE: Some items exist only in fbs (e.g. item 2920, used only for the "Sourcing Flexibility Indicator").
     check = (
         tb_items[tb_items["dataset"] == "faostat_fbsh"]
         .reset_index(drop=True)[["item_code", "fao_item"]]
         .merge(
             tb_items[tb_items["dataset"] == "faostat_fbs"].reset_index(drop=True)[["item_code", "fao_item"]],
-            how="outer",
+            how="inner",
             on=["item_code"],
             suffixes=("_fbsh", "_fbs"),
         )
@@ -771,7 +773,10 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
                 f"Flag definitions in file {table_name} are different to those in our flags ranking. "
                 f"Redefine shared.FLAGS_RANKING."
             )
-            assert (comparison["description"] == comparison["flags"]).all(), error_message
+            earlier_wording = comparison["flag"].map(FLAGS_EARLIER_WORDING)
+            assert (
+                (comparison["description"] == comparison["flags"]) | (earlier_wording == comparison["flags"])
+            ).all(), error_message
 
 
 def check_that_all_flags_in_dataset_are_in_ranking(table: Table, metadata_for_flags: Table) -> None:

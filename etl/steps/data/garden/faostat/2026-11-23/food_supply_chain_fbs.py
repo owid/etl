@@ -183,8 +183,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    FAO publishes FBS tonnages rounded, mostly in units of 1,000 tonnes, so the two sides of the balance identity
    do not close exactly. Food nutrients are retained at their reported precision where the direct density is
    accepted; the other stages still use the rounded tonnages. The gap between those stages and food is included
-   in "data_adjustments", together with FAO's own "residuals" (and the gap that FAO closed with negative exports
-   for Iraq's wheat in 2010; see the corrections file), so that the chain ends exactly on "food".
+   in "data_adjustments", together with FAO's own "residuals", so that the chain ends exactly on "food".
    Keeping the more precise food total changes this adjustment without changing the other flows. The size of
    the gap is kept in the column "balancing_difference" for quality control.
 

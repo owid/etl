@@ -104,10 +104,11 @@ def combine_fbsh_and_fbs_datasets(
     )
 
     # Sanity checks.
-    # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
+    # Ensure the items that are in fbsh but not in fbs are covered by ITEM_AMENDMENTS.
+    # NOTE: Some items exist only in fbs (e.g. item 2920, used only for the "Sourcing Flexibility Indicator").
     error = "Mismatch between items in fbsh and fbs. Redefine shared.ITEM_AMENDMENTS."
-    assert set(tb_fbsh["item"]) == set(tb_fbs["item"]), error
-    assert set(tb_fbsh["item_code"]) == set(tb_fbs["item_code"]), error
+    assert set(tb_fbsh["item"]) <= set(tb_fbs["item"]), error
+    assert set(tb_fbsh["item_code"]) <= set(tb_fbs["item_code"]), error
     # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is
     # more recent and may have additional elements. However, ensure that there are no
     # elements in fbsh that are not in fbs.
