@@ -2,7 +2,7 @@
   "name": "compare-previous-version",
   "displayName": "Compare Previous Version",
   "description": "Compare files with their previous version (date folders), and review a branch's changes against previous versions with the noise of each update hidden and the reviewed files synced with GitHub",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "publisher": "owid",
   "engines": {
     "vscode": "^1.93.0"
