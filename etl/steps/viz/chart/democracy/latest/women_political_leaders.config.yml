@@ -134,8 +134,8 @@ views:
     config:
       <<: *ever_country
       title: Country has ever had a woman as chief executive
-      subtitle: Shows whether a country has had a woman as chief executive at any point since 1789.
-      note: '"Chief executive" is defined here as the head of state or the head of government, whoever has more power over the appointment and dismissal of cabinet ministers.'
+      subtitle: 'Denotes whether a country had a woman chief executive at least once since 1789. "Chief executive" is defined here as the head of state or the head of government, whoever has more power over the appointment and dismissal of cabinet ministers.'
+      note: When the head of state and head of government hold equal power, the head of government is considered the chief executive.
 
   - dimensions:
       leader: chief_executive
@@ -219,8 +219,7 @@ views:
     config:
       <<: *ever_country
       title: Country has ever had a woman as head of government
-      subtitle: Shows whether a country has had a woman as head of government at any point since 1789.
-      note: The head of government is the chief officer of the executive branch of their country.
+      subtitle: Denotes whether a country had a woman head of government at least once since 1789. The head of government is the chief officer of the executive branch of their country.
 
   - dimensions:
       leader: head_of_government
@@ -304,8 +303,7 @@ views:
     config:
       <<: *ever_country
       title: Country has ever had a woman as head of state
-      subtitle: Shows whether a country has had a woman as head of state at any point since 1789.
-      note: The head of state is the chief public representative of their country.
+      subtitle: Denotes whether a country had a woman head of state at least once since 1789. The head of state is the chief public representative of their country.
 
   - dimensions:
       leader: head_of_state
