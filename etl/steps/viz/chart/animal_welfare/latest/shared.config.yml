@@ -1,6 +1,7 @@
 # Dimensions and hand-written views shared by the animal welfare multidims (see shared.py).
 # The big multidim (animal_welfare) shows every view; the others show a subset of them.
 # The step fills the Animal choices and the animal-count views from the data.
+grapher_schema: "012"
 
 # Estimates only come as a range for fish and crustaceans, and only animal counts have a per-person
 # version: every other view has "Not applicable" and "Total" (a multidim shows every dimension,
