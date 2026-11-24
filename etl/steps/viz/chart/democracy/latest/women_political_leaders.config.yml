@@ -60,6 +60,7 @@ definitions:
         customNumericLabels:
           - "No"
           - "Yes"
+      tooltipUseCustomLabels: true
   # Share of countries led by a man or a woman, stacked to 100%.
   by_year_region: &by_year_region
     chartTypes:
