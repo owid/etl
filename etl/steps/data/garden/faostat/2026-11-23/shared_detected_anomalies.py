@@ -9,6 +9,7 @@ See documentation of class DataAnomaly below for more details on how anomaly cla
 import abc
 import os
 
+import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 from owid.catalog import Table
@@ -847,7 +848,40 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
         return tb_fixed
 
 
+class SpuriousZerosInFertilizerRatiosAnomaly(DataAnomaly):
+    description = "* FAOSTAT gives zero fertilizer use per hectare of cropland, per person, and per unit of agricultural production value for many countries and years for which it has no data on fertilizer use itself, mostly between 1961 and 2001. These zeros are not real values, so we removed them.\n"
+
+    # Agricultural use, and the ratios FAOSTAT derives from it (use per area of cropland, per capita, and per value of
+    # agricultural production).
+    agricultural_use_element_code = "005157"
+    affected_element_codes = ["005159", "005172", "005173"]
+
+    def _spurious_zeros(self, tb):
+        keys = ["country", "year", "item_code"]
+        has_use = tb["element_code"] == self.agricultural_use_element_code
+        keys_with_use = set(zip(*[tb.loc[has_use, key].astype(str) for key in keys]))
+        row_has_use = [key in keys_with_use for key in zip(*[tb[key].astype(str) for key in keys])]
+        return (
+            tb["element_code"].isin(self.affected_element_codes)
+            & (tb["value"] == 0)
+            & ~pd.Series(row_has_use, index=tb.index)
+        )
+
+    def check(self, tb):
+        error = "FAOSTAT no longer gives zero fertilizer ratios where agricultural use is missing. Remove this anomaly."
+        assert self._spurious_zeros(tb).any(), error
+
+    def inspect(self, tb):
+        pass
+
+    def fix(self, tb):
+        return tb[~self._spurious_zeros(tb)].reset_index(drop=True)
+
+
 detected_anomalies = {
+    "faostat_rfn": [
+        SpuriousZerosInFertilizerRatiosAnomaly,
+    ],
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
         EggYieldNorthernEuropeAnomaly,
