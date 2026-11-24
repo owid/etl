@@ -104,14 +104,14 @@ class ViewEditor:
         object instead.
         """
         brackets_str, min_value = self._brackets_and_min(indicator_name, age, sex)
+        # With manual binning, grapher reads `customNumericValues` as every bin edge, the lowest
+        # included. The explorer grammar listed only the upper edges, with the lowest in
+        # `colorScaleNumericMinValue` (0 by default), so it goes first here.
         color_scale: dict[str, Any] = {
             "baseColorScheme": self._get_color_scheme(indicator_name),
             "binningStrategy": "manual",
-            "customNumericValues": _parse_brackets(brackets_str),
+            "customNumericValues": [min_value if min_value is not None else 0] + _parse_brackets(brackets_str),
         }
-        if min_value is not None:
-            # grapher colorScale uses `minValue` (Explorer grammar was `customNumericMinValue`).
-            color_scale["minValue"] = min_value
 
         if view.config is None:
             view.config = {}

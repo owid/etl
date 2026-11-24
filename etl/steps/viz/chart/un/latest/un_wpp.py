@@ -322,6 +322,14 @@ def run() -> None:
         }
     )
 
+    # Keep titles free of the time span and entity, as the explorer does (it sets
+    # `hideAnnotationFieldsInTitle` for all its views).
+    for view in c.views:
+        view.config = {
+            **(view.config or {}),
+            "hideAnnotationFieldsInTitle": {"entity": True, "time": True, "changeInPrefix": True},
+        }
+
     # Give the age choices readable slugs. Combining the sub-charts sanitizes slugs that start with
     # a digit and suffixes the ones that collide (e.g. "0-4" -> "_0_4__0"), and these end up in URLs.
     c.prune_dimension_choices(["age"])
