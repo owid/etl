@@ -49,6 +49,17 @@ definitions:
     hasMapTab: true
     tab: map
     chartTypes: []
+    map:
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [0, 0, 1]
+        customNumericColors:
+          - *color_man
+          - *color_woman
+        customNumericColorsActive: true
+        customNumericLabels:
+          - "No"
+          - "Yes"
   # Share of countries led by a man or a woman, stacked to 100%.
   by_year_region: &by_year_region
     chartTypes:
@@ -123,8 +134,6 @@ views:
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#wom_hoe_ever
-          display:
-            colorScaleNumericBins: "0,#e2b99c,No;1,#863d8c,Yes"
     config:
       <<: *ever_country
       title: Country has ever had a woman as chief executive
@@ -211,8 +220,6 @@ views:
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#wom_hog_ever
-          display:
-            colorScaleNumericBins: "0,#e2b99c,No;1,#863d8c,Yes"
     config:
       <<: *ever_country
       title: Country has ever had a woman as head of government
@@ -299,8 +306,6 @@ views:
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#wom_hos_ever
-          display:
-            colorScaleNumericBins: "0,#e2b99c,No;1,#863d8c,Yes"
     config:
       <<: *ever_country
       title: Country has ever had a woman as head of state
