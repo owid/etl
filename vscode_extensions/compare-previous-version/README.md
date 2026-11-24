@@ -3,7 +3,7 @@
 This VSCode extension compares files in date-versioned folders (`YYYY-MM-DD`) with their previous version. It has two parts:
 
 - **Compare Previous Version** (`Cmd+Shift+D`): diff the open file against its previous version.
-- **Changes vs Previous Versions** (its own icon in the Activity Bar): review a whole branch, such as a dataset update, file by file against the previous versions, with the noise of every update hidden, and the reviewed files synced with GitHub's "Viewed" state.
+- **ETL PR Review** (its own icon in the Activity Bar): review a whole branch, such as a dataset update, file by file against the previous versions, with the noise of every update hidden, and the reviewed files synced with GitHub's "Viewed" state.
 
 ## How the previous version is found
 
@@ -16,7 +16,7 @@ So each file finds its own previous version, even when the steps of one update c
 2. Press `Ctrl+Shift+D` (or `Cmd+Shift+D` on Mac), or use Command Palette > "Compare Previous Version".
 3. The extension opens a diff view against the previous version. Press the shortcut again to go back to the file.
 
-## Changes vs Previous Versions
+## ETL PR Review
 
 A dataset update copies each step folder to a new version folder, so git (and GitHub) show the new files as entirely new.
 This view lists the files changed in the current branch (committed or not) since it left `origin/master`, and puts each in one group:

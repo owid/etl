@@ -21,43 +21,43 @@
       {
         "command": "owidVersionDiff.refresh",
         "title": "Refresh",
-        "category": "Changes vs Previous Versions",
+        "category": "ETL PR Review",
         "icon": "$(refresh)"
       },
       {
         "command": "owidVersionDiff.next",
         "title": "Open Next Changed File",
-        "category": "Changes vs Previous Versions",
+        "category": "ETL PR Review",
         "icon": "$(arrow-down)"
       },
       {
         "command": "owidVersionDiff.previous",
         "title": "Open Previous Changed File",
-        "category": "Changes vs Previous Versions",
+        "category": "ETL PR Review",
         "icon": "$(arrow-up)"
       },
       {
         "command": "owidVersionDiff.toggleHideNoise",
         "title": "Toggle Hiding Noise in Diffs",
-        "category": "Changes vs Previous Versions",
+        "category": "ETL PR Review",
         "icon": "$(eye-closed)"
       },
       {
         "command": "owidVersionDiff.openDiff",
         "title": "Open Diff",
-        "category": "Changes vs Previous Versions"
+        "category": "ETL PR Review"
       },
       {
         "command": "owidVersionDiff.openRawDiff",
         "title": "Open Diff Including Noise",
-        "category": "Changes vs Previous Versions"
+        "category": "ETL PR Review"
       }
     ],
     "views": {
       "owidVersionDiffContainer": [
         {
           "id": "owidVersionDiff",
-          "name": "Changes vs Previous Versions"
+          "name": "ETL PR Review"
         }
       ]
     },
@@ -102,7 +102,7 @@
       ]
     },
     "configuration": {
-      "title": "Changes vs Previous Versions",
+      "title": "ETL PR Review",
       "properties": {
         "owidVersionDiff.baseRef": {
           "type": "string",
@@ -168,7 +168,7 @@
       "activitybar": [
         {
           "id": "owidVersionDiffContainer",
-          "title": "Changes vs Previous Versions",
+          "title": "ETL PR Review",
           "icon": "media/versions.svg"
         }
       ]

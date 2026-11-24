@@ -1,5 +1,5 @@
 /**
- * "Changes vs Previous Versions" view (its own Activity Bar container): lists the files changed in the branch, grouped
+ * "ETL PR Review" view (its own Activity Bar container): lists the files changed in the branch, grouped
  * by how they differ from their previous version, and opens each one as a diff with the noise changes hidden. The
  * "reviewed" checkboxes are synced with GitHub's "Viewed" state on the branch's pull request, when there is one.
  */
