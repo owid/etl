@@ -1,0 +1,29 @@
+grapher_schema: "012"
+
+title:
+  title: Animals killed for food
+  title_variant: ""
+topic_tags:
+  - Animal Welfare
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+  - Spain
+default_dimensions:
+  metric: animals_killed
+  animal: all_land_animals
+  estimate: not_applicable
+  per_capita: total
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/animal-welfare
+        entityType: country
+        hasMapTab: true
+
+# Dimensions and views come from shared.config.yml and shared.py.

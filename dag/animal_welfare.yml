@@ -97,6 +97,10 @@ steps:
         - data://garden/animal_welfare/2026-04-28/global_hen_inventory:
           - data://meadow/animal_welfare/2026-04-28/global_hen_inventory:
             - snapshot://animal_welfare/2026-04-28/global_hen_inventory.csv
+    # Chickens killed in egg production (defined below).
+    - data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs
+    # Laying hens and cattle used for milk (FAOSTAT).
+    - data://grapher/faostat/2026-02-25/faostat_qcl
     # Various sources - Bullfighting laws.
     - data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
       - data://garden/animal_welfare/2024-06-04/bullfighting_laws:
@@ -107,15 +111,23 @@ steps:
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
 
-  # Animals used for food, by animal and by how they are counted.
-  viz://chart/animal_welfare/latest/animals_used_for_food:
+  # Animals killed for food, counted in the country or for the country's consumption (views shared with animal_welfare).
+  viz://chart/animal_welfare/latest/animals_killed:
     - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
     - data://grapher/animal_welfare/2026-09-16/animals_killed_for_domestic_consumption
-    - data://grapher/faostat/2026-02-25/faostat_qcl
+    - data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs
 
-  # Production-based vs consumption-based animals killed (temporary comparison chart).
-  viz://chart/animal_welfare/latest/animals_killed_production_vs_consumption:
-    - data://grapher/animal_welfare/2026-09-16/animals_killed_for_domestic_consumption
+  # Live animals, including hens in cages and cage-free systems (views shared with animal_welfare).
+  viz://chart/animal_welfare/latest/live_animals:
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/faostat/2026-02-25/faostat_qcl
+    - data://grapher/animal_welfare/2026-06-11/eggs_and_hens_statistics
+
+  # Animal welfare laws (views shared with animal_welfare).
+  viz://chart/animal_welfare/latest/animal_welfare_laws:
+    - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
+    - data://grapher/animal_welfare/2026-07-01/fur_laws
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
 
   # Defra - Laying hens and chicks in the United Kingdom (poultry and poultry meat statistics, and June survey).
   data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks:
