@@ -1,4 +1,4 @@
-grapher_schema: "011"
+grapher_schema: '012'
 
 title:
   title: "Population & Demography"
@@ -159,6 +159,8 @@ dimensions:
 
   - slug: sex
     name: Sex
+    presentation:
+      type: toggle-buttons
     choices:
       - slug: all
         name: Both sexes
@@ -186,6 +188,8 @@ dimensions:
   - slug: variant
     name: Projection scenario
     description: Projection scenarios share the same mortality and migration assumptions but differ in their fertility assumptions.
+    presentation:
+      type: toggle-buttons
     choices:
       - slug: estimates
         name: None

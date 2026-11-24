@@ -322,5 +322,42 @@ def run() -> None:
         }
     )
 
+    # Give the age choices readable slugs. Combining the sub-charts sanitizes slugs that start with
+    # a digit and suffixes the ones that collide (e.g. "0-4" -> "_0_4__0"), and these end up in URLs.
+    c.prune_dimension_choices(["age"])
+    for choice in list(c.get_dimension("age").choices):
+        c.rename_choice_slug("age", choice.slug, age_slug(choice.name))
+
     # # Save MDIM (upsert to DB)
     c.save(tolerate_extra_indicators=True)
+
+
+def age_slug(name: str) -> str:
+    """Readable slug for an age choice, from its name, e.g. "15–49 years" -> "ages_15_49"."""
+    special = {
+        "Total": "all",
+        "None": "none",
+        "At birth": "at_birth",
+        "Total dependency ratio": "total",
+        "Youth dependency ratio": "youth",
+        "Old-age dependency ratio": "old",
+        "At age 100 and over": "at_age_100_plus",
+    }
+    if name in special:
+        return special[name]
+    words = (
+        name.replace("–", "_")
+        .replace("-", "_")
+        .replace("+", "_plus")
+        .replace(" years", "")
+        .replace(" year", "")
+        .lower()
+        .split()
+    )
+    if words[0] in ("under", "aged", "women"):
+        return "_".join(words)
+    if words[:2] == ["at", "age"]:
+        return "_".join(words)
+    if len(words) == 1:
+        return f"ages_{words[0]}"
+    raise ValueError(f"No slug rule for age choice {name!r}")
