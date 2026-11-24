@@ -439,3 +439,6 @@ steps:
     - data://grapher/faostat/2026-02-25/faostat_rfn
     - data://grapher/faostat/2026-05-22/additional_variables
     - data-private://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014
+  # archived; last active in 41ed73b9f364 on 2026-11-23
+  viz://explorer/agriculture/latest/crop_yields:
+    - data://grapher/agriculture/2026-03-02/attainable_yields

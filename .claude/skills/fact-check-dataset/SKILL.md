@@ -56,6 +56,7 @@ A review's time goes on turns, not on the web: each turn re-reads the whole cont
    ```bash
    .venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <target and options>
    ```
+   It reads production from the internal Datasette (`/query-grapher-db`), so it needs Tailscale.
    It resolves the steps, reads the `.dvc` origins, renders the metadata, fetches the producer's documentation in parallel as plain text, re-checks the source files, and (for a dataset) ranks the indicators, scans for anomalies and lists the DoDs. It prints a dossier and says what to do next. Any section it marks `FAILED` or `NOT RUN` is yours to do by hand; never skip one.
 2. **Read the producer's documentation from the dossier's `docs/` folder** with Grep (Read only the passage you need: the files can be long), and quote from that text with the file's fetch date. Fetch a page yourself only when a claim under review rests on it and the table marks it `unreachable`, `thin` or `not-fetched`, or when a claim needs a source the table lacks.
 3. **Batch what is independent.** Every WebSearch you already know you need goes in one message; then every WebFetch of the hits in one message. Same for file reads and local checks. One call per message only when the next call depends on the last result.

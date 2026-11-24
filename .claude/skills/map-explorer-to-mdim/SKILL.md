@@ -375,10 +375,11 @@ Non-zero exit means **do not post anything**.
 ### 7. Apply — the admin bulk endpoint (GATED, production)
 
 > [!WARNING]
-> **Creating the redirect darkens the explorer immediately.** It is checked on *every*
-> `/explorers/*` request, ahead of `env.ASSETS.fetch`, so it beats the baked explorer page and
-> any `_redirects` entry, and fires while the explorer is still published. There is no staged
-> rollout and no bulk undo — removal is one row at a time.
+> **Creating the redirect darkens the explorer as soon as the deploy it queues goes out.** The
+> paste queues a deploy (admin *Deploys*) that bakes the redirect map; from then on the redirect is
+> checked on *every* `/explorers/*` request, ahead of `env.ASSETS.fetch`, so it beats the baked
+> explorer page and any `_redirects` entry, and fires while the explorer is still published. There
+> is no staged rollout and no bulk undo — removal is one row at a time.
 
 Preflight reads the DB, not the site: first confirm `curl -s -o /dev/null -w '%{http_code}'
 https://ourworldindata.org/grapher/<mdim slug>` returns 200. A multidim published moments ago can
@@ -390,7 +391,7 @@ Paste each `admin_bulk_payload.json` into *Bulk-create redirects from JSON* at
 is the catch-all when present and index `i` is `redirects[i-1]`. Expect
 `created + skipped + errors == entries`.
 
-Then wait for the bake **plus ~2 minutes** (the redirect map is fetched with a 2-minute edge
+Then wait for that deploy to finish **plus ~2 minutes** (the redirect map is fetched with a 2-minute edge
 TTL) and verify:
 
 ```bash

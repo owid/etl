@@ -127,7 +127,7 @@ tables:
 
       It brings together three main sources. Most data on energy comes from the Energy Institute's [Statistical Review of World Energy](https://www.energyinst.org/statistical-review/), and most data on electricity comes from [Ember](https://ember-energy.org/data/yearly-electricity-data/). We fill gaps with data from the [U.S. Energy Information Administration](https://www.eia.gov/international/data/world) and, for earlier years, with historical estimates.
 
-      We combine these with data on population and GDP (also included in the dataset for reference) to calculate figures per person and energy use per unit of GDP.
+      We combine these with data on population and GDP (also included in the dataset for reference) to calculate figures per person and energy use per unit of GDP. Population estimates from 2024 onwards are projections released by the UN.
 
       The dataset includes total energy supply and how it breaks down by source, as amounts, as shares of the total, and as changes from one year to the next. It also includes electricity generation by source, electricity demand and net imports, the emissions and carbon intensity of electricity, and the production of coal, oil, and gas. Data on energy covers most countries from 1980, and data on electricity from 2000. Some series go back much further: the global total energy supply starts in 1800.
 

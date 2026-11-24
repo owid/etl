@@ -22,8 +22,9 @@ import json
 import re
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from etl.config import OWIDEnv
 from etl.paths import BASE_DIR
@@ -112,6 +113,20 @@ def gdoc_uses(content: dict, pat: re.Pattern) -> list[dict]:
     return found
 
 
+def unwrap(url: str) -> str:
+    """The real target of a link pasted from Google's redirect wrapper (`google.com/url?q=<url>&sa=...`).
+
+    Docs keep these when text is copied from a Google search or another doc. Resolving the wrapper
+    itself would read Google's params (`q`, `sa`, `usg`) as explorer params.
+    """
+    parts = urlsplit(url)
+    if parts.netloc.endswith("google.com") and parts.path == "/url":
+        target = dict(parse_qsl(parts.query)).get("q")
+        if target:
+            return target
+    return url
+
+
 def breaks_on_redirect(how: str) -> bool:
     # Embeds and cards render by fetching the explorer page itself; a redirect breaks them at once.
     return how in {"chart", "prominent-link", "all-charts", "key-indicator", "explorer-tiles"}
@@ -133,7 +148,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
         the one dimension that offers its value.
         """
         out, notes = {}, []
-        for k, v in q.items():
+        for k, v in list(q.items()):
+            # A `;` instead of `&` ("…ZAF;hideControls=false") glues the next param onto the value.
+            if ";" in v and "=" in v.split(";", 1)[1]:
+                v, rest = v.split(";", 1)
+                rk, rv = rest.split("=", 1)
+                out.setdefault(rk, rv)
+                notes.append(f"split “{rk}={rv}” off “{k}”")
             if k in choices and v not in choices[k]:
                 head = next((c for c in sorted(choices[k], key=len, reverse=True) if c and v.startswith(c)), None)
                 if head:
@@ -143,6 +164,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         rk, rv = rest.split("=", 1)
                         out[rk] = rv
                     notes.append(f"cut “{v}” to “{head}”")
+                    continue
+                # A renamed choice ("Protein per day" → "Grams of protein per day"): the one choice
+                # whose name contains the old one.
+                named = [c for c in choices[k] if c and v.lower() in c.lower()]
+                if len(named) == 1:
+                    out[k] = named[0]
+                    notes.append(f"renamed choice “{v}” to “{named[0]}”")
                     continue
             if k not in choices and k not in {
                 "country",
@@ -171,18 +199,21 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
 
         Like the explorer (and the multidim), keep the dimensions in order and, at the first one
         whose value no view offers alongside the earlier ones, take the first view's value. A
-        dimension the link leaves out is filled only when the views left allow a single value.
+        dimension the link leaves out also gets the first remaining view's value, as the explorer
+        does.
         """
         out, notes, pool = dict(q), [], views
+        if not any(d in q for d in dim_names):
+            return q, []
         for d in dim_names:
             if d not in out:
-                vals = {v[d] for v in pool}
-                if len(vals) != 1:
+                if not pool:
                     return q, []
-                (val,) = vals
+                val = pool[0][d]
                 if val:
                     out[d] = val
-                    notes.append(f"added the missing “{d}={val}” (the only value the explorer can show)")
+                    notes.append(f"added the missing “{d}={val}” (what the explorer shows)")
+                pool = [v for v in pool if v[d] == val]
                 continue
             if not any(v[d] == out[d] for v in pool):
                 if not pool:
@@ -192,14 +223,24 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
             pool = [v for v in pool if v[d] == out[d]]
         return out, notes
 
+    def clean(r):
+        """The URL to paste in a doc: without explorer params the matched view doesn't use
+        (the redirect carries them along, and the multidim ignores them)."""
+        if not r.leftover_params:
+            return r
+        parts = urlsplit(r.url)
+        q = [(k, v) for k, v in parse_qsl(parts.query) if k not in r.leftover_params]
+        return replace(r, url=urlunsplit(parts._replace(query=urlencode(q))))
+
     def new_url(old: str) -> dict:
+        old = unwrap(old)
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
-        r = resolve_explorer_url(rules, q, SITE, choices, dim_names)
+        r = clean(resolve_explorer_url(rules, q, SITE, choices, dim_names))
         if r.match != "view" and q:
             fixed, notes = repair(q)
             fixed, more = fall_back(fixed)
             notes += more
-            r2 = resolve_explorer_url(rules, fixed, SITE, choices, dim_names) if notes else None
+            r2 = clean(resolve_explorer_url(rules, fixed, SITE, choices, dim_names)) if notes else None
             if r2 and r2.match == "view":
                 # The redirect still sends the broken link to the default view; the doc edit fixes it.
                 return {

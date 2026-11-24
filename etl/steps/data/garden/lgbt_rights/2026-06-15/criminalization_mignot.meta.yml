@@ -79,6 +79,10 @@ tables:
         unit: "people"
         short_unit: ""
         description_short: Population in countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
+        description_processing: &description_processing_population |-
+          {definitions.common.description_processing}
+
+          We calculate the number of people living in countries with each legal status using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
         display:
           name: Population in countries where homosexuality is legal
           <<: *display_common
@@ -88,6 +92,7 @@ tables:
         unit: "people"
         short_unit: ""
         description_short: Population in countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
+        description_processing: *description_processing_population
         display:
           name: Population in countries where homosexuality is illegal
           <<: *display_common
@@ -97,6 +102,7 @@ tables:
         unit: "people"
         short_unit: ""
         description_short: Population in countries with missing data about their homosexuality status.
+        description_processing: *description_processing_population
         display:
           name: Population in countries with missing data
           <<: *display_common

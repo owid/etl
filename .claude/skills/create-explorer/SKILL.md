@@ -8,7 +8,7 @@ metadata:
 
 # Creating an Explorer
 
-Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/crop-yields`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
+Explorers are OWID's multi-dimensional dashboards (`ourworldindata.org/explorers/<slug>`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
 
 This skill is the explorer-flavored sibling of `/create-chart`. They use the same engine (`paths.create_chart` for charts and multidims, `paths.create_explorer` for explorers) and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
 
@@ -438,7 +438,6 @@ Hand the user the exact `etlr` command — don't run it yourself.
 
 Full-YAML (each view hand-listed):
 
-- `etl/steps/viz/explorer/agriculture/latest/crop_yields.{py,config.yml}` — large indicator-based explorer with many dimensions.
 - `etl/steps/viz/explorer/food/latest/food_footprints.{py,config.yml}` — hybrid (16 grapher-chart views + 29 CSV-backed views) showing dimension-filtered `common_views` for differing `sourceDesc` per view-type.
 - `etl/steps/viz/explorer/emissions/latest/ipcc_scenarios.{py,config.yml}` — moderate-size YAML-driven.
 

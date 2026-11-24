@@ -455,7 +455,7 @@ def rendered_metadata(namespace: str, version: str, short_name: str) -> tuple[st
         }
         for row in rows
     ]
-    return "production (the public mirror; no local build of this version)", indicators
+    return "production (the internal Datasette's copy; no local build of this version)", indicators
 
 
 ORIGIN_KEYS = {
