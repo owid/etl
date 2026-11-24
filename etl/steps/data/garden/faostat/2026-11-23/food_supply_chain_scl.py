@@ -235,8 +235,7 @@ Each assumption starts with a line on its scale: how much it changes the results
     Micronesia, and 10% in Vanuatu).
 
     The stage "data_adjustments" holds everything that makes the chain end exactly on food:
-    a. FAO's own "residuals" (and the gap that FAO closed with negative exports for Iraq's wheat in 2010; see the
-       corrections file).
+    a. FAO's own "residuals".
     b. Rounding. Food keeps FAO's reported nutrients (assumption 2), while the other stages use FAO's rounded tonnes
        times the item's density. This matters most for fish, whose tonnes FBS rounds to the nearest 1,000 tonnes
        (assumption 9).

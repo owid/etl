@@ -388,7 +388,9 @@ def sanity_check_totals(tb_grouped, tb_fbsc):
     error = "Calculated total food energy (kcal) differs from original by more than expected."
     assert tb_check["pct"].mean() < 5, error
     # The only cases where the percentage difference is larger than 50% are for a short list of small countries.
-    assert set(tb_check[tb_check["pct"] > 50]["country"]) == {
+    countries_with_large_difference = set(tb_check[tb_check["pct"] > 50]["country"])
+    error = f"Countries with a difference above 50% have changed: {sorted(countries_with_large_difference)}."
+    assert countries_with_large_difference == {
         "Bahrain",
         "Bermuda",
         "Kiribati",
@@ -397,8 +399,7 @@ def sanity_check_totals(tb_grouped, tb_fbsc):
         "Nauru",
         "Netherlands Antilles",
         "Saint Kitts and Nevis",
-        "Seychelles",
-    }
+    }, error
 
 
 def sanity_check_compare_with_hong_et_al(tb_grouped, output_folder=OUTPUT_FOLDER / "comparison-with-hong-et-al-2021"):

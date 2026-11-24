@@ -70,6 +70,7 @@ COUNTRIES_EXPECTED_TO_MISS_DATA = {
     "Saint Helena",
     "Saint Pierre and Miquelon",
     "San Marino",
+    "Seychelles",
     "Singapore",
     "Tokelau",
     "Turks and Caicos Islands",
@@ -253,24 +254,23 @@ def sanity_check_data_coverage(tb, regions):
         "Ethiopia (former)": (min_year, 1992),
         "Ethiopia": (1993, max_year),
         "Sudan (former)": (1961, 2011),
-        "Sudan": (2012, 2022),
+        "Sudan": (2012, max_year),
         # NOTE: One would expect South Sudan to start in 2012, but it starts in 2019.
         # Changes in historical regions in North America.
         # NOTE: Successors of Netherlands Antilles are not informed in the data, hence we exclude it from North America (adjusted).
         "Netherlands Antilles": (min_year, 2009),
         # Changes in data coverage in Africa.
-        "Seychelles": (2010, max_year),
         "South Sudan": (2019, 2022),
         "Democratic Republic of Congo": (2010, max_year),
-        "Mali": (1961, 2022),
+        "Mali": (1961, max_year),
         "Comoros": (2010, max_year),
         "Somalia": (2010, 2022),
         "Burundi": (2010, 2022),
         "Libya": (2010, max_year),
-        "Togo": (1961, 2022),
+        "Togo": (1961, max_year),
         "Central African Republic": (1961, 2022),
-        "Chad": (1961, 2022),
-        "Benin": (1961, 2022),
+        "Chad": (1961, max_year),
+        "Benin": (1961, max_year),
         # Changes in data coverage in Asia.
         "Brunei": (min_year, 2009),
         "Syria": (2010, max_year),
@@ -279,11 +279,12 @@ def sanity_check_data_coverage(tb, regions):
         "Qatar": (2019, max_year),
         "Oman": (1990, max_year),
         "North Korea": (min_year, 2018),
-        "Japan": (1961, 2022),
+        "Japan": (1961, max_year),
         # Changes in data coverage in North America.
         "Bermuda": (min_year, 2009),
         "Cuba": (1961, 2019),
-        "Dominica": (1961, 2022),
+        "Dominica": (1961, max_year),
+        "Nicaragua": (1961, 2022),
         # Changes in data coverage in Oceania.
         "Marshall Islands": (2019, max_year),
         "Tonga": (2019, max_year),
@@ -308,13 +309,13 @@ def sanity_check_data_coverage(tb, regions):
         ]["country"]
     ) - set(countries_expected_coverage)
     countries_expected_coverage.update({country: (min_year, max_year) for country in remaining_informed_countries})
-    # Check that the data coverages is as expected.
-    for country, (range_min, range_max) in countries_expected_coverage.items():
-        error = f"Unexpected data coverage for {country}: ({tb[tb['country'] == country]['year'].min()}, {tb[tb['country'] == country]['year'].max()})"
-        assert set(tb[tb["country"] == country]["year"]) == set(range(range_min, range_max + 1)), error
-        # If the assertion fails, comment it, and uncomment the following lines; then update the list above
-        # if not set(tb[tb["country"] == country]["year"]) == set(range(range_min, range_max + 1)):
-        #     print(f"'{country}': ({tb[tb['country'] == country]['year'].min()}, {tb[tb['country'] == country]['year'].max()}),")
+    # Check that the data coverages is as expected (the error lists the actual coverage of every unexpected country).
+    unexpected = {
+        country: (tb[tb["country"] == country]["year"].min(), tb[tb["country"] == country]["year"].max())
+        for country, (range_min, range_max) in countries_expected_coverage.items()
+        if set(tb[tb["country"] == country]["year"]) != set(range(range_min, range_max + 1))
+    }
+    assert not unexpected, f"Unexpected data coverage (update the list above): {unexpected}"
 
 
 def plot_adjusted_data(tb):
@@ -394,8 +395,9 @@ def run() -> None:
     tb = tb.dropna(subset=["agricultural_land", "food_supply"], how="any").reset_index(drop=True)
 
     # Sanity check.
-    error = "List of countries that are removed (due to not having data on coincident years for both land use and food supply) has changed. Check and update this list."
-    assert countries_original - set(tb["country"]) == COUNTRIES_EXPECTED_TO_MISS_DATA, error
+    countries_removed = countries_original - set(tb["country"])
+    error = f"List of countries that are removed (due to not having data on coincident years for both land use and food supply) has changed. Check and update this list. Newly removed: {sorted(countries_removed - COUNTRIES_EXPECTED_TO_MISS_DATA)}. No longer removed: {sorted(COUNTRIES_EXPECTED_TO_MISS_DATA - countries_removed)}."
+    assert countries_removed == COUNTRIES_EXPECTED_TO_MISS_DATA, error
 
     # FAO doesn't have data for North America. Instead, it has Northern, Central, South, and Caribbean.
     # For convenience, create a "North America (FAO)" by adding up Northern, Central, and Caribbean.
@@ -447,22 +449,15 @@ def run() -> None:
     # Uncomment to visually inspect all changes.
     # plot_adjusted_data(tb=tb)
 
-    ####################################################################################################################
-    # In the latest FAOSTAT update (2026-02-25), Africa is very incomplete in the latest year (2023).
-    # I'll assert the drop, and remove this point.
-    africa_2022 = tb[(tb["country"] == "Africa (adjusted)") & (tb["year"] == 2022)]["agricultural_land"].item()
-    africa_2023 = tb[(tb["country"] == "Africa (adjusted)") & (tb["year"] == 2023)]["agricultural_land"].item()
-    error = "Expected dip in Africa's agricultural land from 2022 and 2023. This may have been fixed; remove this code."
-    assert (100 * (africa_2022 - africa_2023) / africa_2022) > 23, error
-    tb.loc[
-        (tb["country"] == "Africa (adjusted)") & (tb["year"] == 2023),
-        ["population", "food_supply", "agricultural_land"],
-    ] = None
+    # Check that no adjusted region has an abrupt change in agricultural land, which would mean that countries with a
+    # large area lack data in some years (e.g. an incomplete latest year).
+    tb_adjusted = tb[tb["country"].astype(str).str.contains("(adjusted)", regex=False)].sort_values(["country", "year"])
+    change = 100 * tb_adjusted.groupby("country", observed=True)["agricultural_land"].pct_change().abs()
+    error = "Abrupt change in agricultural land of an adjusted region; check the data coverage of its countries."
+    assert (change.dropna() < 15).all(), error
 
-    # A similar issue happens with Asia, but the dip is smaller than 3%, so we'll keep this.
-    # Additionally, Cuba's data from 2020 onwards has been removed from FBS, this causes a noticeable dip in 2020 for North America.
+    # NOTE: Cuba's data from 2020 onwards has been removed from FBS, this causes a noticeable dip in 2020 for North America.
     # This is unfortunate, but we'll keep this data, instead of removing 4 years of data.
-    ####################################################################################################################
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)

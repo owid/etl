@@ -154,7 +154,7 @@ role_overrides:
 #    The animal role sets the waterfall's production stage; these oils are physically processed products.
 #    See assumption 9 and known problem 4 (fish oil partly counted twice) in the step's docstring.
 fish_from_fbs:
-  - {code: 2761, name: "Freshwater Fish", role: animal}
+  - {code: 2761, name: "Freshwater and Diadromous Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
   - {code: 2763, name: "Pelagic Fish", role: animal}
   - {code: 2764, name: "Marine Fish, Other", role: animal}
@@ -162,7 +162,7 @@ fish_from_fbs:
   - {code: 2766, name: "Cephalopods", role: animal}
   - {code: 2767, name: "Molluscs, Other", role: animal}
   - {code: 2768, name: "Meat, Aquatic Mammals", role: animal}
-  - {code: 2769, name: "Aquatic Animals, Others", role: animal}
+  - {code: 2769, name: "Aquatic Animals, Other", role: animal}
   - {code: 2781, name: "Fish, Body Oil", role: animal}
   - {code: 2782, name: "Fish, Liver Oil", role: animal}
 
@@ -179,6 +179,8 @@ country_specific_densities:
   - {country: Peru, code: 1058, name: "Meat of chickens, fresh or chilled"}
   - {country: Peru, code: 116, name: "Potatoes"}
   - {country: Peru, code: 31, name: "Rice, milled"}
+  # FAO revised the calories of some years (2010-2013, 2015-2018) without revising the food quantities.
+  - {country: Uganda, code: 163, name: "Cane sugar, non-centrifugal"}
 
 # 7. Processing families used only as a check: for World, the calories coming out of processing as products should
 #    be close to the calories going in (a few percent are lost in milling, crushing and brewing).
