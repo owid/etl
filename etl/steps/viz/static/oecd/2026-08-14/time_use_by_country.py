@@ -245,9 +245,9 @@ Read each import's tail (the curve's start), control (the cubic's `(3(c1 + c2) -
 (the dart's vertex farthest from its centroid), and pass them with `name: annotation__arrow-<slug>` and
 `replaceIds` the curve and the dart. Pass the CHART's id as both `frameId` and `parentId`, with the
 points in the chart's own coordinates: `chart` is a clipping frame, not a group, and the script refuses
-points given in the outer frame's coordinates (the dart lands off by the chart's offset). Its gate
-reports `arrow-variety` for the two pairs that lean the same way at the same angle; the notes share one
-height and the house minimum length leaves no room for a third angle, so that row is a standing REVIEW.
+points given in the outer frame's coordinates (the dart lands off by the chart's offset). Two gate rows
+are standing REVIEWs, both by design: `arrow-length`, since these arrows are shorter than the library's
+(see `KEY_BAR_SPACE`), and `arrow-variety` for the two hooks, which share a shape at different lengths.
 
 **On mobile, the Note then moves out of `chart` into the footer**, as the footer's first child: one Lato
 12 text joined from the `chart__note*` runs, `Note:` set bold, `Text/Gray 70`, width FILL and line height
@@ -259,9 +259,11 @@ the footer already holds the Note; when the Note's wording changed, set the foot
 fit measures the band the new Note leaves.
 
 **The mobile frame's own slots carry the design team's sizes**, which the template's styles do not: the
-header at y=12 with a 4px gap, the title at 24px and the subtitle at 15px (line height auto), its box
-cropped to 420 with the step's explicit line breaks; the footer's two rows at 12px with a 4px gap, ending
-on the 16px bottom margin. A rebuild clones the frame, which keeps them, and needs only the chart
+header at y=12 with a 4px gap, the title at 24px and the subtitle at 15px (line height auto); the
+footer's two rows at 12px with a 4px gap, ending on the 16px bottom margin. The subtitle's box runs the
+full 508px (FILL), and the step's explicit line breaks keep its first line, the only one beside the logo,
+24px clear of it (`subtitle_under_logo`). `verify_page.js`'s `subtitle-logo-clearance` measures the box,
+not the line, so it FAILs on this frame by design. A rebuild clones the frame, which keeps them, and needs only the chart
 re-imported.
 
 **The gate's standing findings**, each accepted rather than open: the template's own 11px tagline and
@@ -368,6 +370,8 @@ MAIN_CATEGORY_GROUPS = [
         # The desktop annotation's line breaks. Asserted to spell out `run_in_list(members)`, so they
         # cannot drift from the members.
         "key_lines": ["Paid work, commuting, school", "or classes, homework"],
+        # How its arrow leaves the list (`arrow_points`).
+        "arrow": {"kind": "hook"},
     },
     {
         "column": "main_unpaid_work_and_other",
@@ -388,6 +392,7 @@ MAIN_CATEGORY_GROUPS = [
         # Dark Olive Green.
         "color": ("hex", "#18470f"),
         "key_lines": ["Housework, childcare,", "shopping, household travel"],
+        "arrow": {"kind": "drop", "lean": 0, "bow": 0.22},
     },
     {
         "column": "main_personal_care",
@@ -399,6 +404,7 @@ MAIN_CATEGORY_GROUPS = [
         "color": ("hex", "#00295b"),
         "as_hours": True,
         "key_lines": ["Sleep, eating & drinking,", "grooming & health"],
+        "arrow": {"kind": "hook", "run": 30},
         # Compact like the rest, though it has room for the spelled-out form. One category set
         # differently from its neighbours reads as a difference in kind, and the only difference is
         # that this segment is wider.
@@ -415,6 +421,7 @@ MAIN_CATEGORY_GROUPS = [
         # Maroon.
         "color": ("hex", "#883039"),
         "key_lines": ["TV & radio, seeing friends,", "sports, events, hobbies & other"],
+        "arrow": {"kind": "drop", "lean": 10, "bow": -0.15},
     },
 ]
 
@@ -479,6 +486,7 @@ MAIN_CATEGORIES = [
         # What the segment holds, listed over its name.
         "members": group["members"],
         "key_lines": group["key_lines"],
+        "arrow": group["arrow"],
     }
     for group in MAIN_CATEGORY_GROUPS
 ]
@@ -493,6 +501,10 @@ SUBTITLE = (
     "country's most recent time-use survey in the OECD database over the period {first}–{last}. "
     "Activities are grouped into {categories}."
 )
+# The mobile frame's: the same, less "on different activities", which the second sentence says anyway.
+# It takes the subtitle from five lines to four on a frame where every line comes out of the bars.
+SUBTITLE_MOBILE = SUBTITLE.replace("spent on different activities in", "spent in")
+assert SUBTITLE_MOBILE != SUBTITLE, "The mobile subtitle no longer trims the desktop one."
 
 # The row labels set the width of the column they sit in, so the two longest names are shortened to
 # the forms the style guide sanctions (no periods). It buys the bars 15px on desktop and 13px on
@@ -696,21 +708,27 @@ COUNTRY_LINE_PX = 14
 # them.
 HEADER_MIN_GAP = 16
 
-# The arrows from each annotation to its segment, in the house style of the Charts file's curvy arrows
-# (`/owid-staff:create-figma-chart`, ANNOTATIONS-AND-ARROWS.md), which the Figma frame swaps in for these:
-# a 1px curve bowed by a quarter of its chord, a filled dart about 1.4 times as long as it is wide, the
-# curve stopping inside the dart, and no arrow shorter than the library's shortest (45px on a 540-wide
-# frame, so 72 at 850). In template pixels: the clearance under the list, the drop from tail to tip, the
-# air the tip leaves above its bar, the tail's inset from the end of the list nearer the tip, the tip's
-# inset from its segment's ends, the bow as a share of the chord, the dart, and how far behind the tip
-# the curve stops.
-KEY_ARROW_GAP = 4
-ARROW_DROP_PX = 44
+# The arrows from each annotation to its segment, drawn after the editorial sketch of this chart and in
+# the house style of the Charts file's curvy arrows (`/owid-staff:create-figma-chart`,
+# ANNOTATIONS-AND-ARROWS.md), whose library arrows the Figma frame swaps in for these: a 1px curve, a
+# filled dart about 1.4 times as long as it is wide, the curve stopping inside the dart. Two kinds,
+# alternated so neighbouring arrows do not read as one curve repeated: a HOOK leaves the end of the
+# list's last line sideways and turns down onto its segment; a DROP leaves the list's bottom edge and
+# falls almost straight, bowed to one side (see each category's `arrow`).
+#
+# A deliberate exception to the house minimum length (45px on a 540-wide frame, so 72 at 850): these run
+# about 25-40px. The lists sit right over their segments, and a 72px arrow would need either a taller
+# header or arrows running sideways across the neighbouring segment; short arrows keep each note on top
+# of what it names.
+#
+# In template pixels: the room between a list's last line and the bars' top, the clearance the tail
+# leaves off the text, the air the tip leaves above its bar, a hook's default sideways run, and the
+# tip's least inset from its segment's ends; then the dart and how far behind the tip the curve stops.
+KEY_BAR_SPACE = 34
+ARROW_TAIL_GAP = 4
 ARROW_TIP_GAP = 5
-ARROW_MIN_LENGTH_PX = 72
-ARROW_TAIL_INSET = 20
-ARROW_SEGMENT_INSET = 12
-ARROW_BOW = 0.26
+ARROW_HOOK_RUN = 24
+ARROW_SEGMENT_INSET = 10
 ARROW_HEAD_LENGTH_PX = 11
 ARROW_HEAD_WIDTH_PX = 8
 ARROW_CURVE_BACK_PX = 7
@@ -894,9 +912,14 @@ LAYOUTS = {
         # The design team's spacing here: 17px bars on a 26px pitch.
         "bar_fraction": 0.652,
         "note_in_band": True,
-        # The same text as the desktop frame, the legend sentence on lines of its own (`wrap_runs`).
-        "subtitle": SUBTITLE,
+        # The desktop text, trimmed by three words, the legend sentence on lines of its own (`wrap_runs`).
+        "subtitle": SUBTITLE_MOBILE,
         "subtitle_sentence_breaks": True,
+        # The logo sits beside the subtitle's first line only (it ends at y=51, the second line starts at
+        # 63), so the later lines take the full 508px and the subtitle takes fewer lines. In the frame the
+        # subtitle's box is the full width too, with the step's line breaks keeping the first line clear
+        # of the logo.
+        "subtitle_under_logo": True,
     },
 }
 
@@ -1057,8 +1080,13 @@ def create_visualization(
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], PLAYFAIR_SLOT_SLACK)
     tokens = subtitle_tokens(layout["subtitle"], layout["groups"], int(tb["year"].min()), int(tb["year"].max()))
     subtitle_box = subtitle_box_px(template, margin_px, lines_in(title))
+    # A subtitle whose first line is the only one beside the logo runs its later lines the full width.
     subtitle_lines = wrap_runs(
-        tokens, subtitle_box, template["subtitle_px"], by_sentence=bool(layout.get("subtitle_sentence_breaks"))
+        tokens,
+        subtitle_box,
+        template["subtitle_px"],
+        by_sentence=bool(layout.get("subtitle_sentence_breaks")),
+        rest_slot_px=template["subtitle_slot_px"] if layout.get("subtitle_under_logo") else None,
     )
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
@@ -1197,8 +1225,9 @@ def subtitle_tokens(text: str, groups: list[dict], first: int, last: int) -> lis
 
     `{categories}` becomes the category names in bar order — "paid work & study, unpaid work, personal
     care, and leisure" — each word in bold and in its segment's colour, which is what makes the sentence
-    the legend. Punctuation that follows a name rides in the same word as a plain piece, so a line can
-    never break between a name and its comma.
+    the legend. A name is one unbreakable word, so a line never splits "personal / care", and the
+    punctuation that follows it rides in the same word as a plain piece, so a line never breaks between a
+    name and its comma.
     """
     before, after = text.format(first=first, last=last, categories="\0").split("\0")
     runs: list[tuple[str, bool, str]] = [(before, False, TEXT_COLOR)]
@@ -1210,7 +1239,7 @@ def subtitle_tokens(text: str, groups: list[dict], first: int, last: int) -> lis
 
     words: list[list[tuple[str, bool, str]]] = [[]]
     for run_text, bold, color in runs:
-        for index, chunk in enumerate(run_text.split(" ")):
+        for index, chunk in enumerate([run_text] if bold else run_text.split(" ")):
             if index:
                 words.append([])
             if chunk:
@@ -1241,24 +1270,31 @@ def rich_line_width_px(line: list[list[tuple[str, bool, str]]], size_px: float) 
 
 
 def wrap_runs(
-    words: list[list[tuple[str, bool, str]]], slot_px: float, size_px: float, by_sentence: bool = False
+    words: list[list[tuple[str, bool, str]]],
+    slot_px: float,
+    size_px: float,
+    by_sentence: bool = False,
+    rest_slot_px: float | None = None,
 ) -> list[list[list[tuple[str, bool, str]]]]:
     """Wrap mixed-style words into the slot greedily; with `by_sentence`, each sentence on lines of its own.
 
     A sentence boundary outranks filling the line, since a second sentence that starts mid-line reads as a
-    run-on — unless starting it afresh costs a line over the plain wrap. The line breaks are explicit, so
-    the frame's subtitle takes the same text with the same breaks.
+    run-on — unless starting it afresh costs a line over the plain wrap. `slot_px` holds the first line and
+    `rest_slot_px` (default the same) every later one, for a subtitle whose first line runs beside the logo.
+    The line breaks are explicit, so the frame's subtitle takes the same text with the same breaks.
     """
+    rest = slot_px if rest_slot_px is None else rest_slot_px
 
-    def greedy(chunk: list) -> list:
+    def greedy(chunk: list, first_line: int) -> list:
         lines: list = [[]]
         for word in chunk:
-            if lines[-1] and not fits_slot(rich_line_width_px([*lines[-1], word], size_px), slot_px):
+            room = slot_px if first_line + len(lines) == 1 else rest
+            if lines[-1] and not fits_slot(rich_line_width_px([*lines[-1], word], size_px), room):
                 lines.append([])
             lines[-1].append(word)
         return lines
 
-    plain = greedy(words)
+    plain = greedy(words, 0)
     if not by_sentence:
         return plain
     sentences: list = [[]]
@@ -1266,7 +1302,10 @@ def wrap_runs(
         sentences[-1].append(word)
         if word[-1][0].endswith("."):
             sentences.append([])
-    by_sentences = [line for sentence in sentences if sentence for line in greedy(sentence)]
+    by_sentences: list = []
+    for sentence in sentences:
+        if sentence:
+            by_sentences += greedy(sentence, len(by_sentences))
     return by_sentences if len(by_sentences) <= len(plain) else plain
 
 
@@ -1501,7 +1540,7 @@ def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[d
     Each block starts centred over its top-row segment, then is pushed sideways until neighbours clear
     each other by `HEADER_MIN_GAP` and every block sits inside the frame's content column (`bounds`, in
     plot px, so it may reach over the country labels). The last block is set right-aligned, the rest
-    left-aligned. Each then gets its arrow (`plan_arrow`).
+    left-aligned.
     """
     list_font = font_pt(layout, "key_font_px")
     blocks = []
@@ -1514,10 +1553,7 @@ def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[d
                 "category": category,
                 "segment": (start, end),
                 "extent": [centre - width / 2, centre + width / 2],
-                "height": len(category["key_lines"]) * layout["key_line_px"]
-                + KEY_ARROW_GAP
-                + ARROW_DROP_PX
-                + ARROW_TIP_GAP,
+                "height": len(category["key_lines"]) * layout["key_line_px"] + KEY_BAR_SPACE,
             }
         )
     low, high = bounds
@@ -1533,76 +1569,79 @@ def key_blocks(spans: dict, layout: dict, bounds: tuple[float, float]) -> list[d
         shift = max(0.0, block["extent"][1] - ceiling)
         block["extent"] = [block["extent"][0] - shift, block["extent"][1] - shift]
         ceiling = block["extent"][0] - HEADER_MIN_GAP
-    previous = -1
     for index, block in enumerate(blocks):
         last = index == len(blocks) - 1
         block["align"] = "right" if last else "left"
         block["anchor"] = block["extent"][1] if last else block["extent"][0]
-        # Neighbouring arrows lean opposite ways where they can, so no two read as one curve repeated.
-        block["arrow"] = plan_arrow(block, prefer=-previous)
-        previous = block["arrow"]["direction"]
     collision = key_blocks_collide(blocks)
     assert not collision, f"The annotations for {collision} would touch. Re-break their `key_lines`."
     assert blocks[0]["extent"][0] >= low - 0.01, "The annotations overrun the frame's content column."
     return blocks
 
 
-def plan_arrow(block: dict, prefer: int) -> dict:
-    """Where an annotation's arrow leaves its list and lands on its segment, in plot px across.
+def arrow_points(
+    block: dict, list_top: float, bars_top_px: float, plot_left_px: float, layout: dict
+) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float]]:
+    """An annotation arrow's tail, control point and tip, in frame px.
 
-    The arrow drops `ARROW_DROP_PX` and runs sideways far enough that its chord is the house minimum,
-    leaning right (`direction` 1) or left (-1). Its tail sits on the list's bottom edge, at least
-    `ARROW_TAIL_INSET` in from either end, and its tip lands on the top-row segment as near its middle as
-    that allows: a tip near a segment's end reads as pointing at the boundary, or at the neighbour.
-    `prefer` wins unless the other lean lands the tip much nearer the middle.
+    A hook leaves the end of the list's last line, level with its middle, and turns down onto the
+    segment `run` px further along: its control point sits above the tip at the tail's height, so it
+    leaves flat and arrives vertically. A drop leaves the list's bottom edge and lands `lean` px to one
+    side, its curve bowed by `bow` of its chord (positive to the right); its tip goes as near the
+    segment's middle as the list above allows.
     """
-    run = (ARROW_MIN_LENGTH_PX**2 - ARROW_DROP_PX**2) ** 0.5
-    (left, right), (seg_start, seg_end) = block["extent"], block["segment"]
-    middle = (seg_start + seg_end) / 2
-    options = []
-    for direction in (prefer, -prefer):
-        # The tips this lean can reach from the list's bottom edge, within the segment.
-        low = max(seg_start + ARROW_SEGMENT_INSET, left + ARROW_TAIL_INSET + direction * run)
-        high = min(seg_end - ARROW_SEGMENT_INSET, right - ARROW_TAIL_INSET + direction * run)
-        if low <= high:
-            tip = min(max(middle, low), high)
-            # A lean against the preferred one costs this many px of distance from the middle.
-            cost = abs(tip - middle) + (0 if direction == prefer else ARROW_TAIL_INSET)
-            options.append((cost, {"direction": direction, "tail": tip - direction * run, "tip": tip}))
-    if options:
-        return min(options, key=lambda option: option[0])[1]
-    raise AssertionError(
-        f"No arrow of {ARROW_MIN_LENGTH_PX}px fits between the {block['category']['name']} list and its "
-        f"segment. Move the list, or shorten ARROW_DROP_PX."
+    style = block["category"]["arrow"]
+    line = layout["key_line_px"]
+    lines = block["category"]["key_lines"]
+    seg_start, seg_end = (plot_left_px + x for x in block["segment"])
+    left, right = (plot_left_px + x for x in block["extent"])
+    tip_y = bars_top_px - ARROW_TIP_GAP
+    if style["kind"] == "hook":
+        assert block["align"] == "left", "A hook leaves a line's right end, so it needs a left-aligned list."
+        end = plot_left_px + block["anchor"] + text_advance_px(lines[-1], font_pt(layout, "key_font_px"))
+        tail = (end + ARROW_TAIL_GAP, list_top + (len(lines) - 0.5) * line + 0.5)
+        tip = (tail[0] + style.get("run", ARROW_HOOK_RUN), tip_y)
+        control = (tip[0], tail[1])
+    else:
+        lean = style["lean"]
+        middle = (seg_start + seg_end) / 2
+        tip_x = min(max(middle, left + ARROW_SEGMENT_INSET + lean), right - ARROW_SEGMENT_INSET + lean)
+        tail = (tip_x - lean, list_top + len(lines) * line + ARROW_TAIL_GAP)
+        tip = (tip_x, tip_y)
+        dx, dy = tip[0] - tail[0], tip[1] - tail[1]
+        length = (dx**2 + dy**2) ** 0.5
+        control = (
+            (tail[0] + tip[0]) / 2 + style["bow"] * length * dy / length,
+            (tail[1] + tip[1]) / 2 - style["bow"] * length * dx / length,
+        )
+    assert seg_start + ARROW_SEGMENT_INSET <= tip[0] <= seg_end - ARROW_SEGMENT_INSET, (
+        f"The {block['category']['name']} arrow lands at x={tip[0]:.0f}, outside its segment "
+        f"({seg_start:.0f}-{seg_end:.0f}). Change its `arrow` style."
     )
+    return tail, control, tip
 
 
-def arrow_shape(tail: tuple[float, float], tip: tuple[float, float], direction: int) -> dict:
-    """A house arrow from tail to tip, in frame px: the curve's three points and the dart's three.
+def arrow_shape(tail: tuple[float, float], control: tuple[float, float], tip: tuple[float, float]) -> dict:
+    """A house arrow through its three points, in frame px: the curve's three points and the dart's three.
 
-    The curve bows `ARROW_BOW` of its chord to the side that makes it leave the list near-flat and arrive
-    steeply; it ends `ARROW_CURVE_BACK_PX` behind the tip, inside the dart, which points along the
-    curve's end tangent.
+    The curve ends `ARROW_CURVE_BACK_PX` behind the tip, inside the dart, which points along the curve's
+    end tangent.
     """
-    (tx, ty), (ex, ey) = tail, tip
-    vx, vy = ex - tx, ey - ty
-    length = (vx**2 + vy**2) ** 0.5
-    nx, ny = direction * vy / length, -direction * vx / length
-    control = ((tx + ex) / 2 + ARROW_BOW * length * nx, (ty + ey) / 2 + ARROW_BOW * length * ny)
+    ex, ey = tip
     ux, uy = ex - control[0], ey - control[1]
     norm = (ux**2 + uy**2) ** 0.5
     ux, uy = ux / norm, uy / norm
     arrival = abs(degrees(atan2(uy, ux)))
     arrival = min(arrival, 180 - arrival)
     assert arrival >= ARROW_MIN_ARRIVAL_DEG, (
-        f"An arrow arrives at {arrival:.0f} degrees to its bar, under {ARROW_MIN_ARRIVAL_DEG}: raise ARROW_DROP_PX."
+        f"An arrow arrives at {arrival:.0f} degrees to its bar, under {ARROW_MIN_ARRIVAL_DEG}: change its `arrow` style."
     )
     rear = (ex - ARROW_HEAD_LENGTH_PX * ux, ey - ARROW_HEAD_LENGTH_PX * uy)
     half = ARROW_HEAD_WIDTH_PX / 2
     return {
         "curve": [tail, control, (ex - ARROW_CURVE_BACK_PX * ux, ey - ARROW_CURVE_BACK_PX * uy)],
         "head": [tip, (rear[0] - half * uy, rear[1] + half * ux), (rear[0] + half * uy, rear[1] - half * ux)],
-        "length": length,
+        "length": ((ex - tail[0]) ** 2 + (ey - tail[1]) ** 2) ** 0.5,
         "arrival": arrival,
     }
 
@@ -1638,12 +1677,10 @@ def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, l
     """
     list_font = font_pt(layout, "key_font_px")
     line = layout["key_line_px"]
-    tip_y = bars_top_px - ARROW_TIP_GAP
-    tail_y = tip_y - ARROW_DROP_PX
     for block in blocks:
         category = block["category"]
         slug = slugify(category["name"])
-        list_top = tail_y - KEY_ARROW_GAP - len(category["key_lines"]) * line
+        list_top = bars_top_px - KEY_BAR_SPACE - len(category["key_lines"]) * line
         for index, text in enumerate(category["key_lines"]):
             fig.text(
                 fx(plot_left_px + block["anchor"]),
@@ -1655,10 +1692,7 @@ def draw_key(fig, blocks: list[dict], plot_left_px: float, bars_top_px: float, l
                 color=MEMBER_TEXT_COLOR,
                 gid=f"key__{slug}-members" if index == 0 else f"key__{slug}-members-line{index}",
             )
-        plan = block["arrow"]
-        shape = arrow_shape(
-            (plot_left_px + plan["tail"], tail_y), (plot_left_px + plan["tip"], tip_y), plan["direction"]
-        )
+        shape = arrow_shape(*arrow_points(block, list_top, bars_top_px, plot_left_px, layout))
         to_figure = [(fx(x), fy(y)) for x, y in shape["curve"]]
         fig.add_artist(
             PathPatch(
@@ -2321,7 +2355,8 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     # working or not. "Everyone" is not stated in the workbook but follows from the data: each country's
     # categories add up to the whole day, which averages over participants only would not. "Weekdays and
     # weekends" is the workbook's own phrase; it does not say how each survey weights its diary days, so
-    # the Note does not claim "all seven days".
+    # the Note does not claim "all seven days". The zero sentence says "no paid work OR study": a day off
+    # from a job that is spent studying still counts toward the category, which adds the two up.
     #
     # Then what the green segment holds beyond unpaid work: the source's code 5, folded in here (see
     # `MAIN_CATEGORY_GROUPS`). Per the workbook's activity sheet, 5.1 is religious/spiritual activities and
@@ -2335,9 +2370,9 @@ def build_note(ages: dict[str, str], layout: dict) -> str:
     # No generic comparability sentence: it named no comparison a reader could act on. The one country
     # the OECD flags as not comparable is left off the chart (`NOT_COMPARABLE`).
     text += (
-        "Averages cover everyone aged 15 to 64, on weekdays and weekends alike. They include days and "
-        "people with no paid work or study. Unpaid work also includes religious "
-        "and civic activities, and time the OECD doesn't assign to another category, including some travel."
+        "Averages cover everyone aged 15 to 64, on weekdays and weekends alike. Days and people with no paid "
+        "work or study count as zero hours of it. Unpaid work also includes religious and civic activities, "
+        "and time the OECD doesn't assign to another category, including some travel."
     )
     # Against the narrower of the Note's own slot and the content width — the slot is the template's,
     # but a mobile frame's content is narrower than it.
