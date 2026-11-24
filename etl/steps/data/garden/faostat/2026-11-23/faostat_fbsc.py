@@ -16,6 +16,7 @@ update.
 """
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, Table
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
@@ -43,6 +44,86 @@ FBS_FIRST_YEAR = 2010
 DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)"
 # Last year for which we have data in fbsh dataset (used for sanity checks).
 FBSH_LAST_YEAR = 2013
+
+
+def fix_domestic_supply_of_fish_oils(tb_fbs: Table) -> Table:
+    """Recompute FAOSTAT's domestic supply of fish oils in FBS, which leaves out production.
+
+    FAOSTAT defines domestic supply as production + imports - exports - stock variation. For "Fish, Body Oil" and
+    "Fish, Liver Oil", the reported domestic supply often equals that sum minus production (e.g. -333,000 t for Peru in
+    2011, instead of 3,000 t), so it no longer equals the sum of its uses, which still add up to the full sum. The group
+    "Animal fats" sums the domestic supply of its members, so it carries the same error.
+
+    The domestic supply of both fish oils is set to the full sum, and "Animal fats" gets the same correction.
+
+    NOTE: Remove this function once FAOSTAT fixes the data (the first assertion below will fail when that happens).
+    """
+    tb_fbs = tb_fbs.copy()
+    fish_oils = ["00002781", "00002782"]
+    animal_fats = "00002946"
+    animal_fats_members = ["00002737", "00002740", "00002743"] + fish_oils
+    domestic_supply = "005301"
+    production = "005511"
+    # Production, imports, exports and stock variation, with the sign they take in domestic supply.
+    supply_signs = {production: 1, "005611": 1, "005911": -1, "005072": -1}
+    # Food, feed, seed, losses, processing, other uses, residuals and tourist consumption.
+    uses = ["005142", "005521", "005527", "005123", "005131", "005154", "005170", "005171"]
+    # FAOSTAT reports these elements in thousand tonnes, rounded; allow for that rounding.
+    tolerance = 2
+
+    # Pivot the fish oils to one row per area, year and item, and one column per element.
+    fish = tb_fbs.loc[tb_fbs["item_code"].isin(fish_oils), ["area", "year", "item_code", "element_code", "value"]]
+    fish = fish.astype({"area": str, "item_code": str, "element_code": str})
+    wide = fish.pivot_table(
+        index=["area", "year", "item_code"], columns="element_code", values="value", aggfunc="sum"
+    ).fillna(0)
+    full_supply = sum(sign * wide[code] for code, sign in supply_signs.items())
+    sum_of_uses = wide[[code for code in uses if code in wide.columns]].sum(axis=1)
+    # A small production can hide within the rounding, so a negative domestic supply with a non-negative full sum also
+    # counts as wrong.
+    is_wrong = ((wide[domestic_supply] - full_supply).abs() > tolerance) | (
+        (wide[domestic_supply] < 0) & (full_supply >= 0)
+    )
+    leaves_out_production = (wide[domestic_supply] - (full_supply - wide[production])).abs() <= tolerance
+
+    # Check that the error is still there, that it consists of leaving out production, and that the uses confirm the fix.
+    error = "FAOSTAT's domestic supply of fish oils is now correct. Remove fix_domestic_supply_of_fish_oils."
+    assert is_wrong.any(), error
+    error = "Most wrong domestic supply of fish oils was expected to leave out production exactly."
+    assert leaves_out_production[is_wrong].mean() > 0.7, error
+    error = "The uses of fish oils were expected to add up to production + imports - exports - stock variation."
+    assert ((sum_of_uses - full_supply).abs() <= tolerance).all(), error
+
+    # Correct the domestic supply of fish oils.
+    correction = (full_supply - wide[domestic_supply])[is_wrong]
+    is_fish_oil_supply = tb_fbs["item_code"].isin(fish_oils) & (tb_fbs["element_code"] == domestic_supply)
+    keys = pd.MultiIndex.from_arrays(
+        [
+            tb_fbs.loc[is_fish_oil_supply, "area"].astype(str),
+            tb_fbs.loc[is_fish_oil_supply, "year"],
+            tb_fbs.loc[is_fish_oil_supply, "item_code"].astype(str),
+        ]
+    )
+    tb_fbs.loc[is_fish_oil_supply, "value"] += correction.reindex(keys).fillna(0).to_numpy()
+
+    # Apply the same correction to the domestic supply of "Animal fats".
+    correction_by_area_year = correction.groupby(level=["area", "year"]).sum()
+    is_animal_fats_supply = (tb_fbs["item_code"] == animal_fats) & (tb_fbs["element_code"] == domestic_supply)
+    keys = pd.MultiIndex.from_arrays(
+        [tb_fbs.loc[is_animal_fats_supply, "area"].astype(str), tb_fbs.loc[is_animal_fats_supply, "year"]]
+    )
+    error = "Some corrected fish oil balances have no 'Animal fats' domestic supply to correct."
+    assert set(correction_by_area_year.index) <= set(keys), error
+    tb_fbs.loc[is_animal_fats_supply, "value"] += correction_by_area_year.reindex(keys).fillna(0).to_numpy()
+
+    # Check that "Animal fats" still equals the sum of its members.
+    supply = tb_fbs[tb_fbs["element_code"] == domestic_supply].astype({"area": str, "item_code": str})
+    supply = supply.pivot_table(index=["area", "year"], columns="item_code", values="value", aggfunc="sum")
+    members_sum = supply[[code for code in animal_fats_members if code in supply.columns]].fillna(0).sum(axis=1)
+    error = "The domestic supply of 'Animal fats' no longer equals the sum of its members."
+    assert ((supply[animal_fats].dropna() - members_sum).abs() <= tolerance).all(), error
+
+    return tb_fbs
 
 
 def combine_fbsh_and_fbs_datasets(
@@ -80,6 +161,9 @@ def combine_fbsh_and_fbs_datasets(
     tb_fbsh = harmonize_elements(tb=tb_fbsh, dataset_short_name="faostat_fbsh")
     tb_fbs = harmonize_items(tb=tb_fbs, dataset_short_name="faostat_fbs")
     tb_fbs = harmonize_elements(tb=tb_fbs, dataset_short_name="faostat_fbs")
+
+    # Recompute the domestic supply of fish oils, which FAOSTAT reports without production.
+    tb_fbs = fix_domestic_supply_of_fish_oils(tb_fbs=tb_fbs)
 
     # FBSH and FBS overlap for years 2010, 2011, 2012, and 2013.
     # We need to remove overlapping data, prioritising FBS.
