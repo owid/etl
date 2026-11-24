@@ -99,7 +99,7 @@ definitions:
           colorScale:
             baseColorScheme: OrRd
             binningStrategy: manual
-            customNumericValues: [ 0, 0.1, 0.2, 0.5, 1, 2, 5, 10 ]
+            customNumericValues: [ 0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 1 ]
 
     # Child deaths
     - dimensions:
@@ -125,7 +125,7 @@ definitions:
           colorScale:
             baseColorScheme: OrRd
             binningStrategy: manual
-            customNumericValues: [ 0, 0.1, 0.2, 0.5, 1, 2, 5, 10 ]
+            customNumericValues: [ 0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 1 ]
 
 dimensions:
   - slug: indicator
