@@ -1,0 +1,15 @@
+# Known errors in the Quick Stats data, corrected locally until fixed at the source. See etl/data_corrections.py for the
+# format.
+- indicator: average_layers
+  entity: United States
+  years: [2018]
+  action: override
+  value: 394361000
+  expect: {lt: 390000000}
+  reason: Quick Stats gives 378,160 thousand layers as the 2018 annual average, which is inconsistent with its own
+    monthly series (whose mean from December 2017 through November 2018 is 394,442 thousand) and with the figure
+    published in the Chickens and Eggs 2019 Summary (394,361 thousand,
+    https://esmis.nal.usda.gov/sites/default/release-files/1v53jw96n/zs25xt30s/9p290t89h/ckegan20.pdf). The published
+    figure is also the number of laying hens that FAOSTAT reports for the United States in 2018.
+  producer: USDA National Agricultural Statistics Service (NASS)
+  status: open
