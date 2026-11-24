@@ -33,6 +33,7 @@ tables:
           <%- endif -%>
         unit: "sequenced genomes"
         display:
+          timeInterval: day
           tolerance: 28
           name: |-
             <% if variant == 'non_who' %>
@@ -56,6 +57,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
+          timeInterval: day
           numDecimalPlaces: 1
           tolerance: 28
           name: |-
@@ -97,6 +99,7 @@ tables:
           Number of samples of COVID-19 genome that have been sequenced in the preceding two weeks to determine which mutations it has.
         unit: "sequenced genomes per million people"
         display:
+          timeInterval: day
           numDecimalPlaces: 3
 
       num_sequences_cumulative:
@@ -111,4 +114,5 @@ tables:
           Cumulative number of COVID-19 genomes that have been sequenced in the preceding two weeks to determine which mutations it has.
         unit: "sequenced genomes per million people"
         display:
+          timeInterval: day
           numDecimalPlaces: 3
