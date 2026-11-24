@@ -674,7 +674,9 @@ KEY_ARROW_PX = 24
 KEY_ARROW_BAR_GAP = 3
 ARROW_SEGMENT_INSET = 12
 ARROW_TAIL_OFFSET = 10
-ARROW_COLOR = "#858585"
+# The arrows take their list's gray, which is a library style (`Text/Gray 80`): a gray the frame has no
+# style for would be left unbound, and a re-import could not inherit it from the previous chart.
+ARROW_COLOR = MEMBER_TEXT_COLOR
 
 # A mobile country label: the name in bold, right-aligned against a column of years, which sits this far
 # from the bars, and this far from the name.

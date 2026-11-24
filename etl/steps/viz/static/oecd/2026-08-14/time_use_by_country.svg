@@ -1278,42 +1278,42 @@ z
   <g id="key__paid-work-study-arrow">
    <path d="M 145.15432 114.48 
 Q 135.50632 120.6 137.772401 130.93066 
-" style="fill: none; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: none; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
    <path d="M 139.357299 126.487902 
 L 137.772401 130.93066 
 L 134.473417 127.559205 
 z
-" style="fill: #858585; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
   </g>
   <g id="key__unpaid-work-arrow">
    <path d="M 263.929834 114.48 
 Q 254.281834 120.6 256.547914 130.93066 
-" style="fill: none; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: none; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
    <path d="M 258.132813 126.487902 
 L 256.547914 130.93066 
 L 253.24893 127.559205 
 z
-" style="fill: #858585; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
   </g>
   <g id="key__personal-care-arrow">
    <path d="M 390.410771 114.48 
 Q 380.762771 120.6 383.028852 130.93066 
-" style="fill: none; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: none; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
    <path d="M 384.61375 126.487902 
 L 383.028852 130.93066 
 L 379.729868 127.559205 
 z
-" style="fill: #858585; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
   </g>
   <g id="key__leisure-arrow">
    <path d="M 547.862091 114.48 
 Q 538.214091 120.6 540.480171 130.93066 
-" style="fill: none; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: none; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
    <path d="M 542.06507 126.487902 
 L 540.480171 130.93066 
 L 537.181187 127.559205 
 z
-" style="fill: #858585; stroke: #858585; stroke-width: 0.9; stroke-linecap: round"/>
+" style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.9; stroke-linecap: round"/>
   </g>
   <g id="title">
    <text style="font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="24.623438" transform="rotate(-0 11.52 24.623438)">How do people spend their time?</text>
