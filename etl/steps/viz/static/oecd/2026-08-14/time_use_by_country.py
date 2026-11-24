@@ -495,16 +495,14 @@ TITLE = "How do people spend their time?"
 # One sentence for what a bar shows and over which surveys, then the chart's legend: `{categories}` is
 # filled with the four category names, in bar order, each in bold and in its segment's colour
 # (`subtitle_runs`). "In the OECD database" because the OECD does not refresh a country the moment it runs
-# a new survey: Korea is shown at 2014 while Statistics Korea has published 2019 and 2024 rounds.
+# a new survey: Korea is shown at 2014 while Statistics Korea has published 2019 and 2024 rounds. "From
+# {first} to {last}", not "over the period {first}–{last}": plainer, and short enough that both frames take
+# the same text, the mobile frame in four lines.
 SUBTITLE = (
     "Average time spent on different activities in a 24-hour day by people aged 15 to 64, according to each "
-    "country's most recent time-use survey in the OECD database over the period {first}–{last}. "
+    "country's most recent time-use survey in the OECD database from {first} to {last}. "
     "Activities are grouped into {categories}."
 )
-# The mobile frame's: the same, less "on different activities", which the second sentence says anyway.
-# It takes the subtitle from five lines to four on a frame where every line comes out of the bars.
-SUBTITLE_MOBILE = SUBTITLE.replace("spent on different activities in", "spent in")
-assert SUBTITLE_MOBILE != SUBTITLE, "The mobile subtitle no longer trims the desktop one."
 
 # The row labels set the width of the column they sit in, so the two longest names are shortened to
 # the forms the style guide sanctions (no periods). It buys the bars 15px on desktop and 13px on
@@ -917,8 +915,8 @@ LAYOUTS = {
         # The design team's spacing here: 17px bars on a 26px pitch.
         "bar_fraction": 0.652,
         "note_in_band": True,
-        # The desktop text, trimmed by three words, the legend sentence on lines of its own (`wrap_runs`).
-        "subtitle": SUBTITLE_MOBILE,
+        # The desktop text, the legend sentence on lines of its own where that costs no line (`wrap_runs`).
+        "subtitle": SUBTITLE,
         "subtitle_sentence_breaks": True,
         # The logo sits beside the subtitle's first line only (it ends at y=51, the second line starts at
         # 63), so the later lines take the full 508px and the subtitle takes fewer lines. In the frame the

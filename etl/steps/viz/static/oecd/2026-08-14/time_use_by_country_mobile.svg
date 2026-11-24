@@ -1273,16 +1273,16 @@ z
    <text style="font-size: 17.28px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="21.2193" transform="rotate(-0 11.52 21.2193)">How do people spend their time?</text>
   </g>
   <g id="subtitle-0">
-   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="42.76125" transform="rotate(-0 11.52 42.76125)"><tspan style="fill: #5b5b5b">Average time spent in a 24-hour day by people aged 15 to 64,</tspan></text>
+   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="42.76125" transform="rotate(-0 11.52 42.76125)"><tspan style="fill: #5b5b5b">Average time spent on different activities in a 24-hour day by</tspan></text>
   </g>
   <g id="subtitle-1">
-   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="55.72125" transform="rotate(-0 11.52 55.72125)"><tspan style="fill: #5b5b5b">according to each country's most recent time-use survey in the OECD</tspan></text>
+   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="55.72125" transform="rotate(-0 11.52 55.72125)"><tspan style="fill: #5b5b5b">people aged 15 to 64, according to each country's most recent time-use</tspan></text>
   </g>
   <g id="subtitle-2">
-   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="68.68125" transform="rotate(-0 11.52 68.68125)"><tspan style="fill: #5b5b5b">database over the period 2010–2024. Activities are grouped into</tspan></text>
+   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="68.68125" transform="rotate(-0 11.52 68.68125)"><tspan style="fill: #5b5b5b">survey in the OECD database from 2010 to 2024. Activities are grouped</tspan></text>
   </g>
   <g id="subtitle-3">
-   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="81.64125" transform="rotate(-0 11.52 81.64125)"><tspan style="font-weight: 700; fill: #9a5129">paid work &amp; study</tspan><tspan style="fill: #5b5b5b">, </tspan><tspan style="font-weight: 700; fill: #18470f">unpaid work</tspan><tspan style="fill: #5b5b5b">, </tspan><tspan style="font-weight: 700; fill: #00295b">personal care</tspan><tspan style="fill: #5b5b5b">, and </tspan><tspan style="font-weight: 700; fill: #883039">leisure</tspan><tspan style="fill: #5b5b5b">.</tspan></text>
+   <text xml:space="preserve" style="font-size: 10.8px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start" x="11.52" y="81.64125" transform="rotate(-0 11.52 81.64125)"><tspan style="fill: #5b5b5b">into </tspan><tspan style="font-weight: 700; fill: #9a5129">paid work &amp; study</tspan><tspan style="fill: #5b5b5b">, </tspan><tspan style="font-weight: 700; fill: #18470f">unpaid work</tspan><tspan style="fill: #5b5b5b">, </tspan><tspan style="font-weight: 700; fill: #00295b">personal care</tspan><tspan style="fill: #5b5b5b">, and </tspan><tspan style="font-weight: 700; fill: #883039">leisure</tspan><tspan style="fill: #5b5b5b">.</tspan></text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="608.21505" transform="rotate(-0 11.52 608.21505)">Data source: OECD Time Use Database (2026)</text>
