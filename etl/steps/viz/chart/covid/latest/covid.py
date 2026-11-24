@@ -18,4 +18,5 @@ def run() -> None:
     # links to the multidim's own download package.
     add_download_link(c, url=DOWNLOAD_URL, text=DOWNLOAD_TEXT)
 
-    c.save()
+    # The variants view sorts its stacked bars by the total Omicron share, which it doesn't plot.
+    c.save(tolerate_extra_indicators=True)
