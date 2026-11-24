@@ -549,8 +549,14 @@ class ReviewTree implements vscode.TreeDataProvider<Node>, vscode.TextDocumentCo
             return;
         }
 
-        const previousPath = path.join(report.root, file.previousPath!);
-        const hideNoise = !raw && config().hideNoise && file.category === 'meaningful' && (file.noiseLines ?? 0) > 0;
+        const { left, title } = this.versionDiff(file, raw);
+        await vscode.commands.executeCommand('vscode.diff', left, vscode.Uri.file(absolutePath), title);
+    }
+
+    // The left side and the title of the diff of a file with its previous version.
+    private versionDiff(file: FileReport, raw: boolean): { left: vscode.Uri; title: string } {
+        const previousPath = path.join(this.report!.root, file.previousPath!);
+        const hideNoise = !raw && config().hideNoise && hasNoiseToHide(file);
         const left = hideNoise
             ? vscode.Uri.from({
                   scheme: SCHEME,
@@ -559,8 +565,42 @@ class ReviewTree implements vscode.TreeDataProvider<Node>, vscode.TextDocumentCo
               })
             : vscode.Uri.file(previousPath);
         const suffix = hideNoise ? ' (noise hidden)' : file.category === 'noiseOnly' ? ' (only noise)' : '';
-        const title = `${name}: ${file.previousVersion} ↔ ${file.currentVersion}${suffix}`;
-        await vscode.commands.executeCommand('vscode.diff', left, vscode.Uri.file(absolutePath), title);
+        return { left, title: `${path.basename(file.path)}: ${file.previousVersion} ↔ ${file.currentVersion}${suffix}` };
+    }
+
+    /** Reopens the diffs shown in each editor group that do not follow the "hide noise" setting any more. */
+    async reopenDiffs(): Promise<void> {
+        if (!this.report) {
+            return;
+        }
+        const root = this.report.root;
+        const hideNoise = config().hideNoise;
+        const nodes = this.groups.flatMap((group) => group.children).filter((node) => hasNoiseToHide(node.file));
+        for (const group of vscode.window.tabGroups.all) {
+            const tab = group.activeTab;
+            const input = tab?.input;
+            if (!tab || !(input instanceof vscode.TabInputTextDiff) || (input.original.scheme === SCHEME) === hideNoise) {
+                continue;
+            }
+            const node = nodes.find(
+                ({ file }) =>
+                    input.modified.fsPath === path.join(root, file.path) &&
+                    input.original.fsPath === path.join(root, file.previousPath!)
+            );
+            if (!node) {
+                continue;
+            }
+            const { left, title } = this.versionDiff(node.file, false);
+            await vscode.commands.executeCommand('vscode.diff', left, input.modified, title, {
+                viewColumn: group.viewColumn,
+                preview: tab.isPreview,
+                preserveFocus: true,
+            });
+            // A preview tab is replaced by the new one; any other tab is closed here.
+            if (group.tabs.includes(tab)) {
+                await vscode.window.tabGroups.close(tab, true);
+            }
+        }
     }
 
     async step(direction: 1 | -1): Promise<void> {
@@ -596,6 +636,11 @@ function shortFolder(relativePath: string): string {
         .split('/')
         .filter((part) => !/^\d{4}-\d{2}-\d{2}$/.test(part))
         .join('/');
+}
+
+// Whether the diff of a file with its previous version can hide noise changes.
+function hasNoiseToHide(file: FileReport): boolean {
+    return file.category === 'meaningful' && (file.noiseLines ?? 0) > 0;
 }
 
 function describe(file: FileReport): string {
@@ -654,7 +699,12 @@ export function registerReviewView(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('owidVersionDiff.previous', () => tree.step(-1)),
         vscode.commands.registerCommand('owidVersionDiff.toggleHideNoise', async () => {
             const settings = vscode.workspace.getConfiguration('owidVersionDiff');
-            await settings.update('hideNoise', !config().hideNoise, vscode.ConfigurationTarget.Global);
+            // A workspace value overrides the user one, so change it there when it is set.
+            const target =
+                settings.inspect<boolean>('hideNoise')?.workspaceValue !== undefined
+                    ? vscode.ConfigurationTarget.Workspace
+                    : vscode.ConfigurationTarget.Global;
+            await settings.update('hideNoise', !config().hideNoise, target);
         }),
         vscode.workspace.onDidChangeConfiguration((event) => {
             const rescan = ['baseRef', 'noiseRules', 'githubSync', 'ghPath'];
@@ -662,6 +712,7 @@ export function registerReviewView(context: vscode.ExtensionContext): void {
                 tree.refresh();
             } else if (event.affectsConfiguration('owidVersionDiff.hideNoise')) {
                 tree.updateMessage();
+                void tree.reopenDiffs();
             }
         }),
         // An edited file changes its patched previous version and its reviewed state.
