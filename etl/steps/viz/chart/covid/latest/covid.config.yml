@@ -149,7 +149,7 @@ dimensions:
       - slug: stringency
         name: Stringency Index
     presentation:
-      type: dropdown
+      type: dropdown-with-search
   - slug: interval
     name: Interval
     choices:
