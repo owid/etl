@@ -19,4 +19,8 @@ def run() -> None:
     add_download_link(c, url=DOWNLOAD_URL, text=DOWNLOAD_TEXT)
 
     # The variants view sorts its stacked bars by the total Omicron share, which it doesn't plot.
-    c.save(tolerate_extra_indicators=True)
+    # NOTE: No download package yet. The excess mortality indicators declare `timeInterval: week`,
+    # but 76 countries report them monthly, and the Economist's model dates each week by its Monday
+    # while HMD/WMD date it by its Sunday. So the package can't give each row one weekly key.
+    # Readers get the complete dataset from the link above meanwhile.
+    c.save(tolerate_extra_indicators=True, download_package=False)
