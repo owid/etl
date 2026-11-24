@@ -25,7 +25,7 @@ default_dimensions:
   period: year
   equivalence_scale: per capita
 
-# originUrl and the related link are set on every view in the step.
+# originUrl is set on every view in the step.
 
 dimensions:
   - name: Indicator

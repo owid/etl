@@ -28,10 +28,6 @@ definitions:
   common_views:
     - config:
         originUrl: https://ourworldindata.org/poverty
-        # The explorer's text block below the chart only pointed readers to this article.
-        relatedQuestions:
-          - url: https://ourworldindata.org/owid-data-collection-inequality-and-poverty
-            text: "OWID Data Collection: Inequality and Poverty"
 
 dimensions:
   - name: Indicator
