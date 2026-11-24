@@ -328,8 +328,10 @@ def run() -> None:
     for choice in list(c.get_dimension("age").choices):
         c.rename_choice_slug("age", choice.slug, age_slug(choice.name))
 
+    # NOTE: No download package yet. Its zip is 50.9MB (138.9MB of mostly empty CSV), over the 50MB
+    # limit in `etl/viz/chart/download_package.py`. The explorer this replaces offers no download.
     # # Save MDIM (upsert to DB)
-    c.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True, download_package=False)
 
 
 def age_slug(name: str) -> str:
