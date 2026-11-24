@@ -70,10 +70,12 @@ https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-
   A clone of `Static Chart Template_Vertical` (`5332:93`, 850x1095) run 67px taller with its footer
   re-pinned to the bottom margin, at x=1000, with its unstyled import parked at x=70 to the LEFT so the
   page reads original then edited.
-- Frame **`how-do-people-spend-their-time-mobile`**, `29442:520` (540x884) —
-  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29442-520
+- Frame **`how-do-people-spend-their-time-mobile`**, `29611:8` (540x884) —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=29611-8
   A clone of `Static Chart Template_Mobile (example 2)` (`24590:32`, 540x824) run 60px taller, at
   x=2550, its own unstyled import parked at x=1930. The published 2023 image sits leftmost, at x=-860.
+  It still carries the chip legend and the previous subtitle and Note: the coloured-subtitle render
+  has been re-imported into the desktop frame only.
 
 **The node ids are a convenience; the frame NAME is the durable join.** It is the kebab-case slug the
 website exports the PNG by, so it is the one string shared by the layer panel, the exported file and
@@ -213,9 +215,19 @@ spaced by measured advance. Desktop
 and mobile go in one call, since they share a page; it also replaces each frame's parked reference copy.
 The template text slots are not touched by it, so a copy change still means editing them in the frame.
 A render that CHANGES a colour cannot inherit: the old chart never bound the new hex, and the script
-refuses. Run it with `inheritStyles: false` and `families: []` instead (country labels and lists go to
-the body style through `bodyTextParent`), then bind each palette hex to its `Default Palette/*` style,
-moving the SVG's paint opacity onto the node first, and the Note to `Text/Gray 70`.
+refuses. Inheritance is keyed by colour AND kind, so a new shape in a colour the old chart only used
+for text (the arrows' gray, first imported when the old chart had no arrows) is refused the same way.
+Run it then with `inheritStyles: false`, `families: []` and `bodyTextParent:
+/(__label(-year)?$)|(^key__.*-members(-line\d+)?$)/` (country labels, years and lists to the body
+style), then bind each palette hex on the `__main-*` bars to its `Default Palette/*` style (the import
+already carries `SEGMENT_ALPHA` as node opacity, so there is none to move), and the arrows' fill and
+stroke to `Text/Gray 80`. The frame's chart now binds every colour the render uses, so the next re-import
+can inherit again.
+
+After the restyle, **snap the chart box onto the 16..834 column and centre it in the band**, moving the
+children back so no ink shifts. The country labels' boxes end short of the margin in Lato (left edge
+18.66 against 16), which `verify_page.js`'s `box-alignment` fails, and its `gap` row wants the band's
+spare height split evenly above and below.
 
 **Then merge each desktop annotation into one text node**, which an SVG cannot carry, with
 `/owid-staff:create-figma-chart`'s `scripts/group_text_blocks.js`, run after the restyle and again after
