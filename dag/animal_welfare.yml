@@ -27,6 +27,16 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
     - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+  # Fishcount - Number of wild-caught fish killed for food, and wild fish caught for fishmeal and fish oil.
+  data://grapher/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
+    - data://garden/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
+      - data://meadow/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
+        - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food_global.html
+        - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food_by_country.html
+        - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_caught_for_fishmeal_and_fish_oil.html
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
 
   # Fishcount - Number of farmed crustaceans killed for food.
   data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
@@ -57,7 +67,7 @@ steps:
       - data://garden/animal_welfare/2026-03-03/animals_used_for_food:
         - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
         - data://garden/faostat/2026-02-25/faostat_qcl
-        - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+        - data://garden/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food
         - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
     # Eggs and hens statistics (various sources).
     - data://grapher/animal_welfare/2026-06-11/eggs_and_hens_statistics:
