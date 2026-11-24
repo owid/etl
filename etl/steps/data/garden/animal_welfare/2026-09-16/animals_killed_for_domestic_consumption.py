@@ -416,9 +416,10 @@ def run() -> None:
     #
     # Load inputs.
     #
-    tb_fbsc = paths.load_dataset("faostat_fbsc").read("faostat_fbsc")
-    tb_qcl = paths.load_dataset("faostat_qcl").read("faostat_qcl")
-    tb_scl = paths.load_dataset("faostat_scl").read("faostat_scl")
+    # NOTE: FAOSTAT tables are large; keep their categoricals, or the staging server runs out of memory.
+    tb_fbsc = paths.load_dataset("faostat_fbsc").read("faostat_fbsc", safe_types=False)
+    tb_qcl = paths.load_dataset("faostat_qcl").read("faostat_qcl", safe_types=False)
+    tb_scl = paths.load_dataset("faostat_scl").read("faostat_scl", safe_types=False)
 
     #
     # Process data.
