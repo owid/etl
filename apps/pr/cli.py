@@ -804,8 +804,10 @@ Lists every local branch whose latest GitHub PR is **merged** or **closed** (usi
 state, not `git branch --merged`, so squash-merges are detected). A branch with no PR of its own is
 also listed as merged when its last commit is part of a merged PR, e.g. a temporary copy of a PR
 branch, or a branch whose work was merged from a branch with another name. Branches that have a git
-worktree are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`,
-and the tool will:
+worktree are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`.
+The tool then lists what it will do to each branch (which worktrees it removes, what it copies into
+the main repo, which branches it deletes, and which it skips and why) and changes nothing until you
+confirm. For each branch it will:
 
 1. (Worktree branches only) Check the worktree for uncommitted changes that would block
    `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
@@ -919,7 +921,7 @@ def clean_cli() -> None:
         message="Select a branch to clean (or 'all' / 'all merged' / 'all closed')",
         choices=choices,
         style=SHELL_FORM_STYLE,
-        instruction="(Use arrow keys, Enter to confirm)",
+        instruction="(Use arrow keys, Enter to select)",
     ).unsafe_ask()
 
     if selected is None:
@@ -931,9 +933,19 @@ def clean_cli() -> None:
         print(f"Nothing to clean: no local branch has a {state} PR.")
         return
 
+    # Show what will happen to each branch, and change nothing until the user confirms.
+    to_clean, to_skip = plan_clean(branches_to_clean, worktrees, dirty, main_worktree_path)
+    print(format_clean_plan(to_clean, to_skip, cleanable))
+    if not to_clean:
+        print("\nNothing to clean.")
+        return
+    if not questionary.confirm("Go ahead?", default=False, style=SHELL_FORM_STYLE).unsafe_ask():
+        print("Cancelled: nothing was changed.")
+        return
+
     main_project_dir = claude_project_dir(main_worktree_path)
 
-    for branch in branches_to_clean:
+    for branch in to_clean:
         clean_branch(
             repo=repo,
             branch=branch,
@@ -957,6 +969,58 @@ def resolve_branches_to_clean(selected: object, cleanable: dict[str, str]) -> li
     if selected is _CLEAN_ALL_CLOSED:
         return sorted(b for b, s in cleanable.items() if s == "closed")
     return [selected]  # ty: ignore
+
+
+def plan_clean(
+    branches: list[str],
+    worktrees: dict[str, Path],
+    dirty: dict[str, bool],
+    main_worktree_path: Path,
+) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """Work out what cleaning each branch will do, before anything is changed.
+
+    Returns the branches to clean, each with the actions clean_branch will take on it, and the
+    branches to skip, each with the reason.
+    """
+    to_clean: dict[str, list[str]] = {}
+    to_skip: dict[str, str] = {}
+    for branch in branches:
+        worktree_path = worktrees.get(branch)
+        if worktree_path == main_worktree_path:
+            to_skip[branch] = "it's checked out in the main repo"
+            continue
+        if dirty.get(branch):
+            to_skip[branch] = f"its worktree {worktree_path} has uncommitted changes"
+            continue
+        actions = []
+        if worktree_path is not None:
+            if claude_project_dir(worktree_path).exists():
+                actions.append("copy its Claude sessions to the main repo, so they stay resumable")
+            for name in SHARED_SCRATCH_DIRS:
+                src = worktree_path / name
+                if not src.is_symlink() and _has_content(src):
+                    actions.append(f"copy its {name}/ folder to {_namespaced_dest(main_worktree_path / name, branch)}")
+            if worktree_path.exists():
+                actions.append(f"remove the worktree {worktree_path}")
+            else:
+                actions.append(f"unregister the worktree {worktree_path}, whose folder is already gone")
+        actions.append(f"delete the local branch '{branch}'")
+        to_clean[branch] = actions
+    return to_clean, to_skip
+
+
+def format_clean_plan(to_clean: dict[str, list[str]], to_skip: dict[str, str], states: dict[str, str]) -> str:
+    """Write the plan from plan_clean as the message the user confirms."""
+    lines = []
+    if to_clean:
+        lines.append(f"pr-clean will clean {len(to_clean)} branch(es):")
+        for branch, actions in to_clean.items():
+            lines.append(f"\n  {branch}  [{states[branch]}]")
+            lines.extend(f"    - {action}" for action in actions)
+    if to_skip:
+        lines.append(f"\nIt will skip {len(to_skip)} branch(es):")
+        lines.extend(f"  {branch}  [{states[branch]}]: {reason}" for branch, reason in to_skip.items())
+    return "\n".join(lines).strip()
 
 
 def get_main_worktree_path(repo) -> Path:
@@ -1115,19 +1179,29 @@ def copy_dir_namespaced(src: Path, dst_parent: Path, branch: str) -> Path | None
     lands under a branch-named (and, on collision, suffixed) folder. Slashes in the branch name are
     flattened to '-' so the result stays a single folder. Nothing already in `dst_parent` is overwritten.
     """
-    if not src.is_dir() or not any(p.name != ".DS_Store" for p in src.iterdir()):
+    if not _has_content(src):
         return None
 
+    dest = _namespaced_dest(dst_parent, branch)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
+    log.info(f"Copied '{src}' to '{dest}'.")
+    return dest
+
+
+def _has_content(path: Path) -> bool:
+    """Whether `path` is a directory holding anything besides .DS_Store."""
+    return path.is_dir() and any(p.name != ".DS_Store" for p in path.iterdir())
+
+
+def _namespaced_dest(dst_parent: Path, branch: str) -> Path:
+    """Return `dst_parent/<branch>` with '/' flattened to '-', suffixed -1, -2... if it already exists."""
     safe_branch = branch.replace("/", "-")
     dest = dst_parent / safe_branch
     i = 1
     while dest.exists():
         dest = dst_parent / f"{safe_branch}-{i}"
         i += 1
-
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
-    log.info(f"Copied '{src}' to '{dest}'.")
     return dest
 
 

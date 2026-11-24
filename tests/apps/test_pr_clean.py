@@ -6,6 +6,7 @@ A dirty worktree must be skipped before anything is copied or modified: a failed
 under suffixed names.
 """
 
+import re
 import shutil
 from pathlib import Path
 
@@ -18,6 +19,8 @@ from apps.pr.cli import (
     _CLEAN_ALL_MERGED,
     clean_branch,
     fetch_pr_state,
+    format_clean_plan,
+    plan_clean,
     remove_worktree,
     resolve_branches_to_clean,
     worktree_blocking_changes,
@@ -190,6 +193,84 @@ def test_fetch_pr_state_unpushed_last_commit(monkeypatch):
 def test_fetch_pr_state_failed_name_lookup_skips_commit_lookup(monkeypatch):
     _fake_github(monkeypatch, by_name=_FakeResponse(500))
     assert fetch_pr_state("feature", tip_sha="abc") is None
+
+
+def test_plan_clean_lists_what_clean_branch_then_does(repo_with_worktree, tmp_path, monkeypatch):
+    repo, worktree_path = repo_with_worktree
+    main_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    sessions = tmp_path / "home" / ".claude" / "projects" / re.sub(r"[^a-zA-Z0-9]", "-", str(worktree_path))
+    sessions.mkdir(parents=True)
+    (sessions / "session.jsonl").write_text("{}")
+    _add_share_data_symlinks(worktree_path, tmp_path / "shared")
+    (worktree_path / "workbench").unlink()
+    (worktree_path / "workbench").mkdir()
+    (worktree_path / "workbench" / "notes.txt").write_text("keep me")
+
+    to_clean, to_skip = plan_clean(["feature"], {"feature": worktree_path}, {"feature": False}, main_path)
+
+    # ai/ is a --share-data symlink, so there's nothing to copy from it.
+    assert to_skip == {}
+    assert to_clean == {
+        "feature": [
+            "copy its Claude sessions to the main repo, so they stay resumable",
+            f"copy its workbench/ folder to {main_path / 'workbench' / 'feature'}",
+            f"remove the worktree {worktree_path}",
+            "delete the local branch 'feature'",
+        ]
+    }
+
+    clean_branch(
+        repo=repo,
+        branch="feature",
+        worktree_path=worktree_path,
+        main_project_dir=tmp_path / "claude_projects",
+        main_worktree_path=main_path,
+    )
+    assert (tmp_path / "claude_projects" / "session.jsonl").exists()
+    assert (main_path / "workbench" / "feature" / "notes.txt").read_text() == "keep me"
+    assert not worktree_path.exists()
+    assert "feature" not in [b.name for b in repo.branches]
+
+
+def test_plan_clean_skips_dirty_worktrees_and_the_main_repo_branch(tmp_path):
+    main_path = tmp_path / "main"
+    worktrees = {"dirty": tmp_path / "wt-dirty", "in-main": main_path}
+
+    to_clean, to_skip = plan_clean(["dirty", "in-main", "no-worktree"], worktrees, {"dirty": True}, main_path)
+
+    assert to_clean == {"no-worktree": ["delete the local branch 'no-worktree'"]}
+    assert to_skip == {
+        "dirty": f"its worktree {tmp_path / 'wt-dirty'} has uncommitted changes",
+        "in-main": "it's checked out in the main repo",
+    }
+
+
+def test_plan_clean_worktree_folder_already_gone(tmp_path):
+    gone = tmp_path / "wt-gone"
+    to_clean, _ = plan_clean(["feature"], {"feature": gone}, {}, tmp_path / "main")
+    assert to_clean["feature"] == [
+        f"unregister the worktree {gone}, whose folder is already gone",
+        "delete the local branch 'feature'",
+    ]
+
+
+def test_format_clean_plan():
+    text = format_clean_plan(
+        {"a": ["remove the worktree /wt/a", "delete the local branch 'a'"]},
+        {"b": "its worktree /wt/b has uncommitted changes"},
+        {"a": "merged", "b": "closed"},
+    )
+    assert text == (
+        "pr-clean will clean 1 branch(es):\n"
+        "\n"
+        "  a  [merged]\n"
+        "    - remove the worktree /wt/a\n"
+        "    - delete the local branch 'a'\n"
+        "\n"
+        "It will skip 1 branch(es):\n"
+        "  b  [closed]: its worktree /wt/b has uncommitted changes"
+    )
 
 
 def test_clean_branch_cleans_manually_deleted_worktree(repo_with_worktree, tmp_path):
