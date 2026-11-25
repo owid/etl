@@ -1,4 +1,4 @@
-**About this data explorer**
+### About this data explorer
 
 Our goal at Our World in Data is to make data and research accessible so that we can achieve progress against the world's largest problems.
 
