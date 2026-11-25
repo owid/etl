@@ -33,7 +33,7 @@ dimensions:
       type: dropdown-with-search
     choices:
       - slug: all_land_animals
-        name: All land animals
+        name: Land animals
         group: Aggregates
       - slug: land_animals_stacked
         name: Land animals (stacked)
