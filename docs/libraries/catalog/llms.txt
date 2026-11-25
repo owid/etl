@@ -230,7 +230,7 @@ Args:
         - Chart slug: "life-expectancy"
         - Chart URL: "https://ourworldindata.org/grapher/life-expectancy"
         - Chart slug with query params: "years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"
-        - Explorer URL: "https://ourworldindata.org/explorers/energy"
+        - Explorer URL: "https://ourworldindata.org/explorers/co2"
 
 Returns:
     Table (for tables or indicators) or CharTable (for charts)
@@ -487,7 +487,7 @@ Args:
         - Chart slug: ``"life-expectancy"``
         - Slug with query params: ``"education-spending?level=primary&spending_type=gdp_share"``
         - Full grapher URL: ``"https://ourworldindata.org/grapher/life-expectancy?tab=table"``
-        - Full explorer URL: ``"https://ourworldindata.org/explorers/covid?Metric=Cases"``
+        - Full explorer URL: ``"https://ourworldindata.org/explorers/co2?Count=Per+capita"``
     type: Override the chart type. Defaults to ``"chart"`` (grapher).
         Use ``"explorerView"`` for explorer views. Auto-detected from full URLs.
     load_data: If True (default), load full chart data.
@@ -511,10 +511,10 @@ Example:
     tb = client.charts.fetch("education-spending?level=primary&spending_type=gdp_share")
 
     # Fetch from a full URL (type and query params auto-detected)
-    tb = client.charts.fetch("https://ourworldindata.org/explorers/covid?Metric=Cases")
+    tb = client.charts.fetch("https://ourworldindata.org/explorers/co2?Count=Per+capita")
 
     # Explicitly fetch an explorer view
-    tb = client.charts.fetch("covid?Metric=Cases", type="explorerView")
+    tb = client.charts.fetch("co2?Count=Per+capita", type="explorerView")
     ```
 
 #### `search(self, query: 'str', *, countries: 'list[str] | None' = None, topics: 'list[str] | None' = None, require_all_countries: 'bool' = False, limit: 'int' = 10, page: 'int' = 0, timeout: 'int | None' = None) -> 'ResponseSet[ChartResult]'`
