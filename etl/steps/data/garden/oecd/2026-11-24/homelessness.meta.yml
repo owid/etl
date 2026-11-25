@@ -198,7 +198,7 @@ dataset:
         - Belgium is no longer included, because the OECD now reports it only by region.
 
 tables:
-  affordable_housing_database:
+  homelessness:
     variables:
       point_in_time_1:
         title: Rate of people experiencing homelessness (point-in-time, ETHOS 1)

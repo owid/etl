@@ -242,7 +242,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("affordable_housing_database")
+    ds_meadow = paths.load_dataset("homelessness")
 
     # Read tables from meadow dataset.
     tb_point_in_time = ds_meadow.read("point_in_time")

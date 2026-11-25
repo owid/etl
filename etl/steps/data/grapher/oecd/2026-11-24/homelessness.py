@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("affordable_housing_database")
+    ds_garden = paths.load_dataset("homelessness")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("affordable_housing_database", reset_index=False)
+    tb = ds_garden.read("homelessness", reset_index=False)
 
     #
     # Save outputs.
