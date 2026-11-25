@@ -202,6 +202,8 @@ R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
   combination the explorer doesn't have, a dimension the link leaves out),
   so the new URL lands on the view they meant. Copy `references_full.json` to
   `references_baseline.json` before any swap: the page then marks each link swapped or still to do.
+  A swap later found to land on the wrong view goes in `link_overrides.json` (a list of
+  `{where, old_url, new_url, note}`): the page shows that row as to do again, with the right URL.
 - Serve it with the local app, in the background, and give the user the link:
 
   ```bash
