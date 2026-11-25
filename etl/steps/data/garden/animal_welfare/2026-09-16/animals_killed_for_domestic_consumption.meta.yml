@@ -57,9 +57,9 @@ definitions:
     processing_level: major
     description_processing: |-
       - We estimate the number of hens killed each year following [a methodology by Faunalytics](https://faunalytics.org/global-chick-culling-2019-2024/), assuming that each of FAOSTAT's laying hens is killed after 65 weeks of laying, so that 80% of them are killed and replaced every year. We also assume that one male chick is killed for each hen.
-      - The number of chickens is then estimated by scaling the chickens killed in egg production in each country by the ratio of the eggs supplied to that country to the eggs it produced, both reported by the UN Food and Agriculture Organization (FAO) in its Food Balance Sheets.
-      - Countries that produce no eggs have no such ratio, so their egg supply is converted at the world average number of chickens killed per tonne of eggs.
-      - The Food Balance Sheets report the eggs of all birds (mostly hens), and include processed eggs converted back to eggs in their shell.
+      - To count the chickens killed for the eggs each country consumes, we first work out how many chickens are killed per tonne of eggs the country produces. We then multiply that number by the tonnes of eggs supplied to the country. Both the eggs produced and the eggs supplied come from the Food Balance Sheets of the UN Food and Agriculture Organization (FAO).
+      - For the few countries that import all the eggs they consume, we use the world average number of chickens killed per tonne of eggs.
+      - The Food Balance Sheets count the eggs of all birds, not only hens, although most are hens' eggs. They also count processed eggs, converted back to the weight of eggs in their shell.
 
 dataset:
   title: Land animals killed for domestic consumption

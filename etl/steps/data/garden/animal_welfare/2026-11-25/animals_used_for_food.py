@@ -222,6 +222,15 @@ def add_descriptions_from_producer(tb: Table, tb_qcl_flat: Table) -> None:
             tb[variable].metadata.description_from_producer = f"{template}<% endif %>" if template else None
 
 
+def add_descriptions_processing(tb: Table, sources: dict[str, tuple[Table, str]]) -> None:
+    # pr.concat drops description_processing, so take it from the column each indicator comes from.
+    for column, (tb_source, source_column) in sources.items():
+        for suffix in ["", "_per_capita"]:
+            description = tb_source[f"{source_column}{suffix}"].metadata.description_processing
+            assert description, f"No description_processing in the source of {column}{suffix}."
+            tb[f"{column}{suffix}"].metadata.description_processing = description
+
+
 def sanity_check_outputs(tb: Table) -> None:
     error = "Negative numbers of animals."
     assert (tb.drop(columns=["country", "year"] + DIMENSIONS).fillna(0) >= 0).all().all(), error
@@ -335,6 +344,14 @@ def run() -> None:
     # Improve table format.
     tb = tb.format(keys=["country", "year"] + DIMENSIONS, short_name=paths.short_name)
     add_descriptions_from_producer(tb, tb_qcl_flat=tb_qcl_flat)
+    add_descriptions_processing(
+        tb,
+        sources={
+            "land_animals_killed_for_consumption": (tb_consumption, "killed_for_domestic_supply"),
+            "chickens_killed_for_eggs": (tb_eggs, "chickens_killed"),
+            "chickens_killed_for_eggs_for_consumption": (tb_eggs_consumption, "killed_for_domestic_supply"),
+        },
+    )
 
     #
     # Save outputs.
