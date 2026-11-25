@@ -72,13 +72,16 @@ Start with explorers that have few views, no embeds, no featured metrics and no 
 ending on them. Read the flags before committing to one:
 
 - `checkbox` — becomes a two-choice `toggle-buttons` dimension. Easy.
-- `picker` (`pickerColumnSlugs`) and `related` (`wpBlockId`) — no known multidim equivalent.
-  Ask the user how to handle them before porting; don't drop them silently.
-- `download` (`downloadDataLink`) — multidims build their own `download_package` on save, but
-  grapher doesn't link to it yet. Ask the user whether the download must stay. If it must, call
-  `add_download_link(c, url=..., text=...)` (`etl/viz/chart/download_link.py`) in the step,
-  between `create_chart` and `save`: it appends the link to every view's key points, after the
-  ones each view shows today. Drop the link when it points at a stale copy of the data.
+- `picker` (`pickerColumnSlugs`) — no known multidim equivalent. Ask the user how to handle it
+  before porting; don't drop it silently.
+- `related` (`wpBlockId`, the text below the explorer) and `download` (`downloadDataLink`) — a
+  multidim has neither yet. The interim home for both is `<short_name>.explorer.md` next to the
+  step, appended to every view's key points by `add_explorer_text(c, paths)`
+  (`etl/viz/chart/explorer_text.py`), called between `create_chart` and `save`. Draft the file
+  with `scripts/explorer_text_draft.py <slug>`, then cut what the multidim page already covers
+  ("Explore more of our work" link lists: the page shows Research & Writing) and drop a download
+  link that points at a stale copy of the data. Ask the user before cutting prose, and before
+  dropping the file altogether. The text renders as `SimpleMarkdownText`: no raw HTML or tables.
 - `py` (long Python step) — views are generated in code; the port touches the code too.
 - A **twin**: some explorers already have an unpublished multidim mirror in
   `etl/steps/viz/chart/` (search `dag/` for the same namespace). Ask whether to build on it or
@@ -202,6 +205,8 @@ R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
   combination the explorer doesn't have, a dimension the link leaves out),
   so the new URL lands on the view they meant. Copy `references_full.json` to
   `references_baseline.json` before any swap: the page then marks each link swapped or still to do.
+  A swap later found to land on the wrong view goes in `link_overrides.json` (a list of
+  `{where, old_url, new_url, note}`): the page shows that row as to do again, with the right URL.
 - Serve it with the local app, in the background, and give the user the link:
 
   ```bash
