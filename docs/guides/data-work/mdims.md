@@ -293,11 +293,13 @@ common_views:
 
 You can also define general configs if you skip the `dimensions` bit:
 
-```yaml title="etl/steps/viz/explorer/who/latest/monkeypox.yaml"
+```yaml title="etl/steps/viz/chart/who/latest/monkeypox.config.yml"
 common_views:
 - config:
-    hideAnnotationFieldsInTitle: "true"
-    yScaleToggle: "true"
+    hasMapTab: true
+    yAxis:
+      min: 0
+      canChangeScaleType: true
 ```
 
 ### Save and preview an MDIM
@@ -329,7 +331,7 @@ The same helpers work for explorers: call `paths.create_explorer` instead of `pa
 
 
 ### Explorer examples:
-- [:fontawesome-brands-github:  Monkeypox](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/monkeypox.py): Manually crafted.
+- [:fontawesome-brands-github:  Influenza](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/influenza.py): Manually crafted.
 
 ### How are explorers saved in admin?
 Like MDIMs, explorers are upserted to the grapher DB when calling `.save()`. Staging servers write to their own DB, and production is updated when the PR is merged.
