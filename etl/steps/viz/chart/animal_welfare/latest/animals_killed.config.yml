@@ -43,70 +43,70 @@ dimensions:
         group: Aggregates
       - slug: buffaloes
         name: Buffaloes
-        group: Individual animals
+        group: Land animals
       - slug: camels
         name: Camels
-        group: Individual animals
+        group: Land animals
       - slug: cattle
         name: Cattle
-        group: Individual animals
-      - slug: chickens
-        name: Chickens
-        group: Individual animals
+        group: Land animals
       - slug: chickens_killed_for_eggs
-        name: Chickens killed for eggs
-        group: Individual animals
+        name: Chickens, for eggs
+        group: Land animals
+      - slug: chickens
+        name: Chickens, for meat
+        group: Land animals
       - slug: donkeys
         name: Donkeys
-        group: Individual animals
+        group: Land animals
       - slug: ducks
         name: Ducks
-        group: Individual animals
-      - slug: farmed_crustaceans
-        name: Farmed crustaceans
-        group: Individual animals
-      - slug: farmed_fish
-        name: Farmed fish
-        group: Individual animals
+        group: Land animals
       - slug: game_animals
         name: Game animals
-        group: Individual animals
+        group: Land animals
       - slug: geese
         name: Geese
-        group: Individual animals
+        group: Land animals
       - slug: goats
         name: Goats
-        group: Individual animals
+        group: Land animals
       - slug: horses
         name: Horses
-        group: Individual animals
+        group: Land animals
       - slug: mules
         name: Mules
-        group: Individual animals
+        group: Land animals
       - slug: other_camelids
         name: Other camelids
-        group: Individual animals
+        group: Land animals
       - slug: other_rodents
         name: Other rodents
-        group: Individual animals
+        group: Land animals
       - slug: pigeons
         name: Pigeons
-        group: Individual animals
+        group: Land animals
       - slug: pigs
         name: Pigs
-        group: Individual animals
+        group: Land animals
       - slug: rabbits
         name: Rabbits
-        group: Individual animals
+        group: Land animals
       - slug: sheep
         name: Sheep
-        group: Individual animals
+        group: Land animals
       - slug: turkeys
         name: Turkeys
-        group: Individual animals
+        group: Land animals
+      - slug: farmed_crustaceans
+        name: Farmed crustaceans
+        group: Aquatic animals
+      - slug: farmed_fish
+        name: Farmed fish
+        group: Aquatic animals
       - slug: wild_caught_fish
         name: Wild-caught fish
-        group: Individual animals
+        group: Aquatic animals
   # Only the animals with consumption-based numbers can switch to them (the toggle is disabled for the others).
   - slug: metric
     name: Based on
