@@ -1,25 +1,4 @@
 steps:
-  # Explorer
-  viz://explorer/covid/latest/covid:
-    - data://grapher/covid/latest/cases_deaths
-    - data://grapher/covid/latest/vaccinations_global
-    - data://grapher/covid/latest/hospital
-    # Sequencing (variants)
-    - data-private://grapher/covid/latest/sequence:
-      - data-private://garden/covid/latest/sequence
-    # Government response policy
-    - data://grapher/covid/latest/oxcgrt_policy:
-      - data://garden/covid/latest/oxcgrt_policy
-    # Reproduction rate
-    - data://grapher/covid/latest/tracking_r:
-      - data://garden/covid/latest/tracking_r
-    - data://grapher/covid/latest/testing
-    # Combined dataset (megafile-related indicators)
-    - data://grapher/covid/latest/combined:
-      - data://garden/covid/latest/combined
-    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
-    - data://grapher/excess_mortality/latest/excess_mortality
-
   # Compact dataset (similar to former megafile)
   data://garden/covid/latest/compact:
     # COVID
@@ -250,16 +229,24 @@ steps:
   # MULTIDIM
   ##########
 
-  # COVID-19 data explorer, as a multidim (replaces viz://explorer/covid/latest/covid).
+  # COVID-19 data explorer, as a multidim.
   viz://chart/covid/latest/covid:
     - data://grapher/covid/latest/cases_deaths
     - data://grapher/covid/latest/vaccinations_global
     - data://grapher/covid/latest/hospital
-    - data-private://grapher/covid/latest/sequence
-    - data://grapher/covid/latest/oxcgrt_policy
-    - data://grapher/covid/latest/tracking_r
+    # Sequencing (variants)
+    - data-private://grapher/covid/latest/sequence:
+      - data-private://garden/covid/latest/sequence
+    # Government response policy
+    - data://grapher/covid/latest/oxcgrt_policy:
+      - data://garden/covid/latest/oxcgrt_policy
+    # Reproduction rate
+    - data://grapher/covid/latest/tracking_r:
+      - data://garden/covid/latest/tracking_r
     - data://grapher/covid/latest/testing
-    - data://grapher/covid/latest/combined
+    # Combined dataset (megafile-related indicators)
+    - data://grapher/covid/latest/combined:
+      - data://garden/covid/latest/combined
     - data-private://grapher/excess_mortality/latest/excess_mortality_economist
     - data://grapher/excess_mortality/latest/excess_mortality
   # Topic multidims (unpublished).
