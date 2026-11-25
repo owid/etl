@@ -2,7 +2,7 @@
 
 The text below an explorer is a WordPress block (`wpBlockId` in the explorer's TSV), stored as
 HTML in `posts.wpApiSnapshot`. This prints it as markdown that `SimpleMarkdownText` renders
-(paragraphs, headings as bold lines, links, lists, images), plus a download line when the
+(paragraphs, headings as `###`, links, lists, images), plus a download line when the
 explorer has a `downloadDataLink`. It is a draft: read it, cut what the multidim page already
 covers (e.g. "Explore more of our work" link lists, which "Research & Writing" replaces), then save
 it next to the step and call `add_explorer_text` (`etl/viz/chart/explorer_text.py`).
@@ -65,7 +65,7 @@ def blocks(node: Tag) -> list[str]:
         if name and re.fullmatch(r"h[1-6]", name):
             text = inline(child).strip()
             if text:
-                out.append(f"**{text.strip('*')}**")
+                out.append(f"### {text.strip('*')}")
         elif name == "p":
             text = inline(child).strip()
             if text:

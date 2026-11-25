@@ -13,7 +13,7 @@ Grapher shows a view's metadata merged over the metadata of its first `y` indica
 `description_key` there replaces the indicator's instead of adding to it. So the text cannot be
 added on its own: each view gets the key points it shows today, read from the grapher DB (what
 the page reads), with the text appended. The text is markdown as `SimpleMarkdownText` renders it:
-paragraphs, bold, links, lists and images work; raw HTML (e.g. `<details>`) and tables do not.
+paragraphs, `###` headings, bold, links, lists and images work; raw HTML (e.g. `<details>`) and tables do not.
 """
 
 from __future__ import annotations
