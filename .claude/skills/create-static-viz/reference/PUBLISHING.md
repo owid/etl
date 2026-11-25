@@ -1,10 +1,39 @@
 # Publishing a static viz on the site
 
-Read this at Step 9, items 7 to 9, once the Figma frames are final. A flagship static viz goes on the site as
+Read this at Step 9, items 6 to 9, once the Figma frames are final. A flagship static viz goes on the site as
 a **static viz** (Admin → Static viz, `/admin/static-viz/`), not as a bare image. The `{.static-viz}`
 gdoc block renders the image like `{.image}` does, and adds a Download button whose modal shows the
 description, both image versions and the data link. The admin is behind Cloudflare Access, so a cloud
 session cannot reach it: prepare the files and the texts, and the user enters them.
+
+## Ask for the final review
+
+Nothing goes on the site before the final reviewer (Step 9, item 6) approves the frames. Export the
+PNGs first (section 1), then draft the request as a comment on the viz's child issue, for the user to
+post. It opens with the attribution line, then:
+
+- **The ask**, in the first lines: the chart is ready for publication, could they check that the chart
+  and its text read well; a thumbs-up is enough.
+- **Who gave feedback**, and the two or three main changes from the original, as bullets.
+- **Text on the page that changes with it**, in one sentence (section 4 finds it).
+- **The Figma link** to the desktop frame.
+- **The images, each under a bold label, as HTML tags** so they render at a set width:
+
+  ```html
+  **Before (published <year>)**
+  <img src="…" width="850">
+
+  **Desktop**
+  <img src="…" width="850">
+
+  **Mobile**
+  <img src="…" width="360">
+  ```
+
+A session cannot upload images to GitHub, so give each tag a placeholder `src` naming its file (the old
+image from `scripts/fetch_original_image.py`, the new PNGs from section 1). The user drags each file
+into the comment box and moves the `user-attachments` URL GitHub inserts into its tag. A follow-up
+after a review round uses the same image block, with the new version only.
 
 ## 1. Export and upload the images
 

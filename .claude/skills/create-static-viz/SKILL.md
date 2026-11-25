@@ -524,7 +524,9 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 4. Child issue opened (Bertha).
 5. **Pull the data, rebuild, import to Figma** — Steps 4–7 here.
 6. Review as needed (Bertha) → **design review with @mrwbkrm, mandatory** → final edits →
-   final review with @edomt. Each round's feedback goes through the Step 6 ledger.
+   final review with @edomt. Each round's feedback goes through the Step 6 ledger. Ask for the final
+   review in the child issue with a before-and-after comment, and publish nothing before its thumbs-up:
+   [reference/PUBLISHING.md](reference/PUBLISHING.md) → *Ask for the final review* has its shape.
 7. **Upload the refreshed image under a new filename** and repoint the references. The API rejects
    a duplicate name, and the old file must stay reachable for anything still pointing at it.
    **Register it as a static viz** (`/admin/static-viz/`) and swap each `{.image}` block for a
