@@ -1,6 +1,7 @@
 meta:
   origin:
     title: Estimated wild-caught finfish numbers
+    title_snapshot: Estimated wild-caught finfish numbers – Average annual numbers by country
     description: |-
       Estimated numbers of individual finfishes caught annually from the wild for food, feed (often in the form of fishmeal and oil) and bait.
     producer: Fishcount
