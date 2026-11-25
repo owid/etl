@@ -7,6 +7,10 @@ definitions:
   description_key: &description_key
     - This indicator uses data on fisheries capture tonnages and estimated mean weights for fish species.
     - Note that this estimate does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discarded.
+  description_key_fishmeal: &description_key_fishmeal
+    - Fishcount converts the tonnage of fish caught for fishmeal and fish oil, reported by the FAO, into numbers of fish. It uses an average weight of 15 to 33 grams per fish, based on 2010 data.
+    - Fishcount's estimates assume that the mix of species caught each year is the same as in 2010. So they don't capture yearly changes in which species are caught, or the growing share of fish for fishmeal and fish oil that comes from non-selective trawl fisheries in Asia.
+    - The FAO's reported tonnage doesn't include all fish caught to make fishmeal and fish oil, because detailed data is hard to get.
   presentation:
     topic_tags:
       - Animal Welfare
@@ -89,6 +93,8 @@ tables:
         title: Estimated number of wild fish caught for fishmeal and fish oil (lower bound)
         unit: 'fish'
         short_unit: ''
+        description_short: Lower bound estimate of the annual number of wild fish caught to make fishmeal and fish oil.
+        description_key: *description_key_fishmeal
         display:
           numSignificantFigures: 2
           name: Lower estimate
@@ -98,6 +104,9 @@ tables:
         title: Estimated number of wild fish caught for fishmeal and fish oil
         unit: 'fish'
         short_unit: ''
+        description_short: Midpoint estimate of the annual number of wild fish caught to make fishmeal and fish oil, calculated as the average between the lower and upper estimates.
+        description_key: *description_key_fishmeal
+        description_processing: We calculate the midpoint as the average of the lower and upper estimates.
         display:
           numSignificantFigures: 2
           name: Midpoint estimate
@@ -107,6 +116,8 @@ tables:
         title: Estimated number of wild fish caught for fishmeal and fish oil (upper bound)
         unit: 'fish'
         short_unit: ''
+        description_short: Upper bound estimate of the annual number of wild fish caught to make fishmeal and fish oil.
+        description_key: *description_key_fishmeal
         display:
           numSignificantFigures: 2
           name: Upper estimate
