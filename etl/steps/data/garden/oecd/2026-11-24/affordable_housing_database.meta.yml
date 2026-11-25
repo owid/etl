@@ -183,6 +183,8 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  # The data product covers all of affordable housing, while this dataset only covers homelessness.
+  title: OECD Affordable Housing Database – Homelessness
   update_period_days: 365
   owners:
     - Pablo Arriagada
