@@ -119,6 +119,11 @@ def run() -> None:
     # NOTE: Since country data is assigned to the last year, we exclude historical regions (like Netherlands Antilles).
     tb = paths.regions.harmonize_names(tb=tb)
 
+    # Fishcount lists Zanzibar apart from the rest of Tanzania (as the FAO does); add them up into Tanzania.
+    duplicated = set(tb[tb.duplicated(subset=["country", "year"])]["country"])
+    assert duplicated == {"Tanzania"}, f"Unexpected countries with more than one row: {duplicated}"
+    tb = tb.groupby(["country", "year"], as_index=False, observed=True).sum(min_count=1)
+
     # Add region aggregates.
     tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=1)
 
