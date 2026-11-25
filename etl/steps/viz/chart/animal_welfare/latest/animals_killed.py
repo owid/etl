@@ -39,7 +39,7 @@ LAND_ANIMALS_STACKED = [
     "other_land_animals",
 ]
 
-# Animals shown side by side (as bars or lines) in the view of land and aquatic animals.
+# Animals shown side by side (as bars) in the view of land and aquatic animals.
 # NOTE: Chickens killed for eggs are never stacked with other animals, since laying hens are also counted among the
 # chickens slaughtered for meat.
 LAND_AND_AQUATIC_ANIMALS = LAND_ANIMALS_STACKED[:-1] + [
@@ -151,11 +151,9 @@ def run() -> None:
                     "title": "Animals killed for food{per_person}",
                     "subtitle": "Fish and crustaceans are shown as the midpoint of their estimated range.",
                     "hasMapTab": False,
-                    # Show bars first. Lines are on a log scale, since fish are counted in trillions and some land
-                    # animals in thousands (bars are always on a linear scale).
-                    "chartTypes": ["LineChart", "DiscreteBar"],
-                    "tab": "discrete-bar",
-                    "yAxis": {"scaleType": "log", "canChangeScaleType": True},
+                    # Only bars: as lines, the animals are either flat at zero (on a linear scale) or tangled (on a
+                    # log scale), and each one has its own view.
+                    "chartTypes": ["DiscreteBar"],
                 },
             },
         ],
