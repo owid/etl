@@ -1,0 +1,757 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &display_common
+      tolerance: 10
+    processing_level: major
+    description_from_producer: >-
+      _Definitions and methodology_
+
+
+      This indicator presents available data at national level on the number of people experiencing
+      homelessness and housing exclusion, as reported by public authorities in OECD and EU countries.
+      Data are drawn from the OECD Questionnaire on Affordable and Social Housing (QuASH) and other
+      available sources. Data are available for 42 countries, including all OECD countries and the following
+      non-member countries: Croatia, Cyprus, Romania and South Africa (Table HC 3.1.A1).
+
+
+      Comparing national-level estimates of homelessness and housing exclusion across countries is difficult,
+      due to a range of methodological challenges.
+
+
+      National definitions vary widely across countries, limiting international comparability. This indicator
+      presents a collection of available statistics in line with the national statistical definition of homelessness
+      in OECD, EU and key partner countries, drawing on the ETHOS Light Typology of Homelessness and
+      Housing Exclusion to the extent feasible (see Box HC3.1.2).
+
+
+      The type of count can be differentiated between point-in-time counts and flow counts, which are not
+      comparable and thus presented separately in this indicator:
+
+
+      - Point-in-time count: Data are collected at a single point-in-time, generally through a coordinated
+      street count and/or an enumeration of people staying in shelters for people experiencing
+      homelessness on a given night. Point-in-time counts thus present a “snapshot” of homelessness
+      at a single time and place.
+
+
+      - Flow count: Data are collected over a given period of time, such as the enumeration of all people
+      who have stayed in a shelter over the course of the year.
+
+
+      _Data and comparability issues_
+
+
+      _Definitional differences_
+
+
+      As discussed above, differences in statistical definitions drive some of the variation in the reported
+      incidence of homelessness across countries. These differences hamper international comparison and
+      an understanding of the differences in homelessness rates and risks across countries. For instance,
+      several countries that adopt a broader definition of homelessness report a higher incidence of
+      homelessness, like Australia and New Zealand, relative to countries with a narrower definition, such as
+      Chile, Portugal or Japan. Different definitions of homelessness can also co-exist within the same
+      country, depending on the purpose and the collecting authority, producing considerable differences in
+      homelessness estimates for the same territory.
+
+
+      However, definitional differences do not fully explain the variation in homelessness rates across
+      countries: several countries with a broad definition of homelessness report among the lowest incidences
+      of homelessness, such as Norway, Poland, Finland and Denmark. Figure HC3.1 (above) accounts for
+      these definitional differences by presenting cross-country data on homelessness for ETHOS Light
+      categories 1, 2 and 3 only.
+
+
+      _Limitations of data collection approaches_
+
+
+      Beyond definitional differences, there are several challenges in the scope and methods of data
+      collection that might affect measuring the full extent of homelessness (see the OECD Monitoring
+      Framework on Homelessness (OECD, 2025)). Data on homelessness are typically based on the
+      following collection methods, each with its strengths and limitations in terms of how well it captures
+      different types of living situations:
+
+
+      - Street counts: an estimate of the number of people sleeping rough at a point-in-time;
+
+
+      - Service-based methods: information obtained from a broad range of service providers that
+      support people experiencing homelessness;
+
+
+      - Population censuses and Household surveys: a count or a sample of a given population at a
+      point in time (e.g. Population Census; special module on homelessness in household survey);
+
+
+      - Administrative data: records collected by different institutions/organisations (e.g., health data,
+      criminal justice records, social services data, etc.) and used to extrapolate the number of people
+      experiencing homelessness;
+
+
+      - Advanced sampling methods: a statistical method, such as “capture-recapture,” comparing
+      independent samples from two or more sources of data to estimate the total number of people
+      experiencing homelessness;
+
+
+      - By-name lists and Information management systems on homeless individuals: the collection of
+      comprehensive demographic and identifying information on people experiencing
+      homelessness, which may be collected via registry weeks.
+
+
+      Further, the scope, design and implementation of each data collection approach vary widely, which can
+      significantly affect the quality and coverage of the data. For instance, with respect to street counts, the
+      geographic perimeter is not systematic across (or even within) countries. In addition to enumerating
+      people sleeping on public streets, the coverage of street counts may (or may not) include parks, public
+      transport, emergency rooms, parking garages or other places that, depending on the country context,
+      may be used by rough sleepers.
+
+
+      Moreover, in the case of service-based methods, there is no systematic approach to determining which
+      types of services and emergency or temporary accommodation are included in data collection efforts,
+      and which are left out. The selection of services to be surveyed may be narrowly defined (e.g., restricted
+      to overnight shelters and temporary accommodation), or may be quite broad (e.g., to also include food
+      banks, social service centres, health clinics, etc.). As a result, homelessness data resulting from
+      service-based methods (often captured by ETHOS Light 2 and 3) are not fully comparable across
+      countries. Table HC3.1.1 provides an overview of cross-country differences in the inclusion of children
+      and temporary accommodation for specific groups in the national headline estimate of homelessness.
+
+
+      Across 42 OECD and EU countries:
+
+
+      - Over half (27 countries) include children under the age of 18 years;
+
+
+      - Half (21 countries) include temporary accommodation for victims of domestic violence;
+
+
+      - Around a quarter (11 countries) include temporary accommodation for asylum seeker; and
+
+
+      - One third (14 countries) include temporary accommodation for refugees.
+    presentation:
+      topic_tags:
+        - Homelessness
+        - Poverty
+      attribution_short: OECD
+
+  ethos_1: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1_. ETHOS Light 1 is defined as people living rough, living in the streets or public spaces without a shelter that can be defined as living quarters.
+  ethos_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 2 and 3_. ETHOS Light 2 is defined as people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation. ETHOS Light 3 is defined as people living in accommodation for the homeless, including hostels, temporary and transitional accommodation, and women's shelters or refuge accommodation.
+  ethos_1_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1, 2 and 3_. It includes people living in the streets or public spaces, in emergency accommodation and in accommodation for the homeless, but it has not been dissagregated.
+  ethos_broad_women: This data covers countries whose definition of homelessness goes beyond people living rough (ETHOS Light 1) or beyond people staying in emergency accommodation and accommodation for the homeless (ETHOS Light 2 and 3). Depending on the country, it can also include people living in institutions, in non-conventional dwellings, or temporarily with family or friends due to a lack of housing (ETHOS Light 4, 5 and 6).
+
+  point_in_time_count: This data is collected with a _point-in-time count_, in which data are collected at a single point in time, generally through a coordinated street count or an enumeration of people staying in shelters for people experiencing homelessness on a given night. Point-in-time counts thus present a “snapshot” of homelessness at a single time and place.
+  flow_count: This data is collected with a _flow count_, in which data are collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
+
+  gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical definition of each country.
+
+  harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
+  methodology_issues: More details about definitions, methodology and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
+  country_notes: For more information on the statistical definitions for each country, please check the [OECD's Country Notes on Homelessness data](https://www.oecd.org/en/topics/sub-issues/affordable-housing/homelessness.html).
+  unconventional_dwellings: Data for Australia, Canada, Germany, Italy, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
+  united_kingdom_rates: Data for the United Kingdom only considers England. For ETHOS Light 2 and 3, it refers to the number of households experiencing homelessness per 100,000 households.
+  belgium: The OECD reports data for Belgium only for each of its three regions (Brussels, Flanders and Wallonia), because they can't be combined into a national estimate. We don't include them.
+
+  description_short_ethos_1: Includes people living in the streets or public spaces without a shelter that can be defined as living quarters.
+  description_short_ethos_2_3: Includes people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation, and people living in accommodation for the homeless.
+  description_short_ethos_1_2_3: Includes people living in the streets or public spaces, in emergency accommodation, and in accommodation for the homeless.
+  description_short_broad_women: Includes countries whose definition of homelessness covers more than people living rough or more than people in emergency accommodation and accommodation for the homeless.
+
+  description_short_point_in_time: This data is collected at a single point in time, generally through a coordinated street count.
+  description_short_flow: This data is collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
+
+  description_processing_years: The OECD reports the latest data available for each country, and the year of that data differs between countries. We assign each value to the year the OECD gives for that country in its notes and in Table HC3.1.A1. Whenever the data was captured over several years, we use the latest year.
+
+  description_processing_men: We have estimated the share of people experiencing homelessness who are men by subtracting the share of people experiencing homelessness who are women from 100%.
+
+  description_processing_10000_to_100000: We have transformed the data from homelessness per 10,000 population to homeless per 100,000 population.
+
+  description_processing_ethos_breakdown: |-
+    The OECD reports the number of people in each ETHOS Light category only for countries that count that category separately. When a category is counted together with another one, or included in the total without a separate number, we leave it empty.
+
+    {definitions.description_processing_years}
+
+    We don't include the United Kingdom, as its data counts households instead of individuals.
+  description_key_ethos_breakdown: These numbers break down each country's headline estimate of homelessness, following its own statistical definition. Not every country counts every category, so the categories of different countries can't be added up or compared directly.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Arriagada
+
+tables:
+  affordable_housing_database:
+    variables:
+      point_in_time_1:
+        title: Rate of people experiencing homelessness (point-in-time, ETHOS 1)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_1} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.unconventional_dwellings}"
+          - "{definitions.united_kingdom_rates}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 1)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 1)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      point_in_time_2_3:
+        title: Rate of people experiencing homelessness (point-in-time, ETHOS 2 and 3)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_2_3}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.unconventional_dwellings}"
+          - "{definitions.united_kingdom_rates}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      point_in_time_1_2_3:
+        title: Rate of people experiencing homelessness (point-in-time, ETHOS 1, 2 and 3)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_1_2_3} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1_2_3}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.unconventional_dwellings}"
+          - "{definitions.united_kingdom_rates}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      point_in_time_total:
+        title: Rate of people experiencing homelessness (point-in-time, total)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_1_2_3} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1_2_3}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.unconventional_dwellings}"
+          - "{definitions.united_kingdom_rates}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      flow_1:
+        title: Rate of people experiencing homelessness (flow, ETHOS 1)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_1} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 1)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 1)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      flow_2_3:
+        title: Rate of people experiencing homelessness (flow, ETHOS 2 and 3)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_2_3}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      flow_total:
+        title: Rate of people experiencing homelessness (flow, total)
+        unit: people in homelessness per 100,000 population
+        short_unit: ""
+        description_short: "{definitions.description_short_ethos_1_2_3} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_10000_to_100000}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1_2_3}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - For Israel, the OECD gives a total that is higher than the sum of its parts, because it covers the whole national estimate of homelessness, not only ETHOS Light 1, 2 and 3.
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+        display:
+          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_women_point_in_time_1_2_3:
+        title: Share of women as a percentage of people experiencing homelessness (point-in-time, ETHOS 1, 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_broad_women} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_broad_women}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+        display:
+          name: Share of women as a percentage of people experiencing homelessness
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_women_point_in_time_2_3:
+        title: Share of women as a percentage of people experiencing homelessness (point-in-time, ETHOS 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_2_3}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
+        display:
+          name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_women_point_in_time_1:
+        title: Share of women as a percentage of people experiencing homelessness (point-in-time, ETHOS 1)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ethos_1} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1)
+        display:
+          name: Share of women as a percentage of people experiencing homelessness (ETHOS 1)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_women_flow_1_2_3:
+        title: Share of women as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_broad_women} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_broad_women}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+        display:
+          name: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_women_flow_2_3:
+        title: Share of women as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_2_3}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
+        display:
+          name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_men_point_in_time_1_2_3:
+        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1, 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_broad_women} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_men}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_broad_women}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of men as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+        display:
+          name: Share of men as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_men_point_in_time_2_3:
+        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_men}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_2_3}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 2 and 3)
+        display:
+          name: Share of men as a percentage of people experiencing homelessness (ETHOS 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_men_point_in_time_1:
+        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ethos_1} {definitions.description_short_point_in_time}"
+        description_processing: |-
+          {definitions.description_processing_men}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_1}"
+          - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1)
+        display:
+          name: Share of men as a percentage of people experiencing homelessness (ETHOS 1)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_men_flow_1_2_3:
+        title: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_broad_women} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_men}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_broad_women}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+        display:
+          name: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share_of_men_flow_2_3:
+        title: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_flow}"
+        description_processing: |-
+          {definitions.description_processing_men}
+
+          {definitions.description_processing_years}
+        description_key:
+          - "{definitions.ethos_2_3}"
+          - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        presentation:
+          title_public: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
+        display:
+          name: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      share:
+        title: Share of people experiencing homelessness
+        unit: "%"
+        short_unit: "%"
+        description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - "{definitions.harmonization}"
+          - The share uses each country's headline estimate of homelessness, following its own statistical definition, as a percentage of its total population. The OECD rounds it to two significant digits.
+          - This share differs from the rate of homelessness per 100,000 people in our other charts. The rate only counts people living rough or staying in emergency or temporary accommodation (ETHOS Light 1, 2 and 3), so that countries can be compared on a similar basis. The share counts everyone in the national estimate, which in some countries also includes people living in institutions or non-conventional dwellings, or staying temporarily with family or friends because they lack housing (ETHOS Light 4, 5 and 6).
+          - Most countries count people at a single point in time (point-in-time count). Austria, Chile, Cyprus, Israel, Latvia, Lithuania, Romania, Slovenia and Turkey instead count everyone who experienced homelessness over a period of time, such as a year (flow count).
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: |-
+          The OECD reports the share as a fraction of the population. We convert it to a percentage.
+
+          {definitions.description_processing_years}
+
+          We don't include the United Kingdom, as its data counts households instead of individuals.
+        processing_level: minor
+        presentation:
+          title_public: Share of people experiencing homelessness
+        display:
+          name: Share of people experiencing homelessness
+          numDecimalPlaces: 2
+          <<: *display_common
+
+      number:
+        title: Number of people experiencing homelessness
+        unit: people
+        short_unit: ""
+        description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - "{definitions.harmonization}"
+          - "{definitions.belgium}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: |-
+          {definitions.description_processing_years}
+
+          As the data for the United Kingdom includes a count of households experiencing homelessness (instead of individuals), we have removed it to facilitate cross-country comparison.
+
+          The OECD presents the data for three periods: around 2018, around 2023, and 2026 or the latest year available. Changes in definitions, data collection methods or geographic coverage mean that the values of a country are not always comparable over time. Due to visualization limitations, we have connected the values of each country. For more detail, you can check Table HC3.1.A2 on the [OECD Affordable Housing Database website](https://www.oecd.org/en/data/datasets/oecd-affordable-housing-database.html) (HC3.1 People experiencing homelessness and housing exclusion).
+        presentation:
+          title_public: Number of people experiencing homelessness
+        display:
+          name: Number of people experiencing homelessness
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      number_ethos_light_1:
+        title: Number of people experiencing homelessness who are living rough (ETHOS Light 1)
+        unit: people
+        short_unit: ""
+        description_short: People living in the streets or public spaces, without a shelter that can be defined as living quarters.
+        description_key:
+          - "{definitions.description_key_ethos_breakdown}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: "{definitions.description_processing_ethos_breakdown}"
+        presentation:
+          title_public: Number of people living rough
+        display:
+          name: Living rough
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      number_ethos_light_2:
+        title: Number of people experiencing homelessness who are in emergency accommodation (ETHOS Light 2)
+        unit: people
+        short_unit: ""
+        description_short: People with no place of usual residence who move frequently between different types of accommodation, such as overnight shelters.
+        description_key:
+          - "{definitions.description_key_ethos_breakdown}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: "{definitions.description_processing_ethos_breakdown}"
+        presentation:
+          title_public: Number of people in emergency accommodation
+        display:
+          name: In emergency accommodation
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      number_ethos_light_3:
+        title: Number of people experiencing homelessness who are in accommodation for the homeless (ETHOS Light 3)
+        unit: people
+        short_unit: ""
+        description_short: People staying in accommodation for the homeless, where the stay is time-limited and no long-term housing is provided, such as homeless hostels, transitional accommodation and women's shelters.
+        description_key:
+          - "{definitions.description_key_ethos_breakdown}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: "{definitions.description_processing_ethos_breakdown}"
+        presentation:
+          title_public: Number of people in accommodation for the homeless
+        display:
+          name: In accommodation for the homeless
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      number_ethos_light_4:
+        title: Number of people experiencing homelessness who are in institutions (ETHOS Light 4)
+        unit: people
+        short_unit: ""
+        description_short: People who stay in health institutions longer than needed because they have no housing, and people in prison with no housing available when they are released.
+        description_key:
+          - "{definitions.description_key_ethos_breakdown}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: "{definitions.description_processing_ethos_breakdown}"
+        presentation:
+          title_public: Number of people in institutions due to a lack of housing
+        display:
+          name: In institutions
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      number_ethos_light_5:
+        title: Number of people experiencing homelessness who are in non-conventional dwellings (ETHOS Light 5)
+        unit: people
+        short_unit: ""
+        description_short: People living in places that are not their usual residence because they lack housing, such as mobile homes, non-conventional buildings or temporary structures.
+        description_key:
+          - "{definitions.description_key_ethos_breakdown}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: "{definitions.description_processing_ethos_breakdown}"
+        presentation:
+          title_public: Number of people in non-conventional dwellings due to a lack of housing
+        display:
+          name: In non-conventional dwellings
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      number_ethos_light_6:
+        title: Number of people experiencing homelessness who are staying temporarily with family or friends (ETHOS Light 6)
+        unit: people
+        short_unit: ""
+        description_short: People living temporarily in a home with family or friends because they lack housing of their own.
+        description_key:
+          - "{definitions.description_key_ethos_breakdown}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
+        description_processing: "{definitions.description_processing_ethos_breakdown}"
+        presentation:
+          title_public: Number of people staying temporarily with family or friends due to a lack of housing
+        display:
+          name: Staying with family or friends
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      type_of_strategy:
+        title: Type of strategy to address homelessness
+        unit: ""
+        short_unit: ""
+        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to address homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
+        description_key:
+          - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
+          - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
+        processing_level: major
+        description_processing: |-
+          The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place at the national level. We combine them: a country has a "Housing First/housing-led strategy" when it has a Housing First or housing-led approach at the national level. When it doesn't, but it has an active national homelessness strategy, we classify it as "Other strategy". Countries with neither are classified as "No national strategy", even if they have regional or local strategies, or address homelessness in other national strategies.
+
+          The data reflects the situation reported to the 2025 OECD Questionnaire on Affordable and Social Housing, as published in 2026. For more information about these two classifications, please refer to the OECD report [National strategies for combatting homelessness](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-2-Homeless-strategies.pdf).
+        presentation:
+          title_public: Type of strategy to address homelessness
+        display:
+          name: Type of strategy to address homelessness
+          numDecimalPlaces: 0
+          <<: *display_common
+        type: ordinal
+        sort:
+          - Housing First/housing-led strategy
+          - Other strategy
+          - No national strategy

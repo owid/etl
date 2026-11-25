@@ -167,6 +167,10 @@ steps:
     - data://garden/oecd/2024-04-30/affordable_housing_database:
       - data://meadow/oecd/2024-04-30/affordable_housing_database:
         - snapshot://oecd/2024-04-30/affordable_housing_database_homelessness.xlsx
+  data://grapher/oecd/2026-11-24/affordable_housing_database:
+    - data://garden/oecd/2026-11-24/affordable_housing_database:
+      - data://meadow/oecd/2026-11-24/affordable_housing_database:
+        - snapshot://oecd/2026-11-24/affordable_housing_database_homelessness.xlsx
 
   # Institute of Global Homelessness - Better Data Project
   data://grapher/igh/2024-07-05/better_data_homelessness:
