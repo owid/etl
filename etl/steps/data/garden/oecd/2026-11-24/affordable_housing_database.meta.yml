@@ -83,7 +83,7 @@ definitions:
       point in time (e.g. Population Census; special module on homelessness in household survey);
 
 
-      - Administrative data: records collected by different institutions/organisations (e.g., health data,
+      - Administrative data: records collected by different institutions/organizations (e.g., health data,
       criminal justice records, social services data, etc.) and used to extrapolate the number of people
       experiencing homelessness;
 
@@ -110,7 +110,7 @@ definitions:
       types of services and emergency or temporary accommodation are included in data collection efforts,
       and which are left out. The selection of services to be surveyed may be narrowly defined (e.g., restricted
       to overnight shelters and temporary accommodation), or may be quite broad (e.g., to also include food
-      banks, social service centres, health clinics, etc.). As a result, homelessness data resulting from
+      banks, social service centers, health clinics, etc.). As a result, homelessness data resulting from
       service-based methods (often captured by ETHOS Light 2 and 3) are not fully comparable across
       countries. Table HC3.1.1 provides an overview of cross-country differences in the inclusion of children
       and temporary accommodation for specific groups in the national headline estimate of homelessness.
@@ -136,21 +136,21 @@ definitions:
       attribution_short: OECD
 
   ethos_1: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1_. ETHOS Light 1 is defined as people living rough, living in the streets or public spaces without a shelter that can be defined as living quarters.
-  ethos_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 2 and 3_. ETHOS Light 2 is defined as people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation. ETHOS Light 3 is defined as people living in accommodation for the homeless, including hostels, temporary and transitional accommodation, and women's shelters or refuge accommodation.
-  ethos_1_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1, 2 and 3_. It includes people living in the streets or public spaces, in emergency accommodation and in accommodation for the homeless, but it has not been dissagregated.
-  ethos_broad_women: This data covers countries whose definition of homelessness goes beyond people living rough (ETHOS Light 1) or beyond people staying in emergency accommodation and accommodation for the homeless (ETHOS Light 2 and 3). Depending on the country, it can also include people living in institutions, in non-conventional dwellings, or temporarily with family or friends due to a lack of housing (ETHOS Light 4, 5 and 6).
+  ethos_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 2 and 3_. ETHOS Light 2 is defined as people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation. ETHOS Light 3 is defined as people living in accommodation for the homeless, including hostels, temporary and transitional accommodation, and women’s shelters or refuge accommodation.
+  ethos_1_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1, 2, and 3_. It includes people living in the streets or public spaces, in emergency accommodation, and in accommodation for the homeless, but it has not been disaggregated.
+  ethos_broad_women: This data covers countries whose definition of homelessness goes beyond people living rough (ETHOS Light 1) or beyond people staying in emergency accommodation and accommodation for the homeless (ETHOS Light 2 and 3). Depending on the country, it can also include people living in institutions, in non-conventional dwellings, or temporarily with family or friends due to a lack of housing (ETHOS Light 4, 5, and 6).
 
-  point_in_time_count: This data is collected with a _point-in-time count_, in which data are collected at a single point in time, generally through a coordinated street count or an enumeration of people staying in shelters for people experiencing homelessness on a given night. Point-in-time counts thus present a “snapshot” of homelessness at a single time and place.
-  flow_count: This data is collected with a _flow count_, in which data are collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
+  point_in_time_count: This data is collected with a _point-in-time count_, in which data is collected at a single point in time, generally through a coordinated street count or an enumeration of people staying in shelters for people experiencing homelessness on a given night. Point-in-time counts thus present a “snapshot” of homelessness at a single time and place.
+  flow_count: This data is collected with a _flow count_, in which data is collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
 
   gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical definition of each country.
 
   harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
-  methodology_issues: More details about definitions, methodology and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
-  country_notes: For more information on the statistical definitions for each country, please check the [OECD's Country Notes on Homelessness data](https://www.oecd.org/en/topics/sub-issues/affordable-housing/homelessness.html).
+  methodology_issues: More details about definitions, methodology, and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
+  country_notes: For more information on the statistical definitions for each country, please check the [OECD’s Country Notes on Homelessness data](https://www.oecd.org/en/topics/sub-issues/affordable-housing/homelessness.html).
   unconventional_dwellings: Data for Australia, Canada, Germany, Italy, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
   united_kingdom_rates: Data for the United Kingdom only considers England. For ETHOS Light 2 and 3, it refers to the number of households experiencing homelessness per 100,000 households.
-  belgium: The OECD reports data for Belgium only for each of its three regions (Brussels, Flanders and Wallonia), because they can't be combined into a national estimate. We don't include them.
+  belgium: The OECD reports data for Belgium only for each of its three regions (Brussels, Flanders, and Wallonia), because they can’t be combined into a national estimate. We don’t include them.
 
   description_short_ethos_1: Includes people living in the streets or public spaces without a shelter that can be defined as living quarters.
   description_short_ethos_2_3: Includes people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation, and people living in accommodation for the homeless.
@@ -171,8 +171,8 @@ definitions:
 
     {definitions.description_processing_years}
 
-    We don't include the United Kingdom, as its data counts households instead of individuals.
-  description_key_ethos_breakdown: These numbers break down each country's headline estimate of homelessness, following its own statistical definition. Not every country counts every category, so the categories of different countries can't be added up or compared directly.
+    We don’t include the United Kingdom, as its data counts households instead of individuals.
+  description_key_ethos_breakdown: These numbers break down each country’s headline estimate of homelessness, following its own statistical definition. Not every country counts every category, so the categories of different countries can’t be added up or compared directly.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -341,7 +341,7 @@ tables:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
-          - For Israel, the OECD gives a total that is higher than the sum of its parts, because it covers the whole national estimate of homelessness, not only ETHOS Light 1, 2 and 3.
+          - For Israel, the OECD gives a total that is higher than the sum of its parts, because it covers the whole national estimate of homelessness, not only ETHOS Light 1, 2, and 3.
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -580,9 +580,9 @@ tables:
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
         description_key:
           - "{definitions.harmonization}"
-          - The share uses each country's headline estimate of homelessness, following its own statistical definition, as a percentage of its total population. The OECD rounds it to two significant digits.
-          - This share differs from the rate of homelessness per 100,000 people in our other charts. The rate only counts people living rough or staying in emergency or temporary accommodation (ETHOS Light 1, 2 and 3), so that countries can be compared on a similar basis. The share counts everyone in the national estimate, which in some countries also includes people living in institutions or non-conventional dwellings, or staying temporarily with family or friends because they lack housing (ETHOS Light 4, 5 and 6).
-          - Most countries count people at a single point in time (point-in-time count). Austria, Chile, Cyprus, Israel, Latvia, Lithuania, Romania, Slovenia and Turkey instead count everyone who experienced homelessness over a period of time, such as a year (flow count).
+          - The share uses each country’s headline estimate of homelessness, following its own statistical definition, as a percentage of its total population. The OECD rounds it to two significant digits.
+          - This share differs from the rate of homelessness per 100,000 people in our other charts. The rate only counts people living rough or staying in emergency or temporary accommodation (ETHOS Light 1, 2, and 3), so that countries can be compared on a similar basis. The share counts everyone in the national estimate, which in some countries also includes people living in institutions or non-conventional dwellings, or staying temporarily with family or friends because they lack housing (ETHOS Light 4, 5, and 6).
+          - Most countries count people at a single point in time (point-in-time count). Austria, Chile, Cyprus, Israel, Latvia, Lithuania, Romania, Slovenia, and Turkey instead count everyone who experienced homelessness over a period of time, such as a year (flow count).
           - "{definitions.belgium}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
@@ -591,7 +591,7 @@ tables:
 
           {definitions.description_processing_years}
 
-          We don't include the United Kingdom, as its data counts households instead of individuals.
+          We don’t include the United Kingdom, as its data counts households instead of individuals.
         processing_level: minor
         presentation:
           title_public: Share of people experiencing homelessness
@@ -615,7 +615,7 @@ tables:
 
           As the data for the United Kingdom includes a count of households experiencing homelessness (instead of individuals), we have removed it to facilitate cross-country comparison.
 
-          The OECD presents the data for three periods: around 2018, around 2023, and 2026 or the latest year available. Changes in definitions, data collection methods or geographic coverage mean that the values of a country are not always comparable over time. Due to visualization limitations, we have connected the values of each country. For more detail, you can check Table HC3.1.A2 on the [OECD Affordable Housing Database website](https://www.oecd.org/en/data/datasets/oecd-affordable-housing-database.html) (HC3.1 People experiencing homelessness and housing exclusion).
+          The OECD presents the data for three periods: around 2018, around 2023, and 2026 or the latest year available. Changes in definitions, data collection methods, or geographic coverage mean that the values of a country are not always comparable over time. Due to visualization limitations, we have connected the values of each country. For more detail, you can check Table HC3.1.A2 on the [OECD Affordable Housing Database website](https://www.oecd.org/en/data/datasets/oecd-affordable-housing-database.html) (HC3.1 People experiencing homelessness and housing exclusion).
         presentation:
           title_public: Number of people experiencing homelessness
         display:
@@ -663,7 +663,7 @@ tables:
         title: Number of people experiencing homelessness who are in accommodation for the homeless (ETHOS Light 3)
         unit: people
         short_unit: ""
-        description_short: People staying in accommodation for the homeless, where the stay is time-limited and no long-term housing is provided, such as homeless hostels, transitional accommodation and women's shelters.
+        description_short: People staying in accommodation for the homeless, where the stay is time-limited and no long-term housing is provided, such as homeless hostels, transitional accommodation, and women’s shelters.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
@@ -699,7 +699,7 @@ tables:
         title: Number of people experiencing homelessness who are in non-conventional dwellings (ETHOS Light 5)
         unit: people
         short_unit: ""
-        description_short: People living in places that are not their usual residence because they lack housing, such as mobile homes, non-conventional buildings or temporary structures.
+        description_short: People living in places that are not their usual residence because they lack housing, such as mobile homes, non-conventional buildings, or temporary structures.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
@@ -737,13 +737,13 @@ tables:
         short_unit: ""
         description_short: Defines whether the country has a Housing First strategy or housing-led strategy to address homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
         description_key:
-          - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
+          - Housing First models aim to provide tailored, intensive support for people experiencing homelessness who have high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
         processing_level: major
         description_processing: |-
-          The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place at the national level. We combine them: a country has a "Housing First/housing-led strategy" when it has a Housing First or housing-led approach at the national level. When it doesn't, but it has an active national homelessness strategy, we classify it as "Other strategy". Countries with neither are classified as "No national strategy", even if they have regional or local strategies, or address homelessness in other national strategies.
+          The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place at the national level. We combine them: a country has a “Housing First/housing-led strategy” when it has a Housing First or housing-led approach at the national level. When it doesn’t, but it has an active national homelessness strategy, we classify it as “Other strategy”. Countries with neither are classified as “No national strategy”, even if they have regional or local strategies, or address homelessness in other national strategies.
 
-          The data reflects the situation reported to the 2025 OECD Questionnaire on Affordable and Social Housing, as published in 2026. For more information about these two classifications, please refer to the OECD report [National strategies for combatting homelessness](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-2-Homeless-strategies.pdf).
+          The data reflects the situation reported to the 2025 OECD Questionnaire on Affordable and Social Housing, as published in 2026. For more information about these two classifications, please refer to the OECD report [National strategies for combating homelessness](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-2-Homeless-strategies.pdf).
         presentation:
           title_public: Type of strategy to address homelessness
         display:

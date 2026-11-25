@@ -288,13 +288,7 @@ def run() -> None:
     tables = []
     for tb in [tb_rates, tb_women, tb_number, tb_estimates, tb_strategy]:
         tables.append(
-            paths.regions.harmonize_names(
-                tb,
-                countries_file=paths.country_mapping_path,
-                excluded_countries_file=paths.excluded_countries_path,
-                warn_on_unused_countries=False,
-                warn_on_unknown_excluded_countries=False,
-            )
+            paths.regions.harmonize_names(tb, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False)
         )
 
     # Combine all tables.
