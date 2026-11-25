@@ -267,16 +267,16 @@ def add_display_settings(mdim):
 
 Also, you can use the fields `common_views` in the YAML file to define a common configuration for certain subset of views. This is very useful (and recommended) when you want to define different-level of granularity of configs. For instance, imagine you want to define the same subtitle for all views with dimension `sex=age`, but then if you have a view with `sex=age, year=2020`, you want to be able to a different subtitle. etc.
 
-As a reference, you can look at the explorer config of the [:fontawesome-brands-github:  Population and Demography explorer](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/un/latest/un_wpp.manual.config.yml). Below is a snippet of the `common_views` field. In it, we define different general configurations: (i) one for views with `indicator=age_structure`, (ii) one for views with `indicator=age_structure` and `sex=female`, and (iii) one for views with `indicator=age_structure` and `sex=male`.
+As a reference, you can look at the config of the [:fontawesome-brands-github:  Population and Demography multidim](https://github.com/owid/etl/blob/master/etl/steps/viz/chart/un/latest/un_wpp.manual.config.yml). Below is a snippet of the `common_views` field. In it, we define different general configurations: (i) one for views with `indicator=age_structure`, (ii) one for views with `indicator=age_structure` and `sex=female`, and (iii) one for views with `indicator=age_structure` and `sex=male`.
 
-```yaml title="etl/steps/viz/explorer/un/latest/un_wpp.yaml"
+```yaml title="etl/steps/viz/chart/un/latest/un_wpp.manual.config.yml"
 common_views:
   # Age structure
   - dimensions:
       indicator: age_structure
     config:
       title: Age structure
-      type: StackedDiscreteBar
+      chartTypes: [StackedDiscreteBar]
       hasMapTab: false
       stackMode: relative
   - dimensions:
@@ -329,7 +329,6 @@ The same helpers work for explorers: call `paths.create_explorer` instead of `pa
 
 
 ### Explorer examples:
-- [:fontawesome-brands-github:  Population and Demography](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/un/latest/un_wpp.py): Configuration automatically generated (mostly) from dimensions, using `expand_config` and other tools. This one is a good example for explorers with a large number of views.
 - [:fontawesome-brands-github:  Monkeypox](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/monkeypox.py): Manually crafted.
 
 ### How are explorers saved in admin?
