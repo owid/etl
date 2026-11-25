@@ -148,87 +148,8 @@ YEARS_NUMBER = {
     },
 }
 
-# Strategies to address homelessness, from indicator HC3.2 "National strategies for combatting homelessness"
-# (OECD Affordable Housing Database, last updated 10 September 2026), which reflects the 2025 OECD QuASH.
-# NOTE: These lists are transcribed from the PDF (key findings and tables HC3.2.1 and HC3.2.2); update them by hand.
+# Year the strategies (indicator HC3.2, last updated 10 September 2026) are assigned to.
 STRATEGIES_YEAR = 2026
-
-# Countries with an active national homelessness strategy. The key findings list 23 countries and say there are 24;
-# the 24th is the United States, whose national plan (All In) is listed in Table HC3.2.1.
-NATIONAL_STRATEGY = [
-    "Australia",
-    "Belgium",
-    "Canada",
-    "Chile",
-    "Colombia",
-    "Costa Rica",
-    "Denmark",
-    "Finland",
-    "France",
-    "Germany",
-    "Greece",
-    "Ireland",
-    "Israel",
-    "Italy",
-    "Japan",
-    "Korea",
-    "Netherlands",
-    "Poland",
-    "Portugal",
-    "Romania",
-    "Slovak Republic",
-    "Spain",
-    "Sweden",
-    "United States",
-]
-# Countries without an active national homelessness strategy (regional or local strategies only, homelessness
-# addressed in other national strategies, or no strategy at all).
-NO_NATIONAL_STRATEGY = [
-    "Austria",
-    "Bulgaria",
-    "Croatia",
-    "Cyprus",
-    "Czechia",
-    "Estonia",
-    "Hungary",
-    "Iceland",
-    "Latvia",
-    "Lithuania",
-    "Luxembourg",
-    "Malta",
-    "Mexico",
-    "New Zealand",
-    "Norway",
-    "Slovenia",
-    "South Africa",
-    "Switzerland",
-    "Türkiye",
-    "United Kingdom",
-]
-# Countries with a Housing First or housing-led approach at the national level (Table HC3.2.2, first column).
-HOUSING_FIRST_NATIONAL = [
-    "Austria",
-    "Belgium",
-    "Canada",
-    "Chile",
-    "Czechia",
-    "Denmark",
-    "Finland",
-    "France",
-    "Greece",
-    "Ireland",
-    "Italy",
-    "Korea",
-    "Luxembourg",
-    "Netherlands",
-    "New Zealand",
-    "Norway",
-    "Poland",
-    "Portugal",
-    "Slovak Republic",
-    "Spain",
-    "Sweden",
-]
 
 # Countries whose total rate in Figure HC3.1.1 is not the sum of its components (see sanity_check_inputs).
 RATE_TOTAL_EXCEPTIONS = {"Israel"}
@@ -250,6 +171,7 @@ def run() -> None:
     tb_women = ds_meadow.read("share_of_women")
     tb_estimates = ds_meadow.read("estimates")
     tb_number = ds_meadow.read("number")
+    tb_strategies = ds_meadow.read("strategies")
 
     sanity_check_inputs(tb_point_in_time, tb_flow, tb_women, tb_estimates)
 
@@ -282,7 +204,7 @@ def run() -> None:
     tb_estimates = tb_estimates[["country", "year", "share"] + [f"number_{col}" for col in ETHOS_COLUMNS]]
 
     # Strategies to address homelessness.
-    tb_strategy = create_strategy_table(tb_number)
+    tb_strategy = create_strategy_table(tb_strategies)
 
     # Harmonize country names. Belgium is reported only by region, and the regions are excluded.
     tables = []
@@ -458,32 +380,16 @@ def prepare_number(tb: Table, tb_estimates: Table) -> Table:
     return tb
 
 
-def create_strategy_table(tb_reference: Table) -> Table:
+def create_strategy_table(tb: Table) -> Table:
     """Classify the strategy of each country to address homelessness."""
-    countries = sorted(set(NATIONAL_STRATEGY) | set(NO_NATIONAL_STRATEGY) | set(HOUSING_FIRST_NATIONAL))
-    assert not set(NATIONAL_STRATEGY) & set(NO_NATIONAL_STRATEGY), (
-        "Countries listed with and without a national strategy."
-    )
-    assert set(HOUSING_FIRST_NATIONAL) <= set(NATIONAL_STRATEGY) | set(NO_NATIONAL_STRATEGY), (
-        "Housing First countries missing."
-    )
+    tb = tb.copy()
+    tb["year"] = STRATEGIES_YEAR
+    tb["type_of_strategy"] = "No national strategy"
+    tb.loc[tb["national_strategy"], "type_of_strategy"] = "Other strategy"
+    tb.loc[tb["housing_first_national"], "type_of_strategy"] = "Housing First/housing-led strategy"
+    tb["type_of_strategy"] = tb["type_of_strategy"].copy_metadata(tb["national_strategy"])
 
-    records = []
-    for country in countries:
-        if country in HOUSING_FIRST_NATIONAL:
-            strategy = "Housing First/housing-led strategy"
-        elif country in NATIONAL_STRATEGY:
-            strategy = "Other strategy"
-        else:
-            strategy = "No national strategy"
-        records.append({"country": country, "year": STRATEGIES_YEAR, "type_of_strategy": strategy})
-    tb = pr.read_from_records(records, columns=["country", "year", "type_of_strategy"])
-
-    # The strategies come from indicator HC3.2, which has no snapshot; use the origin of the HC3.1 data.
-    for col in tb.columns:
-        tb[col] = tb[col].copy_metadata(tb_reference["number"])
-
-    return tb
+    return tb[["country", "year", "type_of_strategy"]]
 
 
 def sanity_check_outputs(tb: Table) -> None:

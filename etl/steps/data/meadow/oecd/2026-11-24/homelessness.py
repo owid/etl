@@ -10,6 +10,7 @@ from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -96,6 +97,86 @@ BLOCKS = {
     },
 }
 
+# Strategies to address homelessness, transcribed from the PDF of indicator HC3.2 (key findings and Tables HC3.2.1
+# and HC3.2.2), last updated 10 September 2026.
+# NOTE: The PDF has no data file, so update these lists by hand.
+# Countries with an active national homelessness strategy. The key findings list 23 countries and say there are 24;
+# the 24th is the United States, whose national plan (All In) is listed in Table HC3.2.1.
+NATIONAL_STRATEGY = [
+    "Australia",
+    "Belgium",
+    "Canada",
+    "Chile",
+    "Colombia",
+    "Costa Rica",
+    "Denmark",
+    "Finland",
+    "France",
+    "Germany",
+    "Greece",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Japan",
+    "Korea",
+    "Netherlands",
+    "Poland",
+    "Portugal",
+    "Romania",
+    "Slovak Republic",
+    "Spain",
+    "Sweden",
+    "United States",
+]
+# Countries without an active national homelessness strategy (regional or local strategies only, homelessness
+# addressed in other national strategies, or no strategy at all).
+NO_NATIONAL_STRATEGY = [
+    "Austria",
+    "Bulgaria",
+    "Croatia",
+    "Cyprus",
+    "Czechia",
+    "Estonia",
+    "Hungary",
+    "Iceland",
+    "Latvia",
+    "Lithuania",
+    "Luxembourg",
+    "Malta",
+    "Mexico",
+    "New Zealand",
+    "Norway",
+    "Slovenia",
+    "South Africa",
+    "Switzerland",
+    "Türkiye",
+    "United Kingdom",
+]
+# Countries with a Housing First or housing-led approach at the national level (Table HC3.2.2, first column).
+HOUSING_FIRST_NATIONAL = [
+    "Austria",
+    "Belgium",
+    "Canada",
+    "Chile",
+    "Czechia",
+    "Denmark",
+    "Finland",
+    "France",
+    "Greece",
+    "Ireland",
+    "Italy",
+    "Korea",
+    "Luxembourg",
+    "Netherlands",
+    "New Zealand",
+    "Norway",
+    "Poland",
+    "Portugal",
+    "Slovak Republic",
+    "Spain",
+    "Sweden",
+]
+
 # Row where the notes start in Table HC3.1.A2 (data rows end right before it).
 NUMBER_END_MARKER = ".. Not available, | break in series"
 
@@ -106,6 +187,7 @@ def run() -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("affordable_housing_database_homelessness.xlsx")
+    snap_strategies = paths.load_snapshot("affordable_housing_database_strategies.pdf")
 
     # Read every sheet once, without headers, to address cells by position.
     sheets = {
@@ -135,6 +217,9 @@ def run() -> None:
                 tb[col] = pr.to_numeric(tb[col], errors="raise")
 
         tables.append(tb.format(["country"], short_name=short_name))
+
+    # Strategies to address homelessness, from the HC3.2 document.
+    tables.append(read_strategies(snap_strategies))
 
     #
     # Save outputs.
@@ -189,3 +274,23 @@ def clean_number(tb: Table) -> Table:
     assert tb["country"].is_unique, "Duplicate countries in Table HC3.1.A2."
 
     return tb
+
+
+def read_strategies(snap: Snapshot) -> Table:
+    """Build the table of strategies from the lists transcribed from the HC3.2 document."""
+    assert not set(NATIONAL_STRATEGY) & set(NO_NATIONAL_STRATEGY), (
+        "Countries listed with and without a national strategy."
+    )
+    assert set(HOUSING_FIRST_NATIONAL) <= set(NATIONAL_STRATEGY) | set(NO_NATIONAL_STRATEGY), (
+        "Housing First countries missing from the national strategy lists."
+    )
+    countries = sorted(set(NATIONAL_STRATEGY) | set(NO_NATIONAL_STRATEGY))
+    records = [
+        {
+            "country": country,
+            "national_strategy": country in NATIONAL_STRATEGY,
+            "housing_first_national": country in HOUSING_FIRST_NATIONAL,
+        }
+        for country in countries
+    ]
+    return snap.read_from_records(records).format(["country"], short_name="strategies")

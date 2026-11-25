@@ -4,6 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: OECD Affordable Housing Database (AHD)
+    title_snapshot: OECD Affordable Housing Database (AHD) – People experiencing homelessness and housing exclusion
     description: |-
       The OECD Affordable Housing Database (AHD) helps countries monitor access to good-quality affordable housing and strengthen the knowledge base for policy evaluation. It brings together cross-national information from OECD countries, Key Partners and EU member states.
 
