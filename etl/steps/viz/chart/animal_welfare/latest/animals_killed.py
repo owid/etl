@@ -182,6 +182,8 @@ def run() -> None:
                     "description_short": "Fish and crustaceans are shown as the midpoint of their estimated range.",
                     "description_key": [],
                     "description_from_producer": "",
+                    # Chickens killed in egg production are our own estimate.
+                    "processing_level": "major",
                 },
             },
         ],
