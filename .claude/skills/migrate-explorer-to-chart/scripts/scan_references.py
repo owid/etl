@@ -132,6 +132,28 @@ def breaks_on_redirect(how: str) -> bool:
     return how in {"chart", "prominent-link", "all-charts", "key-indicator", "explorer-tiles"}
 
 
+def explorer_default_view(prod: OWIDEnv, slug: str, dim_names: list[str]) -> dict[str, str]:
+    """The explorer's default choices: the first `graphers` row with `defaultView` true.
+
+    The explorer fills a choice a link leaves out (or names wrong) from this view before falling
+    back to the first available choice. An explorer without one has no defaults.
+    """
+    tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %(s)s", params={"s": slug}).tsv[0]
+    lines = tsv.splitlines()
+    start = next((n for n, line in enumerate(lines) if line.startswith("graphers")), None)
+    if start is None:
+        return {}
+    header = lines[start + 1].split("\t")
+    for line in lines[start + 2 :]:
+        if not line.startswith("\t"):
+            break
+        row = dict(zip(header, line.split("\t")))
+        if row.get("defaultView", "").strip().lower() == "true":
+            # Columns are named "<dimension> <control>", e.g. "Metric Dropdown".
+            return {d: row[col] for d in dim_names for col in header if col.rsplit(" ", 1)[0] == d and col in row}
+    return {}
+
+
 def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | None) -> None:
     mapping = json.loads((mapping_dir / "mapping.json").read_text())
     slug = mapping["explorer"]["slug"]
@@ -139,13 +161,15 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     rules = build_source_rules(mapping)
     dim_names, choices = choice_values(mapping_dir)
     prod = OWIDEnv.from_env_file(prod_env_file)
+    default = explorer_default_view(prod, slug, dim_names)
 
     def repair(q: dict) -> tuple[dict, list[str]]:
         """Fix the usual damage in old explorer links, so they can land on the view they meant.
 
         A value glued to the next param by a missing `&` ("…affordhideControls=false") is cut back
         to the choice it starts with; a param named after a renamed dimension ("Metric") is moved to
-        the one dimension that offers its value.
+        the one dimension that offers its value; one that differs from a dimension name only in case
+        is that dimension.
         """
         out, notes = {}, []
         for k, v in list(q.items()):
@@ -155,6 +179,13 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 rk, rv = rest.split("=", 1)
                 out.setdefault(rk, rv)
                 notes.append(f"split “{rk}={rv}” off “{k}”")
+            # A dimension name in different case ("Relative to Population") is that dimension. The
+            # explorer ignores such a param and shows its default, but the value is what the author
+            # asked for, so it wins.
+            same = [d for d in choices if d.lower() == k.lower() and d not in q]
+            if k not in choices and len(same) == 1:
+                notes.append(f"read “{k}” as “{same[0]}” (the explorer ignored it and showed its default)")
+                k = same[0]
             if k in choices and v not in choices[k]:
                 head = next((c for c in sorted(choices[k], key=len, reverse=True) if c and v.startswith(c)), None)
                 if head:
@@ -182,8 +213,10 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 "yScale",
                 "stackMode",
             }:
+                # A true/false value says nothing about which dimension it belongs to: an old
+                # checkbox ("Color by test positivity=false") would overwrite a real one.
                 owners = [d for d, cs in choices.items() if v in cs and d not in q]
-                if len(owners) == 1:
+                if len(owners) == 1 and v.lower() not in {"true", "false"}:
                     out[owners[0]] = v
                     notes.append(f"renamed “{k}” to “{owners[0]}”")
                     continue
@@ -197,30 +230,29 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     def fall_back(q: dict) -> tuple[dict, list[str]]:
         """Pick the view the explorer shows for a combination it doesn't have.
 
-        Like the explorer (and the multidim), keep the dimensions in order and, at the first one
-        whose value no view offers alongside the earlier ones, take the first view's value. A
-        dimension the link leaves out also gets the first remaining view's value, as the explorer
-        does.
+        Like the explorer, keep the dimensions in order and, at each one whose value the link
+        leaves out or no view offers alongside the earlier ones, take the default view's value if
+        a remaining view has it, else the first remaining view's value
+        (`ExplorerDecisionMatrix.toConstrainedOptions`).
         """
         out, notes, pool = dict(q), [], views
         if not any(d in q for d in dim_names):
             return q, []
         for d in dim_names:
-            if d not in out:
-                if not pool:
-                    return q, []
-                val = pool[0][d]
-                if val:
-                    out[d] = val
-                    notes.append(f"added the missing “{d}={val}” (what the explorer shows)")
-                pool = [v for v in pool if v[d] == val]
+            if not pool:
+                return q, []
+            if d in out and any(v[d] == out[d] for v in pool):
+                pool = [v for v in pool if v[d] == out[d]]
                 continue
-            if not any(v[d] == out[d] for v in pool):
-                if not pool:
-                    return q, []
-                notes.append(f"“{d}={out[d]}” doesn't exist here; the explorer shows “{pool[0][d]}”")
-                out[d] = pool[0][d]
-            pool = [v for v in pool if v[d] == out[d]]
+            val = default.get(d) if any(v[d] == default.get(d) for v in pool) else pool[0][d]
+            if d not in out:
+                if val:
+                    notes.append(f"added the missing “{d}={val}” (what the explorer shows)")
+            else:
+                notes.append(f"“{d}={out[d]}” doesn't exist here; the explorer shows “{val}”")
+            if val:
+                out[d] = val
+            pool = [v for v in pool if v[d] == val]
         return out, notes
 
     def clean(r):
@@ -236,7 +268,10 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
         old = unwrap(old)
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
         r = clean(resolve_explorer_url(rules, q, SITE, choices, dim_names))
-        if r.match != "view" and q:
+        # A dimension name in different case must reach `repair`, even when the redirect already
+        # lands on some view without it.
+        cased = any(k not in choices and k.lower() in {d.lower() for d in choices} for k in q)
+        if (r.match != "view" or cased) and q:
             fixed, notes = repair(q)
             fixed, more = fall_back(fixed)
             notes += more
