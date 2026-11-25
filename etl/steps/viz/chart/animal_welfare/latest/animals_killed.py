@@ -39,10 +39,10 @@ LAND_ANIMALS_STACKED = [
     "other_land_animals",
 ]
 
-# Animals shown as lines in the view of all animals.
+# Animals shown side by side (as bars or lines) in the view of land and aquatic animals.
 # NOTE: Chickens killed for eggs are never stacked with other animals, since laying hens are also counted among the
 # chickens slaughtered for meat.
-ALL_ANIMALS = LAND_ANIMALS_STACKED[:-1] + [
+LAND_AND_AQUATIC_ANIMALS = LAND_ANIMALS_STACKED[:-1] + [
     "buffaloes",
     "camels",
     "donkeys",
@@ -124,7 +124,7 @@ def run() -> None:
     for view in c.views:
         del view.dimensions["estimate"]
 
-    # Add a view that stacks land animals, and another that shows all animals as lines.
+    # Add a view that stacks land animals, and another that shows land and aquatic animals side by side.
     c.group_views(
         groups=[
             {
@@ -144,13 +144,17 @@ def run() -> None:
             },
             {
                 "dimension": "animal",
-                "choices": ALL_ANIMALS,
-                "choice_new_slug": "all_animals",
+                "choices": LAND_AND_AQUATIC_ANIMALS,
+                "choice_new_slug": "land_and_aquatic_animals",
                 "view_config": {
                     **ONE_COUNTRY,
                     "title": "Animals killed for food{per_person}",
                     "subtitle": "Fish and crustaceans are shown as the midpoint of their estimated range.",
                     "hasMapTab": False,
+                    # Show bars first. Lines are on a log scale, since fish are counted in trillions and some land
+                    # animals in thousands (bars are always on a linear scale).
+                    "chartTypes": ["LineChart", "DiscreteBar"],
+                    "tab": "discrete-bar",
                     "yAxis": {"scaleType": "log", "canChangeScaleType": True},
                 },
             },
@@ -162,20 +166,23 @@ def run() -> None:
         },
     )
 
-    # In the view of all animals, show only the midpoint of fish and crustaceans.
+    # In the view of land and aquatic animals, show only the midpoint of fish and crustaceans. Also, let each bar show the
+    # latest value of up to 5 years earlier, since fish and crustaceans have no data for the latest years.
     for view in c.views:
-        if view.dimensions["animal"] == "all_animals":
+        if view.dimensions["animal"] == "land_and_aquatic_animals":
             view.indicators.y = [
                 indicator
                 for indicator in view.indicators.y
                 if not any(f"estimate_{bound}" in indicator.catalogPath for bound in ["upper_limit", "lower_limit"])
             ]
+            for indicator in view.indicators.y:
+                indicator.display = {**(indicator.display or {}), "tolerance": 5}
 
-    # Remove the views that are only needed to build the others: all animals based on consumption (which has no fish or
-    # eggs), and other land animals on their own.
+    # Remove the views that are only needed to build the others: land and aquatic animals based on consumption (which has
+    # no fish or eggs), and other land animals on their own.
     c.drop_views(
         [
-            {"animal": "all_animals", "metric": "animals_killed_for_consumption"},
+            {"animal": "land_and_aquatic_animals", "metric": "animals_killed_for_consumption"},
             {"animal": "other_land_animals"},
         ]
     )

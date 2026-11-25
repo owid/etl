@@ -38,8 +38,8 @@ dimensions:
       - slug: land_animals_stacked
         name: Land animals (stacked)
         group: Aggregates
-      - slug: all_animals
-        name: All animals (lines)
+      - slug: land_and_aquatic_animals
+        name: Land and aquatic animals
         group: Aggregates
       - slug: poultry
         name: Poultry
