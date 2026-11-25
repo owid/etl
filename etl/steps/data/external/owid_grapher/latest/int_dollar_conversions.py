@@ -56,8 +56,8 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Bolivia (urban)": Source.NONE,  # We don't want urban/rural splits.
     "British Virgin Islands": Source.WDI,  # only defined by WDI
     "Brunei": Source.WDI,  # only defined by WDI
-    "Bulgaria": Source.WDI,  # Bulgaria adopted the Euro on 2026-01-01. WDI reflects this change (old Lev-denominated
-    # value / the fixed 1.95583 BGN-per-EUR peg matches the new WDI value almost exactly), while PIP doesn't yet.
+    "Bulgaria": Source.WDI,  # Bulgaria adopted the Euro on 2026-01-01. WDI reflects this change (PIP's Lev value /
+    # the fixed 1.95583 BGN-per-EUR peg is within ~1% of WDI), while PIP doesn't yet. See CURRENCY_OVERRIDES.
     "Cambodia": Source.WDI,  # only defined by WDI
     "Cayman Islands": Source.WDI,  # only defined by WDI
     "China (rural)": Source.NONE,  # prefer WDI's value for China, as PIP only has urban & rural population
@@ -117,6 +117,24 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Yemen": Source.PIP,  # only defined by PIP
     "Zimbabwe": Source.UNCLEAR,  # deviation of 21x; Zimbabwe has had a multitude of currencies, and it's not clear which one the sources are using.
 }
+
+# Currency (code, name) to use instead of the ICP 2021 currency metadata, for countries whose chosen PPP value is
+# denominated in a currency that ICP 2021 doesn't reflect (e.g. after a currency change since 2021).
+# The step fails if ICP already reports the overriding currency, so that stale overrides get removed.
+CURRENCY_OVERRIDES = {
+    "Bulgaria": ("EUR", "Euro"),  # Euro adopted on 2026-01-01; the WDI PPP value we use is in Euros.
+}
+
+
+def apply_currency_overrides(tb: DataFrame) -> DataFrame:
+    for country, (currency_code, currency_name) in CURRENCY_OVERRIDES.items():
+        assert country in tb.index, f"Country in CURRENCY_OVERRIDES is missing from the output: {country}"
+        assert tb.loc[country, "currency_code"] != currency_code, (
+            f"ICP already reports {currency_code} for {country}; remove it from CURRENCY_OVERRIDES."
+        )
+        tb.loc[country, "currency_code"] = currency_code
+        tb.loc[country, "currency_name"] = currency_name
+    return tb
 
 
 def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
@@ -271,6 +289,9 @@ def run() -> None:
     # Add currency code and name from ICP 2021 — same currency used in WDI PPP data.
     # Use join (not index.map) to preserve origins from the source dataset.
     tb = tb.join(ds_icp["icp_2021_currencies"][["currency_code", "currency_name"]], how="left")
+
+    # Override currencies that changed since ICP 2021.
+    tb = apply_currency_overrides(tb)
 
     #
     # Format output table.
