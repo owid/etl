@@ -2,9 +2,9 @@
 # per cell. Format: etl/data_corrections.py. Applied to the SCL input table at the start of the step, before the
 # balance table and the region aggregates are built, so that regions inherit the corrected country rows.
 #
-# Why here and not in the garden SCL step (data://garden/faostat/2026-11-23/faostat_scl): this step is the only
-# consumer of the garden SCL dataset, so nothing else sees the error. And FAOSTAT's own mechanism for known errors
-# (shared_detected_anomalies.py) runs after the region rows are built, so it could not correct them.
+# Why here and not in the garden SCL step (faostat_scl): this step is the only consumer of the garden SCL dataset, so
+# nothing else sees the error. And FAOSTAT's own mechanism for known errors (shared_detected_anomalies.py) runs after
+# the region rows are built, so it could not correct them.
 #
 # Denmark, molasses (item 165), 2021-2024. FAOSTAT imputes molasses production equal to the sugar beet processed
 # (2.44, 2.19, 2.26 and 2.37 million tonnes), flagged "I" (imputed), and balances it with an estimated feed use of the
