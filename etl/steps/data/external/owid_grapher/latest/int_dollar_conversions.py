@@ -21,6 +21,10 @@ PPP_YEAR = 2021
 # Maximum deviation that's allowed between the PPP values from PIP and WDI, as a factor. When it's between these limits, we take the PIP value.
 PPP_PIP_WDI_MAX_DEVIATION = 0.03
 
+# Number of years a country's latest CPI data may lag behind the latest CPI year of any country. Countries within this
+# lag are kept (and their conversion_factor_year is their own latest CPI year); countries with older CPI are dropped.
+MAX_CPI_LAG_YEARS = 1
+
 
 class Source(Enum):
     NONE = "none"
@@ -228,15 +232,27 @@ def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
     ]
 
     cpi_latest_available_year = int(tb_cpi_latest["cpi_year"].max())
-    countries_with_outdated_cpi = tb_cpi_latest[tb_cpi_latest["cpi_year"] < cpi_latest_available_year]
+    min_cpi_year = cpi_latest_available_year - MAX_CPI_LAG_YEARS
+
+    # Log each country that is kept, but whose CPI data is older than the latest available year.
+    tb_cpi_lagged = tb_cpi_latest[tb_cpi_latest["cpi_year"].between(min_cpi_year, cpi_latest_available_year - 1)]
+    for country, cpi_year in tb_cpi_lagged["cpi_year"].items():
+        paths.log.info(
+            f"{country}: using CPI data for {int(cpi_year)} instead of {cpi_latest_available_year}.",
+            country=country,
+            cpi_year=int(cpi_year),
+            latest_cpi_year=cpi_latest_available_year,
+        )
+
+    countries_with_outdated_cpi = tb_cpi_latest[tb_cpi_latest["cpi_year"] < min_cpi_year]
     countries_by_latest_cpi_year = {}
     for cpi_year in sorted(countries_with_outdated_cpi["cpi_year"].unique()):
         countries_by_latest_cpi_year[int(cpi_year)] = sorted(
             countries_with_outdated_cpi.loc[countries_with_outdated_cpi["cpi_year"] == cpi_year].index
         )
-    tb_cpi_latest = tb_cpi_latest[tb_cpi_latest["cpi_year"] == cpi_latest_available_year]
+    tb_cpi_latest = tb_cpi_latest[tb_cpi_latest["cpi_year"] >= min_cpi_year]
     paths.log.info(
-        f"Dropped countries with outdated CPI data (CPI year < {cpi_latest_available_year}). Dropped {len(countries_with_outdated_cpi)} countries, {len(tb_cpi_latest)} remain.",
+        f"Dropped countries with outdated CPI data (CPI year < {min_cpi_year}). Dropped {len(countries_with_outdated_cpi)} countries, {len(tb_cpi_latest)} remain.",
         n_countries_dropped=len(countries_with_outdated_cpi),
         latest_cpi_year=cpi_latest_available_year,
         countries_dropped_by_latest_cpi_year=countries_by_latest_cpi_year,
