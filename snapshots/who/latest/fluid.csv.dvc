@@ -10,13 +10,13 @@ meta:
     attribution_short: WHO
     url_main: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
     url_download: https://xmart-api-public.who.int/FLUMART/VIW_FID_EPI?$format=csv
-    date_accessed: '2026-11-24'
+    date_accessed: '2026-11-25'
     date_published: '2023-02-16'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: 93750c7358417e1e711a09a2f4ece6a1
+  - md5: e1266a536f1c48e893f5b676759ee830
     size: 76433727
     path: fluid.csv
