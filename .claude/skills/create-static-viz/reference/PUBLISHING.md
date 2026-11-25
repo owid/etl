@@ -6,34 +6,51 @@ gdoc block renders the image like `{.image}` does, and adds a Download button wh
 description, both image versions and the data link. The admin is behind Cloudflare Access, so a cloud
 session cannot reach it: prepare the files and the texts, and the user enters them.
 
-## Ask for the final review
+## Ask for each review with the same template
 
-Nothing goes on the site before the final reviewer (Step 9, item 6) approves the frames. Export the
-PNGs first (section 1), then draft the request as a comment on the viz's child issue, for the user to
-post. It opens with the attribution line, then:
+Every review round in Step 9, item 6 (Bertha, the design review, the author, the final review) is asked
+for with one comment on the viz's child issue, drafted for the user to post. Use this template, filling
+the angle brackets and dropping the lines that don't apply. Nothing goes on the site before the final
+reviewer's thumbs-up. Export the PNGs first (section 1).
 
-- **The ask**, in the first lines: the chart is ready for publication, could they check that the chart
-  and its text read well; a thumbs-up is enough.
-- **Who gave feedback**, and the two or three main changes from the original, as bullets.
-- **Text on the page that changes with it**, in one sentence (section 4 finds it).
-- **The Figma link** to the desktop frame.
-- **The images, each under a bold label, as HTML tags** so they render at a set width:
+```markdown
+> _Written by Claude <model name> — @<handle> at the wheel._
 
-  ```html
-  **Before (published <year>)**
-  <img src="…" width="850">
+Hi @<reviewer>!
 
-  **Desktop**
-  <img src="…" width="850">
+<The ask, in one or two sentences. Final review: "Here's the <subject> static chart, ready for
+publication. Could you take a final look and let us know if it's good to go? We'd mostly like to check
+that the chart and its text read well." Earlier rounds: what is ready, and the one to three points you'd
+most like their eye on.> A thumbs-up is enough if you're happy with it.
 
-  **Mobile**
-  <img src="…" width="360">
-  ```
+It includes feedback from <names>. The main changes from <the original | the last version>:
+- <change, with the reason when it isn't obvious>
+- <change>
 
-A session cannot upload images to GitHub, so give each tag a placeholder `src` naming its file (the old
-image from `scripts/fetch_original_image.py`, the new PNGs from section 1). The user drags each file
-into the comment box and moves the `user-attachments` URL GitHub inserts into its tag. A follow-up
-after a review round uses the same image block, with the new version only.
+<Text on the page that changes with the chart, in one sentence, when there is any (section 4 finds it).>
+
+[Figma](<link to the desktop frame>)
+
+**Before (published <year>)**
+<img src="<old image>" width="850">
+
+**Desktop**
+<img src="<desktop PNG>" width="850">
+
+**Mobile**
+<img src="<mobile PNG>" width="360">
+```
+
+- **The images stay HTML tags** at those widths, so they render at a set size; GitHub's drag-and-drop
+  inserts full-width Markdown images instead. A session cannot upload to GitHub, so each `src` is a
+  placeholder naming its file (the old image from `scripts/fetch_original_image.py`, the new PNGs from
+  section 1); the user drags each file into the comment box and moves the `user-attachments` URL
+  GitHub inserts into its tag.
+- **A follow-up after a round** ("Thanks @<reviewer>! I applied your suggestions…") keeps the same
+  shape: what changed and anything not applied, with the reason, then the Figma link and the images of
+  the new version only, without the before.
+- **The same template works outside the issue** (a Slack message to a colleague), with the images
+  attached in that order instead of the tags.
 
 ## 1. Export and upload the images
 
