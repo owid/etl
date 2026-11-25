@@ -8,6 +8,7 @@ Each indicator comes from a single source, so that it keeps its own origins:
 - land_animals_killed and live_animals: FAOSTAT (QCL).
 - land_animals_killed_for_consumption: our estimate in animals_killed_for_domestic_consumption.
 - chickens_killed_for_eggs: our estimate in chickens_killed_for_eggs.
+- chickens_killed_for_eggs_for_consumption: our estimate in animals_killed_for_domestic_consumption.
 - wild_caught_fish, farmed_fish and farmed_crustaceans: Fishcount.
 
 Values per person are in indicators of their own (ending in "_per_capita"), since only they also come from population
@@ -162,17 +163,15 @@ def prepare_consumption(tb_consumption: Table) -> Table:
     return add_other_land_animals(tb[["country", "year"] + DIMENSIONS + [column, f"{column}_per_capita"]], column)
 
 
-def prepare_chickens_killed_for_eggs(tb_eggs: Table) -> Table:
-    column = "chickens_killed_for_eggs"
+def prepare_chickens_killed_for_eggs(tb_eggs: Table, source_column: str, metric: str, column: str) -> Table:
     tables = []
-    for per_capita, source_column, new_column in [
-        ("total", "chickens_killed", column),
-        ("per_capita", "chickens_killed_per_capita", f"{column}_per_capita"),
-    ]:
-        tb = tb_eggs[["country", "year", source_column]].rename(columns={source_column: new_column}, errors="raise")
-        tables.append(tb.assign(**{"per_capita": per_capita}).dropna(subset=[new_column]))
+    for per_capita, suffix in [("total", ""), ("per_capita", "_per_capita")]:
+        tb = tb_eggs[["country", "year", f"{source_column}{suffix}"]].rename(
+            columns={f"{source_column}{suffix}": f"{column}{suffix}"}, errors="raise"
+        )
+        tables.append(tb.assign(**{"per_capita": per_capita}).dropna(subset=[f"{column}{suffix}"]))
     tb = pr.concat(tables, ignore_index=True)
-    tb = tb.assign(**{"metric": "animals_killed", "animal": column, "estimate": ESTIMATE_NOT_APPLICABLE})
+    tb = tb.assign(**{"metric": metric, "animal": "chickens_killed_for_eggs", "estimate": ESTIMATE_NOT_APPLICABLE})
 
     return tb[["country", "year"] + DIMENSIONS + [column, f"{column}_per_capita"]].reset_index(drop=True)
 
@@ -267,9 +266,9 @@ def run() -> None:
     tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
     # The wide table has FAOSTAT's description of each item.
     tb_qcl_flat = ds_qcl.read("faostat_qcl_flat", load_data=False)
-    tb_consumption = paths.load_dataset("animals_killed_for_domestic_consumption").read(
-        "animals_killed_for_domestic_consumption"
-    )
+    ds_consumption = paths.load_dataset("animals_killed_for_domestic_consumption")
+    tb_consumption = ds_consumption.read("animals_killed_for_domestic_consumption")
+    tb_eggs_consumption = ds_consumption.read("chickens_killed_for_eggs")
     tb_eggs = paths.load_dataset("chickens_killed_for_eggs").read("chickens_killed_for_eggs")
     tables_fish = {
         animal: paths.load_dataset(dataset).read(dataset) for animal, (dataset, _) in FISH_AND_CRUSTACEANS.items()
@@ -315,7 +314,15 @@ def run() -> None:
             tb_killed,
             *tables_live,
             prepare_consumption(tb_consumption),
-            prepare_chickens_killed_for_eggs(tb_eggs),
+            prepare_chickens_killed_for_eggs(
+                tb_eggs, source_column="chickens_killed", metric="animals_killed", column="chickens_killed_for_eggs"
+            ),
+            prepare_chickens_killed_for_eggs(
+                tb_eggs_consumption,
+                source_column="killed_for_domestic_supply",
+                metric="animals_killed_for_consumption",
+                column="chickens_killed_for_eggs_for_consumption",
+            ),
             *[
                 prepare_fish_and_crustaceans(tables_fish[animal], animal=animal, prefix=prefix)
                 for animal, (_, prefix) in FISH_AND_CRUSTACEANS.items()

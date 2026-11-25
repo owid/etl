@@ -46,6 +46,13 @@ tables:
           name: Chickens killed for eggs
         presentation:
           title_public: *title_chickens_killed_for_eggs
+      chickens_killed_for_eggs_for_consumption: &chickens_killed_for_eggs_for_consumption
+        title: &title_chickens_killed_for_eggs_for_consumption |-
+          Chickens killed for eggs supplied to the country<% if per_capita == "per_capita" %> per person<% endif %>
+        display:
+          name: Chickens killed for eggs
+        presentation:
+          title_public: *title_chickens_killed_for_eggs_for_consumption
       wild_caught_fish: &wild_caught_fish
         title: &title_wild_caught_fish |-
           Fishes caught from the wild<% if per_capita == "per_capita" %> per person<% endif %><% if estimate == "upper_limit" %> (upper limit)<% elif estimate == "lower_limit" %> (lower limit)<% endif %>
@@ -83,6 +90,7 @@ tables:
       land_animals_killed_per_capita: *land_animals_killed
       land_animals_killed_for_consumption_per_capita: *land_animals_killed_for_consumption
       chickens_killed_for_eggs_per_capita: *chickens_killed_for_eggs
+      chickens_killed_for_eggs_for_consumption_per_capita: *chickens_killed_for_eggs_for_consumption
       wild_caught_fish_per_capita: *wild_caught_fish
       farmed_fish_per_capita: *farmed_fish
       farmed_crustaceans_per_capita: *farmed_crustaceans

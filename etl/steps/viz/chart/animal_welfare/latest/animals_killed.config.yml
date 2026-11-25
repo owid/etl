@@ -51,10 +51,10 @@ dimensions:
         name: Cattle
         group: Land animals
       - slug: chickens_killed_for_eggs
-        name: Chickens, for eggs
+        name: Chickens (eggs)
         group: Land animals
       - slug: chickens
-        name: Chickens, for meat
+        name: Chickens (meat)
         group: Land animals
       - slug: donkeys
         name: Donkeys

@@ -12,6 +12,7 @@ INDICATORS = [
         "land_animals_killed",
         "land_animals_killed_for_consumption",
         "chickens_killed_for_eggs",
+        "chickens_killed_for_eggs_for_consumption",
         "wild_caught_fish",
         "farmed_fish",
         "farmed_crustaceans",

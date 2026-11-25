@@ -107,7 +107,7 @@ steps:
       - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
       - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
       - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs
-      # Land animals killed to supply each country's own consumption of meat (corrected for trade).
+      # Land animals killed to supply each country's own consumption of meat and eggs (corrected for trade).
       - data://garden/animal_welfare/2026-09-16/animals_killed_for_domestic_consumption:
         - data://garden/faostat/2026-02-25/faostat_fbsc
         - data://garden/faostat/2026-02-25/faostat_qcl
@@ -115,6 +115,7 @@ steps:
         - data://garden/regions/2023-01-01/regions
         - data://garden/wb/2026-07-01/income_groups
         - data://garden/demography/2024-07-15/population
+        - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs
 
   # Animals killed for food, counted where they are killed or where their meat is consumed.
   viz://chart/animal_welfare/latest/animals_killed:

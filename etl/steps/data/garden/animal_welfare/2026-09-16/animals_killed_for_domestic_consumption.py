@@ -18,6 +18,9 @@ All quantities come from FAOSTAT:
 - FBS and SCL often report a different meat production than QCL, so the meat supplied and produced must come from
   the same source: the ratio between them is what carries over to QCL's animals killed.
 
+A second table does the same for chickens killed in egg production (from our chickens_killed_for_eggs dataset), with
+the eggs supplied and produced from FBS.
+
 This builds on van der Laan, S., Breeman, G., & Scherer, L. (2024). Animal Lives Affected by Meat Consumption Trends in
 the G20 Countries. Animals, 14(11), 1662. https://doi.org/10.3390/ani14111662, extended from the G20 to all
 countries, and from groups of animals to each animal.
@@ -122,8 +125,11 @@ GROUPS = {
 # "Food" is the part of that supply that reaches people.
 FBS_ELEMENTS = {"005301": "killed_for_domestic_supply", "005142": "killed_for_food"}
 
-# FBS element code for meat production, in tonnes.
+# FBS element code for meat (or egg) production, in tonnes.
 FBS_PRODUCTION = "005511"
+
+# FBS item code of eggs (of all birds, mostly hens), including processed eggs converted back to eggs in their shell.
+FBS_EGGS = "00002949"
 
 # SCL element codes, in tonnes.
 SCL_PRODUCTION, SCL_IMPORTS, SCL_EXPORTS, SCL_STOCK_VARIATION, SCL_FOOD = (
@@ -332,9 +338,75 @@ def prepare_meat_supply(tb_fbsc: Table, tb_scl_supply: Table, tb_rates: Table) -
     return tb
 
 
+def prepare_chickens_killed_for_eggs(tb_fbsc: Table, tb_eggs: Table, first_year: int) -> Table:
+    """Chickens killed in egg production, for each country's own consumption of eggs, from the first year of meat.
+
+    As for meat, chickens killed for consumption = chickens killed in the country * (eggs supplied / eggs produced).
+    Eggs of a country that produces none are converted at the world's number of chickens killed per tonne of eggs.
+    """
+    # Eggs supplied and produced, from FBS.
+    elements = {**FBS_ELEMENTS, FBS_PRODUCTION: "production"}
+    tb = tb_fbsc[
+        (tb_fbsc["item_code"] == FBS_EGGS) & tb_fbsc["element_code"].isin(elements) & (tb_fbsc["year"] >= first_year)
+    ].reset_index(drop=True)
+    tb["element"] = tb["element_code"].map(elements)
+    tb["country"] = tb["country"].astype(str)
+    tb = tb.pivot(index=["country", "year"], columns="element", values="value", join_column_levels_with="_")
+    # As for meat, a negative supply cannot be turned into a number of animals.
+    for column in FBS_ELEMENTS.values():
+        tb.loc[tb[column] < 0, column] = float("nan")
+
+    # Chickens killed in egg production in each country.
+    tb = pr.merge(
+        tb,
+        tb_eggs[tb_eggs["year"] >= first_year][["country", "year", "chickens_killed"]].rename(
+            columns={"chickens_killed": "killed_in_country"}, errors="raise"
+        ),
+        on=["country", "year"],
+        how="outer",
+    )
+
+    # Keep only countries (aggregates are built later as sums of countries).
+    tb = tb[~tb["country"].isin(paths.regions.regions_all) & ~tb["country"].str.contains("(FAO)", regex=False)]
+    tb = tb.reset_index(drop=True)
+
+    # Chickens killed per tonne of eggs produced, in each country and in the world.
+    tb["chickens_per_tonne"] = tb["killed_in_country"] / tb["production"].replace(0, float("nan"))
+    informed = tb.dropna(subset=["chickens_per_tonne"])
+    world = informed.groupby("year", as_index=False).agg({"killed_in_country": "sum", "production": "sum"})
+    world["world_chickens_per_tonne"] = world["killed_in_country"] / world["production"]
+    tb = pr.merge(tb, world[["year", "world_chickens_per_tonne"]], on="year", how="left")
+    tb["chickens_per_tonne"] = tb["chickens_per_tonne"].fillna(tb["world_chickens_per_tonne"])
+    for column in FBS_ELEMENTS.values():
+        tb[column] = tb[column] * tb["chickens_per_tonne"]
+
+    tb = tb.dropna(how="all", subset=["killed_in_country"] + list(FBS_ELEMENTS.values())).reset_index(drop=True)
+
+    return tb[["country", "year", "killed_in_country"] + list(FBS_ELEMENTS.values())]
+
+
+def sanity_check_chickens_killed_for_eggs(tb: Table) -> None:
+    error = "Negative numbers of chickens killed for eggs."
+    assert (tb[list(FBS_ELEMENTS.values())].fillna(0) >= 0).all().all(), error
+
+    # The chickens killed for the consumption of all countries should roughly match those killed in the same countries
+    # (as for meat, see sanity_check_outputs).
+    covered = tb.dropna(subset=["killed_for_domestic_supply", "killed_in_country"])
+    compared = covered.groupby("year", as_index=False).agg(
+        {"killed_for_domestic_supply": "sum", "killed_in_country": "sum"}
+    )
+    ratio = compared["killed_for_domestic_supply"] / compared["killed_in_country"]
+    error = "Chickens killed for the consumption of eggs differ from those killed in the same countries by over 20%."
+    assert ratio.between(0.8, 1.2).all(), error
+
+
 def sanity_check_inputs(tb_fbsc: Table, tb_scl: Table, tb_qcl: Table) -> None:
     tb_meat = tb_fbsc[tb_fbsc["item_code"].isin(FBS_GROUPS.values()) & tb_fbsc["element_code"].isin(FBS_ELEMENTS)]
     assert set(tb_meat["unit"]) == {"tonnes"}, "Unexpected units in FAOSTAT FBS meat supply."
+    tb_eggs = tb_fbsc[
+        (tb_fbsc["item_code"] == FBS_EGGS) & tb_fbsc["element_code"].isin([*FBS_ELEMENTS, FBS_PRODUCTION])
+    ]
+    assert set(tb_eggs["unit"]) == {"tonnes"}, "Unexpected units in FAOSTAT FBS egg supply or production."
     scl_items = {item for info in ANIMALS.values() for item in info["scl_items"]}
     error = f"SCL items not found: {scl_items - set(tb_scl['item'])}"
     assert scl_items <= set(tb_scl["item"]), error
@@ -418,6 +490,7 @@ def run() -> None:
     tb_fbsc = paths.load_dataset("faostat_fbsc").read("faostat_fbsc", safe_types=False)
     tb_qcl = paths.load_dataset("faostat_qcl").read("faostat_qcl", safe_types=False)
     tb_scl = paths.load_dataset("faostat_scl").read("faostat_scl", safe_types=False)
+    tb_eggs = paths.load_dataset("chickens_killed_for_eggs").read("chickens_killed_for_eggs")
 
     #
     # Process data.
@@ -500,7 +573,22 @@ def run() -> None:
     )
     tb = tb.format(keys=["country", "year", "animal"], short_name=paths.short_name)
 
+    # Chickens killed in egg production, for each country's own consumption of eggs (in a table of their own, so that
+    # their sources are not mixed with those of meat).
+    tb_eggs = prepare_chickens_killed_for_eggs(tb_fbsc=tb_fbsc, tb_eggs=tb_eggs, first_year=tb_scl["year"].min())
+    sanity_check_chickens_killed_for_eggs(tb=tb_eggs)
+    tb_eggs = paths.regions.add_aggregates(
+        tb=tb_eggs, regions=REGIONS, index_columns=["country", "year"], min_num_values_per_year=1
+    )
+    tb_eggs = paths.regions.add_per_capita(
+        tb=tb_eggs,
+        regions=REGIONS,
+        index_columns=["country", "year"],
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
+    )
+    tb_eggs = tb_eggs.format(keys=["country", "year"], short_name="chickens_killed_for_eggs")
+
     #
     # Save outputs.
     #
-    paths.create_dataset(tables=[tb]).save()
+    paths.create_dataset(tables=[tb, tb_eggs]).save()
