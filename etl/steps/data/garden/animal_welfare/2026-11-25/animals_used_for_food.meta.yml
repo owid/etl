@@ -53,8 +53,6 @@ tables:
         display: &display_estimates
           name: |-
             <% if estimate == "upper_limit" %>Upper estimate<% elif estimate == "lower_limit" %>Lower estimate<% elif animal == "wild_caught_fish" %>Wild-caught fish<% elif animal == "farmed_fish" %>Farmed fish<% else %>Farmed crustaceans<% endif %>
-          color: |-
-            <% if estimate == "midpoint" %>#ae2032<% else %>#716b6c<% endif %>
         presentation:
           title_public: *title_wild_caught_fish
       farmed_fish: &farmed_fish

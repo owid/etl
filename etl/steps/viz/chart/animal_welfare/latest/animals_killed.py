@@ -164,9 +164,14 @@ def run() -> None:
         },
     )
 
+    # Color the midpoint of each range red and its bounds grey, as in our charts on wild-caught and farmed fish.
     # In the view of land and aquatic animals, show only the midpoint of fish and crustaceans. Also, let each bar show the
     # latest value of up to 5 years earlier, since fish and crustaceans have no data for the latest years.
     for view in c.views:
+        if view.dimensions["animal"] in FISH_AND_CRUSTACEANS:
+            for indicator in view.indicators.y:
+                color = "#ae2032" if "estimate_midpoint" in indicator.catalogPath else "#716b6c"
+                indicator.display = {**(indicator.display or {}), "color": color}
         if view.dimensions["animal"] == "land_and_aquatic_animals":
             view.indicators.y = [
                 indicator
