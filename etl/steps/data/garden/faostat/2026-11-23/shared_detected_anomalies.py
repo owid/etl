@@ -911,10 +911,38 @@ class JapanFertilizerUseFrom2021Anomaly(DataAnomaly):
         return tb[~self._affected_rows(tb)].reset_index(drop=True)
 
 
+class FaroeIslandsFertilizerUsePerCroplandAnomaly(DataAnomaly):
+    description = "* In FAOSTAT, the Faroe Islands have only 60 to 70 hectares of cropland, out of about 96,000 hectares of agricultural land. Their fertilizer use per hectare of cropland reaches 16,057 kilograms of nitrogen in 2017, while no other country exceeds 1,000 kilograms. We removed the Faroe Islands' fertilizer use per hectare of cropland.\n"
+
+    # Nitrogen, phosphate, and potash.
+    affected_item_codes = ["00003102", "00003103", "00003104"]
+    # Use per area of cropland.
+    affected_element_codes = ["005159"]
+    affected_countries = ["Faroe Islands"]
+
+    def _affected_rows(self, tb):
+        return (
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+        )
+
+    def check(self, tb):
+        error = "The Faroe Islands' fertilizer use per hectare of cropland is no longer above 1,000 kg/ha. Remove this anomaly."
+        assert (tb[self._affected_rows(tb)]["value"] > 1000).any(), error
+
+    def inspect(self, tb):
+        pass
+
+    def fix(self, tb):
+        return tb[~self._affected_rows(tb)].reset_index(drop=True)
+
+
 detected_anomalies = {
     "faostat_rfn": [
         SpuriousZerosInFertilizerRatiosAnomaly,
         JapanFertilizerUseFrom2021Anomaly,
+        FaroeIslandsFertilizerUsePerCroplandAnomaly,
     ],
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
