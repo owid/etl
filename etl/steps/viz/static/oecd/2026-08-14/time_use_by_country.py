@@ -75,6 +75,12 @@ https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-
   A clone of `Static Chart Template_Mobile (example 2)` (`24590:32`, 540x824) run 60px taller, at
   x=2550, its own unstyled import parked at x=1930. The published 2023 image sits leftmost, at x=-860.
 
+**On the site it is the static viz `how-do-people-spend-their-time`** (Admin → Static viz), holding
+`how-do-people-spend-their-time.png` (desktop) and `how-do-people-spend-their-time-mobile.png`, and
+shown by a `{.static-viz}` block on the Time Use topic page (ourworldindata.org/time-use). A refresh
+uploads new PNGs under new filenames and edits this entry, keeping its name, so the block picks them up;
+`/create-static-viz` → `reference/PUBLISHING.md` has the steps.
+
 **The node ids are a convenience; the frame NAME is the durable join.** It is the kebab-case slug the
 website exports the PNG by, so it is the one string shared by the layer panel, the exported file and
 this step — and re-cloning a rebuilt template mints new ids, which is exactly when someone comes
