@@ -4,7 +4,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 
 ## Critical Rules
 
-- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`). If it isn't there — `.venv/bin/etlr: no such file or directory`, most likely in a fresh worktree — run `make .venv` to build it (~17s), then retry. Never bare `uv sync`; see Package Management.
+- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`). If it isn't there — `.venv/bin/etlr: no such file or directory`, most likely in a fresh worktree — run `make .venv` to build it (~3s), then retry. Never bare `uv sync`; see Package Management.
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
@@ -14,7 +14,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Committing runs `make check` for you** — the pre-commit hook lints, formats and typechecks, re-stages whatever it could fix, and blocks the commit on anything it couldn't. So don't run it separately first; just commit, and read the output only if it fails. (It refuses to fix a *partially* staged file, since re-staging would widen the commit — stage the whole file, or `--no-verify`.) Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - **A PR that changes a published library bumps its version.** `lib/catalog`, `lib/repack` and `lib/datautils` publish to PyPI whenever their `pyproject.toml` changes on `master`, and the publish fails if that version is already out. So any PR that changes a package's `owid/` code or its `pyproject.toml` bumps `version` there, with a changelog entry and refreshed lockfiles (checklist in `lib/catalog/DEVELOPMENT.md`). Changes to tests or docs alone need no bump.
 - If not told otherwise, save outputs to `ai/` directory.
-- **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
+- **Notebooks**: execute a notebook as soon as you create it, with `.venv/bin/jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills. Write the `description` as a folded block scalar (`>-`) whenever it contains a `:` or a `#`: in a plain scalar a `: ` makes the **whole frontmatter block** fail to parse, and a ` #` silently truncates the value at that point. Claude Code's own loader is lenient enough to hide both, so verify by parsing the file and comparing the parsed `description` against the text you intended — not merely by checking that parsing didn't raise. Every skill also carries `metadata.owner`: the bare GitHub handle (no `@` — YAML reserves it as a first character) of the one person accountable for it. It goes under `metadata` because the Agent Skills spec defines no top-level `author`/`owner` field, and a non-spec key is dropped silently by Claude Code and rejected outright when a skill is packaged or uploaded elsewhere. Skills that are staff-only but not tied to this repo's code belong in `owid/skills-private` (installed here as the `owid-staff` plugin via `.claude/settings.json`), not in `.claude/skills/`.
 - **Write skills and this file as rules, not history.** When adding to or editing a skill or this CLAUDE.md, state the rule and the condition it applies to. Don't record anecdotes, incident notes, dates (except ones the skill uses, such as a "last verified" stamp), or which dataset prompted the rule.
 - **Adding a lesson to a skill or this file:** first look for text that already covers it and sharpen that in place. Add new text only if nothing covers it and it would change what a future run does, in one or two sentences; longer material (a procedure, a query) goes in a reference file next to the skill.
@@ -165,7 +165,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 **Important:**
 - **Snapshot scripts need no `__main__` guard and no `click` decorators** — the `etls` CLI imports the module and calls its `run()` function itself, so don't add `if __name__ == "__main__":` boilerplate or `@click.command()` / `@click.option(...)`. New scripts should match the shape the wizard's cookiecutter emits: a plain `def run(upload: bool = True) -> None:`. Most existing scripts still carry both — they keep working, because `etl/snapshot_command.py` also accepts a click command — but don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
-- **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
+- **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain. The exception is a `viz://chart` step defined only by its `.config.yml`: it reads the table names of a grapher dataset that isn't on disk from the grapher DB (see `/create-chart`).
 - **`PREFER_DOWNLOAD=1` — default it on any run that verifies your own edit**, so only the steps you touched rebuild and published upstream deps are fetched from the catalog. Steps missing from the catalog or whose checksum changed just build locally, so it is always safe to leave on.
 - For `grapher://` steps, always add `--grapher` flag
 - **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
@@ -177,7 +177,9 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 
 ## Git Workflow
 
-**Always use `etl pr`** - never use `git checkout -b` + `gh pr create` manually.
+**Always use `etl pr`** - never use `git checkout -b` + `gh pr create` manually. `etl pr` carries uncommitted changes onto the new branch: if `git status` shows changes that aren't yours, add `-t` to start in a worktree of its own.
+
+**Changes spanning etl and owid-grapher share one staging server when both PRs use the same branch name.** `staging-site-<branch>` checks out the etl branch of the same name when one exists, so pick the name explicitly (`etl pr "..." <category> -w <branch>`) to test both together. That covers staging only: on production, merge the owid-grapher PR first when the ETL change depends on its migration.
 
 ```bash
 # 1. Create PR (creates new branch, does NOT commit)
@@ -338,15 +340,15 @@ Silent data corruption is one of the easier bugs to miss: a step can run cleanly
 
 ## Querying MySQL, and verifying charts on staging
 
-Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the public Datasette, and the staging indicator/SVG endpoints.
+Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the internal Datasette (over Tailscale; `public.duckdb` off the tailnet), and the staging indicator/SVG endpoints.
 
 ## Package Management
 
-**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
+**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --frozen --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
 
 ## GitHub Actions
 
-When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+When editing `.github/workflows/**` or `.github/actions/**`, follow the lockfile rule imported below:
 
 @.github/instructions/github-actions.instructions.md
 

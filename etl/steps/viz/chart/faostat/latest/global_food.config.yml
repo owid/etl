@@ -1,0 +1,27 @@
+grapher_schema: "012"
+
+title:
+  title: Global Food
+  title_variant: ""
+slug: global-food
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore the world's food system, from production to supply.
+topic_tags:
+  - Food Supply
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/agricultural-production
+        entityType: country
+        hasMapTab: true
+
+# Dimensions and views are generated from the FAOSTAT tables in the .py.

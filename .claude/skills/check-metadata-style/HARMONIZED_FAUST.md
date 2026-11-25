@@ -1,7 +1,7 @@
 # Harmonizing FAUST across OWID
 
 > Source: [Harmonizing FAUST across OWID](https://docs.google.com/document/d/1tcknTryJAxOR0yv8x38s3jkONq-TY3T4HNCEcZQ_c-s/edit?tab=t.0) (Google Doc)
-> Last synced from Google Doc: 2026-10-28
+> Last synced from Google Doc: 2026-11-12
 > Committed snapshot used by `/check-metadata-style`. Refresh it with step 1 of SKILL.md; don't edit the rules here by hand.
 
 Some metrics are used many times over on OWID, so their FAUST (title, subtitle, footnote, units) must stay consistent. When an indicator is one of the metrics below, use these elements. On charts with several metrics, a title proposed here can become one sentence of the subtitle, with another sentence explaining the other metric.

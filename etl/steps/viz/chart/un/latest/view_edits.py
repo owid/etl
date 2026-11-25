@@ -104,14 +104,15 @@ class ViewEditor:
         object instead.
         """
         brackets_str, min_value = self._brackets_and_min(indicator_name, age, sex)
+        # Reproduce the values the explorer serves for the same brackets: its minimum (0 unless
+        # set) followed by every value in the bracket string, the trailing one included. Dropping
+        # either shifts the bins, and the map legend loses its lowest or highest one.
+        values = [float(x) if "." in x else int(x) for x in brackets_str.split(";")]
         color_scale: dict[str, Any] = {
             "baseColorScheme": self._get_color_scheme(indicator_name),
             "binningStrategy": "manual",
-            "customNumericValues": _parse_brackets(brackets_str),
+            "customNumericValues": [min_value if min_value is not None else 0] + values,
         }
-        if min_value is not None:
-            # grapher colorScale uses `minValue` (Explorer grammar was `customNumericMinValue`).
-            color_scale["minValue"] = min_value
 
         if view.config is None:
             view.config = {}
@@ -410,21 +411,6 @@ class ViewEditor:
             assert v.indicators.y is not None
             self._set_map_colorscale_on_view("all", "all", indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
-
-
-def _parse_brackets(brackets_str: str) -> list[float]:
-    """Parse an Explorer-grammar bracket string into a list of floats for MDIM.
-
-    Explorer stores bracket boundaries as a semicolon-separated string (e.g.
-    ``"0.1;0.2;0.5;1;2;5;10;1"``), and a trailing ``1`` is a legacy log-scale
-    flag rather than a bin boundary — see ``_get_brackets_sex`` which strips it
-    the same way. MDIM's ``colorScale.customNumericValues`` expects an array of
-    numbers, so we drop that flag and cast the remaining values.
-    """
-    parts = brackets_str.split(";")
-    if parts and parts[-1] == "1":
-        parts = parts[:-1]
-    return [float(p) if "." in p else int(p) for p in parts]
 
 
 def _get_brackets_sex(brackets, threshold=None):

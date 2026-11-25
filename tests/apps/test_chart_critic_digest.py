@@ -53,7 +53,7 @@ def test_a_finding_shows_the_chart_at_the_view_the_claim_is_about():
     result = _result("a", "chart")
     result["issues"][0]["url"] = "https://ourworldindata.org/grapher/a?country=~GBR&tab=chart"
     (_, message) = _format([result], {})
-    assert "https://ourworldindata.org/grapher/thumbnail/a.png?country=~GBR&tab=chart" in message.text
+    assert "https://ourworldindata.org/grapher/a.png?country=~GBR&tab=chart" in message.text
 
 
 def test_the_evidence_is_posted_in_the_finding_s_thread():
@@ -98,7 +98,7 @@ def test_a_finding_is_laid_out_like_analytics_bites():
     assert message.blocks is not None
     section, image, context = message.blocks
     assert "Something is off." in section["text"]["text"]
-    assert image["image_url"] == "https://ourworldindata.org/grapher/thumbnail/a.png"
+    assert image["image_url"] == "https://ourworldindata.org/grapher/a.png"
     footer = context["elements"][0]["text"]
     assert "medium" in footer and "10 views/day" in footer
     assert "View live chart" in footer and "Edit in admin" in footer

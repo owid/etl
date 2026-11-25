@@ -21,13 +21,18 @@ from etl.viz.static import (
     SVG_HASHSALT,
     TEMPLATES,
     SketchPaths,
+    _sub_yearly_grid,
     apply_svg_rcparams,
     export_frame,
     name_furniture,
     nice_year_ticks,
     save_fig,
     source_citation,
+    style_time_axis,
+    style_year_axis,
+    time_axis_ticks,
     unclip,
+    year_axis_ticks,
 )
 
 
@@ -440,3 +445,252 @@ def test_nice_year_ticks_never_exceeds_the_requested_limit(lo, hi, max_ticks):
 def test_nice_year_ticks_degenerate_range():
     assert nice_year_ticks(2000, 2000) == [2000]
     assert nice_year_ticks(2000, 1990) == [2000]
+
+
+@pytest.mark.parametrize(
+    "lo,hi,max_ticks",
+    [(1700, 2100, 8), (1950, 2023, 8), (1990, 2024, 8), (1990, 2024, 4), (-10000, 2100, 6), (2000, 2005, 8)],
+)
+def test_year_axis_ticks_open_and_close_on_the_data(lo, hi, max_ticks):
+    """Grapher's time axis shows the first and last year, whatever the round years between them."""
+    ticks = year_axis_ticks(lo, hi, max_ticks=max_ticks)
+    assert ticks[0] == lo and ticks[-1] == hi, ticks
+    assert ticks == sorted(set(ticks)), ticks
+    assert len(ticks) <= max_ticks, ticks
+
+
+def test_year_axis_ticks_keep_the_round_step_and_add_the_last_year():
+    """Round years stay on their step, never re-spaced from first to last (2000, 2006, 2012, 2018, 2024)."""
+    assert year_axis_ticks(2000, 2024) == [2000, 2005, 2010, 2015, 2020, 2024]
+    assert year_axis_ticks(1700, 2100) == [1700, 1800, 1900, 2000, 2100]
+    assert year_axis_ticks(2000, 2000) == [2000]
+
+
+def test_year_axis_ticks_drop_a_round_year_only_where_its_label_collides():
+    """2020 next to 2023 collides on an 850-wide plot over 73 years; next to 2022 over 22 years it does not."""
+    assert year_axis_ticks(1950, 2023, plot_width_px=770) == [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2023]
+    assert year_axis_ticks(2000, 2022, plot_width_px=770) == [2000, 2005, 2010, 2015, 2020, 2022]
+    assert year_axis_ticks(2000, 2022, plot_width_px=400) == [2000, 2005, 2010, 2015, 2022]
+
+
+@pytest.mark.parametrize(
+    "lo,hi,plot_width_px",
+    [(2000, 2014, 200), (1950, 2023, 200), (2000, 2024, 470), (1950, 2023, 770), (1990, 2024, 300)],
+)
+def test_year_axis_ticks_keep_the_minimum_gap_between_every_pair_of_ticks(lo, hi, plot_width_px):
+    """On a narrow plot or a facet the round step coarsens, so no two neighbouring labels overlap.
+
+    Checking the gap only against the two ends let 2000..2014 at 200 px keep a 2-year step, with
+    interior labels about 29 px apart.
+    """
+    min_gap_px = 56
+    ticks = year_axis_ticks(lo, hi, plot_width_px=plot_width_px, min_gap_px=min_gap_px)
+    assert ticks[0] == lo and ticks[-1] == hi, ticks
+    px_per_year = plot_width_px / (hi - lo)
+    gaps = [(b - a) * px_per_year for a, b in zip(ticks, ticks[1:])]
+    assert min(gaps) >= min_gap_px, f"{lo}..{hi} at {plot_width_px}px: {ticks} has gaps {gaps}"
+
+
+def test_year_axis_ticks_coarsen_the_round_step_on_a_narrow_plot():
+    assert year_axis_ticks(2000, 2014, plot_width_px=200) == [2000, 2005, 2010, 2014]
+    assert year_axis_ticks(1950, 2023, plot_width_px=200) == [1950, 2000, 2023]
+
+
+def _year_axes(ticks, xs=None):
+    fig, ax = plt.subplots(figsize=(8.5, 6.38))
+    xs = xs if xs is not None else [ticks[0], ticks[-1]]
+    ax.plot(xs, [0, 1], gid="line__value")
+    ax.set_xticks(ticks, [str(getattr(t, "year", t)) for t in ticks])
+    return fig, ax
+
+
+def test_style_year_axis_closes_the_axis_as_grapher_draws_it():
+    """Range pinned to the ends, a 1px butt-capped spine, 5x1px marks, end labels inset to their ticks."""
+    fig, ax = _year_axes([2000, 2005, 2010, 2015, 2020, 2024])
+    style_year_axis(ax, 2000, 2024)
+    assert ax.get_xlim() == (2000, 2024)
+    spine = ax.spines["bottom"]
+    assert spine.get_capstyle() == "butt" and spine.get_linewidth() == pytest.approx(0.72)
+    # Drawing must keep the alignment: matplotlib reuses the ticks it zipped the locations with.
+    name_furniture(fig)
+    ticks = ax.xaxis.get_major_ticks()
+    assert [t.label1.get_horizontalalignment() for t in ticks] == [
+        "left",
+        "center",
+        "center",
+        "center",
+        "center",
+        "right",
+    ]
+    assert ticks[0].tick1line.get_markersize() == pytest.approx(3.6)
+    assert ticks[0].tick1line.get_markeredgewidth() == pytest.approx(0.72)
+    plt.close(fig)
+
+
+def test_style_year_axis_writes_end_labels_on_their_ticks_and_a_butt_spine(tmp_path):
+    """In the SVG, the end labels anchor start / end at their tick's x and the spine stops at the end ticks."""
+    import re
+
+    apply_svg_rcparams()
+    fig, ax = _year_axes([2000, 2010, 2020, 2024])
+    style_year_axis(ax, 2000, 2024)
+    ax.tick_params(labelsize=10)  # a later tick_params must not reset the alignment
+    name_furniture(fig)
+    unclip(fig)
+    path = tmp_path / "axis.svg"
+    fig.savefig(path, format="svg")
+    plt.close(fig)
+    svg = path.read_text()
+
+    def label(value):
+        match = re.search(
+            rf'id="axes__x-tick-label-{value}">\s*<text style="[^"]*text-anchor: (\w+)[^"]*" x="([0-9.]+)"', svg
+        )
+        assert match, f"no label for {value}"
+        return match.group(1), float(match.group(2))
+
+    def mark(value):
+        match = re.search(rf'id="axes__x-tick-{value}">.*?<use [^>]*x="([0-9.]+)"', svg, re.S)
+        assert match, f"no tick mark for {value}"
+        return float(match.group(1))
+
+    assert label(2000) == ("start", mark(2000))
+    assert label(2024) == ("end", mark(2024))
+    assert label(2010)[0] == "middle"
+    spine = re.search(
+        r'id="axes__spine-bottom">\s*<path d="M ([0-9.]+) [0-9.]+\s+L ([0-9.]+) [0-9.]+\s*" style="([^"]*)"', svg
+    )
+    assert spine, "no bottom spine in the SVG"
+    assert (float(spine.group(1)), float(spine.group(2))) == (mark(2000), mark(2024))
+    assert "stroke-linecap: square" not in spine.group(3) and "stroke-width: 0.72" in spine.group(3)
+
+
+def test_style_year_axis_aligns_the_visible_end_ticks_on_a_date_axis():
+    """Dates are converted to the axis' units; a tick outside the range is not the one aligned."""
+    import datetime as dt
+
+    ticks = [dt.date(year, 1, 1) for year in (1995, 2000, 2010, 2020, 2030)]
+    fig, ax = _year_axes(ticks, xs=[dt.date(2000, 1, 1), dt.date(2020, 1, 1)])
+    style_year_axis(ax, dt.date(2000, 1, 1), dt.date(2020, 1, 1))
+    name_furniture(fig)
+    alignment = {t.get_loc(): t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()}
+    visible = [alignment[loc] for loc in sorted(alignment) if ax.get_xlim()[0] <= loc <= ax.get_xlim()[1]]
+    assert visible == ["left", "center", "right"]
+    plt.close(fig)
+
+
+def test_style_year_axis_centers_a_single_tick():
+    fig, ax = _year_axes([2020], xs=[2020, 2020])
+    style_year_axis(ax, 2019, 2021)
+    assert [t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()] == ["center"]
+    plt.close(fig)
+
+
+def test_style_time_axis_colors_the_furniture_as_grapher_does():
+    """The axis line and marks are #999 (SOLID_TICK_COLOR), the labels #5b5b5b unless the step asks otherwise."""
+    from matplotlib.colors import to_hex
+
+    fig, ax = _year_axes([2000, 2010, 2024])
+    style_time_axis(ax, 2000, 2024)
+    name_furniture(fig)
+    assert to_hex(ax.spines["bottom"].get_edgecolor()) == "#999999"
+    tick = ax.xaxis.get_major_ticks()[0]
+    assert to_hex(tick.tick1line.get_markeredgecolor()) == "#999999"
+    assert to_hex(tick.label1.get_color()) == "#5b5b5b"
+    style_time_axis(ax, 2000, 2024, label_color="#767676")
+    assert to_hex(ax.xaxis.get_major_ticks()[0].label1.get_color()) == "#767676"
+    assert style_year_axis is style_time_axis
+    plt.close(fig)
+
+
+def _grid(start, end, interval, target):
+    import datetime as dt
+
+    days = _sub_yearly_grid(dt.date.fromisoformat(start), dt.date.fromisoformat(end), interval, target)
+    return [(d.isoformat(), label) for d, label in days]
+
+
+@pytest.mark.parametrize(
+    "start,end,interval,target,expected",
+    [
+        # Mirrors grapher/src/axis/timeAxisTicks.test.ts.
+        ("2020-01-01", "2020-09-01", "month", 6, ["Jan 2020", "Mar", "May", "Jul", "Sep"]),
+        ("2018-03-01", "2021-11-01", "month", 4, ["2019", "2020", "2021"]),
+        ("2007-06-01", "2022-06-01", "month", 6, ["2010", "2015", "2020"]),
+        ("2020-01-09", "2026-06-28", "month", 6, ["2021", "2022", "2023", "2024", "2025", "2026"]),
+        ("2020-01-05", "2020-08-20", "month", 6, ["Mar 2020", "May", "Jul"]),
+        ("2020-01-01", "2021-06-01", "month", 6, ["Jan 2020", "Apr", "Jul", "Oct", "Jan 2021", "Apr"]),
+        ("2020-02-01", "2020-11-01", "month", 4, ["Apr 2020", "Jul", "Oct"]),
+        ("2020-09-15", "2021-05-01", "month", 3, ["Oct 2020", "Jan 2021", "Apr 2021"]),
+        ("2020-02-29", "2020-03-09", "day", 6, ["Mar 1, 2020", "Mar 3", "Mar 5", "Mar 7", "Mar 9"]),
+        ("2020-03-01", "2020-04-05", "day", 6, ["Mar 2, 2020", "Mar 9", "Mar 16", "Mar 23", "Mar 30"]),
+        ("2020-03-04", "2020-04-02", "day", 2, ["Mar 16, 2020", "Mar 30, 2020"]),
+        ("2015-06-15", "2022-03-01", "day", 6, ["2016", "2018", "2020", "2022"]),
+        ("2020-12-20", "2021-01-20", "day", 6, ["Dec 21, 2020", "Dec 28", "Jan 4, 2021", "Jan 11", "Jan 18"]),
+    ],
+)
+def test_sub_yearly_grid_matches_grapher(start, end, interval, target, expected):
+    assert [label for _, label in _grid(start, end, interval, target)] == expected
+
+
+def test_quarter_grid_never_steps_below_a_quarter():
+    assert _grid("2020-01-01", "2020-12-31", "quarter", 6) == [
+        ("2020-01-01", "Jan 2020"),
+        ("2020-04-01", "Apr"),
+        ("2020-07-01", "Jul"),
+        ("2020-10-01", "Oct"),
+    ]
+
+
+def test_time_axis_ticks_keep_to_the_calendar_grid_by_default():
+    """A daily axis from Feb 24, 2023 to Nov 19, 2026 shows 2024, 2025, 2026, as grapher does: no dated ends."""
+    import datetime as dt
+
+    dates, labels = time_axis_ticks("2023-02-24", "2026-11-19", "day", plot_width_px=815)
+    assert labels == ["2024", "2025", "2026"]
+    assert dates == [dt.date(2024, 1, 1), dt.date(2025, 1, 1), dt.date(2026, 1, 1)]
+
+
+def test_time_axis_ticks_label_the_ends_in_grapher_formats_and_drop_colliding_grid_labels():
+    dates, labels = time_axis_ticks("2023-02-24", "2026-11-19", "day", plot_width_px=815, label_ends=True)
+    assert labels == ["Feb 24, 2023", "2024", "2025", "2026", "Nov 19, 2026"]
+    # A quarter reads from its first month to its last; 2019 sits on the start and is dropped.
+    _, labels = time_axis_ticks("2019-01-01", "2026-07-01", "quarter", plot_width_px=770, label_ends=True)
+    assert labels[0] == "Jan 2019" and labels[-1] == "Sep 2026" and "2019" not in labels
+    # A week reads from its Monday to its Sunday.
+    _, labels = time_axis_ticks("2024-01-03", "2024-03-27", "week", plot_width_px=770, label_ends=True)
+    assert labels[0] == "Jan 1, 2024" and labels[-1] == "Mar 31, 2024"
+
+
+def test_time_axis_ticks_thin_out_on_a_narrow_plot():
+    _, wide = time_axis_ticks("2020-01-01", "2021-06-01", "month", plot_width_px=770)
+    _, narrow = time_axis_ticks("2020-01-01", "2021-06-01", "month", plot_width_px=200)
+    assert len(narrow) < len(wide) and len(narrow) >= 2
+
+
+def test_time_axis_ticks_reject_a_year_interval_and_a_backwards_range():
+    with pytest.raises(ValueError, match="year_axis_ticks"):
+        time_axis_ticks("2020-01-01", "2024-01-01", "year")
+    with pytest.raises(ValueError, match="forwards"):
+        time_axis_ticks("2024-01-01", "2020-01-01", "month")
+
+
+def test_style_time_axis_centers_grid_labels_and_insets_only_an_overhanging_one():
+    """On a calendar grid every label is centered on its tick; one that would hang past an end is aligned inwards."""
+    import datetime as dt
+
+    fig, ax = plt.subplots(figsize=(8.5, 6.38))
+    start, end = dt.date(2023, 2, 24), dt.date(2026, 12, 20)
+    ax.plot([start, end], [0, 1])
+    dates, labels = time_axis_ticks(start, end, "day", plot_width_px=815)
+    ax.set_xticks(dates, labels)
+    style_time_axis(ax, start, end, inset_ends=False)
+    name_furniture(fig)
+    assert [t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()] == ["center"] * len(labels)
+    # Marked as a calendar grid, so the verifier does not ask it for the data's first and last date.
+    assert ax.xaxis.get_gid() == "axes__x-axis-calendar"
+    # A label on a tick right at the end would overhang, so it turns inwards.
+    ax.set_xticks([dt.date(2024, 1, 1), end], ["2024", "Dec 20, 2026"])
+    style_time_axis(ax, start, end, inset_ends=False)
+    assert [t.label1.get_horizontalalignment() for t in ax.xaxis.get_major_ticks()] == ["center", "right"]
+    plt.close(fig)

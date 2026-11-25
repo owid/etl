@@ -83,36 +83,36 @@ fills these same slots when the SVG is imported.
 
 | Slot | y | Width | Height | Size |
 |---|---|---|---|---|
-| Title | 16.22 | 737.84 | 58 (**two lines**) | 25 |
+| Title | 12 | 737.84 | 58 (**two lines**) | 25 |
 | Logo | 16 | 63 | 35 (top-right, x=771) | — |
-| Subtitle | 80 | 818 (731 under a one-line title, see below) | 38 (two lines) | 16 |
-| *chart area* | *118 → 558.6* | 818 | ~440 | — |
-| `Note:` | 558.62 | 818 | 28 (two lines) | **12** |
-| `Data source:` | 590.62 | 818 | 14 | **12** |
-| Tagline (left) | 608.62 | 467 | 13 | **11** |
-| License (right, x=571) | 608.62 | 263 | 13 | **11** |
+| Subtitle | 74 | 818 (731 under a one-line title, see below) | 38 (two lines) | 16 |
+| *chart area* | *112 → 558* | 818 | ~446 | — |
+| `Note:` | 558 | 818 | 28 (two lines) | **12** |
+| `Data source:` | 590 | 818 | 14 | **12** |
+| Tagline (left) | 608 | 467 | 14 | **11** |
+| License (right, x=571) | 608 | 263 | 14 | **11** |
 
-The slots sit in two auto-layout frames: a header block (`Frame 20` at last check) spanning **0→118**,
-and footer block **`Frame 22` (`25808:13`)** starting at **559**. **Neither wrapper carries inner
-padding** — `header.y + header.height` *is* the chart area's top edge at 118, and the footer's own `y`
+The slots sit in two auto-layout frames: a header block (`Frame 20` at last check) spanning **12→112**,
+and footer block **`Frame 22` (`25808:13`)** starting at **558**. **Neither wrapper carries inner
+padding** — `header.y + header.height` *is* the chart area's top edge at 112, and the footer's own `y`
 is the `Note:` row. Resolve both structurally (topmost/bottommost auto-layout child) rather than by
 name or id: the design team renames and re-ids these frames in place.
 
 ### Vertical — 850 × 1095
 
 Same slots, widths, sizes and auto-layout wrappers as Horizontal. The header block (`Frame 23`) is
-**0→118**; footer block **`Frame 25` (`25808:16`)** starts at **1015.81**. Absolute y: title 16.22,
-subtitle 80.22, chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license
+**12→112**; footer block **`Frame 25` (`25808:16`)** starts at **1015.81**. Absolute y: title 12,
+subtitle 74, chart area 112 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license
 1065.81.
 
-**The two header blocks are identical at 118**, so don't reintroduce a Vertical-specific header
+**The two header blocks are identical at 112**, so don't reintroduce a Vertical-specific header
 offset.
 
-> **Re-measure the wrapper figures and the slot table before relying on them.** The wrapper ids, the 118
+> **Re-measure the wrapper figures and the slot table before relying on them.** The wrapper ids, the 112
 > header bottom and the unpadded wrappers match `/owid-staff:create-figma-chart`'s node map. The
-> per-slot `y` values sit within ~0.4 px of them (the footer rows derive as 559 / 591 / 609 against the
-> tabled 558.62 / 590.62 / 608.62) — immaterial for emitting an SVG, but re-measure before trusting them
-> for anything tighter.
+> per-slot `y` values were last measured on 2026-11-11, after the design team re-spaced the templates
+> (headers moved up to y=12 with a 4 px title-subtitle gap; the Horizontal footer to 558). Re-measure
+> before trusting them for anything tighter.
 
 ### The license slot holds about fifty characters
 
@@ -129,9 +129,9 @@ are stacked and full width, so the same string has 508 px to itself.
 
 | Slot | y (540×540) | y (540×824) | Width | Size |
 |---|---|---|---|---|
-| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) | 25 |
-| Subtitle | 80 | 80 | 508 (420 under a one-line title) | 16 |
-| *chart area* | *118 → 486* | *118 → 770* | 508 | — |
+| Title | 12 | 12 | 428 (**two lines**; logo sits beside it at x=460) | 25 |
+| Subtitle | 74 | 74 | 508 (420 under a one-line title) | 16 |
+| *chart area* | *112 → 486* | *112 → 770* | 508 | — |
 | `Data source:` | 486 | 770 | 508 | 14 |
 | License | 507 | 791 | 508 | 14 |
 
@@ -173,29 +173,29 @@ So derive them, from this rhythm:
 
 ```
 title_row   = title_lines × 29 + row_pad_px                   # no max(): the logo is a SIBLING, see below
-subtitle_y  = origin_y + title_row + 6                        # 6 px auto-layout gap
+subtitle_y  = origin_y + title_row + 4                        # 4 px auto-layout gap
 band_top    = subtitle_y + subtitle_lines × 19                # the subtitle's ink bottom
 band_bottom = note_ink_bottom − note_lines × 14               # the Note's ink top, growing upward
 ```
 
 | | 850-wide pair | Mobile (both) |
 |---|---|---|
-| `origin_y` (the header block's own top edge) | 16 | 16 |
+| `origin_y` (the header block's own top edge) | 12 | 12 |
 | `logo_px` (the logo's **row**, not the logo) | 0 — the logo is a sibling | 0 — the logo is a sibling |
 | `row_pad_px` (the title row's own top padding) | 0 | 0 |
-| `note_ink_bottom` | 587 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
+| `note_ink_bottom` | 586 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
 | footer row spacing / block top padding | 4 / 0 | 4 / 0 |
 
 Measured off `5332:93`, `5332:75` and `24590:20`. **The two families share one header rhythm** — both
-sit at `origin_y = 16` with no row padding. The line steps: title **29**/line, subtitle **19**/line, a
-**6** px gap between them, and **4** px between footer rows.
+sit at `origin_y = 12` with no row padding. The line steps: title **29**/line, subtitle **19**/line, a
+**4** px gap between them, and **4** px between footer rows.
 
 The rhythm reproduces both templates exactly, which is the check that matters:
 
 | Case | Derivation | Live |
 |---|---|---|
-| Placeholder (2-line title, 2-line subtitle) | `16 + 58 + 6 + 38` | **118** ✓ |
-| One-line title, one-line subtitle | `16 + 29 + 6 + 19` | **70** ✓ |
+| Placeholder (2-line title, 2-line subtitle) | `12 + 58 + 4 + 38` | **112** ✓ |
+| One-line title, one-line subtitle | `12 + 29 + 4 + 19` | **64** ✓ |
 
 > **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
 > of a title row (`/owid-staff:create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
@@ -237,7 +237,7 @@ chart_bottom_px = band_bottom - BAND_INSET - below_px
 ```
 
 **Both edges are ink, not frame — and on the current templates the footer frame's own `y` *is* its
-first row's ink** (Horizontal's footer starts at 559, which is the `Note:` row). So inset once, from
+first row's ink** (Horizontal's footer starts at 558, which is the `Note:` row). So inset once, from
 that edge. If you measure a gap between the footer frame's `y` and its first row's ink, the wrappers
 have been re-padded, and insetting from the frame's `y` would inset twice and leave a visibly loose
 bottom — re-verify before compensating for it.

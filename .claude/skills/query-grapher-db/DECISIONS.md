@@ -1,0 +1,7 @@
+# Decisions: query-grapher-db
+
+Calls still in force, each with its reason and the case that caused it. Read before changing the skill.
+
+- **A skill, not a section of the root `CLAUDE.md`.** Querying MySQL and verifying charts on staging matter only in some sessions, so the guidance loads on demand and only a one-line pointer stays in `CLAUDE.md`. Case: #6542, which moved it out to trim always-loaded context.
+- **Production goes through the internal Datasette (`http://analytics.owid.io/owid`), over Tailscale, and `public.duckdb` is only the route off the tailnet.** Staff are on the tailnet, and Datasette runs the SQL server-side, so the skill scripts stay on the etl venv's `requests` and a fact-check's DoD lookup takes seconds. Reading `public.duckdb` in place instead needed duckdb layered onto the venv with `uv run --with duckdb` and 0.5–1 GB of range requests per fact-check run. Cloud sandboxes aren't on the tailnet, so `.claude/docs/cloud-sandbox.md` keeps the `public.duckdb` recipe. Case: #7386, when `datasette-public.owid.io` was retired.
+- **Every `ATTACH` of `public.duckdb` is followed by `SET enable_external_access=false; SET lock_configuration=true`.** `READ_ONLY` doesn't stop a view or macro inside the file from reading local files or fetching URLs, so a tampered export could pull local secrets into an agent's context. The `SET`s go after the `ATTACH` because httpfs can't autoload once external access is off. Case: #7386, hardening asked for in review.

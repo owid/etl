@@ -25,7 +25,7 @@ definitions:
       UNRWA has a humanitarian and development mandate to “provide assistance and protection to Palestine refugees pending a just and lasting solution to their plight.” This includes essential service delivery, primarily in the areas of basic education, primary health care and mental health care, relief and social services, microcredit, and emergency assistance, including in situations of armed conflict to registered Palestinian refugees.
       They operate in Jordan, Lebanon, Syria the West Bank including East Jerusalem, and Gaza. The Agency does not have a mandate to engage in political negotiations or durable solutions.
     population: &population |-
-      To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+      To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography). Population estimates from 2024 onwards are projections released by the UN.
     china_indochinese: &china_indochinese |-
       A large group of refugees from current-day Vietnam settled in China after the Vietnam War in the late 1970s and early 1980s. These refugees and their descendants are [de facto integrated into Chinese society](https://www.unhcr.org/asia/where-we-work/countries/china), have full access to public services, and enjoy the same rights as Chinese nationals. UNHCR therefore stopped counting them in the refugee population in 2022.
 
@@ -79,7 +79,7 @@ tables:
         description_from_producer: *refugee
         processing_level: major
         description_processing: |-
-          - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+          - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography). Population estimates from 2024 onwards are projections released by the UN.
         display:
           numDecimalPlaces: 1
         description_key:
@@ -96,7 +96,7 @@ tables:
         description_from_producer: *refugee
         processing_level: major
         description_processing: |-
-          - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+          - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography). Population estimates from 2024 onwards are projections released by the UN.
         display:
           numDecimalPlaces: 1
         description_key:

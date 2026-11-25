@@ -1,0 +1,113 @@
+grapher_schema: "012"
+
+title:
+  title: Poverty - Luxembourg Income Study
+  title_variant: ""
+slug: poverty-lis
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore Luxembourg Income Study data on poverty.
+# The explorer's tag: keeps it out of listings, as the explorer was.
+topic_tags:
+  - Unlisted
+default_selection:
+  - Brazil
+  - Chile
+  - China
+  - France
+  - South Africa
+  - United States
+# The explorer's default view (its `defaultView` row).
+default_dimensions:
+  indicator: headcount_ratio
+  poverty_line: "30"
+  welfare_type: dhi
+  equivalence_scale: per capita
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/poverty
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    presentation:
+      type: dropdown
+    choices:
+      - slug: headcount_ratio
+        name: Share in poverty
+        description: Share of the population living below the poverty line
+      - slug: headcount
+        name: Number in poverty
+        description: Number of people living below the poverty line
+      - slug: total_shortfall
+        name: Total shortfall from poverty line
+        description: Money theoretically needed to lift the income of all people in poverty up to the poverty line
+      - slug: avg_shortfall
+        name: Average shortfall ($)
+        description: Average amount by which the income of people in poverty falls below the poverty line
+      - slug: income_gap_ratio
+        name: Average shortfall (%)
+        description: Average shortfall as a percentage of the poverty line, also known as income gap ratio
+      - slug: poverty_gap_index
+        name: Poverty gap index
+        description: Share of population in poverty multiplied by the average shortfall as a percentage of the poverty line
+  - name: Poverty line
+    slug: poverty_line
+    presentation:
+      type: dropdown-with-search
+    choices:
+      - slug: "1"
+        name: "$1 per day"
+      - slug: "2"
+        name: "$2 per day"
+      - slug: "3"
+        name: "$3 per day: International Poverty Line"
+      - slug: "4.20"
+        name: "$4.20 per day: Lower-middle income poverty line"
+      - slug: "5"
+        name: "$5 per day"
+      - slug: "8.30"
+        name: "$8.30 per day: Upper-middle income poverty line"
+      - slug: "10"
+        name: "$10 per day"
+      - slug: "20"
+        name: "$20 per day"
+      - slug: "30"
+        name: "$30 per day"
+      - slug: "40"
+        name: "$40 per day"
+      - slug: "multiple_lines"
+        name: "Multiple lines"
+      - slug: "40% of the median"
+        name: "Relative poverty: 40% of median"
+      - slug: "50% of the median"
+        name: "Relative poverty: 50% of median"
+      - slug: "60% of the median"
+        name: "Relative poverty: 60% of median"
+  - name: Income measure
+    slug: welfare_type
+    presentation:
+      type: dropdown
+    choices:
+      - slug: "dhi"
+        name: "After tax"
+      - slug: "mi"
+        name: "Before tax"
+      - slug: "after_vs_before_tax"
+        name: "After vs. before tax"
+  - name: Household size adjustment
+    slug: equivalence_scale
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: "per capita"
+        name: "Per capita"
+        description: Each person, including children, is attributed an equal share of the total income received by all members of their household.
+      - slug: "square root"
+        name: "Equivalized"
+        description: Income is adjusted for household size, since people sharing a household can split costs like rent and heating. LIS divides the total household income by the square root of the number of people in the household.
+
+# Views are generated from the table in the .py.
+views: []

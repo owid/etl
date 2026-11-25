@@ -61,7 +61,7 @@ Present the inferred metadata and ask the user to fill in or correct:
 - `license_name` — e.g. `CC BY 4.0`
 - `license_url` — license page URL (optional)
 - `file_extension` — inferred from download URL or `csv`
-- `is_private` — default `false`
+- `is_private` — default `false`; `true` when the license restricts redistribution or the data isn't meant for public sharing (a draft, or a file supplied to us privately; see `docs/guides/private-import.md`), and ask the user when its status is unclear. Settle it before the first upload: a public snapshot can't be deleted from our side (the public bucket refuses deletes), so making it private later needs the infrastructure team to remove the public copy and the public catalog files.
 - `dataset_manual_import` — default `false` (set to `true` if there's no `url_download` and none can be inferred)
 
 Present this as a summary block so the user can quickly scan and correct individual fields. Wait for confirmation before proceeding.
@@ -201,7 +201,7 @@ After writing the files, run:
   ```
 
   Route the finding by where the pattern came from. The script in step 3 comes from `apps/wizard/etl_steps/cookiecutter/snapshot/`, which is where the current practices are supposed to live — so a hit on a line that came from the template means the **template** is stale, and fixing only the generated file leaves every future snapshot carrying it. Fix it upstream in the cookiecutter as well as in the file you just wrote.
-- **Optional deeper pass — adversarial source verification**: [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description accuracy, counts, `date_published`, license, citation) against what the docs actually say — its Phase 0 is the slice that applies at snapshot stage (the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
+- **Optional deeper pass — adversarial source verification**: [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description accuracy, counts, `date_published`, license, citation) against what the docs actually say — its `snapshot` context is the slice that applies at snapshot stage (`.venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <ns>/<version>/<short_name> --context snapshot`; the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
 
 ### 6. Report to the user
 

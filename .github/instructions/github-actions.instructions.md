@@ -1,20 +1,21 @@
----
-applyTo: ".github/workflows/**,.github/actions/**"
----
+# GitHub Actions dependency locking
 
-# GitHub Actions version pinning
-
-We use [pinact](https://github.com/suzuki-shunsuke/pinact) to manage GitHub Actions
-and workflow versions. Action references in `.github/workflows/*` and
-`.github/actions/*` must be pinned to immutable commit SHAs with version comments:
+GitHub Actions dependencies, including transitive ones, are locked to commit SHAs in
+[`.github/workflows/actions.lock`](https://docs.github.com/actions/concepts/security/workflow-dependency-lockfiles),
+and the runner refuses any action that isn't in it. Workflows reference actions by a
+full version tag, not a SHA:
 
 ```yaml
-# Good — pinned to a SHA with a version comment
-- uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+# Good — full version tag, locked in actions.lock
+- uses: actions/checkout@v7.0.1
 
-# Bad — mutable tag, not pinned
-- uses: actions/checkout@v5
+# Bad — mutable major tag
+- uses: actions/checkout@v7
 ```
 
-When adding or bumping an action, run `pinact run` to pin every reference and
-refresh the version comments.
+After adding or changing any `uses:` in `.github/workflows/` or `.github/actions/`, run
+`gh actions-lock` (install once with `gh extension install github/gh-actions-lock`) and
+commit the updated lockfile. Never edit `actions.lock` by hand. `owid/actions@main` is
+locked too, so new commits there only take effect after `gh actions-lock --relock`.
+The `GitHub Actions checks` workflow runs `gh actions-lock --verify` and zizmor on every
+change under `.github/`.

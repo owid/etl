@@ -381,7 +381,7 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         ),
         "",
         "> [!WARNING]",
-        "> **Creating the redirect darkens a live explorer immediately.** An explorer redirect is "
+        "> **Creating the redirect darkens a live explorer with the next deploy.** An explorer redirect is "
         "checked on *every* request to `/explorers/*`, before the explorer page is served — so it "
         "beats the baked explorer and any site redirect, and fires while the explorer is still "
         "published. Everything that *embeds* the explorer breaks in that same instant, because "

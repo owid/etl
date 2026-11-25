@@ -36,8 +36,8 @@
   frame give each a 2:1 landscape box, and a growth curve in that box looks flat. Turning them
   portrait gives each more than twice the vertical resolution, and the shape appears. Compute the panel box
   (`content_width`, `available_height / n_rows`) before choosing the grid.
-- **A template's fixed y positions encode assumptions.** `subtitle_y = 80` is `16 + two lines of
-  title`. Pin to it under a one-line title and you get a dead line.
+- **A template's fixed y positions encode assumptions.** `subtitle_y = 74` is `12 + two lines of
+  title + 4`. Pin to it under a one-line title and you get a dead line.
 - **A matplotlib legend extends downwards from its `bbox_to_anchor`**, and occupies more than its
   text height. Its anchor must clear the axes by its own full height plus a gap, or the swatches
   land on the plot. A gap calibrated for a legend's internal padding is too big for anything else,

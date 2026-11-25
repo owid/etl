@@ -450,7 +450,7 @@ def _thumbnail(url: str) -> str:
     """
     base, _, params = url.partition("?")
     slug = base.rsplit("/", 1)[-1]
-    return f"{GRAPHER_URL}/thumbnail/{slug}.png" + (f"?{params}" if params else "")
+    return f"{GRAPHER_URL}/{slug}.png" + (f"?{params}" if params else "")
 
 
 def _evidence(issue: dict[str, Any], model: str) -> str:

@@ -62,9 +62,12 @@ tables:
       pop_regime_ert:
         title: People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>
         unit: "people"
+        description_processing: &description_population |-
+          We calculate the number of people living under each type of regime using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
       pop_regime_trich_ert:
         title: People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >> (trich)
         unit: "people"
+        description_processing: *description_population
         display:
           name: |-
             People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>

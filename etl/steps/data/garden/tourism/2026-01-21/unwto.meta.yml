@@ -63,6 +63,9 @@ definitions:
     - This enables standardized comparison across different population sizes and provides an estimate of the significance of the tourism sector in terms of employment.
     - For instance, if there are "10 employed persons in the tourism industries per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 persons employed in tourism-related jobs.
 
+  desc_processing_per_capita: &desc_processing_per_capita |-
+    We calculate this indicator by dividing the total number by the country's population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
+
   # --- Visitor-type note (receipts / expenditure) ---
   note_all_visitor_types: &note_all_visitor_types |-
     Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
@@ -158,6 +161,7 @@ tables:
           - *desc_key_domestic
           - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
           - This enables standardized comparison across different population sizes and provides an estimate of domestic tourism intensity.
+        description_processing: *desc_processing_per_capita
         display:
           tolerance: 2
           numDecimalPlaces: 1
@@ -192,6 +196,7 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_per_1000_arrivals
+        description_processing: *desc_processing_per_capita
         display:
           tolerance: 2
           numDecimalPlaces: 0
@@ -213,6 +218,7 @@ tables:
         description_key:
           - *desc_key_arrivals
           - *desc_key_per_1000_same_day
+        description_processing: *desc_processing_per_capita
         display:
           tolerance: 2
           numDecimalPlaces: 0
@@ -437,6 +443,7 @@ tables:
         description_key:
           - *desc_key_departures
           - *desc_key_per_1000_departures
+        description_processing: *desc_processing_per_capita
         display:
           tolerance: 2
           numDecimalPlaces: 0
@@ -591,6 +598,7 @@ tables:
         description_key:
           - *desc_key_employment
           - *desc_key_per_1000_employment
+        description_processing: *desc_processing_per_capita
         presentation:
           grapher_config:
             note: Includes employees and the self-employed. Individuals who are employed may hold multiple jobs concurrently.

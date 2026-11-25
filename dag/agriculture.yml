@@ -18,6 +18,10 @@ steps:
         - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
         - snapshot://usda_ers/2023-06-07/food_expenditure_since_2017.xlsx
 
+  # Food prices, as a multidim shown as a data explorer (replaces the food-prices explorer).
+  viz://chart/agriculture/latest/food_prices:
+    - data://grapher/wb/2025-08-04/food_prices_for_nutrition
+
   # Food prices for nutrition - World Bank based on FAO.
   data://grapher/wb/2025-08-04/food_prices_for_nutrition:
     - data://garden/wb/2025-08-04/food_prices_for_nutrition:
@@ -129,16 +133,16 @@ steps:
   data://grapher/agriculture/2026-03-02/long_term_crop_yields:
     - data://garden/agriculture/2026-03-02/long_term_crop_yields
 
-  # Crop yields explorer (uses attainable yields).
-  viz://explorer/agriculture/latest/crop_yields:
+  # Crop yields multidim (shown as a data explorer).
+  viz://chart/agriculture/latest/crop_yields:
     # Attainable yields.
     - data://grapher/agriculture/2026-03-02/attainable_yields:
       - data://garden/agriculture/2026-03-02/attainable_yields:
         - data://garden/papers/2024-03-26/mueller_et_al_2012
         - data://garden/agriculture/2026-03-02/long_term_crop_yields
 
-  # Fertilizers explorer.
-  viz://explorer/agriculture/latest/fertilizers:
+  # Fertilizers multidim (shown as a data explorer).
+  viz://chart/agriculture/latest/fertilizers:
     - data://grapher/faostat/2026-02-25/faostat_rfn
     - data://grapher/faostat/2026-05-22/additional_variables
     - data-private://grapher/agriculture/2014/excess_fertilizers__west_et_al__2014
@@ -199,3 +203,9 @@ steps:
       - data://meadow/sea_around_us/2026-10-24/fish_catch:
         - snapshot://sea_around_us/2026-10-24/fish_catch.csv
       - data://garden/regions/2023-01-01/regions
+
+  # Global Hunger Index.
+  data://grapher/food/2026-11-12/global_hunger_index:
+    - data://garden/food/2026-11-12/global_hunger_index:
+      - data://meadow/food/2026-11-12/global_hunger_index:
+        - snapshot://food/2026-11-12/global_hunger_index.xlsx

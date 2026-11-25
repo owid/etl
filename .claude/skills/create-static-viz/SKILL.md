@@ -43,7 +43,9 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > | Which text slots this step fills vs. leaves to the template | this skill | that skill's Step 6 |
 > | Type and palette — this step sets neither | that skill | this skill defers to it |
 > | The design vocabulary (per chart type, labeling, colors) | that skill's `GUIDELINES.md` | both |
-> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, local-SVG route |
+> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, its `local-svg` stage |
+> | A sketch frame's render size: the `W×H px` its band leaves, reported by the `local-svg` stage and recorded as `Render size` in the `Figma handoff` | that skill measures it (`SKETCH-AND-FINALIZE.md` §2.6) | this skill renders at it ([reference/SKETCHING.md](reference/SKETCHING.md) §5) |
+> | A year axis opens on the data's first year and closes on its last, each as a tick; a date axis takes grapher's calendar grid for its `display.timeInterval`; either is a 1px `#999` line with 5px `#999` marks | this skill draws it ([reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md)) | that skill's restyle warns when it does not |
 > | The sketch marker — page `… [sketch]`, frame `<slug>--sketch`; no sketch carries the bare website slug | that skill | this skill reports it |
 > | Finalize mode as the re-entry point once a sketch has its `viz://static` step | that skill | this skill's Sketch mode, §8 (its own finalize hands off to it) |
 > | The finalize split for a sketch with no step: both halves, the ETL steps only, or the Figma checks only, asked by whichever skill the finalize starts in | the Figma-checks-only rules: that skill (`SKETCH-AND-FINALIZE.md` F1); the ETL half: this skill ([reference/SKETCHING.md](reference/SKETCHING.md) §7) | both |
@@ -226,7 +228,7 @@ so the DB path reports *"Staging server … is not reachable. Run `etl pr` first
 staging build to finish"* — which invites waiting for something that will never arrive here. Don't
 wait, and don't run `etl pr` for it. Fall back to the read-only routes in
 [cloud-sandbox.md](../../docs/cloud-sandbox.md) —
-`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, the public Datasette
+`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, public.duckdb
 for `variables` and `chart_dimensions` — or ask the user to run the resolver locally and paste the
 output. This is a fallback for one environment, not a replacement: use the resolver with its DB
 wherever MySQL is reachable, since it does strictly more than the fallbacks do.
@@ -234,8 +236,8 @@ wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
 1. The grapher `static_viz` table carries a **`grapherSlug`** column. That gives a slug, and the
-   slug goes through the resolver above. Note this table is **not** mirrored to the public
-   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
+   slug goes through the resolver above. Note this table is **not** in the internal Datasette or public.duckdb,
+   so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
    cloud session cannot reach it either, and the slug has to come from the user.
 2. `ai/static_viz_popularity/static_viz_popular.csv` gives rank, the pages it appears on, views,
    authors and tags — useful context, but it has **no slug or indicator column**, so it cannot
@@ -350,8 +352,7 @@ the *main* checkout's path, so `paths.BASE_DIR` resolves to the main checkout wh
 reports `Finished`, your worktree's files never change, and that reads exactly like a no-op render.
 
 ```bash
-make .venv                             # uv sync --all-extras --group dev; the pre-commit hook also does this
-ln -s /path/to/main/checkout/data data # gitignored; the built deps only exist in the main checkout
+make .venv                             # uv sync --frozen --all-extras --group dev; the pre-commit hook also does this
 .venv/bin/etlr viz://static/...
 ```
 
@@ -379,7 +380,9 @@ Then, in this order:
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
 3. **Check every reader-facing string before the Figma handoff**:
    `.venv/bin/codespell --ignore-words=.codespell-ignore.txt <step-dir>`,
-   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note.
+   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note
+   (the fact check's chart-texts context: its `prepare.py` takes the strings as a file). Start both
+   as background agents in one message and read the PNG meanwhile.
    Each wording fix after the import costs a re-import, the colour bindings again and a full Step 8c
    pass.
 

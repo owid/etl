@@ -13,6 +13,7 @@ from typing import Any
 import pandas as pd
 import pyarrow.feather as feather
 import pyarrow.parquet as pq
+import yaml
 from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 from owid.catalog.core.datasets import SUPPORTED_FORMATS, Dataset
 from owid.catalog.core.docs import ordered_table_names
@@ -26,6 +27,7 @@ from owid.catalog.schema_org import (
 )
 from structlog import get_logger
 
+from etl.catalog_pages.links import load_indicator_links
 from etl.catalog_pages.pages import (
     DATASET_JSONLD_FILENAME,
     page_build_checksum,
@@ -66,6 +68,10 @@ class LatestDatasetPath:
     def short_key(self) -> str:
         return f"{self.namespace}/{self.dataset}"
 
+    @property
+    def channel(self) -> str:
+        return self.catalog_path.split("/", 1)[0]
+
 
 @dataclass
 class JsonLdBuildResult:
@@ -87,18 +93,22 @@ class JsonLdBuildResult:
     warnings: list[DatasetQualityResult] = field(default_factory=list)
     archived_entries: list[LatestDatasetPath] = field(default_factory=list)
     superseded_entries: list[LatestDatasetPath] = field(default_factory=list)
+    # The short keys of every opted-in dataset of the build, also those whose page failed: no cleanup deletes them.
+    owned_short_keys: set[str] = field(default_factory=set)
 
 
 def build_catalog_page_artifacts(
     *,
     output_dir: Path,
     catalog_dir: Path = DATA_DIR,
-    channel: CHANNEL = "garden",
+    channel: CHANNEL | tuple[CHANNEL, ...] = "garden",
     base_url: str = DEFAULT_CATALOG_BASE_URL,
     dry_run: bool = False,
     only: set[str] | None = None,
+    restrict_to: set[str] | None = None,
     active_steps: set[str] | None = None,
     published_build_checksum: Callable[[str], str | None] | None = None,
+    steps_dir: Path | None = None,
 ) -> JsonLdBuildResult:
     """Generate the page files of every opted-in dataset, plus sitemap and JSON-LD quality report, locally.
 
@@ -110,14 +120,34 @@ def build_catalog_page_artifacts(
     per table its CSV, parquet, workbook, codebook and sources, plus ``readme.md`` and ``manifest.json`` (see
     :mod:`etl.catalog_pages.pages`), and, when the dataset passes every quality gate, ``dataset.jsonld``. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
-    otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.
+    otherwise only datasets that opt in via ``DatasetMeta.dataset_page`` are considered.
+
+    ``channel`` is one channel or several. A garden step and a grapher step can both have a page, but two steps at
+    the same ``<namespace>/<dataset>`` cannot both opt in: they would claim the same page, so that raises an error.
+    ``restrict_to`` keeps only the opted-in datasets whose ``"<namespace>/<dataset>"`` is in the set (unlike ``only``, it does
+    not override the opt-in).
 
     ``active_steps`` overrides the set of active DAG step URIs used to exclude stale,
     archived on-disk builds (see :func:`latest_dataset_paths`). Defaults to the real DAG;
-    tests should pass an explicit set instead of relying on ``dag/*.yml``.
+    tests should pass an explicit set instead of relying on ``dag/*.yml``. ``steps_dir`` is the folder of the
+    data steps, where the links file of a step is read from.
     """
-    catalog = LocalCatalog(catalog_dir, channels=(channel,))
-    latest_paths = latest_dataset_paths(catalog.frame, channel=channel, only=only, active_steps=active_steps)
+    channels: tuple[CHANNEL, ...] = (channel,) if isinstance(channel, str) else tuple(channel)
+    if active_steps is None:
+        active_steps = graph_nodes(load_dag())
+    catalog = LocalCatalog(catalog_dir, channels=channels)
+    latest_paths: list[LatestDatasetPath] = []
+    for one_channel in channels:
+        # The allowlist overrides the opt-in for garden datasets only; other channels are just narrowed by it.
+        entries = latest_dataset_paths(
+            catalog.frame,
+            channel=one_channel,
+            only=only if one_channel == "garden" else None,
+            active_steps=active_steps,
+        )
+        if one_channel != "garden" and only is not None:
+            entries = [entry for entry in entries if entry.short_key in only]
+        latest_paths.extend(entries)
     result = JsonLdBuildResult()
     sitemap_entries: list[SitemapEntry] = []
 
@@ -127,9 +157,11 @@ def build_catalog_page_artifacts(
     # old dated path, and — for a fully-archived dataset with no active replacement at all —
     # its stable short key too) would linger on R2 forever, since nothing would ever schedule
     # its deletion again.
-    result.archived_entries, result.superseded_entries = find_inactive_dataset_entries(
-        catalog.frame, channel=channel, only=only, active_steps=active_steps
-    )
+    # Only garden builds are cleaned up this way: the page of an archived grapher step is removed by hand.
+    if "garden" in channels:
+        result.archived_entries, result.superseded_entries = find_inactive_dataset_entries(
+            catalog.frame, channel="garden", only=only, active_steps=active_steps
+        )
     for entry in result.archived_entries:
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
@@ -140,26 +172,36 @@ def build_catalog_page_artifacts(
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
 
-    duplicate_catalog_paths = find_duplicate_short_key_paths(
-        (entry.catalog_path, entry.namespace, entry.dataset) for entry in latest_paths
-    )
-
+    # Without an explicit allowlist, only datasets that opt in via `dataset: dataset_page: true`
+    # in their metadata are considered.
+    # Unflagged datasets are invisible to this build: not emitted, not reported, and any
+    # previously published artifacts are left untouched.
+    candidates: list[tuple[LatestDatasetPath, Dataset]] = []
     for entry in latest_paths:
+        ds = Dataset(catalog_dir / entry.catalog_path)
+        opted_in = bool(ds.metadata.dataset_page) or (entry.channel == "garden" and only is not None)
+        if opted_in and (restrict_to is None or entry.short_key in restrict_to):
+            candidates.append((entry, ds))
+
+    # Two steps at the same `<namespace>/<dataset>` (a garden step and its grapher step) would claim the same page.
+    duplicate_catalog_paths = find_duplicate_short_key_paths(
+        (entry.catalog_path, entry.namespace, entry.dataset) for entry, _ in candidates
+    )
+    if duplicate_catalog_paths:
+        raise ValueError(
+            f"These steps opt in to a dataset page at the same <namespace>/<dataset>: {sorted(duplicate_catalog_paths)}. "
+            "Only one of them can set `dataset: dataset_page: true`."
+        )
+    result.owned_short_keys = {entry.short_key for entry, _ in candidates}
+
+    for entry, ds in candidates:
         catalog_path = entry.catalog_path
-        ds = Dataset(catalog_dir / catalog_path)
-        # Without an explicit allowlist, only datasets that opt in via `dataset: jsonld: true`
-        # in their metadata are considered (canary rollout of the catalog-discovery project).
-        # Unflagged datasets are invisible to this build: not emitted, not reported, and any
-        # previously published artifacts are left untouched.
-        if only is None and not ds.metadata.jsonld:
-            continue
         tables = load_table_schema_inputs(ds)
         quality = assess_dataset_quality(
             catalog_path=catalog_path,
             namespace=entry.namespace,
             dataset_meta=ds.metadata,
             tables=tables,
-            duplicate_short_key=catalog_path in duplicate_catalog_paths,
         )
         if not quality.is_page_eligible:
             # The dataset must not be served at all: the publish step removes every page file from R2.
@@ -168,6 +210,24 @@ def build_catalog_page_artifacts(
             if not dry_run:
                 _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
             continue
+
+        # Extra links from the indicators of the page to grapher indicators. What is wrong in the links file is
+        # reported; a file that cannot be read at all keeps the published page as it is.
+        try:
+            indicator_links, link_problems = load_indicator_links(
+                catalog_path,
+                {table.short_name: list(table.variables) for table in tables},
+                active_steps,
+                steps_dir,
+                catalog_dir,
+            )
+        except (ValueError, yaml.YAMLError) as error:
+            log.error("catalog_pages.indicator_links_invalid", dataset=catalog_path, error=str(error))
+            result.page_failures[catalog_path] = str(error)
+            continue
+        quality.warnings.extend(f"indicator_links: {problem}" for problem in link_problems)
+        for problem in link_problems:
+            log.warning("catalog_pages.indicator_links_problem", dataset=catalog_path, problem=problem)
 
         # The JSON-LD side product has stricter gates than the page: metadata must be complete, and no Jinja
         # template may leak into it. A dataset that fails them still gets its page.
@@ -218,6 +278,7 @@ def build_catalog_page_artifacts(
                         jsonld=jsonld,
                         topics=dataset_keywords(tables),
                         build_checksum=build_checksum,
+                        indicator_links=indicator_links,
                     )
                 except Exception as error:  # noqa: BLE001 - one broken dataset must not stop the whole publish.
                     log.error("catalog_pages.page_failed", dataset=catalog_path, error=str(error))

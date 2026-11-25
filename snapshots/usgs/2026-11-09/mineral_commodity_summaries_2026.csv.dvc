@@ -1,0 +1,32 @@
+# NOTE: ScienceBase blocks scripted downloads (it answers with a Cloudflare challenge), so this file has to be downloaded by hand.
+#  Open the data release page in a browser (https://www.sciencebase.gov/catalog/item/696a75d5d4be0228872d3bf8), download "MCS2026_Commodities_Data.csv", and run:
+#  etls usgs/2026-11-09/mineral_commodity_summaries_2026 --path-to-file <path-to-downloaded-file>
+#  Unlike earlier releases, there is no separate world data zip file; world production and reserves are in the "World ..." sections of this file.
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Mineral Commodity Summaries
+    title_snapshot: Mineral Commodity Summaries 2026
+    description: |-
+      This database contains the United States salient statistics and world production statistics for over 90 nonfuel mineral commodities.
+    date_published: "2026-02-06"
+
+    # Citation
+    producer: United States Geological Survey
+    citation_full: |-
+      National Minerals Information Center, 2026, U.S. Geological Survey Mineral Commodity Summaries 2026 Data Release: U.S. Geological Survey data release. https://doi.org/10.5066/P1WKQ63T
+    attribution: USGS – Mineral Commodity Summaries (2026)
+    attribution_short: USGS
+
+    # Files
+    url_main: https://doi.org/10.5066/P1WKQ63T
+    date_accessed: '2026-11-09'
+
+    # License
+    license:
+      name: CC0 1.0
+      url: https://www.usgs.gov/data/mineral-commodity-summaries-2026-data-release
+outs:
+  - md5: 36185ff3742087e1dd90c52fe634fe12
+    size: 3189010
+    path: mineral_commodity_summaries_2026.csv

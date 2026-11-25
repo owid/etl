@@ -1,7 +1,7 @@
 # Writing and style guide
 
 > Source: OWID Notion page — [Writing and style guide](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c).
-> Last synced from Notion: 2026-10-26
+> Last synced from Notion: 2026-11-12
 > The check-metadata-style skill verifies this date on every run and refreshes this file from Notion when it is more than two weeks old. Commit refreshes via a PR.
 
 This guide establishes a uniform style for all OWID content to ensure consistency, clarity, and accuracy across our publications. The rules in this guide apply to all writing we do on OWID, whether in articles, topic pages, or charts.

@@ -18,7 +18,7 @@ This library is part of the larger `etl` repository under `lib/catalog/` and is 
 
 ### Virtual Environment
 
-**CRITICAL:** This project uses a Python virtual environment (`.venv/`). All Python commands must use the virtual environment binaries:
+This project uses a Python virtual environment (`.venv/`). Run Python commands through its binaries, since the global ones fail here:
 
 ```bash
 # CORRECT - Use .venv binaries
@@ -39,7 +39,7 @@ uv add package_name     # Add a new package
 uv remove package_name  # Remove a package
 ```
 
-**Never run bare `uv sync`** — it prunes optional deps the repo needs and breaks the `etl` CLI. To install or repair the environment, use `uv sync --all-extras --group dev` (what `make .venv` runs).
+**Never run bare `uv sync`** — it prunes optional deps the repo needs and breaks the `etl` CLI. To install or repair the environment, use `uv sync --frozen --all-extras --group dev` (what `make .venv` runs).
 
 ### Common Development Tasks
 
