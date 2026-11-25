@@ -41,7 +41,7 @@ dimensions:
       - slug: confirmed_deaths
         name: Confirmed deaths
     presentation:
-      type: toggle-buttons
+      type: dropdown
   - slug: frequency
     name: Frequency
     choices:
@@ -52,7 +52,7 @@ dimensions:
       - slug: daily
         name: Daily
     presentation:
-      type: toggle-buttons
+      type: dropdown
   - slug: scale
     name: Relative to population
     choices:
