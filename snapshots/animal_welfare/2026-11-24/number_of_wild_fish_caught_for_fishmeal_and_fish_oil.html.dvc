@@ -10,7 +10,6 @@ meta:
     url_download: https://fishcount.org.uk/fish-count-estimates-2/numbers-of-wild-fish-caught-for-reduction-to-fish-oil-and-fishmeal
     date_published: "2026"
     date_accessed: 2026-11-24
-    # NOTE: This page states no license (only "Content © fishcount.org.uk"), so we temporarily assume CC BY 4.0, as the metadata guidelines say. Fishcount licenses its other estimates under CC BY 4.0.
     license:
       name: CC BY 4.0
 outs:
