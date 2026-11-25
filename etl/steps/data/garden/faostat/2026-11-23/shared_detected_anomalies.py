@@ -911,6 +911,38 @@ class JapanFertilizerUseFrom2021Anomaly(DataAnomaly):
         return tb[~self._affected_rows(tb)].reset_index(drop=True)
 
 
+class JapanPhosphateProductionFrom2021Anomaly(DataAnomaly):
+    description = "* In FAOSTAT's latest release, Japan's production of phosphate fertilizers drops from 183,099 tonnes in 2020 to 30,321 tonnes in 2021, the same figure as its use, while FAOSTAT's previous release had 186,794 tonnes for 2021. We removed Japan's phosphate production from 2021 onward.\n"
+
+    # Phosphate.
+    affected_item_codes = ["00003103"]
+    # Production.
+    affected_element_codes = ["005510"]
+    affected_countries = ["Japan"]
+    first_affected_year = 2021
+
+    def _affected_rows(self, tb):
+        return (
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"] >= self.first_affected_year)
+        )
+
+    def check(self, tb):
+        phosphate_production = tb[
+            (tb["country"] == "Japan") & (tb["item_code"] == "00003103") & (tb["element_code"] == "005510")
+        ].set_index("year")["value"]
+        error = "Japan's phosphate production no longer drops abruptly in 2021. Remove this anomaly."
+        assert phosphate_production.loc[2021] < 0.2 * phosphate_production.loc[2020], error
+
+    def inspect(self, tb):
+        pass
+
+    def fix(self, tb):
+        return tb[~self._affected_rows(tb)].reset_index(drop=True)
+
+
 class FaroeIslandsFertilizerUsePerCroplandAnomaly(DataAnomaly):
     description = "* In FAOSTAT, the Faroe Islands have only 60 to 70 hectares of cropland, out of about 96,000 hectares of agricultural land. Their fertilizer use per hectare of cropland reaches 16,057 kilograms of nitrogen in 2017, while no other country exceeds 1,000 kilograms. We removed the Faroe Islands' fertilizer use per hectare of cropland.\n"
 
@@ -942,6 +974,7 @@ detected_anomalies = {
     "faostat_rfn": [
         SpuriousZerosInFertilizerRatiosAnomaly,
         JapanFertilizerUseFrom2021Anomaly,
+        JapanPhosphateProductionFrom2021Anomaly,
         FaroeIslandsFertilizerUsePerCroplandAnomaly,
     ],
     "faostat_qcl": [
