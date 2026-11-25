@@ -1295,3 +1295,6 @@ steps:
       - data://meadow/cdc/2025-03-14/polio_deaths:
         - snapshot://cdc/2025-03-14/polio_deaths.csv
       - data://meadow/public_health_reports/2025-03-14/polio_deaths
+  # archived; last active in de6780b7e95a on 2026-11-25
+  viz://explorer/who/latest/monkeypox:
+    - data://grapher/who/latest/monkeypox
