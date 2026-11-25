@@ -30,7 +30,7 @@ tables:
         title: Estimated number of wild-caught fish (lower bound)
         unit: 'fish'
         short_unit: ''
-        description_short: Lower bound estimate of the annual number of fish caught in global fishing.
+        description_short: Lower-bound estimate of the annual number of fish caught in global fishing.
         description_key: *description_key
         description_processing: *description_processing
         display:
@@ -57,7 +57,7 @@ tables:
         title: Estimated number of wild-caught fish killed for food (upper bound)
         unit: 'fish'
         short_unit: ''
-        description_short: Upper bound estimate of the annual number of fish caught in global fishing.
+        description_short: Upper-bound estimate of the annual number of fish caught in global fishing.
         description_key: *description_key
         description_processing: *description_processing
         display:
@@ -69,7 +69,7 @@ tables:
         title: Estimated number of wild-caught fish per capita (lower bound)
         unit: 'fish per person'
         short_unit: ''
-        description_short: Lower bound estimate of the annual number of fish caught in global fishing per person.
+        description_short: Lower-bound estimate of the annual number of fish caught in global fishing per person.
         description_key: *description_key
         description_processing: *description_processing
         display:
@@ -91,7 +91,7 @@ tables:
         title: Estimated number of wild-caught fish killed for food per capita (upper bound)
         unit: 'fish per person'
         short_unit: ''
-        description_short: Upper bound estimate of the annual number of fish caught in global fishing per person.
+        description_short: Upper-bound estimate of the annual number of fish caught in global fishing per person.
         description_key: *description_key
         description_processing: *description_processing
         display:
@@ -102,7 +102,7 @@ tables:
         title: Estimated number of wild fish caught for fishmeal and fish oil (lower bound)
         unit: 'fish'
         short_unit: ''
-        description_short: Lower bound estimate of the annual number of wild fish caught to make fishmeal and fish oil.
+        description_short: Lower-bound estimate of the annual number of wild fish caught to make fishmeal and fish oil.
         description_key: *description_key_fishmeal
         display:
           numSignificantFigures: 2
@@ -125,7 +125,7 @@ tables:
         title: Estimated number of wild fish caught for fishmeal and fish oil (upper bound)
         unit: 'fish'
         short_unit: ''
-        description_short: Upper bound estimate of the annual number of wild fish caught to make fishmeal and fish oil.
+        description_short: Upper-bound estimate of the annual number of wild fish caught to make fishmeal and fish oil.
         description_key: *description_key_fishmeal
         display:
           numSignificantFigures: 2
