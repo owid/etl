@@ -30,11 +30,10 @@ DIMENSIONS = ["metric", "animal", "per_capita", "estimate"]
 # Value of the estimate dimension for animals that are not estimated as a range.
 ESTIMATE_NOT_APPLICABLE = "not_applicable"
 
-# FAOSTAT QCL items of animals slaughtered for meat. "Meat, Total" (all land animals) is the sum of all other items
-# except poultry, which is the sum of the birds.
+# FAOSTAT QCL items of animals slaughtered for meat. "Meat, Total" (all land animals) is the sum of all other items.
+# NOTE: Poultry is not included, since it is mostly chickens.
 SLAUGHTERED_ITEM_CODES = {
     "00001765": "all_land_animals",  # 'Meat, Total'.
-    "00001808": "poultry",  # 'Meat, Poultry'.
     "00001058": "chickens",  # 'Meat of chickens, fresh or chilled'.
     "00001069": "ducks",  # 'Meat of ducks, fresh or chilled'.
     "00001035": "pigs",  # 'Meat of pig with the bone, fresh or chilled'.
@@ -60,7 +59,6 @@ SLAUGHTERED_ELEMENT_CODES = {"005320": "total", "005321": "total", "5320pc": "pe
 
 # FAOSTAT QCL items of live animals.
 LIVE_ITEM_CODES = {
-    "00002029": "poultry",  # 'Poultry Birds'.
     "00000866": "cattle",  # 'Cattle'.
     "00000946": "buffaloes",  # 'Buffalo'.
     "00001057": "chickens",  # 'Chickens'.
@@ -96,7 +94,7 @@ LIVE_PRODUCING_ANIMALS = {
 # Land animals shown on their own when stacked. All other land animals are added up as "other_land_animals".
 MAIN_LAND_ANIMALS = ["chickens", "ducks", "pigs", "geese", "sheep", "rabbits", "turkeys", "goats", "cattle"]
 OTHER_LAND_ANIMALS = "other_land_animals"
-LAND_ANIMAL_AGGREGATES = ["all_land_animals", "poultry"]
+ALL_LAND_ANIMALS = "all_land_animals"
 
 # Fishcount estimates: for each animal, its dataset and the prefix of its columns.
 FISH_AND_CRUSTACEANS = {
@@ -132,9 +130,9 @@ def prepare_qcl(tb_qcl: Table, item_codes: dict[str, str], element_codes: dict[s
 
 
 def add_other_land_animals(tb: Table, column: str) -> Table:
-    # Add up all land animals other than the main ones (and other than the aggregates).
+    # Add up all land animals other than the main ones (and other than their total).
     columns = [column, f"{column}_per_capita"]
-    others = tb[~tb["animal"].isin(MAIN_LAND_ANIMALS + LAND_ANIMAL_AGGREGATES)]
+    others = tb[~tb["animal"].isin(MAIN_LAND_ANIMALS + [ALL_LAND_ANIMALS])]
     tb_other = (
         others.groupby(["country", "year", "metric", "per_capita", "estimate"], observed=True, as_index=False)
         .agg({name: lambda values: values.sum(min_count=1) for name in columns})
@@ -157,6 +155,8 @@ def prepare_consumption(tb_consumption: Table) -> Table:
         tables.append(tb.assign(**{"per_capita": per_capita}).dropna(subset=[new_column]))
     tb = pr.concat(tables, ignore_index=True)
     tb["animal"] = tb["animal"].astype(str).map(underscore)
+    # Poultry is not included, since it is mostly chickens.
+    tb = tb[tb["animal"] != "poultry"].reset_index(drop=True)
     tb = tb.assign(**{"metric": "animals_killed_for_consumption", "estimate": ESTIMATE_NOT_APPLICABLE})
 
     return add_other_land_animals(tb[["country", "year"] + DIMENSIONS + [column, f"{column}_per_capita"]], column)
@@ -238,7 +238,7 @@ def sanity_check_outputs(tb: Table) -> None:
             .groupby("year", as_index=False)
             .agg({column: "sum"})
         )
-        total = world[world["animal"] == "all_land_animals"][["year", column]]
+        total = world[world["animal"] == ALL_LAND_ANIMALS][["year", column]]
         compared = pr.merge(stacked, total, on="year", suffixes=("_stacked", "_total")).dropna()
         assert len(compared) > 0, f"No world data to compare for {column}."
         difference = (compared[f"{column}_stacked"] - compared[f"{column}_total"]).abs()

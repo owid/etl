@@ -41,9 +41,6 @@ dimensions:
       - slug: land_and_aquatic_animals
         name: Land and aquatic animals
         group: Aggregates
-      - slug: poultry
-        name: Poultry
-        group: Aggregates
       - slug: buffaloes
         name: Buffaloes
         group: Individual animals
