@@ -150,6 +150,8 @@ def run() -> None:
                     "subtitle": "{subtitle}",
                     "chartTypes": ["StackedArea"],
                     "hasMapTab": False,
+                    # Let readers see the share of each animal.
+                    "hideRelativeToggle": False,
                     # By default, a stacked chart only shows the years when every animal has data, and game animals
                     # (among the other land animals) only have data between 1991 and 2017.
                     "missingDataStrategy": "show",

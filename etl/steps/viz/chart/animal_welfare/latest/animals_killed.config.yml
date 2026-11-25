@@ -24,6 +24,9 @@ definitions:
         originUrl: https://ourworldindata.org/animal-welfare
         entityType: country
         hasMapTab: true
+        # Views of a single animal (views that combine several animals have their own chart types).
+        chartTypes: ["LineChart", "DiscreteBar", "SlopeChart"]
+        hideRelativeToggle: false
 
 # The step creates the views from the dimensions of the indicators, and adds those that combine several animals.
 dimensions:
