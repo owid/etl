@@ -1,0 +1,91 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+    unit: |-
+      <% if per_capita == "per_capita" %>animals per person<% else %>animals<% endif %>
+    short_unit: ""
+  description_short_production: &description_short_production Based on the country of production, not consumption.
+
+dataset:
+  title: Animals used for food
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  animals_used_for_food:
+    title: Animals used for food
+    variables:
+      land_animals_killed: &land_animals_killed
+        title: &title_land_animals_killed |-
+          <% if animal == "all_land_animals" %>Land animals<% else %><< animal.replace("_", " ").capitalize() >><% endif %> slaughtered for meat<% if per_capita == "per_capita" %> per person<% endif %>
+        description_short: *description_short_production
+        description_key:
+          - Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.
+          - <% if animal in ["chickens", "poultry"] %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>
+        processing_level: minor
+        display:
+          name: |-
+            <% if animal == "all_land_animals" %>All land animals<% else %><< animal.replace("_", " ").capitalize() >><% endif %>
+        presentation:
+          title_public: *title_land_animals_killed
+      land_animals_killed_for_consumption: &land_animals_killed_for_consumption
+        title: &title_land_animals_killed_for_consumption |-
+          <% if animal == "all_land_animals" %>Land animals<% else %><< animal.replace("_", " ").capitalize() >><% endif %> slaughtered for meat supplied to the country<% if per_capita == "per_capita" %> per person<% endif %>
+        display:
+          name: |-
+            <% if animal == "all_land_animals" %>All land animals<% else %><< animal.replace("_", " ").capitalize() >><% endif %>
+        presentation:
+          title_public: *title_land_animals_killed_for_consumption
+      chickens_killed_for_eggs: &chickens_killed_for_eggs
+        title: &title_chickens_killed_for_eggs |-
+          Estimated number of chickens killed in egg production<% if per_capita == "per_capita" %> per person<% endif %>
+        display:
+          name: Chickens killed for eggs
+        presentation:
+          title_public: *title_chickens_killed_for_eggs
+      wild_caught_fish: &wild_caught_fish
+        title: &title_wild_caught_fish |-
+          Fishes caught from the wild<% if per_capita == "per_capita" %> per person<% endif %><% if estimate == "upper_limit" %> (upper limit)<% elif estimate == "lower_limit" %> (lower limit)<% endif %>
+        description_short: *description_short_production
+        display: &display_estimates
+          name: |-
+            <% if estimate == "upper_limit" %>Upper estimate<% elif estimate == "lower_limit" %>Lower estimate<% elif animal == "wild_caught_fish" %>Wild-caught fish<% elif animal == "farmed_fish" %>Farmed fish<% else %>Farmed crustaceans<% endif %>
+          color: |-
+            <% if estimate == "midpoint" %>#ae2032<% else %>#716b6c<% endif %>
+        presentation:
+          title_public: *title_wild_caught_fish
+      farmed_fish: &farmed_fish
+        title: &title_farmed_fish |-
+          Farmed fishes killed for food<% if per_capita == "per_capita" %> per person<% endif %><% if estimate == "upper_limit" %> (upper limit)<% elif estimate == "lower_limit" %> (lower limit)<% endif %>
+        description_short: *description_short_production
+        display: *display_estimates
+        presentation:
+          title_public: *title_farmed_fish
+      farmed_crustaceans: &farmed_crustaceans
+        title: &title_farmed_crustaceans |-
+          Farmed crustaceans killed for food<% if per_capita == "per_capita" %> per person<% endif %><% if estimate == "upper_limit" %> (upper limit)<% elif estimate == "lower_limit" %> (lower limit)<% endif %>
+        description_short: *description_short_production
+        display: *display_estimates
+        presentation:
+          title_public: *title_farmed_crustaceans
+      live_animals: &live_animals
+        title: &title_live_animals |-
+          Live <% if animal == "laying_hens" %>laying hens<% elif animal == "milk_cattle" %>cattle used for milk<% else %><< animal.replace("_", " ") >><% endif %><% if per_capita == "per_capita" %> per person<% endif %>
+        description_short: Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year.
+        processing_level: minor
+        display:
+          name: |-
+            <% if animal == "laying_hens" %>Laying hens<% elif animal == "milk_cattle" %>Cattle used for milk<% else %><< animal.replace("_", " ").capitalize() >><% endif %>
+        presentation:
+          title_public: *title_live_animals
+      # Values per person have the same metadata (each one is a separate indicator, to keep its own origins).
+      land_animals_killed_per_capita: *land_animals_killed
+      land_animals_killed_for_consumption_per_capita: *land_animals_killed_for_consumption
+      chickens_killed_for_eggs_per_capita: *chickens_killed_for_eggs
+      wild_caught_fish_per_capita: *wild_caught_fish
+      farmed_fish_per_capita: *farmed_fish
+      farmed_crustaceans_per_capita: *farmed_crustaceans
+      live_animals_per_capita: *live_animals

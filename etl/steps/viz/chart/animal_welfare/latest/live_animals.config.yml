@@ -25,4 +25,114 @@ definitions:
         entityType: country
         hasMapTab: true
 
-# Dimensions and views come from shared.config.yml and shared.py.
+# The step creates the views of live animals from the dimensions of the indicator.
+dimensions:
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: animals_alive
+        name: Live animals
+        description: Kept at a given moment, not counted over a year
+      - slug: caged_hens
+        name: Cage and cage-free hens
+  - slug: animal
+    name: Animal
+    presentation:
+      type: dropdown-with-search
+    choices:
+      - slug: poultry
+        name: Poultry
+        group: Aggregates
+      - slug: buffaloes
+        name: Buffaloes
+        group: Individual animals
+      - slug: camels
+        name: Camels
+        group: Individual animals
+      - slug: cattle
+        name: Cattle
+        group: Individual animals
+      - slug: milk_cattle
+        name: Cattle used for milk
+        group: Individual animals
+      - slug: chickens
+        name: Chickens
+        group: Individual animals
+      - slug: donkeys
+        name: Donkeys
+        group: Individual animals
+      - slug: ducks
+        name: Ducks
+        group: Individual animals
+      - slug: geese
+        name: Geese
+        group: Individual animals
+      - slug: goats
+        name: Goats
+        group: Individual animals
+      - slug: horses
+        name: Horses
+        group: Individual animals
+      - slug: laying_hens
+        name: Laying hens
+        group: Individual animals
+      - slug: mules
+        name: Mules
+        group: Individual animals
+      - slug: other_camelids
+        name: Other camelids
+        group: Individual animals
+      - slug: other_rodents
+        name: Other rodents
+        group: Individual animals
+      - slug: pigs
+        name: Pigs
+        group: Individual animals
+      - slug: rabbits
+        name: Rabbits
+        group: Individual animals
+      - slug: sheep
+        name: Sheep
+        group: Individual animals
+      - slug: turkeys
+        name: Turkeys
+        group: Individual animals
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+
+views:
+  - dimensions:
+      metric: caged_hens
+      animal: chickens
+      per_capita: total
+      estimate: not_applicable
+    indicators:
+      y:
+        - catalogPath: eggs_and_hens_statistics#number_of_hens_in_cages
+          display:
+            name: In cages
+            color: "#883039"
+            tolerance: 5
+        - catalogPath: eggs_and_hens_statistics#number_of_hens_cage_free
+          display:
+            name: Cage-free
+            color: "#5D7395"
+            tolerance: 5
+    config:
+      title: Egg-laying hens in cages and cage-free systems
+      subtitle: Cage-free housing systems include barns and free-range (non-organic and organic) farms. Cages can be conventional (battery cages) or enriched.
+      note: Data may refer to different years for each country, due to limited data availability.
+      hasMapTab: false
+      chartTypes:
+        - StackedDiscreteBar
+      stackMode: absolute
+      hideRelativeToggle: false

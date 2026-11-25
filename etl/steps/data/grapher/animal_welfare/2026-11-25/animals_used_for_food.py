@@ -11,8 +11,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset and read its main table.
-    ds_garden = paths.load_dataset("animals_killed_for_domestic_consumption")
-    tb = ds_garden.read("animals_killed_for_domestic_consumption", reset_index=False)
+    ds_garden = paths.load_dataset("animals_used_for_food")
+    tb = ds_garden.read("animals_used_for_food", reset_index=False)
 
     #
     # Save outputs.

@@ -14,8 +14,8 @@ default_selection:
   - United Kingdom
   - Spain
 default_dimensions:
-  metric: animals_killed
   animal: all_land_animals
+  metric: animals_killed
   per_capita: total
 
 definitions:
@@ -25,4 +25,111 @@ definitions:
         entityType: country
         hasMapTab: true
 
-# Dimensions and views come from shared.config.yml and shared.py.
+# The step creates the views from the dimensions of the indicators, and adds those that combine several animals.
+dimensions:
+  - slug: animal
+    name: Animal
+    presentation:
+      type: dropdown-with-search
+    choices:
+      - slug: all_land_animals
+        name: All land animals
+        group: Aggregates
+      - slug: land_animals_stacked
+        name: Land animals (stacked)
+        group: Aggregates
+      - slug: all_animals
+        name: All animals (lines)
+        group: Aggregates
+      - slug: poultry
+        name: Poultry
+        group: Aggregates
+      - slug: buffaloes
+        name: Buffaloes
+        group: Individual animals
+      - slug: camels
+        name: Camels
+        group: Individual animals
+      - slug: cattle
+        name: Cattle
+        group: Individual animals
+      - slug: chickens
+        name: Chickens
+        group: Individual animals
+      - slug: chickens_killed_for_eggs
+        name: Chickens killed for eggs
+        group: Individual animals
+      - slug: donkeys
+        name: Donkeys
+        group: Individual animals
+      - slug: ducks
+        name: Ducks
+        group: Individual animals
+      - slug: farmed_crustaceans
+        name: Farmed crustaceans
+        group: Individual animals
+      - slug: farmed_fish
+        name: Farmed fish
+        group: Individual animals
+      - slug: game_animals
+        name: Game animals
+        group: Individual animals
+      - slug: geese
+        name: Geese
+        group: Individual animals
+      - slug: goats
+        name: Goats
+        group: Individual animals
+      - slug: horses
+        name: Horses
+        group: Individual animals
+      - slug: mules
+        name: Mules
+        group: Individual animals
+      - slug: other_camelids
+        name: Other camelids
+        group: Individual animals
+      - slug: other_rodents
+        name: Other rodents
+        group: Individual animals
+      - slug: pigeons
+        name: Pigeons
+        group: Individual animals
+      - slug: pigs
+        name: Pigs
+        group: Individual animals
+      - slug: rabbits
+        name: Rabbits
+        group: Individual animals
+      - slug: sheep
+        name: Sheep
+        group: Individual animals
+      - slug: turkeys
+        name: Turkeys
+        group: Individual animals
+      - slug: wild_caught_fish
+        name: Wild-caught fish
+        group: Individual animals
+  # Only the animals with consumption-based numbers can switch to them (the toggle is disabled for the others).
+  - slug: metric
+    name: Based on
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: animals_killed
+        name: Production
+        description: Includes animals whose meat is exported
+      - slug: animals_killed_for_consumption
+        name: Consumption
+        description: Adjusted for trade in meat
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+
+views: []
