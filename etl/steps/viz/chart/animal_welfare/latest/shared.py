@@ -19,11 +19,32 @@ METRICS_LIVE_ANIMALS = ["animals_alive", "caged_hens"]
 METRICS_LAWS = ["fur_farming_status", "fur_trading_status", "bullfighting_status", "chick_culling_status"]
 
 # Only fish and crustaceans are estimated as a range. Their views show one line for each estimate, for one country at a
-# time, named and colored as in our charts on wild-caught and farmed fish.
+# time, named and colored as in our charts on wild-caught and farmed fish. For each estimate in the data, its choice in
+# the estimate dropdown (see ESTIMATE_DIMENSION), and its line.
 ESTIMATES = {
-    "midpoint": {"name": "Midpoint estimate", "color": "#ae2032"},
-    "upper limit": {"name": "Upper estimate", "color": "#716b6c"},
-    "lower limit": {"name": "Lower estimate", "color": "#716b6c"},
+    "midpoint": {"slug": "midpoint", "display": {"name": "Midpoint estimate", "color": "#ae2032"}},
+    "upper limit": {"slug": "upper_limit", "display": {"name": "Upper estimate", "color": "#716b6c"}},
+    "lower limit": {"slug": "lower_limit", "display": {"name": "Lower estimate", "color": "#716b6c"}},
+}
+
+# Dropdown of estimates, used instead of the lines by the big animal welfare multidim.
+# NOTE: The published animal welfare multidim keeps this dropdown, since links to the old animal welfare explorer
+# redirect to its views, and the id of each view includes its estimate. Drop it when those redirects are remapped.
+ESTIMATE_NOT_APPLICABLE = "not_applicable"
+ESTIMATE_DIMENSION = {
+    "slug": "estimate",
+    "name": "Estimate",
+    "presentation": {"type": "dropdown"},
+    "choices": [
+        {"slug": "midpoint", "name": "Midpoint", "description": "Midpoint of the estimated range."},
+        {"slug": "lower_limit", "name": "Lower limit", "description": "Lower end of the estimated range."},
+        {"slug": "upper_limit", "name": "Upper limit", "description": "Upper end of the estimated range."},
+        {
+            "slug": ESTIMATE_NOT_APPLICABLE,
+            "name": "Not applicable",
+            "description": "Only fish and crustaceans are estimated as a range.",
+        },
+    ],
 }
 
 # Animal choices that are not in the animals_used_for_food data.
@@ -117,12 +138,18 @@ def _check_stack_adds_up(tb: Table, columns: list[str], total_column: str) -> No
     assert (abs(stacked[informed] - total[informed]) <= 1e-3 * total[informed]).all(), error
 
 
-def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_dimension: bool = True) -> dict[str, Any]:
+def create_config(
+    paths: PathFinder,
+    metrics: list[str] | None = None,
+    animal_dimension: bool = True,
+    estimate_dimension: bool = False,
+) -> dict[str, Any]:
     """Create the config of an animal welfare multidim, keeping only the views of the given metrics (all if None).
 
     The adjacent config of the step gives the title and other top-level fields; shared.config.yml gives the
     dimensions and the views on laws and hens. Without the animal dimension, views are told apart by the other
-    dimensions alone (each law names its animal).
+    dimensions alone (each law names its animal). With the estimate dimension, each estimate of fish and crustaceans
+    is a view of its own, instead of a line.
     """
     config = paths.load_config()
     shared = paths.load_config(filename="shared.config.yml")
@@ -151,11 +178,17 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
                 indicators = [{"catalogPath": f"animals_used_for_food#{by_estimate[None]}"}]
                 views.append(_view(metric, animal, indicators, per_capita))
                 continue
-            # Show the estimated range as one line for each estimate.
             assert set(by_estimate) == set(ESTIMATES), f"Unexpected estimates for {animal}: {set(by_estimate)}"
+            if estimate_dimension:
+                for estimate, column in by_estimate.items():
+                    view = _view(metric, animal, [{"catalogPath": f"animals_used_for_food#{column}"}], per_capita)
+                    view["dimensions"]["estimate"] = ESTIMATES[estimate]["slug"]
+                    views.append(view)
+                continue
+            # Show the estimated range as one line for each estimate.
             indicators = [
-                {"catalogPath": f"animals_used_for_food#{by_estimate[estimate]}", "display": display}
-                for estimate, display in ESTIMATES.items()
+                {"catalogPath": f"animals_used_for_food#{by_estimate[estimate]}", "display": choice["display"]}
+                for estimate, choice in ESTIMATES.items()
             ]
             view_config = {**_faust(tb, by_estimate["midpoint"]), **ONE_COUNTRY}
             views.append(_view(metric, animal, indicators, per_capita, config=view_config))
@@ -212,8 +245,15 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
         tb_chick = paths.load_dataset("chick_culling_laws").read("chick_culling_laws")
         _color_chick_culling_status(views, set(tb_chick["status"]))
 
-    # Fill the dimensions: metric choices in the given order, and animals grouped.
+    # Add the estimate dropdown, if wanted, after the animal dropdown.
     dimensions = shared["dimensions"]
+    if estimate_dimension:
+        for view in views:
+            view["dimensions"].setdefault("estimate", ESTIMATE_NOT_APPLICABLE)
+        position = [dimension["slug"] for dimension in dimensions].index("animal") + 1
+        dimensions.insert(position, ESTIMATE_DIMENSION)
+
+    # Fill the dimensions: metric choices in the given order, and animals grouped.
     for dimension in dimensions:
         if dimension["slug"] == "metric":
             choices = {choice["slug"]: choice for choice in dimension["choices"]}

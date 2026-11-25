@@ -12,5 +12,6 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    c = paths.create_chart(config=create_config(paths))
+    # Keep the estimate dropdown, so that the views of the published multidim keep their ids (see shared.py).
+    c = paths.create_chart(config=create_config(paths, estimate_dimension=True))
     c.save()
