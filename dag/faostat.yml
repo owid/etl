@@ -13,21 +13,11 @@ steps:
     - data://grapher/faostat/2026-11-23/faostat_rfn
     - data://grapher/faostat/2026-11-23/additional_variables
 
-  ##########
-  # NOTE: The latest version of FBS is missing data for various countries that are currently under review.
-  # For now, import the data for those missing countries from the previous version:
-  ##########
-
-  ##########
-  # NOTE: The latest version of QV is missing post-2017 data for all EU-27 countries.
-  # For now, import the data for those missing country-years from the previous version:
-  ##########
-
   # FAOSTAT meadow steps for version 2026-11-23
 
   ##########
-  # NOTE: The latest version of FBS is missing data for various countries that are currently under review.
-  # For now, import the data for those missing countries from the previous version:
+  # NOTE: FAO withholds FBS data for a few countries "due to an ongoing review" (they are listed in MISSING_COUNTRIES,
+  # in the FBS meadow step). Until FAO restores them, their data is taken from the 2025-03-17 release.
   ##########
 
   data://meadow/faostat/2026-11-23/faostat_fbs:
