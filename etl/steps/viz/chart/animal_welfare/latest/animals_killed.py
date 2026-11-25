@@ -77,6 +77,15 @@ SUBTITLES = {
     "animals_killed": "Based on the country of production, not consumption.",
     "animals_killed_for_consumption": "Based on the country of consumption, not production.",
 }
+# Text of the data pages of the stacked view and the bar chart. Otherwise, a data page shows the text of the first
+# indicator of its view (here, chickens). The stacked view has the key points of the view of all land animals.
+DESCRIPTION_KEYS_STACKED = {
+    "animals_killed": [
+        "Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to"
+        " disease or accidents, are not included."
+    ],
+    "animals_killed_for_consumption": [],
+}
 
 
 def per_person(view) -> str:
@@ -145,6 +154,11 @@ def run() -> None:
                     # (among the other land animals) only have data between 1991 and 2017.
                     "missingDataStrategy": "show",
                 },
+                "view_metadata": {
+                    "presentation": {"title_public": "{title}{per_person}"},
+                    "description_short": "{subtitle}",
+                    "description_from_producer": "",
+                },
             },
             {
                 "dimension": "animal",
@@ -159,6 +173,12 @@ def run() -> None:
                     # log scale), and each one has its own view.
                     "chartTypes": ["DiscreteBar"],
                 },
+                "view_metadata": {
+                    "presentation": {"title_public": "Animals killed for food{per_person}"},
+                    "description_short": "Fish and crustaceans are shown as the midpoint of their estimated range.",
+                    "description_key": [],
+                    "description_from_producer": "",
+                },
             },
         ],
         params={
@@ -171,12 +191,17 @@ def run() -> None:
     # Color the midpoint of each range red and its bounds grey, as in our charts on wild-caught and farmed fish.
     # In the view of land and aquatic animals, show only the midpoint of fish and crustaceans. Also, let each bar show the
     # latest value of up to 5 years earlier, since fish and crustaceans have no data for the latest years. And tell the
-    # two bars of chickens apart, as in the animal dropdown.
+    # two bars of chickens apart, as in the animal dropdown. Give the stacked views the key points of all land animals.
     for view in c.views:
         if view.dimensions["animal"] in FISH_AND_CRUSTACEANS:
             for indicator in view.indicators.y:
                 color = "#ae2032" if "estimate_midpoint" in indicator.catalogPath else "#716b6c"
                 indicator.display = {**(indicator.display or {}), "color": color}
+        if view.dimensions["animal"] == "land_animals_stacked":
+            view.metadata = {
+                **(view.metadata or {}),
+                "description_key": DESCRIPTION_KEYS_STACKED[view.dimensions["metric"]],
+            }
         if view.dimensions["animal"] == "land_and_aquatic_animals":
             view.indicators.y = [
                 indicator
