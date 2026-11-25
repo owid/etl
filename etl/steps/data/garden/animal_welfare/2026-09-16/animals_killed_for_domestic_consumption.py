@@ -113,8 +113,6 @@ ANIMALS: dict[str, dict[str, Any]] = {
 
 # Groups reported as sums of their animals (pigs is both an animal and an FBS group).
 GROUPS = {
-    "cattle and buffaloes": ["cattle", "buffaloes"],
-    "sheep and goats": ["sheep", "goats"],
     "poultry": ["chickens", "ducks", "geese", "turkeys", "pigeons"],
     "all land animals": list(ANIMALS),
 }

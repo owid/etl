@@ -37,15 +37,9 @@ EXTRA_ANIMALS = [
     {"slug": "milk_cattle", "name": "Cattle used for milk"},
 ]
 
-# Metric of each indicator of animals_killed_for_domestic_consumption shown in the multidims (by its name without the
-# animal dimension). Animals killed in the country come from animals_used_for_food, except for the groups it lacks.
-INDICATORS_KILLED_FOR_CONSUMPTION = {
-    "killed_for_domestic_supply": "animals_killed_for_consumption",
-    "killed_for_domestic_supply_per_capita": "animals_killed_for_consumption",
-    "killed_in_country": "animals_killed",
-    "killed_in_country_per_capita": "animals_killed",
-}
-ANIMALS_KILLED_IN_COUNTRY_GROUPS = ["cattle_and_buffaloes", "sheep_and_goats"]
+# Indicators of animals_killed_for_domestic_consumption shown in the multidims (by their name without the animal
+# dimension). Animals killed in the country come from animals_used_for_food.
+INDICATORS_KILLED_FOR_CONSUMPTION = ["killed_for_domestic_supply", "killed_for_domestic_supply_per_capita"]
 
 # Chickens killed in egg production (hens and male chicks), from chickens_killed_for_eggs (counted where the eggs are
 # produced). For each animal choice, its column in that table.
@@ -116,20 +110,26 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
                 )
             )
 
-    # Add views of animals killed for the country's consumption, and of groups of animals killed in the country.
-    if {"animals_killed", "animals_killed_for_consumption"} & set(metrics):
+    # Add views of animals killed for the country's consumption.
+    if "animals_killed_for_consumption" in metrics:
         name = "animals_killed_for_domestic_consumption"
         tb_consumption = paths.load_dataset(name).read(name)
         for column in tb_consumption.columns:
             if column in tb_consumption.metadata.primary_key:
                 continue
             indicator = tb_consumption[column].metadata.original_short_name
-            animal = underscore(tb_consumption[column].metadata.dimensions["animal"])
-            metric = INDICATORS_KILLED_FOR_CONSUMPTION.get(indicator)
-            if metric is None or (metric == "animals_killed" and animal not in ANIMALS_KILLED_IN_COUNTRY_GROUPS):
+            if indicator not in INDICATORS_KILLED_FOR_CONSUMPTION:
                 continue
+            animal = underscore(tb_consumption[column].metadata.dimensions["animal"])
             animals.setdefault(animal, {"slug": animal, "name": animal.replace("_", " ").capitalize()})
-            views.append(_view(metric, animal, f"{name}#{column}", per_capita=indicator.endswith("_per_capita")))
+            views.append(
+                _view(
+                    "animals_killed_for_consumption",
+                    animal,
+                    f"{name}#{column}",
+                    per_capita=indicator.endswith("_per_capita"),
+                )
+            )
 
     # Add views of chickens killed in egg production.
     for per_capita in [False, True]:

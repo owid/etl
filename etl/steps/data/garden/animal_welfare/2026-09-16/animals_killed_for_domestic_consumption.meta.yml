@@ -21,9 +21,7 @@ definitions:
     description_short: Based on the country of production, not consumption.
     processing_level: minor
     description_processing: |-
-      <% if animal == "cattle and buffaloes" %>FAO reports each species separately; the numbers for cattle and buffaloes are summed.
-      <%- elif animal == "sheep and goats" %>FAO reports each species separately; the numbers for sheep and goats are summed.
-      <%- elif animal == "poultry" %>FAO reports each species separately; the numbers for chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+      <% if animal == "poultry" %>FAO reports each species separately; the numbers for chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
       <%- elif animal == "all land animals" %>FAO reports each species separately; the numbers for cattle, buffaloes, sheep, goats, pigs, chickens, ducks, geese and guinea fowl, turkeys, pigeons and other birds, horses, donkeys, mules, camels, other camelids, rabbits, and other rodents are summed.
       <%- endif %>
   consumption: &consumption
