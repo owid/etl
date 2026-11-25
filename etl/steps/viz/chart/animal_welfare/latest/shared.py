@@ -8,6 +8,7 @@ show a subset of those views: animals killed (animals_killed), live animals (liv
 import re
 from typing import Any
 
+from owid.catalog import Table
 from owid.catalog.utils import underscore
 
 from etl.helpers import PathFinder
@@ -17,13 +18,13 @@ METRICS_ANIMALS_KILLED = ["animals_killed", "animals_killed_for_consumption"]
 METRICS_LIVE_ANIMALS = ["animals_alive", "caged_hens"]
 METRICS_LAWS = ["fur_farming_status", "fur_trading_status", "bullfighting_status", "chick_culling_status"]
 
-# Estimate choice slug for each estimate in the data (only fish and crustaceans are estimated as a range).
+# Only fish and crustaceans are estimated as a range. Their views show one line for each estimate, for one country at a
+# time, named and colored as in our charts on wild-caught and farmed fish.
 ESTIMATES = {
-    "midpoint": "midpoint",
-    "lower limit": "lower_limit",
-    "upper limit": "upper_limit",
+    "midpoint": {"name": "Midpoint estimate", "color": "#ae2032"},
+    "upper limit": {"name": "Upper estimate", "color": "#716b6c"},
+    "lower limit": {"name": "Lower estimate", "color": "#716b6c"},
 }
-ESTIMATE_NOT_APPLICABLE = "not_applicable"
 
 # Animal choices that are not in the animals_used_for_food data.
 EXTRA_ANIMALS = [
@@ -37,6 +38,15 @@ EXTRA_ANIMALS = [
     {"slug": "milk_cattle", "name": "Cattle used for milk"},
 ]
 
+# Animal choices that show several animals at once.
+LAND_ANIMALS_STACKED = {"slug": "land_animals_stacked", "name": "Land animals (stacked)"}
+ALL_ANIMALS = {"slug": "all_animals", "name": "All animals (lines)"}
+
+# Groups of the animal dropdown. Aggregates come first, in this order; the other animals follow alphabetically.
+GROUP_AGGREGATES = "Aggregates"
+GROUP_INDIVIDUAL_ANIMALS = "Individual animals"
+AGGREGATES = ["all_land_animals", LAND_ANIMALS_STACKED["slug"], ALL_ANIMALS["slug"], "poultry"]
+
 # Indicators of animals_killed_for_domestic_consumption shown in the multidims (by their name without the animal
 # dimension). Animals killed in the country come from animals_used_for_food.
 INDICATORS_KILLED_FOR_CONSUMPTION = ["killed_for_domestic_supply", "killed_for_domestic_supply_per_capita"]
@@ -45,7 +55,7 @@ INDICATORS_KILLED_FOR_CONSUMPTION = ["killed_for_domestic_supply", "killed_for_d
 # produced). For each animal choice, its column in that table.
 # NOTE: Hens and male chicks are shown together, because the data assumes one male chick killed per hen. Show them
 # separately once the data accounts for in-ovo sexing.
-# NOTE: These are not added to any total: laying hens are also counted among the chickens slaughtered for meat.
+# NOTE: These are not added to any total or stack: laying hens are also counted among the chickens slaughtered for meat.
 ANIMALS_KILLED_FOR_EGGS = {
     "chickens_killed_for_eggs": "chickens_killed",
 }
@@ -64,17 +74,47 @@ CHICK_CULLING_STATUS_COLORS = {
     "Partially banned": "#A46F49",
 }
 
+# Settings of the views that show several lines or stacked areas for one country at a time.
+ONE_COUNTRY = {"addCountryMode": "change-country", "selectedEntityNames": ["World"]}
+# Settings of the stacked views. By default, a stacked chart only shows the years when every animal has data, and game
+# animals only have data between 1991 and 2017.
+STACKED = {"chartTypes": ["StackedArea"], "hasMapTab": False, "missingDataStrategy": "show"}
 
-def _view(metric: str, animal: str, catalog_path: str, per_capita: bool, estimate: str | None = None) -> dict:
-    return {
+
+def _view(metric: str, animal: str, indicators: list[dict], per_capita: bool, config: dict | None = None) -> dict:
+    view = {
         "dimensions": {
             "metric": metric,
             "animal": animal,
-            "estimate": estimate or ESTIMATE_NOT_APPLICABLE,
             "per_capita": "per_capita" if per_capita else "total",
         },
-        "indicators": {"y": [{"catalogPath": catalog_path}]},
+        "indicators": {"y": indicators},
     }
+    if config:
+        view["config"] = config
+    return view
+
+
+def _faust(tb: Table, column: str) -> dict:
+    # Title and subtitle of a view with several indicators, taken from the indicator that the view is about.
+    meta = tb[column].metadata
+    faust = {"title": (meta.presentation.title_public if meta.presentation else None) or meta.title}
+    if meta.description_short:
+        faust["subtitle"] = meta.description_short
+    return faust
+
+
+def _world_latest(tb: Table, column: str) -> float:
+    return tb[tb["country"] == "World"].sort_values("year")[column].dropna().iloc[-1]
+
+
+def _check_stack_adds_up(tb: Table, columns: list[str], total_column: str) -> None:
+    world = tb[tb["country"] == "World"]
+    stacked = world[columns].sum(axis=1, min_count=1)
+    total = world[total_column]
+    informed = total.notna() & stacked.notna()
+    error = f"The stacked animals do not add up to {total_column}."
+    assert (abs(stacked[informed] - total[informed]) <= 1e-3 * total[informed]).all(), error
 
 
 def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_dimension: bool = True) -> dict[str, Any]:
@@ -89,31 +129,42 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
     if metrics is None:
         metrics = [choice["slug"] for choice in shared["dimensions"][0]["choices"]]
 
-    # Build one view per animal count indicator in animals_used_for_food, and collect the animal choices.
     animals = {animal["slug"]: animal for animal in EXTRA_ANIMALS}
     views = []
+
+    # Build the views of each animal count in animals_used_for_food, and collect the animal choices.
+    tb = None
     if {"animals_killed", "animals_alive"} & set(metrics):
         tb = paths.load_dataset("animals_used_for_food").read("animals_used_for_food")
+        # Columns of each (metric, animal, per capita), by estimate (None for animals not estimated as a range).
+        columns = {}
         for column in tb.columns:
             if column in tb.metadata.primary_key:
                 continue
             dims = tb[column].metadata.dimensions
             animal = underscore(dims["animal"])
             animals[animal] = {"slug": animal, "name": dims["animal"].capitalize()}
-            views.append(
-                _view(
-                    metric=dims["metric"],
-                    animal=animal,
-                    catalog_path=f"animals_used_for_food#{column}",
-                    per_capita=str(dims["per_capita"]).lower() == "true",
-                    estimate=ESTIMATES[dims["estimate"]] if dims.get("estimate") else None,
-                )
-            )
+            key = (dims["metric"], animal, str(dims["per_capita"]).lower() == "true")
+            columns.setdefault(key, {})[dims.get("estimate") or None] = column
+        for (metric, animal, per_capita), by_estimate in columns.items():
+            if None in by_estimate:
+                indicators = [{"catalogPath": f"animals_used_for_food#{by_estimate[None]}"}]
+                views.append(_view(metric, animal, indicators, per_capita))
+                continue
+            # Show the estimated range as one line for each estimate.
+            assert set(by_estimate) == set(ESTIMATES), f"Unexpected estimates for {animal}: {set(by_estimate)}"
+            indicators = [
+                {"catalogPath": f"animals_used_for_food#{by_estimate[estimate]}", "display": display}
+                for estimate, display in ESTIMATES.items()
+            ]
+            view_config = {**_faust(tb, by_estimate["midpoint"]), **ONE_COUNTRY}
+            views.append(_view(metric, animal, indicators, per_capita, config=view_config))
 
     # Add views of animals killed for the country's consumption.
+    tb_consumption = None
+    consumption = "animals_killed_for_domestic_consumption"
     if "animals_killed_for_consumption" in metrics:
-        name = "animals_killed_for_domestic_consumption"
-        tb_consumption = paths.load_dataset(name).read(name)
+        tb_consumption = paths.load_dataset(consumption).read(consumption)
         for column in tb_consumption.columns:
             if column in tb_consumption.metadata.primary_key:
                 continue
@@ -122,24 +173,28 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
                 continue
             animal = underscore(tb_consumption[column].metadata.dimensions["animal"])
             animals.setdefault(animal, {"slug": animal, "name": animal.replace("_", " ").capitalize()})
-            views.append(
-                _view(
-                    "animals_killed_for_consumption",
-                    animal,
-                    f"{name}#{column}",
-                    per_capita=indicator.endswith("_per_capita"),
-                )
-            )
+            indicators = [{"catalogPath": f"{consumption}#{column}"}]
+            views.append(_view("animals_killed_for_consumption", animal, indicators, indicator.endswith("_per_capita")))
 
     # Add views of chickens killed in egg production.
     for per_capita in [False, True]:
         suffix = "_per_capita" if per_capita else ""
         for animal, column in ANIMALS_KILLED_FOR_EGGS.items():
-            views.append(_view("animals_killed", animal, f"chickens_killed_for_eggs#{column}{suffix}", per_capita))
+            indicators = [{"catalogPath": f"chickens_killed_for_eggs#{column}{suffix}"}]
+            views.append(_view("animals_killed", animal, indicators, per_capita))
 
     # Add views of live animals from FAOSTAT.
     for animal, catalog_path in ANIMALS_ALIVE_FROM_FAOSTAT.items():
-        views.append(_view("animals_alive", animal, catalog_path, per_capita=False))
+        views.append(_view("animals_alive", animal, [{"catalogPath": catalog_path}], per_capita=False))
+
+    # Add views that stack all land animals killed, and that show all animals killed as lines.
+    for per_capita in [False, True]:
+        if tb is not None and "animals_killed" in metrics:
+            views += _views_of_all_animals(tb, per_capita)
+        if tb_consumption is not None:
+            views.append(_view_of_land_animals_stacked_for_consumption(tb_consumption, per_capita))
+    if {view["dimensions"]["animal"] for view in views} & {LAND_ANIMALS_STACKED["slug"], ALL_ANIMALS["slug"]}:
+        animals.update({choice["slug"]: choice for choice in [LAND_ANIMALS_STACKED, ALL_ANIMALS]})
 
     # Animal count views go first, followed by those on laws and hens.
     views += shared["views"]
@@ -157,14 +212,14 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
         tb_chick = paths.load_dataset("chick_culling_laws").read("chick_culling_laws")
         _color_chick_culling_status(views, set(tb_chick["status"]))
 
-    # Fill the dimensions: metric choices in the given order, and animals sorted alphabetically.
+    # Fill the dimensions: metric choices in the given order, and animals grouped.
     dimensions = shared["dimensions"]
     for dimension in dimensions:
         if dimension["slug"] == "metric":
             choices = {choice["slug"]: choice for choice in dimension["choices"]}
             dimension["choices"] = [choices[metric] for metric in metrics]
         if dimension["slug"] == "animal":
-            dimension["choices"] = sorted(animals.values(), key=lambda choice: choice["name"].lower())
+            dimension["choices"] = _group_animals(animals)
 
     # Drop the animal dimension, if not wanted, and dimensions with a single choice in use (e.g. per capita, for laws).
     drop = {"animal"} if not animal_dimension else set()
@@ -183,6 +238,97 @@ def create_config(paths: PathFinder, metrics: list[str] | None = None, animal_di
     config["views"] = views
 
     return config
+
+
+def _views_of_all_animals(tb: Table, per_capita: bool) -> list[dict]:
+    # Columns of each land animal killed in the country (aggregates excluded), largest first in the world's latest year.
+    land = {}
+    total = None
+    for column in tb.columns:
+        if column in tb.metadata.primary_key:
+            continue
+        dims = tb[column].metadata.dimensions
+        if dims["metric"] != "animals_killed" or (str(dims["per_capita"]).lower() == "true") != per_capita:
+            continue
+        animal = underscore(dims["animal"])
+        if animal == "all_land_animals":
+            total = column
+        elif not dims.get("estimate") and animal not in AGGREGATES:
+            land[animal] = column
+    assert total is not None, "Missing the number of all land animals killed."
+    land_columns = sorted(land.values(), key=lambda column: _world_latest(tb, column), reverse=True)
+    _check_stack_adds_up(tb, land_columns, total)
+
+    stacked = _view(
+        "animals_killed",
+        LAND_ANIMALS_STACKED["slug"],
+        [{"catalogPath": f"animals_used_for_food#{column}"} for column in land_columns],
+        per_capita,
+        config={**_faust(tb, total), **ONE_COUNTRY, **STACKED},
+    )
+
+    # Lines of all animals: land animals, the midpoint of fish and crustaceans, and chickens killed for eggs.
+    fish = [
+        column
+        for column in tb.columns
+        if column not in tb.metadata.primary_key
+        and tb[column].metadata.dimensions["metric"] == "animals_killed"
+        and tb[column].metadata.dimensions.get("estimate") == "midpoint"
+        and (str(tb[column].metadata.dimensions["per_capita"]).lower() == "true") == per_capita
+    ]
+    suffix = "_per_capita" if per_capita else ""
+    indicators = [{"catalogPath": f"animals_used_for_food#{column}"} for column in land_columns + fish]
+    for animal, column in ANIMALS_KILLED_FOR_EGGS.items():
+        name = next(choice["name"] for choice in EXTRA_ANIMALS if choice["slug"] == animal)
+        indicators.append({"catalogPath": f"chickens_killed_for_eggs#{column}{suffix}", "display": {"name": name}})
+    lines = _view(
+        "animals_killed",
+        ALL_ANIMALS["slug"],
+        indicators,
+        per_capita,
+        config={
+            "title": "Animals killed for food per person" if per_capita else "Animals killed for food",
+            "subtitle": "Fish and crustaceans are shown as the midpoint of their estimated range.",
+            **ONE_COUNTRY,
+            "hasMapTab": False,
+            "yAxis": {"scaleType": "log", "canChangeScaleType": True},
+        },
+    )
+    return [stacked, lines]
+
+
+def _view_of_land_animals_stacked_for_consumption(tb: Table, per_capita: bool) -> dict:
+    # Columns of each land animal killed for the country's consumption (aggregates excluded), largest first.
+    indicator = INDICATORS_KILLED_FOR_CONSUMPTION[1 if per_capita else 0]
+    land = {}
+    for column in tb.columns:
+        if column in tb.metadata.primary_key or tb[column].metadata.original_short_name != indicator:
+            continue
+        land[underscore(tb[column].metadata.dimensions["animal"])] = column
+    total = land.pop("all_land_animals")
+    land_columns = sorted(
+        [column for animal, column in land.items() if animal not in AGGREGATES],
+        key=lambda column: _world_latest(tb, column),
+        reverse=True,
+    )
+    _check_stack_adds_up(tb, land_columns, total)
+    return _view(
+        "animals_killed_for_consumption",
+        LAND_ANIMALS_STACKED["slug"],
+        [{"catalogPath": f"animals_killed_for_domestic_consumption#{column}"} for column in land_columns],
+        per_capita,
+        config={**_faust(tb, total), **ONE_COUNTRY, **STACKED},
+    )
+
+
+def _group_animals(animals: dict[str, dict]) -> list[dict]:
+    # Aggregates first, in their given order, then individual animals alphabetically.
+    aggregates = [{**animals[slug], "group": GROUP_AGGREGATES} for slug in AGGREGATES if slug in animals]
+    individual = sorted(
+        [{**choice, "group": GROUP_INDIVIDUAL_ANIMALS} for slug, choice in animals.items() if slug not in AGGREGATES],
+        key=lambda choice: choice["name"].lower(),
+    )
+    return aggregates + individual
 
 
 def _color_chick_culling_status(views: list[dict], statuses: set[str]) -> None:

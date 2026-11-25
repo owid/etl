@@ -3,9 +3,8 @@
 # The step fills the Animal choices and the animal-count views from the data.
 grapher_schema: "012"
 
-# Estimates only come as a range for fish and crustaceans, and only animal counts have a per-person
-# version: every other view has "Not applicable" and "Total" (a multidim shows every dimension,
-# disabled when one choice is available).
+# Only animal counts have a per-person version: every other view has "Total" (a multidim shows every
+# dimension, disabled when one choice is available).
 # Views on laws and hens have an animal of their own.
 dimensions:
   - slug: metric
@@ -37,23 +36,6 @@ dimensions:
     presentation:
       type: dropdown-with-search
     choices: []
-  - slug: estimate
-    name: Estimate
-    presentation:
-      type: dropdown
-    choices:
-      - slug: midpoint
-        name: Midpoint
-        description: Midpoint of the estimated range.
-      - slug: lower_limit
-        name: Lower limit
-        description: Lower end of the estimated range.
-      - slug: upper_limit
-        name: Upper limit
-        description: Upper end of the estimated range.
-      - slug: not_applicable
-        name: Not applicable
-        description: Only fish and crustaceans are estimated as a range.
   - slug: per_capita
     name: Per capita
     presentation:
@@ -68,7 +50,6 @@ views:
   - dimensions:
       metric: fur_farming_status
       animal: fur_animals
-      estimate: not_applicable
       per_capita: total
     indicators:
       y:
@@ -91,7 +72,6 @@ views:
   - dimensions:
       metric: fur_trading_status
       animal: fur_animals
-      estimate: not_applicable
       per_capita: total
     indicators:
       y:
@@ -111,7 +91,6 @@ views:
   - dimensions:
       metric: bullfighting_status
       animal: cattle
-      estimate: not_applicable
       per_capita: total
     indicators:
       y:
@@ -132,7 +111,6 @@ views:
   - dimensions:
       metric: chick_culling_status
       animal: chickens
-      estimate: not_applicable
       per_capita: total
     indicators:
       y:
@@ -148,7 +126,6 @@ views:
   - dimensions:
       metric: caged_hens
       animal: chickens
-      estimate: not_applicable
       per_capita: total
     indicators:
       y:

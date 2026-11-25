@@ -16,7 +16,6 @@ default_selection:
 default_dimensions:
   metric: animals_killed
   animal: all_land_animals
-  estimate: not_applicable
   per_capita: total
 
 definitions:
