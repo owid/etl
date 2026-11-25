@@ -263,6 +263,8 @@ steps:
   viz://explorer/who/latest/monkeypox:
     - data://grapher/who/latest/monkeypox:
       - data://garden/who/latest/monkeypox
+  viz://chart/who/latest/monkeypox:
+    - data://grapher/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
 
