@@ -138,12 +138,14 @@ definitions:
   ethos_1: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1_. ETHOS Light 1 is defined as people living rough, living in the streets or public spaces without a shelter that can be defined as living quarters.
   ethos_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 2 and 3_. ETHOS Light 2 is defined as people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation. ETHOS Light 3 is defined as people living in accommodation for the homeless, including hostels, temporary and transitional accommodation, and women’s shelters or refuge accommodation.
   ethos_1_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1, 2, and 3_. It includes people living in the streets or public spaces, in emergency accommodation, and in accommodation for the homeless, but it has not been disaggregated.
+  ethos_total: This data adds up people living rough (ETHOS Light 1) and people in emergency accommodation or accommodation for the homeless (ETHOS Light 2 and 3), including countries that report only the combined number.
   ethos_broad_women: This data covers countries whose definition of homelessness goes beyond people living rough (ETHOS Light 1) or beyond people staying in emergency accommodation and accommodation for the homeless (ETHOS Light 2 and 3). Depending on the country, it can also include people living in institutions, in non-conventional dwellings, or temporarily with family or friends due to a lack of housing (ETHOS Light 4, 5, and 6).
 
   point_in_time_count: This data is collected with a _point-in-time count_, in which data is collected at a single point in time, generally through a coordinated street count or an enumeration of people staying in shelters for people experiencing homelessness on a given night. Point-in-time counts thus present a “snapshot” of homelessness at a single time and place.
   flow_count: This data is collected with a _flow count_, in which data is collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
 
   gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical definition of each country.
+  women_undercount: The OECD notes that these statistics likely undercount women. Women are less likely to sleep rough or use homeless shelters, and more likely to stay with family or friends. In 20 countries, shelters for victims of domestic violence aren’t counted.
 
   harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
   methodology_issues: More details about definitions, methodology, and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
@@ -157,7 +159,7 @@ definitions:
   description_short_ethos_1_2_3: Includes people living in the streets or public spaces, in emergency accommodation, and in accommodation for the homeless.
   description_short_broad_women: Includes countries whose definition of homelessness covers more than people living rough or more than people in emergency accommodation and accommodation for the homeless.
 
-  description_short_point_in_time: This data is collected at a single point in time, generally through a coordinated street count.
+  description_short_point_in_time: This data is collected at a single point in time, generally through a street count or a count of people staying in shelters on a given night.
   description_short_flow: This data is collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
 
   description_processing_years: The OECD reports the latest data available for each country, and the year of that data differs between countries. We assign each value to the year the OECD gives for that country in its notes and in Table HC3.1.A1. Whenever the data was captured over several years, we use the latest year.
@@ -172,6 +174,10 @@ definitions:
     {definitions.description_processing_years}
 
     We don’t include the United Kingdom, as its data counts households instead of individuals.
+
+    For Mexico, whose estimate counts only people living rough, we leave out the other categories. The OECD takes them from the census, and Mexico doesn’t count them as homelessness.
+
+    Values for France are approximate.
   description_key_ethos_breakdown: These numbers break down each country’s headline estimate of homelessness, following its own statistical definition. Not every country counts every category, so the categories of different countries can’t be added up or compared directly.
 
 # Learn more about the available fields:
@@ -180,6 +186,14 @@ dataset:
   update_period_days: 365
   owners:
     - Pablo Arriagada
+  changelog:
+    - date: 2026-11-24
+      changes:
+        - Updated to the September 2026 release of the OECD Affordable Housing Database.
+        - The share of people experiencing homelessness now shows only each country’s latest data point, because the OECD no longer publishes its 2010–2023 series.
+        - The number of people experiencing homelessness now covers around 2018, around 2023, and the latest year.
+        - Added the number of people in each type of living situation (ETHOS Light 1 to 6).
+        - Belgium is no longer included, because the OECD now reports it only by region.
 
 tables:
   affordable_housing_database:
@@ -269,7 +283,7 @@ tables:
 
           {definitions.description_processing_years}
         description_key:
-          - "{definitions.ethos_1_2_3}"
+          - "{definitions.ethos_total}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.unconventional_dwellings}"
@@ -278,9 +292,9 @@ tables:
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
-          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3, total)
         display:
-          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3, total)
           numDecimalPlaces: 0
           <<: *display_common
 
@@ -338,21 +352,21 @@ tables:
 
           {definitions.description_processing_years}
         description_key:
-          - "{definitions.ethos_1_2_3}"
+          - "{definitions.ethos_total}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
           - For Israel, the OECD gives a total that is higher than the sum of its parts, because it covers the whole national estimate of homelessness, not only ETHOS Light 1, 2, and 3.
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
-          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3, total)
         display:
-          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
+          name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3, total)
           numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_1_2_3:
-        title: Share of women as a percentage of people experiencing homelessness (point-in-time, ETHOS 1, 2 and 3)
+        title: Share of women as a percentage of people experiencing homelessness (point-in-time, broad definitions)
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_broad_women} {definitions.description_short_point_in_time}"
@@ -363,13 +377,14 @@ tables:
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.belgium}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
-          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          title_public: Share of women as a percentage of people experiencing homelessness (broad definitions)
         display:
-          name: Share of women as a percentage of people experiencing homelessness
+          name: Share of women as a percentage of people experiencing homelessness (broad definitions)
           numDecimalPlaces: 0
           <<: *display_common
 
@@ -385,6 +400,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -406,6 +422,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -416,7 +433,7 @@ tables:
           <<: *display_common
 
       share_of_women_flow_1_2_3:
-        title: Share of women as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+        title: Share of women as a percentage of people experiencing homelessness (flow, broad definitions)
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_broad_women} {definitions.description_short_flow}"
@@ -427,12 +444,13 @@ tables:
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
-          title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          title_public: Share of women as a percentage of people experiencing homelessness (broad definitions)
         display:
-          name: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          name: Share of women as a percentage of people experiencing homelessness (broad definitions)
           numDecimalPlaces: 0
           <<: *display_common
 
@@ -448,6 +466,7 @@ tables:
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -458,7 +477,7 @@ tables:
           <<: *display_common
 
       share_of_men_point_in_time_1_2_3:
-        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1, 2 and 3)
+        title: Share of men as a percentage of people experiencing homelessness (point-in-time, broad definitions)
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_broad_women} {definitions.description_short_point_in_time}"
@@ -471,13 +490,14 @@ tables:
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.belgium}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          title_public: Share of men as a percentage of people experiencing homelessness (broad definitions)
         display:
-          name: Share of men as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
+          name: Share of men as a percentage of people experiencing homelessness (broad definitions)
           numDecimalPlaces: 0
           <<: *display_common
 
@@ -495,6 +515,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -518,6 +539,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -528,7 +550,7 @@ tables:
           <<: *display_common
 
       share_of_men_flow_1_2_3:
-        title: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+        title: Share of men as a percentage of people experiencing homelessness (flow, broad definitions)
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_broad_women} {definitions.description_short_flow}"
@@ -541,12 +563,13 @@ tables:
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+          title_public: Share of men as a percentage of people experiencing homelessness (flow, broad definitions)
         display:
-          name: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
+          name: Share of men as a percentage of people experiencing homelessness (flow, broad definitions)
           numDecimalPlaces: 0
           <<: *display_common
 
@@ -564,6 +587,7 @@ tables:
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -743,7 +767,7 @@ tables:
         description_processing: |-
           The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place at the national level. We combine them: a country has a “Housing First/housing-led strategy” when it has a Housing First or housing-led approach at the national level. When it doesn’t, but it has an active national homelessness strategy, we classify it as “Other strategy”. Countries with neither are classified as “No national strategy”, even if they have regional or local strategies, or address homelessness in other national strategies.
 
-          The data reflects the situation reported to the 2025 OECD Questionnaire on Affordable and Social Housing, as published in 2026. For more information about these two classifications, please refer to the OECD report [National strategies for combating homelessness](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-2-Homeless-strategies.pdf).
+          The data reflects the strategies reported to the OECD Questionnaire on Affordable and Social Housing (most recently in 2025) and OECD desk research, as published in September 2026. For more information about these two classifications, please refer to the OECD report [National strategies for combating homelessness](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-2-Homeless-strategies.pdf).
         presentation:
           title_public: Type of strategy to address homelessness
         display:

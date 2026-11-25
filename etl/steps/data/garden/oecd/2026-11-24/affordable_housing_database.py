@@ -296,6 +296,9 @@ def run() -> None:
     for tb_other in tables[1:]:
         tb = pr.merge(tb, tb_other, on=["country", "year"], how="outer")
 
+    # Patch known issues in the source (see the .corrections.yml file).
+    tb = paths.apply_corrections(tb)
+
     sanity_check_outputs(tb)
 
     tb = tb.format(["country", "year"], short_name=paths.short_name)
