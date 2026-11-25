@@ -20,11 +20,6 @@ definitions:
         yAxis:
           min: 0
           canChangeScaleType: true
-        # The explorer hides the time span and entity in its titles.
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
     - dimensions:
         metric: confirmed_deaths
       config:
