@@ -772,7 +772,9 @@ class TestParseChartSlug:
         assert parsed.type == "explorerView"
 
     def test_explorer_url_with_params(self):
-        parsed = parse_chart_slug("https://ourworldindata.org/explorers/co2?Count=Per+capita&Accounting=Production-based")
+        parsed = parse_chart_slug(
+            "https://ourworldindata.org/explorers/co2?Count=Per+capita&Accounting=Production-based"
+        )
         assert parsed.slug == "co2"
         assert parsed.query_params == "?Count=Per+capita&Accounting=Production-based"
         assert parsed.type == "explorerView"
