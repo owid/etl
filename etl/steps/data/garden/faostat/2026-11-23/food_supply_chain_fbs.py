@@ -221,7 +221,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 
    A region-year is dropped when the countries with a balance hold less
     than 80% of the region's population, so that a value labeled "Africa" is never built from a small fraction of
-    Africa. This rule removes "Low-income countries" before 2010 and in 2023, and Oceania in 2002-2009 (Papua New
+    Africa. This rule removes "Low-income countries" before 2010, and Oceania in 2002-2009 (Papua New
     Guinea is missing in those years).
 
 13. All stages are divided by that population and by 365 days, to give values per person per day.
