@@ -659,10 +659,10 @@ def generate_fertilizers(tb_rfn: Table, tb_rl: Table) -> Table:
         errors="raise",
     )
 
-    # Add column for total fertilizers per area cropland.
+    # Add column for total fertilizers per area cropland, only where all three nutrients have data.
     fertilizers["all_fertilizers_per_cropland"] = fertilizers[
         ["nitrogen_per_cropland", "phosphate_per_cropland", "potash_per_cropland"]
-    ].sum(axis=1)
+    ].sum(axis=1, min_count=3)
 
     # To get total agricultural use of fertilizers, we need cropland area.
     area = tb_rl[
