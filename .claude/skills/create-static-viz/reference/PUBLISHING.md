@@ -29,7 +29,7 @@ It includes feedback from <names>. The main changes from <the original | the las
 
 <Text on the page that changes with the chart, in one sentence, when there is any (section 4 finds it).>
 
-[Figma](<link to the desktop frame>)
+[Figma](https://www.figma.com/design/<fileKey>/<FileName>?node-id=<desktop frame id>)
 
 **Before (published <year>)**
 <img src="<old image>" width="850">
