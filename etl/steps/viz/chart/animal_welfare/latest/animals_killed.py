@@ -57,6 +57,9 @@ LAND_AND_AQUATIC_ANIMALS = LAND_ANIMALS_STACKED[:-1] + [
     *FISH_AND_CRUSTACEANS,
 ]
 
+# Names of the two bars of chickens in the view of land and aquatic animals (elsewhere, each appears on its own).
+CHICKEN_BAR_NAMES = {"chickens": "Chickens (meat)", "chickens_killed_for_eggs": "Chickens (eggs)"}
+
 # Settings shared by all views (views created by grouping do not inherit those of the config).
 COMMON = {"originUrl": "https://ourworldindata.org/animal-welfare", "entityType": "country"}
 # Settings of the views that show several lines or areas for one country at a time.
@@ -167,7 +170,8 @@ def run() -> None:
 
     # Color the midpoint of each range red and its bounds grey, as in our charts on wild-caught and farmed fish.
     # In the view of land and aquatic animals, show only the midpoint of fish and crustaceans. Also, let each bar show the
-    # latest value of up to 5 years earlier, since fish and crustaceans have no data for the latest years.
+    # latest value of up to 5 years earlier, since fish and crustaceans have no data for the latest years. And tell the
+    # two bars of chickens apart, as in the animal dropdown.
     for view in c.views:
         if view.dimensions["animal"] in FISH_AND_CRUSTACEANS:
             for indicator in view.indicators.y:
@@ -181,6 +185,9 @@ def run() -> None:
             ]
             for indicator in view.indicators.y:
                 indicator.display = {**(indicator.display or {}), "tolerance": 5}
+                for animal, name in CHICKEN_BAR_NAMES.items():
+                    if f"__animal_{animal}__" in indicator.catalogPath:
+                        indicator.display["name"] = name
 
     # Remove the views that are only needed to build the others: land and aquatic animals based on consumption (which has
     # no fish or eggs), and other land animals on their own.
