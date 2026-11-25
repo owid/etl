@@ -32,7 +32,7 @@ b. SCL includes by-products that FBS has no items for: oilseed cakes, brans and 
 
 The disadvantage of using SCL instead of FBS is coverage:
 a. SCL starts in 2010.
-b. A few countries are missing, because FAO has not compiled them (Japan, Sudan, Somalia and a few others).
+b. A few countries are missing, because FAO has not compiled them (Somalia, South Sudan and a few others).
 c. SCL has no fish or seafood.
 
 ASSUMPTIONS THAT GO INTO THE CALCULATION
@@ -272,10 +272,7 @@ Each assumption starts with a line on its scale: how much it changes the results
     countries that have an SCL balance that year (fish included), and the region's population is the sum of the same
     countries' populations. The sums are taken before assumptions 11 and 14, which then apply to the region's own
     stages. A region-year is dropped when those countries hold less than 80% of the region's population, so that a
-    value labeled "Africa" is never built from a small part of Africa. No region-year of the 11 regions is dropped.
-    "Low-income countries" is left out altogether: SCL covers just under or just over 80% of its population in 2010
-    to 2018, and 76% from 2019 (FAO has not compiled Sudan, Somalia and a few others), so the region would pass the
-    80% rule only in 2010 to 2013 and 2016 to 2018: a series with holes.
+    value labeled "Africa" is never built from a small part of Africa. No region-year of the 12 regions is dropped.
 
 13. All values are per person per day.
     >> Scale: minor. A choice of unit; it rescales all values equally.
@@ -534,8 +531,8 @@ FIRST_YEAR = 2010
 # assumption 1).
 IDENTITY_RELATIVE_TOLERANCE = 0.01
 IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
-# Expected outcome of the coverage rule below; empty, because "Low-income countries" is left out altogether
-# (checks assumption 12).
+# Expected outcome of the coverage rule below; empty, because every region covers at least 80% of its population in
+# every year (checks assumption 12).
 REGIONS_WITH_LOW_COVERAGE = set()
 # Safety limit for assumption 11: World trade is only equalized while the gap is small; a gap above this share
 # of imports crashes the step instead.
@@ -567,7 +564,7 @@ REGIONS = [
     "North America",
     "Oceania",
     "South America",
-    # "Low-income countries" is left out (assumption 12): SCL covers only 76% to 80% of its population.
+    "Low-income countries",
     "Lower-middle-income countries",
     "Upper-middle-income countries",
     "High-income countries",
