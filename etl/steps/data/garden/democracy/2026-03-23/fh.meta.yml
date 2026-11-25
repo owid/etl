@@ -52,6 +52,11 @@ tables:
               - DiscreteBar
               - Marimekko
               - Dumbbell
+            # Lower ratings mean more liberties, so show rises in red and falls in green.
+            dumbbell:
+              trendColorMap:
+                increase: "#d73c50"
+                decrease: "#00875e"
             hasMapTab: true
             tab: map
             yAxis:
@@ -99,6 +104,11 @@ tables:
               - DiscreteBar
               - Marimekko
               - Dumbbell
+            # Lower ratings mean more rights, so show rises in red and falls in green.
+            dumbbell:
+              trendColorMap:
+                increase: "#d73c50"
+                decrease: "#00875e"
             hasMapTab: true
             tab: map
             yAxis:
