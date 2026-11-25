@@ -10,9 +10,9 @@ meta:
     version_producer: '2025'
     url_main: https://www.wider.unu.edu/project/grd-government-revenue-dataset
     date_accessed: '2026-03-24'
-    date_published: '2025-11-01'
+    date_published: '2025-11-27'
     license:
-      name: CC BY 4.0
+      name: Open and free to use
       url: https://www.wider.unu.edu/project/grd-government-revenue-dataset
 outs:
   - md5: 282967792d94be52da38670157174bda

@@ -686,14 +686,14 @@ class TestDataclassModels:
 
     def test_chart_result_explorer_url(self):
         result = ChartResult(
-            slug="covid",
-            title="COVID Explorer",
+            slug="co2",
+            title="CO2 Explorer",
             type="explorerView",
-            query_params="?Metric=Cases",
+            query_params="?Count=Per+capita",
             site_url="https://ourworldindata.org",
         )
 
-        assert result.url == "https://ourworldindata.org/explorers/covid?Metric=Cases"
+        assert result.url == "https://ourworldindata.org/explorers/co2?Count=Per+capita"
         assert result.chart_base_url == "https://ourworldindata.org/explorers"
 
     def test_indicator_result(self):
@@ -766,15 +766,15 @@ class TestParseChartSlug:
         assert parsed.type == "chart"
 
     def test_explorer_url(self):
-        parsed = parse_chart_slug("https://ourworldindata.org/explorers/covid")
-        assert parsed.slug == "covid"
+        parsed = parse_chart_slug("https://ourworldindata.org/explorers/co2")
+        assert parsed.slug == "co2"
         assert parsed.query_params == ""
         assert parsed.type == "explorerView"
 
     def test_explorer_url_with_params(self):
-        parsed = parse_chart_slug("https://ourworldindata.org/explorers/covid?Metric=Cases&Interval=Weekly")
-        assert parsed.slug == "covid"
-        assert parsed.query_params == "?Metric=Cases&Interval=Weekly"
+        parsed = parse_chart_slug("https://ourworldindata.org/explorers/co2?Count=Per+capita&Accounting=Production-based")
+        assert parsed.slug == "co2"
+        assert parsed.query_params == "?Count=Per+capita&Accounting=Production-based"
         assert parsed.type == "explorerView"
 
     def test_slug_with_query_params(self):
