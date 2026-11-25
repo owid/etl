@@ -7,6 +7,10 @@ definitions:
       <% if per_capita == "per_capita" %>animals per person<% else %>animals<% endif %>
     short_unit: ""
   description_short_production: &description_short_production Based on the country of production, not consumption.
+  # Subtitle of chickens killed in egg production (in chickens_killed_for_eggs), moved to the key points, so that the
+  # subtitle can say whether the numbers are based on production or consumption.
+  description_key_eggs: &description_key_eggs
+    - Around half of the estimated total are laying hens, killed when their productivity declines. The other half are male chickens, most of which are killed within a day of hatching.
 
 dataset:
   title: Animals used for food
@@ -42,6 +46,8 @@ tables:
       chickens_killed_for_eggs: &chickens_killed_for_eggs
         title: &title_chickens_killed_for_eggs |-
           Estimated number of chickens killed in egg production<% if per_capita == "per_capita" %> per person<% endif %>
+        description_short: *description_short_production
+        description_key: *description_key_eggs
         display:
           name: Chickens killed for eggs
         presentation:
@@ -50,6 +56,7 @@ tables:
       chickens_killed_for_eggs_for_consumption: &chickens_killed_for_eggs_for_consumption
         title: |-
           Estimated number of chickens killed in egg production, based on consumption<% if per_capita == "per_capita" %> per person<% endif %>
+        description_key: *description_key_eggs
         display:
           name: Chickens killed for eggs
         presentation:

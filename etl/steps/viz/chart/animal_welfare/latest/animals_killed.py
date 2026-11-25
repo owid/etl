@@ -172,6 +172,10 @@ def run() -> None:
                     # Only bars: as lines, the animals are either flat at zero (on a linear scale) or tangled (on a
                     # log scale), and each one has its own view.
                     "chartTypes": ["DiscreteBar"],
+                    # Same note as in the static chart of land animals killed for food.
+                    "note": "Chickens killed in egg production include male chickens, most culled soon after hatching,"
+                    " and laying hens. Some are later sold for meat, so adding up the numbers would count those chickens"
+                    " twice.",
                 },
                 "view_metadata": {
                     "presentation": {"title_public": "Animals killed for food{per_person}"},
