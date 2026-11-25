@@ -580,7 +580,7 @@ tables:
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
         description_key:
           - "{definitions.harmonization}"
-          - The share uses each country’s headline estimate of homelessness, following its own statistical definition, as a percentage of its total population. The OECD rounds it to two significant digits.
+          - The share uses each country’s headline estimate of homelessness, following its own statistical definition, as a percentage of its total population. The OECD reports it rounded, so very small shares are approximate.
           - This share differs from the rate of homelessness per 100,000 people in our other charts. The rate only counts people living rough or staying in emergency or temporary accommodation (ETHOS Light 1, 2, and 3), so that countries can be compared on a similar basis. The share counts everyone in the national estimate, which in some countries also includes people living in institutions or non-conventional dwellings, or staying temporarily with family or friends because they lack housing (ETHOS Light 4, 5, and 6).
           - Most countries count people at a single point in time (point-in-time count). Austria, Chile, Cyprus, Israel, Latvia, Lithuania, Romania, Slovenia, and Turkey instead count everyone who experienced homelessness over a period of time, such as a year (flow count).
           - "{definitions.belgium}"
@@ -597,7 +597,7 @@ tables:
           title_public: Share of people experiencing homelessness
         display:
           name: Share of people experiencing homelessness
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           <<: *display_common
 
       number:
