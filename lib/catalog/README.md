@@ -88,6 +88,9 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.4.2`
+- No change to the API. The explorer examples in the docstrings of `Client.charts.fetch` and `quick.get` use the CO2 explorer: the COVID-19 explorer is moving to `/grapher/covid`, and the energy explorer is no longer published
+
 ### `v1.4.1`
 - The sources table (`Table.sources`, and the `sources.csv` of a dataset page) has a `title_snapshot` column, which tells apart several files of one data product: those share a `label`, the one the codebook uses
 

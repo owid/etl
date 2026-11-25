@@ -90,6 +90,7 @@ tables:
             - SlopeChart
             - DiscreteBar
             - Marimekko
+            - Dumbbell
           note: Data excludes long-term members of the OECD because they are considered stable democracies.
           yAxis:
             max: 10
