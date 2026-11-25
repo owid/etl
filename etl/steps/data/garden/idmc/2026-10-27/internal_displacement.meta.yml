@@ -45,7 +45,7 @@ definitions:
     population_projections: |-
       For years after 2023, our population data comes from the UN’s population projections (World Population Prospects 2024, medium scenario). For some territories (e.g. Svalbard and Jan Mayen) no estimates are published, so we don’t calculate values per 1,000 people after 2023.
     population_share: |-
-      We calculate this by dividing the rounded figure from IDMC by the country’s population and multiplying it by 1,000. For population, we use our long-term population dataset, which you can explore in the [population data explorer](https://ourworldindata.org/explorers/population-and-demography).
+      We calculate this by dividing the rounded figure from IDMC by the country’s population and multiplying it by 1,000. For population, we use our long-term population dataset, which you can explore in the [population data explorer](https://ourworldindata.org/grapher/population-and-demography).
     footnote_displacements: |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     footnote_zero_displacements: &footnote_zero_displacements |-
