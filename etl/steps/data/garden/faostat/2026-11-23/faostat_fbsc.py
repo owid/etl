@@ -330,7 +330,7 @@ def run() -> None:
     ####################################################################################################################
     # TEMPORARY: Add note about data sourced from previous snapshot for missing FBS countries.
     # Remove this block once FAOSTAT restores data for these countries.
-    fbs_note = "The latest FAOSTAT release (published on 2025-10-28) is missing data for Benin, Burundi, Central African Republic, Chad, Dominica, Japan, Mali, Somalia, South Sudan, Sudan, and Togo, due to an ongoing review. To avoid data gaps, we sourced data for those countries from a previous FAOSTAT release."
+    fbs_note = "The latest FAOSTAT release (published on 2026-11-23) is missing data for Burundi, Central African Republic, Somalia, and South Sudan, due to an ongoing review. To avoid data gaps, we sourced data for those countries from a previous FAOSTAT release."
     for column in tb_wide.columns:
         if column not in ["area_code"]:
             existing = tb_wide[column].metadata.description_processing or ""
