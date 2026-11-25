@@ -13,7 +13,10 @@ for with one comment on the viz's child issue in `owid/owid-issues`, drafted for
 repo is private, so naming the colleagues who gave feedback is fine there; never post the comment in
 this public repo, where CLAUDE.md's rule on internal context applies. Use this template, filling
 the angle brackets and dropping the lines that don't apply. Nothing goes on the site before the final
-reviewer's thumbs-up. Export the PNGs first (section 1).
+reviewer approves in a reply. Export the PNGs first (section 1).
+
+- **Ask for a written reply, never "a thumbs-up is enough".** A reaction sends the user no
+  notification, so an approval given that way is easy to miss.
 
 ```markdown
 > _Written by Claude <model name> — @<handle> at the wheel._
@@ -23,7 +26,7 @@ Hi @<reviewer>!
 <The ask, in one or two sentences. Final review: "Here's the <subject> static chart, ready for
 publication. Could you take a final look and let us know if it's good to go? We'd mostly like to check
 that the chart and its text read well." Earlier rounds: what is ready, and the one to three points you'd
-most like their eye on.> A thumbs-up is enough if you're happy with it.
+most like their eye on.> Could you reply here when you've had a look, even if it's just to say it's fine?
 
 It includes feedback from <names>. The main changes from <the original | the last version>:
 - <change, with the reason when it isn't obvious>
