@@ -9,7 +9,9 @@ session cannot reach it: prepare the files and the texts, and the user enters th
 ## Ask for each review with the same template
 
 Every review round in Step 9, item 6 (Bertha, the design review, the author, the final review) is asked
-for with one comment on the viz's child issue, drafted for the user to post. Use this template, filling
+for with one comment on the viz's child issue in `owid/owid-issues`, drafted for the user to post. That
+repo is private, so naming the colleagues who gave feedback is fine there; never post the comment in
+this public repo, where CLAUDE.md's rule on internal context applies. Use this template, filling
 the angle brackets and dropping the lines that don't apply. Nothing goes on the site before the final
 reviewer's thumbs-up. Export the PNGs first (section 1).
 
