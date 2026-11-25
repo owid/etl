@@ -3,6 +3,7 @@
 import re
 
 import pandas as pd
+import pypdf
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -10,6 +11,18 @@ from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Columns of the table of global numbers in the PDF supplement of Mood and Brooke (2024).
+PDF_COLUMNS = [
+    "year",
+    "Capture production (landings) (million tonnes)",
+    "Estimated numbers in millions (lower)",
+    "Estimated numbers in millions (upper)",
+    "Estimated numbers in millions (midpoint)",
+    "% of estimate based on specific species/genus weight data (by tonnage)",
+    "Mean individual fish weight for year (g) (lower)",
+    "Mean individual fish weight for year (g) (upper)",
+]
 
 
 def read_html_table(snap: Snapshot, header_rows: list[list[str]]) -> Table:
@@ -40,6 +53,24 @@ def read_html_table(snap: Snapshot, header_rows: list[list[str]]) -> Table:
     return snap.read_custom(read_function=_read_function)
 
 
+def read_pdf_table_of_yearly_global_numbers(snap: Snapshot) -> Table:
+    """Read the rows of yearly data from the table of global numbers in the PDF supplement of Mood and Brooke (2024)."""
+    with open(snap.path, "rb") as file:
+        text = "".join(page.extract_text() for page in pypdf.PdfReader(file).pages)
+    records = []
+    for line in text.split("\n"):
+        fields = line.split()
+        # Rows of yearly data start with a year (rows of averages and differences are skipped).
+        if fields and re.fullmatch(r"\d{4}", fields[0]):
+            assert len(fields) == 8, f"Unexpected number of fields in row: {line}"
+            values = [float(field.replace(",", "").replace("%", "")) for field in fields[1:]]
+            records.append(dict(zip(PDF_COLUMNS, [int(fields[0])] + values)))
+    tb = snap.read_from_records(records)
+    assert list(tb["year"]) == list(range(1999, 2020)), "Unexpected years in the PDF table of global numbers."
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -48,6 +79,8 @@ def run() -> None:
     snap_global = paths.load_snapshot("number_of_wild_fish_killed_for_food_global.html")
     snap_by_country = paths.load_snapshot("number_of_wild_fish_killed_for_food_by_country.html")
     snap_fishmeal = paths.load_snapshot("number_of_wild_fish_caught_for_fishmeal_and_fish_oil.html")
+    # Mood and Brooke (2024), used for the world totals before 2003.
+    snap_paper = paths.load_snapshot("number_of_wild_fish_killed_for_food_global.pdf")
 
     # Read the data tables from the HTML pages.
     tb_global = read_html_table(
@@ -100,6 +133,7 @@ def run() -> None:
             ],
         ],
     )
+    tb_paper = read_pdf_table_of_yearly_global_numbers(snap=snap_paper)
 
     #
     # Process data.
@@ -109,10 +143,11 @@ def run() -> None:
     tb_global = tb_global.format(keys=["year"], short_name="number_of_wild_fish_killed_for_food_global")
     tb_by_country = tb_by_country.format(keys=["country"], short_name="number_of_wild_fish_killed_for_food_by_country")
     tb_fishmeal = tb_fishmeal.format(keys=["year"], short_name="number_of_wild_fish_caught_for_fishmeal_and_fish_oil")
+    tb_paper = tb_paper.format(keys=["year"], short_name="number_of_wild_fish_killed_for_food_global_from_paper")
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=[tb_global, tb_by_country, tb_fishmeal])
+    ds_meadow = paths.create_dataset(tables=[tb_global, tb_by_country, tb_fishmeal, tb_paper])
     ds_meadow.save()

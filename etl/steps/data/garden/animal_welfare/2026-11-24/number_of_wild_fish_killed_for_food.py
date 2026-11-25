@@ -24,6 +24,15 @@ COLUMNS_BY_COUNTRY = {
     "numbers__upper__in_millions": "n_wild_fish_high",
 }
 
+# Columns to select from the table of yearly global numbers in Mood and Brooke (2024) (given in millions), and how to
+# rename them.
+COLUMNS_PAPER = {
+    "year": "year",
+    "estimated_numbers_in_millions__lower": "n_wild_fish_low",
+    "estimated_numbers_in_millions__midpoint": "n_wild_fish",
+    "estimated_numbers_in_millions__upper": "n_wild_fish_high",
+}
+
 # Columns to select from the table of fish caught for fishmeal and fish oil (given in billions), and how to rename them.
 COLUMNS_FISHMEAL = {
     "year": "year",
@@ -61,6 +70,7 @@ def run() -> None:
     tb_global = ds_meadow.read("number_of_wild_fish_killed_for_food_global")
     tb_by_country = ds_meadow.read("number_of_wild_fish_killed_for_food_by_country")
     tb_fishmeal = ds_meadow.read("number_of_wild_fish_caught_for_fishmeal_and_fish_oil")
+    tb_paper = ds_meadow.read("number_of_wild_fish_killed_for_food_global_from_paper")
 
     #
     # Process data.
@@ -69,6 +79,7 @@ def run() -> None:
     tb_global = tb_global[list(COLUMNS_GLOBAL)].rename(columns=COLUMNS_GLOBAL, errors="raise")
     tb_by_country = tb_by_country[list(COLUMNS_BY_COUNTRY)].rename(columns=COLUMNS_BY_COUNTRY, errors="raise")
     tb_fishmeal = tb_fishmeal[list(COLUMNS_FISHMEAL)].rename(columns=COLUMNS_FISHMEAL, errors="raise")
+    tb_paper = tb_paper[list(COLUMNS_PAPER)].rename(columns=COLUMNS_PAPER, errors="raise")
 
     # Small countries have values given as "< 1" (less than one million fish); treat them as missing.
     for column in ["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]:
@@ -76,7 +87,7 @@ def run() -> None:
         tb_by_country[column] = pr.to_numeric(tb_by_country[column])
 
     # Run sanity checks on inputs.
-    sanity_check_inputs(tb_global=tb_global, tb_by_country=tb_by_country, tb_fishmeal=tb_fishmeal)
+    sanity_check_inputs(tb_global=tb_global, tb_by_country=tb_by_country, tb_fishmeal=tb_fishmeal, tb_paper=tb_paper)
 
     # Remove rows of averages and totals (used only in sanity checks).
     tb_global = tb_global[tb_global["year"] != LABEL_GLOBAL_AVERAGE].astype({"year": int}).reset_index(drop=True)
@@ -89,12 +100,17 @@ def run() -> None:
     for column in ["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]:
         tb_global[column] = tb_global[column] * 1e9
         tb_by_country[column] = tb_by_country[column] * 1e6
+        tb_paper[column] = tb_paper[column] * 1e6
     for column in ["n_wild_fish_for_fishmeal_and_fish_oil_low", "n_wild_fish_for_fishmeal_and_fish_oil_high"]:
         tb_fishmeal[column] = tb_fishmeal[column] * 1e9
 
     # Country data are averages over the whole period of the yearly data; assign them to the last year of that period.
-    tb_global["country"] = "World"
+    first_year_of_country_average = tb_global["year"].min()
     tb_by_country["year"] = tb_global["year"].max()
+
+    # Fishcount's website starts in 2003; add the earlier years from Mood and Brooke (2024), which uses the same method.
+    tb_global = pr.concat([tb_paper[tb_paper["year"] < first_year_of_country_average], tb_global], ignore_index=True)
+    tb_global["country"] = "World"
 
     # Combine global and country data.
     tb = pr.concat([tb_global, tb_by_country], ignore_index=True)
@@ -121,7 +137,7 @@ def run() -> None:
     tb_fishmeal["country"] = "World"
 
     # Run sanity checks on outputs.
-    sanity_check_outputs(tb=tb, tb_fishmeal=tb_fishmeal)
+    sanity_check_outputs(tb=tb, tb_fishmeal=tb_fishmeal, first_year_of_country_average=first_year_of_country_average)
 
     # Improve table formats.
     tb = tb.format(short_name=paths.short_name)
@@ -135,7 +151,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def sanity_check_inputs(tb_global: Table, tb_by_country: Table, tb_fishmeal: Table) -> None:
+def sanity_check_inputs(tb_global: Table, tb_by_country: Table, tb_fishmeal: Table, tb_paper: Table) -> None:
     columns = ["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]
     global_average = tb_global[tb_global["year"] == LABEL_GLOBAL_AVERAGE][columns]
     country_total = tb_by_country[tb_by_country["country"] == LABEL_COUNTRY_TOTAL][columns]
@@ -162,6 +178,20 @@ def sanity_check_inputs(tb_global: Table, tb_by_country: Table, tb_fishmeal: Tab
         f"The global average differs from the mean of all years by more than 5%: {error.to_dict()}"
     )
 
+    # The world totals on Fishcount's website (in billions) and in Mood and Brooke (2024) (in millions) should agree in
+    # the years they share (they differ slightly because both round values to two significant figures).
+    tb_compare = yearly.assign(year=years).merge(tb_paper, on="year", how="inner", suffixes=("_website", "_paper"))
+    assert len(tb_compare) > 10, "Expected Fishcount's website and Mood and Brooke (2024) to share many years."
+    for column in columns:
+        error = (
+            100
+            * abs(1000 * tb_compare[f"{column}_website"] - tb_compare[f"{column}_paper"])
+            / tb_compare[f"{column}_paper"]
+        )
+        assert (error < 5).all(), (
+            f"Fishcount's website and Mood and Brooke (2024) differ by more than 5% in {column}: {error.max():.1f}%"
+        )
+
     # The fishmeal average (over the last 10 years) should be close to the mean of those years.
     columns = ["n_wild_fish_for_fishmeal_and_fish_oil_low", "n_wild_fish_for_fishmeal_and_fish_oil_high"]
     fishmeal_average = tb_fishmeal[tb_fishmeal["year"] == LABEL_FISHMEAL_AVERAGE][columns]
@@ -172,7 +202,7 @@ def sanity_check_inputs(tb_global: Table, tb_by_country: Table, tb_fishmeal: Tab
     assert (error < 5).all(), f"The fishmeal average differs from the mean of the last 10 years: {error.to_dict()}"
 
 
-def sanity_check_outputs(tb: Table, tb_fishmeal: Table) -> None:
+def sanity_check_outputs(tb: Table, tb_fishmeal: Table, first_year_of_country_average: int) -> None:
     for table, column in [(tb, "n_wild_fish"), (tb_fishmeal, "n_wild_fish_for_fishmeal_and_fish_oil")]:
         error = "Expected lower bound <= midpoint <= upper bound."
         assert (table[f"{column}_low"].dropna() >= 0).all(), "Unexpected negative values."
@@ -183,12 +213,15 @@ def sanity_check_outputs(tb: Table, tb_fishmeal: Table) -> None:
 
     # The world total should be between 1 and 3 trillion fish (the source estimates 1.1-2.2 trillion fish on average).
     world = tb[tb["country"] == "World"]
+    assert list(world["year"]) == list(range(1999, world["year"].max() + 1)), "Expected world totals for every year."
     assert (world["n_wild_fish_low"] > 5e11).all() and (world["n_wild_fish_high"] < 3e12).all(), (
         "Unexpected magnitude of world totals; check unit conversions."
     )
 
     # The sum of continents should be close to the global average (since country data is an average over all years).
-    world_average = world[["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]].mean()
+    world_average = world[world["year"] >= first_year_of_country_average][
+        ["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]
+    ].mean()
     continents = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
     continents_sum = tb[tb["country"].isin(continents)][["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]].sum()
     error = 100 * abs(continents_sum - world_average) / world_average

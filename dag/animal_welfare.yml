@@ -34,6 +34,8 @@ steps:
         - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food_global.html
         - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food_by_country.html
         - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_caught_for_fishmeal_and_fish_oil.html
+        # Mood and Brooke (2024), used for the world totals before 2003.
+        - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
