@@ -104,10 +104,10 @@ tables:
         title: Estimated number of chickens killed in egg production per person
       killed_for_domestic_supply:
         <<: [*eggs_consumption, *eggs]
-        title: Chickens killed for eggs supplied to the country
+        title: Estimated number of chickens killed in egg production, based on consumption
       killed_for_domestic_supply_per_capita:
         <<: [*eggs_consumption, *eggs_per_capita]
-        title: Chickens killed for eggs supplied to the country per person
+        title: Estimated number of chickens killed in egg production, based on consumption, per person
       killed_for_food:
         <<: [*eggs_consumption, *eggs]
         title: Chickens killed for eggs eaten in the country

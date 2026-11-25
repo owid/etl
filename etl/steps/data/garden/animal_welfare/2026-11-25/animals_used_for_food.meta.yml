@@ -46,13 +46,14 @@ tables:
           name: Chickens killed for eggs
         presentation:
           title_public: *title_chickens_killed_for_eggs
+      # NOTE: Same public title as chickens killed in egg production (the subtitle tells them apart).
       chickens_killed_for_eggs_for_consumption: &chickens_killed_for_eggs_for_consumption
-        title: &title_chickens_killed_for_eggs_for_consumption |-
-          Chickens killed for eggs supplied to the country<% if per_capita == "per_capita" %> per person<% endif %>
+        title: |-
+          Estimated number of chickens killed in egg production, based on consumption<% if per_capita == "per_capita" %> per person<% endif %>
         display:
           name: Chickens killed for eggs
         presentation:
-          title_public: *title_chickens_killed_for_eggs_for_consumption
+          title_public: *title_chickens_killed_for_eggs
       wild_caught_fish: &wild_caught_fish
         title: &title_wild_caught_fish |-
           Fishes caught from the wild<% if per_capita == "per_capita" %> per person<% endif %><% if estimate == "upper_limit" %> (upper limit)<% elif estimate == "lower_limit" %> (lower limit)<% endif %>
