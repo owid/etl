@@ -3,7 +3,7 @@
 This VSCode extension compares files in date-versioned folders (`YYYY-MM-DD`) with their previous version. It has two parts:
 
 - **Compare Previous Version** (`Cmd+Shift+D`): diff the open file against its previous version.
-- **ETL PR Review** (its own icon in the Activity Bar): review a whole branch, such as a dataset update, file by file against the previous versions, with the noise of every update hidden, and the reviewed files synced with GitHub's "Viewed" state.
+- **ETL PR Review** (its own icon in the Activity Bar): review a whole branch, such as a dataset update, file by file against the previous versions, with the files whose only changes are dates and hashes set apart, and the reviewed files synced with GitHub's "Viewed" state.
 
 ## How the previous version is found
 
@@ -23,16 +23,16 @@ This view lists the files changed in the current branch (committed or not) since
 
 | Group | What it means | Clicking it opens |
 |-------|---------------|-------------------|
-| Meaningful changes | A new-version file that differs from its previous version beyond noise. | The diff against the previous version, with the noise lines hidden. Right-click > "Open Diff Including Noise" shows everything. |
+| Meaningful changes | A new-version file that differs from its previous version in more than dates and hashes (see below). | The diff against the previous version. |
 | In previous version, missing in new version | A file of an updated step (same name before the first dot) that is in the previous folder but not in the new one, such as a dropped `.countries.json` or `.corrections.yml`. | The old file. |
 | New files, with no previous version | A file added in a version folder with no older counterpart. | The file. |
 | DAG | The active DAG files (`dag/*.yml`). | The diff against the branch's merge base. |
 | Other changed files | Other files without a date folder (scripts, docs), and dated files edited in place. | The diff against the branch's merge base. |
-| Only noise changes | Differs from its previous version, but only in noise. | The full diff, to check it. |
+| Only date and hash changes | A snapshot file that differs from its previous version only in the dates and hashes listed below. | The diff against the previous version, to check it. |
 | Identical to previous version | Byte-identical copies. | The diff (no changes). |
 | DAG archive | `dag/archive/*.yml`, which `etl archive-dag` generates (collapsed). | The diff against the branch's merge base. |
 
-The buttons at the top of the view step to the previous or next file to review (the first five groups), toggle hiding the noise, and rescan.
+The buttons at the top of the view step to the previous or next file to review (the first five groups), and rescan.
 
 ### Reviewed checkboxes
 
@@ -52,20 +52,19 @@ When the branch has an open pull request, and the GitHub CLI (`gh`) is installed
 If there is no open pull request, or `gh` is missing or not logged in, the view says so at the top (and once in a notification), and the checkboxes stay local.
 `owidVersionDiff.githubSync` turns the sync off, and `owidVersionDiff.ghPath` sets where `gh` is (by default it is looked up on the PATH, then in `/opt/homebrew/bin` and `/usr/local/bin`).
 
-### What counts as noise
+### What counts as a date and hash change
 
-A line is hidden only when it and its counterpart become equal after rewriting the parts below; any other difference on the line keeps it visible.
-Unchanged lines are never affected.
+These are the changes that every snapshot update makes, in `.dvc` files only. A file goes to "Only date and hash changes" when each of its changed lines becomes equal to its counterpart after rewriting the parts below; any other change puts it in "Meaningful changes".
+The diffs always show every change, including these.
 
-| Rule (`owidVersionDiff.noiseRules`) | Files | What is rewritten |
-|-------------------------------------|-------|-------------------|
-| `version-dates` | All | Any old or new version date of the compared files, as a whole token, e.g. `data://garden/faostat/2026-02-25/...` vs `.../2026-11-23/...`. A date glued to other text (`2026-02-20_analysis`) or a date that is not a version of the branch is not touched. |
-| `dvc-outs` | `.dvc` | The `md5`, `size` and `nfiles` values under `outs:` (not `path`). |
-| `dvc-date-accessed` | `.dvc` | The value of `date_accessed`. |
-| `dvc-date-published` | `.dvc` | The value of `date_published`. |
-| `dvc-citation-dates` | `.dvc` | Years, and the date right after "accessed", in `attribution` and `citation_full` (one-line or block values). |
+| Rule (`owidVersionDiff.noiseRules`) | What is rewritten |
+|-------------------------------------|-------------------|
+| `dvc-outs` | The `md5`, `size` and `nfiles` values under `outs:` (not `path`). |
+| `dvc-date-accessed` | The value of `date_accessed`. |
+| `dvc-date-published` | The value of `date_published`. |
+| `dvc-citation-dates` | Years, and the date right after "accessed", in `attribution` and `citation_full` (one-line or block values). |
 
-To see a kind of change that is hidden by default (for example, to check every `date_published`), remove its rule from `owidVersionDiff.noiseRules`.
+To treat one of these as a meaningful change (for example, so that a changed `date_published` puts the file among the meaningful changes), remove its rule from `owidVersionDiff.noiseRules`.
 `owidVersionDiff.baseRef` (default `origin/master`) sets what the branch is compared with.
 
 ### Command line
@@ -76,7 +75,7 @@ The same classification runs in a terminal, which is handy outside VS Code or fo
 node vscode_extensions/compare-previous-version/dist/cli.js [repo dir] [--base origin/master] [--hunks] [--noise] [--all] [--json]
 ```
 
-`--hunks` prints the meaningful hunks, `--noise` the line pairs treated as noise, `--all` also lists identical files, and `--json` everything as JSON.
+`--hunks` prints the meaningful hunks, `--noise` the line pairs whose only change is a date or hash, `--all` also lists identical files, and `--json` everything as JSON.
 
 ## Installation
 

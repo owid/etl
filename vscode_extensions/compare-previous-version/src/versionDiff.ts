@@ -4,7 +4,8 @@
  *
  * A dataset update copies each step folder to a new version folder, so git shows the new files as entirely new. Here,
  * each new file in a version folder is compared with the same file in its previous version folder, and the changes
- * are split into "noise" (the mechanical edits of every update, see NOISE_RULES) and meaningful changes.
+ * are split into date and hash changes of snapshot files (the mechanical edits of every update, see NOISE_RULES) and
+ * meaningful changes. Files whose only changes are date and hash changes get their own group.
  */
 import { execFileSync } from 'child_process';
 import * as fs from 'fs';
@@ -27,7 +28,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
     noPrevious: 'New files, with no previous version',
     dag: 'DAG',
     other: 'Other changed files (diff against base)',
-    noiseOnly: 'Only noise changes',
+    noiseOnly: 'Only date and hash changes',
     identical: 'Identical to previous version',
     dagArchive: 'DAG archive',
 };
@@ -58,11 +59,6 @@ export interface NoiseRule {
 
 // Each rule only ever makes two lines that differ count as equal; a line that is unchanged is never affected.
 export const NOISE_RULES: NoiseRule[] = [
-    {
-        id: 'version-dates',
-        description:
-            'One version date of this branch replaced by another (any old or new version folder date of the compared files, as a whole token), e.g. data://garden/faostat/2026-02-25/... -> .../2026-11-23/..., or the version in a docstring.',
-    },
     { id: 'dvc-outs', description: 'md5, size and nfiles values under "outs:" in a .dvc file.' },
     { id: 'dvc-date-accessed', description: 'The value of date_accessed in a .dvc file.' },
     { id: 'dvc-date-published', description: 'The value of date_published in a .dvc file.' },
@@ -84,12 +80,12 @@ export interface FileReport {
     currentVersion?: string;
     // Git status letter, for files diffed against the base ("dag", "dagArchive" and "other") and for "noPrevious".
     gitStatus?: string;
-    // Meaningful hunks and lines (for "meaningful"), and lines whose change is noise.
+    // Meaningful hunks and lines (for "meaningful"), and lines whose only change is a date or hash change.
     hunks?: Hunk[];
     added?: number;
     removed?: number;
     noiseLines?: number;
-    // The pairs of lines (old, new) that differ only in noise.
+    // The pairs of lines (old, new) that differ only in a date or hash.
     noisePairs?: [string, string][];
 }
 
@@ -105,7 +101,6 @@ export interface ReviewReport {
     root: string;
     baseRef: string;
     mergeBase: string;
-    versionDates: string[];
     files: FileReport[];
 }
 
@@ -156,54 +151,43 @@ export function splitLines(text: string): string[] {
     return text.split(/\r?\n/);
 }
 
-function versionDatesRegex(versionDates: string[]): RegExp | null {
-    if (versionDates.length === 0) {
-        return null;
-    }
-    return new RegExp(`(?<![\\w-])(${versionDates.join('|')})(?![\\w-])`, 'g');
-}
-
 // A date right after "accessed" (as in "Accessed on 11-November-2026", "accessed November 11, 2026" or "accessed
 // 2026-11-11"); any other text after "accessed" is left alone.
 const ACCESS_DATE =
     /(\b[Aa]ccessed(?: on)?:?\s*)(\d{1,2}[- ][A-Za-z]+[- ,]*\d{4}|[A-Za-z]+\.? \d{1,2},? \d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{4})/g;
 
-/** Rewrite the noise parts of each line, so that lines differing only in noise become equal. */
-export function normalizeLines(lines: string[], relativePath: string, versionDates: string[], rules: Set<string>): string[] {
-    const isDvc = relativePath.endsWith('.dvc');
-    const outsStart = isDvc ? lines.findIndex((line) => /^outs:\s*$/.test(line)) : -1;
-    const versionRegex = rules.has('version-dates') ? versionDatesRegex(versionDates) : null;
+/** Rewrite the date and hash parts of each line of a .dvc file, so that lines differing only in those become equal. */
+export function normalizeLines(lines: string[], relativePath: string, rules: Set<string>): string[] {
+    if (!relativePath.endsWith('.dvc')) {
+        return lines;
+    }
+    const outsStart = lines.findIndex((line) => /^outs:\s*$/.test(line));
     // Indentation of the attribution or citation_full key whose block (or one-line value) is being read, if any.
     let citationIndent: number | null = null;
 
     return lines.map((line, index) => {
         let normalized = line;
-        if (versionRegex) {
-            normalized = normalized.replace(versionRegex, '<VERSION>');
+        if (rules.has('dvc-outs') && outsStart >= 0 && index > outsStart) {
+            normalized = normalized.replace(/^(\s*-?\s*)(md5|size|nfiles):\s*\S+\s*$/, '$1$2: <OUTS>');
         }
-        if (isDvc) {
-            if (rules.has('dvc-outs') && outsStart >= 0 && index > outsStart) {
-                normalized = normalized.replace(/^(\s*-?\s*)(md5|size|nfiles):\s*\S+\s*$/, '$1$2: <OUTS>');
+        if (rules.has('dvc-date-accessed')) {
+            normalized = normalized.replace(/^(\s*)date_accessed:.*$/, '$1date_accessed: <DATE>');
+        }
+        if (rules.has('dvc-date-published')) {
+            normalized = normalized.replace(/^(\s*)date_published:.*$/, '$1date_published: <DATE>');
+        }
+        if (rules.has('dvc-citation-dates')) {
+            const indent = line.length - line.trimStart().length;
+            const key = line.match(/^\s*(attribution|citation_full):/);
+            if (key) {
+                citationIndent = indent;
+            } else if (citationIndent !== null && line.trim() !== '' && indent <= citationIndent) {
+                citationIndent = null;
             }
-            if (rules.has('dvc-date-accessed')) {
-                normalized = normalized.replace(/^(\s*)date_accessed:.*$/, '$1date_accessed: <DATE>');
-            }
-            if (rules.has('dvc-date-published')) {
-                normalized = normalized.replace(/^(\s*)date_published:.*$/, '$1date_published: <DATE>');
-            }
-            if (rules.has('dvc-citation-dates')) {
-                const indent = line.length - line.trimStart().length;
-                const key = line.match(/^\s*(attribution|citation_full):/);
-                if (key) {
-                    citationIndent = indent;
-                } else if (citationIndent !== null && line.trim() !== '' && indent <= citationIndent) {
-                    citationIndent = null;
-                }
-                if (citationIndent !== null) {
-                    normalized = normalized
-                        .replace(ACCESS_DATE, '$1<DATE>')
-                        .replace(/(?<!\d)(1[89]|20)\d{2}(?!\d)/g, '<YEAR>');
-                }
+            if (citationIndent !== null) {
+                normalized = normalized
+                    .replace(ACCESS_DATE, '$1<DATE>')
+                    .replace(/(?<!\d)(1[89]|20)\d{2}(?!\d)/g, '<YEAR>');
             }
         }
         return normalized;
@@ -321,46 +305,28 @@ export interface ComparedLines {
     hunks: Hunk[];
     noiseLines: number;
     noisePairs: [string, string][];
-    // The old file with its noise changes replaced by the new lines, so a diff against the new file shows only the
-    // meaningful hunks.
-    patchedOldText: string;
 }
 
-export function compareTexts(
-    oldText: string,
-    newText: string,
-    relativePath: string,
-    versionDates: string[],
-    rules: Set<string>
-): ComparedLines {
+export function compareTexts(oldText: string, newText: string, relativePath: string, rules: Set<string>): ComparedLines {
     const oldLines = splitLines(oldText);
     const newLines = splitLines(newText);
-    const pairs = matchLines(
-        normalizeLines(oldLines, relativePath, versionDates, rules),
-        normalizeLines(newLines, relativePath, versionDates, rules)
-    );
+    const pairs = matchLines(normalizeLines(oldLines, relativePath, rules), normalizeLines(newLines, relativePath, rules));
 
     const hunks: Hunk[] = [];
-    const patched: string[] = [];
     const noisePairs: [string, string][] = [];
     let i = 0;
     let j = 0;
     for (const [pi, pj] of [...pairs, [oldLines.length, newLines.length] as [number, number]]) {
         if (pi > i || pj > j) {
             hunks.push({ oldStart: i, oldLines: oldLines.slice(i, pi), newStart: j, newLines: newLines.slice(j, pj) });
-            patched.push(...oldLines.slice(i, pi));
         }
-        if (pi < oldLines.length) {
-            if (oldLines[pi] !== newLines[pj]) {
-                noisePairs.push([oldLines[pi], newLines[pj]]);
-            }
-            patched.push(newLines[pj]);
+        if (pi < oldLines.length && oldLines[pi] !== newLines[pj]) {
+            noisePairs.push([oldLines[pi], newLines[pj]]);
         }
         i = pi + 1;
         j = pj + 1;
     }
-    const eol = newText.includes('\r\n') ? '\r\n' : '\n';
-    return { hunks, noiseLines: noisePairs.length, noisePairs, patchedOldText: patched.join(eol) };
+    return { hunks, noiseLines: noisePairs.length, noisePairs };
 }
 
 /** Classify every file changed in the branch against its previous version. */
@@ -389,10 +355,6 @@ export function buildReport(dir: string, options: ReviewOptions = {}): ReviewRep
         }
     }
 
-    const versionDates = [
-        ...new Set(pairs.flatMap((pair) => [versionInPath(pair.path)!, versionInPath(pair.previousPath)!])),
-    ].sort();
-
     for (const pair of pairs) {
         const report: FileReport = {
             category: 'identical',
@@ -404,7 +366,7 @@ export function buildReport(dir: string, options: ReviewOptions = {}): ReviewRep
         const oldBuffer = fs.readFileSync(path.join(root, pair.previousPath));
         const newBuffer = fs.readFileSync(path.join(root, pair.path));
         if (!oldBuffer.equals(newBuffer)) {
-            const compared = compareTexts(oldBuffer.toString('utf8'), newBuffer.toString('utf8'), pair.path, versionDates, rules);
+            const compared = compareTexts(oldBuffer.toString('utf8'), newBuffer.toString('utf8'), pair.path, rules);
             report.hunks = compared.hunks;
             report.noiseLines = compared.noiseLines;
             report.noisePairs = compared.noisePairs;
@@ -417,7 +379,7 @@ export function buildReport(dir: string, options: ReviewOptions = {}): ReviewRep
 
     files.push(...findMissingInNew(root, pairs));
     files.sort((a, b) => pipelineRank(a.path) - pipelineRank(b.path) || a.path.localeCompare(b.path));
-    return { root, baseRef, mergeBase, versionDates, files };
+    return { root, baseRef, mergeBase, files };
 }
 
 /** Order files as the pipeline runs: snapshot, meadow, garden, grapher, then everything else. */

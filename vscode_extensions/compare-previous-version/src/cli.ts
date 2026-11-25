@@ -1,9 +1,9 @@
 /**
  * Print which files of a branch changed meaningfully against their previous versions.
  *
- * Usage: node dist/cli.js [repo dir] [--base origin/master] [--hunks] [--noise] [--all] [--json] [--rules version-dates,dvc-outs,...]
+ * Usage: node dist/cli.js [repo dir] [--base origin/master] [--hunks] [--noise] [--all] [--json] [--rules dvc-outs,dvc-date-accessed,...]
  *
- * --hunks prints the meaningful hunks, --noise prints the line pairs that were treated as noise, --all also lists identical files.
+ * --hunks prints the meaningful hunks, --noise prints the line pairs whose only change is a date or hash, --all also lists identical files.
  */
 import { ALL_RULE_IDS, buildReport, CATEGORY_LABELS, CATEGORY_ORDER, FileReport, NOISE_RULES } from './versionDiff';
 
@@ -32,8 +32,7 @@ function main() {
     }
 
     console.log(`Base: ${baseRef} (merge base ${report.mergeBase.slice(0, 10)})`);
-    console.log(`Version dates treated as interchangeable: ${report.versionDates.join(', ')}`);
-    console.log(`Noise rules: ${NOISE_RULES.filter((rule) => rules.includes(rule.id)).map((rule) => rule.id).join(', ')}`);
+    console.log(`Date and hash rules: ${NOISE_RULES.filter((rule) => rules.includes(rule.id)).map((rule) => rule.id).join(', ')}`);
     console.log('');
     for (const category of CATEGORY_ORDER) {
         const files = report.files.filter((file) => file.category === category);
@@ -56,8 +55,8 @@ function main() {
             }
             if (showNoise && file.noisePairs) {
                 for (const [oldLine, newLine] of file.noisePairs) {
-                    console.log(`    noise -${oldLine}`);
-                    console.log(`    noise +${newLine}`);
+                    console.log(`    date/hash -${oldLine}`);
+                    console.log(`    date/hash +${newLine}`);
                 }
             }
         }
@@ -67,9 +66,9 @@ function main() {
 function describe(file: FileReport): string {
     switch (file.category) {
         case 'meaningful':
-            return `${file.path}  (from ${file.previousVersion}; ${file.hunks!.length} hunks, +${file.added} -${file.removed}, ${file.noiseLines} noise lines hidden)`;
+            return `${file.path}  (from ${file.previousVersion}; ${file.hunks!.length} hunks, +${file.added} -${file.removed}, ${file.noiseLines} date and hash lines)`;
         case 'noiseOnly':
-            return `${file.path}  (from ${file.previousVersion}; ${file.noiseLines} noise lines)`;
+            return `${file.path}  (from ${file.previousVersion}; ${file.noiseLines} date and hash lines)`;
         case 'missingInNew':
             return `${file.path}  (no ${file.currentVersion} counterpart)`;
         default:

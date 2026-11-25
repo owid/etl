@@ -1,7 +1,7 @@
 {
   "name": "compare-previous-version",
   "displayName": "Compare Previous Version",
-  "description": "Compare files with their previous version (date folders), and review a branch's changes against previous versions with the noise of each update hidden and the reviewed files synced with GitHub",
+  "description": "Compare files with their previous version (date folders), and review a branch's changes against previous versions, with files whose only changes are dates and hashes set apart and the reviewed files synced with GitHub",
   "version": "0.1.0",
   "publisher": "owid",
   "engines": {
@@ -37,19 +37,8 @@
         "icon": "$(arrow-up)"
       },
       {
-        "command": "owidVersionDiff.toggleHideNoise",
-        "title": "Toggle Hiding Noise in Diffs",
-        "category": "ETL PR Review",
-        "icon": "$(eye-closed)"
-      },
-      {
         "command": "owidVersionDiff.openDiff",
         "title": "Open Diff",
-        "category": "ETL PR Review"
-      },
-      {
-        "command": "owidVersionDiff.openRawDiff",
-        "title": "Open Diff Including Noise",
         "category": "ETL PR Review"
       }
     ],
@@ -74,29 +63,14 @@
           "group": "navigation@2"
         },
         {
-          "command": "owidVersionDiff.toggleHideNoise",
-          "when": "view == owidVersionDiff",
-          "group": "navigation@3"
-        },
-        {
           "command": "owidVersionDiff.refresh",
           "when": "view == owidVersionDiff",
-          "group": "navigation@4"
-        }
-      ],
-      "view/item/context": [
-        {
-          "command": "owidVersionDiff.openRawDiff",
-          "when": "view == owidVersionDiff && viewItem == file-meaningful"
+          "group": "navigation@3"
         }
       ],
       "commandPalette": [
         {
           "command": "owidVersionDiff.openDiff",
-          "when": "false"
-        },
-        {
-          "command": "owidVersionDiff.openRawDiff",
           "when": "false"
         }
       ]
@@ -109,24 +83,17 @@
           "default": "origin/master",
           "description": "Git ref the branch is compared with, to find its changed files."
         },
-        "owidVersionDiff.hideNoise": {
-          "type": "boolean",
-          "default": true,
-          "description": "Hide noise changes (see owidVersionDiff.noiseRules) in the diffs of files with meaningful changes."
-        },
         "owidVersionDiff.noiseRules": {
           "type": "array",
           "items": {
             "type": "string",
             "enum": [
-              "version-dates",
               "dvc-outs",
               "dvc-date-accessed",
               "dvc-date-published",
               "dvc-citation-dates"
             ],
             "enumDescriptions": [
-              "One version date of the branch replaced by another (any old or new version folder date of the compared files, as a whole token).",
               "md5, size and nfiles values under outs: in a .dvc file.",
               "The value of date_accessed in a .dvc file.",
               "The value of date_published in a .dvc file.",
@@ -134,13 +101,12 @@
             ]
           },
           "default": [
-            "version-dates",
             "dvc-outs",
             "dvc-date-accessed",
             "dvc-date-published",
             "dvc-citation-dates"
           ],
-          "description": "Changes treated as noise. A line that differs only by these is hidden; any other difference on the line keeps it visible."
+          "description": "Changes in snapshot (.dvc) files that count as date and hash changes. A file whose only changes are these goes to the group \"Only date and hash changes\"; any other change puts it in \"Meaningful changes\". Diffs always show every change."
         },
         "owidVersionDiff.githubSync": {
           "type": "boolean",
