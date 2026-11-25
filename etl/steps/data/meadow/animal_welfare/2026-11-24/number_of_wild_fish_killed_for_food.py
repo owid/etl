@@ -139,7 +139,7 @@ def run() -> None:
     # Process data.
     #
     # Improve table formats.
-    # NOTE: Values are kept as strings, because the source includes rows of averages and totals, and values like "< 1".
+    # NOTE: Columns with rows of averages and totals, or values like "< 1", stay as strings; garden cleans them.
     tb_global = tb_global.format(keys=["year"], short_name="number_of_wild_fish_killed_for_food_global")
     tb_by_country = tb_by_country.format(keys=["country"], short_name="number_of_wild_fish_killed_for_food_by_country")
     tb_fishmeal = tb_fishmeal.format(keys=["year"], short_name="number_of_wild_fish_caught_for_fishmeal_and_fish_oil")

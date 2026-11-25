@@ -128,10 +128,9 @@ def run() -> None:
     tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=1)
 
     # Add per capita numbers.
-    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
-    for column in ["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"]:
-        tb[f"{column}_per_capita"] = tb[column] / tb["population"]
-    tb = tb.drop(columns=["population"], errors="raise")
+    tb = paths.regions.add_per_capita(
+        tb=tb, columns=["n_wild_fish_low", "n_wild_fish", "n_wild_fish_high"], warn_on_missing_countries=False
+    )
 
     # Prepare table of fish caught for fishmeal and fish oil.
     # The source gives no midpoint; as in Fishcount's other estimates, take the average of the lower and upper bounds.
@@ -216,7 +215,7 @@ def sanity_check_outputs(tb: Table, tb_fishmeal: Table, first_year_of_country_av
         _tb = table.dropna(subset=[column, f"{column}_high"])
         assert (_tb[column] <= _tb[f"{column}_high"]).all(), error
 
-    # The world total should be between 1 and 3 trillion fish (the source estimates 1.1-2.2 trillion fish on average).
+    # The world total should be between 0.5 and 3 trillion fish (the source estimates 1.0-2.1 trillion fish on average).
     world = tb[tb["country"] == "World"]
     assert list(world["year"]) == list(range(1999, world["year"].max() + 1)), "Expected world totals for every year."
     assert (world["n_wild_fish_low"] > 5e11).all() and (world["n_wild_fish_high"] < 3e12).all(), (
