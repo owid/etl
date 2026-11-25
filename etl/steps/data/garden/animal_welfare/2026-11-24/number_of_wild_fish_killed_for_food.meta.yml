@@ -10,7 +10,7 @@ definitions:
   description_key_fishmeal: &description_key_fishmeal
     - Fishmeal and fish oil are products made by processing fish. They are mostly used as feed on fish and shrimp farms.
     - Fishcount converts the tonnage of fish caught for fishmeal and fish oil, reported by the FAO, into numbers of fish. It uses an average weight of 15 to 33 grams per fish, based on 2010 data.
-    - Fishcount's estimates assume that the mix of species caught each year is the same as in 2010. So they don't capture yearly changes in which species are caught, or the growing share of fish for fishmeal and fish oil that comes from non-selective trawl fisheries in Asia.
+    - Fishcount assumes that the mix of species caught each year is the same as in 2010, even though that mix is only partly known. So the estimates don't capture changes in which species are caught.
     - The FAO's reported tonnage doesn't include all fish caught to make fishmeal and fish oil, because detailed data is hard to get.
   presentation:
     topic_tags:
