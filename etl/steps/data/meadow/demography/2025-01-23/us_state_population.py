@@ -23,7 +23,8 @@ def run() -> None:
     #
     tb["year"] = pd.to_datetime(tb["date"]).dt.year
     tb = tb.drop(columns=["realtime_start", "realtime_end", "date"])
-    tb["value"] += tb["value"] * 1000
+    # Convert from thousands of people to people.
+    tb["value"] *= 1000
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [tb.format(["state", "year"])]
 

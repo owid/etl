@@ -21,7 +21,7 @@ def run() -> None:
     ds_measles_cdc_archive = paths.load_snapshot("cdc_measles")
     # Load in the CDC historical dataset for missing data < 2001
     ds_measles_cdc_historical = paths.load_snapshot("measles_cases")
-    # Load the CDC dataset for 2016-2022
+    # Load the CDC dataset for 2016 onwards (finalized annual counts, then provisional counts for the latest years)
     ds_measles_cdc = paths.load_dataset("measles_state_level", namespace="cdc")
     ds_pop = paths.load_dataset("us_state_population")
 
@@ -32,7 +32,6 @@ def run() -> None:
     tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["cases"] != "NN"].dropna(subset=["cases"])
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
     tb_cdc_state = ds_measles_cdc.read("state_measles")
-    tb_cdc_state["source"] = "CDC WONDER - https://wonder.cdc.gov/controller/datarequest/D130"
     tb_pop = ds_pop.read("us_state_population")
     #
     # Process data.
@@ -83,7 +82,7 @@ def combine_state_tables(tb: Table, tb_cdc_historical: Table, tb_cdc_archive: Ta
     - Project Tycho: 1888-2001 (tb)
     - CDC Historical (from PDFs) <2001
     - CDC archive: 2002-2015 (tb_cdc_archive)
-    - CDC NNDSS: 2016-2022 (tb_cdc_state)
+    - CDC NNDSS: 2016 onwards, finalized from CDC WONDER and provisional from the NNDSS weekly data (tb_cdc_state)
     """
     # Format the Project Tycho data to match the CDC data
     tb = tb[["state", "year", "countvalue", "source"]]

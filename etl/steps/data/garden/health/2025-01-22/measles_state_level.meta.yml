@@ -4,26 +4,42 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
-      attribution: "Public Health Reports (1921-1925); Centers for Disease Control and Prevention (1959-2024); Project Tycho (2018)"
+      attribution: "Public Health Reports (1921-1925); Centers for Disease Control and Prevention (1959-2025); Project Tycho (2018)"
+  description_key_years: &description_key_years
+    - How a case is assigned to a year depends on the source.
+    - From 2024, cases are counted in the year the person's rash began. These figures come from the CDC's Measles Cases and Outbreaks page and are preliminary, so they can still change as health departments finish their investigations.
+    - From 2002 to 2023, cases are counted in the year that state health departments assigned them to when reporting to the CDC's National Notifiable Diseases Surveillance System. Each state chooses which date to use, such as when symptoms began, when the case was diagnosed, or when it was reported, so a case can be counted in a later year than the one in which the person got sick.
+    - Most data before 2002 comes from weekly disease reports compiled by Project Tycho, which count cases in the week they were reported.
+    - The difference matters most when an outbreak spans the turn of the year. For 2025, counting cases by when the rash began gives over 200 more cases than counting them by when they were reported, mostly because of an outbreak in South Carolina that began late in the year.
+  description_processing_sources: &description_processing_sources |-
+    We combined data from Project Tycho and several CDC sources into one series for each state, using finalized CDC counts where they are available. For years without finalized counts, we use the CDC's preliminary counts. Cases in New York City are added to the rest of New York State.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
   title: Reported measles cases in the United States - State Level
-
   owners:
     - Fiona Spooner
+
 tables:
   measles:
     variables:
       case_count:
         title: Reported number of measles cases
         unit: cases
+        description_key: *description_key_years
+        description_processing: *description_processing_sources
       case_rate:
         title: Measles case rate per 100,000 population
         description_short: Number of measles cases per 100,000 population.
         unit: cases per 100,000 population
         processing_level: major
+        description_key: *description_key_years
+        description_processing: |-
+          We combined data from Project Tycho and several CDC sources into one series for each state, using finalized CDC counts where they are available. For years without finalized counts, we use the CDC's preliminary counts. Cases in New York City are added to the rest of New York State.
+
+          We divided the number of cases by each state's population, from US Census Bureau estimates published by FRED, and multiplied by 100,000.
       source:
         title: Source of the data
         unit: ""

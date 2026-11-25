@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    producer: Centers for Disease Control and Prevention
+    title: National Notifiable Diseases Surveillance System (NNDSS) Annual Summary Data
+    description: |-
+      Finalized annual counts of reported measles cases in the United States, by year and reporting area (US regions, states, New York City and US territories). Cases are split into indigenous cases (infected in the United States) and imported cases (infected outside the United States), and a total. New York State figures exclude New York City, which reports separately.
+    date_published: "2025"
+    # Citation
+    citation_full: |-
+      Centers for Disease Control and Prevention. National Notifiable Diseases Surveillance System (NNDSS) Annual Summary Data for years 2016-2023, United States, CDC WONDER online database.
+    attribution_short: CDC
+    # Files
+    url_main: https://wonder.cdc.gov/nndss-annual-summary.html
+    url_download: https://wonder.cdc.gov/controller/saved/D130/D422F203
+    date_accessed: 2026-11-06
+    # License
+    license:
+      name: Public domain
+      url: https://wonder.cdc.gov/wonder/help/faq.html#8
+outs:
+  - md5: 46a7c68d227205f03abb961733321c6d
+    size: 63868
+    path: measles_state_level.csv
