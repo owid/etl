@@ -25,5 +25,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new grapher dataset.
-    dataset = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    dataset = paths.create_dataset(tables=[tb])
     dataset.save()
