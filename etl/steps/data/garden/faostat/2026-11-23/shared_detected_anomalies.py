@@ -878,9 +878,43 @@ class SpuriousZerosInFertilizerRatiosAnomaly(DataAnomaly):
         return tb[~self._spurious_zeros(tb)].reset_index(drop=True)
 
 
+class JapanFertilizerUseFrom2021Anomaly(DataAnomaly):
+    description = "* In FAOSTAT's latest release, Japan's use of nitrogen and phosphate fertilizers drops abruptly in 2021, by about 90% in one year for phosphate. FAOSTAT's previous release, and independent estimates such as the OECD's nutrient balances, show values much closer to those of earlier years. We removed Japan's nitrogen and phosphate data from 2021 onward.\n"
+
+    # Nitrogen and phosphate.
+    affected_item_codes = ["00003102", "00003103"]
+    # Agricultural use, and the ratios FAOSTAT derives from it (use per area of cropland, per capita, and per value of
+    # agricultural production).
+    affected_element_codes = ["005157", "005159", "005172", "005173"]
+    affected_countries = ["Japan"]
+    first_affected_year = 2021
+
+    def _affected_rows(self, tb):
+        return (
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"] >= self.first_affected_year)
+        )
+
+    def check(self, tb):
+        phosphate_use = tb[
+            (tb["country"] == "Japan") & (tb["item_code"] == "00003103") & (tb["element_code"] == "005157")
+        ].set_index("year")["value"]
+        error = "Japan's phosphate use no longer drops abruptly in 2021. Remove this anomaly."
+        assert phosphate_use.loc[2021] < 0.2 * phosphate_use.loc[2020], error
+
+    def inspect(self, tb):
+        pass
+
+    def fix(self, tb):
+        return tb[~self._affected_rows(tb)].reset_index(drop=True)
+
+
 detected_anomalies = {
     "faostat_rfn": [
         SpuriousZerosInFertilizerRatiosAnomaly,
+        JapanFertilizerUseFrom2021Anomaly,
     ],
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
