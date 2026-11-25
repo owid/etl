@@ -217,6 +217,14 @@ def run() -> None:
                 for animal, name in CHICKEN_BAR_NAMES.items():
                     if f"__animal_{animal}__" in indicator.catalogPath:
                         indicator.display["name"] = name
+            # NOTE: A data page lists only the sources of the first indicator of its view (chickens), so list those of
+            # all indicators, once each (some come in several snapshots of the same data product).
+            # Remove this once https://github.com/owid/owid-grapher/issues/7626 is fixed.
+            origins = {}
+            for indicator in view.indicators.y:
+                for origin in tb[indicator.catalogPath.split("#")[-1]].metadata.origins:
+                    origins.setdefault((origin.producer, origin.title), origin)
+            view.metadata = {**(view.metadata or {}), "origins": [origin.to_dict() for origin in origins.values()]}
 
     # Remove the views that are only needed to build the others: land and aquatic animals based on consumption (which has
     # no fish or eggs), and other land animals on their own.
