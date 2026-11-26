@@ -110,6 +110,7 @@ Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.d
 
 - **`docs.google.com` 200 ≠ publicly viewable.** Google Sheets/Docs links return HTTP 200 even when they're behind a permission wall (the 200 is the "request access"/sign-in page). When a user-facing `description_key`/`description_processing` links a Google Sheet, confirm real public access with `WebFetch` (ask whether the page shows data or a "you need access"/sign-in wall) — curl status alone will pass a private sheet.
 - **Cross-check the same sheet is cited consistently.** If a dataset links a "source per data point" sheet from more than one field, verify they're the *same* sheet ID — divergent IDs (one current, one stale) is a 🟡.
+- **Chart-config links are links too.** Read `relatedQuestions` and the links in `note` and `subtitle` of the dataset's published charts on the branch's staging server (`/update-dataset` § 6c, "Links in chart configs"). A link whose target isn't the chart its text describes is 🟡.
 - **HTTP 200 ≠ anchor exists.** For URLs carrying a `#fragment`, run the anchor pass from `/update-dataset` § 6c: the fragment must match an `id`/`name` attribute in the page HTML (skip non-DOM fragments: any fragment containing `=` or `/` — text fragments, `gid=`, `page=`, hash routes like FAOSTAT's `#data/FBS` — plus `#!` hashbangs). Rule out client-side rendering and Cloudflare challenge bodies (WebFetch de-slugged-heading check) before flagging. A confirmed missing anchor on an otherwise-working page is 🟡 — the page loads, the reader just lands at the top; escalate to 🔴 only if the linked section genuinely no longer exists and the link's claim depends on it.
 
 ### 7. Code clarity & docs
@@ -251,7 +252,8 @@ When the PR body (or `workbench/<short_name>/update-context.yml`) does reference
 ### 10c. Referencing-prose check
 
 `/update-dataset` step 7 asks the author to read the prose of every surface citing the dataset — articles, data
-insights, and especially titles — for quantitative claims the update invalidates. As reviewer, check the PR body
+insights, and especially titles — in full, for any claim the update invalidates, numeric or not, and for embed and
+link parameters that no longer fit the chart as it now is. As reviewer, check the PR body
 records an outcome for it: either a clean verdict, or a named list of claims with what was decided (handed to
 content, or deliberately left with a reason). A clean verdict has to say three things to be acceptable: **what was
 checked** — no unbounded claim, and, on an update that revised any named period (a restatement, a corrected date),
