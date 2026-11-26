@@ -122,8 +122,13 @@ steps:
   # Animal welfare laws.
   viz://chart/animal_welfare/latest/animal_welfare_laws:
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
-    - data://grapher/animal_welfare/2026-07-01/fur_laws
-    # Bullfighting laws (various sources), with the status of each country in each year.
+    # Fur laws (Fur Free Alliance).
+    - data://grapher/animal_welfare/2026-11-26/fur_laws:
+      - data://garden/animal_welfare/2026-11-26/fur_laws:
+        - data://meadow/animal_welfare/2026-11-26/fur_laws:
+          - snapshot://animal_welfare/2026-11-26/fur_laws.csv
+        - data://garden/regions/2023-01-01/regions
+    # Bullfighting laws (various sources).
     - data://grapher/animal_welfare/2026-11-26/bullfighting_laws:
       - data://garden/animal_welfare/2026-11-26/bullfighting_laws:
         - data://meadow/animal_welfare/2026-11-26/bullfighting_laws:
