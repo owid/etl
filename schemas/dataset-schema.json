@@ -711,7 +711,7 @@
                   "requirement_level": "optional",
                   "guidelines": [
                     [
-                      "Start `text` with a capital letter and end it with a period, even when it is short."
+                      "Start `text` with a capital letter and end it with a period, even when it is short. The exception is a note on some `entities` with no `time`: charts show it next to the entity's name, like a label, so it takes no period."
                     ],
                     [
                       "Don't repeat `time` or `time_end` in `text`: charts already show them next to the note."

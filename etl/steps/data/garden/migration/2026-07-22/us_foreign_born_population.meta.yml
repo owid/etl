@@ -219,9 +219,9 @@ tables:
           numDecimalPlaces: 0
         annotations:
           - entities: [Korea]
-            text: Includes North & South.
+            text: Includes North & South
           - entities: [Czechoslovakia]
-            text: Includes Czechia & Slovakia.
+            text: Includes Czechia & Slovakia
 
   share_by_origin_group:
     variables:
