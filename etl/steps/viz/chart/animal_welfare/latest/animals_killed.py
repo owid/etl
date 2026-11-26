@@ -81,10 +81,7 @@ SUBTITLES = {
     "animals_killed": "Based on the country of production, not consumption.",
     "animals_killed_for_consumption": "Based on the country of consumption, not production.",
 }
-SUBTITLE_FISHMEAL_AND_FISH_OIL = (
-    "Fishmeal and fish oil are mostly used as feed on fish and shrimp farms. These fish are also included in the number"
-    " of wild-caught fish."
-)
+SUBTITLE_FISHMEAL_AND_FISH_OIL = "Fishmeal and fish oil are mostly used as feed on fish and shrimp farms."
 # Text of the data pages of the stacked view and the bar chart. Otherwise, a data page shows the text of the first
 # indicator of its view (here, chickens). The stacked view has the key points of the view of all land animals.
 DESCRIPTION_KEYS_STACKED = {

@@ -74,7 +74,7 @@ tables:
       wild_caught_fish_for_fishmeal_and_fish_oil:
         title: &title_wild_caught_fish_for_fishmeal_and_fish_oil |-
           Wild fish caught for fishmeal and fish oil<% if estimate == "upper_limit" %> (upper limit)<% elif estimate == "lower_limit" %> (lower limit)<% endif %>
-        description_short: Fishmeal and fish oil are mostly used as feed on fish and shrimp farms. These fish are also included in the number of wild-caught fish.
+        description_short: Fishmeal and fish oil are mostly used as feed on fish and shrimp farms.
         display: *display_estimates
         presentation:
           title_public: *title_wild_caught_fish_for_fishmeal_and_fish_oil
