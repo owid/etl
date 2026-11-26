@@ -438,7 +438,6 @@ Hand the user the exact `etlr` command — don't run it yourself.
 
 Full-YAML (each view hand-listed):
 
-- `etl/steps/viz/explorer/food/latest/food_footprints.{py,config.yml}` — hybrid (16 grapher-chart views + 29 CSV-backed views) showing dimension-filtered `common_views` for differing `sourceDesc` per view-type.
 - `etl/steps/viz/explorer/emissions/latest/ipcc_scenarios.{py,config.yml}` — moderate-size YAML-driven.
 
 Table-driven (views auto-expanded from a dimensional table):
