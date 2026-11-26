@@ -108,7 +108,8 @@ def run() -> None:
     paths.log.info(
         f"Domains with less than 20 notable systems that were reclassified to 'Other': {', '.join(reclassified_domains)}"
     )
-    # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
+    # Keep training compute in FLOP, as Epoch AI publishes it, and also in petaFLOP for the regression datasets.
+    tb["training_compute_flop"] = tb["training_compute__flop"].copy()
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
 
     # Classify each model's training compute as reported by the developer or estimated by Epoch AI.

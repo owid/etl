@@ -10,7 +10,7 @@ meta:
     description: |-
       Epoch AI tracks over 3,700 machine learning models, from the 1950s to today. For each model, it records details such as the publication date, the developer, the number of parameters, the size of the training data, and the amount of computation used to train it.
 
-      Epoch AI also records how it found each model's training compute. Sometimes the developers report it. Otherwise, Epoch AI estimates it from what is known about the model, such as its size and training data, the hardware it was trained on and for how long, its training cost, or its benchmark scores.
+      Epoch AI also records how it found each model’s training compute. Sometimes the developers report it. Otherwise, Epoch AI estimates it from what is known about the model, such as its size and training data, the hardware it was trained on and for how long, its training cost, or its benchmark scores.
 
     # Citation
     producer: Epoch AI

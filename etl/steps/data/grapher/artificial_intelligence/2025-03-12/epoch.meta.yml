@@ -9,6 +9,8 @@ definitions:
 tables:
   epoch:
     variables:
+      training_compute_flop:
+        unit: FLOP
       max_compute:
         title: Maximum compute
       max_data:

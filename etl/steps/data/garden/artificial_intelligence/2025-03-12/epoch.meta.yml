@@ -65,15 +65,21 @@ tables:
           zeroDay: '1949-01-01'
           timeInterval: day
 
+      training_compute_flop:
+        title: Training computation
+        unit: FLOP
+        short_unit: ''
+        description_short: Total number of [floating-point operations](#dod:flop) used to train an AI model.
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          timeInterval: day
+
       training_computation_petaflop:
         title: Training computation (petaFLOP)
         unit: 'petaFLOP'
-        description_short: Computation is measured in total petaFLOP, which is 10¹⁵ [floating-point operations](#dod:flop) estimated from AI literature, albeit with some uncertainty.
-        description_key:
-          - In the context of artificial intelligence (AI), training computation is predominantly measured using floating-point operations or “FLOP”. One FLOP represents a single arithmetic operation involving floating-point numbers, such as addition, subtraction, multiplication, or division. To adapt to the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly used. One petaFLOP stands as a staggering one quadrillion FLOPs, underscoring the magnitude of computational operations within AI.
-          - Modern AI systems are rooted in machine learning and deep learning techniques. These methodologies are notorious for their computational intensity, involving complex mathematical processes and algorithms. During the training phase, AI models process large volumes of data, while continuously adapting and refining their parameters to optimize performance, rendering the training process computationally intensive.
-          - Many factors influence the magnitude of training computation within AI systems. Notably, the size of the dataset employed for training significantly impacts the computational load. Larger datasets necessitate more processing power. The complexity of the model's architecture also plays a pivotal role; more intricate models lead to more computations. Parallel processing, involving the simultaneous use of multiple processors, also has a substantial effect. Beyond these factors, specific design choices and other variables further contribute to the complexity and scale of training computation within AI.
-        description_processing: Training computation was converted from its original measurement in FLOPs (floating-point operations) to a more manageable unit known as petaFLOPs. This conversion is performed by dividing the original training compute value by 1e15, which represents one quadrillion (10^15). The purpose of this conversion is to provide a more human-readable and practical representation of the immense computational efforts involved in training AI systems. By expressing the training computation in petaFLOPs, it becomes easier to grasp the scale and magnitude of the computational resources required for training these systems, especially when dealing with large datasets and complex architectures.
+        description_short: Total number of [floating-point operations](#dod:flop) used to train an AI model, in petaFLOP. One petaFLOP is 10¹⁵ (1 quadrillion) FLOP.
+        description_processing: We converted Epoch AI’s training compute from FLOP to petaFLOP by dividing it by 10¹⁵.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
@@ -90,7 +96,7 @@ tables:
         description_from_producer: |-
           Indicates how the quantity of training compute was found or estimated. Options include: "Reported", when the developers report how much training compute was used. "Operation counting", when the parameters, training data, and/or architecture are known, and these are used to estimate the number of operations performed while training. "Hardware", when the training time and/or hardware type are known, allowing an estimate based on the rate of computation. "Cost", when the training cost is known and the compute is estimated through the hardware usage budget. "Benchmarks", when the model's training compute was estimated using its benchmark performance.
         description_processing: |-
-          Epoch AI lists one or more methods for how it found each model's training compute. We count a model as "Reported by the developer" when one of them is "Reported", and as "Estimated by Epoch AI" otherwise, including the few models whose method Epoch AI has not recorded yet. Models without a training compute figure have no value.
+          Epoch AI lists one or more methods for how it found each model’s training compute. We count a model as “Reported by the developer” when one of them is “Reported”, and as “Estimated by Epoch AI” otherwise, including the few models whose method Epoch AI has not recorded yet. Models without a training compute figure have no value.
         display:
           zeroDay: '1949-01-01'
           timeInterval: day

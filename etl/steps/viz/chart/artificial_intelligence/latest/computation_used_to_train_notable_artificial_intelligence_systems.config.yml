@@ -8,18 +8,13 @@ views:
   - dimensions: {}
     indicators:
       y:
-        - catalogPath: "epoch#training_computation_petaflop"
-          # Show FLOP rather than the indicator's petaFLOP; the axis label already names the unit, so ticks don't repeat it.
-          display:
-            conversionFactor: 1000000000000000
-            unit: "FLOP"
-            shortUnit: ""
+        - catalogPath: "epoch#training_compute_flop"
       color:
         catalogPath: "epoch#training_compute_reporting"
     config:
       title: "Computation used to train notable AI models"
       subtitle: "Each dot is a notable AI model, placed by its publication date and the computation used to train it. Colors show whether its training compute was directly reported by the developer or indirectly estimated by Epoch AI."
-      note: "One FLOP (floating-point operation) is a single calculation, such as adding or multiplying two decimal numbers. Where developers do not report it, Epoch AI estimates training compute from a model's size, training data, hardware or cost; the least-documented estimates may be off by a factor of about 30. About half of notable models have no compute figure and are not shown."
+      note: "One floating-point operation (FLOP) is a single calculation, such as adding or multiplying two decimal numbers. Where developers do not report it, Epoch AI estimates training compute from a model’s size, training data, hardware, or cost; the least-documented estimates may be off by a factor of about 30. About half of notable models have no compute figure and are not shown."
       xAxis:
         label: "Publication date"
       yAxis:
