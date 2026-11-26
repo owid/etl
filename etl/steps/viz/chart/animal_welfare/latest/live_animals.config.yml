@@ -47,13 +47,16 @@ dimensions:
         name: Camels
         group: Land animals
       - slug: cattle
-        name: Cattle
+        name: Cattle (all)
         group: Land animals
       - slug: milk_cattle
-        name: Cattle used for milk
+        name: Cattle (milk cows)
         group: Land animals
       - slug: chickens
-        name: Chickens
+        name: Chickens (all)
+        group: Land animals
+      - slug: laying_hens
+        name: Chickens (laying hens)
         group: Land animals
       - slug: donkeys
         name: Donkeys
@@ -69,9 +72,6 @@ dimensions:
         group: Land animals
       - slug: horses
         name: Horses
-        group: Land animals
-      - slug: laying_hens
-        name: Laying hens
         group: Land animals
       - slug: mules
         name: Mules
