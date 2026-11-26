@@ -1,0 +1,44 @@
+chart_config_id: 019c1dc6-4af4-77b6-b419-2abba0375370
+grapher_schema: "012"
+slug: ai-frontiermath-over-time
+topic_tags:
+  - Artificial Intelligence
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "epoch_benchmark_data#mean_score"
+          display:
+            name: "Share of problems solved correctly by each model"
+            zeroDay: "2024-06-20"
+    config:
+      note: "This chart shows performance on Tiers 1-3 of the FrontierMath benchmark (295 problems)."
+      title: "Share of FrontierMath problems solved correctly by AI models"
+      yAxis:
+        max: 100
+        min: 0
+        canChangeScaleType: true
+      minTime: 1612
+      subtitle: "The FrontierMath benchmark tests AI models on research-level mathematics problems that take expert mathematicians hours or days to solve."
+      originUrl: "/artificial-intelligence"
+      chartTypes:
+        - "ScatterPlot"
+      hideTimeline: true
+      addCountryMode: "disabled"
+      selectedEntityNames:
+        - "o1 (Dec 2024), high"
+        - "o4-mini (Apr 2025), high"
+        - "GPT-5 (Aug 2025), high"
+        - "GPT-5.2 (Dec 2025), xhigh"
+        - "GPT-6 Astra, max"
+        - "Claude Opus 4.8, max"
+        - "Claude Fable 5.1, max"
+        - "Gemini 3.1 Pro"
+        - "Claude Opus 4.1 (Aug 2025), 32K"
+        - "Kimi K3, max"
+        - "GPT-4o (Aug 2024)"
+        - "Qwen3.7-Max"
+      hideAnnotationFieldsInTitle:
+        time: true
+        entity: true

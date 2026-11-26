@@ -23,9 +23,9 @@ def run() -> None:
     # Extract the benchmark table from the zip file.
     with snap.extracted() as archive:
         tb = archive.read(BENCHMARK_FILE, safe_types=False)
-        # Epoch's model registry ships in the same archive and maps every model version string used across
-        # its benchmark files to a curated human-readable name.
-        tb_registry = archive.read("epoch_capabilities_index.csv", safe_types=False)
+        # Epoch's model metadata ships in the same archive and maps every model version string used across
+        # its benchmark files to a curated human-readable name ("model_group").
+        tb_registry = archive.read("model_metadata.csv", safe_types=False)
         # The archive also indexes its own benchmarks, marking retired ones in "superseded_by". Reading a
         # superseded file is how this chart silently stopped gaining models for three months, so refuse to.
         tb_benchmarks = archive.read("benchmark_metadata.csv", safe_types=False)
@@ -50,14 +50,16 @@ def run() -> None:
 
     tb = tb.format(["release_date", "model_version"])
 
-    # Keep only the name; the registry's "Display name" column is populated for about half its rows, so it
-    # cannot be relied on to name every model.
+    # Keep only the name; the "display_name" column is populated for a minority of rows, so it cannot be
+    # relied on to name every model.
     tb_registry = tb_registry.reset_index(drop=True)
-    tb_registry = tb_registry[["Model version", "Model name"]]
-    # Epoch repeats a registry row outright now and then (deepseek-r1-0528-qwen3-8b, from 2026-09-01), which
-    # would break the index below. Deduplicating after narrowing to the two columns we read means only rows
-    # indistinguishable in the data we use get collapsed: one version carrying two different names still
-    # reaches format() twice and fails there, as it should.
+    tb_registry = tb_registry[["model_version", "model_group"]].rename(columns={"model_group": "model_name"})
+    # Some rows name a model group but no model version; they can't be matched to a benchmark row.
+    tb_registry = tb_registry.dropna(subset=["model_version"])
+    # Epoch lists some versions twice with different dates (deepseek-r1-0528-qwen3-8b), which would break the
+    # index below. Deduplicating after narrowing to the two columns we read means only rows indistinguishable
+    # in the data we use get collapsed: one version carrying two different names still reaches format()
+    # twice and fails there, as it should.
     tb_registry = tb_registry.drop_duplicates()
     # Every table read from an archive is named after the snapshot, so the second one needs an explicit
     # short name to avoid clashing with the benchmark table.
