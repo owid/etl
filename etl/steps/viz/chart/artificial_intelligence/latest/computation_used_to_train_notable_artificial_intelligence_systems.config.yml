@@ -9,11 +9,11 @@ views:
     indicators:
       y:
         - catalogPath: "epoch#training_computation_petaflop"
-          # Show FLOP rather than the indicator's petaFLOP.
+          # Show FLOP rather than the indicator's petaFLOP; the axis label already names the unit, so ticks don't repeat it.
           display:
             conversionFactor: 1000000000000000
             unit: "FLOP"
-            shortUnit: "FLOP"
+            shortUnit: ""
       color:
         catalogPath: "epoch#training_compute_reporting"
     config:
