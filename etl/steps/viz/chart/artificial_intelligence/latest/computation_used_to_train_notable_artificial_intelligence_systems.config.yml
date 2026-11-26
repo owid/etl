@@ -9,40 +9,35 @@ views:
     indicators:
       y:
         - catalogPath: "epoch#training_computation_petaflop"
+          # Show FLOP rather than the indicator's petaFLOP.
+          display:
+            conversionFactor: 1000000000000000
+            unit: "FLOP"
+            shortUnit: "FLOP"
+      color:
+        catalogPath: "epoch#training_compute_reporting"
     config:
-      note: ""
-      title: "Computation used to train notable artificial intelligence systems"
+      title: "Computation used to train notable AI models"
+      subtitle: "Each dot is a notable AI model, placed by its publication date and the computation used to train it. Colors show whether its training compute was directly reported by the developer or indirectly estimated by Epoch AI."
+      note: "One FLOP (floating-point operation) is a single calculation, such as adding or multiplying two decimal numbers. Where developers do not report it, Epoch AI estimates training compute from a model's size, training data, hardware or cost; the least-documented estimates may be off by a factor of about 30. About half of notable models have no compute figure and are not shown."
       xAxis:
         label: "Publication date"
       yAxis:
-        max: 500000000000
+        label: "Training compute (FLOP)"
         scaleType: "log"
         canChangeScaleType: true
-      subtitle: "Computation is measured in total petaFLOP, which is 10¹⁵ [floating-point operations](#dod:flop). Estimated from AI literature, albeit with some uncertainty. Estimates are expected to be accurate within a factor of 2, or a factor of 5 for recent undisclosed models like GPT-4."
       originUrl: "/artificial-intelligence"
       chartTypes:
         - "ScatterPlot"
       colorScale:
-        baseColorScheme: "OwidCategoricalB"
-        binningStrategy: "manual"
-        legendDescription: "Domain"
         customCategoryColors:
-          Other: "#6e7581"
-          Maximum compute: "#d73c50"
-        customCategoryLabels:
-          games: "Games"
-          speech: "Speech"
-          vision: "Vision"
-          No data: "Other"
-          driving: "Driving"
-          general: "General"
-          language: "Language"
-      entityType: "system"
-      entityTypePlural: "systems"
+          Reported by the developer: "#4C6A9C"
+          Estimated by Epoch AI: "#996D36"
+      entityType: "model"
+      entityTypePlural: "models"
       hideScatterLabels: true
+      # Rows the grapher step adds for the yearly records, which aren't models.
       excludedEntityNames:
-        - "East Asia and the Pacific (UNWTO)"
-        - "Other (UNWTO)"
         - "Maximum data"
         - "Maximum parameters"
         - "Maximum compute"
