@@ -236,6 +236,22 @@ unused-ignore-comment = "ignore"
 call-top-callable = "ignore"
 possibly-missing-submodule = "ignore"
 
+# `make check` skips ETL steps and snapshots, but editors type-check every open file. In those files, silence the rules
+# that mostly flag pandas and Table typing quirks, and keep the ones that catch real bugs (e.g. undefined names).
+[[tool.ty.overrides]]
+include = ["etl/steps/**", "snapshots/**"]
+
+[tool.ty.overrides.rules]
+unresolved-attribute = "ignore"
+invalid-return-type = "ignore"
+invalid-assignment = "ignore"
+call-non-callable = "ignore"
+unresolved-import = "ignore"
+unknown-argument = "ignore"
+unsupported-operator = "ignore"
+not-subscriptable = "ignore"
+not-iterable = "ignore"
+
 [tool.owl]
 steps-dir = "owl_steps"
 snapshots-dir = "data/snapshots"
