@@ -19,7 +19,7 @@ dimensions:
   - slug: pollutant
     name: Pollutant
     presentation:
-      type: dropdown
+      type: dropdown-with-search
     choices:
       - slug: all_pollutants
         name: All pollutants
@@ -44,7 +44,7 @@ dimensions:
   - slug: sector
     name: Sector
     presentation:
-      type: dropdown
+      type: dropdown-with-search
     choices:
       - slug: all_sectors
         name: All sectors (total)
