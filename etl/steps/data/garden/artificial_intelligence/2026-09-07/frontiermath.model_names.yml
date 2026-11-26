@@ -1,6 +1,6 @@
 # Model names we set ourselves, keyed on Epoch's "Model version" string.
 #
-# Names normally come from Epoch's own model registry (`epoch_capabilities_index.csv`, shipped in the same
+# Names normally come from Epoch's own model registry (`model_metadata.csv`, shipped in the same
 # snapshot archive as the benchmark). Add an entry here only when that registry cannot tell two models
 # apart, or when the name it gives is unusable in a chart. The step asserts that no two models end up with
 # the same name, so a new clash fails the build instead of quietly merging them into one entity.

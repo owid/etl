@@ -22,9 +22,10 @@ tables:
         title: Domain
         unit: ''
         short_unit: ''
-        description_short: Refers to the specific area, application, or field in which an AI model is designed to operate.
+        description_short: Broad area of machine learning that an AI model is designed for, such as language, vision, or games.
+        description_from_producer: The machine learning domain(s) of application associated with the model. This is fairly high-level, for example “Language” incorporates many different ML tasks.
         description_processing: |-
-          In cases where multiple domains were associated with a model, we consolidated these entries under the label "Multiple domains". We also identified domains associated with fewer than 20 notable systems and grouped these under the category 'Other'.
+          We group models that Epoch AI lists under several domains as “Multiple domains”, and domains with fewer than 20 notable models as “Other”.
         display:
           zeroDay: '1949-01-01'
           timeInterval: day
@@ -33,14 +34,17 @@ tables:
         title: Researcher affiliation
         unit: ''
         short_unit: ''
-        description_short: Describes the sector where the authors of an AI model have their primary affiliations.
+        description_short: Type of organization that the authors of an AI model work for, such as companies or universities.
         description_from_producer: |-
-          Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
+          Categorization of the organization(s), automatically populated from the Organization entry. Models are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
+        description_processing: |-
+          When Epoch AI lists several types of organization for a model, we combine them, as in “Academia and industry collaboration”. Combinations with fewer than 20 notable models are grouped as “Other”, and models with no type listed as “Not specified”.
 
       parameters:
         title: Number of parameters
         unit: ''
-        description_short: Total number of learnable variables or weights that the model contains. Parameters are adjusted during the training process to optimize the model's performance.
+        description_short: Number of values, also called weights, that an AI model adjusts during training to learn from its data.
+        description_from_producer: Number of learnable parameters in the model. For neural networks, these are the weights and biases.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
@@ -48,8 +52,8 @@ tables:
 
       training_dataset_size__total:
         title: Training dataset size
-        unit: 'unique datapoints'
-        description_short: Number of unique data points used to train the model. Each domain has a specific data point unit; for example, for vision it is images, for language it is words, and for games it is timesteps. This means systems can only be compared directly within the same domain.
+        unit: 'data points'
+        description_short: Number of data points used to train an AI model. What counts as a data point depends on the domain, such as words or tokens of text, images, or moves in a game, so compare models only within the same domain.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'

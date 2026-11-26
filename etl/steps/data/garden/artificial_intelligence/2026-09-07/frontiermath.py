@@ -1,8 +1,8 @@
 """Process FrontierMath benchmark data for garden step.
 
 Entities are individual model evaluations, named from Epoch's own model registry rather than parsed out of
-its version strings. The registry (`epoch_capabilities_index.csv`) travels in the same snapshot archive as
-the benchmark itself and covers every model version Epoch publishes a benchmark score for.
+its version strings. The registry (`model_metadata.csv`) travels in the same snapshot archive as the
+benchmark itself and covers every model version Epoch publishes a benchmark score for.
 """
 
 import re

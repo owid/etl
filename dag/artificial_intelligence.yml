@@ -8,6 +8,11 @@ steps:
     - data://garden/artificial_intelligence/2026-09-07/frontiermath:
       - data://meadow/artificial_intelligence/2026-09-07/frontiermath:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
+  #
+  # FrontierMath scores over time — chart authored in ETL.
+  #
+  viz://chart/artificial_intelligence/latest/ai_frontiermath_over_time:
+    - data://grapher/artificial_intelligence/2026-09-07/frontiermath
 
   # Stack Overflow Developer Survey – AI tool usage
   data://grapher/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
