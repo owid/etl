@@ -33,9 +33,9 @@ steps:
 
   # Emissions - Air pollution explorer
   viz://explorer/emissions/latest/air_pollution:
-    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+    - data://grapher/emissions/2026-11-23/ceds_air_pollutants
   viz://chart/emissions/latest/air_pollution:
-    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+    - data://grapher/emissions/2026-11-23/ceds_air_pollutants
 
   # CO₂ and greenhouse gas emissions explorer.
   viz://explorer/emissions/latest/co2:
@@ -173,3 +173,14 @@ steps:
     - data://garden/rff/2026-06-10/emissions_weighted_carbon_price:
       - data://meadow/rff/2026-06-10/emissions_weighted_carbon_price:
         - snapshot://rff/2026-06-10/emissions_weighted_carbon_price.zip
+
+  # Hoesly et al. (2025): CEDS air pollutants
+  data://grapher/emissions/2026-11-23/ceds_air_pollutants:
+    - data://garden/emissions/2026-11-23/ceds_air_pollutants:
+      - data://meadow/emissions/2026-11-23/ceds_air_pollutants:
+        - snapshot://emissions/2026-11-23/ceds_air_pollutants__detailed.zip
+        - snapshot://emissions/2026-11-23/ceds_air_pollutants__bunkers.zip
+        - snapshot://emissions/2026-11-23/ceds_air_pollutants__extension.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
