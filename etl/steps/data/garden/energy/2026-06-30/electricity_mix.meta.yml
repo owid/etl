@@ -42,6 +42,8 @@ definitions:
         {definitions.description_processing_only_ember_origins}
       display:
         name: Bioenergy
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from bioenergy
     bioenergy_share_of_electricity__pct: &bioenergy_share_of_electricity__pct
@@ -75,6 +77,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Coal
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from coal
     coal_share_of_electricity__pct:
@@ -94,6 +98,8 @@ definitions:
         Electricity generation from coal, oil, and gas, measured in [terawatt-hours](#dod:watt-hours).
       display:
         name: Fossil fuels
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from fossil fuels
     fossil_share_of_electricity__pct:
@@ -113,6 +119,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Gas
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from gas
     gas_share_of_electricity__pct:
@@ -131,6 +139,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Hydropower
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from hydropower
     hydro_share_of_electricity__pct:
@@ -150,6 +160,8 @@ definitions:
         Measured in [terawatt-hours](#dod:watt-hours). Low-carbon sources correspond to renewables and nuclear power, that produce significantly less [greenhouse-gas emissions](#dod:ghgemissions) than fossil fuels. Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.
       display:
         name: Low-carbon
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from low-carbon sources
     low_carbon_share_of_electricity__pct:
@@ -179,6 +191,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Nuclear
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from nuclear
     nuclear_share_of_electricity__pct:
@@ -197,6 +211,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Oil
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from oil
     oil_share_of_electricity__pct:
@@ -217,6 +233,8 @@ definitions:
         {definitions.description_processing_only_ember_origins}
       display:
         name: Other renewables excluding bioenergy
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from other renewables, excluding bioenergy
     other_renewables_excluding_bioenergy_share_of_electricity__pct: &other_renewables_excluding_bioenergy_share_of_electricity__pct
@@ -235,6 +253,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Other renewables including bioenergy
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from other renewables, including bioenergy
     other_renewables_including_bioenergy_share_of_electricity__pct:
@@ -256,6 +276,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Other renewables
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from other renewables
     per_capita_other_renewables_generation__kwh: &per_capita_other_renewables_generation__kwh
@@ -279,6 +301,8 @@ definitions:
         {definitions.description_processing_only_ember_origins}
       display:
         name: Bioenergy
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from bioenergy
     per_capita_bioenergy_stacked_generation__kwh: &per_capita_bioenergy_stacked_generation__kwh
@@ -504,6 +528,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Renewables
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from renewables
     renewable_share_of_electricity__pct:
@@ -523,6 +549,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Solar
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from solar power
     solar_and_wind_generation__twh:
@@ -532,6 +560,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Solar and wind
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from solar and wind power
     solar_share_of_electricity__pct:
@@ -561,6 +591,8 @@ definitions:
         {definitions.description_processing_only_ember_origins}
       display:
         name: Electricity demand
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity demand
         # This indicator comes from Ember alone (it is not combined with any other source).
@@ -586,6 +618,8 @@ definitions:
         Total electricity generated in each country or region, measured in [terawatt-hours](#dod:watt-hours).
       display:
         name: Total electricity
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Total electricity generation
     total_net_imports__twh:
@@ -598,6 +632,8 @@ definitions:
         {definitions.description_processing_only_ember_origins}
       display:
         name: Net imports
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Net electricity imports
     wind_generation__twh:
@@ -607,6 +643,8 @@ definitions:
       description_short: *description_short_twh
       display:
         name: Wind
+        roundingMode: significantFigures
+        numSignificantFigures: 3
       presentation:
         title_public: Electricity generation from wind power
     wind_share_of_electricity__pct:
@@ -691,6 +729,8 @@ tables:
           - Data from 2000 onwards comes from Ember. For the United Kingdom, earlier data (from 1920) comes from the UK's Department for Business, Energy & Industrial Strategy (BEIS).
         display:
           name: Net imports
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: Net electricity imports
       population:
