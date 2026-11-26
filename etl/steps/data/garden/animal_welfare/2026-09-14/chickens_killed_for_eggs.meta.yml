@@ -64,14 +64,16 @@ tables:
         unit: hens per person
         short_unit: ""
         display:
-          numDecimalPlaces: 2
+          roundingMode: significantFigures
+          numSignificantFigures: 2
       male_chickens_killed_per_capita:
         title: Estimated number of male chickens killed in egg production per person
         description_processing: *description_processing_killed
         unit: chickens per person
         short_unit: ""
         display:
-          numDecimalPlaces: 2
+          roundingMode: significantFigures
+          numSignificantFigures: 2
       chickens_killed_per_capita:
         title: Estimated number of chickens killed in egg production per person
         description_short: *description_short_killed
@@ -79,4 +81,5 @@ tables:
         unit: chickens per person
         short_unit: ""
         display:
-          numDecimalPlaces: 2
+          roundingMode: significantFigures
+          numSignificantFigures: 2
