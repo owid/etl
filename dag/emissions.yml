@@ -31,9 +31,7 @@ steps:
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
 
-  # Emissions - Air pollution explorer
-  viz://explorer/emissions/latest/air_pollution:
-    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+  # Emissions - Air pollution data explorer (a multidim)
   viz://chart/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
 
