@@ -288,10 +288,13 @@ archives the explorer and any data only it used, following CLAUDE.md's archive r
 3. Delete the explorer's `.py` and `.config.yml`, and the files of the archived datasets. Commit.
 4. Delete orphaned backport mirrors in `snapshots/backport/latest/` of the grapher dataset the
    explorer used before it moved into ETL, if that dataset is archived in the DB and no chart uses
-   its variables (`chart_dimensions`). Commit.
+   its variables (`chart_dimensions`), and no file in the repo still reads it (`git grep` the file name: a snapshot script can load a mirror to build a live dataset). Commit.
 
 Then tick the explorer in owid/etl#6014, pointing the line at `/grapher/<slug>` and the PRs, and
-rebuild the review page with `--stage retire`.
+rebuild the review page with `--stage retire`. Then refresh the count of links the migrations
+corrected (old explorer links that showed the wrong view): run
+`scripts/link_repairs_report.py --root ai` from the worktree whose `ai/` links every review folder,
+and republish `ai/link_repairs_report.html` to the same report page, so its link stays the same.
 
 ## Report
 
