@@ -4,6 +4,8 @@
 # `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
+grapher_schema: "012"
+
 definitions:
   # Legend & colors
   display_c_aut: &display_c_aut
@@ -51,13 +53,13 @@ dimensions:
       type: dropdown
     choices:
       - slug: political_regime
-        name: "­Political regime"
+        name: "Political regime"
       - slug: electoral_democracy
-        name: "­Electoral democracy"
+        name: "Electoral democracy"
       - slug: liberal_democracy
-        name: "­Liberal democracy"
+        name: "Liberal democracy"
       - slug: political_regime_including_ambiguous_categories
-        name: "­Political regime, including ambiguous categories"
+        name: "Political regime, including ambiguous categories"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -76,7 +78,7 @@ dimensions:
       - slug: multi_party_elections_for_legislature
         name: "Multi-party elections for legislature"
       - slug: free_and_fair_elections
-        name: "­Free and fair elections"
+        name: "Free and fair elections"
       - slug: democratic_electoral_institutions
         name: "Democratic electoral institutions"
       - slug: age_of_electoral_democracy
@@ -90,7 +92,7 @@ dimensions:
       - slug: access_to_justice_for_women
         name: "Access to justice for women"
       - slug: liberal_political_institutions
-        name: "­Liberal political institutions"
+        name: "Liberal political institutions"
       - slug: age_of_liberal_democracy
         name: "Age of liberal democracy"
       - slug: number_and_share_of_long_standing_liberal_democracies

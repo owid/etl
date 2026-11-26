@@ -5,6 +5,8 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+grapher_schema: "012"
+
 definitions:
   group_subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
 
@@ -19,9 +21,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: democracy
-        name: "­­­Democracy"
+        name: "Democracy"
       - slug: political_regime
-        name: "­­­Political regime"
+        name: "Political regime"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -41,7 +43,7 @@ dimensions:
       - slug: competitiveness_of_political_participation_score
         name: "Competitiveness of political participation score"
       - slug: main_index_distribution
-        name: "­­­­­Main index distribution"
+        name: "Main index distribution"
       # Political regime
       - slug: main_classification
         name: "Main classification"

@@ -5,6 +5,8 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+grapher_schema: "012"
+
 definitions:
   display_n_dem: &display_n_dem
     name: "Non-democracies"
@@ -36,9 +38,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: freedom
-        name: "­­­­Freedom"
+        name: "Freedom"
       - slug: electoral_democracy
-        name: "­­­­Electoral democracy"
+        name: "Electoral democracy"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -61,9 +63,9 @@ dimensions:
       - slug: people_living_in_free_countries_and_territories
         name: "People living in free countries and territories"
       - slug: number_and_share_of_democracies
-        name: "­Number and share of democracies"
+        name: "Number and share of democracies"
       - slug: people_living_in_democracies
-        name: "­People living in democracies"
+        name: "People living in democracies"
 
 views:
   - dimensions:

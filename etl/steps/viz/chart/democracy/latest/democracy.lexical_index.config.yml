@@ -5,6 +5,8 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+grapher_schema: "012"
+
 definitions:
   group_subtitle_base: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index).
   display_ne_aut: &display_ne_aut
@@ -49,9 +51,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: political_regime
-        name: "­­Political regime"
+        name: "Political regime"
       - slug: electoral_democracy
-        name: "­­Electoral democracy"
+        name: "Electoral democracy"
       - slug: full_democracy
         name: "Full democracy"
   - slug: sub_metric
@@ -78,9 +80,9 @@ dimensions:
       - slug: universal_right_to_vote_for_women
         name: "Universal right to vote for women"
       - slug: age_of_electoral_democracy
-        name: "­Age of electoral democracy"
+        name: "Age of electoral democracy"
       - slug: number_and_share_of_long_standing_electoral_democracies
-        name: "­Number and share of long-standing electoral democracies"
+        name: "Number and share of long-standing electoral democracies"
       - slug: political_liberties
         name: "Political liberties"
       - slug: age_of_full_democracy

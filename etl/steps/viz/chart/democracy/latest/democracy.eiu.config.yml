@@ -5,6 +5,8 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+grapher_schema: "012"
+
 definitions:
   group_subtitle: &group_subtitle "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
   display_aut: &display_aut
@@ -31,7 +33,7 @@ dimensions:
       type: dropdown
     choices:
       - slug: democracy
-        name: "­­­­Democracy"
+        name: "Democracy"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -42,9 +44,9 @@ dimensions:
       - slug: political_regime
         name: "Political regime"
       - slug: number_and_share_of_democracies
-        name: "­­­Number and share of democracies"
+        name: "Number and share of democracies"
       - slug: people_living_in_democracies
-        name: "­­­People living in democracies"
+        name: "People living in democracies"
 
 views:
   - dimensions:
