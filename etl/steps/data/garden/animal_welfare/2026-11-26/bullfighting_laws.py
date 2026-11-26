@@ -19,6 +19,10 @@ STATUS_NOT_BANNED = "Not banned"
 # Status of a ban in the years between when it was passed and when it takes effect.
 STATUS_BANNED_NOT_IN_EFFECT = "Banned but not yet in effect"
 
+# First year shown. Most bans are either much older or recent, so starting at the earliest ban (1823) would leave the
+# recent changes as thin slivers in a timeline chart.
+FIRST_YEAR = 1990
+
 
 def sanity_check_inputs(tb: Table, last_year: int) -> None:
     error = "Unexpected status in the snapshot."
@@ -74,13 +78,12 @@ def run() -> None:
     #
     # Process data.
     #
-    # Show the years from the earliest ban to the year of this version.
-    first_year = int(tb_snapshot["year_effective"].min())
+    # Show the years until the year of this version.
     last_year = int(paths.version.split("-")[0])
     sanity_check_inputs(tb_snapshot, last_year=last_year)
 
     # Create a status for each country and year.
-    tb = create_status_by_year(tb_snapshot, first_year=first_year, last_year=last_year)
+    tb = create_status_by_year(tb_snapshot, first_year=FIRST_YEAR, last_year=last_year)
     sanity_check_outputs(tb, tb_snapshot=tb_snapshot, last_year=last_year)
 
     # Improve table format.
