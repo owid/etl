@@ -111,7 +111,7 @@ dimensions:
         name: Wild-caught fish
         group: Aquatic animals
       - slug: wild_caught_fish_for_fishmeal_and_fish_oil
-        name: Wild-caught fish for fishmeal and fish oil
+        name: Fish for fishmeal and oil
         group: Aquatic animals
   # Only the animals with consumption-based numbers can switch to them (the toggle is disabled for the others).
   - slug: metric
