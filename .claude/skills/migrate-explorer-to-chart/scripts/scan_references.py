@@ -163,6 +163,11 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     prod = OWIDEnv.from_env_file(prod_env_file)
     default = explorer_default_view(prod, slug, dim_names)
 
+    def _loose(name: str) -> str:
+        """A choice name lowercased, with British spellings and bracketed parts removed."""
+        name = re.sub(r"\s*\([^)]*\)", "", name.lower()).replace("sulph", "sulf")
+        return re.sub(r"\s+", " ", name).strip()
+
     def repair(q: dict) -> tuple[dict, list[str]]:
         """Fix the usual damage in old explorer links, so they can land on the view they meant.
 
@@ -203,6 +208,11 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 named = [c for c in choices[k] if c and v.lower() in c.lower()]
                 if len(named) > 1:
                     named = [c for c in named if c.lower().startswith(v.lower())]
+                if len(named) != 1:
+                    # Compare without spelling variants and bracketed suffixes
+                    # ("Sulphur dioxide (SO₂)" → "Sulfur dioxide").
+                    nv = _loose(v)
+                    named = [c for c in choices[k] if c and (nv in _loose(c) or _loose(c) in nv)]
                 if len(named) == 1:
                     out[k] = named[0]
                     notes.append(f"renamed choice “{v}” to “{named[0]}”")
@@ -223,6 +233,10 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 if len(owners) == 1 and v.lower() not in {"true", "false"}:
                     out[owners[0]] = v
                     notes.append(f"renamed “{k}” to “{owners[0]}”")
+                    continue
+                if not owners and k[:1].isupper():
+                    # A dimension the explorer no longer has ("Fuel"): the explorer ignores it.
+                    notes.append(f"dropped “{k}”, which the explorer no longer has")
                     continue
             out.setdefault(k, v)
         return out, notes

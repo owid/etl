@@ -164,10 +164,22 @@ def diff_configs(a: dict, b: dict, prefix: str = "") -> list[dict]:
 
 
 def sample_views(pairs: list[dict], dims: list[str], max_rendered: int) -> list[int]:
-    """All views, or a sample that covers every choice of every dimension."""
+    """All views, or a sample: every view whose config, indicators or names differ, then views that
+    cover every choice of every dimension, then any others up to `max_rendered`.
+
+    A config-only difference can be explained away only if its rendered check passes, so a view
+    with one is always rendered, even past `max_rendered`.
+    """
     if len(pairs) <= max_rendered:
         return [p["id"] for p in pairs]
-    chosen, seen = [], set()
+    flagged = [
+        p["id"]
+        for p in pairs
+        if p["config_diffs"]
+        or p["explorer_indicators"] != p["multidim_indicators"]
+        or p["explorer_names"] != p["multidim_names"]
+    ]
+    chosen, seen = list(flagged), {(d, p["explorer_dims"].get(d, "")) for p in pairs if p["id"] in flagged for d in dims}
     for p in pairs:
         new = {(d, p["explorer_dims"].get(d, "")) for d in dims} - seen
         if new:
@@ -178,7 +190,7 @@ def sample_views(pairs: list[dict], dims: list[str], max_rendered: int) -> list[
             break
         if p["id"] not in chosen:
             chosen.append(p["id"])
-    return sorted(chosen[:max_rendered])
+    return sorted(chosen[: max(max_rendered, len(flagged))])
 
 
 # Times a page is loaded before a timeout is reported as a rendering difference.
@@ -328,7 +340,12 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
         mv = mviews.get(tuple(sorted((tgt or {}).get("dimensions", {}).items()))) if tgt else None
         m_full = json.loads(full[mv["fullConfigId"]]) if mv else {}
         m_paths = [y.get("catalogPath") for y in (mv or {}).get("indicators", {}).get("y", [])]
-        m_names = [((d.get("display") or {}).get("name")) or None for d in m_full.get("dimensions", [])]
+        # Only the y dimensions: a view's color (or x, size) indicator is not one of the explorer's y columns.
+        m_names = [
+            ((d.get("display") or {}).get("name")) or None
+            for d in m_full.get("dimensions", [])
+            if d.get("property", "y") == "y"
+        ]
         e_params = {k: v for k, v in src.items() if v}
         e_url = f"{PROD_SITE}/explorers/{slug}" + (f"?{urlencode(e_params)}" if e_params else "")
         m_url = f"{stg_site}/grapher/{mdim['slug']}" + (
