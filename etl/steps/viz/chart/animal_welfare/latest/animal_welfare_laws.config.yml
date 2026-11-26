@@ -84,31 +84,9 @@ views:
     config:
       title: Which countries have banned bullfighting?
       subtitle: Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
-      # A map with a timeline, and a chart of the status of each country over time.
-      chartTypes: ["Swimlane"]
-      selectedEntityNames:
-        - Spain
-        - Portugal
-        - France
-        - Mexico
-        - Colombia
-        - Bolivia
-        - Chile
-      colorScale:
-        customCategoryColors:
-          Banned: "#759AC8"
-          Banned but not yet in effect: "#058580"
-          Not banned: "#AE2E3F"
-          Partially banned: "#A46F49"
-      map:
-        colorScale:
-          baseColorScheme: OwidCategoricalC
-          binningStrategy: manual
-          customCategoryColors:
-            Banned: "#759AC8"
-            Banned but not yet in effect: "#058580"
-            Not banned: "#AE2E3F"
-            Partially banned: "#A46F49"
+      chartTypes: []
+      # NOTE: The map colors come from the indicator, which gives each status-year value (e.g. "Banned (2015)") the
+      # color of its status.
   # The step expands these colors into one entry per status-year value found in the data (see the step).
   - dimensions:
       metric: chick_culling_status

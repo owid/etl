@@ -1,7 +1,7 @@
 """Script to create a snapshot of dataset.
 
-The data is manually curated, and this file is its single source of truth: every per-country fact (status, the years
-when the ban was passed and took effect, source, and comments) is defined below. The citation_full field of the .dvc
+The data is manually curated, and this file is its single source of truth: every per-country fact (status, the year
+when the ban took effect, source, and comments) is defined below. The citation_full field of the .dvc
 file is built by this script from the entries below; never edit it by hand.
 
 Each source has a copy in the Wayback Machine (url_archived). When the original page is gone, url is the archived copy.
@@ -12,8 +12,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Status of bullfighting in each country, and the evidence for it.
-# The status, year_passed and year_effective fields become the data; the rest is used only in the citation.
-# NOTE: year_passed is only given when a ban was passed in an earlier year than it took effect.
+# The status and year_effective fields become the data; the rest is used only in the citation.
 COUNTRIES = [
     {
         "country": "Argentina",
@@ -72,8 +71,7 @@ COUNTRIES = [
     },
     {
         "country": "Colombia",
-        "status": "Banned",
-        "year_passed": 2024,
+        "status": "Banned but not yet in effect",
         "year_effective": 2027,
         "source": "Law 2385 of 2024, July 22nd, 2024.",
         "url": "https://normograma.mintic.gov.co/mintic/compilacion/docs/ley_2385_2024.htm",
@@ -288,8 +286,8 @@ def run(upload: bool = True) -> None:
     snap = paths.init_snapshot()
 
     # Create the data table.
-    columns = ["country", "status", "year_passed", "year_effective"]
-    data = [(row["country"], row["status"], row.get("year_passed"), row["year_effective"]) for row in COUNTRIES]
+    columns = ["country", "status", "year_effective"]
+    data = [(row["country"], row["status"], row["year_effective"]) for row in COUNTRIES]
     tb = snap.read_from_records(data=data, columns=columns)
 
     # Build the full citation from the curated entries, and rewrite the metadata (.dvc) file.
