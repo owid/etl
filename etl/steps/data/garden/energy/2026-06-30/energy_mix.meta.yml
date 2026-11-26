@@ -53,6 +53,8 @@ tables:
           {definitions.description_processing_traditional_biomass}
         display:
           name: Traditional biomass
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.traditional_biomass_twh.title}'
       biofuels_annual_change_pct:
@@ -64,6 +66,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Biofuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.biofuels_annual_change_pct.title}'
       biofuels_annual_change_twh:
@@ -75,6 +79,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Biofuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.biofuels_annual_change_twh.title}'
       biofuels_per_capita_kwh:
@@ -87,6 +93,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Biofuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.biofuels_per_capita_kwh.title}'
       biofuels_share_including_biomass_pct:
@@ -99,6 +107,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Biofuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.biofuels_share_including_biomass_pct.title}'
       biofuels_share_pct:
@@ -108,6 +118,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Biofuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.biofuels_share_pct.title}'
       biofuels_twh:
@@ -117,6 +129,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Biofuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.biofuels_twh.title}'
       coal_annual_change_pct:
@@ -128,6 +142,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Coal
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.coal_annual_change_pct.title}'
       coal_annual_change_twh:
@@ -139,6 +155,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Coal
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.coal_annual_change_twh.title}'
       coal_per_capita_kwh:
@@ -151,6 +169,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Coal
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.coal_per_capita_kwh.title}'
       coal_share_including_biomass_pct:
@@ -163,6 +183,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Coal
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.coal_share_including_biomass_pct.title}'
       coal_share_pct:
@@ -172,6 +194,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Coal
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.coal_share_pct.title}'
       coal_twh:
@@ -181,6 +205,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Coal
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.coal_twh.title}'
       fossil_fuels_annual_change_pct:
@@ -192,6 +218,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Fossil fuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.fossil_fuels_annual_change_pct.title}'
       fossil_fuels_annual_change_twh:
@@ -203,6 +231,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Fossil fuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.fossil_fuels_annual_change_twh.title}'
       fossil_fuels_per_capita_kwh:
@@ -215,6 +245,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Fossil fuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.fossil_fuels_per_capita_kwh.title}'
       fossil_fuels_share_pct:
@@ -224,6 +256,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Fossil fuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.fossil_fuels_share_pct.title}'
       fossil_fuels_twh:
@@ -233,6 +267,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Fossil fuels
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.fossil_fuels_twh.title}'
       gas_annual_change_pct:
@@ -244,6 +280,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Gas
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.gas_annual_change_pct.title}'
       gas_annual_change_twh:
@@ -255,6 +293,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Gas
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.gas_annual_change_twh.title}'
       gas_per_capita_kwh:
@@ -267,6 +307,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Gas
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.gas_per_capita_kwh.title}'
       gas_share_including_biomass_pct:
@@ -279,6 +321,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Gas
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.gas_share_including_biomass_pct.title}'
       gas_share_pct:
@@ -288,6 +332,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Gas
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.gas_share_pct.title}'
       gas_twh:
@@ -297,6 +343,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Gas
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.gas_twh.title}'
       hydro_annual_change_pct:
@@ -308,6 +356,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Hydropower
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.hydro_annual_change_pct.title}'
       hydro_annual_change_twh:
@@ -319,6 +369,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Hydropower
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.hydro_annual_change_twh.title}'
       hydro_per_capita_kwh:
@@ -331,6 +383,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Hydropower
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.hydro_per_capita_kwh.title}'
       hydro_share_including_biomass_pct:
@@ -343,6 +397,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Hydropower
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.hydro_share_including_biomass_pct.title}'
       hydro_share_pct:
@@ -352,6 +408,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Hydropower
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.hydro_share_pct.title}'
       hydro_twh:
@@ -361,6 +419,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Hydropower
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.hydro_twh.title}'
       low_carbon_energy_annual_change_pct:
@@ -372,6 +432,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Low-carbon energy
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.low_carbon_energy_annual_change_pct.title}'
       low_carbon_energy_annual_change_twh:
@@ -383,6 +445,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Low-carbon energy
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.low_carbon_energy_annual_change_twh.title}'
       low_carbon_energy_per_capita_kwh:
@@ -395,6 +459,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Low-carbon energy
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.low_carbon_energy_per_capita_kwh.title}'
       low_carbon_energy_share_pct:
@@ -404,6 +470,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Low-carbon energy
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.low_carbon_energy_share_pct.title}'
       low_carbon_energy_twh:
@@ -413,6 +481,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Low-carbon energy
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.low_carbon_energy_twh.title}'
       nuclear_annual_change_pct:
@@ -424,6 +494,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Nuclear
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.nuclear_annual_change_pct.title}'
       nuclear_annual_change_twh:
@@ -435,6 +507,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Nuclear
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.nuclear_annual_change_twh.title}'
       nuclear_per_capita_kwh:
@@ -447,6 +521,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Nuclear
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.nuclear_per_capita_kwh.title}'
       nuclear_share_including_biomass_pct:
@@ -459,6 +535,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Nuclear
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.nuclear_share_including_biomass_pct.title}'
       nuclear_share_pct:
@@ -468,6 +546,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Nuclear
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.nuclear_share_pct.title}'
       nuclear_twh:
@@ -477,6 +557,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Nuclear
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.nuclear_twh.title}'
       oil_annual_change_pct:
@@ -488,6 +570,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Oil
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.oil_annual_change_pct.title}'
       oil_annual_change_twh:
@@ -499,6 +583,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Oil
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.oil_annual_change_twh.title}'
       oil_per_capita_kwh:
@@ -511,6 +597,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Oil
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.oil_per_capita_kwh.title}'
       oil_share_including_biomass_pct:
@@ -523,6 +611,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Oil
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.oil_share_including_biomass_pct.title}'
       oil_share_pct:
@@ -532,6 +622,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Oil
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.oil_share_pct.title}'
       oil_twh:
@@ -541,6 +633,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Oil
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.oil_twh.title}'
       other_renewables_annual_change_pct:
@@ -552,6 +646,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Other renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.other_renewables_annual_change_pct.title}'
       other_renewables_annual_change_twh:
@@ -563,6 +659,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Other renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.other_renewables_annual_change_twh.title}'
       other_renewables_per_capita_kwh:
@@ -575,6 +673,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Other renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.other_renewables_per_capita_kwh.title}'
       other_renewables_share_including_biomass_pct:
@@ -587,6 +687,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Other renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.other_renewables_share_including_biomass_pct.title}'
       other_renewables_share_pct:
@@ -596,6 +698,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Other renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.other_renewables_share_pct.title}'
       other_renewables_twh:
@@ -605,6 +709,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Other renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.other_renewables_twh.title}'
       renewables_annual_change_pct:
@@ -616,6 +722,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.renewables_annual_change_pct.title}'
       renewables_annual_change_twh:
@@ -627,6 +735,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.renewables_annual_change_twh.title}'
       renewables_per_capita_kwh:
@@ -639,6 +749,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.renewables_per_capita_kwh.title}'
       renewables_share_pct:
@@ -648,6 +760,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.renewables_share_pct.title}'
       renewables_twh:
@@ -657,6 +771,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Renewables
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.renewables_twh.title}'
       solar_and_wind_annual_change_pct:
@@ -668,6 +784,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Solar and wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_and_wind_annual_change_pct.title}'
       solar_and_wind_annual_change_twh:
@@ -679,6 +797,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Solar and wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_and_wind_annual_change_twh.title}'
       solar_and_wind_per_capita_kwh:
@@ -691,6 +811,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Solar and wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_and_wind_per_capita_kwh.title}'
       solar_and_wind_share_pct:
@@ -700,6 +822,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar and wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_and_wind_share_pct.title}'
       solar_and_wind_twh:
@@ -709,6 +833,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar and wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_and_wind_twh.title}'
       solar_annual_change_pct:
@@ -720,6 +846,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Solar
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_annual_change_pct.title}'
       solar_annual_change_twh:
@@ -731,6 +859,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Solar
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_annual_change_twh.title}'
       solar_per_capita_kwh:
@@ -743,6 +873,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Solar
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_per_capita_kwh.title}'
       solar_share_including_biomass_pct:
@@ -755,6 +887,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Solar
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_share_including_biomass_pct.title}'
       solar_share_pct:
@@ -764,6 +898,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_share_pct.title}'
       solar_twh:
@@ -773,6 +909,8 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.solar_twh.title}'
       total_energy_supply_annual_change_pct:
@@ -784,6 +922,8 @@ tables:
           {definitions.description_processing_eia}
         display:
           name: Total energy supply
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_annual_change_pct.title}'
       total_energy_supply_annual_change_twh:
@@ -795,6 +935,8 @@ tables:
           {definitions.description_processing_eia}
         display:
           name: Total energy supply
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_annual_change_twh.title}'
       total_energy_supply_per_capita_kwh:
@@ -808,6 +950,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Total energy supply
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_capita_kwh.title}'
       total_energy_supply_per_gdp_kwh_per_dollar:
@@ -818,6 +962,9 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world_from_1820}
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
       total_energy_supply_twh:
@@ -830,6 +977,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Total energy supply
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_twh.title}'
       traditional_biomass_share_including_biomass_pct:
@@ -845,6 +994,8 @@ tables:
           {definitions.description_processing_traditional_biomass}
         display:
           name: Traditional biomass
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.traditional_biomass_share_including_biomass_pct.title}'
       wind_annual_change_pct:
@@ -856,6 +1007,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.wind_annual_change_pct.title}'
       wind_annual_change_twh:
@@ -867,6 +1020,8 @@ tables:
           {definitions.description_processing_none}
         display:
           name: Wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.wind_annual_change_twh.title}'
       wind_per_capita_kwh:
@@ -879,6 +1034,8 @@ tables:
           {definitions.description_processing_per_capita}
         display:
           name: Wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.wind_per_capita_kwh.title}'
       wind_share_including_biomass_pct:
@@ -891,6 +1048,8 @@ tables:
           {definitions.description_processing_smil_world}
         display:
           name: Wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.wind_share_including_biomass_pct.title}'
       wind_share_pct:
@@ -900,6 +1059,8 @@ tables:
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.wind_share_pct.title}'
       wind_twh:
@@ -909,5 +1070,7 @@ tables:
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Wind
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: '{tables.energy_mix.variables.wind_twh.title}'
