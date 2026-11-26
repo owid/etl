@@ -75,8 +75,8 @@ COUNTRIES = [
         "year_effective": 2027,
         "source": "Law 2385 of 2024, July 22nd, 2024.",
         "url": "https://normograma.mintic.gov.co/mintic/compilacion/docs/ley_2385_2024.htm",
-        "url_archived": "",
-        "comments": "The ban takes effect three years after the law entered into force, in July 2027. The Constitutional Court upheld the law [in 2025](https://www.corteconstitucional.gov.co/relatoria/2025/C-374-25.htm).",
+        "url_archived": "https://web.archive.org/web/20261126110516/https://normograma.mintic.gov.co/mintic/compilacion/docs/ley_2385_2024.htm",
+        "comments": "The ban takes effect three years after the law entered into force, in July 2027. The Constitutional Court upheld the law [in 2025](https://www.corteconstitucional.gov.co/relatoria/2025/C-374-25.htm) ([archived](https://web.archive.org/web/20261126110640/https://www.corteconstitucional.gov.co/relatoria/2025/C-374-25.htm)).",
     },
     {
         "country": "Costa Rica",
