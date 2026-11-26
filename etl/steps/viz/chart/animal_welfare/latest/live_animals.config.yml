@@ -24,6 +24,9 @@ definitions:
         originUrl: https://ourworldindata.org/animal-welfare
         entityType: country
         hasMapTab: true
+        # Views of a single animal (the view of hens in cages has its own chart type).
+        chartTypes: ["LineChart", "DiscreteBar", "SlopeChart"]
+        hideRelativeToggle: false
 
 # The step creates the views of live animals from the dimensions of the indicator.
 dimensions:
