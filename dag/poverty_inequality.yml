@@ -134,6 +134,8 @@ steps:
   data://garden/wb/2026-09-22/thousand_bins_distribution:
     - data://meadow/wb/2026-09-22/thousand_bins_distribution:
       - snapshot://wb/2026-09-22/thousand_bins_distribution.dta
+    # PIP lineup estimates, for the welfare type (income or consumption) of each country-year.
+    - data://meadow/wb/2026-09-22/world_bank_pip
   data://external/poverty_inequality/latest/thousand_bins_distribution:
     - data://garden/wb/2026-09-22/thousand_bins_distribution
   viz://bespoke/poverty_inequality/latest/income_distribution:

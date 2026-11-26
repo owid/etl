@@ -19,6 +19,7 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Pablo Arriagada
+    - Marcel Gerber
 tables:
   thousand_bins_distribution:
     # Learn more about the available fields:
@@ -46,3 +47,27 @@ tables:
         unit: people
         short_unit: ""
         description_short: Number of people in each of the 1000 bins of the distribution. It should correspond to roughly 1/1000 of the total population of the country in the given year.
+
+  welfare_type:
+    variables:
+      welfare_type:
+        title: Welfare type
+        unit: ""
+        description_short: Whether the data for each country and year measures income or consumption.
+        description_key:
+          - The World Bank relies on household surveys that measure either income or consumption, depending on the country. When a country has both for the same year, the World Bank uses consumption.
+          - For years without a survey, the World Bank estimates the distribution from the surveys of other years, and the data measures what those surveys measure.
+          - Where a country has no usable survey data, the World Bank predicts the distribution with a statistical model. The model still predicts either an income or a consumption distribution, and this column says which.
+        description_processing: |-
+          We took the welfare type from the World Bank's lineup estimates, which the 1000 bins are based on, for each country and year. For countries whose only survey covers part of the country (urban Argentina), we use that survey's welfare type.
+      estimation_type:
+        title: Estimation type
+        unit: ""
+        description_short: How the World Bank arrived at the distribution for each country and year.
+        description_key:
+          - "\"Survey\": a household survey was carried out that year."
+          - "\"Interpolated\": there is no survey that year, so the World Bank estimates the distribution from the surveys before and after it."
+          - "\"Extrapolated\": there is no survey that year, and none on one side of it, so the World Bank scales the distribution of the nearest survey with economic growth from national accounts."
+          - "\"Modeled\": the country has no usable survey data for that year, so the World Bank predicts the distribution from GDP per capita, child mortality, life expectancy and other indicators. The World Bank doesn't publish these estimates on its website and uses them only for its regional and global figures."
+        description_processing: |-
+          We took the estimation type from the World Bank's lineup estimates and renamed its categories: "survey", "interpolation", "extrapolation" and "CMD estimation" became "survey", "interpolated", "extrapolated" and "modeled".
