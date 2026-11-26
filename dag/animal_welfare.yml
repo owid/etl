@@ -123,7 +123,11 @@ steps:
   viz://chart/animal_welfare/latest/animal_welfare_laws:
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
     - data://grapher/animal_welfare/2026-07-01/fur_laws
-    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+    # Bullfighting laws (various sources), with the status of each country in each year.
+    - data://grapher/animal_welfare/2026-11-26/bullfighting_laws:
+      - data://garden/animal_welfare/2026-11-26/bullfighting_laws:
+        - data://meadow/animal_welfare/2026-11-26/bullfighting_laws:
+          - snapshot://animal_welfare/2026-11-26/bullfighting_laws.csv
 
   # Defra - Laying hens and chicks in the United Kingdom (poultry and poultry meat statistics, and June survey).
   data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks:

@@ -1,0 +1,55 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  bullfighting_laws:
+    variables:
+      status:
+        title: Bans on bullfighting
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        description_processing: |-
+          - The sources give the current status of bullfighting in each country, and the year when each ban (or partial ban) took effect. We show that status from that year onward, and before that year we show bullfighting as not banned.
+          - When a ban was passed in an earlier year than the year it takes effect, we show it as banned but not yet in effect in the years in between.
+          - When the year of a ban (or partial ban) is not known, we only show its status in the latest year.
+        presentation:
+          grapher_config:
+            title: Which countries have banned bullfighting?
+            subtitle: >-
+              Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
+            note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that the bull cannot be severely injured or killed during the event."
+            chartTypes: ["Swimlane"]
+            hasMapTab: true
+            tab: map
+            selectedEntityNames:
+              - Spain
+              - Portugal
+              - France
+              - Mexico
+              - Colombia
+              - Bolivia
+              - Chile
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericColorsActive: true
+                customCategoryColors:
+                  Banned: '#759ac8'
+                  Banned but not yet in effect: '#058580'
+                  Not banned: '#ae2e3f'
+                  Partially banned: '#ca9773'
+            colorScale:
+              customCategoryColors:
+                Banned: '#759ac8'
+                Banned but not yet in effect: '#058580'
+                Not banned: '#ae2e3f'
+                Partially banned: '#ca9773'
