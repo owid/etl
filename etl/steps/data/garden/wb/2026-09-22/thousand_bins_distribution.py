@@ -1,6 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Create the garden dataset of the 1000-bins income distribution, and the welfare type of each country-year from PIP."""
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -18,6 +19,10 @@ REGIONS_MAPPING = {
     "SSF": "Sub-Saharan Africa",
 }
 
+# PIP's label for distributions it models instead of taking them from a household survey. Those country-years have no
+# welfare type of their own, so we leave it empty instead of reporting the label PIP attaches to the model.
+MODELED_DISTRIBUTION_TYPE = "CMD distribution"
+
 
 def run() -> None:
     #
@@ -29,6 +34,10 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("thousand_bins_distribution")
 
+    # Load PIP meadow dataset (same release as the bins), which carries the welfare type of its lineup estimates.
+    ds_pip = paths.load_dataset("world_bank_pip", channel="meadow")
+    tb_pip = ds_pip.read("world_bank_pip", safe_types=False)
+
     #
     # Process data.
     #
@@ -39,16 +48,21 @@ def run() -> None:
     # Assert that there are no negative values for avg and that avg data is monotonically increasing by each quantile.
     tb = sanity_checks(tb=tb)
 
+    # Build the welfare type (income or consumption) behind each country-year of the bins.
+    tb_welfare_type = create_welfare_type_table(tb_pip=tb_pip, tb=tb)
+
     tb = paths.regions.harmonize_names(tb=tb)
+    tb_welfare_type = paths.regions.harmonize_names(tb=tb_welfare_type)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year", "region", "quantile"])
+    tb_welfare_type = tb_welfare_type.format(["country", "year"], short_name="welfare_type")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb, tb_welfare_type], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -75,6 +89,50 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
     tb = tb.drop(columns=["region_name", "pipvintage"])
 
     return tb
+
+
+def create_welfare_type_table(tb_pip: Table, tb: Table) -> Table:
+    """Create a country-year table of the welfare type (income or consumption) that the bins are based on.
+
+    The bins follow PIP's lineup estimates, which are PIP's filled data. Both tables still use ISO codes in `country`
+    here, so they are matched on code before harmonization. Country-years whose distribution PIP models instead of
+    taking it from a survey get an empty welfare type.
+    """
+    # Keep lineup estimates for countries, in 2021 PPPs like the bins (regions have no welfare type).
+    mask = tb_pip["filled"] & (tb_pip["ppp_version"] == 2021) & tb_pip["welfare_type"].notna()
+    tb_pip = tb_pip.loc[mask, ["country_code", "year", "reporting_level", "welfare_type", "distribution_type"]]
+    # Use national estimates, or the only reporting level a country has (e.g. urban for Argentina).
+    has_national = tb_pip.groupby(["country_code", "year"], observed=True)["reporting_level"].transform(
+        lambda levels: (levels == "national").any()
+    )
+    tb_pip = tb_pip.loc[(tb_pip["reporting_level"] == "national") | ~has_national]
+    tb_welfare_type = (
+        tb_pip[["country_code", "year", "welfare_type", "distribution_type"]]
+        .drop_duplicates()
+        .rename(columns={"country_code": "country"}, errors="raise")
+        .reset_index(drop=True)
+    )
+    tb_welfare_type["welfare_type"] = tb_welfare_type["welfare_type"].astype("string")
+
+    # Each country-year must have a single welfare type across poverty lines.
+    duplicated = tb_welfare_type[tb_welfare_type.duplicated(["country", "year"], keep=False)]
+    assert duplicated.empty, f"Country-years with more than one welfare type in PIP:\n{duplicated}"
+    assert set(tb_welfare_type["welfare_type"]) <= {"income", "consumption"}, (
+        f"Unexpected welfare types: {set(tb_welfare_type['welfare_type'])}"
+    )
+
+    # Leave the welfare type empty where PIP models the distribution instead of using a survey.
+    tb_welfare_type.loc[tb_welfare_type["distribution_type"] == MODELED_DISTRIBUTION_TYPE, "welfare_type"] = None
+    tb_welfare_type = tb_welfare_type.drop(columns=["distribution_type"])
+
+    # Keep the country-years of the bins, and check that every one of them has a match in PIP.
+    tb_country_years = tb[["country", "year"]].drop_duplicates()
+    tb_welfare_type = pr.merge(tb_country_years, tb_welfare_type, on=["country", "year"], how="left", indicator=True)
+    missing = tb_welfare_type[tb_welfare_type["_merge"] != "both"]
+    assert missing.empty, f"Country-years of the bins missing from PIP lineup estimates:\n{missing}"
+    tb_welfare_type = tb_welfare_type.drop(columns=["_merge"])
+
+    return tb_welfare_type
 
 
 def sanity_checks(tb: Table) -> Table:

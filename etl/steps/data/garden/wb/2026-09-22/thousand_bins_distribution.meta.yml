@@ -19,6 +19,7 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Pablo Arriagada
+    - Marcel Gerber
 tables:
   thousand_bins_distribution:
     # Learn more about the available fields:
@@ -46,3 +47,12 @@ tables:
         unit: people
         short_unit: ""
         description_short: Number of people in each of the 1000 bins of the distribution. It should correspond to roughly 1/1000 of the total population of the country in the given year.
+
+  welfare_type:
+    variables:
+      welfare_type:
+        title: Welfare type
+        unit: ""
+        description_short: Whether the data for each country and year is based on surveys of income or of consumption.
+        description_processing: |-
+          We took the welfare type of the World Bank's lineup estimates for each country and year, the estimates the 1000 bins are based on. We left it empty for the country-years where the World Bank models the distribution instead of basing it on a household survey.
