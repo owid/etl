@@ -263,6 +263,8 @@ definitions:
 dataset:
   update_period_days: 365
   title: UNESCO Institute for Statistics (UIS) - Education (other policy relevant indicators)
+  owners:
+    - Tuna Acisu
 
 
 tables:

@@ -17,7 +17,7 @@ The model draws on historical population and demographic data from the United Na
 
 The UN publishes its latest [World Population Prospects](https://population.un.org/wpp/) — typically every two years — giving historical population and demographic data from 1950 through to the present day, plus multiple projection scenarios for how these may change through to 2100\.
 
-We visualize and publish these trends for all countries in our [work on Population Growth](https://ourworldindata.org/explorers/population-and-demography).
+We visualize and publish these trends for all countries in our [work on Population Growth](https://ourworldindata.org/grapher/population-and-demography).
 
 The UN’s projections are some of the most commonly used and referenced figures in demography. Our aim is not to replace this work; indeed, our model is a simplified representation that does not include some of the finer details included in these expert assessments.
 

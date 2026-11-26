@@ -132,7 +132,7 @@ def main() -> None:
             print(f"# wpBlockId {block_id} has no content in posts.wpApiSnapshot.")
     download = tsv_field(tsv, "downloadDataLink")
     if download:
-        parts.append(f"**Download the data**: [download the complete dataset]({download}).")
+        parts.append(f"### Download the data\n\nDownload the complete dataset [from our data catalog]({download}).")
     if not parts:
         raise SystemExit(f"{args.slug!r} has no text below it and no download link: no .explorer.md needed.")
 
