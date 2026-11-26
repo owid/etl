@@ -98,13 +98,14 @@ def run() -> None:
         # TODO: Remove "sources" once the waterfall (owid/owid-grapher#7324) stops reading it: grapher builds the
         #  source line from the metadata's origins (owid/owid-grapher#7484).
         # Each origin of the shown columns, named as grapher names it under a chart: its attribution, or "Producer (year)".
-        "sources": sorted(
-            {
+        # They keep the order of the origins, not alphabetical order, so that FAO, the main source, comes first.
+        "sources": list(
+            dict.fromkeys(
                 attribution_label(origin)
                 for nutrient in NUTRIENTS
                 for key, _, _ in STAGES
                 for origin in tables[nutrient][key].metadata.origins
-            }
+            )
         ),
         "timeRange": {"start": int(reference["year"].min()), "end": int(reference["year"].max())},
         "units": {nutrient: tables[nutrient]["food"].metadata.unit for nutrient in NUTRIENTS},

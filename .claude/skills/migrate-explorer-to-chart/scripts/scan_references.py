@@ -188,7 +188,9 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 k = same[0]
             if k in choices and v not in choices[k]:
                 head = next((c for c in sorted(choices[k], key=len, reverse=True) if c and v.startswith(c)), None)
-                if head:
+                # Only a value glued to the next param is cut back: "Population growth" is a choice
+                # renamed to "Population growth rate", not "Population" with junk after it.
+                if head and "=" in v[len(head) :]:
                     out[k] = head
                     rest = v[len(head) :]
                     if "=" in rest:
@@ -199,6 +201,8 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 # A renamed choice ("Protein per day" → "Grams of protein per day"): the one choice
                 # whose name contains the old one.
                 named = [c for c in choices[k] if c and v.lower() in c.lower()]
+                if len(named) > 1:
+                    named = [c for c in named if c.lower().startswith(v.lower())]
                 if len(named) == 1:
                     out[k] = named[0]
                     notes.append(f"renamed choice “{v}” to “{named[0]}”")
@@ -267,6 +271,20 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     def new_url(old: str) -> dict:
         old = unwrap(old)
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
+        # A stray `?` before a param ("…&?country=…") makes a key the explorer doesn't read.
+        stray = [k for k in q if k.startswith("?") and k.lstrip("?") not in q]
+        q = {k.lstrip("?") if k in stray else k: v for k, v in q.items()}
+        res = resolve(q)
+        if stray:
+            res["repairs"] = [f"dropped the stray “?” in “{k}”" for k in stray] + res.get("repairs", [])
+            if res["match"] == "view":
+                res["match"] = "view, after repairing the old link"
+        # Profile templates replace the literal `$entityCode` (and the other `$` tokens), so the
+        # URL keeps them unencoded: `%24entityCode` would never become a country code.
+        res["new_url"] = res["new_url"].replace("%24", "$")
+        return res
+
+    def resolve(q: dict) -> dict:
         r = clean(resolve_explorer_url(rules, q, SITE, choices, dim_names))
         # A dimension name in different case must reach `repair`, even when the redirect already
         # lands on some view without it.
@@ -417,7 +435,11 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         add("Chart config (unattached)", r["id"], None, m.group(0), "config text")
         elif t == "variables":
             rows = prod.read_sql(
-                f"SELECT id, catalogPath, `{c}` AS txt FROM variables WHERE `{c}` LIKE %s", params=(like,)
+                # An archived dataset isn't shown anywhere on the site, so its text needs no swap.
+                f"""SELECT v.id, v.catalogPath, v.`{c}` AS txt FROM variables v
+                    JOIN datasets d ON d.id = v.datasetId
+                    WHERE v.`{c}` LIKE %s AND NOT d.isArchived""",
+                params=(like,),
             )
             for r in rows.to_dict("records"):
                 for m in pat.finditer(r["txt"]):

@@ -145,7 +145,11 @@ def render_page(review: Path, live: bool = False) -> str:
         for r in refs["references"]:
             o = over.get((r["where"], r["old_url"]))
             if o:
-                r.update(status="pending", new_url=o["new_url"], match=o["note"], repairs=[], stale_params={})
+                # A correction made before the swap only changes the URL to paste; `reopen` marks a
+                # swap that already landed on the wrong view as to do again.
+                r.update(new_url=o["new_url"], match=o["note"], repairs=[], stale_params={})
+                if o.get("reopen") or r.get("status") not in ("done", "new"):
+                    r["status"] = "pending"
     preflight = (review / "preflight.txt").read_text() if (review / "preflight.txt").exists() else None
     mapping = json.loads((mapping_dir / "mapping.json").read_text())
     payload = json.loads((mapping_dir / "admin_bulk_payload.json").read_text())
