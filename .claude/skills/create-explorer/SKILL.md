@@ -444,7 +444,7 @@ Full-YAML (each view hand-listed):
 Table-driven (views auto-expanded from a dimensional table):
 
 - `etl/steps/viz/explorer/emissions/latest/co2.{py,dims.yaml,config.yml}` — sidecar `.dims.yaml` for the 54-entry column→dimensions map; uses `c.edit_views([...])` with both an unscoped default and a 4-dim-filtered override; uses a `c.views` loop with `view.matches(...)` for per-indicator `numDecimalPlaces` overrides.
-- `etl/steps/viz/explorer/emissions/latest/air_pollution.{py,config.yml}` — table-driven with `c.group_views(...)` to add facet views, `c.drop_views(...)` to prune cross-products, and a checkbox dimension with `choice_slug_true`.
+- `etl/steps/viz/chart/emissions/latest/air_pollution.{py,config.yml}` — a multidim ported from an explorer, table-driven with `c.group_views(...)` to add facet views and `c.drop_views(...)` to prune cross-products; explorers take the same calls.
 - `etl/steps/viz/chart/minerals/latest/minerals.py` — same APIs in the multidim channel; useful read for `choice_renames`.
 
 ## Follow-up
