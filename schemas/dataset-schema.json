@@ -711,10 +711,10 @@
                   "requirement_level": "optional",
                   "guidelines": [
                     [
-                      "Must start with a capital letter."
+                      "`text` must start with a capital letter."
                     ],
                     [
-                      "Must end with a period, unless it is a note on some `entities` with no `time`.",
+                      "`text` must end with a period, unless the note is on some `entities` and has no `time`.",
                       {
                         "type": "list",
                         "value": [
@@ -724,19 +724,22 @@
                       }
                     ],
                     [
-                      "Don't repeat `time` or `time_end` in `text`: charts already show them next to the note."
+                      "`text` should not repeat `time` or `time_end`, since charts already show them next to the note."
                     ],
                     [
-                      "Omit `entities` for a note on the whole indicator."
+                      "`entities` should be omitted for a note on the whole indicator."
                     ],
                     [
-                      "`time` alone is one year; with `time_end` it is a range of years. Use `time_end: latest` for a range that runs to the end of the data, rather than a year that goes stale at the next update. Omit both for a note on the whole series."
+                      "`time` alone should be used for a note on one year, `time` with `time_end` for a range of years, and neither for a note on the whole series."
                     ],
                     [
-                      "Write times as years for yearly data, and as YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
+                      "`time_end` should be `latest` for a range that runs to the end of the data, rather than a year that goes stale at the next update."
                     ],
                     [
-                      "Replaces `display.entityAnnotationsMap`, which is now deprecated. The two must not be combined on the same indicator."
+                      "Times must be years for yearly data, and YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
+                    ],
+                    [
+                      "`annotations` must not be combined with `display.entityAnnotationsMap` on the same indicator. That field is deprecated, and `annotations` replaces it."
                     ]
                   ],
                   "items": {
