@@ -10,7 +10,7 @@ from etl.paths import BASE_DIR
 
 log = get_logger()
 
-SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails")
+SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails", "mobile")
 
 # Written by devTools/svgTester/verify-graphs.ts, one per suite
 VERIFY_RESULTS_FILENAME = "verify-results.json"
