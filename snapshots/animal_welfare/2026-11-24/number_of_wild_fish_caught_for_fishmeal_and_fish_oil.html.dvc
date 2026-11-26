@@ -1,0 +1,18 @@
+meta:
+  origin:
+    title: Fish caught for reduction to fish oil and fishmeal
+    description: |-
+      Estimated numbers of wild finfishes caught each year for reduction to fishmeal and fish oil. Finfish numbers caught for reduction to fishmeal and oil are calculated using an estimated mean weight of 15-33 g, previously derived from 2010 data.
+    producer: Fishcount
+    citation_full: |-
+      Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations. Fish caught for reduction to fish oil and fishmeal by A Mood & P Brooke (2026).
+    url_main: https://fishcount.org.uk/fish-count-estimates-2/numbers-of-wild-fish-caught-for-reduction-to-fish-oil-and-fishmeal
+    url_download: https://fishcount.org.uk/fish-count-estimates-2/numbers-of-wild-fish-caught-for-reduction-to-fish-oil-and-fishmeal
+    date_published: "2026"
+    date_accessed: 2026-11-24
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: b9fc16c5cda643832c1b57854508c6fd
+    size: 48621
+    path: number_of_wild_fish_caught_for_fishmeal_and_fish_oil.html

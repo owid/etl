@@ -30,7 +30,7 @@ definitions:
     new_displacement: |-
       One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
     population: |-
-      To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+      To calculate IDPs per 1000 inhabitants, we divide the number of internally displaced children by the total population of the country and multiply by 1000. For the total population we use our long-term population data, which can be explored [here](https://ourworldindata.org/grapher/population-and-demography).
 
 dataset:
   update_period_days: 365
@@ -70,7 +70,7 @@ tables:
           - {definitions.unicef_descriptions.international_migrant}
         processing_level: major
         description_processing: |-
-          - We divide the number of migrants by the total population of the destination country and multiply by 1000 to get the number of migrants per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+          - We divide the number of migrants by the total population of the destination country and multiply by 1000 to get the number of migrants per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/grapher/population-and-demography).
         display:
           numDecimalPlaces: 1
       new_idps_under_18_conflict_violence:
@@ -103,7 +103,7 @@ tables:
           - {definitions.unicef_descriptions.refugee}
         processing_level: major
         description_processing: |-
-          - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+          - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/grapher/population-and-demography).
         display:
           numDecimalPlaces: 1
       refugees_under_18_origin:
@@ -118,7 +118,7 @@ tables:
           - {definitions.unicef_descriptions.refugee}
         processing_level: major
         description_processing: |-
-          - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+          - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/grapher/population-and-demography).
         display:
           numDecimalPlaces: 1
       refugees_under_18_unrwa_asylum:

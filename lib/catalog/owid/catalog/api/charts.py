@@ -221,7 +221,7 @@ def parse_chart_slug(slug_or_url: str) -> ParsedSlug:
         raise ValueError(
             "URL must be a grapher or explorer URL, e.g.\n"
             "  https://ourworldindata.org/grapher/life-expectancy\n"
-            "  https://ourworldindata.org/explorers/covid?Metric=Cases"
+            "  https://ourworldindata.org/explorers/co2?Count=Per+capita"
         )
     # Plain slug, possibly with query params (e.g. "education-spending?level=primary")
     if "?" in slug_or_url:
@@ -648,7 +648,7 @@ class ChartsAPI:
                 - Chart slug: ``"life-expectancy"``
                 - Slug with query params: ``"education-spending?level=primary&spending_type=gdp_share"``
                 - Full grapher URL: ``"https://ourworldindata.org/grapher/life-expectancy?tab=table"``
-                - Full explorer URL: ``"https://ourworldindata.org/explorers/covid?Metric=Cases"``
+                - Full explorer URL: ``"https://ourworldindata.org/explorers/co2?Count=Per+capita"``
             type: Override the chart type. Defaults to ``"chart"`` (grapher).
                 Use ``"explorerView"`` for explorer views. Auto-detected from full URLs.
             load_data: If True (default), load full chart data.
@@ -672,10 +672,10 @@ class ChartsAPI:
             tb = client.charts.fetch("education-spending?level=primary&spending_type=gdp_share")
 
             # Fetch from a full URL (type and query params auto-detected)
-            tb = client.charts.fetch("https://ourworldindata.org/explorers/covid?Metric=Cases")
+            tb = client.charts.fetch("https://ourworldindata.org/explorers/co2?Count=Per+capita")
 
             # Explicitly fetch an explorer view
-            tb = client.charts.fetch("covid?Metric=Cases", type="explorerView")
+            tb = client.charts.fetch("co2?Count=Per+capita", type="explorerView")
             ```
         """
         effective_timeout = timeout or self._client.timeout

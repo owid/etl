@@ -28,15 +28,8 @@ EQUIVALENCE_SCALE_NOTE = "Income has been [equivalized](#dod:equivalization)."
 EQUIVALENCE_SCALE_SUBTITLE = "Income has been [equivalized](#dod:equivalization) – adjusted to account for the fact that people in the same household can share costs like rent and heating."
 
 # Settings every view gets, grouped ones included (they are created after `common_views` would apply).
-# The explorer's text block below the chart only pointed readers to the related article.
 ALL_VIEWS_CONFIG = {
     "originUrl": "https://ourworldindata.org/poverty",
-    "relatedQuestions": [
-        {
-            "url": "https://ourworldindata.org/owid-data-collection-inequality-and-poverty",
-            "text": "OWID Data Collection: Inequality and Poverty",
-        }
-    ],
 }
 
 

@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title: Estimated wild-caught finfish numbers
+    title_snapshot: Estimated wild-caught finfish numbers – Average annual numbers by country
+    description: |-
+      Estimated numbers of individual finfishes caught annually from the wild for food, feed (often in the form of fishmeal and oil), and bait.
+    producer: Fishcount
+    citation_full: |-
+      Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations. Estimated wild-caught finfish numbers 2003 to 2022 by A Mood & P Brooke (2025), using the method described in Mood A, Brooke P. Estimating global numbers of fishes caught from the wild annually from 2000 to 2019. Animal Welfare. 2024;33:e6. doi:10.1017/awf.2024.7
+    url_main: https://fishcount.org.uk/fish-count-estimates-2/numbers-of-fish-caught-from-the-wild-each-year
+    url_download: https://fishcount.org.uk/estimates/wildfishes/data03/fishcount_global_wild_fish_estimate.php?selyear=2003to2022&selcountry=&selspecies=*+All+species+*
+    date_published: "2025"
+    date_accessed: 2026-11-24
+    license:
+      name: CC BY 4.0
+      url: https://fishcount.org.uk/estimates/wildfishes/data03/fishcount_global_wild_fish_estimate.php?selyear=2003to2022&selcountry=&selspecies=*+All+species+*
+outs:
+  - md5: 750e1696f422356251efb6ebd011eaa1
+    size: 273898
+    path: number_of_wild_fish_killed_for_food_by_country.html

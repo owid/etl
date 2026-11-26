@@ -11,7 +11,8 @@ So the contract lives here as code instead. `export_frame` applies it on the way
 those four failures structurally impossible rather than merely documented.
 
 What belongs in this module: anything every static viz needs and none of them should re-derive —
-the rcParams, the template proportions, the source citation, the save discipline. What does not:
+the rcParams, the template proportions, the source citation, the save discipline, and grapher's own
+axis treatment (`style_time_axis`, `year_axis_ticks`, `time_axis_ticks`). What does not: series
 colors, fonts, the logo, or any visual treatment the Figma template provides. Those are applied in
 Figma, and setting them here is work that gets thrown away.
 
@@ -45,6 +46,7 @@ and the loader, so promoting it to a step is a two-line edit:
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import date, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -105,9 +107,19 @@ def apply_svg_rcparams() -> None:
     `svg.fonttype="none"` is the one that matters most: the default outlines every glyph, so the copy
     arrives in Figma as vector paths that cannot be edited, restyled or spell-checked. Two shipped
     steps omitted this line and neither failure is visible in the rendered PNG.
+
+    It also starts every axes with grapher's x-axis furniture, so a step that never styles its axis
+    still draws grapher's: a 1px `#999` axis line, 5px x 1px `#999` tick marks and `#5b5b5b` tick
+    labels. `style_time_axis` sets the same values on one axes, and closes a time axis on its ends.
     """
     matplotlib.rcParams["svg.fonttype"] = "none"
     matplotlib.rcParams["svg.hashsalt"] = SVG_HASHSALT
+    matplotlib.rcParams["axes.edgecolor"] = AXIS_LINE_COLOR
+    matplotlib.rcParams["axes.linewidth"] = AXIS_LINE_PT
+    matplotlib.rcParams["xtick.color"] = AXIS_LINE_COLOR
+    matplotlib.rcParams["xtick.labelcolor"] = TICK_LABEL_COLOR
+    matplotlib.rcParams["xtick.major.size"] = TICK_LENGTH_PT
+    matplotlib.rcParams["xtick.major.width"] = AXIS_LINE_PT
 
 
 def unclip(fig: Any) -> None:
@@ -437,27 +449,45 @@ def year_axis_ticks(
 # points, and a template pixel is 0.72pt at PIXELS_PER_INCH.
 AXIS_LINE_PT = 72 / PIXELS_PER_INCH
 TICK_LENGTH_PT = 5 * AXIS_LINE_PT
+# Grapher's axis furniture (`grapher/src/axis/AxisViews.tsx`): the axis line and the tick marks are
+# `SOLID_TICK_COLOR`, the tick labels `GRAPHER_DARK_TEXT`. The swimlane chart, grapher's own timeline
+# of segments, labels its axis in `GRAPHER_LIGHT_TEXT` (#767676) instead.
+AXIS_LINE_COLOR = "#999999"
+TICK_LABEL_COLOR = "#5b5b5b"
 
 
-def style_year_axis(ax: Any, first: Any, last: Any) -> None:
-    """Close a year axis as grapher draws one: it runs from `first` to `last`, and its end labels sit inside it.
+def style_time_axis(
+    ax: Any,
+    first: Any,
+    last: Any,
+    *,
+    inset_ends: bool = True,
+    label_color: str = TICK_LABEL_COLOR,
+) -> None:
+    """Draw a time axis as grapher does: a 1px #999 line from `first` to `last`, with 5px #999 marks.
 
-    The range is pinned to the first and last year, with no padding. The bottom spine is 1px and
-    butt-capped: matplotlib's default projecting cap runs it half its width past each end tick, so
-    the line overhangs the marks that should close it. The x tick marks are 5px long and 1px wide;
-    matplotlib draws them butt-capped already, since a tick is a marker. The first visible tick label
-    is left-aligned to its tick (`ha="left"`), the last right-aligned (`ha="right"`) and the rest
-    centered, so neither end label hangs past the axis.
+    The range is pinned to `first` and `last`, with no padding. The bottom spine is the axis line:
+    1px, `#999` and butt-capped, since matplotlib's default projecting cap runs it half its width past
+    each end. The x tick marks are 5px long, 1px wide and `#999`, and the tick labels `#5b5b5b` (pass
+    `label_color="#767676"` for a timeline of segments, as grapher's swimlane chart labels it). Never
+    draw the axis yourself (an `axhline`, a thicker line in the text color): the spine is the line.
+
+    With `inset_ends` (a year axis, whose first and last ticks are the data's ends, or a sub-yearly
+    one with `time_axis_ticks(..., label_ends=True)`), the first visible label is left-aligned to its
+    tick and the last right-aligned, so neither hangs past the axis. Without it (a sub-yearly axis on
+    its calendar grid), every label is centered on its tick, and only one that would overhang an end
+    of the axis is aligned inwards, as grapher does.
 
     Call it after `ax.set_xticks`: matplotlib creates any new tick by copying the first one's
     properties, alignment included, so ticks set afterwards would all start left-aligned. `first` and
-    `last` are in the axis' own units (years, dates or category positions). Colors are left to the step.
+    `last` are in the axis' own units (years, dates or category positions).
     """
     ax.set_xlim(first, last)
     spine = ax.spines["bottom"]
     spine.set_capstyle("butt")
     spine.set_linewidth(AXIS_LINE_PT)
-    ax.tick_params(axis="x", length=TICK_LENGTH_PT, width=AXIS_LINE_PT)
+    spine.set_color(AXIS_LINE_COLOR)
+    ax.tick_params(axis="x", length=TICK_LENGTH_PT, width=AXIS_LINE_PT, color=AXIS_LINE_COLOR, labelcolor=label_color)
     # Zip the locations with the ticks, as matplotlib does at draw time, so this holds before any draw.
     lo, hi = sorted(ax.get_xlim())
     locs = ax.xaxis.get_majorticklocs()
@@ -468,8 +498,255 @@ def style_year_axis(ax: Any, first: Any, last: Any) -> None:
     )
     for i, (_, tick) in enumerate(visible):
         ha = "center"
-        if len(visible) > 1 and i == 0:
+        if inset_ends and len(visible) > 1 and i == 0:
             ha = "left"
-        elif len(visible) > 1 and i == len(visible) - 1:
+        elif inset_ends and len(visible) > 1 and i == len(visible) - 1:
             ha = "right"
         tick.label1.set_horizontalalignment(ha)
+    if inset_ends:
+        return
+    # Tell the verifier and Figma's restyle this axis is on grapher's calendar grid, whose ends carry no ticks.
+    ax.xaxis.set_gid(f"{_axes_subject(ax)}__x-axis-calendar")
+    if not visible:
+        return
+    # A centered label that would overhang the axis is aligned inwards instead.
+    renderer = ax.figure.canvas.get_renderer()
+    left, right = ax.transData.transform([[lo, 0], [hi, 0]])[:, 0].tolist()
+    for _, tick in visible:
+        extent = tick.label1.get_window_extent(renderer)
+        if extent.x0 < left - 0.5:
+            tick.label1.set_horizontalalignment("left")
+        elif extent.x1 > right + 0.5:
+            tick.label1.set_horizontalalignment("right")
+
+
+# The name year-axis steps already use.
+style_year_axis = style_time_axis
+
+
+def _axes_subject(ax: Any) -> str:
+    """The `<subject>` `name_furniture` gives an axes: `axes`, `axes2`, …, `axes-child1` for an inset."""
+    fig = ax.figure
+    for index, top in enumerate(fig.axes):
+        subject = "axes" if index == 0 else f"axes{index + 1}"
+        found = _find_subject(top, ax, subject)
+        if found:
+            return found
+    return "axes"
+
+
+def _find_subject(parent: Any, ax: Any, subject: str) -> str | None:
+    if parent is ax:
+        return subject
+    for j, child in enumerate(parent.child_axes):
+        found = _find_subject(child, ax, f"{subject}-child{j + 1}")
+        if found:
+            return found
+    return None
+
+
+# Grapher's sub-yearly time axis (`grapher/src/axis/timeAxisTicks.ts`), driven by the indicator's
+# `display.timeInterval`. Day values count from grapher's epoch, which anchors its every-other-day
+# grid; weekly grids land on the Monday before it.
+_GRAPHER_EPOCH = date(2020, 1, 21)
+_WEEK_GRID_REFERENCE = -1  # 2020-01-20, a Monday
+_MONTH_STEPS = (1, 2, 3, 6, 12, 24, 60, 120, 300, 600, 1200)
+_QUARTER_STEPS = (3, 6, 12, 24, 60, 120, 300, 600, 1200)
+_DAY_STEPS = (1, 2, 7, 14)
+_WEEK_STEPS = (7, 14)
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+SUB_YEARLY_INTERVALS = ("day", "week", "month", "quarter")
+
+
+def time_axis_ticks(
+    start: Any,
+    end: Any,
+    interval: str,
+    *,
+    plot_width_px: float = 470,
+    font_px: float = 14,
+    label_ends: bool = False,
+) -> tuple[list[date], list[str]]:
+    """Ticks and labels for a sub-yearly time axis, as grapher picks them for `display.timeInterval`.
+
+    `interval` is the indicator's `display.timeInterval`: `day`, `week`, `month` or `quarter` (a year
+    axis takes `year_axis_ticks`). Grapher puts the ticks on a calendar grid, not on the data's first
+    and last date:
+
+    - month and quarter: a January-anchored grid every 1, 2, 3, 6 or 12 months, then every 2, 5,
+      10, ... years (a quarter axis starts at 3 months);
+    - day and week: every day, every other day, weekly or biweekly on Mondays, and the month grid on
+      longer spans;
+    - the finest step whose tick count is within grapher's target for the plot's width (one tick per
+      1.8 base font sizes, 2 to 6) wins;
+    - labels: just the year (`2024`) when every tick is a January; otherwise `Apr` / `Apr 2024`, or
+      `Mar 16` / `Mar 16, 2024` on a day grid, with the year on the first tick and wherever it
+      changes, and on every tick once at least half of them carry it anyway.
+
+    A label that would collide with the one before it is dropped, mark and all, as grapher hides
+    overlapping labels. `label_ends=True` adds the data's first and last date as ticks of their own,
+    labelled as grapher labels a thumbnail's endpoints (`Feb 24, 2023`, `Feb 2023`; a week reads from
+    its Monday to its Sunday, a quarter from its first month to its last), and drops a grid label that
+    collides with one. Use it when the last date is the point, and style the axis with
+    `style_time_axis(ax, start, end)`; without it, pass `inset_ends=False`. `start` and `end` take
+    anything `pandas.Timestamp` reads. Returns the tick dates and their labels, for
+    `ax.set_xticks(dates, labels)` on an axis plotted against dates.
+    """
+    if interval not in SUB_YEARLY_INTERVALS:
+        raise ValueError(
+            f"interval must be one of {SUB_YEARLY_INTERVALS} (a year axis takes year_axis_ticks), not {interval!r}"
+        )
+    lo, hi = _to_date(start), _to_date(end)
+    if hi <= lo:
+        raise ValueError(f"the axis must run forwards, not from {lo} to {hi}")
+    # Grapher's static download sets its base font at 4/3 of the tick label size (13.5 under 18).
+    base_font_px = font_px * 4 / 3
+    target = round(min(max(plot_width_px / (base_font_px * 1.8), 2), 6))
+
+    placed: list[tuple[date, str, int]] = []  # date, label, priority (ends first)
+    if label_ends:
+        first, last = _endpoint_labels(lo, hi, interval)
+        placed += [(lo, first, 1), (hi, last, 1)]
+    placed += [(d, label, 2) for d, label in _sub_yearly_grid(lo, hi, interval, target)]
+
+    def span(d: date, label: str) -> tuple[float, float]:
+        # Lato's average glyph is about 0.55em; a label is centered on its tick unless it would overhang.
+        width = 0.55 * font_px * len(label)
+        x = (d - lo).days / (hi - lo).days * plot_width_px
+        a = min(max(x - width / 2, 0.0), plot_width_px - width)
+        return a, a + width
+
+    shown: list[tuple[date, str]] = []
+    boxes: list[tuple[float, float]] = []
+    for d, label, _ in sorted(placed, key=lambda item: item[2]):
+        a, b = span(d, label)
+        # Grapher pads each label by 3px before testing for overlap.
+        if any(a < q + 3 and p < b + 3 for p, q in boxes):
+            continue
+        shown.append((d, label))
+        boxes.append((a, b))
+    shown.sort(key=lambda item: item[0])
+    return [d for d, _ in shown], [label for _, label in shown]
+
+
+def _to_date(value: Any) -> date:
+    import pandas as pd
+
+    return pd.Timestamp(value).date()
+
+
+def _day(d: date) -> int:
+    return (d - _GRAPHER_EPOCH).days
+
+
+def _from_day(n: int) -> date:
+    return _GRAPHER_EPOCH + timedelta(days=n)
+
+
+def _add_months(d: date, months: int) -> date:
+    total = d.year * 12 + d.month - 1 + months
+    return date(total // 12, total % 12 + 1, 1)
+
+
+def _grid_for_target(steps: Iterable[int], target: int, span: int, grid_for_step: Any) -> list[date] | None:
+    """The grid of the finest step that stays within the target count (`findGridForTarget`)."""
+    for step in steps:
+        grid = grid_for_step(step)
+        if span / step <= target or len(grid) <= target:
+            return grid
+    return None
+
+
+def _month_grid(lo: date, hi: date, steps: tuple[int, ...], target: int) -> list[tuple[date, str]] | None:
+    """`buildContinuousMonthGridTicks`: a January-anchored month grid, with the year on change."""
+    span_months = (hi.year * 12 + hi.month) - (lo.year * 12 + lo.month)
+    if span_months <= 0:
+        return None
+
+    def grid_for_step(step: int) -> list[date]:
+        anchor_year = lo.year
+        if step >= 12:
+            anchor_year = (anchor_year // (step // 12)) * (step // 12)
+        anchor = date(anchor_year, 1, 1)
+
+        def months_from_anchor(d: date) -> int:
+            return (d.year - anchor.year) * 12 + d.month - 1
+
+        first_index = -(-months_from_anchor(lo) // step)
+        last_index = months_from_anchor(hi) // step
+        grid = [_add_months(anchor, k * step) for k in range(first_index, last_index + 1)]
+        return [d for d in grid if lo <= d <= hi]
+
+    grid = _grid_for_target(steps, target, span_months, grid_for_step) or grid_for_step(steps[-1])
+    if not grid:
+        return None
+    if all(d.month == 1 for d in grid):
+        return [(d, str(d.year)) for d in grid]
+    return _label_with_year_on_change(
+        grid, lambda d: _MONTHS[d.month - 1], lambda d: f"{_MONTHS[d.month - 1]} {d.year}"
+    )
+
+
+def _day_grid(lo: date, hi: date, steps: tuple[int, ...], target: int) -> list[tuple[date, str]] | None:
+    """`buildContinuousDayGridTicks`: a day or Monday grid, continuing on the month grid when too dense."""
+    span_days = (hi - lo).days
+    if span_days <= 0:
+        return None
+
+    def grid_for_step(step: int) -> list[date]:
+        reference = _WEEK_GRID_REFERENCE if step % 7 == 0 else 0
+        first_index = -(-(_day(lo) - reference) // step)
+        last_index = (_day(hi) - reference) // step
+        return [_from_day(reference + k * step) for k in range(first_index, last_index + 1)]
+
+    grid = _grid_for_target(steps, target, span_days, grid_for_step)
+    if grid is None:
+        monthly = _month_grid(lo, hi, _MONTH_STEPS, target)
+        if monthly:
+            return monthly
+        grid = grid_for_step(steps[-1])
+    if not grid:
+        return None
+    return _label_with_year_on_change(
+        grid, lambda d: f"{_MONTHS[d.month - 1]} {d.day}", lambda d: f"{_MONTHS[d.month - 1]} {d.day}, {d.year}"
+    )
+
+
+def _sub_yearly_grid(lo: date, hi: date, interval: str, target: int) -> list[tuple[date, str]]:
+    if interval == "quarter":
+        grid = _month_grid(lo, hi, _QUARTER_STEPS, target)
+    elif interval == "month":
+        grid = _month_grid(lo, hi, _MONTH_STEPS, target)
+    elif interval == "week":
+        grid = _day_grid(lo, hi, _WEEK_STEPS, target)
+    else:
+        grid = _day_grid(lo, hi, _DAY_STEPS, target)
+    return grid or []
+
+
+def _label_with_year_on_change(grid: list[date], short: Any, with_year: Any) -> list[tuple[date, str]]:
+    """`labelGridWithYearOnChange`: the year on the first tick and at each change, or on all once half carry it."""
+    new_year = [i == 0 or grid[i].year != grid[i - 1].year for i in range(len(grid))]
+    if sum(new_year) >= len(grid) / 2:
+        return [(d, with_year(d)) for d in grid]
+    return [(d, with_year(d) if new else short(d)) for d, new in zip(grid, new_year)]
+
+
+def _endpoint_labels(lo: date, hi: date, interval: str) -> tuple[str, str]:
+    """A thumbnail's endpoint labels (`formatTimeShort` / `formatTimeShortEnd` of the interval's column)."""
+
+    def day_label(d: date) -> str:
+        return f"{_MONTHS[d.month - 1]} {d.day}, {d.year}"
+
+    def month_label(d: date) -> str:
+        return f"{_MONTHS[d.month - 1]} {d.year}"
+
+    if interval == "day":
+        return day_label(lo), day_label(hi)
+    if interval == "week":
+        return day_label(lo - timedelta(days=lo.weekday())), day_label(hi + timedelta(days=6 - hi.weekday()))
+    if interval == "quarter":
+        first_month = date(lo.year, (lo.month - 1) // 3 * 3 + 1, 1)
+        last_month = date(hi.year, (hi.month - 1) // 3 * 3 + 3, 1)
+        return month_label(first_month), month_label(last_month)
+    return month_label(lo), month_label(hi)

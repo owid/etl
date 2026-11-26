@@ -179,6 +179,8 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 
 **Always use `etl pr`** - never use `git checkout -b` + `gh pr create` manually. `etl pr` carries uncommitted changes onto the new branch: if `git status` shows changes that aren't yours, add `-t` to start in a worktree of its own.
 
+**Changes spanning etl and owid-grapher share one staging server when both PRs use the same branch name.** `staging-site-<branch>` checks out the etl branch of the same name when one exists, so pick the name explicitly (`etl pr "..." <category> -w <branch>`) to test both together. That covers staging only: on production, merge the owid-grapher PR first when the ETL change depends on its migration.
+
 ```bash
 # 1. Create PR (creates new branch, does NOT commit)
 .venv/bin/etl pr "Update dataset" data
@@ -338,7 +340,7 @@ Silent data corruption is one of the easier bugs to miss: a step can run cleanly
 
 ## Querying MySQL, and verifying charts on staging
 
-Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the public Datasette, and the staging indicator/SVG endpoints.
+Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the internal Datasette (over Tailscale; `public.duckdb` off the tailnet), and the staging indicator/SVG endpoints.
 
 ## Package Management
 

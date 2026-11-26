@@ -45,7 +45,7 @@ definitions:
     population_projections: |-
       For years after 2023, our population data comes from the UN’s population projections (World Population Prospects 2024, medium scenario). For some territories (e.g. Svalbard and Jan Mayen) no estimates are published, so we don’t calculate values per 1,000 people after 2023.
     population_share: |-
-      We calculate this by dividing the rounded figure from IDMC by the country’s population and multiplying it by 1,000. For population, we use our long-term population dataset, which you can explore in the [population data explorer](https://ourworldindata.org/explorers/population-and-demography).
+      We calculate this by dividing the rounded figure from IDMC by the country’s population and multiplying it by 1,000. For population, we use our long-term population dataset, which you can explore in the [population data explorer](https://ourworldindata.org/grapher/population-and-demography).
     footnote_displacements: |-
       One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
     footnote_zero_displacements: &footnote_zero_displacements |-
@@ -54,10 +54,6 @@ definitions:
       A value of 0 means that the Internal Displacement Monitoring Centre (IDMC) is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
     idmc_na_processing: |-
       IDMC uses “N/A” to denote that no displacements or IDPs were recorded for that year. In our dataset, we convert these “N/A” values to 0 to make this more transparent and the data easier to interpret.
-    idmc_na_processing_disaster_stock: |-
-      IDMC uses “N/A” to denote that no displacements or IDPs were recorded for that year. From 2019, we convert these “N/A” values to 0. Before 2019, IDMC only has figures on people displaced by disasters for some countries, so we leave the missing values blank (no data).
-    idmc_na_processing_total_stock: |-
-      We only calculate this total from 2019. Before 2019, IDMC only has figures on people displaced by disasters for some countries, so a total of people displaced by conflict and by disasters would be incomplete. From 2019, we convert IDMC’s “N/A” values to 0.
     idmc_rounded: &idmc_rounded |-
       The data source provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
     idmc_criteria: &idmc_criteria |-
@@ -90,7 +86,7 @@ tables:
           {definitions.idmc_definitions.disaster}
         description_processing: |-
           - This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
-          - {definitions.processing_notes.idmc_na_processing_total_stock}
+          - {definitions.processing_notes.idmc_na_processing}
         description_key:
           - *stock_data
           - *idmc_criteria
@@ -120,7 +116,7 @@ tables:
           - {definitions.processing_notes.population_share}
           - {definitions.processing_notes.population_projections}
           - This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
-          - {definitions.processing_notes.idmc_na_processing_total_stock}
+          - {definitions.processing_notes.idmc_na_processing}
         presentation:
           grapher_config:
             note: *footnote_zero_idps
@@ -187,7 +183,7 @@ tables:
           - *idmc_criteria
           - *idmc_rounded
         description_processing: |-
-          - {definitions.processing_notes.idmc_na_processing_disaster_stock}
+          - {definitions.processing_notes.idmc_na_processing}
         presentation:
           grapher_config:
             note: *footnote_zero_idps
@@ -210,7 +206,7 @@ tables:
         description_processing: |-
           - {definitions.processing_notes.population_share}
           - {definitions.processing_notes.population_projections}
-          - {definitions.processing_notes.idmc_na_processing_disaster_stock}
+          - {definitions.processing_notes.idmc_na_processing}
         presentation:
           grapher_config:
             note: *footnote_zero_idps

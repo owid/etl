@@ -1351,3 +1351,8 @@ steps:
     - data://garden/gallup/2026-07-15/ai_indicator:
       - data://meadow/gallup/2026-07-15/ai_indicator:
         - snapshot://gallup/2026-07-15/ai_indicator.csv
+  # archived; last active in e2875fe830b9 on 2026-11-20
+  data://grapher/artificial_intelligence/2026-08-20/robotaxis:
+    - data://garden/artificial_intelligence/2026-08-20/robotaxis:
+      - data://meadow/artificial_intelligence/2026-08-20/robotaxis:
+        - snapshot://artificial_intelligence/2026-08-20/robotaxis.csv

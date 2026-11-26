@@ -50,6 +50,13 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
+            # Lower ratings mean more liberties, so show rises in red and falls in green.
+            dumbbell:
+              trendColorMap:
+                increase: "#d73c50"
+                decrease: "#00875e"
             hasMapTab: true
             tab: map
             yAxis:
@@ -95,6 +102,13 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
+            # Lower ratings mean more rights, so show rises in red and falls in green.
+            dumbbell:
+              trendColorMap:
+                increase: "#d73c50"
+                decrease: "#00875e"
             hasMapTab: true
             tab: map
             yAxis:
@@ -186,6 +200,8 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -222,6 +238,7 @@ tables:
               - SlopeChart
               - DiscreteBar
               - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -259,6 +276,7 @@ tables:
               - SlopeChart
               - DiscreteBar
               - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -343,6 +361,8 @@ tables:
           People living in free countries
           <%- endif %>
         unit: "countries"
+        description_processing: &description_population |-
+          We calculate the number of people living under each type of regime using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
       pop_electdem:
         title: |-
           <% if category == '-1' %>
@@ -353,3 +373,4 @@ tables:
           People living in electoral democracies
           <%- endif %>
         unit: "countries"
+        description_processing: *description_population

@@ -36,6 +36,8 @@ definitions:
 dataset:
   update_period_days: 365
   title: "Long run whaling data (Rocha + IWC)"
+  owners:
+    - Tuna Acisu
 
 
 tables:

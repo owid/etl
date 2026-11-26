@@ -1,6 +1,3 @@
----
-status: new
----
 # What are the world's deadliest animals?
 
 !!! info ""
