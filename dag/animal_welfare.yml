@@ -17,16 +17,6 @@ steps:
   data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
     - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
 
-  # Number of wild-caught fish killed for food.
-  data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-    - data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-      - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
-      - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_by_country.pdf
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2026-07-01/income_groups
-    - data://garden/demography/2024-07-15/population
-  data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
   # Fishcount - Number of wild-caught fish killed for food, and wild fish caught for fishmeal and fish oil.
   data://grapher/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
     - data://garden/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
