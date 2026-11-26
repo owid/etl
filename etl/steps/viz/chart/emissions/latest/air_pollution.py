@@ -199,9 +199,17 @@ def run() -> None:
         ]
     )
 
-    # Map tab only on single-indicator views (y-axis settings are in the YAML's common_views).
-    # Single-indicator title/subtitle remain unset and inherit from the indicator metadata.
+    # Config shared by every view, including the grouped ones (which `definitions.common_views` doesn't reach).
+    # Map tab only on single-indicator views. The explorer's titles hide the time span, and its footer links to the
+    # topic page. Single-indicator title/subtitle remain unset and inherit from the indicator metadata.
     # The default view (all pollutants, all sectors, total) is the first view after sorting.
-    c.set_global_config({"hasMapTab": _has_map_tab})
+    c.set_global_config(
+        {
+            "hasMapTab": _has_map_tab,
+            "yAxis": {"min": 0, "canChangeScaleType": True},
+            "hideAnnotationFieldsInTitle": {"entity": True, "time": True, "changeInPrefix": True},
+            "originUrl": "https://ourworldindata.org/air-pollution",
+        }
+    )
 
     c.save()
