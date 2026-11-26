@@ -3,6 +3,7 @@ grapher_schema: "012"
 title:
   title: Live animals
   title_variant: ""
+slug: live-animals
 topic_tags:
   - Animal Welfare
 default_selection:

@@ -3,6 +3,7 @@ grapher_schema: "012"
 title:
   title: Animal welfare laws
   title_variant: ""
+slug: animal-welfare-laws
 topic_tags:
   - Animal Welfare
 default_selection:

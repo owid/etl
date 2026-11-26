@@ -3,6 +3,7 @@ grapher_schema: "012"
 title:
   title: Animals killed for food
   title_variant: ""
+slug: animals-killed
 topic_tags:
   - Animal Welfare
 default_selection:
