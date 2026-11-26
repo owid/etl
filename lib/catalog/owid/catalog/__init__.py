@@ -6,6 +6,7 @@ from owid.catalog.core import processing, tables, utils
 from owid.catalog.core.datasets import CHANNEL, Dataset
 from owid.catalog.core.indicators import Indicator, Variable
 from owid.catalog.core.meta import (
+    Annotation,
     ChangelogEntry,
     DatasetMeta,
     License,
@@ -33,6 +34,7 @@ __all__ = [
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
+    "Annotation",
     "Origin",
     "License",
     # backwards compatibility re-exports

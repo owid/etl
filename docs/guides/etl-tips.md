@@ -181,15 +181,24 @@ Make sure to point users to an alternative function or method that they can use 
 
 Please deprecate function with care, and make sure to check if the function is widely used, and communicate the deprecation to the team.
 
-## Add entity annotations to your dataset
-Just add the field `display.entityAnnotationsMap` to the desired indicator.
+## Add annotations to your indicators
+Add the field `annotations` to the desired indicator.
+Each annotation is a short note shown on charts, optionally tied to some entities and to a point or range in time.
 
 ```yaml
-display:
-    entityAnnotationsMap: |-
-        Spain: Some annotation
-        France: Another annotation
+annotations:
+  # A note on Spain, for all years.
+  - entities: [Spain]
+    text: Some annotation.
+  # A note on France, for a range of years.
+  - entities: [France]
+    time: 2003
+    time_end: 2017
+    text: Another annotation.
 ```
+
+See the field `annotations` in the [metadata reference](../architecture/metadata/reference/) for all the options.
+The old field `display.entityAnnotationsMap` is deprecated.
 
 !!! note "Space is limited"
 

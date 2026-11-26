@@ -712,7 +712,7 @@
       },
       "entityAnnotationsMap": {
         "type": "string",
-        "description": "Entity annotations"
+        "description": "Deprecated: use the indicator's `annotations` field instead. Entity annotations, one `Entity: text` line per entity."
       },
       "timeInterval": {
         "description": "Interval that each value in the year/time column represents. Sub-yearly intervals (day, week, month, quarter) are encoded as days-since-`zeroDay` integers.",

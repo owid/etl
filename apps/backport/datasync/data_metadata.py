@@ -125,6 +125,8 @@ def _variable_metadata(
     licenseJson = row.pop("license")
     descriptionKeyJson = row.pop("descriptionKey")
     sortJson = row.pop("sort")
+    # Default for databases that don't have the column yet
+    annotationsJson = row.pop("annotations", None)
 
     display = json.loads(displayJson)
     license = json.loads(licenseJson) if licenseJson else None
@@ -133,6 +135,7 @@ def _variable_metadata(
     if isinstance(descriptionKey, list):
         descriptionKey = description_key_to_string(descriptionKey)
     sort = json.loads(sortJson) if sortJson else None
+    annotations = json.loads(annotationsJson) if annotationsJson else None
 
     # group fields from flat structure into presentation field
     presentation = dict(
@@ -153,6 +156,7 @@ def _variable_metadata(
         presentation=_omit_nullable_values(presentation),
         license=license,
         descriptionKey=descriptionKey,
+        annotations=annotations,
     )
 
     assert variableMetadata["type"], "type must be set"

@@ -704,6 +704,65 @@
                   ],
                   "category": "metadata"
                 },
+                "annotations": {
+                  "title": "Indicator's annotations",
+                  "type": "array",
+                  "description": "Short notes shown on charts of the indicator, each optionally tied to some entities and to a point or range in time.",
+                  "requirement_level": "optional",
+                  "guidelines": [
+                    [
+                      "Start `text` with a capital letter and end it with a period, even when it is short."
+                    ],
+                    [
+                      "Don't repeat `time` or `time_end` in `text`: charts already show them next to the note."
+                    ],
+                    [
+                      "Omit `entities` for a note on the whole indicator."
+                    ],
+                    [
+                      "`time` alone is one year; with `time_end` it is a range of years. Use `time_end: latest` for a range that runs to the end of the data, rather than a year that goes stale at the next update. Omit both for a note on the whole series."
+                    ],
+                    [
+                      "Write times as years for yearly data, and as YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
+                    ],
+                    [
+                      "Replaces `display.entityAnnotationsMap`, which is now deprecated. The two must not be combined on the same indicator."
+                    ]
+                  ],
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["text"],
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "description": "Text of the note, in markdown (links are allowed)."
+                      },
+                      "entities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Entities the note applies to."
+                      },
+                      "time": {
+                        "type": ["integer", "string"],
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
+                        "description": "Year (e.g. `2003`) or date (e.g. `2020-03-15`) the note applies to, or the start of a range. A year can also be injected with `yaml_params`, e.g. `\"{LATEST_YEAR}\"`."
+                      },
+                      "time_end": {
+                        "type": ["integer", "string"],
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\}|latest)$",
+                        "description": "End of the range that starts at `time`, in the same form, or `latest` for a range that ends at the last time of each entity's data (filled in when the indicator is upserted, so it keeps up with new data)."
+                      },
+                      "dimensions": {
+                        "type": "object",
+                        "description": "Only for long tables: values of the extra index levels the note applies to, e.g. `{cause: Maternal disorders}`. The grapher step keeps the note on the indicators of matching dimensions and removes this field when flattening the table. A step fails if no table of its dataset has data for these values."
+                      }
+                    }
+                  },
+                  "category": "metadata"
+                },
                 "description_processing": {
                   "title": "Indicator's processing description",
                   "type": "string",

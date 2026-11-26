@@ -15,7 +15,7 @@ from owid.catalog.core.indicators import (
     get_unique_licenses_from_indicators,
     get_unique_origins_from_indicators,
 )
-from owid.catalog.core.meta import VariableMeta, VariablePresentationMeta
+from owid.catalog.core.meta import Annotation, VariableMeta, VariablePresentationMeta
 
 # description_key of the indicators defined in conftest.py.
 DESCRIPTION_KEY_A = "- Key description point 1 of Indicator 1\n- Common key description point"
@@ -512,6 +512,7 @@ def test_combine_indicators_metadata_uses_all_fields() -> None:
         "description_short",
         "description_from_producer",
         "description_key",
+        "annotations",
         "origins",
         "licenses",
         "unit",
@@ -653,3 +654,12 @@ def test_combine_indicators_processing_level_with_jinja_templates() -> None:
     # Unknown literal levels still fail loudly.
     with pytest.raises(AssertionError):
         combine_indicators_processing_level([_var("mjor")])
+
+
+def test_combined_indicator_keeps_annotations_of_all_indicators() -> None:
+    shared = Annotation(text="Shared note.")
+    a = Variable([1, 2], name="a")
+    a.metadata.annotations = [shared, Annotation(text="Note on a.", time=2000)]
+    b = Variable([3, 4], name="b")
+    b.metadata.annotations = [Annotation(text="Note on b.", entities=["France"]), shared]
+    assert (a / b).metadata.annotations == [shared, Annotation(text="Note on a.", time=2000), b.metadata.annotations[0]]
