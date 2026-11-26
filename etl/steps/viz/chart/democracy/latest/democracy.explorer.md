@@ -1,3 +1,5 @@
+### About this data explorer
+
 This explorer seeks to make data on democracy easier to access and understand. It provides and explains data from eight leading democracy datasets: their main democracy measures, indicators of specific characteristics, and global and regional overviews. You can learn more about the approaches — **and which democracy measure may be best to answer your questions** — in our article explaining [how researchers measure democracy](https://ourworldindata.org/democracies-measurement).
 
 ### Explore more of our work on democracy

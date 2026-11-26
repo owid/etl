@@ -8,6 +8,8 @@ Indicator FAUST and `display.*` live in the indicators' garden `.meta.yml`, whic
 so most views are just dimensions plus `indicators.y`.
 """
 
+import heapq
+
 from etl.helpers import PathFinder
 from etl.viz import combine_charts
 from etl.viz.chart.explorer_text import add_explorer_text
@@ -66,6 +68,48 @@ def categorical_bins_to_color_scale(config: dict) -> dict:
     return config
 
 
+def order_choices_as_each_source(combined, charts, dimension: str, within: str | None = None) -> None:
+    """Order the choices of `dimension` so that every source lists them in its own order.
+
+    A multidim's dropdown shows a dimension's available choices in one global order, but the same
+    choice can sit at different positions in different sources. The explorer worked around this
+    with invisible characters in the choice names; here the choices get one order that agrees
+    with each source (and, if `within` is given, with each choice of `within` in that source):
+    a topological sort, with ties broken by the combined order.
+    """
+    position = {choice.slug: i for i, choice in enumerate(combined.get_dimension(dimension).choices)}
+    after: dict[str, set[str]] = {slug: set() for slug in position}
+    for chart in charts:
+        source_order = {c.slug: i for i, c in enumerate(chart.get_dimension(dimension).choices)}
+        groups: dict[str | None, set[str]] = {}
+        for view in chart.views:
+            groups.setdefault(view.dimensions[within] if within else None, set()).add(view.dimensions[dimension])
+        for slugs in groups.values():
+            ordered = sorted(slugs, key=source_order.__getitem__)
+            for before, slug in zip(ordered, ordered[1:]):
+                after[before].add(slug)
+
+    # Kahn's algorithm, taking the earliest available choice (in the combined order) at each step.
+    pending = {slug: 0 for slug in position}
+    for slugs in after.values():
+        for slug in slugs:
+            pending[slug] += 1
+    ready = [(position[slug], slug) for slug, n in pending.items() if n == 0]
+    heapq.heapify(ready)
+    order = []
+    while ready:
+        _, slug = heapq.heappop(ready)
+        order.append(slug)
+        for nxt in after[slug]:
+            pending[nxt] -= 1
+            if pending[nxt] == 0:
+                heapq.heappush(ready, (position[nxt], nxt))
+    assert len(order) == len(position), f"The sources order the `{dimension}` choices inconsistently."
+
+    dim = combined.get_dimension(dimension)
+    dim.choices = sorted(dim.choices, key=lambda choice: order.index(choice.slug))
+
+
 def run() -> None:
     # Build one multidim per source dataset.
     charts = [
@@ -89,6 +133,10 @@ def run() -> None:
         chart_choices_names=list(SOURCES.values()),
     )
     c.get_dimension("dataset").presentation = DimensionPresentation(type="dropdown")
+
+    # Keep each source's own order of metrics, and of sub-metrics within each metric.
+    order_choices_as_each_source(c, charts, "metric")
+    order_choices_as_each_source(c, charts, "sub_metric", within="metric")
 
     # Settings every view shares (the explorer set them once, for all views).
     c.set_global_config(
