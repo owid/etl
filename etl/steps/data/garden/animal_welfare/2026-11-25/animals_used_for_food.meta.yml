@@ -95,7 +95,7 @@ tables:
       live_animals: &live_animals
         title: &title_live_animals |-
           Live <% if animal == "laying_hens" %>laying hens<% elif animal == "milk_cattle" %>cattle used for milk<% else %><< animal.replace("_", " ") >><% endif %><% if per_capita == "per_capita" %> per person<% endif %>
-        description_short: Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year.
+        description_short: Number of animals alive at a given time of the year. This is different from the number of animals slaughtered in a given year.
         processing_level: minor
         display:
           name: |-
