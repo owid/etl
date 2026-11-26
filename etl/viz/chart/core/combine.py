@@ -384,10 +384,9 @@ def combine_charts(
         "title_variant": "Use a YAML to define these attributes",
     }
     if not is_explorer:
+        # Fill in placeholders only when the config gives no title at all (a given title has no variant to fill).
         if "title" not in cconfig:
             cconfig["title"] = default_title
-        else:
-            cconfig["title"] = {**default_title, **cconfig["title"]}
         if "default_selection" not in cconfig:
             cconfig["default_selection"] = charts[0].default_selection
     else:
