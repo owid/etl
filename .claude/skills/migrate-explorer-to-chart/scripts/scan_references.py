@@ -413,19 +413,21 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 f"""SELECT cc.id, cc.slug, ch.id AS chart_id, nc.id AS narrative_id, nc.name AS narrative_name,
                            mx.multiDimId AS mdim_id, cc.`{c}` AS txt
                     FROM chart_configs cc
-                    LEFT JOIN charts ch ON ch.configId = cc.id
+                    LEFT JOIN charts ch ON cc.id IN (ch.configId, ch.patchConfigId)
                     LEFT JOIN narrative_charts nc ON nc.chartConfigId = cc.id
                     LEFT JOIN multi_dim_x_chart_configs mx ON mx.chartConfigId = cc.id
                     WHERE cc.`{c}` LIKE %s""",
                 params=(like,),
             )
+            # Missing joins come back as NaN, which is truthy: turn them into None.
+            rows = rows.astype(object).where(rows.notna(), None)
             for r in rows.to_dict("records"):
                 for m in pat.finditer(r["txt"]):
                     if r["chart_id"]:
                         add(
                             "Chart config",
-                            f"chart {r['chart_id']} ({r['slug']})",
-                            f"{ADMIN}/charts/{r['chart_id']}/edit",
+                            f"chart {int(r['chart_id'])} ({r['slug']})",
+                            f"{ADMIN}/charts/{int(r['chart_id'])}/edit",
                             m.group(0),
                             "config text",
                         )
