@@ -108,6 +108,8 @@ def create_autoupdate_pr(update_name: str, files: list[Path], assignees: list[st
     # Don't create PR if there are no changes
     if not has_changes:
         log.info(f"No changes in {update_name}")
+        # A PR that already holds the latest files still gets any assignee added to the .dvc files since.
+        assign_open_prs(branch_name, assignees)
         return
 
     existing_prs = github_repo.get_open_prs(branch_name)
@@ -120,11 +122,17 @@ def create_autoupdate_pr(update_name: str, files: list[Path], assignees: list[st
         pr_url = github_repo.create_pull_request(title, branch_name, body)
         log.info(f"Pull request created: {pr_url}")
 
-    # Assign the PR, so that someone is responsible for reviewing and merging it. Also done for a PR that already
-    # exists, so that adding an assignee to the .dvc files takes effect on the next run.
-    if assignees:
-        for pr in github_repo.get_open_prs(branch_name):
-            pr.add_to_assignees(*assignees)
+    # Assign the PR, so that someone is responsible for reviewing and merging it.
+    assign_open_prs(branch_name, assignees)
+
+
+def assign_open_prs(branch_name: str, assignees: list[str] | None) -> None:
+    """Assign the open PRs of a branch. Run on every update, so that an assignee added to the .dvc files takes effect
+    on the next run, even for a PR that already exists."""
+    if not assignees:
+        return
+    for pr in github_repo.get_open_prs(branch_name):
+        pr.add_to_assignees(*assignees)
 
 
 def run_updates(
