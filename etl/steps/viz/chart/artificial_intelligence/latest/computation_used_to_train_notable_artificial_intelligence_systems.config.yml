@@ -1,0 +1,43 @@
+chart_config_id: 0191b6c7-4dec-7605-957b-973ed8bb2298
+grapher_schema: "012"
+slug: computation-used-to-train-notable-artificial-intelligence-systems
+topic_tags:
+  - Artificial Intelligence
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "epoch#training_compute_flop"
+      color:
+        catalogPath: "epoch#training_compute_reporting"
+    config:
+      title: "Computation used to train notable AI models"
+      subtitle: "Each dot is a notable AI model, placed by its publication date and the computation used to train it. Colors show whether its training compute was directly reported by the developer or indirectly estimated by Epoch AI."
+      note: "One floating-point operation (FLOP) is a single calculation, such as adding or multiplying two decimal numbers. Where developers do not report it, Epoch AI estimates training compute from a model’s size, training data, hardware, or cost; the least-documented estimates may be off by a factor of about 30. About half of notable models have no compute figure and are not shown."
+      xAxis:
+        label: "Publication date"
+      yAxis:
+        label: "Training compute (FLOP)"
+        scaleType: "log"
+        canChangeScaleType: true
+      originUrl: "/artificial-intelligence"
+      chartTypes:
+        - "ScatterPlot"
+      colorScale:
+        customCategoryColors:
+          Reported by the developer: "#4C6A9C"
+          Estimated by Epoch AI: "#996D36"
+      entityType: "model"
+      entityTypePlural: "models"
+      hideScatterLabels: true
+      # Rows the grapher step adds for the yearly records, which aren't models.
+      excludedEntityNames:
+        - "Maximum data"
+        - "Maximum parameters"
+        - "Maximum compute"
+      scatterPointLabelStrategy: "y"
+      hideAnnotationFieldsInTitle:
+        time: true
+        entity: true
+        changeInPrefix: true

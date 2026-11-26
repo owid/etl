@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+autoupdate:
+  name: Epoch
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Data on AI Models
+    title_snapshot: All AI models
+    description: |-
+      Epoch AI tracks over 3,700 machine learning models, from the 1950s to today. For each model, it records details such as the publication date, the developer, the number of parameters, the size of the training data, and the amount of computation used to train it.
+
+      Epoch AI also records how it found each model’s training compute. Sometimes the developers report it. Otherwise, Epoch AI estimates it from what is known about the model, such as its size and training data, the hardware it was trained on and for how long, its training cost, or its benchmark scores.
+
+    # Citation
+    producer: Epoch AI
+    citation_full: "Epoch AI, 'Data on AI models'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/ai-models' [online resource]"
+
+    # Files
+    url_main: https://epoch.ai/data/ai-models
+    url_download: https://epoch.ai/data/all_ai_models.csv
+    date_accessed: '2026-11-26'
+    date_published: '2026-11-24'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://epoch.ai/data/ai-models
+outs:
+  - md5: 3cc289d3185cc38477808bc8b14b24b6
+    size: 6967725
+    path: epoch_all_ai_models.csv
