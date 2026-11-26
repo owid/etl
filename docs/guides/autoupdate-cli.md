@@ -46,6 +46,17 @@ outs:
 
 The `name` field is used to group related snapshots together. Multiple snapshots can share the same update name, which means they will be processed together and included in the same pull request.
 
+Add `assignees` with the GitHub handles (without `@`) of the people who review and merge the update, so that its pull request doesn't sit unattended:
+
+```yaml
+autoupdate:
+  name: Update name
+  assignees:
+    - github-handle
+```
+
+The pull request is assigned to everyone listed by any snapshot of the group, also when it already exists.
+
 
 ## Advanced approach
 

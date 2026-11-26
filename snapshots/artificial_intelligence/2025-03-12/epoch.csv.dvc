@@ -2,6 +2,8 @@
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 autoupdate:
   name: Epoch
+  assignees:
+    - lucasrodes
 meta:
   origin:
     # Data product / Snapshot

@@ -19,7 +19,7 @@ etl autoupdate --filter "population"
 import datetime as dt
 import subprocess
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import click
@@ -47,9 +47,16 @@ class SnapshotUpdate:
     name: str
     snapshot_script: Path
     dvc_files: list[Path]
+    # GitHub handles to assign the update's PR to, from `autoupdate.assignees` in the .dvc file.
+    assignees: list[str] = field(default_factory=list)
 
 
-def create_autoupdate_pr(update_name: str, files: list[Path]):
+def group_assignees(group_updates: list[SnapshotUpdate]) -> list[str]:
+    """GitHub handles to assign a group's PR to: every assignee listed by any of its snapshots, in order, once."""
+    return list(dict.fromkeys(handle for update in group_updates for handle in update.assignees))
+
+
+def create_autoupdate_pr(update_name: str, files: list[Path], assignees: list[str] | None = None):
     """Create a pull request with given files. It creates it via API without modifying the local repo."""
     # name = Path(snapshot).stem.replace("_", "-")
     # version = snapshot.split("/")[1]
@@ -112,6 +119,12 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
         body = "" if has_changes else "This PR was created without file changes but includes a merge with master."
         pr_url = github_repo.create_pull_request(title, branch_name, body)
         log.info(f"Pull request created: {pr_url}")
+
+    # Assign the PR, so that someone is responsible for reviewing and merging it. Also done for a PR that already
+    # exists, so that adding an assignee to the .dvc files takes effect on the next run.
+    if assignees:
+        for pr in github_repo.get_open_prs(branch_name):
+            pr.add_to_assignees(*assignees)
 
 
 def run_updates(
@@ -188,7 +201,11 @@ def run_updates(
 
     # If MD5 has changed, create a PR.
     if create_pr and not any(identical for identical in identicals):
-        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # ty: ignore
+        create_autoupdate_pr(
+            update_name=update.name,  # ty: ignore
+            files=files_to_update,
+            assignees=group_assignees(group_updates),
+        )
 
     # Restore the DVC files to their original state after processing
     if not dry_run:
@@ -259,6 +276,7 @@ def cli(
                 name=meta["autoupdate"]["name"],
                 snapshot_script=snapshot_script,
                 dvc_files=dvc_files,
+                assignees=meta["autoupdate"].get("assignees", []),
             )
         )
 
