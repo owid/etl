@@ -8,6 +8,8 @@ meta:
     description: |-
       The OECD Affordable Housing Database (AHD) helps countries monitor access to good-quality affordable housing and strengthen the knowledge base for policy evaluation. It brings together cross-national information from OECD countries, Key Partners and EU member states.
 
+      The database groups indicators along three dimensions: housing market, housing conditions and affordability, and public policies towards affordable housing. Each indicator presents data, relevant definitions and methodology, and key results. Indicators also discuss comparability, data issues, and, where relevant, include the raw data or descriptive information across countries.
+    description_snapshot: |-
       This snapshot is the document of indicator HC3.2, "National strategies for combating homelessness". It describes the national and regional strategies that countries have to address homelessness, and whether they follow a Housing First or housing-led approach, as reported by governments to the OECD Questionnaire on Affordable and Social Housing (QuASH) and found through OECD desk research.
     date_published: "2026-09-10"
 

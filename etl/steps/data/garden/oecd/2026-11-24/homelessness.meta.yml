@@ -147,8 +147,8 @@ definitions:
   gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical definition of each country.
   women_undercount: The OECD notes that these statistics likely undercount women. Women are less likely to sleep rough or use homeless shelters, and more likely to stay with family or friends. In 20 countries, shelters for victims of domestic violence aren’t counted.
 
-  harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
-  methodology_issues: More details about definitions, methodology, and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
+  harmonization: Countries use different definitions and data collection methods. The OECD presents each country’s statistics following its national definition, and classifies them by the ETHOS Light typology where possible.
+  methodology_issues: More details about definitions, methodology, and comparability issues can be found in the [OECD documentation, People experiencing homelessness and housing exclusion](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
   country_notes: For more information on the statistical definitions for each country, please check the [OECD’s Country Notes on Homelessness data](https://www.oecd.org/en/topics/sub-issues/affordable-housing/homelessness.html).
   unconventional_dwellings: Data for Australia, Canada, Germany, Italy, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
   united_kingdom_rates: Data for the United Kingdom only considers England. For ETHOS Light 2 and 3, it refers to the number of households experiencing homelessness per 100,000 households.
@@ -178,7 +178,7 @@ definitions:
     For Mexico, whose estimate counts only people living rough, we leave out the other categories. The OECD takes them from the census, and Mexico doesn’t count them as homelessness.
 
     Values for France are approximate.
-  description_key_ethos_breakdown: These numbers break down each country’s headline estimate of homelessness, following its own statistical definition. Not every country counts every category, so the categories of different countries can’t be added up or compared directly.
+  description_key_ethos_breakdown: These numbers break down each country’s headline estimate of homelessness by ETHOS Light category, following its own statistical definition. They may not add up to the headline estimate, which can include living situations outside the ETHOS Light categories. Not every country counts every category, so the categories of different countries can’t be added up or compared directly.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -761,7 +761,7 @@ tables:
         title: Type of strategy to address homelessness
         unit: ""
         short_unit: ""
-        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to address homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
+        description_short: Whether the country has a national Housing First or housing-led approach to homelessness, another national homelessness strategy, or no national strategy.
         description_key:
           - Housing First models aim to provide tailored, intensive support for people experiencing homelessness who have high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
