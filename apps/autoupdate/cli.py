@@ -56,12 +56,17 @@ def group_assignees(group_updates: list[SnapshotUpdate]) -> list[str]:
     return list(dict.fromkeys(handle for update in group_updates for handle in update.assignees))
 
 
+def autoupdate_branch_name(update_name: str) -> str:
+    """Branch that holds the PR of an autoupdate group."""
+    return f"auto-{underscore(update_name).replace('_', '-')}"
+
+
 def create_autoupdate_pr(update_name: str, files: list[Path], assignees: list[str] | None = None):
     """Create a pull request with given files. It creates it via API without modifying the local repo."""
     # name = Path(snapshot).stem.replace("_", "-")
     # version = snapshot.split("/")[1]
     # snapshot_hash = hashlib.md5(snapshot.encode()).hexdigest()[:3]
-    branch_name = f"auto-{underscore(update_name).replace('_', '-')}"
+    branch_name = autoupdate_branch_name(update_name)
     title = f"🤖 Autoupdate: {update_name}"
 
     # Get the latest commit SHA on master
@@ -214,6 +219,9 @@ def run_updates(
             files=files_to_update,
             assignees=group_assignees(group_updates),
         )
+    elif create_pr and not dry_run:
+        # Some snapshot is unchanged, so the PR isn't updated, but an open one still gets any new assignee.
+        assign_open_prs(autoupdate_branch_name(group_updates[0].name), group_assignees(group_updates))
 
     # Restore the DVC files to their original state after processing
     if not dry_run:

@@ -14,3 +14,9 @@ def test_group_assignees_merges_snapshots_in_order_without_duplicates():
 
 def test_group_assignees_empty_when_no_snapshot_lists_any():
     assert group_assignees([_update(), _update()]) == []
+
+
+def test_autoupdate_branch_name():
+    from apps.autoupdate.cli import autoupdate_branch_name
+
+    assert autoupdate_branch_name("Epoch") == "auto-epoch"
