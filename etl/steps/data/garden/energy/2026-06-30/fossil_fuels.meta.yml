@@ -241,8 +241,7 @@ tables:
           - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
         display:
           name: Coal
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 0
         presentation:
           title_public: '{tables.fossil_fuels.variables.coal_reserves_to_production_ratio.title}'
       coal_reserves_tonnes:
@@ -487,8 +486,7 @@ tables:
           - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
         display:
           name: Gas
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 0
         presentation:
           title_public: '{tables.fossil_fuels.variables.gas_reserves_to_production_ratio.title}'
       oil_consumption_m3:
@@ -722,8 +720,7 @@ tables:
           - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
         display:
           name: Oil
-          roundingMode: significantFigures
-          numSignificantFigures: 3
+          numDecimalPlaces: 0
         presentation:
           title_public: '{tables.fossil_fuels.variables.oil_reserves_to_production_ratio.title}'
       total_consumption_per_capita_kwh:
