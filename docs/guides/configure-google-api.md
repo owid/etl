@@ -5,32 +5,9 @@ tags:
 ---
 # Google API configuration
 
-In order to use the Google API for ETL tasks, you need to configure your Google Cloud Project and set up OAuth credentials. Follow these steps:
+ETL's Google helpers (`etl/google.py`: Docs, Drive and Sheets) sign in as you through one OAuth client that the whole team shares. It lives in the `owid-etl` Google Cloud project, and only `@ourworldindata.org` accounts can sign in through it. You don't need a Cloud project of your own.
 
-1. Create a Google Cloud Project:
+1. Download [the shared `client_secret.json`](https://ourworldindata.1password.com/app#/E46VV72PBZFZXCCJCLRXIFV4WY/Vault/E46VV72PBZFZXCCJCLRXIFV4WY:tzic5fifbreubh4uzchmxk4tt4:mv2wimfc6lgiehhghd7u5lpmgm) from 1Password and save it as `~/.config/owid_etl_doc/client_secret.json`. Keep it out of git repositories: `owid/etl` is public.
+2. Log in once. Run `from etl.google import GoogleDrive; GoogleDrive()` from a Python terminal or interactive window, and sign in with your OWID account in the browser window that opens. This saves `token.pickle` next to `client_secret.json`, so later runs don't ask again.
 
-    - Go to Google Cloud Console: [https://console.cloud.google.com/](https://console.cloud.google.com/) (ensure you are logged in with your owid google account)
-    - Click "Select a project (top menu)" > "New Project."
-    - Name the project `owid-etl-surname`, replacing surname with your last name (e.g., owid-etl-rosado).
-    - Click "Create"
-
-2. Enable Required APIs:
-
-    - Navigate to "APIs & Services" > "Library"
-    - Enable the following APIs: Google Drive API, Google Docs API, Google Sheets API
-
-3. Create OAuth Credentials:
-
-    - Go to "APIs & Services" > "Credentials."
-    - Click "Create Credentials" > "OAuth Client ID."
-    - ⚠️ If prompted, configure the consent screen:
-        - Select "External" and click "Create"
-        - Fill in the required fields (e.g., app name, email) and click "Save and Continue" until the process is complete.
-    - Choose "Desktop App" as the application type.
-    - Click "Create" and then "Download JSON" to save the client_secret.json file.
-    - Save the downloaded file in your home directory in a hidden folder and rename as: `.config/owid_etl_doc/client_secret.json`
-
-4. Generate your own token pickle:
-
-    - Run the following code from the python terminal (or interactive window): `from etl.google import GoogleDrive; GoogleDrive()`
-    - A browser window should appear. Log in with your owid google account. This will create a token.pickle in the same folder as your `client_secret.json`
+**If you set up a personal `owid-etl-<surname>` project before:** replace your `client_secret.json` with the shared one. The next run notices that your saved login belongs to the old client and asks you to sign in once more. After that, the old project can be deleted.
