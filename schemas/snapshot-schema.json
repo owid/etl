@@ -109,6 +109,13 @@
         "notify": {
           "type": "string",
           "description": "Slack user to notify when the autoupdate is successful."
+        },
+        "assignees": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "GitHub handles (without @) of the people to assign the autoupdate's pull request to. Snapshots of the same autoupdate share one pull request, assigned to everyone listed by any of them."
         }
       },
       "required": [

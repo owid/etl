@@ -1,5 +1,7 @@
 autoupdate:
   name: Epoch
+  assignees:
+    - lucasrodes
 meta:
   origin:
     # Data product / Snapshot
