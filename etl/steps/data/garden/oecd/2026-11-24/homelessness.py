@@ -157,6 +157,12 @@ RATE_TOTAL_EXCEPTIONS = {"Israel"}
 # ETHOS Light categories in Table HC3.1.A1.
 ETHOS_COLUMNS = [f"ethos_light_{i}" for i in range(1, 7)]
 
+# Countries that report ETHOS Light categories outside their headline estimate, so their breakdown adds up to more.
+# Table HC3.1.A1 shades in grey the categories included in the headline: Poland leaves ETHOS Light 6 unshaded, and
+# its shaded categories add up exactly to the headline. (Mexico's unshaded categories are removed in corrections.)
+# NOTE: Check the shading again at each update.
+BREAKDOWN_OUTSIDE_HEADLINE = {"Poland"}
+
 
 def run() -> None:
     #
@@ -408,8 +414,12 @@ def sanity_check_outputs(tb: Table) -> None:
     # Coverage didn't shrink much from the previous release (it had 22 countries with point-in-time rates).
     assert tb["point_in_time_total"].notna().sum() >= 22, "Fewer countries with point-in-time rates than before."
 
-    # The breakdown by ETHOS Light category never exceeds the headline number of the same year.
-    for col in ETHOS_COLUMNS:
-        above = tb[f"number_{col}"] > tb["number"]
-        if above.any():
-            log.warning(f"{col} above the headline estimate", countries=tb.loc[above, "country"].tolist())
+    # The ETHOS Light categories add up to at most the headline number of the same year (the headline can include
+    # people outside ETHOS Light, so it can be larger). A margin of 2 allows for rounding (Luxembourg, Spain).
+    breakdown = tb[[f"number_{col}" for col in ETHOS_COLUMNS]].astype(float).sum(axis=1, min_count=1)
+    above = (breakdown > tb["number"] + 2) & ~tb["country"].isin(BREAKDOWN_OUTSIDE_HEADLINE)
+    if above.any():
+        log.warning(
+            "ETHOS Light breakdown adds up to more than the headline estimate",
+            countries=tb.loc[above, ["country", "year"]].values.tolist(),
+        )
