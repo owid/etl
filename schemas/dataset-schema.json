@@ -724,13 +724,13 @@
                       }
                     ],
                     [
-                      "`text` should not repeat `time` or `time_end`, since charts already show them next to the note."
+                      "`text` must not repeat `time` or `time_end`, since charts already show them next to the note."
                     ],
                     [
-                      "`entities` should be omitted for a note on the whole indicator."
+                      "`entities` must be omitted for a note on the whole indicator."
                     ],
                     [
-                      "`time` alone should be used for a note on one year, `time` with `time_end` for a range of years, and neither for a note on the whole series."
+                      "`time` alone must be used for a note on one year, `time` with `time_end` for a range of years, and neither for a note on all years."
                     ],
                     [
                       "`time_end` should be `latest` for a range that runs to the end of the data, rather than a year that goes stale at the next update."
