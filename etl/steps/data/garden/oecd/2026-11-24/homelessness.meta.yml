@@ -788,6 +788,19 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Whether the country has a national Housing First or housing-led approach to homelessness, another national homelessness strategy, or neither. A Housing First approach can exist without a formal national strategy.
+        # From indicator HC3.2, not HC3.1: overrides the common description_from_producer.
+        description_from_producer: >-
+          This indicator presents an overview of strategies to tackle homelessness at the national and regional
+          levels, as reported by governments responding to the 2025, 2023, 2021 and 2019 OECD Questionnaire on
+          Social and Affordable Housing (QuASH), and related desk research. Homelessness strategies are defined as
+          policy documents setting out targets and actions to tackle homelessness, often linked to actions in other
+          policy sectors, such as housing, social protection, health and/or employment. This indicator also presents
+          information on the existence of housing-led and Housing First strategies in OECD and EU countries.
+
+
+          Housing First and housing-led approaches aim to provide long-term, immediate housing solutions to people
+          experiencing homelessness, as distinct from a “staircase model” that makes access to housing contingent on
+          the completion of counseling or treatment programs.
         description_key:
           - Housing First models aim to provide tailored, intensive support for people experiencing homelessness who have high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
