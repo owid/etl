@@ -34,12 +34,6 @@ default_selection:
   - Wheat & Rye
 topic_tags:
   - Environmental Impacts of Food Production
-definitions:
-  common_views:
-    - config:
-        hasMapTab: false
-        entityType: food product
-        entityTypePlural: food products
 
 dimensions:
   - slug: view_type

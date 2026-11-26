@@ -269,8 +269,19 @@ def run() -> None:
         ]
     )
 
-    # Chart type applies to every view (DiscreteBar default; StackedDiscreteBar for the YAML stage view).
-    c.set_global_config({"chartTypes": lambda view: [_chart_type(view)]})
+    # Config shared by every view, including the grouped ones (which `definitions.common_views` doesn't reach).
+    # Chart type is DiscreteBar, except StackedDiscreteBar for the YAML stage view. The explorer's titles hide the
+    # data year, and its footer links to the topic page.
+    c.set_global_config(
+        {
+            "chartTypes": lambda view: [_chart_type(view)],
+            "hasMapTab": False,
+            "entityType": "food product",
+            "entityTypePlural": "food products",
+            "hideAnnotationFieldsInTitle": {"entity": True, "time": True, "changeInPrefix": True},
+            "originUrl": "https://ourworldindata.org/environmental-impacts-of-food",
+        }
+    )
 
     # Templated title / subtitle are only needed for the Clark `specific_food_product`
     # side. Commodity single-y views inherit from the Poore & Nemecek garden meta.yml;
