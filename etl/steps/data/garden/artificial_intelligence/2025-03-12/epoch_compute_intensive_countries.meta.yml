@@ -7,7 +7,7 @@ definitions:
       topic_tags:
         - Artificial Intelligence
       grapher_config:
-        note: Large-scale AI models are those trained with more than 10²³ floating-point operations (FLOP).
+        note: Epoch AI counts a model as large-scale if it was, or may have been, trained with more than 10²³ floating-point operations (FLOP).
 
     unit: 'AI systems'
     short_unit: ''
