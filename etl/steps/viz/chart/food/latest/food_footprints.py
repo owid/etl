@@ -239,7 +239,7 @@ def run() -> None:
                 "choice_new_slug": "all_impacts",
                 "view_config": {
                     "selectedFacetStrategy": "metric",
-                    "facetYDomain": "independent",
+                    "yAxis": {"facetDomain": "independent"},
                 },
             },
             {
@@ -248,7 +248,7 @@ def run() -> None:
                 "choice_new_slug": "compare_units",
                 "view_config": {
                     "selectedFacetStrategy": "metric",
-                    "facetYDomain": "independent",
+                    "yAxis": {"facetDomain": "independent"},
                 },
             },
         ],
