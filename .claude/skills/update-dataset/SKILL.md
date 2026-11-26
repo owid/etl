@@ -33,6 +33,10 @@ Assumptions:
 
 **Every item below is mandatory.** When an item names a skill, run that skill; a partial hand check doesn't count. Skip an item only on the user's explicit request, and list the skip in the PR's open items.
 
+**Track it with the script, not from memory.** `scripts/progress.py init <short_name>` copies these items into `workbench/<short_name>/progress.md`. Close each one with ` | evidence: <artifact, link or reason>` (an `N/A` needs its reason). Every check you tell the user you'll run goes in that file's "Added during this update" section the moment you say it. `scripts/progress.py check <short_name>` lists what is still open and exits with 1 until nothing is: run it before the QA hand-off and before saying the update is ready to merge.
+
+**A later change reopens the checks that read it.** When you change chart configs (type, selection, FAUST, links), metadata text or the data after an audit ran, run that audit again on the changed surfaces before handing off: the referencing-prose audit, the empty-entity audit, and the contrast with the producer's documentation.
+
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Pipeline refresher: run `scripts/pipeline_overview.py`, brief the user on the chain (what each step does, external inputs, consumers, who last updated it), link the producer's main documentation (methodology, indicator definitions, codebook, main report), and give a provisional structure verdict — re-confirm it after the snapshot + meadow diffs (see 0b)
@@ -52,8 +56,9 @@ Assumptions:
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Run `/check-metadata-typos` and `/check-metadata-style` on the new steps (see 6b)
+- [ ] Contrast every reader-facing text with the producer's latest documentation, passage by passage: indicator metadata, the snapshot `.dvc`, and the FAUST, legend labels and links of every published chart on the dataset, admin-authored ones included. Propose the fixes, citing the passage; apply them only after the user agrees (see 6b)
 - [ ] Changelog: decide whether this release deserves an entry in `dataset.changelog` of the garden `.meta.yml`, dated with the new version, whether or not the dataset has a changelog yet. Entries are optional. They are release notes for the people who use the data, so capture only changes that matter to them, briefly. Show the user the draft before committing it.
-- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c)
+- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c). This covers the links in chart configs too (`relatedQuestions`, links in notes and subtitles), and for those also that each one points at the right chart
 - [ ] Run the adversarial review (`/fact-check-dataset`) once the garden step is built: its `prepare.py` command, then its two lanes as background agents, then the assembled report (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
@@ -61,7 +66,7 @@ Assumptions:
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Run `check-hardcoded-years` after all remaps — numeric time pins below the new data's latest time hide the update; propose `"latest"` fixes with user sign-off (see step 7)
 - [ ] Run the empty-entity audit (`check-empty-entities`) as a background agent after the indicator upgrade: full automated pass, scaled follow-up; regressions vs production = fix, pre-existing = document (see step 7)
-- [ ] Run the referencing-prose audit — read the prose of every surface the sweep found for quantitative claims this update invalidates, and hand the recomputed numbers to content — never edit published prose yourself (see step 7)
+- [ ] Run the referencing-prose audit — read every document the sweep found **in full**, check every claim it makes about the data (numeric or not) and the parameters of every embed and link against the new data and the new chart configs, and hand the findings to content — never edit published prose yourself (see step 7)
 - [ ] Post `@codex review` as a separate PR comment once the last data or metadata change is pushed, then address its comments (fix valid ones + resolve all threads). Request it again after every later push that changes the PR's own content (step code, metadata, snapshots, DAG entries), including fixes from the QA review, so the merged and announced version is the reviewed one; merging master or deleting the old version's files doesn't need one
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment/etl-build` PR check is green, then triage the data-diff report's data-point losses and 🔴-tier datasets and run the full-report audit probes (see "Silent-breakage check" section)
@@ -74,7 +79,7 @@ Assumptions:
 - [ ] After the merge, show both announcements again in the session: the Slack text in full, and the /latest Doc link (or, when the post was declined, its eligible date), with any number the merged data changed corrected (see step 8)
 
 Persistence:
-- After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
+- Keep `workbench/<short_name>/progress.md` current through `scripts/progress.py` (see above): tick each item with its evidence as you finish it.
 - **Log lessons in `workbench/<short_name>/lessons.md` as you hit them** (what you expected, what happened, the rule). Fold them into skills only when the user asks, and only lessons that would change what a future run does (apply this bar yourself, then list the changes per skill for the user); a quirk of one dataset goes in a `# NOTE:` in that dataset's step files instead. For each lesson, **re-read the target skill on `master` first**. If existing text already covers the point, sharpen that text in place. Add new text only when nothing covers it: one or two sentences stating the rule and its condition (CLAUDE.md, "Write skills and this file as rules, not history"), with anything longer (a procedure, a query) in a reference file next to the skill.
 
 ## Checkpoints — when to pause
@@ -129,7 +134,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 0) Initial setup
    - Check if `workbench/<short_name>/progress.md` exists to determine if continuing existing update
    - If starting fresh: delete `workbench/<short_name>` directory if it exists
-   - Create fresh `workbench/<short_name>` directory for artifacts
+   - Create fresh `workbench/<short_name>` directory for artifacts, and the checklist in it: `.venv/bin/python .claude/skills/update-dataset/scripts/progress.py init <short_name>`
 
 0b) Pipeline refresher — brief the user before changing anything
 
@@ -475,7 +480,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
    - **Jinja spacing and style guide** — `/check-metadata-style` on the grapher step. A mechanical pass first catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering; then it audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is usually needed — the skill checks the file's `Last synced from Notion` date and refreshes it from Notion (in a separate PR) when it is more than two weeks old.
    - **Clarity for a general audience** — read every user-facing field with non-specialist eyes. The other two skills enforce structure and style; this one judges whether the text is *understandable*.
-   - **Contrast the carried-over text with the new documentation** — `etl update` copies every `.meta.yml` and `.dvc` field verbatim, so read each indicator's text against the documentation found in step 3 (methodology, what's new) and propose a fix, citing the passage, for each claim that is wrong, stale or missing a caveat (`.claude/rules/producer-documentation.md`, "Contrast what's already written"). For the metadata you write or change, tell the user and the PR description which documentation each indicator's text rests on and where in it, or that it is inferred from the data (same rule, "Say what the metadata rests on").
+   - **Contrast the carried-over text with the new documentation** — `etl update` copies every `.meta.yml` and `.dvc` field verbatim, so read each indicator's text against the documentation found in step 3 (methodology, what's new) and propose a fix, citing the passage, for each claim that is wrong, stale or missing a caveat (`.claude/rules/producer-documentation.md`, "Contrast what's already written"). For the metadata you write or change, tell the user and the PR description which documentation each indicator's text rests on and where in it, or that it is inferred from the data (same rule, "Say what the metadata rests on"). Do the same for the FAUST, legend labels and links of every published chart on the dataset, read from the staging chart configs, since admin-authored text never passes through the `.meta.yml`. These are proposals: list them with the passage they rest on, and apply them only once the user agrees.
    - **Dimension sweep** (dimensional indicators only) — a sentence written for one breakdown renders on all the sibling views, where the view's own filtering can make it false: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Render the text per dimension value (the grapher channel already has it flattened) and read each output as a reader of that chart. Prefer qualifying the wording so it holds everywhere over adding a Jinja branch. Full version: check 5 of the canonical suite in `/generate-metadata`.
 
    ### Clarity checklist (do manually, no skill yet)
@@ -569,6 +574,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    3. **No automated check is decisive — a suspected-broken link always ends at flag-and-ask.** curl, `WebFetch`, and Wayback only accumulate suspicion: a missing Wayback capture is **non-evidence** (plenty of live URLs were simply never archived), and a double curl+WebFetch failure can be bot-blocking (hosts like BLS block both curl *and* WebFetch while serving browsers fine), so never clear a link on Wayback evidence alone. The only decisive test is a real browser — offer to open the URL in the user's Chrome through the Claude in Chrome extension, or ask them to open it — so report the evidence trail (statuses, capture date or absence) and **ask before rewriting any external link in metadata**. Replacing a working link with a "safer" alternative because of a false-positive is worse than leaving the original. Apply the same restraint here as the global "Checkpoints — when to pause" section.
 
    Fix any genuinely-non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing. The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren.
+
+   **Links in chart configs.** The step files don't hold every link a reader clicks. For every published chart on the dataset, read `relatedQuestions` and the links in `note` and `subtitle` from the staging config (`AdminAPI.get_chart_config(id)`), and check that each one resolves and that its target is the chart its text describes (a "counted over a whole year" link must open the flow-count version of the same chart, not another indicator's). Fix a wrong target on staging, so it rides Chart Diff.
 
    **Anchor fragments — HTTP 200 can't validate them.** Servers ignore everything after `#`, so `https://ourworldindata.org/poverty#key-insightsfdd` (broken anchor) returns the same 200 as the real `#key-insights`. For every checked URL that carries a fragment, run a second pass against the page *body*:
    ```bash
@@ -764,7 +771,15 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      `posts_gdocs.markdown` (the body) **and** `posts_gdocs.content->>'$.title'` — the title is stored in the
      content JSON, not in `markdown`, so a body-only read misses the headline, and a body can be correctly
      hedged while the title states the bare multiple — and the title is what readers see in feeds and social
-     cards. Then re-derive every quantitative claim against the new data.
+     cards. Read each document **in full**: a scan for sentences with numbers misses claims without digits.
+     Then check every claim against the new data and the new chart configs:
+     - **numbers**, re-derived from the new data;
+     - **claims without numbers**: trends ("has doubled", "declined, then increased"), comparisons ("more women
+       than men"), rankings, which countries a chart covers, what the source does ("harmonized data"), and what a
+       chart lets readers do ("you can only choose one country");
+     - **embed and link parameters** (`country=`, `time=`, `tab=`, `stackMode=`): each must still make sense on
+       the chart as it now is. A chart that changes type or coverage in this update (a line chart turned into a
+       single-year bar, a series gone) can turn a valid parameter into a near-empty view.
      The distinction that decides whether there is anything to do:
      - **Time-bounded claims survive appended periods — but not revisions of the periods they name.** "In
        early 2023 it was around $4 billion; by late 2025 it had grown to $62 billion" is untouched by a new
@@ -1216,7 +1231,7 @@ In the same message, remind the user that when the dataset is important and the 
 
 **Close every hand-off with an explicit list of what's still open — in the PR body, not just chat** (chat scrolls away; the PR is what the reviewer and future-you actually read). This is one of the two cases where the list is worth writing out formally rather than as a sentence; see `.claude/docs/open-items.md` for what tends to get dropped. An update generates far more loose ends than it closes; this workflow's usual danglers: content/gdoc edits, producer error reports and any Metadata Diff rejection still unactioned (handed off — `metadata-rejections.md` is addressed to the dataset owner and nothing in the merge enforces it), reader-facing config changes held for sign-off (awaiting a decision), audits skipped at the user's request and anything the staging build didn't cover (nobody checked it) — plus a **fourth category, deferred to a follow-up PR**, where the two-PR pattern is in play (downstream consumers to repoint, old-version archiving, charts on retired indicators): that list is the follow-up PR's scope, so losing it means redoing the analysis.
 
-**Before saying the update is ready to merge, confirm every checklist item that names a skill ran that skill**, including the two background audits, with their findings handled. Run anything missing now, and wait for any audit still running.
+**Before the QA hand-off, and again before saying the update is ready to merge, run `scripts/progress.py check <short_name>`.** It must report nothing open: every item, including the checks you told the user you'd run, closed with its evidence, and every item that names a skill closed by that skill, background audits included, with their findings handled. Run anything missing now, and wait for any audit still running.
 
 **Right before merging, check that the producer hasn't published a newer release since the snapshot.** Updates take days, and some producers release monthly. Read the current release date where the snapshot got `date_published` (the API's publication-date attribute, the dataset page's stamp) and spot-check a few values against the snapshot. A newer release goes back to the user before the merge.
 
