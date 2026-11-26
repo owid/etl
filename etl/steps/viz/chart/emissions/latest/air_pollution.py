@@ -1,57 +1,215 @@
-"""
-This chart was created as a proof of concept. It can be deleted if not used.
-"""
+"""Air pollution data explorer, as a multidim. It replaces the `viz://explorer/emissions/latest/air_pollution` step.
 
-from owid.catalog.meta import TableDimension
+Single upstream table backs it:
+- CEDS air pollutants (`grapher/emissions/2025-02-12/ceds_air_pollutants`) — 198 columns
+  covering 9 pollutants × 11 sectors × 2 metrics (absolute, per capita).
+
+The grapher step already tags each column with `m.dimensions = {pollutant, sector}` using
+display values ("BC" / "Agriculture"). This step rewrites those to URL-friendly slugs and
+adds a `per_capita` slot derived from `original_short_name` (`emissions` vs
+`emissions_per_capita`). `paths.create_chart(...)` then auto-expands 198 single-
+indicator views.
+
+`c.group_views(...)` adds:
+- 2 "All pollutants" facet views (sector=all_sectors × per_capita ∈ {total, per_capita}).
+- 18 "Breakdown by sector" facet views (one per pollutant × per_capita).
+
+`c.drop_views(...)` removes the cross-product all_pollutants × <real sector> views (which
+the legacy explorer doesn't surface) and the all_pollutants × breakdown_by_sector view
+(emitted when the second `group_views` runs over views the first had already produced).
+
+Single-indicator views inherit title/subtitle from the indicator's stored grapher_config;
+multi-indicator (grouped) views set them explicitly via `group_views` view_config callables.
+`c.set_global_config(...)` sets hasMapTab per view.
+"""
 
 from etl.helpers import PathFinder
 
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run() -> None:
-    # Load configuration from adjacent yaml file.
-    config = paths.load_config()
+# ---------------------------------------------------------------------------
+# Slug mappings (upstream display values → URL-friendly slugs)
+# ---------------------------------------------------------------------------
 
-    # Load (flattened) table from grapher channel with dimension metadata
-    tb = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
-    # Use the updated function with mapping from original_short_name to configuration values.
-    add_dimension(
-        tb,
-        dimension={"name": "Per capita", "slug": "per_capita"},
-        mapping={
-            "emissions_per_capita": {"new_short_name": "emissions", "value": "True"},
-            "emissions": {"value": "False"},
-        },
+POLLUTANT_SLUG = {
+    "NH₃": "nh3",
+    "BC": "bc",
+    "CO": "co",
+    "CH₄": "ch4",
+    "NOₓ": "nox",
+    "N₂O": "n2o",
+    "NMVOC": "nmvoc",
+    "OC": "oc",
+    "SO₂": "so2",
+}
+
+SECTOR_SLUG = {
+    "All sectors": "all_sectors",
+    "Agriculture": "agriculture",
+    "Buildings": "buildings",
+    "Domestic aviation": "domestic_aviation",
+    "Energy": "energy",
+    "Industry": "industry",
+    "International aviation": "international_aviation",
+    "International shipping": "international_shipping",
+    "Solvents": "solvents",
+    "Transport": "transport",
+    "Waste": "waste",
+}
+
+POLLUTANTS = list(POLLUTANT_SLUG.values())
+SECTORS_REAL = [v for v in SECTOR_SLUG.values() if v != "all_sectors"]
+
+
+# ---------------------------------------------------------------------------
+# FAUST templates
+# ---------------------------------------------------------------------------
+
+
+def _dim(view, key):
+    """Safe accessor — robust to missing keys (e.g. the auto-added `chart__slug`)."""
+    return view.dimensions.get(key)
+
+
+def _is_per_capita(view) -> bool:
+    return _dim(view, "per_capita") == "per_capita"
+
+
+def _all_pollutants_title(view):
+    return (
+        "Per capita emissions of air pollutants from all sectors"
+        if _is_per_capita(view)
+        else "Emissions of air pollutants from all sectors"
     )
 
-    # Create chart
+
+def _all_pollutants_subtitle(view):
+    return (
+        "Measured in kilograms and split by major pollutant."
+        if _is_per_capita(view)
+        else "Measured in tonnes and split by major pollutant."
+    )
+
+
+def _build_breakdown_title(pollutant_name: dict[str, str]):
+    """Build the breakdown-by-sector title callable, closing over the YAML's slug→name map.
+
+    The second `group_views` call also produces an `all_pollutants × breakdown_by_sector`
+    view that's dropped immediately after, but its title callable runs first — so guard.
+    """
+
+    def _breakdown_title(view):
+        name = pollutant_name.get(_dim(view, "pollutant"))
+        if name is None:
+            return None
+        if _is_per_capita(view):
+            return f"Per capita {name.lower()} emissions by sector"
+        return f"{name} emissions by sector"
+
+    return _breakdown_title
+
+
+def _has_map_tab(view) -> bool:
+    return _dim(view, "pollutant") != "all_pollutants" and _dim(view, "sector") != "breakdown_by_sector"
+
+
+# ---------------------------------------------------------------------------
+# Step
+# ---------------------------------------------------------------------------
+
+
+def run() -> None:
+    config = paths.load_config()
+
+    ds = paths.load_dataset("ceds_air_pollutants")
+    tb = ds.read("ceds_air_pollutants", load_data=False)
+
+    # Translate upstream dimension display values to URL-friendly slugs and add a
+    # `per_capita` slot derived from each column's `original_short_name`.
+    for col in tb.columns:
+        if col in {"country", "year"}:
+            continue
+        d = tb[col].metadata.dimensions
+        if d is None:
+            continue
+        is_per_capita = tb[col].metadata.original_short_name == "emissions_per_capita"
+        tb[col].metadata.original_short_name = "emissions"
+        tb[col].metadata.dimensions = {
+            "pollutant": POLLUTANT_SLUG[d["pollutant"]],
+            "sector": SECTOR_SLUG[d["sector"]],
+            "per_capita": "per_capita" if is_per_capita else "total",
+        }
+
     c = paths.create_chart(
         config=config,
         tb=tb,
+        indicator_names="emissions",
+        dimensions={
+            "pollutant": POLLUTANTS,
+            "sector": list(SECTOR_SLUG.values()),
+            "per_capita": ["total", "per_capita"],
+        },
     )
 
-    # Sort choices alphabetically
-    c.sort_choices({"pollutant": lambda x: sorted(x)})
+    # Pull slug→display-name from the chart so titles stay in sync with the
+    # dropdown labels users see.
+    breakdown_title = _build_breakdown_title(c.get_choice_names("pollutant"))
 
-    # Save
+    c.group_views(
+        groups=[
+            # All-pollutants facet: collapse the 9 pollutants into one multi-indicator view per
+            # (sector, per_capita). The cross-product against real sectors is dropped below.
+            {
+                "dimension": "pollutant",
+                "choices": POLLUTANTS,
+                "choice_new_slug": "all_pollutants",
+                "view_config": {
+                    "selectedFacetStrategy": "metric",
+                    "yAxis": {"facetDomain": "independent"},
+                    "title": _all_pollutants_title,
+                    "subtitle": _all_pollutants_subtitle,
+                },
+            },
+            # Breakdown-by-sector facet: collapse the real sectors (excluding `all_sectors`) into
+            # one multi-indicator view per (pollutant, per_capita).
+            {
+                "dimension": "sector",
+                "choices": SECTORS_REAL,
+                "choice_new_slug": "breakdown_by_sector",
+                "view_config": {
+                    "selectedFacetStrategy": "entity",
+                    "yAxis": {"facetDomain": "independent"},
+                    "title": breakdown_title,
+                },
+            },
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # Drop unwanted views:
+    # - all_pollutants × <real sector>: the legacy explorer only shows the all-pollutants
+    #   facet for sector=all_sectors.
+    # - all_pollutants × breakdown_by_sector: created when the second `group_views` runs
+    #   over the views the first one had already produced.
+    c.drop_views(
+        [
+            {"pollutant": "all_pollutants", "sector": "breakdown_by_sector"},
+            *[{"pollutant": "all_pollutants", "sector": s} for s in SECTORS_REAL],
+        ]
+    )
+
+    # Config shared by every view, including the grouped ones (which `definitions.common_views` doesn't reach).
+    # Map tab only on single-indicator views. The explorer's titles hide the time span, and its footer links to the
+    # topic page. Single-indicator title/subtitle remain unset and inherit from the indicator metadata.
+    # The default view (all pollutants, all sectors, total) is the first view after sorting.
+    c.set_global_config(
+        {
+            "hasMapTab": _has_map_tab,
+            "yAxis": {"min": 0, "canChangeScaleType": True},
+            "hideAnnotationFieldsInTitle": {"entity": True, "time": True, "changeInPrefix": True},
+            "originUrl": "https://ourworldindata.org/air-pollution",
+        }
+    )
+
     c.save()
-
-
-def add_dimension(table, dimension: TableDimension, mapping: dict) -> None:
-    """Adds a dimension and updates column metadata.
-
-    The mapping is a dict where each key is an original short name and its value is a dict.
-    The value dict can contain:
-      - 'new_short_name': Optional new short name.
-      - 'value': The value value to set for the dimension.
-    """
-    table.m.dimensions.append(dimension)
-    for _, v in table.items():
-        key = v.m.original_short_name
-        if key in mapping:
-            config = mapping[key]
-            v.m.dimensions[dimension["slug"]] = config["value"]
-            if "new_short_name" in config:
-                v.m.original_short_name = config["new_short_name"]
