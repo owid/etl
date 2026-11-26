@@ -706,3 +706,6 @@ steps:
   # archived; last active in 41e1c3d8d33d on 2026-11-10
   data://grapher/gcp/2025-11-13/global_carbon_budget:
     - data://garden/gcp/2025-11-13/global_carbon_budget
+  # archived; last active in 136af1827da2 on 2026-11-26
+  viz://explorer/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
