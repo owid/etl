@@ -386,7 +386,7 @@ def create_strategy_table(tb: Table) -> Table:
     tb["year"] = STRATEGIES_YEAR
     tb["type_of_strategy"] = "No national strategy"
     tb.loc[tb["national_strategy"], "type_of_strategy"] = "Other strategy"
-    tb.loc[tb["housing_first_national"], "type_of_strategy"] = "Housing First/housing-led strategy"
+    tb.loc[tb["housing_first_national"], "type_of_strategy"] = "Housing First or housing-led approach"
     tb["type_of_strategy"] = tb["type_of_strategy"].copy_metadata(tb["national_strategy"])
 
     return tb[["country", "year", "type_of_strategy"]]

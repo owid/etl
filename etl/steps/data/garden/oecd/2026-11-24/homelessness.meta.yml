@@ -147,7 +147,8 @@ definitions:
   gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical definition of each country.
   women_undercount: The OECD notes that these statistics likely undercount women. Women are less likely to sleep rough or use homeless shelters, and more likely to stay with family or friends. In 20 countries, shelters for victims of domestic violence aren’t counted.
 
-  harmonization: Countries use different definitions and data collection methods. The OECD presents each country’s statistics following its national definition, and classifies them by the ETHOS Light typology where possible.
+  harmonization: Definitions and data collection methods differ across countries and are harmonized to the extent possible.
+  undercount: These are numbers reported in national statistics, which likely undercount the people experiencing homelessness. Some people are hard to count, such as those staying temporarily with family or friends, or not in contact with support services.
   methodology_issues: More details about definitions, methodology, and comparability issues can be found in the [OECD documentation, People experiencing homelessness and housing exclusion](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-1-Population-experiencing-homelessness.pdf).
   country_notes: For more information on the statistical definitions for each country, please check the [OECD’s Country Notes on Homelessness data](https://www.oecd.org/en/topics/sub-issues/affordable-housing/homelessness.html).
   unconventional_dwellings: Data for Australia, Canada, Germany, Italy, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
@@ -213,6 +214,7 @@ tables:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.unconventional_dwellings}"
           - "{definitions.united_kingdom_rates}"
           - "{definitions.belgium}"
@@ -238,6 +240,7 @@ tables:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.unconventional_dwellings}"
           - "{definitions.united_kingdom_rates}"
           - "{definitions.belgium}"
@@ -263,6 +266,7 @@ tables:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.unconventional_dwellings}"
           - "{definitions.united_kingdom_rates}"
           - "{definitions.belgium}"
@@ -288,6 +292,7 @@ tables:
           - "{definitions.ethos_total}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.unconventional_dwellings}"
           - "{definitions.united_kingdom_rates}"
           - "{definitions.belgium}"
@@ -313,6 +318,7 @@ tables:
           - "{definitions.ethos_1}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -335,6 +341,7 @@ tables:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         presentation:
@@ -357,6 +364,7 @@ tables:
           - "{definitions.ethos_total}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - For Israel, the OECD gives a total that is higher than the sum of its parts, because it covers the whole national estimate of homelessness, not only ETHOS Light 1, 2, and 3.
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
@@ -378,6 +386,7 @@ tables:
           - "{definitions.ethos_broad_women}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.belgium}"
@@ -401,6 +410,7 @@ tables:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -423,6 +433,7 @@ tables:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -445,6 +456,7 @@ tables:
           - "{definitions.ethos_broad_women}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -467,6 +479,7 @@ tables:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -491,6 +504,7 @@ tables:
           - "{definitions.ethos_broad_women}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.belgium}"
@@ -516,6 +530,7 @@ tables:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -540,6 +555,7 @@ tables:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -564,6 +580,7 @@ tables:
           - "{definitions.ethos_broad_women}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -588,6 +605,7 @@ tables:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.gender_breakdown}"
           - "{definitions.women_undercount}"
           - "{definitions.methodology_issues}"
@@ -606,6 +624,7 @@ tables:
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
         description_key:
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - The share uses each country’s headline estimate of homelessness, following its own statistical definition, as a percentage of its total population. The OECD reports it rounded, so very small shares are approximate.
           - This share differs from the rate of homelessness per 100,000 people in our other charts. The rate only counts people living rough or staying in emergency or temporary accommodation (ETHOS Light 1, 2, and 3), so that countries can be compared on a similar basis. The share counts everyone in the national estimate, which in some countries also includes people living in institutions or non-conventional dwellings, or staying temporarily with family or friends because they lack housing (ETHOS Light 4, 5, and 6).
           - Most countries count people at a single point in time (point-in-time count). Austria, Chile, Cyprus, Israel, Latvia, Lithuania, Romania, Slovenia, and Turkey instead count everyone who experienced homelessness over a period of time, such as a year (flow count).
@@ -627,12 +646,13 @@ tables:
           <<: *display_common
 
       number:
-        title: Number of people experiencing homelessness
+        title: Reported number of people experiencing homelessness
         unit: people
         short_unit: ""
         description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
         description_key:
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.belgium}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
@@ -643,115 +663,121 @@ tables:
 
           The OECD presents the data for three periods: around 2018, around 2023, and 2026 or the latest year available. Changes in definitions, data collection methods, or geographic coverage mean that the values of a country are not always comparable over time. Due to visualization limitations, we have connected the values of each country. For more detail, you can check Table HC3.1.A2 on the [OECD Affordable Housing Database website](https://www.oecd.org/en/data/datasets/oecd-affordable-housing-database.html) (HC3.1 People experiencing homelessness and housing exclusion).
         presentation:
-          title_public: Number of people experiencing homelessness
+          title_public: Reported number of people experiencing homelessness
         display:
           name: Number of people experiencing homelessness
           numDecimalPlaces: 0
           <<: *display_common
 
       number_ethos_light_1:
-        title: Number of people experiencing homelessness who are living rough (ETHOS Light 1)
+        title: Reported number of people experiencing homelessness who are living rough (ETHOS Light 1)
         unit: people
         short_unit: ""
         description_short: People living in the streets or public spaces, without a shelter that can be defined as living quarters.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         description_processing: "{definitions.description_processing_ethos_breakdown}"
         presentation:
-          title_public: Number of people living rough
+          title_public: Reported number of people living rough
         display:
           name: Living rough
           numDecimalPlaces: 0
           <<: *display_common
 
       number_ethos_light_2:
-        title: Number of people experiencing homelessness who are in emergency accommodation (ETHOS Light 2)
+        title: Reported number of people experiencing homelessness who are in emergency accommodation (ETHOS Light 2)
         unit: people
         short_unit: ""
         description_short: People with no place of usual residence who move frequently between different types of accommodation, such as overnight shelters.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         description_processing: "{definitions.description_processing_ethos_breakdown}"
         presentation:
-          title_public: Number of people in emergency accommodation
+          title_public: Reported number of people in emergency accommodation
         display:
           name: In emergency accommodation
           numDecimalPlaces: 0
           <<: *display_common
 
       number_ethos_light_3:
-        title: Number of people experiencing homelessness who are in accommodation for the homeless (ETHOS Light 3)
+        title: Reported number of people experiencing homelessness who are in accommodation for the homeless (ETHOS Light 3)
         unit: people
         short_unit: ""
         description_short: People staying in accommodation for the homeless, where the stay is time-limited and no long-term housing is provided, such as homeless hostels, transitional accommodation, and women’s shelters.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         description_processing: "{definitions.description_processing_ethos_breakdown}"
         presentation:
-          title_public: Number of people in accommodation for the homeless
+          title_public: Reported number of people in accommodation for the homeless
         display:
           name: In accommodation for the homeless
           numDecimalPlaces: 0
           <<: *display_common
 
       number_ethos_light_4:
-        title: Number of people experiencing homelessness who are in institutions (ETHOS Light 4)
+        title: Reported number of people experiencing homelessness who are in institutions (ETHOS Light 4)
         unit: people
         short_unit: ""
         description_short: People who stay in health institutions longer than needed because they have no housing, and people in prison with no housing available when they are released.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         description_processing: "{definitions.description_processing_ethos_breakdown}"
         presentation:
-          title_public: Number of people in institutions due to a lack of housing
+          title_public: Reported number of people in institutions due to a lack of housing
         display:
           name: In institutions
           numDecimalPlaces: 0
           <<: *display_common
 
       number_ethos_light_5:
-        title: Number of people experiencing homelessness who are in non-conventional dwellings (ETHOS Light 5)
+        title: Reported number of people experiencing homelessness who are in non-conventional dwellings (ETHOS Light 5)
         unit: people
         short_unit: ""
         description_short: People living in places that are not their usual residence because they lack housing, such as mobile homes, non-conventional buildings, or temporary structures.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         description_processing: "{definitions.description_processing_ethos_breakdown}"
         presentation:
-          title_public: Number of people in non-conventional dwellings due to a lack of housing
+          title_public: Reported number of people in non-conventional dwellings due to a lack of housing
         display:
           name: In non-conventional dwellings
           numDecimalPlaces: 0
           <<: *display_common
 
       number_ethos_light_6:
-        title: Number of people experiencing homelessness who are staying temporarily with family or friends (ETHOS Light 6)
+        title: Reported number of people experiencing homelessness who are staying temporarily with family or friends (ETHOS Light 6)
         unit: people
         short_unit: ""
         description_short: People living temporarily in a home with family or friends because they lack housing of their own.
         description_key:
           - "{definitions.description_key_ethos_breakdown}"
           - "{definitions.harmonization}"
+          - "{definitions.undercount}"
           - "{definitions.methodology_issues}"
           - "{definitions.country_notes}"
         description_processing: "{definitions.description_processing_ethos_breakdown}"
         presentation:
-          title_public: Number of people staying temporarily with family or friends due to a lack of housing
+          title_public: Reported number of people staying temporarily with family or friends due to a lack of housing
         display:
           name: Staying with family or friends
           numDecimalPlaces: 0
@@ -761,13 +787,13 @@ tables:
         title: Type of strategy to address homelessness
         unit: ""
         short_unit: ""
-        description_short: Whether the country has a national Housing First or housing-led approach to homelessness, another national homelessness strategy, or no national strategy.
+        description_short: Whether the country has a national Housing First or housing-led approach to homelessness, another national homelessness strategy, or neither. A Housing First approach can exist without a formal national strategy.
         description_key:
           - Housing First models aim to provide tailored, intensive support for people experiencing homelessness who have high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
         processing_level: major
         description_processing: |-
-          The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place at the national level. We combine them: a country has a “Housing First/housing-led strategy” when it has a Housing First or housing-led approach at the national level. When it doesn’t, but it has an active national homelessness strategy, we classify it as “Other strategy”. Countries with neither are classified as “No national strategy”, even if they have regional or local strategies, or address homelessness in other national strategies.
+          The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether they follow a Housing First or housing-led approach at the national level. The OECD treats them as different things: a country can follow a Housing First approach without a formal national strategy. We combine them: a country has a “Housing First or housing-led approach” when it has a Housing First or housing-led approach at the national level. When it doesn’t, but it has an active national homelessness strategy, we classify it as “Other strategy”. Countries with neither are classified as “No national strategy”, even if they have regional or local strategies, or address homelessness in other national strategies.
 
           The data reflects the strategies reported to the OECD Questionnaire on Affordable and Social Housing (most recently in 2025) and OECD desk research, as published in September 2026. For more information about these two classifications, please refer to the OECD report [National strategies for combating homelessness](https://webfs.oecd.org/Els-com/Affordable_Housing_Database/HC3-2-Homeless-strategies.pdf).
         presentation:
@@ -778,6 +804,6 @@ tables:
           <<: *display_common
         type: ordinal
         sort:
-          - Housing First/housing-led strategy
+          - Housing First or housing-led approach
           - Other strategy
           - No national strategy
