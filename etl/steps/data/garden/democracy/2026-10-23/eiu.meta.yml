@@ -48,6 +48,9 @@ definitions:
     presentation:
       topic_tags:
         - Democracy
+      grapher_config:
+        # EIU's data is shown under CC BY-NC-ND. Set on every indicator, so explorer views show it in the footer too.
+        license: cc-by-nc-nd
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
