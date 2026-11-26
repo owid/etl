@@ -1,34 +1,82 @@
 # Compare Previous Version Extension
 
-This VSCode extension allows you to quickly compare the currently open file with its previous version by finding the highest date version that's lower than the current version.
+This VSCode extension compares files in date-versioned folders (`YYYY-MM-DD`) with their previous version. It has two parts:
 
-## Features
+- **Compare Previous Version** (`Cmd+Shift+D`): diff the open file against its previous version.
+- **ETL PR Review** (its own icon in the Activity Bar): review a whole branch, such as a dataset update, file by file against the previous versions, with the files whose only changes are dates and hashes set apart, and the reviewed files synced with GitHub's "Viewed" state.
 
-- **Keyboard Shortcut**: `Ctrl+Shift+D` (Windows/Linux) or `Cmd+Shift+D` (Mac)
-- **Command Palette**: "Compare Previous Version"
-- Automatically finds the previous version of the current file based on date folders
-- Directly opens a diff view comparing current version with previous version
-- Works with versioned folder structures using YYYY-MM-DD format
-- Smart version detection and sorting
+## How the previous version is found
 
-## How to Use
+For a file like `etl/steps/data/garden/faostat/2026-11-23/faostat_qcl.py`, the extension looks at the other date folders in `etl/steps/data/garden/faostat/`, and takes the most recent one older than `2026-11-23` that has a file with the same name (e.g. `2026-02-25/faostat_qcl.py`).
+So each file finds its own previous version, even when the steps of one update come from different older folders.
 
-1. Open a file in VSCode that has a date version in its path (e.g., `snapshots/biodiversity/2025-04-07/cherry_blossom.py`)
-2. Press `Ctrl+Shift+D` (or `Cmd+Shift+D` on Mac) or use Command Palette > "Compare Previous Version"
-3. The extension will automatically find the previous version and open a diff view
-4. If no previous version exists, you'll be notified
+## Compare Previous Version
 
-## Example
+1. Open a file that has a date version in its path (e.g., `snapshots/biodiversity/2025-04-07/cherry_blossom.py`).
+2. Press `Ctrl+Shift+D` (or `Cmd+Shift+D` on Mac), or use Command Palette > "Compare Previous Version".
+3. The extension opens a diff view against the previous version. Press the shortcut again to go back to the file.
 
-If you have a file open at `snapshots/biodiversity/2025-04-07/cherry_blossom.py`, the extension will:
-- Look in `snapshots/biodiversity/` for other date folders
-- Find the highest date that's lower than `2025-04-07` (e.g., `2024-01-25`)
-- Open a diff view comparing `snapshots/biodiversity/2024-01-25/cherry_blossom.py` with your current file
+## ETL PR Review
+
+A dataset update copies each step folder to a new version folder, so git (and GitHub) show the new files as entirely new.
+This view lists the files changed in the current branch (committed or not) since it left `origin/master`, and puts each in one group:
+
+| Group | What it means | Clicking it opens |
+|-------|---------------|-------------------|
+| Meaningful changes | A new-version file that differs from its previous version in more than dates and hashes (see below). | The diff against the previous version. |
+| In previous version, missing in new version | A file of an updated step (same name before the first dot) that is in the previous folder but not in the new one, such as a dropped `.countries.json` or `.corrections.yml`. | The old file. |
+| New files, with no previous version | A file added in a version folder with no older counterpart. | The file. |
+| DAG | The active DAG files (`dag/*.yml`). | The diff against the branch's merge base. |
+| Other changed files | Other files without a date folder (scripts, docs), and dated files edited in place. | The diff against the branch's merge base. |
+| Only date and hash changes | A snapshot file that differs from its previous version only in the dates and hashes listed below. | The diff against the previous version, to check it. |
+| Identical to previous version | Byte-identical copies. | The diff (no changes). |
+| DAG archive | `dag/archive/*.yml`, which `etl archive-dag` generates (collapsed). | The diff against the branch's merge base. |
+
+The buttons at the top of the view step to the previous or next file to review (the first five groups), and rescan.
+
+### Reviewed checkboxes
+
+Each file has a "reviewed" checkbox, and each group has one that ticks or unticks all its files (it shows as ticked when all of them are).
+
+Without a pull request, the checkboxes are kept per workspace in VS Code, and a file unticks itself when its content (or its previous version's) changes.
+
+When the branch has an open pull request, and the GitHub CLI (`gh`) is installed and logged in, the checkboxes are synced with GitHub's "Viewed" state on that pull request, for your own GitHub user:
+
+- Ticking a file marks it as viewed on GitHub, and unticking it unmarks it. Changes are sent in batches (at most 20 files every 4 seconds), so ticking a large group takes a few seconds; the status bar shows the progress.
+- Every refresh reads the "Viewed" state of all the pull request's files, and GitHub's state wins: a file viewed or unviewed in the browser shows up here, and so does GitHub's own reset after a new push changes a file ("Viewed" becomes dismissed, which counts as not reviewed).
+- If GitHub rejects a change, the file keeps the state you gave it here, a warning offers to retry, and the change is sent again at the next refresh. The message at the top of the view counts the changes that have not reached GitHub yet.
+- A file that was ticked here but never reached GitHub (ticked before the pull request existed, or while `gh` was not working) is not unticked silently: the next refresh asks whether to mark those files as viewed on GitHub or to untick them here. Unticks made while GitHub was unreachable are not kept: GitHub's state wins for those.
+- Files that are not in the pull request (not pushed yet, or the old files of "In previous version, missing in new version") keep the local state only.
+- GitHub only knows the pushed content, so editing a file locally does not untick it while it is viewed on GitHub.
+
+If there is no open pull request, or `gh` is missing or not logged in, the view says so at the top (and once in a notification), and the checkboxes stay local.
+`owidVersionDiff.githubSync` turns the sync off, and `owidVersionDiff.ghPath` sets where `gh` is (by default it is looked up on the PATH, then in `/opt/homebrew/bin` and `/usr/local/bin`).
+
+### What counts as a date and hash change
+
+These are the changes that every snapshot update makes, in `.dvc` files only. A file goes to "Only date and hash changes" when each of its changed lines becomes equal to its counterpart after rewriting the parts below; any other change puts it in "Meaningful changes".
+The diffs always show every change, including these.
+
+| Rule (`owidVersionDiff.noiseRules`) | What is rewritten |
+|-------------------------------------|-------------------|
+| `dvc-outs` | The `md5`, `size` and `nfiles` values under `outs:` (not `path`). |
+| `dvc-date-accessed` | The value of `date_accessed`. |
+| `dvc-date-published` | The value of `date_published`. |
+| `dvc-citation-dates` | Years, and the date right after "accessed", in `attribution` and `citation_full` (one-line or block values). |
+
+To treat one of these as a meaningful change (for example, so that a changed `date_published` puts the file among the meaningful changes), remove its rule from `owidVersionDiff.noiseRules`.
+`owidVersionDiff.baseRef` (default `origin/master`) sets what the branch is compared with.
+
+### Command line
+
+The same classification runs in a terminal, which is handy outside VS Code or for an agent reviewing a PR (`dist/` is built by `make vsce-compile EXT=compare-previous-version`, and also ships inside the installed extension, in `~/.vscode/extensions/owid.compare-previous-version-<version>/dist/cli.js`):
+
+```bash
+node vscode_extensions/compare-previous-version/dist/cli.js [repo dir] [--base origin/master] [--hunks] [--noise] [--all] [--json]
+```
+
+`--hunks` prints the meaningful hunks, `--noise` the line pairs whose only change is a date or hash, `--all` also lists identical files, and `--json` everything as JSON.
 
 ## Installation
 
-1. Navigate to the extension directory
-2. Run `npm install` to install dependencies
-3. Run `npm run compile` to build the extension
-4. Run `vsce package` to create the .vsix file
-5. Install the .vsix file in VSCode using "Extensions: Install from VSIX"
+From the repository root, `make vsce-compile EXT=compare-previous-version INSTALL=1` (or `make vsce-sync`), then reload the window.

@@ -61,9 +61,6 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
-  viz://explorer/un/latest/un_wpp:
-    - data://grapher/un/2024-07-12/un_wpp
-    - data://grapher/un/2024-07-12/un_wpp_full
   viz://chart/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
     - data://grapher/un/2024-07-12/un_wpp_full

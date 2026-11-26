@@ -26,10 +26,6 @@ definitions:
   common_views:
     - config:
         originUrl: https://ourworldindata.org/economic-inequality
-        # The explorer showed a link to this article below the chart.
-        relatedQuestions:
-          - url: https://ourworldindata.org/owid-data-collection-inequality-and-poverty
-            text: "OWID Data Collection: Inequality and Poverty"
 
 dimensions:
   - name: Indicator

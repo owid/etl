@@ -37,7 +37,10 @@ tables:
         title: Number of pages in the Guardian that mention a country (per million people)
         unit: "pages per million people"
         description_short: Number of pages in the Guardian that mention a particular country, normalized by the population of the country.
-        description_processing: *desc_proc_2
+        description_processing: |-
+          {tables.guardian_mentions.variables.num_pages.description_processing}
+
+          We divide the number of pages by the population of the country, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
 
       relative_pages:
         title: Share of pages in The Guardian that mention a country
@@ -71,7 +74,7 @@ tables:
         description_short: |-
           {tables.guardian_mentions.variables.num_pages_per_million.description_short}. It reflects a 10-year average (2015 - 2024).
         description_processing: |-
-          {tables.guardian_mentions.variables.num_pages.description_processing}
+          {tables.guardian_mentions.variables.num_pages_per_million.description_processing}
 
       relative_pages_10y_avg:
         title: |-

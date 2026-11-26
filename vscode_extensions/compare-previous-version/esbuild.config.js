@@ -1,15 +1,15 @@
 const esbuild = require('esbuild');
 
-// Common build options
+// Common build options: the extension, and the command-line script that shares its comparison code.
 const buildOptions = {
-  entryPoints: ['src/extension.ts'],
+  entryPoints: ['src/extension.ts', 'src/cli.ts'],
   bundle: true,
-  outfile: 'dist/extension.js',
+  outdir: 'dist',
   external: ['vscode'],
   platform: 'node',
   format: 'cjs',
   sourcemap: true,
-  target: 'node12'
+  target: 'node18'
 };
 
 // Start the build

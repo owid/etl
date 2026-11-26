@@ -646,8 +646,8 @@ def main() -> int:
                     (
                         WARN,
                         slug,
-                        "explorer is still PUBLISHED — creating the redirect darkens it immediately (the redirect "
-                        "is checked on every /explorers/* request, ahead of the page itself)",
+                        "explorer is still PUBLISHED — the redirect darkens it once the deploy the paste "
+                        "queues goes out (it is checked on every /explorers/* request, ahead of the page itself)",
                     )
                 )
 

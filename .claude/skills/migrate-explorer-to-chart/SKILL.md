@@ -45,6 +45,9 @@ Ask first, every time, and wait for a yes that names the action:
 - **Posting to Slack**, in any channel or DM, including drafts. Give the user the text, and they
   post it.
 - **Anything on production**: redirects, featured metrics, gdoc edits, unpublishing the explorer.
+  The one standing exception is step 7.1: once the multidim is merged and published, add the
+  link swaps to the Google Docs as **suggestions**, without asking. Never a direct edit, never
+  accepting a suggestion, never republishing a doc.
 - **Contacting anyone outside OWID**, such as the sites that embed the explorer. Draft the
   message; the user sends it.
 
@@ -69,10 +72,16 @@ Start with explorers that have few views, no embeds, no featured metrics and no 
 ending on them. Read the flags before committing to one:
 
 - `checkbox` — becomes a two-choice `toggle-buttons` dimension. Easy.
-- `picker` (`pickerColumnSlugs`) and `related` (`wpBlockId`) — no known multidim equivalent.
-  Ask the user how to handle them before porting; don't drop them silently.
-- `download` (`downloadDataLink`) — multidims build their own `download_package` on save; the
-  grapher download UI may still be pending (owid/owid-grapher#6784).
+- `picker` (`pickerColumnSlugs`) — no known multidim equivalent. Ask the user how to handle it
+  before porting; don't drop it silently.
+- `related` (`wpBlockId`, the text below the explorer) and `download` (`downloadDataLink`) — a
+  multidim has neither yet. The interim home for both is `<short_name>.explorer.md` next to the
+  step, appended to every view's key points by `add_explorer_text(c, paths)`
+  (`etl/viz/chart/explorer_text.py`), called between `create_chart` and `save`. Draft the file
+  with `scripts/explorer_text_draft.py <slug>`, then cut what the multidim page already covers
+  ("Explore more of our work" link lists: the page shows Research & Writing) and drop a download
+  link that points at a stale copy of the data. Ask the user before cutting prose, and before
+  dropping the file altogether. The text renders as `SimpleMarkdownText`: no raw HTML or tables.
 - `py` (long Python step) — views are generated in code; the port touches the code too.
 - A **twin**: some explorers already have an unpublished multidim mirror in
   `etl/steps/viz/chart/` (search `dag/` for the same namespace). Ask whether to build on it or
@@ -196,6 +205,9 @@ R=ai/<slug>-review M=ai/<slug>-mdim-mapping P=<prod env file>
   combination the explorer doesn't have, a dimension the link leaves out),
   so the new URL lands on the view they meant. Copy `references_full.json` to
   `references_baseline.json` before any swap: the page then marks each link swapped or still to do.
+  A link whose suggested URL is wrong goes in `link_overrides.json` (a list of
+  `{where, old_url, new_url, note}`): the page shows that row with the right URL. Add
+  `"reopen": true` when the wrong URL was already swapped in, to show the row as to do again.
 - Serve it with the local app, in the background, and give the user the link:
 
   ```bash
@@ -225,20 +237,37 @@ Merging creates the multidim on production **unpublished**: the user publishes i
 
 ## 7. Cut over on production
 
-In this order, because creating the redirects darkens the explorer at once:
+In this order, because the redirects darken the explorer, published or not, as soon as the deploy
+they queue goes out:
 
-1. **Links.** Rebuild the page with `--stage links`. The user (or the doc's author)
-   swaps the links from its "Links to replace" section and republishes each doc; never edit a
-   Google Doc yourself. Featured metrics go through `/map-explorer-to-mdim` step 5b with the
-   topic owner. Then re-run `scan_references.py`: no reference that breaks on redirect may remain,
-   and check the live pages (they re-bake a few minutes after the DB changes).
+1. **Links.** Once `/grapher/<slug>` returns 200, re-run `scan_references.py` (docs change
+   between the review and the merge) and rebuild the page with `--stage links`. Then add every
+   Google Doc link from "Links to replace" to its doc as a suggestion, so the user keeps control of
+   the text and of republishing. Per doc, with the Google Docs connector (if it isn't connected,
+   ask the user to run `/mcp` and pick "claude.ai Google Docs"):
+   - `read_doc` the doc (a large one is saved to a file);
+   - `scripts/gdoc_suggestions.py --doc <that file> --references <review>/references_full.json
+     --out <requests.json>` builds the requests: a URL written as text is replaced, a link
+     target is restyled to the new URL with its text kept. It lists any reference it can't find;
+   - `update_doc` with those requests and `writeControl: {"requiredRevisionId": <from the
+     file>, "writeMode": "SUGGEST"}`. A revision mismatch means the doc changed since the read:
+     read it again. Never send without `"writeMode": "SUGGEST"`: the default edits the doc.
+
+   Read one doc back to check the changes show as suggestions (`suggestedInsertionIds`,
+   `suggestedTextStyleChanges`), then tell the user which docs have suggestions. The user accepts
+   them and republishes each doc. References that aren't Google Docs (site redirects, legacy
+   WordPress, repo files) are not touched this way. Featured metrics go through
+   `/map-explorer-to-mdim` step 5b with the topic owner. After the user has republished, re-run
+   `scan_references.py`: no reference that breaks on redirect may remain, and check the live
+   pages (they re-bake a few minutes after the DB changes).
 2. **Site redirects** that end on `/explorers/<slug>` (admin `/redirects`): repoint them to the
    multidim, so they don't chain.
 3. **Redirect JSON.** Re-run `/map-explorer-to-mdim` steps 1–3 against production (the payload
    carries each view's config id, which differs from staging), then its `audit_references.py` and
    `preflight.py`. Rebuild the page with `--payload-env production --stage redirects`: only that
    version of the JSON is pasteable. Confirm `/grapher/<slug>` returns 200
-   (preflight reads the DB, not the site). After the user pastes it, poll a few views with
+   (preflight reads the DB, not the site). The paste queues a deploy (admin *Deploys*), and the
+   rules go live when it finishes. Then poll a few views with
    `curl -s -o /dev/null -w '%{http_code} %{redirect_url}'` until they return 302, including one
    with a `country=` param to check it is carried over.
 4. **External embeds.** Re-run the referrer query from

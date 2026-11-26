@@ -269,3 +269,28 @@ steps:
     - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
     - data://grapher/animal_welfare/2026-07-01/fur_laws
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
+    - data://garden/faostat/2026-02-25/faostat_qcl
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/animal_welfare/2026-03-03/animals_used_for_food:
+    - data://garden/animal_welfare/2026-03-03/animals_used_for_food
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/animal_welfare/2026-03-03/animals_used_for_food:
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+  # archived; last active in 78cd28ba4622 on 2026-11-26
+  data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
+    - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
+    - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_by_country.pdf
+  # archived; last active in 78cd28ba4622 on 2026-11-26
+  data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+  # archived; last active in 78cd28ba4622 on 2026-11-26
+  data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
+    - data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2026-07-01/income_groups

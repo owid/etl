@@ -15,6 +15,9 @@ dataset:
 tables:
   population_doubling_times:
     # (Inherited from meadow, remove if not different.)
+    common:
+      description_processing: |-
+        We find the year in which the world population reached each value by interpolating our [long-term population estimates](https://ourworldindata.org/population-sources) between years. Population estimates from 2024 onwards are projections released by the UN, so values reached after 2023 are based on these projections.
     variables:
       num_years_to_double:
         title: Years since population was half
