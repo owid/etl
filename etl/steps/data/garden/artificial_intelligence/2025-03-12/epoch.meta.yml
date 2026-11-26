@@ -82,6 +82,19 @@ tables:
           grapher_config:
             title: Training computation
 
+      training_compute_reporting:
+        title: Source of training compute
+        unit: ''
+        short_unit: ''
+        description_short: Whether the developer of an AI model reported how much computation was used to train it, or Epoch AI estimated it.
+        description_from_producer: |-
+          Indicates how the quantity of training compute was found or estimated. Options include: "Reported", when the developers report how much training compute was used. "Operation counting", when the parameters, training data, and/or architecture are known, and these are used to estimate the number of operations performed while training. "Hardware", when the training time and/or hardware type are known, allowing an estimate based on the rate of computation. "Cost", when the training cost is known and the compute is estimated through the hardware usage budget. "Benchmarks", when the model's training compute was estimated using its benchmark performance.
+        description_processing: |-
+          Epoch AI lists one or more methods for how it found each model's training compute. We count a model as "Reported by the developer" when one of them is "Reported", and as "Estimated by Epoch AI" otherwise, including the few models whose method Epoch AI has not recorded yet. Models without a training compute figure have no value.
+        display:
+          zeroDay: '1949-01-01'
+          timeInterval: day
+
       publication_date:
         title: Publication date
         unit: ''

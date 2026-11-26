@@ -111,6 +111,9 @@ def run() -> None:
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
 
+    # Classify each model's training compute as reported by the developer or estimated by Epoch AI.
+    tb = add_training_compute_reporting(tb)
+
     # Convert training dataset size to numeric
     tb["training_dataset_size__total"] = pd.to_numeric(tb["training_dataset_size__total"], errors="coerce")
 
@@ -137,7 +140,13 @@ def run() -> None:
 
     # Drop columns that are not needed
     tb = tb.drop(
-        ["training_compute__flop", "organization", "authors", "country__from_organization"],
+        [
+            "training_compute__flop",
+            "training_compute_estimation_method",
+            "organization",
+            "authors",
+            "country__from_organization",
+        ],
         axis=1,
     )
     tb = tb.format(["days_since_1949", "model"])
@@ -155,3 +164,25 @@ def run() -> None:
     ds_garden.save()
 
     paths.log.info("epoch.end")
+
+
+def add_training_compute_reporting(tb):
+    """Add whether a model's training compute was reported by its developer or estimated by Epoch AI.
+
+    Epoch AI lists one or more methods per model, e.g. "Reported,Operation counting". A model counts as
+    reported when "Reported" is among them, and as estimated otherwise. Models without a compute figure get no value.
+    """
+    methods = tb["training_compute_estimation_method"].astype("string").fillna("").str.split(",")
+    is_reported = methods.apply(lambda model_methods: "Reported" in [method.strip() for method in model_methods])
+    has_compute = tb["training_compute__flop"].notna()
+
+    tb["training_compute_reporting"] = tb["training_compute_estimation_method"].astype("object")
+    tb.loc[:, "training_compute_reporting"] = None
+    tb.loc[has_compute, "training_compute_reporting"] = "Estimated by Epoch AI"
+    tb.loc[has_compute & is_reported, "training_compute_reporting"] = "Reported by the developer"
+
+    # Every model with a compute figure falls in one of the two groups, and only those models do.
+    assert (tb["training_compute_reporting"].notna() == has_compute).all(), "Unexpected training compute reporting."
+    assert set(tb["training_compute_reporting"].dropna()) == {"Estimated by Epoch AI", "Reported by the developer"}
+
+    return tb

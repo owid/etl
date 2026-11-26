@@ -1,0 +1,53 @@
+chart_config_id: 0191b6c7-4dec-7605-957b-973ed8bb2298
+grapher_schema: "012"
+slug: computation-used-to-train-notable-artificial-intelligence-systems
+topic_tags:
+  - Artificial Intelligence
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "epoch#training_computation_petaflop"
+    config:
+      note: ""
+      title: "Computation used to train notable artificial intelligence systems"
+      xAxis:
+        label: "Publication date"
+      yAxis:
+        max: 500000000000
+        scaleType: "log"
+        canChangeScaleType: true
+      subtitle: "Computation is measured in total petaFLOP, which is 10¹⁵ [floating-point operations](#dod:flop). Estimated from AI literature, albeit with some uncertainty. Estimates are expected to be accurate within a factor of 2, or a factor of 5 for recent undisclosed models like GPT-4."
+      originUrl: "/artificial-intelligence"
+      chartTypes:
+        - "ScatterPlot"
+      colorScale:
+        baseColorScheme: "OwidCategoricalB"
+        binningStrategy: "manual"
+        legendDescription: "Domain"
+        customCategoryColors:
+          Other: "#6e7581"
+          Maximum compute: "#d73c50"
+        customCategoryLabels:
+          games: "Games"
+          speech: "Speech"
+          vision: "Vision"
+          No data: "Other"
+          driving: "Driving"
+          general: "General"
+          language: "Language"
+      entityType: "system"
+      entityTypePlural: "systems"
+      hideScatterLabels: true
+      excludedEntityNames:
+        - "East Asia and the Pacific (UNWTO)"
+        - "Other (UNWTO)"
+        - "Maximum data"
+        - "Maximum parameters"
+        - "Maximum compute"
+      scatterPointLabelStrategy: "y"
+      hideAnnotationFieldsInTitle:
+        time: true
+        entity: true
+        changeInPrefix: true
