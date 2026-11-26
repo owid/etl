@@ -137,6 +137,19 @@ def render_page(review: Path, live: bool = False) -> str:
             base[i] = dict(now[key(r)], status="pending") if key(r) in now else dict(r, status="done")
         extra = [dict(r, status="new") for r in refs["references"] if key(r) not in {key(b) for b in base}]
         refs = dict(refs, references=base + extra)
+    # A swap that landed on the wrong view is re-opened by hand: `link_overrides.json` lists
+    # {where, old_url, new_url, note}, and the row goes back to "to do" with the right URL.
+    over_path = review / "link_overrides.json"
+    if over_path.exists():
+        over = {(o["where"], o["old_url"]): o for o in json.loads(over_path.read_text())}
+        for r in refs["references"]:
+            o = over.get((r["where"], r["old_url"]))
+            if o:
+                # A correction made before the swap only changes the URL to paste; `reopen` marks a
+                # swap that already landed on the wrong view as to do again.
+                r.update(new_url=o["new_url"], match=o["note"], repairs=[], stale_params={})
+                if o.get("reopen") or r.get("status") not in ("done", "new"):
+                    r["status"] = "pending"
     preflight = (review / "preflight.txt").read_text() if (review / "preflight.txt").exists() else None
     mapping = json.loads((mapping_dir / "mapping.json").read_text())
     payload = json.loads((mapping_dir / "admin_bulk_payload.json").read_text())
