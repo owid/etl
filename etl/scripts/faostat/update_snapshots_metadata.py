@@ -21,10 +21,10 @@ def run():
     # NOTE: I assume that the latest published ETL version in garden contains all datasets.
     version = sorted((STEP_DIR / "data/garden/faostat/").glob("*/faostat_metadata.py"))[-1].parent.name
 
-    # Load custom dataset titles and descriptions.
-    df = pd.read_csv(STEP_DIR / f"data/garden/faostat/{version}/custom_datasets.csv")[
-        ["dataset", "owid_dataset_title", "owid_dataset_description"]
-    ]
+    # Load custom dataset titles and descriptions (an empty custom field inherits FAO's).
+    df = pd.read_csv(STEP_DIR / f"data/garden/faostat/{version}/custom_datasets.csv")
+    for field in ["title", "description"]:
+        df[f"owid_dataset_{field}"] = df[f"owid_dataset_{field}"].fillna(df[f"fao_dataset_{field}"])
 
     # List all snapshots.
     snapshot_names = [

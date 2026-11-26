@@ -293,10 +293,10 @@ class FAOAdditionalMetadata:
 
 
 def run(read_only: bool = False, include_all_datasets: bool = False) -> None:
-    # Load list of existing snapshots related to current NAMESPACE.
-    existing_snapshots = [
-        snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
-    ]
+    # Load list of existing snapshots in the current NAMESPACE.
+    # The match is anchored to the namespace folder, since a bare "faostat" also matches backport snapshots, which have
+    # no origin and fail to load.
+    existing_snapshots = list(snapshot_catalog(match=f"^{NAMESPACE}/"))
 
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False

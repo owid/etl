@@ -1755,3 +1755,272 @@ steps:
   viz://explorer/faostat/latest/global_food:
     - data://grapher/faostat/2026-02-25/faostat_qcl
     - data://grapher/faostat/2026-02-25/faostat_fbsc
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_rl:
+    - snapshot://faostat/2025-03-17/faostat_rl.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_qv:
+    - data://garden/faostat/2026-02-25/faostat_qv
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_rfn:
+    - snapshot://faostat/2025-03-17/faostat_rfn.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_qi:
+    - data://garden/faostat/2026-02-25/faostat_qi
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_fs:
+    - data://garden/faostat/2026-02-25/faostat_fs
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_fs:
+    - snapshot://faostat/2026-02-25/faostat_fs.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_qcl:
+    - data://garden/faostat/2026-02-25/faostat_qcl
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_metadata:
+    - snapshot://faostat/2026-02-25/faostat_metadata.json
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_qv:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_qv
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-09-04/food_supply_chain_scl:
+    - data://meadow/faostat/2026-02-25/faostat_metadata
+    - snapshot://faostat/2026-10-14/nutrient_conversion_table.xlsx
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://feedipedia/2026-10-14/feed_composition.csv
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_scl
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2025-03-17/faostat_metadata:
+    - data://meadow/faostat/2025-03-17/faostat_rl
+    - data://meadow/faostat/2025-03-17/faostat_metadata
+    - data://meadow/faostat/2025-03-17/faostat_fbs
+    - data://meadow/faostat/2025-03-17/faostat_rfn
+    - data://meadow/faostat/2025-03-17/faostat_fbsh
+    - data://meadow/faostat/2025-03-17/faostat_qv
+    - data://meadow/faostat/2025-03-17/faostat_cisp
+    - data://meadow/faostat/2025-03-17/faostat_fs
+    - data://meadow/faostat/2025-03-17/faostat_qi
+    - data://meadow/faostat/2025-03-17/faostat_sdgb
+    - data://meadow/faostat/2025-03-17/faostat_rp
+    - data://meadow/faostat/2025-03-17/faostat_qcl
+    - data://meadow/faostat/2025-03-17/faostat_lc
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_qcl:
+    - snapshot://faostat/2025-03-17/faostat_qcl.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_lc:
+    - data://meadow/faostat/2026-02-25/faostat_lc
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_rp:
+    - data://meadow/faostat/2026-02-25/faostat_rp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_lc:
+    - snapshot://faostat/2025-03-17/faostat_lc.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_cisp:
+    - snapshot://faostat/2025-03-17/faostat_cisp.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_scl:
+    - snapshot://faostat/2026-02-25/faostat_scl.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_sdgb:
+    - snapshot://faostat/2025-03-17/faostat_sdgb.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_rfn:
+    - snapshot://faostat/2026-02-25/faostat_rfn.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_fbsc:
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_rl:
+    - snapshot://faostat/2026-02-25/faostat_rl.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_scl:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_scl
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_metadata:
+    - snapshot://faostat/2025-03-17/faostat_metadata.json
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_rp:
+    - snapshot://faostat/2026-02-25/faostat_rp.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_fbs:
+    - snapshot://faostat/2026-02-25/faostat_fbs.zip
+    - snapshot://faostat/2025-03-17/faostat_fbs.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_fbsh:
+    - snapshot://faostat/2025-03-17/faostat_fbsh.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_qi:
+    - snapshot://faostat/2025-03-17/faostat_qi.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_rl:
+    - data://garden/faostat/2026-02-25/faostat_rl
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_lc:
+    - snapshot://faostat/2026-02-25/faostat_lc.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_rfn:
+    - data://garden/faostat/2026-02-25/faostat_rfn
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_cisp:
+    - data://garden/faostat/2026-02-25/faostat_cisp
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2025-03-17/faostat_fs:
+    - data://garden/faostat/2025-03-17/faostat_fs
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_rp:
+    - snapshot://faostat/2025-03-17/faostat_rp.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_fbsc:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_fbs
+    - data://meadow/faostat/2026-02-25/faostat_fbsh
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_metadata:
+    - data://meadow/faostat/2026-02-25/faostat_metadata
+    - data://meadow/faostat/2026-02-25/faostat_sdgb
+    - data://meadow/faostat/2026-02-25/faostat_lc
+    - data://meadow/faostat/2026-02-25/faostat_rp
+    - data://meadow/faostat/2026-02-25/faostat_cisp
+    - data://meadow/faostat/2026-02-25/faostat_fbs
+    - data://meadow/faostat/2026-02-25/faostat_scl
+    - data://meadow/faostat/2026-02-25/faostat_qv
+    - data://meadow/faostat/2026-02-25/faostat_fbsh
+    - data://meadow/faostat/2026-02-25/faostat_rfn
+    - data://meadow/faostat/2026-02-25/faostat_rl
+    - data://meadow/faostat/2026-02-25/faostat_qcl
+    - data://meadow/faostat/2026-02-25/faostat_fs
+    - data://meadow/faostat/2026-02-25/faostat_qi
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_rp:
+    - data://garden/faostat/2026-02-25/faostat_rp
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_sdgb:
+    - snapshot://faostat/2026-02-25/faostat_sdgb.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_lc:
+    - data://garden/faostat/2026-02-25/faostat_lc
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_qcl:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_qcl
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_qv:
+    - snapshot://faostat/2025-03-17/faostat_qv.zip
+    - snapshot://faostat/2026-02-25/faostat_qv.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-09-04/food_supply_chain_fbs:
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-05-22/additional_variables:
+    - data://garden/faostat/2026-02-25/faostat_sdgb
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/faostat/2026-02-25/faostat_qi
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/faostat/2026-02-25/faostat_rfn
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_fs:
+    - snapshot://faostat/2025-03-17/faostat_fs.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_cisp:
+    - data://meadow/faostat/2026-02-25/faostat_cisp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2025-03-17/faostat_fs:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2025-03-17/faostat_fs
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_qv:
+    - snapshot://faostat/2025-03-17/faostat_qv.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_fs:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_fs
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_sdgb:
+    - data://meadow/faostat/2026-02-25/faostat_sdgb
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_cisp:
+    - snapshot://faostat/2026-02-25/faostat_cisp.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_qi:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/faostat/2026-02-25/faostat_qi
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_rl:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_rl
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://garden/faostat/2026-02-25/faostat_rfn:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/faostat/2026-02-25/faostat_rfn
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2026-07-01/income_groups
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_qcl:
+    - snapshot://faostat/2026-02-25/faostat_qcl.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_qi:
+    - snapshot://faostat/2026-02-25/faostat_qi.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-05-22/additional_variables:
+    - data://garden/faostat/2026-05-22/additional_variables
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2026-02-25/faostat_fbsh:
+    - snapshot://faostat/2026-02-25/faostat_fbsh.zip
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://grapher/faostat/2026-02-25/faostat_sdgb:
+    - data://garden/faostat/2026-02-25/faostat_sdgb
+  # archived; last active in 8c590bcce9ba on 2026-11-24
+  data://meadow/faostat/2025-03-17/faostat_fbs:
+    - snapshot://faostat/2025-03-17/faostat_fbs.zip
