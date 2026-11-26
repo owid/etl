@@ -166,7 +166,7 @@ def run() -> None:
                 "choice_new_slug": "all_pollutants",
                 "view_config": {
                     "selectedFacetStrategy": "metric",
-                    "facetYDomain": "independent",
+                    "yAxis": {"facetDomain": "independent"},
                     "title": _all_pollutants_title,
                     "subtitle": _all_pollutants_subtitle,
                 },
@@ -179,7 +179,7 @@ def run() -> None:
                 "choice_new_slug": "breakdown_by_sector",
                 "view_config": {
                     "selectedFacetStrategy": "entity",
-                    "facetYDomain": "independent",
+                    "yAxis": {"facetDomain": "independent"},
                     "title": breakdown_title,
                 },
             },
