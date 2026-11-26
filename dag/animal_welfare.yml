@@ -114,10 +114,9 @@ steps:
   viz://chart/animal_welfare/latest/animals_killed:
     - data://grapher/animal_welfare/2026-11-25/animals_used_for_food
 
-  # Live animals, including hens in cages and cage-free systems.
+  # Live animals.
   viz://chart/animal_welfare/latest/live_animals:
     - data://grapher/animal_welfare/2026-11-25/animals_used_for_food
-    - data://grapher/animal_welfare/2026-06-11/eggs_and_hens_statistics
 
   # Animal welfare laws.
   viz://chart/animal_welfare/latest/animal_welfare_laws:

@@ -94,6 +94,19 @@ LIVE_PRODUCING_ANIMALS = {
 
 # Land animals shown on their own when stacked. All other land animals are added up as "other_land_animals".
 MAIN_LAND_ANIMALS = ["chickens", "ducks", "pigs", "geese", "sheep", "rabbits", "turkeys", "goats", "cattle"]
+# Same for live animals (where there are about as many buffaloes as rabbits).
+MAIN_LIVE_ANIMALS = [
+    "chickens",
+    "cattle",
+    "sheep",
+    "ducks",
+    "goats",
+    "pigs",
+    "geese",
+    "turkeys",
+    "buffaloes",
+    "rabbits",
+]
 OTHER_LAND_ANIMALS = "other_land_animals"
 ALL_LAND_ANIMALS = "all_land_animals"
 
@@ -136,10 +149,22 @@ def prepare_qcl(tb_qcl: Table, item_codes: dict[str, str], element_codes: dict[s
     return split_per_capita(tb, column=column)
 
 
-def add_other_land_animals(tb: Table, column: str) -> Table:
+def add_all_land_animals(tb: Table, column: str) -> Table:
+    # FAOSTAT gives no total of live animals, so add up all of them.
+    columns = [column, f"{column}_per_capita"]
+    tb_all = (
+        tb.groupby(["country", "year", "metric", "per_capita", "estimate"], observed=True, as_index=False)
+        .agg({name: lambda values: values.sum(min_count=1) for name in columns})
+        .assign(**{"animal": ALL_LAND_ANIMALS})
+    )
+
+    return pr.concat([tb, tb_all], ignore_index=True)
+
+
+def add_other_land_animals(tb: Table, column: str, main_animals: list[str] = MAIN_LAND_ANIMALS) -> Table:
     # Add up all land animals other than the main ones (and other than their total).
     columns = [column, f"{column}_per_capita"]
-    others = tb[~tb["animal"].isin(MAIN_LAND_ANIMALS + [ALL_LAND_ANIMALS])]
+    others = tb[~tb["animal"].isin(main_animals + [ALL_LAND_ANIMALS])]
     tb_other = (
         others.groupby(["country", "year", "metric", "per_capita", "estimate"], observed=True, as_index=False)
         .agg({name: lambda values: values.sum(min_count=1) for name in columns})
@@ -248,13 +273,14 @@ def sanity_check_outputs(tb: Table) -> None:
     assert (tb.drop(columns=["country", "year"] + DIMENSIONS).fillna(0) >= 0).all().all(), error
 
     # The main land animals and the other land animals must add up to all land animals, so that they can be stacked.
-    for metric, column in [
-        ("animals_killed", "land_animals_killed"),
-        ("animals_killed_for_consumption", "land_animals_killed_for_consumption"),
+    for metric, column, main_animals in [
+        ("animals_killed", "land_animals_killed", MAIN_LAND_ANIMALS),
+        ("animals_killed_for_consumption", "land_animals_killed_for_consumption", MAIN_LAND_ANIMALS),
+        ("animals_alive", "live_animals", MAIN_LIVE_ANIMALS),
     ]:
         world = tb[(tb["country"] == "World") & (tb["metric"] == metric) & (tb["per_capita"] == "total")]
         stacked = (
-            world[world["animal"].isin(MAIN_LAND_ANIMALS + [OTHER_LAND_ANIMALS])]
+            world[world["animal"].isin(main_animals + [OTHER_LAND_ANIMALS])]
             .groupby("year", as_index=False)
             .agg({column: "sum"})
         )
@@ -308,16 +334,20 @@ def run() -> None:
     )
     tb_killed = add_other_land_animals(tb_killed, column="land_animals_killed")
 
-    # Live animals, including laying hens and cattle used for milk.
-    tables_live = [
-        prepare_qcl(
-            tb_qcl,
-            item_codes=LIVE_ITEM_CODES,
-            element_codes=LIVE_ELEMENT_CODES,
-            metric="animals_alive",
-            column="live_animals",
-        )
-    ]
+    # Live animals, including their total and the other land animals added up.
+    tb_live = prepare_qcl(
+        tb_qcl,
+        item_codes=LIVE_ITEM_CODES,
+        element_codes=LIVE_ELEMENT_CODES,
+        metric="animals_alive",
+        column="live_animals",
+    )
+    tb_live = add_all_land_animals(tb_live, column="live_animals")
+    tb_live = add_other_land_animals(tb_live, column="live_animals", main_animals=MAIN_LIVE_ANIMALS)
+
+    # Laying hens and cattle used for milk (added after the total, since they are already counted among chickens and
+    # cattle).
+    tables_live = [tb_live]
     for animal, (item_code, element_codes) in LIVE_PRODUCING_ANIMALS.items():
         tables_live.append(
             prepare_qcl(

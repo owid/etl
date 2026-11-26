@@ -94,12 +94,14 @@ tables:
           title_public: *title_farmed_crustaceans
       live_animals: &live_animals
         title: &title_live_animals |-
-          Live <% if animal == "laying_hens" %>laying hens<% elif animal == "milk_cattle" %>cattle used for milk<% else %><< animal.replace("_", " ") >><% endif %><% if per_capita == "per_capita" %> per person<% endif %>
+          Live <% if animal == "all_land_animals" %>land animals<% elif animal == "laying_hens" %>laying hens<% elif animal == "milk_cattle" %>cattle used for milk<% else %><< animal.replace("_", " ") >><% endif %><% if per_capita == "per_capita" %> per person<% endif %>
         description_short: Number of animals alive at a given time of the year. This is different from the number of animals slaughtered in a given year.
+        description_processing: |-
+          <% if animal == "all_land_animals" %>We add up all live land animals in FAO's data, except laying hens and cattle used for milk, which are already counted among chickens and cattle.<% endif %>
         processing_level: minor
         display:
           name: |-
-            <% if animal == "laying_hens" %>Laying hens<% elif animal == "milk_cattle" %>Cattle used for milk<% else %><< animal.replace("_", " ").capitalize() >><% endif %>
+            <% if animal == "all_land_animals" %>All land animals<% elif animal == "laying_hens" %>Laying hens<% elif animal == "milk_cattle" %>Cattle used for milk<% else %><< animal.replace("_", " ").capitalize() >><% endif %>
         presentation:
           title_public: *title_live_animals
       # Values per person have the same metadata (each one is a separate indicator, to keep its own origins).

@@ -14,8 +14,7 @@ default_selection:
   - United Kingdom
   - Spain
 default_dimensions:
-  metric: animals_alive
-  animal: chickens
+  animal: land_animals_stacked
   per_capita: total
 
 definitions:
@@ -24,63 +23,77 @@ definitions:
         originUrl: https://ourworldindata.org/animal-welfare
         entityType: country
         hasMapTab: true
-        # Views of a single animal (the view of hens in cages has its own chart type).
+        # Views of a single animal (the stacked view has its own chart type).
         chartTypes: ["LineChart", "DiscreteBar", "SlopeChart"]
         hideRelativeToggle: false
 
-# The step creates the views of live animals from the dimensions of the indicator.
+# The step creates the views of live animals from the dimensions of the indicator, and adds the stacked view.
 dimensions:
-  - slug: metric
-    name: Metric
-    presentation:
-      type: dropdown
-    choices:
-      - slug: animals_alive
-        name: Live animals
-        description: Kept at a given moment, not counted over a year
-      - slug: caged_hens
-        name: Cage and cage-free hens
   - slug: animal
     name: Animal
     presentation:
       type: dropdown-with-search
     choices:
+      - slug: all_land_animals
+        name: Land animals
+        group: Aggregates
+      - slug: land_animals_stacked
+        name: Land animals (stacked)
+        group: Aggregates
       - slug: buffaloes
         name: Buffaloes
+        group: Land animals
       - slug: camels
         name: Camels
+        group: Land animals
       - slug: cattle
         name: Cattle
+        group: Land animals
       - slug: milk_cattle
         name: Cattle used for milk
+        group: Land animals
       - slug: chickens
         name: Chickens
+        group: Land animals
       - slug: donkeys
         name: Donkeys
+        group: Land animals
       - slug: ducks
         name: Ducks
+        group: Land animals
       - slug: geese
         name: Geese
+        group: Land animals
       - slug: goats
         name: Goats
+        group: Land animals
       - slug: horses
         name: Horses
+        group: Land animals
       - slug: laying_hens
         name: Laying hens
+        group: Land animals
       - slug: mules
         name: Mules
+        group: Land animals
       - slug: other_camelids
         name: Other camelids
+        group: Land animals
       - slug: other_rodents
         name: Other rodents
+        group: Land animals
       - slug: pigs
         name: Pigs
+        group: Land animals
       - slug: rabbits
         name: Rabbits
+        group: Land animals
       - slug: sheep
         name: Sheep
+        group: Land animals
       - slug: turkeys
         name: Turkeys
+        group: Land animals
   - slug: per_capita
     name: Per capita
     presentation:
@@ -91,30 +104,4 @@ dimensions:
       - slug: per_capita
         name: Per person
 
-views:
-  - dimensions:
-      metric: caged_hens
-      animal: chickens
-      per_capita: total
-      estimate: not_applicable
-    indicators:
-      y:
-        - catalogPath: eggs_and_hens_statistics#number_of_hens_in_cages
-          display:
-            name: In cages
-            color: "#883039"
-            tolerance: 5
-        - catalogPath: eggs_and_hens_statistics#number_of_hens_cage_free
-          display:
-            name: Cage-free
-            color: "#5D7395"
-            tolerance: 5
-    config:
-      title: Egg-laying hens in cages and cage-free systems
-      subtitle: Cage-free housing systems include barns and free-range (non-organic and organic) farms. Cages can be conventional (battery cages) or enriched.
-      note: Data may refer to different years for each country, due to limited data availability.
-      hasMapTab: false
-      chartTypes:
-        - StackedDiscreteBar
-      stackMode: absolute
-      hideRelativeToggle: false
+views: []
