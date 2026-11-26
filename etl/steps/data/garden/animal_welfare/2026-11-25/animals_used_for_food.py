@@ -9,7 +9,7 @@ Each indicator comes from a single source, so that it keeps its own origins:
 - land_animals_killed_for_consumption: our estimate in animals_killed_for_domestic_consumption.
 - chickens_killed_for_eggs: our estimate in chickens_killed_for_eggs.
 - chickens_killed_for_eggs_for_consumption: our estimate in animals_killed_for_domestic_consumption.
-- wild_caught_fish, farmed_fish and farmed_crustaceans: Fishcount.
+- wild_caught_fish, wild_caught_fish_for_fishmeal_and_fish_oil, farmed_fish and farmed_crustaceans: Fishcount.
 
 Values per person are in indicators of their own (ending in "_per_capita"), since only they also come from population
 data.
@@ -97,11 +97,17 @@ MAIN_LAND_ANIMALS = ["chickens", "ducks", "pigs", "geese", "sheep", "rabbits", "
 OTHER_LAND_ANIMALS = "other_land_animals"
 ALL_LAND_ANIMALS = "all_land_animals"
 
-# Fishcount estimates: for each animal, its dataset and the prefix of its columns.
+# Fishcount estimates: for each animal, its dataset, table, and the prefix of its columns.
 FISH_AND_CRUSTACEANS = {
-    "wild_caught_fish": ("number_of_wild_fish_killed_for_food", "n_wild_fish"),
-    "farmed_fish": ("number_of_farmed_fish", "n_farmed_fish"),
-    "farmed_crustaceans": ("number_of_farmed_crustaceans", "n_farmed_crustaceans"),
+    "wild_caught_fish": ("number_of_wild_fish_killed_for_food", "number_of_wild_fish_killed_for_food", "n_wild_fish"),
+    # NOTE: These fish are also included in wild-caught fish. Only world totals, and no values per person.
+    "wild_caught_fish_for_fishmeal_and_fish_oil": (
+        "number_of_wild_fish_killed_for_food",
+        "number_of_wild_fish_caught_for_fishmeal_and_fish_oil",
+        "n_wild_fish_for_fishmeal_and_fish_oil",
+    ),
+    "farmed_fish": ("number_of_farmed_fish", "number_of_farmed_fish", "n_farmed_fish"),
+    "farmed_crustaceans": ("number_of_farmed_crustaceans", "number_of_farmed_crustaceans", "n_farmed_crustaceans"),
 }
 # Suffix of the columns of each estimate in the Fishcount datasets.
 ESTIMATE_SUFFIXES = {"midpoint": "", "lower_limit": "_low", "upper_limit": "_high"}
@@ -177,9 +183,13 @@ def prepare_chickens_killed_for_eggs(tb_eggs: Table, source_column: str, metric:
 
 
 def prepare_fish_and_crustaceans(tb: Table, animal: str, prefix: str) -> Table:
+    # Values per person, where the source has them.
+    suffixes_per_capita = {"total": ""}
+    if f"{prefix}_per_capita" in tb.columns:
+        suffixes_per_capita["per_capita"] = "_per_capita"
     tables = []
     for estimate, suffix in ESTIMATE_SUFFIXES.items():
-        for per_capita, suffix_per_capita in [("total", ""), ("per_capita", "_per_capita")]:
+        for per_capita, suffix_per_capita in suffixes_per_capita.items():
             source_column = f"{prefix}{suffix}{suffix_per_capita}"
             new_column = f"{animal}{suffix_per_capita}"
             tb_estimate = tb[["country", "year", source_column]].rename(
@@ -190,7 +200,9 @@ def prepare_fish_and_crustaceans(tb: Table, animal: str, prefix: str) -> Table:
     tb = pr.concat(tables, ignore_index=True)
     tb = tb.assign(**{"metric": "animals_killed", "animal": animal})
 
-    return tb[["country", "year"] + DIMENSIONS + [animal, f"{animal}_per_capita"]].reset_index(drop=True)
+    return tb[
+        ["country", "year"] + DIMENSIONS + [f"{animal}{suffix}" for suffix in suffixes_per_capita.values()]
+    ].reset_index(drop=True)
 
 
 def add_descriptions_from_producer(tb: Table, tb_qcl_flat: Table) -> None:
@@ -280,7 +292,7 @@ def run() -> None:
     tb_eggs_consumption = ds_consumption.read("chickens_killed_for_eggs")
     tb_eggs = paths.load_dataset("chickens_killed_for_eggs").read("chickens_killed_for_eggs")
     tables_fish = {
-        animal: paths.load_dataset(dataset).read(dataset) for animal, (dataset, _) in FISH_AND_CRUSTACEANS.items()
+        animal: paths.load_dataset(dataset).read(table) for animal, (dataset, table, _) in FISH_AND_CRUSTACEANS.items()
     }
 
     #
@@ -334,7 +346,7 @@ def run() -> None:
             ),
             *[
                 prepare_fish_and_crustaceans(tables_fish[animal], animal=animal, prefix=prefix)
-                for animal, (_, prefix) in FISH_AND_CRUSTACEANS.items()
+                for animal, (_, _, prefix) in FISH_AND_CRUSTACEANS.items()
             ],
         ],
         ignore_index=True,
@@ -350,6 +362,7 @@ def run() -> None:
             "land_animals_killed_for_consumption": (tb_consumption, "killed_for_domestic_supply"),
             "chickens_killed_for_eggs": (tb_eggs, "chickens_killed"),
             "chickens_killed_for_eggs_for_consumption": (tb_eggs_consumption, "killed_for_domestic_supply"),
+            "wild_caught_fish": (tables_fish["wild_caught_fish"], "n_wild_fish"),
         },
     )
 

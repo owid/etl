@@ -18,13 +18,16 @@ INDICATORS = [
         "farmed_crustaceans",
     ]
     for suffix in ["", "_per_capita"]
-]
+] + ["wild_caught_fish_for_fishmeal_and_fish_oil"]  # Only world totals, and no values per person.
 
 # Dimensions, in the order of the selectors.
 DIMENSIONS = {"animal": "*", "metric": "*", "per_capita": "*", "estimate": "*"}
 
-# Animals estimated as a range.
+# Fish and crustaceans, estimated as a range.
 FISH_AND_CRUSTACEANS = ["wild_caught_fish", "farmed_fish", "farmed_crustaceans"]
+# Wild fish caught for fishmeal and fish oil, also estimated as a range.
+# NOTE: They are also included in wild-caught fish, so they are not shown next to other animals.
+FISHMEAL_AND_FISH_OIL = "wild_caught_fish_for_fishmeal_and_fish_oil"
 
 # Land animals stacked, from bottom to top (as in our chart of land animals slaughtered for meat).
 LAND_ANIMALS_STACKED = [
@@ -70,6 +73,7 @@ TITLES = {
     "wild_caught_fish": "Fishes caught from the wild",
     "farmed_fish": "Farmed fishes killed for food",
     "farmed_crustaceans": "Farmed crustaceans killed for food",
+    FISHMEAL_AND_FISH_OIL: "Wild fish caught for fishmeal and fish oil",
     "animals_killed": "Land animals slaughtered for meat",
     "animals_killed_for_consumption": "Land animals slaughtered for meat supplied to the country",
 }
@@ -77,6 +81,10 @@ SUBTITLES = {
     "animals_killed": "Based on the country of production, not consumption.",
     "animals_killed_for_consumption": "Based on the country of consumption, not production.",
 }
+SUBTITLE_FISHMEAL_AND_FISH_OIL = (
+    "Fishmeal and fish oil are mostly used as feed on fish and shrimp farms. These fish are also included in the number"
+    " of wild-caught fish."
+)
 # Text of the data pages of the stacked view and the bar chart. Otherwise, a data page shows the text of the first
 # indicator of its view (here, chickens). The stacked view has the key points of the view of all land animals.
 DESCRIPTION_KEYS_STACKED = {
@@ -124,13 +132,21 @@ def run() -> None:
                 "view_config": {
                     **ONE_COUNTRY,
                     "title": "{title}{per_person}",
-                    "subtitle": SUBTITLES["animals_killed"],
+                    "subtitle": "{subtitle}",
                     # The map shows the midpoint (the first indicator).
                     "hasMapTab": True,
                 },
             }
         ],
-        params={"title": lambda view: TITLES[view.dimensions["animal"]], "per_person": per_person},
+        params={
+            "title": lambda view: TITLES[view.dimensions["animal"]],
+            "subtitle": lambda view: (
+                SUBTITLE_FISHMEAL_AND_FISH_OIL
+                if view.dimensions["animal"] == FISHMEAL_AND_FISH_OIL
+                else SUBTITLES["animals_killed"]
+            ),
+            "per_person": per_person,
+        },
     )
     # Each animal now has a single estimate, so the estimate selector is not needed.
     c.dimensions = [dimension for dimension in c.dimensions if dimension.slug != "estimate"]
@@ -207,10 +223,13 @@ def run() -> None:
     # latest value of up to 5 years earlier, since fish and crustaceans have no data for the latest years. And tell the
     # two bars of chickens apart, as in the animal dropdown. Give the stacked views the key points of all land animals.
     for view in c.views:
-        if view.dimensions["animal"] in FISH_AND_CRUSTACEANS:
+        if view.dimensions["animal"] in FISH_AND_CRUSTACEANS + [FISHMEAL_AND_FISH_OIL]:
             for indicator in view.indicators.y:
                 color = "#ae2032" if "estimate_midpoint" in indicator.catalogPath else "#716b6c"
                 indicator.display = {**(indicator.display or {}), "color": color}
+        if view.dimensions["animal"] == FISHMEAL_AND_FISH_OIL:
+            # There are only world totals, so a map would be empty.
+            view.config = {**(view.config or {}), "hasMapTab": False}
         if view.dimensions["animal"] == "land_animals_stacked":
             view.metadata = {
                 **(view.metadata or {}),
