@@ -19,7 +19,6 @@ views:
         max: 100
         min: 0
         canChangeScaleType: true
-      minTime: 1612
       subtitle: "The FrontierMath benchmark tests AI models on research-level mathematics problems that take expert mathematicians hours or days to solve."
       originUrl: "/artificial-intelligence"
       chartTypes:

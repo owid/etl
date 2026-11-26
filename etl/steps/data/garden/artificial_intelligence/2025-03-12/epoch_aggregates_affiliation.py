@@ -1,5 +1,7 @@
 """Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
+import datetime as dt
+
 import pandas as pd
 
 from etl.catalog_helpers import last_date_accessed
@@ -68,9 +70,15 @@ def run() -> None:
     #
     ds_garden = paths.create_dataset(
         tables=[tb_agg],
-        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
+        yaml_params={"date_accessed": american_date(last_date_accessed(tb)), "year": last_date_accessed(tb)[-4:]},
     )
 
     ds_garden.save()
 
     paths.log.info("epoch_aggregates_affiliation.end")
+
+
+def american_date(date: str) -> str:
+    """Rewrite a date like "26 November 2026" as "November 26, 2026", the format the style guide asks for."""
+    parsed = dt.datetime.strptime(date, "%d %B %Y")
+    return f"{parsed:%B} {parsed.day}, {parsed.year}"

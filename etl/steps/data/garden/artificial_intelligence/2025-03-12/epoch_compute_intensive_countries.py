@@ -1,5 +1,7 @@
 """Generate aggregated table for total yearly and cumulative number of compute intensive AI systems in each country."""
 
+import datetime as dt
+
 import shared as sh
 
 from etl.catalog_helpers import last_date_accessed
@@ -53,10 +55,16 @@ def run() -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
         tables=[tb_agg],
-        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
+        yaml_params={"date_accessed": american_date(last_date_accessed(tb)), "year": last_date_accessed(tb)[-4:]},
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
     paths.log.info("epoch_compute_intensive_countries.end")
+
+
+def american_date(date: str) -> str:
+    """Rewrite a date like "26 November 2026" as "November 26, 2026", the format the style guide asks for."""
+    parsed = dt.datetime.strptime(date, "%d %B %Y")
+    return f"{parsed:%B} {parsed.day}, {parsed.year}"
