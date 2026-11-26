@@ -711,7 +711,17 @@
                   "requirement_level": "optional",
                   "guidelines": [
                     [
-                      "Start `text` with a capital letter and end it with a period, even when it is short. The exception is a note on some `entities` with no `time`: charts show it next to the entity's name, like a label, so it takes no period."
+                      "Must start with a capital letter."
+                    ],
+                    [
+                      "Must end with a period, unless it is a note on some `entities` with no `time`.",
+                      {
+                        "type": "list",
+                        "value": [
+                          "A note on some `entities` with no `time` must not end with a period, since charts show it next to the entity's name, like a label.",
+                          "NOTE: This is a temporary solution until we find a more convenient solution."
+                        ]
+                      }
                     ],
                     [
                       "Don't repeat `time` or `time_end` in `text`: charts already show them next to the note."
