@@ -55,9 +55,14 @@ dataset:
     For a more detailed description_short of the HMD data, including week date definitions, the coverage (of individuals, locations, and time), whether dates are for death occurrence or registration, the original national source information, and important caveats, see the HMD metadata file at https://www.mortality.org/Public/STMF_DOC/STMFmetadata.pdf.
 
     For a more detailed description_short of the WMD data, including original source information, see their GitHub page at https://github.com/akarlinsky/world_mortality.
+  owners:
+    - Lucas Rodés-Guirao
 
 tables:
   excess_mortality:
+    # NOTE: Indicators covering all ages mix weekly countries (dated by the Sunday each week ends)
+    # and monthly ones (dated by the month's last day), so they use `timeInterval: day`. The
+    # age-group indicators only come from weekly countries, so they use `week`.
     variables:
       # p_avg_*
       p_avg_all_ages:
@@ -70,7 +75,7 @@ tables:
           name: Excess mortality P-scores, 5-year average baseline, all ages
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       p_avg_0_14:
         title: p_avg_0_14
         # title: Excess mortality P-scores (5-year average baseline, 0–14)
@@ -139,7 +144,7 @@ tables:
           includeInTable: true
           tolerance: 30
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
         presentation:
           grapher_config:
             title: "Excess mortality: Deaths from all causes compared to projection based on previous years"
@@ -244,7 +249,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2016_all_ages:
         title: deaths_2016_all_ages
         # title: Number of deaths (weekly or monthly, 2016)
@@ -253,7 +258,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2017_all_ages:
         title: deaths_2017_all_ages
         # title: Number of deaths (weekly or monthly, 2017)
@@ -262,7 +267,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2018_all_ages:
         title: deaths_2018_all_ages
         # title: Number of deaths (weekly or monthly, 2018)
@@ -271,7 +276,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2019_all_ages:
         title: deaths_2019_all_ages
         # title: Number of deaths (weekly or monthly, 2019)
@@ -280,7 +285,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2020_all_ages:
         title: deaths_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020)
@@ -289,7 +294,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2021_all_ages:
         title: deaths_2021_all_ages
         # title: Number of deaths (weekly or monthly, 2021)
@@ -298,7 +303,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2022_all_ages:
         title: deaths_2022_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
@@ -307,7 +312,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2023_all_ages:
         title: deaths_2023_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
@@ -316,7 +321,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2024_all_ages:
         title: deaths_2024_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
@@ -325,7 +330,7 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       deaths_2025_all_ages:
         title: deaths_2025_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
@@ -345,7 +350,7 @@ tables:
           numDecimalPlaces: 0
 
       # other metrics
-          timeInterval: week
+          timeInterval: day
       excess_proj_all_ages:
         title: excess_proj_all_ages
         # title: Excess deaths (projected, all ages)
@@ -353,7 +358,7 @@ tables:
         description_short: Number of excess deaths; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
-          timeInterval: week
+          timeInterval: day
       excess_per_million_proj_all_ages:
         title: excess_per_million_proj_all_ages
         # title: Excess deaths per million people (projected, all ages)
@@ -361,7 +366,7 @@ tables:
         description_short: Number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
-          timeInterval: week
+          timeInterval: day
       average_deaths_2015_2019_all_ages:
         title: average_deaths_2015_2019_all_ages
         # title: Average number of deaths (2015–2019, all ages)
@@ -369,7 +374,7 @@ tables:
         description_short: Average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
         display:
           includeInTable: true
-          timeInterval: week
+          timeInterval: day
       projected_deaths_since_2020_all_ages:
         title: projected_deaths_since_2020_all_ages
         # title: Projected number of deaths (2020–2022, all ages)
@@ -379,7 +384,7 @@ tables:
           name: Projected, 2020
           includeInTable: true
           numDecimalPlaces: 0
-          timeInterval: week
+          timeInterval: day
       cum_excess_proj_all_ages:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
@@ -389,7 +394,7 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          timeInterval: week
+          timeInterval: day
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
@@ -416,7 +421,7 @@ tables:
         description_short: Cumulative number of projected deaths; cumulated starting 1 January 2020.
         display:
           includeInTable: true
-          timeInterval: week
+          timeInterval: day
       cum_p_proj_all_ages:
         title: cum_p_proj_all_ages
         # title: Cumulative p-score (projected, all ages)
@@ -428,7 +433,7 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          timeInterval: week
+          timeInterval: day
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative deaths from all causes compared to projection based on previous years"
@@ -444,7 +449,7 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          timeInterval: week
+          timeInterval: day
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
@@ -470,14 +475,14 @@ tables:
         description_short: Week or month number in the year.
         display:
           includeInTable: true
-          timeInterval: week
+          timeInterval: day
       time_unit:
         title: Time unit
         unit: ""
         description_short: Denotes whether the “time” column values are weekly or monthly.
         display:
           includeInTable: true
-          timeInterval: week
+          timeInterval: day
       cum_excess_proj_all_ages_last12m:
         title: cum_excess_proj_all_ages_last12m
         # title: Cumulative excess of deaths (projected, all ages)

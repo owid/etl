@@ -169,7 +169,7 @@ def fetch(path: str) -> Table | ChartTable:
             - Chart slug: "life-expectancy"
             - Chart URL: "https://ourworldindata.org/grapher/life-expectancy"
             - Chart slug with query params: "years-of-schooling?metric_type=expected_years_schooling&level=primary&sex=boys"
-            - Explorer URL: "https://ourworldindata.org/explorers/energy"
+            - Explorer URL: "https://ourworldindata.org/explorers/co2"
 
     Returns:
         Table (for tables or indicators) or CharTable (for charts)

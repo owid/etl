@@ -334,10 +334,10 @@ def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
     """`viz://` / `export://` URIs of the recipes a changed *shared* file in a recipe folder feeds.
 
     The recipe mirror of `_shared_step_file_datasets`, and the same blind spot: a recipe's helpers are not
-    recipes. `explorer/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py`, and
+    recipes. `chart/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py`, and
     reads `map_brackets.yml`; none of the three is a step, so `get_directly_changed_export_uris` derives
-    `viz://explorer/un/latest/utils` — a recipe that exists in no DAG and publishes nothing. The
-    explorer's own text then belongs to nobody in this branch, and the review files every difference in it
+    `viz://chart/un/latest/utils` — a recipe that exists in no DAG and publishes nothing. The
+    multidim's own text then belongs to nobody in this branch, and the review files every difference in it
     as baseline lag: the one bucket where a reviewer will not look for their own edit.
 
     Config companions are already handled upstream (`un_wpp.sex_ratio.config.yml` resolves to the sibling
