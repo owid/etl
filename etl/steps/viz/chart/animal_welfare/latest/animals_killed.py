@@ -196,11 +196,15 @@ def run() -> None:
                     "presentation": {"title_public": "Animals killed for food{per_person}"},
                     "description_short": "Fish and crustaceans are shown as the midpoint of their estimated range.",
                     "description_key": [
-                        "This chart does not include wild-caught crustaceans or farmed insects. According to one estimate"
-                        " by [Rethink Priorities](https://rethinkpriorities.org/research-area/shrimp-the-animals-most-commonly-used-and-killed-for-food-production/),"
+                        "This chart does not include wild-caught crustaceans. According to one estimate by"
+                        " [Rethink Priorities](https://rethinkpriorities.org/research-area/shrimp-the-animals-most-commonly-used-and-killed-for-food-production/),"
                         " around 25 trillion shrimps and prawns were caught from the wild in 2020, with a range of 6.5 to"
-                        " 66 trillion. According to another estimate by [Rethink Priorities](https://rethinkpriorities.org/research-area/insects-raised-for-food-and-feed/),"
-                        " 1 to 1.2 trillion insects are raised on farms each year for food and animal feed."
+                        " 66 trillion.",
+                        "This chart does not include farmed insects. According to one estimate by"
+                        " [Rethink Priorities](https://rethinkpriorities.org/research-area/insects-raised-for-food-and-feed/),"
+                        " 1 to 1.2 trillion insects are raised on farms each year. People eat some of them, and others"
+                        " are used as feed for livestock, farmed fish, and pets. The countries that farm the most insects"
+                        " are Thailand, France, South Africa, China, Canada, and the United States.",
                     ],
                     "description_from_producer": "",
                     # Chickens killed in egg production are our own estimate.
