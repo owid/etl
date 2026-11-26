@@ -71,6 +71,10 @@ steps:
     - data://grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018
     - data-private://grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
     - data://grapher/food/2026-05-06/clark_et_al_2022
+  viz://chart/food/latest/food_footprints:
+    - data://grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018
+    - data-private://grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
+    - data://grapher/food/2026-05-06/clark_et_al_2022
 
   # Population fed by synthetic nitrogen fertilizers - Erisman et al. (2008).
   # NOTE: The share of the world population fed (digitized from Figure 1 of Erisman et al. (2008)) is not
