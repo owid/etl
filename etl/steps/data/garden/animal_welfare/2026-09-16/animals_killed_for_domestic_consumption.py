@@ -149,18 +149,11 @@ PRODUCTION_ELEMENT_CODE = "005510"
 # Countries with FBS data but no SCL data, which therefore have no estimates.
 # NOTE: Remove countries from this list once SCL includes them.
 COUNTRIES_WITHOUT_SCL = [
-    "Benin",
     "Burundi",
     "Central African Republic",
-    "Chad",
-    "Dominica",
-    "Japan",
-    "Mali",
     "Somalia",
     "South Sudan",
-    "Sudan",
     "Sudan (former)",
-    "Togo",
 ]
 
 # Countries in FAOSTAT that have no population data.
@@ -473,13 +466,13 @@ def sanity_check_outputs(tb: Table, tb_rates: Table) -> None:
     compared = compared[compared["killed_in_country"] > 1e7].reset_index(drop=True)
     compared["ratio"] = compared["killed_for_domestic_supply"] / compared["killed_in_country"]
     outliers = compared[~compared["ratio"].between(0.8, 1.2)]
-    # NOTE: This should be an assertion. It is a warning only until this step uses the FAOSTAT release that fixes
-    # India's beef and buffalo meat production in FBS (which leaves only buffaloes in 2012-2013 and pigeons in 2010
-    # as outliers).
-    if not outliers.empty:
-        log.warning(
-            f"Animals killed for consumption differ from those killed in the same countries by over 20%:\n{outliers}"
-        )
+    # NOTE: Known outliers, in the FAOSTAT release of 2026-11-23.
+    known_outliers = {("buffaloes", 2012), ("buffaloes", 2013), ("pigeons", 2010)}
+    outliers = outliers[
+        [(animal, year) not in known_outliers for animal, year in zip(outliers["animal"], outliers["year"])]
+    ]
+    error = f"Animals killed for consumption differ from those killed in the same countries by over 20%:\n{outliers}"
+    assert outliers.empty, error
 
 
 def run() -> None:
