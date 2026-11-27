@@ -39,6 +39,10 @@ steps:
   viz://explorer/emissions/latest/co2:
     - data://grapher/gcp/2026-11-10/global_carbon_budget
     - data://grapher/emissions/2025-12-04/national_contributions
+  # CO₂ and greenhouse gas emissions data explorer, as a multidim (replaces the explorer above).
+  viz://chart/emissions/latest/co2:
+    - data://grapher/gcp/2026-11-10/global_carbon_budget
+    - data://grapher/emissions/2025-12-04/national_contributions
 
   # CO₂ charts with data-dependent thresholds and reporting years.
   viz://chart/emissions/latest/per_capita_co2_vs_average:
