@@ -1,0 +1,176 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  sheet: "[this spreadsheet](https://docs.google.com/spreadsheets/d/1fifzj8l5Y55Jp5Xrr4FNipeEzl6GenbasjS6FpCvJ68/edit)"
+  key_compilation: |-
+    Our World in Data compiled the national figures from the published data of each country's statistics office, civil registry, or health ministry, for 2010 to 2025. We use the most recent figure published for each year, as published. Each country's sources and notes are listed in the Sources tab, and {definitions.sheet} has the sources and notes for each year.
+  key_inclusion: |-
+    We include a country when it had at least 1 million people in 2023, its yearly count of births is at least 90% complete, a national government body publishes that count, the count is available for at least one year from 2020 onward, and it covers the same population as the UN's figures. That leaves 79 countries. {definitions.sheet} lists every other country or area, and the reason it is left out.
+  key_un: |-
+    The UN figures come from the UN's World Population Prospects 2024: its estimates up to 2023, and its medium projection for 2024 and 2025.
+  key_sign: |-
+    The difference is the national figure minus the UN's. A positive difference means the national figure is higher than the UN's; a negative one means it is lower.
+  key_fertility_sources: |-
+    For some countries and years, the national fertility rate comes from a census or a household survey run by the country's statistics office, rather than from yearly birth registrations. The notes say which.
+  key_fertility_rounding: |-
+    Many countries publish their fertility rate with one decimal, so a difference of up to about 0.05 births per woman can come from rounding alone.
+  description_short_tfr: |-
+    the average number of children a woman would have if she experienced the year's age-specific birth rates throughout her childbearing years.
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+        - Population Growth
+    processing_level: major
+
+dataset:
+  title: "Births and fertility rates: national statistics compared with UN estimates"
+  update_period_days: 0
+  owners:
+    - Edouard Mathieu
+
+tables:
+  births_fertility_national_vs_un:
+    title: "Births and fertility rates: national statistics compared with UN estimates"
+    variables:
+      births_national:
+        title: Births (national statistics)
+        unit: births
+        description_short: Number of live births in the year, as published by the country's statistics office, civil registry, or health ministry.
+        description_key:
+          - "{definitions.key_compilation}"
+          - "{definitions.key_inclusion}"
+        processing_level: minor
+        display:
+          name: National statistics
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Births, according to national statistics
+          attribution_short: National statistics
+      births_un:
+        title: Births (UN estimates)
+        unit: births
+        description_short: Number of live births in the year, as estimated by the UN. Figures for 2024 and 2025 are projections.
+        description_key:
+          - "{definitions.key_un}"
+          - "{definitions.key_inclusion}"
+        processing_level: minor
+        display:
+          name: UN estimates
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Births, according to UN estimates
+          attribution_short: UN WPP
+      births_difference:
+        title: Difference in births between national statistics and UN estimates
+        unit: births
+        description_short: Number of live births published by national statistics, minus the number the UN estimates. A positive number means the national figure is higher.
+        description_key:
+          - "{definitions.key_sign}"
+          - "{definitions.key_un}"
+          - "{definitions.key_compilation}"
+          - "{definitions.key_inclusion}"
+        display:
+          name: Difference in births
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Difference in births between national statistics and UN estimates
+          attribution_short: National statistics and UN WPP
+      births_relative_difference:
+        title: Relative difference in births between national statistics and UN estimates
+        unit: "%"
+        short_unit: "%"
+        description_short: How far the number of live births published by national statistics is from the number the UN estimates, as a percentage of the UN's figure. A positive number means the national figure is higher.
+        description_key:
+          - "{definitions.key_sign}"
+          - "{definitions.key_un}"
+          - "{definitions.key_compilation}"
+          - "{definitions.key_inclusion}"
+        display:
+          name: Relative difference in births
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Relative difference in births between national statistics and UN estimates
+          attribution_short: National statistics and UN WPP
+      fertility_rate_national:
+        title: Fertility rate (national statistics)
+        unit: live births per woman
+        description_short: "[Total fertility rate](#dod:fertility-rate), as published by the country's statistics office, civil registry, or health ministry: {definitions.description_short_tfr}"
+        description_key:
+          - "{definitions.key_compilation}"
+          - "{definitions.key_fertility_sources}"
+          - "{definitions.key_inclusion}"
+        processing_level: minor
+        display:
+          name: National statistics
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Fertility rate, according to national statistics
+          attribution_short: National statistics
+      fertility_rate_un:
+        title: Fertility rate (UN estimates)
+        unit: live births per woman
+        description_short: "[Total fertility rate](#dod:fertility-rate), as estimated by the UN: {definitions.description_short_tfr} Figures for 2024 and 2025 are projections."
+        description_key:
+          - "{definitions.key_un}"
+          - "{definitions.key_inclusion}"
+        processing_level: minor
+        display:
+          name: UN estimates
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Fertility rate, according to UN estimates
+          attribution_short: UN WPP
+      fertility_rate_difference:
+        title: Difference in the fertility rate between national statistics and UN estimates
+        unit: live births per woman
+        description_short: "[Total fertility rate](#dod:fertility-rate) published by national statistics, minus the rate the UN estimates. A positive number means the national figure is higher."
+        description_key:
+          - "{definitions.key_sign}"
+          - "{definitions.key_fertility_rounding}"
+          - "{definitions.key_un}"
+          - "{definitions.key_compilation}"
+          - "{definitions.key_fertility_sources}"
+          - "{definitions.key_inclusion}"
+        display:
+          name: Difference in the fertility rate
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Difference in the fertility rate between national statistics and UN estimates
+          attribution_short: National statistics and UN WPP
+      fertility_rate_relative_difference:
+        title: Relative difference in the fertility rate between national statistics and UN estimates
+        unit: "%"
+        short_unit: "%"
+        description_short: "How far the [total fertility rate](#dod:fertility-rate) published by national statistics is from the rate the UN estimates, as a percentage of the UN's figure. A positive number means the national figure is higher."
+        description_key:
+          - "{definitions.key_sign}"
+          - "{definitions.key_fertility_rounding}"
+          - "{definitions.key_un}"
+          - "{definitions.key_compilation}"
+          - "{definitions.key_fertility_sources}"
+          - "{definitions.key_inclusion}"
+        display:
+          name: Relative difference in the fertility rate
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Relative difference in the fertility rate between national statistics and UN estimates
+          attribution_short: National statistics and UN WPP
+
+  coverage:
+    title: Countries covered by the comparison of national statistics with UN estimates
+    variables:
+      status:
+        title: Whether national births and fertility rates are included in the comparison with UN estimates
+        unit: ""
+        description_short: Whether a country's births and fertility rates from national statistics are included in our comparison with UN estimates, and if not, the main reason.
+        description_key:
+          - "{definitions.key_inclusion}"
+          - |-
+            "Birth registration under 90% or unknown" means the country hasn't reported, to the UN or in a household survey since 2010, that at least 90% of births are registered, or a census or survey shows the yearly count is less complete than that. "Left out for another reason" means no national government body publishes a yearly count, the count stops before 2020, or it covers a population that differs from the UN's by 3% or more of births.
+          - "{definitions.key_compilation}"
+        processing_level: minor
+        display:
+          name: Inclusion status
+        presentation:
+          title_public: Countries included in the comparison of national births and fertility rates with UN estimates
+          attribution_short: Our World in Data

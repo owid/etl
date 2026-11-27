@@ -1,0 +1,27 @@
+chart_config_id: 01a21c13-1085-7dac-8505-3d2fc1027883
+grapher_schema: "012"
+slug: births-fertility-national-vs-un-coverage
+topic_tags:
+  - Fertility Rate
+  - Population Growth
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: coverage#status
+    config:
+      title: "Which countries are included in our comparison of national births and fertility rates with UN estimates?"
+      subtitle: "Countries with at least 1 million people, whose yearly count of births is at least 90% complete, published by a national government body, available for at least one year from 2020 onward, and covering the same population as the UN's figures."
+      originUrl: /fertility-rate
+      tab: map
+      hasMapTab: true
+      chartTypes: []
+      map:
+        hideTimeline: true
+        colorScale:
+          customCategoryColors:
+            Included: "#2c8465"
+            Population under 1 million: "#d9d9d9"
+            Birth registration under 90% or unknown: "#c15065"
+            Left out for another reason: "#e6a23c"
