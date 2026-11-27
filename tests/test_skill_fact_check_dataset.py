@@ -795,6 +795,15 @@ def test_anomalist_neighbors_and_old_values():
     assert anomalist_candidates.neighbors(None, 2020)[0].startswith("not on disk")
 
 
+def test_anomalist_rerun_without_candidates_asks_to_reassemble_the_report():
+    """The earlier result was set aside, so the assembled report must be rebuilt without its findings."""
+    args = ("ns/v/thing", "ai/fact-check/ns/v/thing", [], ["note"], NO_FIRST_PASS, 0.3)
+    assert "assemble_report.py ai/fact-check/ns/v/thing --reconciled" in anomalist_candidates.render(
+        *args, replaced=True
+    )
+    assert "assemble_report.py" not in anomalist_candidates.render(*args)
+
+
 def test_anomalist_values_tell_a_corrupt_dataset_from_a_missing_one(tmp_path):
     """A dataset that is on disk but fails to read must say so, not pass as "not on disk"."""
     (tmp_path / "index.json").write_text("{not json")

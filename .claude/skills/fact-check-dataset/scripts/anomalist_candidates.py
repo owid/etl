@@ -95,6 +95,7 @@ def run(step: str, top: int, min_score: float) -> str:
     dossier.mkdir(parents=True, exist_ok=True)
     # A run regenerates the candidates, so an earlier run's brief and result answer another set: set them aside.
     set_aside = clear_previous_run(dossier)
+    rel = str(dossier.relative_to(paths.BASE_DIR))
     engine = get_engine()
 
     dataset = dataset_row(engine, f"{namespace}/{version}/{short_name}")
@@ -105,6 +106,8 @@ def run(step: str, top: int, min_score: float) -> str:
             f"grapher://grapher/{namespace}/{version}/{short_name} --grapher`) and run this again.\n"
         )
         text += "".join(f"\n- {note}\n" for note in set_aside)
+        if set_aside:
+            text += f"\n{reassemble(rel)}\n"
         (dossier / "anomalist.md").write_text(text)
         return text
 
@@ -114,8 +117,7 @@ def run(step: str, top: int, min_score: float) -> str:
     add_values(rows, paths.DATA_DIR, f"{namespace}/{version}/{short_name}", old_dataset(engine, dataset))
     write_csv(rows, dossier / "anomalist.csv")
     coverage = coverage_notes(stored, indicators, dataset, notes) + set_aside
-    rel = str(dossier.relative_to(paths.BASE_DIR))
-    text = render(step, rel, rows, coverage, first_pass, min_score)
+    text = render(step, rel, rows, coverage, first_pass, min_score, replaced=bool(set_aside))
     (dossier / "anomalist.md").write_text(text)
     # The brief exists only when there is something to check: `assemble_report.py` waits for the result of a brief.
     if any(r["selected"] for r in rows):
@@ -508,7 +510,25 @@ def write_csv(rows: list[dict], path: Path) -> None:
         writer.writerows(rows)
 
 
-def render(step: str, rel: str, rows: list[dict], coverage: list[str], first_pass: dict, min_score: float) -> str:
+def reassemble(rel: str) -> str:
+    """What to run when an earlier run's result was set aside: the assembled report still carries its findings."""
+    return (
+        "The assembled report still carries the earlier run's Anomalist findings: run "
+        f"`.venv/bin/python .claude/skills/fact-check-dataset/scripts/assemble_report.py {rel} --reconciled` "
+        "now, so it drops them."
+    )
+
+
+def render(
+    step: str,
+    rel: str,
+    rows: list[dict],
+    coverage: list[str],
+    first_pass: dict,
+    min_score: float,
+    replaced: bool = False,
+) -> str:
+    """`anomalist.md`. `replaced`: an earlier run's result was set aside, so the assembled report is stale."""
     selected = [r for r in rows if r["selected"]]
     counts = pd.Series([r["why"] for r in rows]).value_counts().to_dict() if rows else {}
     out = [f"# Anomalist candidates: `{step}`", ""]
@@ -538,6 +558,8 @@ def render(step: str, rel: str, rows: list[dict], coverage: list[str], first_pas
         ]
     else:
         out += ["No new candidate: no agent to start. Say so in the PR body, with the coverage above."]
+        if replaced:
+            out += ["", reassemble(rel)]
     return "\n".join(out) + "\n"
 
 
