@@ -111,15 +111,34 @@ def explained_of(issue: dict) -> str:
     return "" if value is None else str(value).strip().lower()
 
 
+def entry_id(issue: dict, number: int) -> str:
+    """An entry's `id` as text, or its position in the log when it has none."""
+    return str(issue.get("id", number))
+
+
+def duplicate_ids(issues: list[dict]) -> list[str]:
+    """The `id`s used by more than one entry, as `#<id>`: a draft keyed by id would silently keep only one."""
+    counts: dict[str, int] = {}
+    for number, issue in enumerate(issues, start=1):
+        counts[entry_id(issue, number)] = counts.get(entry_id(issue, number), 0) + 1
+    return [f"#{key}" for key, count in counts.items() if count > 1]
+
+
 def check(log: dict) -> tuple[str, list[dict]]:
     issues = log.get("issues") or []
     rows = []
     for number, issue in enumerate(issues, start=1):
         state, reasons = verdict(issue)
         rows.append(
-            {"id": issue.get("id", number), "state": state, "summary": issue.get("summary", ""), "why": reasons}
+            {"id": entry_id(issue, number), "state": state, "summary": issue.get("summary", ""), "why": reasons}
         )
     out = [f"# Producer issues: {log.get('dataset', '?')} ({log.get('producer', 'producer unknown')})", ""]
+    repeated = duplicate_ids(issues)
+    if repeated:
+        out += [
+            f"**Repeated ids: {', '.join(repeated)}.** Give each entry its own `id`: `draft` refuses until then.",
+            "",
+        ]
     if not rows:
         return "\n".join(out + ["The log is empty: nothing to send. The draft step is complete.", ""]), rows
     order = ("ready", "held", "explained", "ours", "sent", "answered", "dropped")
@@ -143,7 +162,10 @@ def check(log: dict) -> tuple[str, list[dict]]:
 def draft(log: dict, ids: list[str] | None) -> str:
     """The message skeleton for the chosen ready entries; refuses any entry that is not ready."""
     issues = log.get("issues") or []
-    by_id = {str(issue.get("id", number)): issue for number, issue in enumerate(issues, start=1)}
+    repeated = duplicate_ids(issues)
+    if repeated:
+        sys.exit("Not drafted. Give each entry its own `id`; these are used more than once: " + ", ".join(repeated))
+    by_id = {entry_id(issue, number): issue for number, issue in enumerate(issues, start=1)}
     chosen = ids or [key for key, issue in by_id.items() if verdict(issue)[0] == "ready"]
     refused = [
         f"#{key}: {verdict(by_id[key])[0]}" for key in chosen if key in by_id and verdict(by_id[key])[0] != "ready"

@@ -169,6 +169,17 @@ def test_draft_quotes_partial_explanations_and_marks_follow_ups():
     assert "Raised before: email 2025-03-01" in text
 
 
+def test_repeated_ids_are_refused_before_drafting():
+    """Two entries with one `id` would leave only the last in a draft keyed by id."""
+    log = {"issues": [_issue(), _issue(summary="Peru's 2023 value is missing.")]}
+    with pytest.raises(SystemExit, match="used more than once: #1"):
+        pi.draft(log, None)
+    text, rows = pi.check(log)
+    assert len(rows) == 2 and "Repeated ids: #1" in text
+    assert pi.duplicate_ids([_issue(), _issue(id=2)]) == []
+    assert pi.duplicate_ids([{"summary": "a"}, {"id": 1}]) == ["#1"]
+
+
 def test_draft_lists_what_was_checked_but_not_unpublished_documents():
     text = pi.draft({"issues": [_issue()]}, None)
     assert "https://example.int/methods.pdf" in text and "not published" not in text

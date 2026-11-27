@@ -11,6 +11,7 @@ import importlib.util
 import json
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -757,6 +758,43 @@ def test_anomalist_coverage_says_what_was_not_looked_at():
     assert "1 of 2 indicators" in text
     assert "upgrade_change, upgrade_missing, gp_outlier" in text and "old-vs-new detectors are missing" in text
     assert "Stale: time_change" in text and "raw anomaly score" in text
+
+
+def test_anomalist_rerun_sets_aside_the_previous_brief_and_result(tmp_path):
+    """A rerun answers a new candidate set: the report must not fold in a result written for the old one."""
+    for name in ("lane_anomalist.md", "lane_anomalist.result.md", "anomalist.csv"):
+        (tmp_path / name).write_text("old")
+    notes = anomalist_candidates.clear_previous_run(tmp_path)
+    assert not (tmp_path / "lane_anomalist.md").exists() and not (tmp_path / "anomalist.csv").exists()
+    assert not (tmp_path / "lane_anomalist.result.md").exists()
+    assert (tmp_path / anomalist_candidates.PREVIOUS_RESULT).read_text() == "old"
+    assert notes and "another candidate set" in notes[0]
+    assert anomalist_candidates.clear_previous_run(tmp_path) == []
+
+
+def test_anomalist_mapping_failure_leaves_old_values_unavailable():
+    """Only a missing mapping table falls back to the same-named dataset; any other DB error is reported."""
+    from sqlalchemy.exc import OperationalError, ProgrammingError
+
+    class Engine:
+        def __init__(self, error):
+            self.error = error
+
+    def fake_read_sql(sql, engine, params=None):
+        if "wiz__variable_mapping" in sql:
+            raise engine.error
+        return pd.DataFrame({"catalogPath": ["ns/2025-01-01/thing"]})
+
+    dataset = {"id": 7, "namespace": "ns", "shortName": "thing", "version": "2026-01-01"}
+    missing = ProgrammingError("SELECT", {}, Exception(1146, "Table 'wiz__variable_mapping' doesn't exist"))
+    denied = OperationalError("SELECT", {}, Exception(1142, "SELECT command denied"))
+    with patch("etl.db.read_sql", fake_read_sql):
+        assert anomalist_candidates.old_dataset(Engine(missing), dataset) == ("ns/2025-01-01/thing", {}, "")
+        old_path, olds, reason = anomalist_candidates.old_dataset(Engine(denied), dataset)
+    assert old_path is None and olds == {} and "could not be read" in reason and "denied" in reason
+    rows = [{"selected": True, "identity": "t#gdp", "year": "2020", "entity": "Chad", "indicator_id": 2}]
+    anomalist_candidates.add_values(rows, Path("/nonexistent"), "ns/2026-01-01/thing", (old_path, olds, reason))
+    assert rows[0]["old_value"] == reason
 
 
 # ----------------------------------------------------------------------------------------------------------------

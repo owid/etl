@@ -16,6 +16,9 @@ It writes, into the dataset's dossier `ai/fact-check/<namespace>/<version>/<shor
     anomalist.csv        every stored candidate above --min-score: values, first-pass status, selected or why not
     anomalist.md         what it prints: coverage, the selected candidates, what to run next
     lane_anomalist.md    the brief for the one agent that checks the selected candidates
+
+Each run starts over: an earlier run's result answers another candidate set, so it is moved to
+`lane_anomalist.previous-result.md`, which the report ignores.
 """
 
 import argparse
@@ -32,6 +35,11 @@ sys.path.insert(0, str(HERE))
 
 import anomaly_scan  # noqa: E402
 
+BRIEF = "lane_anomalist.md"
+RESULT = "lane_anomalist.result.md"
+PREVIOUS_RESULT = "lane_anomalist.previous-result.md"
+# MySQL's "table doesn't exist": the indicator upgrader has never run on this DB.
+NO_SUCH_TABLE = 1146
 TYPES = ("upgrade_change", "upgrade_missing", "time_change", "gp_outlier")
 UPGRADE_TYPES = ("upgrade_change", "upgrade_missing")
 # Candidates already looked at by the first pass, or still to look at.
@@ -83,6 +91,8 @@ def run(step: str, top: int, min_score: float) -> str:
     namespace, version, short_name = parse_step(step)
     dossier = paths.BASE_DIR / "ai" / "fact-check" / namespace / version / short_name
     dossier.mkdir(parents=True, exist_ok=True)
+    # A run regenerates the candidates, so an earlier run's brief and result answer another set: set them aside.
+    set_aside = clear_previous_run(dossier)
     engine = get_engine()
 
     dataset = dataset_row(engine, f"{namespace}/{version}/{short_name}")
@@ -92,6 +102,7 @@ def run(step: str, top: int, min_score: float) -> str:
             f"staging build of your latest push (or upload it: `STAGING=<branch> .venv/bin/etlr "
             f"grapher://grapher/{namespace}/{version}/{short_name} --grapher`) and run this again.\n"
         )
+        text += "".join(f"\n- {note}\n" for note in set_aside)
         (dossier / "anomalist.md").write_text(text)
         return text
 
@@ -100,17 +111,29 @@ def run(step: str, top: int, min_score: float) -> str:
     rows = candidates(stored, indicators, first_pass, top)
     add_values(rows, paths.DATA_DIR, f"{namespace}/{version}/{short_name}", old_dataset(engine, dataset))
     write_csv(rows, dossier / "anomalist.csv")
-    coverage = coverage_notes(stored, indicators, dataset, notes)
+    coverage = coverage_notes(stored, indicators, dataset, notes) + set_aside
     rel = str(dossier.relative_to(paths.BASE_DIR))
     text = render(step, rel, rows, coverage, first_pass, min_score)
     (dossier / "anomalist.md").write_text(text)
     # The brief exists only when there is something to check: `assemble_report.py` waits for the result of a brief.
-    lane = dossier / "lane_anomalist.md"
     if any(r["selected"] for r in rows):
-        lane.write_text(brief(step, rel, rows))
-    elif lane.exists() and not (dossier / "lane_anomalist.result.md").exists():
-        lane.unlink()
+        (dossier / BRIEF).write_text(brief(step, rel, rows))
     return text
+
+
+def clear_previous_run(dossier: Path) -> list[str]:
+    """Remove an earlier run's candidates and brief, and move its result aside so `assemble_report.py` ignores it."""
+    notes = []
+    result = dossier / RESULT
+    if result.exists():
+        result.replace(dossier / PREVIOUS_RESULT)
+        notes.append(
+            f"An earlier run's `{RESULT}` answered another candidate set: it was moved to `{PREVIOUS_RESULT}`, "
+            "and the report ignores it."
+        )
+    for name in (BRIEF, "anomalist.csv"):
+        (dossier / name).unlink(missing_ok=True)
+    return notes
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -138,12 +161,17 @@ def dataset_row(engine, catalog_path: str) -> dict | None:
     return None if df.empty else df.iloc[0].to_dict()
 
 
-def old_dataset(engine, dataset: dict) -> tuple[str | None, dict[int, str]]:
-    """The dataset this one replaces (`<ns>/<version>/<short_name>`), and the old identity of each new indicator.
+def old_dataset(engine, dataset: dict) -> tuple[str | None, dict[int, str], str]:
+    """The dataset this one replaces (`<ns>/<version>/<short_name>`), the old identity of each new indicator, and
+    why there is none when the first is None.
 
     The indicator upgrader's mapping (`wiz__variable_mapping`) says it when it exists, also when the short name
-    changed; otherwise it is the latest older version with the same short name, paired by identity.
+    changed; otherwise it is the latest older version with the same short name, paired by identity. Only a missing
+    mapping table falls back to that: any other failure to read the mapping leaves the old values unavailable,
+    because the same-named fallback can be the wrong dataset after a rename or a remap.
     """
+    from sqlalchemy.exc import DBAPIError
+
     from etl.db import read_sql
 
     try:
@@ -154,18 +182,29 @@ def old_dataset(engine, dataset: dict) -> tuple[str | None, dict[int, str]]:
             engine,
             params={"d": int(dataset["id"])},
         )
-    except Exception:
+    except DBAPIError as error:
+        if not is_missing_table(error):
+            reason = f"unavailable: the variable mapping could not be read ({type(error.orig).__name__}: {error.orig})"
+            return None, {}, reason[:240]
         mapping = pd.DataFrame()
     if not mapping.empty:
         olds = {int(r.id_new): identity_of(r.old_path, "") for r in mapping.drop_duplicates("id_new").itertuples()}
-        return str(mapping["old_dataset"].iloc[0]), olds
+        return str(mapping["old_dataset"].iloc[0]), olds, ""
     df = read_sql(
         "SELECT catalogPath FROM datasets WHERE namespace = %(n)s AND shortName = %(s)s AND version < %(v)s "
         "ORDER BY version DESC LIMIT 1",
         engine,
         params={"n": dataset["namespace"], "s": dataset["shortName"], "v": dataset["version"]},
     )
-    return (None if df.empty else str(df["catalogPath"].iloc[0])), {}
+    if df.empty:
+        return None, {}, "no older version in the DB"
+    return str(df["catalogPath"].iloc[0]), {}, ""
+
+
+def is_missing_table(error: Exception) -> bool:
+    """Whether a DB error is MySQL's "table doesn't exist"."""
+    args = getattr(getattr(error, "orig", None), "args", None) or ()
+    return bool(args) and args[0] == NO_SUCH_TABLE
 
 
 def load_scores(engine, dataset_id: int, min_score: float) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
@@ -301,9 +340,9 @@ def candidates(stored: pd.DataFrame, indicators: pd.DataFrame, first_pass: dict,
     return rows
 
 
-def add_values(rows: list[dict], data_dir: Path, new: str, old: tuple[str | None, dict[int, str]]) -> None:
+def add_values(rows: list[dict], data_dir: Path, new: str, old: tuple[str | None, dict[int, str], str]) -> None:
     """The flagged value, its neighbors and the old version's value, from the grapher datasets on disk."""
-    old_path, old_identities = old
+    old_path, old_identities, no_old = old
     new_dir = data_dir / "grapher" / new
     old_dir = data_dir / "grapher" / old_path if old_path else None
     cache: dict = {}
@@ -316,7 +355,7 @@ def add_values(rows: list[dict], data_dir: Path, new: str, old: tuple[str | None
             read_series(cache, new_dir, table, column, row["entity"]), year
         )
         if old_dir is None:
-            row["old_value"] = "no older version in the DB"
+            row["old_value"] = no_old
             continue
         old_table, _, old_column = old_identities.get(row["indicator_id"], row["identity"]).partition("#")
         old_series = read_series(cache, old_dir, old_table, old_column, row["entity"])
