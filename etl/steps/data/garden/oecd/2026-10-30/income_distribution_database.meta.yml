@@ -12,41 +12,19 @@ definitions:
 
   gini: |-
     The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
-  disposable_income: |-
-    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
-  market_income: |-
-    Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received. However, data for China, Hungary, Mexico, Turkey as well as part of the data for Greece refer to the income post taxes and before transfers.
-  gross_income: |-
-    Income here is measured before taxes and after benefits.
+  # Income type, for the short descriptions (harmonized FAUST, "Inequality and incomes across the distribution").
+  inequality_disposable: |-
+    Inequality is measured here in terms of income after taxes and benefits.
+  inequality_gross: |-
+    Inequality is measured here in terms of income before taxes and after benefits.
+  inequality_market: |-
+    Inequality is measured here in terms of income before taxes and benefits.
+  income_disposable: |-
+    Income here is measured after taxes and benefits.
+  market_income_exceptions: |-
+    For China, Mexico, and Turkey, the OECD measures market income after taxes and before benefits.
   equivalization: |-
     The income data has been [equivalized](#dod:equivalization), that is, adjusted for household size. This makes living standards more comparable across households of different sizes, since people sharing a household can split costs like rent and heating. To make the adjustment, the OECD uses the square root equivalence scale: it divides the total household income by the square root of the number of people in the household.
-  additional_info: |-
-    {definitions.age_groups}, and uses the OECD’s income definition since 2012. For more information on the methodology, see the [OECD Income Distribution Database (IDD)](http://www.oecd.org/social/income-distribution-database.htm).
-  covid: |-
-    Survey estimates for 2020 are subject to additional uncertainty and are to be treated with extra caution, as in most countries the survey fieldwork was affected by the Coronavirus (COVID-19) pandemic.
-
-  age_groups: |-
-    <% if age == "Total" %>
-    This data covers the whole population of each country
-    <%- elif age == "Working population" %>
-    This data covers people of working age (18 to 65)
-    <%- elif age == "Over 65 years" %>
-    This data covers people over 65
-    <%- elif age == "Under 18 years" %>
-    This data covers people under 18
-    <%- elif age == "18 to 25 years" %>
-    This data covers people aged 18 to 25
-    <%- elif age == "26 to 40 years" %>
-    This data covers people aged 26 to 40
-    <%- elif age == "41 to 50 years" %>
-    This data covers people aged 41 to 50
-    <%- elif age == "51 to 65 years" %>
-    This data covers people aged 51 to 65
-    <%- elif age == "66 to 75 years" %>
-    This data covers people aged 66 to 75
-    <%- elif age == "76 years and older" %>
-    This data covers people aged 76 and older
-    <%- endif %>
 
   # People covered by each age group, for the poverty indicators' text.
   age_people: |-
@@ -76,7 +54,7 @@ definitions:
   poverty_relative: |-
     This is a measure of relative poverty — it captures the share of people whose income is low by the standards typical in their own country.
   poverty_only_income: |-
-    Only income is included. Savings, investments, home ownership and other forms of wealth are not, so income alone can understate their living standards.
+    Only income counts, including interest, dividends and rent. The value of what people own, such as savings or their home, does not, so income alone can understate the living standards of people with wealth.
   poverty_source: |-
     The data comes from the OECD Income Distribution Database, which draws on national household surveys and tax records.
 
@@ -108,9 +86,12 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
-
-
+  changelog:
+    - date: 2026-10-30
+      changes:
+        - Added seven narrower age groups (under 18, 18 to 25, 26 to 40, 41 to 50, 51 to 65, 66 to 75, and 76 and older) for the share of people below 50% of the median income, after taxes and benefits.
+        - Added the average income of each age group as a share of the average income of the whole population.
+        - Updated to the OECD's June 2026 release. It adds a new latest year for 10 countries, removes Israel's data for 2011–2022 and Hungary's for 2018–2022, and revises past values, mostly for Bulgaria, Iceland, Romania, and South Korea.
   owners:
     - Pablo Arriagada
 tables:
@@ -120,12 +101,9 @@ tables:
         title: Gini coefficient (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: "{definitions.gini}"
+        description_short: "{definitions.gini} {definitions.inequality_disposable}"
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_gini}
 
@@ -139,12 +117,9 @@ tables:
         title: Gini coefficient (gross income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: "{definitions.gini}"
+        description_short: "{definitions.gini} {definitions.inequality_gross}"
         description_key:
-          - "{definitions.gross_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_gini}
 
@@ -158,12 +133,10 @@ tables:
         title: Gini coefficient (market income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: "{definitions.gini}"
+        description_short: "{definitions.gini} {definitions.inequality_market}"
         description_key:
-          - "{definitions.market_income}"
+          - "{definitions.market_income_exceptions}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_gini}
 
@@ -179,12 +152,9 @@ tables:
         title: P50/P10 ratio (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income or consumption is two times higher than that of someone just falling in the poorest tenth of the population.
+        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income is two times higher than that of someone just falling in the poorest tenth of the population. {definitions.inequality_disposable}
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_p50_p10_ratio}
 
@@ -198,12 +168,9 @@ tables:
         title: P90/P10 ratio (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: P90 and P10 are the levels of income or consumption below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        description_short: P90 and P10 are the levels of income below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population. {definitions.inequality_disposable}
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_p90_p10_ratio}
 
@@ -217,12 +184,9 @@ tables:
         title: P90/P50 ratio (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income. {definitions.inequality_disposable}
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_p90_p50_ratio}
 
@@ -236,12 +200,9 @@ tables:
         title: Palma ratio (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.
+        description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.inequality_disposable}
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_palma_ratio}
 
@@ -255,12 +216,9 @@ tables:
         title: S80/S20 ratio (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: Share of income of the richest 20% divided by the share of the poorest 20%.
+        description_short: Share of income of the richest 20% divided by the share of the poorest 20%. {definitions.inequality_disposable}
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_s80_s20_ratio}
 
@@ -274,7 +232,7 @@ tables:
         title: 50% of median - Share of population in poverty (disposable income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of {definitions.age_people} living in households with an income below 50% of their country’s median income.
+        description_short: Share of {definitions.age_people} living in households with an income below 50% of their country’s median income. {definitions.income_disposable}
         description_key:
           - "{definitions.poverty_50_definition}"
           - "{definitions.poverty_relative}"
@@ -292,13 +250,10 @@ tables:
         title: Average income relative to the whole population (disposable income) - <<age>>
         unit: "% of the population’s average income"
         short_unit: "%"
-        description_short: Average disposable income of people in this age group, as a share of the average disposable income of the whole population.
+        description_short: Average income of people in this age group, as a share of the average income of the whole population. {definitions.income_disposable}
         description_key:
           - A value of 90% means that the incomes of people in this age group are 10% lower than the average for the whole population.
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_processing: |-
           The OECD publishes the average disposable income of each age group in national currency. We divide it by the average disposable income of the whole population of the same country and year.
         description_from_producer: |-
@@ -312,12 +267,9 @@ tables:
         title: 60% of median - Share of population in poverty (disposable income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of {definitions.age_people} living in households with an income below 60% of their country’s median income.
+        description_short: Share of {definitions.age_people} living in households with an income below 60% of their country’s median income. {definitions.income_disposable}
         description_key:
-          - "{definitions.disposable_income}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_recommended_uses_and_limitations}
         display:
@@ -329,12 +281,10 @@ tables:
         title: 50% of median - Share of population in poverty (market income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of {definitions.age_people} living in households with an income below 50% of their country’s median income.
+        description_short: Share of {definitions.age_people} living in households with an income below 50% of their country’s median income. Income here is measured before taxes and benefits, while the poverty line is set on the median income after taxes and benefits.
         description_key:
-          - "{definitions.market_income}"
+          - "{definitions.market_income_exceptions}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_headcount_ratio_market}
 
@@ -348,12 +298,10 @@ tables:
         title: 60% of median - Share of population in poverty (market income) - <<age>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of {definitions.age_people} living in households with an income below 60% of their country’s median income.
+        description_short: Share of {definitions.age_people} living in households with an income below 60% of their country’s median income. Income here is measured before taxes and benefits, while the poverty line is set on the median income after taxes and benefits.
         description_key:
-          - "{definitions.market_income}"
+          - "{definitions.market_income_exceptions}"
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_headcount_ratio_market}
 
@@ -368,10 +316,10 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "This is the percentage difference between the Gini coefficient before taxes and benefits and the Gini coefficient after taxes and benefits."
+        description_processing: |-
+          We calculate this as the difference between the Gini coefficient of income before taxes and benefits and that of income after taxes and benefits, as a percentage of the Gini coefficient before taxes and benefits.
         description_key:
           - "{definitions.equivalization}"
-          - "{definitions.additional_info}"
-          - "{definitions.covid}"
         description_from_producer: |-
           {definitions.source_recommended_uses_and_limitations}
         display:
