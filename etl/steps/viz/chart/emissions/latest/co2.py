@@ -65,13 +65,18 @@ def run() -> None:
     )
 
     # Universal chart-level config, plus a Slope tab on the flagship per-capita CO₂ territorial view.
-    # Per-view title/subtitle/tab inherit from each indicator's upstream `presentation.grapher_config`.
+    # Per-view title/subtitle inherit from each indicator's upstream `presentation.grapher_config`.
+    # The explorer opened every view on the chart tab (overriding the indicators' `tab: map`), hid the time
+    # span in titles, and linked its footer to the topic page; keep all three.
     c.edit_views(
         [
             {
                 "config": {
                     "chartTypes": ["LineChart", "DiscreteBar"],
                     "hasMapTab": True,
+                    "tab": "chart",
+                    "originUrl": "/co2-and-greenhouse-gas-emissions",
+                    "hideAnnotationFieldsInTitle": {"entity": True, "time": True, "changeInPrefix": True},
                 },
             },
             {
