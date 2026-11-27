@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("income_distribution_database")
 
     # Read table from garden dataset.
-    tb = ds_garden["income_distribution_database"]
+    tb = ds_garden.read("income_distribution_database", reset_index=False)
 
     #
     # Save outputs.
