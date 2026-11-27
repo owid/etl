@@ -194,9 +194,10 @@ MODEL_DEFAULT = "claude-haiku-5-5"
     help="Symlink the new worktree's data/, workbench/, and ai/ to the original repo's (only with --worktree). Avoids recomputing upstream ETL steps and losing workbench/ai scratch artifacts on worktree removal. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` (or workbench/ or ai/) in the worktree.",
 )
 @click.option(
-    "--auto-assign",
-    is_flag=True,
-    help="Automatically assign the PR to the GitHub user the token belongs to.",
+    "--auto-assign/--no-auto-assign",
+    "auto_assign",
+    default=None,
+    help="Assign the PR to the GitHub user the token belongs to. On by default when an AI agent (e.g. Claude Code) runs the command, off otherwise.",
 )
 @click.option(
     "--no-update-base",
@@ -216,7 +217,7 @@ def cli(
     worktree: bool,
     worktree_path: str | None,
     share_data: bool,
-    auto_assign: bool,
+    auto_assign: bool | None,
     no_update_base: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
@@ -240,6 +241,10 @@ def cli(
         raise click.ClickException("--share-data requires --worktree.")
     if no_update_base and direct:
         raise click.ClickException("--no-update-base has no effect with --direct (no new branch is created).")
+
+    # Assign the PR to its human owner whenever an AI agent opens it, unless told otherwise.
+    if auto_assign is None:
+        auto_assign = is_run_by_ai_agent()
 
     # Get category
     category = ensure_category(category)
@@ -631,6 +636,14 @@ def print_worktree_hint(
             "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree —"
         )
         print("    both remove only the symlinks, leaving the shared content untouched.")
+
+
+def is_run_by_ai_agent() -> bool:
+    """Whether an AI coding agent is running this command.
+
+    Claude Code sets `CLAUDECODE=1` in the shells it spawns; `AI_AGENT` is a cross-tool convention for the same.
+    """
+    return bool(os.environ.get("CLAUDECODE") or os.environ.get("AI_AGENT"))
 
 
 def create_pr(repo, work_branch, base_branch, pr_title, auto_assign: bool = False):
