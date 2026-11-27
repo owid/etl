@@ -718,7 +718,15 @@ def test_anomalist_candidates_keep_the_ranking_and_list_everything_past_the_cap(
 def test_anomalist_candidates_skip_what_the_first_pass_covered(tmp_path):
     (tmp_path / "lane_values.result.md").write_text(VALUES.replace("| gdp | World | 2024 |", "| gdp | Chad | 2020 |"))
     anomaly_scan.write_csv(
-        [{"table": "t", "column": "rate", "kind": "OUTLIER", "period": 2023, "detail": "France: 9.9 (|z|>6)"}],
+        [
+            {
+                "table": "t",
+                "column": "rate",
+                "kind": "OUTLIER",
+                "period": 2023,
+                "detail": "France, sex=female 2023: 9.9 (|z|>6)",
+            }
+        ],
         tmp_path / "anomalies.csv",
     )
     first_pass = anomalist_candidates.first_pass_keys(tmp_path)
@@ -731,7 +739,7 @@ def test_anomalist_candidates_skip_what_the_first_pass_covered(tmp_path):
     )
     rows = anomalist_candidates.candidates(stored, INDICATORS, first_pass, top=5)
     assert [r["status"] for r in rows] == [
-        anomalist_candidates.FLAGGED,  # the garden column `rate` covers its grapher slice `rate__sex_female`
+        anomalist_candidates.FLAGGED,  # garden `rate` at sex=female is the grapher slice `rate__sex_female`
         anomalist_candidates.CHECKED,
         anomalist_candidates.NEW,
     ]
@@ -742,6 +750,19 @@ def test_anomalist_first_pass_flag_needs_the_same_year():
     first_pass = {**NO_FIRST_PASS, "flagged": {("t#rate", "France: 9.9", "2019")}}
     assert anomalist_candidates.status_of("t#rate", "France", "2023", first_pass) == anomalist_candidates.NEW
     assert anomalist_candidates.status_of("t#rate", "France", "2019", first_pass) == anomalist_candidates.FLAGGED
+
+
+def test_anomalist_scan_flag_covers_only_the_dimension_slice_it_names():
+    flagged = {("t#rate", "France, sex=male, age=0-4 2023: ≥×10 jump from the previous period", "2023")}
+    first_pass = {**NO_FIRST_PASS, "flagged": flagged}
+    status = anomalist_candidates.status_of
+    assert status("t#rate__sex_male__age_0_4", "France", "2023", first_pass) == anomalist_candidates.FLAGGED
+    assert status("t#rate__sex_female__age_0_4", "France", "2023", first_pass) == anomalist_candidates.NEW
+    assert status("t#rate__sex_male", "France", "2023", first_pass) == anomalist_candidates.NEW
+    # A flag on a series with no dimensions covers the undimensioned column only.
+    plain = {**NO_FIRST_PASS, "flagged": {("t#rate", "France 2023: 9.9 (|z|>6)", "2023")}}
+    assert status("t#rate", "France", "2023", plain) == anomalist_candidates.FLAGGED
+    assert status("t#rate__sex_female", "France", "2023", plain) == anomalist_candidates.NEW
 
 
 def test_anomalist_checked_row_names_the_exact_column_not_a_related_one():

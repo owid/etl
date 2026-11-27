@@ -29,6 +29,7 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+from owid.catalog.core.utils import underscore
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -285,8 +286,9 @@ def table_section(text: str, heading: str) -> list[str]:
 def status_of(identity: str, entity: str, year: str, first_pass: dict) -> str:
     """Whether the first pass already checked this value, or its scan flagged it, or neither.
 
-    A checked row counts when its indicator cell names this exact column (`names_column`); a scan flag names the
-    garden column, which a grapher name extends (`rate__sex_female` is garden `rate`).
+    A checked row counts when its indicator cell names this exact column (`names_column`). A scan flag names the
+    garden column, which a grapher name extends with its dimension slice (`rate__sex_female` is garden `rate` at
+    `sex=female`): it counts only for the slice its detail names.
     """
     table, _, column = identity.partition("#")
     for indicator, checked_entity, checked_year in first_pass["checked"]:
@@ -296,9 +298,25 @@ def status_of(identity: str, entity: str, year: str, first_pass: dict) -> str:
     for key, detail, period in first_pass["flagged"]:
         key_table, _, key_column = key.partition("#")
         if key_table == table and anomaly_scan.column_matches(column, key_column) and names_entity(detail, entity):
+            slice_of_column = {part for part in column.removeprefix(key_column).split("__") if part}
+            if slice_of_column != flag_slice(detail, entity, period):
+                continue
             if not period or str(period).removesuffix(".0") == str(year):
                 return FLAGGED
     return NEW
+
+
+def flag_slice(detail: str, entity: str, period: str) -> set[str]:
+    """The dimension slice a scan flag's detail names, as grapher spells it in a column name (`sex_female`).
+
+    `anomaly_scan.py` writes the dimensions after the entity as `, <name>=<value>`, before the period. A detail
+    that lists bare values (`CONSTANT`) names no slice it can be matched on, so it covers no dimensioned column.
+    """
+    head = detail[len(entity) :].split(": ", 1)[0]
+    if period:
+        head = head.removesuffix(f" {period}")
+    pairs = re.findall(r", ([^,=]+)=([^,]*)", head)
+    return {underscore(f"{name.strip()}_{value.strip()}") for name, value in pairs}
 
 
 def names_column(cell: str, identity: str) -> bool:
