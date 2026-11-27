@@ -1,0 +1,200 @@
+# NOTE: To learn more about the fields, hover over their names.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Child & Infant Mortality
+  age_note: |-
+    Volk and Atkinson measure this at, or immediately before, puberty, which is generally around 15 years and varies between the studies they pool. The modern sources measure survival to exactly 15 years.
+
+dataset:
+  title: Child mortality in the past
+  # UN IGME, the source of the recent global series, publishes new estimates each year.
+  update_period_days: 365
+  owners:
+    - Pablo Arriagada
+
+tables:
+  historical_societies:
+    title: Child mortality in historical societies
+    variables:
+      share_dying_before_15:
+        title: Share of children who died before the end of puberty
+        description_short: |-
+          Share of children in a historical society who died before reaching the end of puberty.
+        description_key:
+          - "{definitions.age_note}"
+          - Where a study reports a range, this is its midpoint; where it reports only a lower bound, this is that bound. The bounds are kept alongside.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_dying_before_15_low:
+        title: Share of children who died before the end of puberty, lower bound
+        description_short: |-
+          Lowest value a study reports for the share of children who died before the end of puberty.
+        unit: "%"
+        short_unit: "%"
+      share_dying_before_15_high:
+        title: Share of children who died before the end of puberty, upper bound
+        description_short: |-
+          Highest value a study reports for the share of children who died before the end of puberty. Empty where the study gives only a lower bound.
+        unit: "%"
+        short_unit: "%"
+      rate_as_published:
+        title: Rate as published
+        description_short: |-
+          Rate exactly as the source prints it, including ranges and open-ended values.
+        unit: ""
+      study:
+        title: Study
+        description_short: |-
+          Study the rate comes from, as cited by the source.
+        unit: ""
+      data_source:
+        title: Data source
+        description_short: |-
+          Which of this dataset's three sources the rate was taken or computed from.
+        unit: ""
+      period_mid:
+        title: Middle of the period covered
+        description_short: |-
+          Midpoint between the first and last year the study covers, in years, with negative values before the common era.
+        unit: "year"
+      period_label:
+        title: Period label
+        description_short: |-
+          Period the study covers, written the way a chart labels it.
+        unit: ""
+
+  hunter_gatherer_societies:
+    title: Child mortality in hunter-gatherer societies
+    variables:
+      share_dying_before_15:
+        title: Share of children who died before the end of puberty
+        description_short: |-
+          Share of children in a hunter-gatherer society who died before reaching the end of puberty.
+        description_key:
+          - "{definitions.age_note}"
+          - Volk and Atkinson use modern hunter-gatherer societies as a proxy for the ancestral ones, for which there is too little direct archaeological evidence. They restrict their sample to populations not significantly affected by contact with modern education, food, medicine or sanitation.
+          - Where a study reports a range, this is its midpoint; where it reports only a lower bound, this is that bound.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_dying_before_15_low:
+        title: Share of children who died before the end of puberty, lower bound
+        description_short: |-
+          Lowest value a study reports for the share of children who died before the end of puberty.
+        unit: "%"
+        short_unit: "%"
+      share_dying_before_15_high:
+        title: Share of children who died before the end of puberty, upper bound
+        description_short: |-
+          Highest value a study reports for the share of children who died before the end of puberty. Empty where the study gives only a lower bound.
+        unit: "%"
+        short_unit: "%"
+      rate_as_published:
+        title: Rate as published
+        description_short: |-
+          Rate exactly as the source prints it, including ranges and open-ended values.
+        unit: ""
+      study:
+        title: Study
+        description_short: |-
+          Study the rate comes from, as cited by the source.
+        unit: ""
+
+  global_child_mortality:
+    title: Global child mortality since 1950
+    variables:
+      share_dying_before_15:
+        title: Share of children who died before age 15
+        description_short: |-
+          Estimated share of children worldwide who died before reaching age 15.
+        description_processing: |-
+          Two sources are joined to reach back to 1950. UN IGME estimates a global rate from 1990 onward, and is used from that year. For 1950 to 1989 the rate is computed from UN World Population Prospects life tables for the world, as one minus the ratio of life-table survivors at age 15 to survivors at birth.
+
+          Where the two sources meet, in 1990, they differ by about 0.2 percentage points.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      data_source:
+        title: Data source
+        description_short: |-
+          Which of the two global sources the year's rate comes from.
+        unit: ""
+
+  country_extremes:
+    title: Highest and lowest national child mortality rates
+    variables:
+      year:
+        title: Year
+        description_short: |-
+          Latest year UN IGME estimates national rates for.
+        unit: "year"
+      share_dying_before_15:
+        title: Share of children who died before age 15
+        description_short: |-
+          Estimated share of children in the country who died before reaching age 15.
+        description_processing: |-
+          Countries with fewer than one million people are excluded, because under-fifteen deaths there number in the handful each year and the ranking between them is noise. Aggregates such as continents and income groups are excluded too.
+
+          The lowest rate is shared by every country whose rate rounds to the lowest rounded value, at one decimal place.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+  summary:
+    title: Averages across societies
+    variables:
+      hunter_gatherer_mean_published:
+        title: Mean child mortality rate across hunter-gatherer societies, as published
+        description_short: |-
+          Average share of children who died before the end of puberty across hunter-gatherer societies, as Volk and Atkinson publish it.
+        unit: "%"
+        short_unit: "%"
+      hunter_gatherer_mean_recomputed:
+        title: Mean child mortality rate across hunter-gatherer societies, recomputed
+        description_short: |-
+          Same average, recomputed from the rates the source prints.
+        description_key:
+          - This does not match the published figure of 48.8%. Recomputing from the 17 printed rates gives 47.3%, or between 46.7% and 47.8% depending on how the open-ended and range values are read. Both are carried so the discrepancy stays visible; the published figure is the one to quote.
+        unit: "%"
+        short_unit: "%"
+      hunter_gatherer_societies:
+        title: Number of hunter-gatherer societies
+        description_short: |-
+          Number of hunter-gatherer societies with a child mortality rate.
+        unit: "societies"
+      historical_mean:
+        title: Mean child mortality rate across historical societies
+        description_short: |-
+          Average share of children who died before the end of puberty across the historical societies in this dataset.
+        description_processing: |-
+          Computed as an unweighted mean over the 21 societies in the `historical_societies` table, using each society's point estimate.
+        unit: "%"
+        short_unit: "%"
+      historical_societies:
+        title: Number of historical societies
+        description_short: |-
+          Number of historical societies the average is taken over.
+        unit: "societies"
+      global_splice_year:
+        title: Year the global series changes source
+        description_short: |-
+          First year for which the global series uses UN IGME rather than UN WPP.
+        unit: "year"
+      global_splice_difference:
+        title: Difference between the two global sources
+        description_short: |-
+          How far the two global sources differ in the year they both cover.
+        description_key:
+          - Measured within the splice year, comparing the two sources for that same year. The step between the last UN WPP year and the first UN IGME year is larger, because it also contains a real one-year fall in mortality.
+        unit: "percentage points"
+        short_unit: "pp"
