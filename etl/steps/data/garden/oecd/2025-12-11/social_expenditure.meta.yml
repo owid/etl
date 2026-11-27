@@ -14,10 +14,19 @@ definitions:
       topic_tags:
         - Government Spending
       attribution_short: OECD
+    description_processing: |-
+      <% if expenditure_source == "Mandatory private" %>
+      {definitions.processing_mandatory_private}
+      <%- endif %>
     description_from_producer: |-
       _Social expenditures_ (from the [Guide to the OECD Social Expenditure Database](https://www.oecd.org/content/dam/oecd/en/topics/policy-sub-issues/social-spending/socx_manuel_2019.pdf))
 
       The provision by public and private institutions of benefits to, and financial contributions targeted at, households and individuals in order to provide support during circumstances which adversely affect their welfare, provided that the provision of the benefits and financial contributions constitutes neither a direct payment for a particular good or service nor an individual contract or transfer.
+
+  processing_mandatory_private: |-
+    The OECD publishes public spending, and public and mandatory private spending combined. We calculate mandatory private spending as the difference between the two. This gives zero for countries without mandatory private schemes, which the OECD leaves blank. It also gives an OECD average across all member countries, while the OECD's own average of mandatory private spending only covers the countries that have such schemes. In some years before all members reported data, the OECD's combined average is lower than its public average, and we don't show an OECD average for those years. Where the difference can't be calculated, we use the OECD's own figure for mandatory private spending.
+    <%- if programme_type_category in ["All", "Old age", "Old age and survivors"] and programme_type in ["Total", "Other cash benefits"] and spending_type != "In-kind spending" %> We removed Chile's value for 1986: the OECD reports about 21% of GDP that year, compared with less than 0.4% in 1987, which looks like an error in the source.
+    <%- endif %>
 
   ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2015 prices.
