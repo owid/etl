@@ -1,35 +1,11 @@
 """
 Google utilities.
 
-To be able to use them, you will first need to generate your own credentials, following these instructions:
-
-1. Create a Google Cloud Project:
-  - Go to Google Cloud Console:
-    https://console.cloud.google.com/ (ensure you are logged in with your owid google account)
-  - Click Select a project (top menu) > New Project.
-  - Name the project owid-etl-surname (e.g., owid-etl-rosado).
-  - Click Create.
-2. Enable Required APIs:
-  - Navigate to APIs & Services > Library.
-  - Enable the following APIs: Google Drive API, Google Docs API, Google Sheets API
-3. Create OAuth Credentials:
-  - Go to APIs & Services > Credentials.
-  - Click Create Credentials > OAuth Client ID.
-  - If prompted, configure the consent screen:
-    - Select External and click Create.
-    - Fill in the required fields (e.g., app name, email) and click Save and Continue until the process is complete.
-  - Choose Desktop App as the application type.
-  - Click Create and then Download JSON to save the client_secret.json file.
-  - Save the downloaded file in your home directory in a hidden folder and rename as:
-    .config/owid_etl_doc/client_secret.json
-4. Generate your own token pickle:
-  - Run the following code from the python terminal (or interactive window):
-    from etl.google import GoogleDrive
-    GoogleDrive()
-  - A browser window should appear. Log in with your owid google account. This will create a token.pickle in the same folder as your client_secret.json
-
+They sign in through the team's shared OAuth client: put its client_secret.json at
+~/.config/owid_etl_doc/client_secret.json and log in once. Setup steps: docs/guides/configure-google-api.md.
 """
 
+import json
 import pickle
 from io import BytesIO
 from pathlib import Path
@@ -55,6 +31,15 @@ CLIENT_SECRET_FILE = Path.home() / ".config" / "owid_etl_doc" / "client_secret.j
 
 # Path where to cache the token after the first login.
 TOKEN_PATH = Path.home() / ".config" / "owid_etl_doc" / "token.pickle"
+
+
+def _client_secret_file_client_id() -> str | None:
+    """Return the client ID in CLIENT_SECRET_FILE, or None when the file is missing."""
+    if not CLIENT_SECRET_FILE.exists():
+        return None
+    config = json.loads(CLIENT_SECRET_FILE.read_text())
+    # Google's downloaded file nests the client under "installed" for Desktop apps, "web" for web apps.
+    return (config.get("installed") or config.get("web") or {}).get("client_id")
 
 
 def read_gbq(*args, **kwargs) -> pd.DataFrame:
@@ -119,10 +104,18 @@ class GoogleDrive:
                     missing_scopes=sorted(missing_scopes),
                 )
                 credentials = None
+            # A token issued to another OAuth client, such as the personal client everyone created before
+            # the team moved to a shared one, keeps working only until that client's project is deleted and
+            # then fails to refresh. Re-authorize against the client in CLIENT_SECRET_FILE instead.
+            elif (client_id := _client_secret_file_client_id()) and getattr(
+                credentials, "client_id", None
+            ) != client_id:
+                log.warning("Cached Google token belongs to a different OAuth client; re-running OAuth flow.")
+                credentials = None
 
         if credentials is None:
             if not CLIENT_SECRET_FILE.exists():
-                log.error("Follow instructions in etl/google.py to create a client_secret.json file.")
+                log.error("Follow docs/guides/configure-google-api.md to get the shared client_secret.json file.")
                 raise FileNotFoundError(f"Client secret file not found at {CLIENT_SECRET_FILE}.")
             # Create an OAuth flow using the client secrets file and the required scopes.
             flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, self.SCOPES)
