@@ -1,6 +1,6 @@
 """Compare births and fertility rates from national statistics with UN WPP 2024 estimates."""
 
-from owid.catalog import Table
+from owid.catalog import Table, VariableMeta
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -76,6 +76,10 @@ def get_un_series(ds_wpp, countries: set) -> Table:
             | ((tb["variant"] == "medium") & (tb["year"] > YEAR_LAST_ESTIMATE))
         ]
         tb = tb[["country", "year", column]].rename(columns={column: f"{column}_un"}, errors="raise")
+        # Keep only the UN's origins and licenses: the rest of its metadata is templated on dimensions we drop, and
+        # this step's .meta.yml gives the text.
+        meta = tb[f"{column}_un"].metadata
+        tb[f"{column}_un"].metadata = VariableMeta(origins=meta.origins, licenses=meta.licenses)
         tb["country"] = tb["country"].astype("string")
         tables.append(tb)
     tb_un = pr.merge(tables[0], tables[1], on=["country", "year"], how="outer")

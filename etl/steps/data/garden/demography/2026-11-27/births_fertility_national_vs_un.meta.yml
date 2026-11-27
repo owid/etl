@@ -1,6 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  sheet: "[this spreadsheet](https://docs.google.com/spreadsheets/d/1fifzj8l5Y55Jp5Xrr4FNipeEzl6GenbasjS6FpCvJ68/edit)"
+  sheet: "[this spreadsheet](https://docs.google.com/spreadsheets/d/1Fq9XJFC4GHmNYSjheURb9xeEZAMSw5-UISrxfQG2tTg/edit)"
   key_compilation: |-
     Our World in Data compiled the national figures from the published data of each country's statistics office, civil registry, or health ministry, for 2010 to 2025. We use the most recent figure published for each year, as published. Each country's sources and notes are listed in the Sources tab, and {definitions.sheet} has the sources and notes for each year.
   key_inclusion: |-

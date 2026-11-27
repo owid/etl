@@ -71,6 +71,7 @@ dimensions:
       - slug: relative_difference
         name: Relative difference (%)
 
+# Significant figures shown in this chart: 3 for numbers of births, 2 for fertility rates and percentages.
 views:
   - dimensions:
       measure: births
@@ -79,9 +80,15 @@ views:
       y:
         - catalogPath: births_fertility_national_vs_un#births_national
           display:
+            roundingMode: significantFigures
+            numSignificantFigures: 3
+            numDecimalPlaces: 0
             name: National statistics
         - catalogPath: births_fertility_national_vs_un#births_un
           display:
+            roundingMode: significantFigures
+            numSignificantFigures: 3
+            numDecimalPlaces: 0
             name: UN estimates
     config:
       title: "Births: national statistics compared with UN estimates"
@@ -98,6 +105,10 @@ views:
     indicators:
       y:
         - catalogPath: births_fertility_national_vs_un#births_difference
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 3
+            numDecimalPlaces: 0
     config:
       title: "Difference in births between national statistics and UN estimates"
       subtitle: "Number of live births published by national statistics, minus the number the UN estimates. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
@@ -108,6 +119,10 @@ views:
     indicators:
       y:
         - catalogPath: births_fertility_national_vs_un#births_relative_difference
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+            numDecimalPlaces: 2
     config:
       title: "Relative difference in births between national statistics and UN estimates"
       subtitle: "How far the number of live births published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
@@ -119,9 +134,15 @@ views:
       y:
         - catalogPath: births_fertility_national_vs_un#fertility_rate_national
           display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+            numDecimalPlaces: 2
             name: National statistics
         - catalogPath: births_fertility_national_vs_un#fertility_rate_un
           display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+            numDecimalPlaces: 2
             name: UN estimates
     config:
       title: "Fertility rate: national statistics compared with UN estimates"
@@ -138,6 +159,10 @@ views:
     indicators:
       y:
         - catalogPath: births_fertility_national_vs_un#fertility_rate_difference
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+            numDecimalPlaces: 2
     config:
       title: "Difference in the fertility rate between national statistics and UN estimates"
       subtitle: "[Total fertility rate](#dod:fertility-rate) published by national statistics, minus the rate the UN estimates, in live births per woman. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
@@ -159,6 +184,10 @@ views:
     indicators:
       y:
         - catalogPath: births_fertility_national_vs_un#fertility_rate_relative_difference
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+            numDecimalPlaces: 2
     config:
       title: "Relative difference in the fertility rate between national statistics and UN estimates"
       subtitle: "How far the [total fertility rate](#dod:fertility-rate) published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."

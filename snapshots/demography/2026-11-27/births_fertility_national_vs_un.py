@@ -21,8 +21,12 @@ CITATION_INTRO = (
     "Our World in Data (2026). Births and fertility rates from national statistics. Compiled from the published "
     "figures of national statistics offices, civil registries, and health ministries: [spreadsheet with the data, "
     "sources, and notes for each year, and the reason each country is left out]({url}).\n\n"
-    "Sources for each country, with the years each one covers, and notes on the data:"
+    "Sources for each country, with the years each one covers, and notes on the data (the spreadsheet also gives "
+    "each source's title):"
 )
+
+# The grapher database stores citation_full in a MySQL TEXT column, which holds at most 65,535 bytes.
+CITATION_MAX_BYTES = 65_535
 
 
 def year_ranges(years) -> str:
@@ -52,15 +56,23 @@ def build_citation_full(data: pd.DataFrame, sources: pd.DataFrame, url: str) -> 
         )
         parts = []
         for source_id, years in by_source:
-            producer, title, link = sources.loc[source_id, ["Producer", "Title", "URL"]]
-            parts.append(f"[{producer}, {title}]({link}) ({year_ranges(years)})")
+            # Source titles are left out, to keep the citation within the database's size limit.
+            producer, link = sources.loc[source_id, ["Producer", "URL"]]
+            parts.append(f"[{producer}]({link}) ({year_ranges(years)})")
         line = f"- {country}: " + "; ".join(parts) + "."
-        # Notes, with the years each applies to.
-        notes = tb.dropna(subset=["Notes"]).groupby("Notes", sort=False)["Year"]
+        # Notes, sentence by sentence, with the years each sentence applies to.
+        notes = (
+            tb.assign(note=tb["Notes"].str.split(r"(?<=\.)\s+(?=[A-Z])", regex=True))
+            .explode("note")
+            .dropna(subset=["note"])
+            .groupby("note", sort=False)["Year"]
+        )
         if len(notes):
             line += " Notes: " + " ".join(f"{year_ranges(years)}: {note}" for note, years in notes)
         lines.append(line)
-    return "\n".join(lines)
+    citation = "\n".join(lines)
+    assert len(citation.encode("utf-8")) < CITATION_MAX_BYTES, len(citation.encode("utf-8"))
+    return citation
 
 
 def run(upload: bool = True) -> None:
