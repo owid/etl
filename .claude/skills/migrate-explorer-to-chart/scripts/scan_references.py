@@ -435,7 +435,7 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         add(
                             "Narrative chart",
                             r["narrative_name"],
-                            f"{ADMIN}/narrative-charts/{r['narrative_id']}/edit",
+                            f"{ADMIN}/narrative-charts/{int(r['narrative_id'])}/edit",
                             m.group(0),
                             "config text",
                         )
