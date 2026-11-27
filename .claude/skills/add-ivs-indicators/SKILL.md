@@ -494,7 +494,7 @@ single pipeline step runs.
 
 ```bash
 .venv/bin/etlr integrated_values_surveys  # meadow→garden→grapher
-.venv/bin/etlr integrated_values_surveys --grapher  # upload to staging grapher
+.venv/bin/etlr integrated_values_surveys --grapher  # writes to the DB in .env; prefix STAGING=1 for this branch's staging
 ```
 
 - **Two separate gates:** the build (first command) runs `check_sum_100` in garden (green = recodes sum to
@@ -518,7 +518,6 @@ single pipeline step runs.
     JOIN tags_variables_topic_tags tv ON tv.variableId=v.id JOIN tags t ON t.id=tv.tagId
     WHERE v.catalogPath LIKE '%%ivs/<v>/%%' GROUP BY t.name ORDER BY n DESC""").to_string())
   ```
-- `make check` before committing.
 
 ## Step 8 — Git (per repo CLAUDE.md)
 

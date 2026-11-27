@@ -21,7 +21,7 @@ Two modes:
 
 **description_short / description_key** resolve from the namesake top-level fields on `VariableMeta` — not from `grapher_config`.
 
-Not every chart has `presentation.grapher_config` populated: some charts are edited only in the admin DB, so the ETL metadata looks empty. Treat those fields as chart-level (see routing below) rather than inventing a fallback. See `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` for the full rule.
+Not every chart has `presentation.grapher_config` populated: some charts are edited only in the admin DB, so the ETL metadata looks empty. Treat those fields as chart-level (see routing below) rather than inventing a fallback.
 
 Field mapping — user vocabulary → where the field can live:
 
@@ -69,7 +69,7 @@ Notes baked into the resolver — don't re-derive them by hand:
 - MDims are served at `/grapher/<slug>` too — slug lookups check `multi_dim_data_pages` after `charts`.
 - Old slugs resolve through `chart_slug_redirects`; the canonical slug is reported.
 - Duplicate slugs prefer the published chart; editing an unpublished chart gets a warning.
-- MDim choice values can carry deliberate trailing spaces — dims are matched stripped but written back raw (memory: `reference_mdim_choice_name_trailing_space`).
+- MDim choice values can carry deliberate trailing spaces — dims are matched stripped but written back raw.
 - Never hand-build `staging-site-<branch>` hostnames — branch names get normalized and truncated to 28 chars (`etl.config.get_container_name`); a wrong name silently serves a different environment.
 - When a `<short_name>.meta.override.yml` exists next to the meta.yml, the resolver lists it first — that's the manual-curation surface (the main meta.yml is likely auto-generated; see the route (a) note below).
 
@@ -77,7 +77,7 @@ Notes baked into the resolver — don't re-derive them by hand:
 
 Primitives:
 
-- **Explicitly set at chart level** ⇔ the key exists in the authored layer (the `chart_configs` row named by `patchConfigId`). Never judge this from the rendered config — that has every inherited value merged in, so an inherited title looks identical to an override there (`etl/indicator_upgrade/indicator_update.py:207`).
+- **Explicitly set at chart level** ⇔ the key exists in the authored layer (the `chart_configs` row named by `patchConfigId`). Never judge this from the rendered config — that has every inherited value merged in, so an inherited title looks identical to an override there (`etl/indicator_upgrade/indicator_update.py`).
 - **Inheritable** ⇔ the chart's primary y variable has an ETL grapher config (`variables.patchConfigIdETL IS NOT NULL`) and that config carries the field.
 
 Three routes:
@@ -211,7 +211,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 
 **The single checkpoint rule: nothing is committed or pushed before the user's explicit go-ahead.** Everything up to the checkpoint happens on the branch + staging server only.
 
-**In a cloud session** (`CLAUDE_CODE_REMOTE=true`) staging is unreachable, so edits reach it only by push, and only on a branch with an open PR. Open the draft PR (step 2), then in step 7 commit and push instead of writing to staging; the go-ahead gates marking the PR ready. Don't build the step in the sandbox. After each push, tell the user as soon as the staging build has written the edit, with the preview link, as `.claude/docs/cloud-sandbox.md` says. Steps that read the staging DB fall back to the public Datasette. Route (c) isn't possible from the sandbox.
+**In a cloud session** (`CLAUDE_CODE_REMOTE=true`) staging is unreachable, so edits reach it only by push, and only on a branch with an open PR. Open the draft PR (step 2), then in step 7 commit and push instead of writing to staging; the go-ahead gates marking the PR ready. Don't build the step in the sandbox. After each push, tell the user as soon as the staging build has written the edit, with the preview link, as `.claude/docs/cloud-sandbox.md` says. Steps that read the staging DB fall back to public.duckdb (`/query-grapher-db`). Route (c) isn't possible from the sandbox.
 
 Whoever asks from the web usually wants to see the change, not the process, so keep each message to what changed, the link and what to look at. Leave out checks that found nothing (no other surfaces affected), branch names, what you're watching, and anything that waits on the go-ahead, such as the reviewer; the checkpoint is the link plus "say if it looks right". Here the open items CLAUDE.md asks for go in the PR body, not the chat, and opening the PR needs no explanation.
 
@@ -241,8 +241,7 @@ Two things leave the fast path for the full workflow below: indicator text (a `m
 9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.
 10. **CHECKPOINT** — show: the `git diff` (routes a/b) and/or the chart-patch JSON diff (route c), staging preview links (strip the `.tail6e23.ts.net` suffix from admin links), the blast-radius summary (link Metadata Diff's `?diff-type=blast` beside it once the grapher step is on staging — the same claim, verified against what the server actually renders), and any unresolved check findings. **Wait for the user's explicit go-ahead.**
 11. After the go-ahead, hands-off:
-    - `make check`;
-    - commit `🔨🤖 <description>` with `Co-Authored-By: Claude <model name> <noreply@anthropic.com>`;
+    - commit (the pre-commit hook runs `make check`) `🔨🤖 <description>` with `Co-Authored-By: Claude <model name> <noreply@anthropic.com>`;
     - first push needs the upstream: `git push -u origin <branch>`, then verify `gh pr view --json files` is non-empty;
     - PR description via `gh pr edit` — first line is the attribution blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`), then: what changed and why (public facts only), which documentation passage the new text rests on (or that it is inferred), the blast-radius summary, any route-(c) DB-only edits (they have **no file diff** — describe them explicitly and note they ride to production via chart-diff approval), and any `#dod:` follow-ups ("create in admin");
     - if the PR has committed files: post a bare `@codex review` comment, record its exact timestamp, and spawn the `babysit-pr` skill's background agent to watch CI, judge/fix findings, reply + resolve threads;
@@ -263,7 +262,7 @@ Scoping rules specific to this skill:
 - **Pin-coupling check — the mirror of [`check-hardcoded-years`](../check-hardcoded-years/SKILL.md)' deliberate-pin signal.** That audit refuses to bump a time pin when the pin's value lives in the FAUST text; this skill edits the text side of the same coupling, so check it from here too, in both directions. (i) When the edited text names a year or a figure the chart's current window produces ("increased 12-fold", "more than 95%", a ratio in the title, "the past three decades"), read the config's `minTime`/`maxTime`/`map.time` before shipping: changing the words without the pin — or leaving words that a pin bump has already invalidated — breaks the pairing that audit deliberately preserves. Scan for **numbers, not just years**: "grown 300%" names no year but is entirely determined by the pinned endpoint. (ii) When *adding* text, an endpoint-dependent figure creates a new coupling that silently goes stale at the next data update — prefer phrasing that survives updates ("has increased more than tenfold" only if it stays true with more years), and where the figure is the point, say so in the PR body so the next update cycle's audit knows the pin↔text pair is deliberate.
 - Route (c) chart-config text has no `.meta.yml` — apply the style guide, the clarity checklist, and a typo pass directly to the new text.
 - If a check rewrites a `.meta.yml`, re-run the affected step (grapher steps with `--grapher`) and re-run the check to confirm zero remaining violations.
-- New `[term](#dod:term)` links: check the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`) before shipping; if missing, keep the link and list it in the PR body as a "create in admin" follow-up.
+- New `[term](#dod:term)` links: check the `dods` table via the internal Datasette (`SELECT name FROM dods WHERE name LIKE ...`) before shipping; if missing, keep the link and list it in the PR body as a "create in admin" follow-up.
 
 ## Verifying on staging
 
@@ -316,10 +315,8 @@ Never suggest it; enter it only when the user asks for a dump, report or audit o
 - Do NOT monkey-patch around a MySQL outage by calling `Chart.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. If MySQL is down, stop and tell the user.
 - Do NOT suggest dump + compare mode — only enter it on explicit request.
 
-## Related memories, skills, and references
+## Related skills and references
 
-- `.claude/projects/-Users-parriagadap-etl/memory/faust_definition.md` — FAUST = Footnote, Axis titles, Units, Subtitle, Title.
-- `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` — the inheritance rule, with the caveat about `grapher_config` not being universally populated.
 - `.claude/skills/generate-metadata/SKILL.md` — writing style rules + the canonical metadata-check suite.
 - `.claude/skills/babysit-pr/SKILL.md` — the Codex review→fix→resolve background loop (step 11).
 - `.claude/skills/check-chart-preview/SKILL.md` — visual QA on staging.

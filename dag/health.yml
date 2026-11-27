@@ -262,7 +262,7 @@ steps:
     - data://garden/health/latest/global_health_mpox:
       - data://meadow/health/latest/global_health_mpox:
         - snapshot://health/latest/global_health_mpox.csv
-  viz://explorer/who/latest/monkeypox:
+  viz://chart/who/latest/monkeypox:
     - data://grapher/who/latest/monkeypox:
       - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
@@ -695,6 +695,11 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2026-05-22/gho:
     - data://garden/who/2026-05-22/gho
+  #
+  # Adult obesity and overweight (MDim) — chart authored in ETL.
+  #
+  viz://chart/who/latest/adult_obesity:
+    - data://grapher/who/2026-05-22/gho
 
   #viz://chart/who/latest/share_overweight_adults:
   #  - data://grapher/who/2026-05-22/gho

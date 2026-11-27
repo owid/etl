@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Immigrants and emigrant populations
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on immigrant and emigrant populations.
 topic_tags:
   - Migration
 

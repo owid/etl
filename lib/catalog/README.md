@@ -88,6 +88,24 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.4.3`
+- **Indicator annotations:** new `VariableMeta.annotations`, a list of `Annotation(text, entities, time, time_end, dimensions)` set from `annotations` in `.meta.yml`. Each annotation is a short note shown on charts, optionally tied to some entities and to a point or range in time
+  - `time` and `time_end` are years for yearly data, and `YYYY-MM-DD` dates for daily, weekly, monthly or quarterly data. YAML dates and years given as strings are normalized to these forms
+  - `time_end` also accepts `latest`, for a range that runs to the end of the data. ETL replaces it with the last time of each entity's data when it upserts the indicator
+  - A string in `entities`, a malformed time, a `time_end` without `time`, a mix of a year and a date, or a range that ends before it starts raises where the annotation is set
+  - `dimensions` scopes an annotation to some values of the extra index levels of a long table
+- Combining indicators keeps the annotations of all of them, without duplicates
+- `update_variable_metadata` drops annotations whose text renders empty through Jinja
+
+### `v1.4.2`
+- No change to the API. The explorer examples in the docstrings of `Client.charts.fetch` and `quick.get` use the CO2 explorer: the COVID-19 explorer is moving to `/grapher/covid`, and the energy explorer is no longer published
+
+### `v1.4.1`
+- The sources table (`Table.sources`, and the `sources.csv` of a dataset page) has a `title_snapshot` column, which tells apart several files of one data product: those share a `label`, the one the codebook uses
+
+### `v1.4.0`
+- **`DatasetMeta.jsonld` is renamed `DatasetMeta.dataset_page`** (`dataset: dataset_page: true` in a step's `.meta.yml`). The flag opts a dataset into a whole public page (data files, codebook, sources, README, manifest), of which the Schema.org JSON-LD is one file. An `index.json` that still has `jsonld` loads without error, with `dataset_page` false until the dataset is rebuilt
+
 ### `v1.3.1`
 - No change to the package. Dev tooling: the lockfile now resolves only for Python >= 3.11.5, so it no longer pins a vulnerable soupsieve 2.x for Python 3.11.0–3.11.4
 

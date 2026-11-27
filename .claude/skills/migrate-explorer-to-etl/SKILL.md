@@ -7,9 +7,8 @@ description: >-
   the settings, `graphers` and `columns` tables into the dimensions and views
   `/create-explorer` needs, hands off to it, and sets the PROD/STAGING comparison body on the
   PR. Every explorer still outside ETL is grapher-based (variable IDs or chart IDs), so this is
-  the one migration skill. Trigger on "/migrate-explorer-to-etl SLUG", "migrate the SLUG
-  explorer to ETL", "bring SLUG explorer into ETL", or "port explorer SLUG". Temporary: retire
-  when no explorer remains outside ETL; global-health (#6513) is the last tracked one.
+  the one migration skill. Use when someone wants an explorer that lives outside ETL brought
+  into it. Temporary: retire when no explorer remains outside ETL.
 metadata:
   internal: true
   status: temporary
@@ -60,15 +59,15 @@ problem. To keep working on the current branch in parallel, add `--worktree` and
 sibling directory it prints.
 
 If a tracking issue exists for the explorer (global-health: #6513), add the PR link to its checklist
-row with `gh issue edit`. The umbrella issue #6028 is closed; do not edit it.
+row with `gh issue edit`.
 
 ## Step 2: read the live explorer config from production
 
 The `explorers` table is the source of truth. Do **not** read `owid-content/explorers/*.tsv`; that
 repo is stale and mis-routes migrations. Priority:
 
-1. **Production**, read-only, through the `.env.prod` the repo ships. It is reachable when `.env`
-   declares `ENV_FILE_PROD` (see `etl/config.py`):
+1. **Production**, read-only, through your local production env file. It is reachable when `.env`
+   declares `ENV_FILE_PROD` (see `etl/config.py`); ask the user if it doesn't:
    ```python
    from etl.config import ENV_FILE_PROD, OWIDEnv
    PROD = OWIDEnv.from_env_file(ENV_FILE_PROD)
@@ -126,9 +125,8 @@ Do not trust type labels in old issues; check the columns.
 
 Some production TSVs carry invisible Unicode prefixes on dropdown display names, almost always SOFT
 HYPHEN (`\xad`), occasionally ZWSP or ZWNJ: a curator's hack to coerce Grapher's first-appearance
-dropdown ordering when sub-collections share choice names. Democracy is the canonical case;
-the prefixes are preserved in
-`etl/steps/viz/explorer/democracy/latest/democracy.*.config.yml`.
+dropdown ordering when sub-collections share choice names. Democracy is the canonical case: its
+`Metric` and `Sub-metric` choices carry up to five soft hyphens each.
 
 **Preserve them byte for byte.** Grapher uses the choice's display name, not its slug, as the URL
 query parameter, so stripping a prefix silently breaks every shared link that targeted the value.
@@ -147,7 +145,7 @@ In the YAML, write the escape (`name: "\xad\xad\xadElectoral democracy"`), never
 they load identically, and the escape is visible in editors and diffs. `ruamel.yaml` re-emits `\xad`
 as the raw character on round-trip, so if you scaffold the YAML programmatically, post-process the
 dump to swap raw soft hyphens back to `\xad` inside double-quoted strings. When prefixes diverge
-across sub-configs that share a slug, `combine_collections` renames the conflicting slugs internally
+across sub-configs that share a slug, `combine_charts` renames the conflicting slugs internally
 (`_update_choice_slugs_in_views` in `etl/viz/chart/core/combine.py`); slug renames are invisible to
 URL parameters, so that is fine.
 

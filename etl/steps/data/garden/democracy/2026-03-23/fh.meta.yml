@@ -24,7 +24,7 @@ tables:
           Freedom House’s freedom score captures the extent of free and fair elections, political pluralism and participation, a functioning government, freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more freedom.
 
         description_key:
-          - This score, produced by Freedom House, is useful if you are interested in big and small differences in freedom, want scores for almost all countries, and prefer a definition of democracy that especially focuses on political and civil freedoms. For data that focuses on big differences in political systems or has a narrower or broader understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - This score, produced by Freedom House, is useful if you are interested in big and small differences in freedom, want scores for almost all countries, and prefer a definition of democracy that especially focuses on political and civil freedoms. For data that focuses on big differences in political systems or has a narrower or broader understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/grapher/democracy?country=ARG~AUS~BWA~CHN~OWID_WRL&dataset=vdem&metric=electoral_democracy&sub_metric=main_index).
           - The score is based mainly on assessments by Freedom House’s country and regional experts, and its own researchers.
           - It is made up of 10 indicators of political rights (up to 40 points) and 15 indicators of civil liberties (up to 60 points).
           - The score is used by Freedom House to classify countries as [not free, partly free, or free](https://ourworldindata.org/grapher/political-regime-fh).
@@ -50,6 +50,13 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
+            # Lower ratings mean more liberties, so show rises in red and falls in green.
+            dumbbell:
+              trendColorMap:
+                increase: "#d73c50"
+                decrease: "#00875e"
             hasMapTab: true
             tab: map
             yAxis:
@@ -95,6 +102,13 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
+            # Lower ratings mean more rights, so show rises in red and falls in green.
+            dumbbell:
+              trendColorMap:
+                increase: "#d73c50"
+                decrease: "#00875e"
             hasMapTab: true
             tab: map
             yAxis:
@@ -186,6 +200,8 @@ tables:
               - LineChart
               - SlopeChart
               - DiscreteBar
+              - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -222,6 +238,7 @@ tables:
               - SlopeChart
               - DiscreteBar
               - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -259,6 +276,7 @@ tables:
               - SlopeChart
               - DiscreteBar
               - Marimekko
+              - Dumbbell
             hasMapTab: true
             tab: map
             yAxis:
@@ -343,6 +361,8 @@ tables:
           People living in free countries
           <%- endif %>
         unit: "countries"
+        description_processing: &description_population |-
+          We calculate the number of people living under each type of regime using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
       pop_electdem:
         title: |-
           <% if category == '-1' %>
@@ -353,3 +373,4 @@ tables:
           People living in electoral democracies
           <%- endif %>
         unit: "countries"
+        description_processing: *description_population

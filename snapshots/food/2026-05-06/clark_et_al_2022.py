@@ -2,8 +2,7 @@
 curated 211-product roll-up, mirrored from the legacy `owid-datasets` GitHub repo.
 
 This is the data that has historically backed the "Specific food products" view of the
-food-footprints explorer. We bring it under ETL so the explorer can be authored as a
-single ETL-managed `viz://explorer/food/latest/food_footprints` step.
+food-footprints data explorer, now the `viz://chart/food/latest/food_footprints` multidim.
 """
 
 from pathlib import Path

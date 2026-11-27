@@ -48,6 +48,9 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
+    # Fix known errors in the source data (before totals and per-1,000 values are calculated).
+    tb = paths.apply_corrections(tb)
+
     # fill rounded columns with non-rounded values where rounded values are na
     tb[C_T_D_R] = tb[C_T_D_R].fillna(tb[C_T_D])
     tb[C_N_D_R] = tb[C_N_D_R].fillna(tb[C_N_D])
@@ -59,22 +62,13 @@ def run() -> None:
 
     # add total displacements (conflict + disaster)
     tb["total_displacement"] = tb[C_T_D] + tb[D_T_D]
-    # NOTE: IDMC reports disaster IDPs before 2019 only for some countries (blanks there mean no data, not zero),
-    # so we only calculate total IDPs from 2019. Re-check with IDMC on each update.
-    tb.loc[tb["year"] < 2019, "total_displacement"] = None
     tb["total_displacement_rounded"] = tb["total_displacement"].apply(round_idmc_style)
     tb["total_new_displacement"] = tb[C_N_D] + tb[D_N_D]
     tb["total_new_displacement_rounded"] = tb["total_new_displacement"].apply(round_idmc_style)
 
-    # fill n/a values with 0 in the new total columns
-    # stock IDPs starting in 2019 (full disaster IDP coverage starts in 2019)
-    tb.loc[tb["year"] >= 2019, "total_displacement_rounded"] = tb.loc[
-        tb["year"] >= 2019, "total_displacement_rounded"
-    ].fillna(0)
-    # new displacements starting in 2008 (conflict and disaster displacements both start in 2008)
-    tb.loc[tb["year"] >= 2008, "total_new_displacement_rounded"] = tb.loc[
-        tb["year"] >= 2008, "total_new_displacement_rounded"
-    ].fillna(0)
+    # fill n/a values with 0 in the new total columns (all series start in 2008)
+    for col in ["total_displacement_rounded", "total_new_displacement_rounded"]:
+        tb[col] = tb[col].fillna(0)
 
     # Add population after na_to_zero, so the rows it creates also get per-1,000 values.
     tb = paths.regions.add_population(tb)
@@ -112,23 +106,26 @@ def sanity_check_inputs(tb: Table) -> None:
 
 
 def sanity_check_outputs(tb: Table) -> None:
-    # Conflict figures and disaster displacements are complete from 2008, disaster IDPs from 2019.
-    for col in [C_T_D, C_T_D_R, C_N_D, C_N_D_R, D_N_D, D_N_D_R, "total_new_displacement_rounded"]:
+    # All series are complete from 2008, as IDMC's blanks mean no known IDPs or displacements in every year.
+    for col in [
+        C_T_D,
+        C_T_D_R,
+        C_N_D,
+        C_N_D_R,
+        D_T_D,
+        D_T_D_R,
+        D_N_D,
+        D_N_D_R,
+        "total_displacement",
+        "total_displacement_rounded",
+        "total_new_displacement",
+        "total_new_displacement_rounded",
+    ]:
         assert tb[col].notna().all(), f"Missing values in {col}."
-    recent = tb["year"] >= 2019
-    for col in [D_T_D, D_T_D_R, "total_displacement", "total_displacement_rounded"]:
-        assert tb.loc[recent, col].notna().all(), f"Missing values in {col} from 2019."
-    # Before 2019, disaster IDPs are only reported for some countries, so they must not be zero-filled, and no total is calculated.
-    assert not (tb.loc[~recent, D_T_D] == 0).any(), "Disaster IDPs before 2019 were filled with zeros."
-    assert tb.loc[~recent, ["total_displacement", "total_displacement_rounded"]].isna().all().all(), (
-        "Total IDPs calculated before 2019."
-    )
 
     # Totals are the sum of their parts (cast to float, as the source columns are unsigned integers).
-    total = tb.loc[recent, C_T_D].astype(float) + tb.loc[recent, D_T_D].astype(float)
-    assert (tb.loc[recent, "total_displacement"].astype(float) == total).all(), (
-        "Total IDPs don't equal conflict + disaster IDPs."
-    )
+    total = tb[C_T_D].astype(float) + tb[D_T_D].astype(float)
+    assert (tb["total_displacement"].astype(float) == total).all(), "Total IDPs don't equal conflict + disaster IDPs."
     total_new = tb[C_N_D].astype(float) + tb[D_N_D].astype(float)
     assert (tb["total_new_displacement"].astype(float) == total_new).all(), (
         "Total new displacements don't equal conflict + disaster."
@@ -167,9 +164,8 @@ def round_idmc_style(x):
 
 def na_to_zero(tb):
     """Fill all NaN values with 0. If a country year combination has no row (and no NaN value), create one with 0 values.
-    Start of data collection:
-    - 2008: natural disaster displacements, conflict displacements + conflict IDPs
-    - 2019: disaster IDPs (before 2019, IDMC reports them only for some countries, so blanks stay as no data)
+
+    IDMC's blanks mean that no IDPs or displacements are known to them, in every year. All series start in 2008.
     """
     if tb["year"].min() < 2008:
         raise ValueError(f"Year {tb['year'].min()} is before 2008, which is not expected in the dataset.")
@@ -180,19 +176,8 @@ def na_to_zero(tb):
     )
     tb = tb.set_index(["country", "year"]).reindex(all_combinations).reset_index()
 
-    # then, fill NaN values with 0 for years where data is expected to exist
-    # 2008 and onwards has natural disaster displacements
-    tb.loc[tb["year"] >= 2008, D_N_D_R] = tb.loc[tb["year"] >= 2008, D_N_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2008, D_N_D] = tb.loc[tb["year"] >= 2008, D_N_D].fillna(0)
-
-    # 2008 and onwards has conflict displacements and conflict IDPs
-    tb.loc[tb["year"] >= 2008, C_T_D_R] = tb.loc[tb["year"] >= 2008, C_T_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2008, C_T_D] = tb.loc[tb["year"] >= 2008, C_T_D].fillna(0)
-    tb.loc[tb["year"] >= 2008, C_N_D_R] = tb.loc[tb["year"] >= 2008, C_N_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2008, C_N_D] = tb.loc[tb["year"] >= 2008, C_N_D].fillna(0)
-
-    # 2019 and onwards has disaster IDPs
-    tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2019, D_T_D] = tb.loc[tb["year"] >= 2019, D_T_D].fillna(0)
+    # then, fill NaN values with 0
+    for col in [C_T_D_R, C_T_D, C_N_D_R, C_N_D, D_T_D_R, D_T_D, D_N_D_R, D_N_D]:
+        tb[col] = tb[col].fillna(0)
 
     return tb

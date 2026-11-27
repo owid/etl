@@ -1,5 +1,6 @@
+import json
 from collections.abc import Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Literal, cast
 
@@ -63,6 +64,13 @@ def _yield_wide_table(
     # Keep only entity_id and year in index
     table = table.reset_index(level=dim_names)
 
+    # Check annotation scopes before any variable is yielded and upserted
+    for column in table.columns:
+        if column in dim_names:
+            continue
+        for annotation in table[column].m.annotations:
+            _check_annotation_dimension_names(annotation, dim_names, column)
+
     if dim_names:
         # `dropna=False` makes sure we don't drop NaN values from index
         grouped = table.groupby(
@@ -116,14 +124,30 @@ def _yield_wide_table(
             tab.rename(columns={column: short_name}, inplace=True)
 
             tab[short_name].metadata = _metadata_for_dimensions(  # ty: ignore[unresolved-attribute]
-                tab[short_name].metadata, dim_dict, column
+                tab[short_name].metadata, dim_dict, column, dim_names
             )
+
+            # Replace `time_end: latest` with the last time of the indicator's data
+            meta = tab[short_name].metadata
+            if any(annotation.time_end == "latest" for annotation in meta.annotations):
+                rows = tab.index.to_frame(index=False).rename(columns={"entityName": "country"})
+                meta.annotations = _resolve_latest_times(meta.annotations, rows, meta.display or {})
 
             yield tab
 
 
-def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: dict[str, Any], column: str) -> catalog.VariableMeta:
-    """Add dimensions to metadata and expand Jinja in metadata fields."""
+def _metadata_for_dimensions(
+    meta: catalog.VariableMeta, dim_dict: dict[str, Any], column: str, dim_names: list[str] | None = None
+) -> catalog.VariableMeta:
+    """Add dimensions to metadata and expand Jinja in metadata fields.
+
+    :param dim_names: All dimension names of the table; defaults to the keys of `dim_dict`.
+    """
+    # Keep only the annotations of these dimensions, before rendering (the text of others may not render here)
+    meta.annotations = _annotations_for_dimensions(
+        meta.annotations, dim_dict, list(dim_dict) if dim_names is None else dim_names, column
+    )
+
     # Add info about dimensions to metadata
     if dim_dict:
         meta.dimensions = {dim_name: sanitize_numpy(dim_value) for dim_name, dim_value in dim_dict.items()}
@@ -153,6 +177,115 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: dict[str, Any
         raise ValueError(
             f"Error expanding Jinja in metadata for column '{column}' with dim values: {dim_dict}.\n\nVariable metadata:\n\n{yaml_dump(meta.to_dict())}"
         ) from e
+
+
+def _annotation_in_scope(annotation: catalog.Annotation, dim_dict: dict[str, Any]) -> bool:
+    """Check whether an annotation applies to a combination of dimensions."""
+    return all(k in dim_dict and str(dim_dict[k]) == str(v) for k, v in (annotation.dimensions or {}).items())
+
+
+def _check_annotation_dimension_names(annotation: catalog.Annotation, dim_names: list[str], column: str) -> None:
+    """Check that an annotation is scoped only to dimensions the table has."""
+    unknown = set(annotation.dimensions or {}) - set(dim_names)
+    if unknown:
+        raise ValueError(
+            f"Annotation of column '{column}' is scoped to dimensions {sorted(unknown)}, which the table does not have "
+            f"(its dimensions are {sorted(dim_names)}): {annotation.text!r}. Fix the dimension name or, if the "
+            f"annotation comes from another dataset this step is built from, set `annotations` in this step's metadata, "
+            f"which replaces the inherited ones."
+        )
+
+
+def _annotations_for_dimensions(
+    annotations: list[catalog.Annotation], dim_dict: dict[str, Any], dim_names: list[str], column: str
+) -> list[catalog.Annotation]:
+    """Keep the annotations that apply to a combination of dimensions, without their `dimensions` scope."""
+    kept = []
+    for annotation in annotations:
+        _check_annotation_dimension_names(annotation, dim_names, column)
+        if _annotation_in_scope(annotation, dim_dict):
+            kept.append(replace(annotation, dimensions=None))
+    return kept
+
+
+def _resolve_latest_times(
+    annotations: list[catalog.Annotation], rows: pd.DataFrame, display: dict[str, Any]
+) -> list[catalog.Annotation]:
+    """Replace `time_end: latest` with the last time of each annotated entity's data.
+
+    Entities whose data end at different times get one annotation each.
+    """
+    resolved = []
+    for annotation in annotations:
+        if annotation.time_end != "latest":
+            resolved.append(annotation)
+            continue
+        entities_by_last_time = {}
+        for entity in annotation.entities or [None]:
+            last = _time_range(rows if entity is None else rows[rows["country"] == entity], display)[1]
+            entities_by_last_time.setdefault(last if isinstance(last, str) else int(last), []).append(entity)
+        for last, entities in entities_by_last_time.items():
+            entities = [] if entities == [None] else entities
+            resolved.append(replace(annotation, entities=entities, time_end=last))
+    return resolved
+
+
+def has_scoped_annotations(table: catalog.Table) -> bool:
+    """Check whether any column of a table has annotations scoped to dimensions."""
+    return any(annotation.dimensions for column in table.columns for annotation in table[column].m.annotations)
+
+
+def tables_with_scoped_annotations(ds: catalog.Dataset) -> list[catalog.Table]:
+    """Load the tables of a saved dataset that have annotations scoped to dimensions, reading metadata files first."""
+    tables = []
+    for name in ds.table_names:
+        with open(Path(ds.path) / f"{name}.meta.json") as f:
+            fields = json.load(f).get("fields", {})
+        if any(
+            annotation.get("dimensions") for meta in fields.values() for annotation in meta.get("annotations") or []
+        ):
+            tables.append(ds[name])
+    return tables
+
+
+def check_annotation_scopes_match(tables: Iterable[catalog.Table]) -> None:
+    """Check that each annotation scoped to dimensions applies to data in at least one of the tables.
+
+    The tables of a dataset often share metadata, so an annotation only needs data in one of them. Otherwise, a typo in
+    a dimension value would drop the annotation silently when the tables are flattened.
+    """
+    matched = set()
+    unmatched = {}
+    for table in tables:
+        dim_names = [k for k in table.primary_key if k not in ("year", "country", "date", "entityId", "entityCode")]
+        index = table.index.to_frame(index=False)
+        for column in table.columns:
+            for annotation in table[column].m.annotations:
+                if not annotation.dimensions:
+                    continue
+                _check_annotation_dimension_names(annotation, dim_names, column)
+                key = json.dumps(annotation.to_dict(), sort_keys=True, default=str)
+                if key in matched:
+                    continue
+                in_scope = table[column].notna().to_numpy(copy=True)
+                for name, value in annotation.dimensions.items():
+                    in_scope &= (index[name].astype(str) == str(value)).to_numpy()
+                if in_scope.any():
+                    matched.add(key)
+                    unmatched.pop(key, None)
+                else:
+                    unmatched.setdefault(key, (column, annotation))
+
+    if unmatched:
+        notes = "\n".join(
+            f"- column '{column}', dimensions {annotation.dimensions}: {annotation.text!r}"
+            for column, annotation in unmatched.values()
+        )
+        raise ValueError(
+            "These annotations are scoped to dimension values that have no data in any table of the dataset. Check the "
+            "values for typos or, if an annotation comes from another dataset this step is built from, set "
+            f"`annotations` in this step's metadata, which replaces the inherited ones:\n{notes}"
+        )
 
 
 def _create_dim_dict(dim_names: list[str], dim_values: list[Any]) -> dict[str, Any]:
@@ -196,7 +329,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
         short_names.append(short_name)
 
         # Create metadata for the column from dimensions
-        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column))
+        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column, dim_names))
 
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
@@ -723,6 +856,8 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             raise AssertionError("Table must have columns country and year or date.")
 
         cols_missing_title_public = []
+        # Country and time of each row, built only if a column has annotations
+        entity_times = None
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -733,6 +868,10 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
 
             _validate_ordinal_variables(tab, col)
             _validate_time_interval(tab, col)
+            if tab[col].m.annotations:
+                if entity_times is None:
+                    entity_times = _entity_times(tab)
+                _validate_annotations(tab, col, entity_times)
 
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
@@ -793,6 +932,66 @@ def _validate_time_interval(tab: Table, col: str) -> None:
         assert time_interval in TIME_INTERVALS, (
             f"Column `{col}` has display.timeInterval='{time_interval}', which is not one of {sorted(TIME_INTERVALS)}."
         )
+
+
+def _entity_times(tab: Table) -> pd.DataFrame:
+    """Country and time of each row of a table, whether they are index levels or columns."""
+    entity_times = tab.index.to_frame(index=False)
+    for key in ("country", "year", "date"):
+        if key in tab.columns:
+            entity_times[key] = tab[key].to_numpy()
+    return entity_times
+
+
+def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> None:
+    """Check that the annotations of a column point to entities and years for which it has data."""
+    meta = tab[col].m
+    display = meta.display or {}
+    assert "entityAnnotationsMap" not in display, (
+        f"Column `{col}` sets both `annotations` and `display.entityAnnotationsMap`, which is deprecated. Use only "
+        f"`annotations`. If they come from another dataset this step is built from, set `annotations` in this step's "
+        f"metadata, which replaces the inherited ones."
+    )
+    rows = entity_times[tab[col].notna().to_numpy()]
+    entities = set(rows["country"])
+    flattened = not set(tab.index.names) - {"country", "year", "date", None}
+    for annotation in meta.annotations:
+        assert not (annotation.dimensions and flattened), (
+            f"Annotation of column `{col}` is scoped to dimensions {annotation.dimensions}, but the column has none: "
+            f"{annotation.text!r}. If it comes from another dataset this step is built from, set `annotations` in "
+            f"this step's metadata, which replaces the inherited ones."
+        )
+        missing = sorted(set(annotation.entities) - entities)
+        assert not missing, f"Annotation of column `{col}` names entities without data {missing}: {annotation.text!r}"
+        times = [t for t in (annotation.time, annotation.time_end) if t not in (None, "latest")]
+        if times:
+            first, last = _time_range(rows, display)
+            yearly = not isinstance(first, str)
+            assert all(isinstance(t, str) != yearly for t in times), (
+                f"Annotation of column `{col}` must give its time as a {'year' if yearly else 'YYYY-MM-DD date'}, "
+                f"like the column's data: {annotation.text!r}"
+            )
+            # Check the times against the data of each annotated entity, or of the whole column
+            for entity in annotation.entities or [None]:
+                if entity is not None:
+                    first, last = _time_range(rows[rows["country"] == entity], display)
+                scope = "the column's data" if entity is None else f"the data of {entity}"
+                assert all(first <= t <= last for t in times), (
+                    f"Annotation of column `{col}` has time {times} outside {scope} ({first} to {last}): "
+                    f"{annotation.text!r}"
+                )
+
+
+def _time_range(rows: pd.DataFrame, display: dict[str, Any]) -> tuple[Any, Any]:
+    """First and last time of some rows, as years, or as YYYY-MM-DD dates for sub-yearly data."""
+    if "year" in rows and display.get("timeInterval") not in SUB_YEARLY_TIME_INTERVALS:
+        return rows["year"].min(), rows["year"].max()
+    if "year" in rows:
+        # Sub-yearly data already converted to days since zeroDay
+        dates = pd.Timestamp(display["zeroDay"]) + pd.to_timedelta(rows["year"], unit="D")
+    else:
+        dates = pd.to_datetime(rows["date"])
+    return dates.min().date().isoformat(), dates.max().date().isoformat()
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:

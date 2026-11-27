@@ -31,6 +31,8 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb)
 
     sanity_check_inputs(tb)
+    # Drop known source errors (see homicide.corrections.yml).
+    tb = paths.apply_corrections(tb)
     tb = clean_up_categories(tb)
     tb = calculate_united_kingdom(tb)
     # Calculate rates for any country-year with counts but no source-provided rate

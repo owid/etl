@@ -2,41 +2,33 @@
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 autoupdate:
   name: Epoch
+  assignees:
+    - lucasrodes
 meta:
   origin:
     # Data product / Snapshot
-    title: Parameter, Compute and Data Trends in Machine Learning
-    date_published: "2026-04-10"
-    description_snapshot: |
-      We update this chart with the latest available data from our source every month.
+    title: Data on AI Models
+    title_snapshot: Notable AI models
+    description: |-
+      Epoch AI tracks over 3,700 machine learning models, from the 1950s to today. For each model, it records details such as the publication date, the developer, the number of parameters, the size of the training data, and the amount of computation used to train it.
 
-      The authors selected the AI systems for inclusion based on the following necessary criteria:
-      — Have an explicit learning component
-      — Showcase experimental results
-      — Advance the state of the art
-
-      In addition, the systems had to meet at least one of the following notability criteria:
-      — Paper has more than 1000 citations
-      — Historical importance
-      — Important state-of-the-art advance
-      — Deployed in a notable context
-
-      The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models."
+      Epoch AI marks a model as notable if it met at least one of these criteria: it improved on the state of the art, was highly cited, had over a million monthly users, was historically significant, or cost over one million dollars to train.
+    date_published: '2026-11-24'
 
     # Citation
     producer: Epoch AI
-    citation_full: "Epoch AI, ‘Parameter, Compute and Data Trends in Machine Learning’. Published online at epochai.org. Retrieved from: ‘https://epoch.ai/data/epochdb/visualization’ [online resource]"
+    citation_full: "Epoch AI, ‘Data on AI models’. Published online at epoch.ai. Retrieved from ‘https://epoch.ai/data/ai-models’ [online resource]"
 
     # Files
-    url_main: https://epoch.ai/mlinputs/visualization
+    url_main: https://epoch.ai/data/ai-models
     url_download: https://epoch.ai/data/epochdb/notable_ai_models.csv
-    date_accessed: '2026-09-04'
+    date_accessed: '2026-11-26'
 
     # License
     license:
       name: CC BY 4.0
-      url: https://creativecommons.org/licenses/by/4.0/
+      url: https://epoch.ai/data/ai-models
 outs:
-  - md5: d15aaf03a804e5e65d3269ff1282d8ec
-    size: 2230511
+  - md5: a4b78fe4494d492919b111a2f8deb12c
+    size: 2298776
     path: epoch.csv

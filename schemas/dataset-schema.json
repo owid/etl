@@ -406,10 +406,10 @@
           "title": "Non-redistribution of dataset ",
           "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart."
         },
-        "jsonld": {
+        "dataset_page": {
           "type": "boolean",
-          "title": "Publish catalog landing page / JSON-LD",
-          "description": "Opt this dataset into a public catalog page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD (`etl d publish --jsonld`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand."
+          "title": "Publish a dataset page",
+          "description": "Opt this dataset into a public dataset page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD that lets search engines list the dataset (`etl d publish --dataset-pages`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand. A garden step or a grapher step can opt in, only through its own `.meta.yml`: a dataset built from another one's metadata (like a grapher step from its garden step) does not inherit the flag. Only one step at each `<namespace>/<short_name>` can set it. The page of a grapher step automatically shows the charts that use the step's indicators. To also show the charts of indicators in other grapher datasets that hold the same data as a column, list those indicators in a `<short_name>.indicator_links.yml` file next to the step (format in `etl/catalog_pages/links.py`); the step's own indicators do not need to be listed there. The page of a garden step shows charts only for the columns listed in such a file, because a garden step has no grapher indicators of its own."
         },
         "changelog": {
           "type": "array",
@@ -702,6 +702,78 @@
                       }
                     ]
                   ],
+                  "category": "metadata"
+                },
+                "annotations": {
+                  "title": "Indicator's annotations",
+                  "type": "array",
+                  "description": "Short notes shown on charts of the indicator, each optionally tied to some entities and to a point or range in time.",
+                  "requirement_level": "optional",
+                  "guidelines": [
+                    [
+                      "`text` must start with a capital letter."
+                    ],
+                    [
+                      "`text` must end with a period, unless the note is on some `entities` and has no `time`.",
+                      {
+                        "type": "list",
+                        "value": [
+                          "A note on some `entities` with no `time` must not end with a period, since charts show it next to the entity's name, like a label.",
+                          "NOTE: This is a temporary solution until we find a more convenient solution."
+                        ]
+                      }
+                    ],
+                    [
+                      "`text` must not repeat `time` or `time_end`, since charts already show them next to the note."
+                    ],
+                    [
+                      "`entities` must be omitted for a note on the whole indicator."
+                    ],
+                    [
+                      "`time` alone must be used for a note on one year, `time` with `time_end` for a range of years, and neither for a note on all years."
+                    ],
+                    [
+                      "`time_end` should be `latest` for a range that runs to the end of the data, rather than a year that goes stale at the next update."
+                    ],
+                    [
+                      "Times must be years for yearly data, and YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
+                    ],
+                    [
+                      "`annotations` must not be combined with `display.entityAnnotationsMap` on the same indicator. That field is deprecated, and `annotations` replaces it."
+                    ]
+                  ],
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["text"],
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "description": "Text of the note, in markdown (links are allowed)."
+                      },
+                      "entities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Entities the note applies to."
+                      },
+                      "time": {
+                        "type": ["integer", "string"],
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
+                        "description": "Year (e.g. `2003`) or date (e.g. `2020-03-15`) the note applies to, or the start of a range. A year can also be injected with `yaml_params`, e.g. `\"{LATEST_YEAR}\"`."
+                      },
+                      "time_end": {
+                        "type": ["integer", "string"],
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\}|latest)$",
+                        "description": "End of the range that starts at `time`, in the same form, or `latest` for a range that ends at the last time of each entity's data (filled in when the indicator is upserted, so it keeps up with new data)."
+                      },
+                      "dimensions": {
+                        "type": "object",
+                        "description": "Only for long tables: values of the extra index levels the note applies to, e.g. `{cause: Maternal disorders}`. The grapher step keeps the note on the indicators of matching dimensions and removes this field when flattening the table. A step fails if no table of its dataset has data for these values."
+                      }
+                    }
+                  },
                   "category": "metadata"
                 },
                 "description_processing": {
@@ -1069,7 +1141,7 @@
                       "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         [
-                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name)."
+                          "Must be an existing topic tag, and be spelled correctly: one of the values in this field's `enum`. That list is a snapshot; the live one is the topic-tag query in the [create-chart skill](https://github.com/owid/etl/blob/master/.claude/skills/create-chart/SKILL.md)."
                         ],
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."

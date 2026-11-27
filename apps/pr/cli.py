@@ -194,9 +194,10 @@ MODEL_DEFAULT = "claude-haiku-5-5"
     help="Symlink the new worktree's data/, workbench/, and ai/ to the original repo's (only with --worktree). Avoids recomputing upstream ETL steps and losing workbench/ai scratch artifacts on worktree removal. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` (or workbench/ or ai/) in the worktree.",
 )
 @click.option(
-    "--auto-assign",
-    is_flag=True,
-    help="Automatically assign the PR to the GitHub user the token belongs to.",
+    "--auto-assign/--no-auto-assign",
+    "auto_assign",
+    default=None,
+    help="Assign the PR to the GitHub user the token belongs to. On by default when an AI agent (e.g. Claude Code) runs the command, off otherwise.",
 )
 @click.option(
     "--no-update-base",
@@ -216,7 +217,7 @@ def cli(
     worktree: bool,
     worktree_path: str | None,
     share_data: bool,
-    auto_assign: bool,
+    auto_assign: bool | None,
     no_update_base: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
@@ -240,6 +241,10 @@ def cli(
         raise click.ClickException("--share-data requires --worktree.")
     if no_update_base and direct:
         raise click.ClickException("--no-update-base has no effect with --direct (no new branch is created).")
+
+    # Assign the PR to its human owner whenever an AI agent opens it, unless told otherwise.
+    if auto_assign is None:
+        auto_assign = is_run_by_ai_agent()
 
     # Get category
     category = ensure_category(category)
@@ -633,6 +638,14 @@ def print_worktree_hint(
         print("    both remove only the symlinks, leaving the shared content untouched.")
 
 
+def is_run_by_ai_agent() -> bool:
+    """Whether an AI coding agent is running this command.
+
+    Claude Code sets `CLAUDECODE=1` in the shells it spawns; `AI_AGENT` is a cross-tool convention for the same.
+    """
+    return bool(os.environ.get("CLAUDECODE") or os.environ.get("AI_AGENT"))
+
+
 def create_pr(repo, work_branch, base_branch, pr_title, auto_assign: bool = False):
     """Create a draft pull request work_branch -> base_branch."""
     pr_title_str = str(pr_title)
@@ -801,16 +814,20 @@ def summarize_title_llm(title) -> str:
 CLEAN_HELP = """Clean up local branches whose pull request was merged or closed on GitHub.
 
 Lists every local branch whose latest GitHub PR is **merged** or **closed** (using GitHub's PR
-state, not `git branch --merged`, so squash-merges are detected). Branches that have a git worktree
-are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`, and the
-tool will:
+state, not `git branch --merged`, so squash-merges are detected). A branch with no PR of its own is
+also listed as merged when its last commit is part of a merged PR, e.g. a temporary copy of a PR
+branch, or a branch whose work was merged from a branch with another name. Branches that have a git
+worktree have it removed too. Before you pick, the tool lists what cleaning each branch will do
+(which worktree it removes, what it copies into the main repo, which branch it deletes), and which
+branches it will skip and why. Then pick a single branch, `all`, `all merged`, or `all closed`:
+that pick is the only confirmation. For each branch it will:
 
 1. (Worktree branches only) Check the worktree for uncommitted changes that would block
    `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
    symlinks, which are handled in step 4. A dirty worktree is skipped with a warning *before
    anything is copied or modified*, so the worktree stays fully intact; commit/discard the changes
-   (or `git worktree remove --force` it) and re-run. Dirty worktrees are flagged `(dirty)` in the
-   selection list.
+   (or `git worktree remove --force` it) and re-run. Dirty worktrees are listed as skipped before
+   you pick, and left out of the selection list.
 2. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
    their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
    repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
@@ -877,16 +894,16 @@ def clean_cli() -> None:
             f"  cd to main and re-run:\n    cd {main_worktree_path}"
         )
 
-    # Candidate branches: every local branch except master.
-    candidate_branches = [b.name for b in repo.branches if b.name != "master"]
-    if not candidate_branches:
+    # Candidate branches: every local branch except master, with the last commit of each.
+    candidate_tips = {b.name: b.commit.hexsha for b in repo.branches if b.name != "master"}
+    if not candidate_tips:
         print("No local branches to clean (only 'master' found).")
         return
 
-    # Resolve each branch's PR state from GitHub (parallelised — one API call per branch).
-    log.info(f"Checking GitHub PR state for {len(candidate_branches)} local branch(es)...")
+    # Resolve each branch's PR state from GitHub (parallelised — one or two API calls per branch).
+    log.info(f"Checking GitHub PR state for {len(candidate_tips)} local branch(es)...")
     with ThreadPoolExecutor(max_workers=8) as executor:
-        states = dict(zip(candidate_branches, executor.map(fetch_pr_state, candidate_branches)))
+        states = dict(zip(candidate_tips, executor.map(fetch_pr_state, candidate_tips, candidate_tips.values())))
 
     # Keep only branches whose PR was merged or closed; active (open / no-PR) branches are left alone.
     cleanable = {b: s for b, s in states.items() if s in ("merged", "closed")}
@@ -894,13 +911,20 @@ def clean_cli() -> None:
         print("Nothing to clean: no local branch has a merged or closed PR.")
         return
 
-    # Flag worktrees with blocking uncommitted changes in the selection list, so the user knows
-    # before picking that those branches will be skipped (clean_branch re-checks before mutating).
+    # Worktrees with uncommitted changes are skipped (clean_branch re-checks before changing anything).
     dirty = {
         b: bool(worktree_blocking_changes(worktrees[b]))
         for b in cleanable
         if b in worktrees and worktrees[b] != main_worktree_path
     }
+
+    # Show what cleaning each branch will do before the user picks, so picking is the only confirmation.
+    to_clean, to_skip = plan_clean(sorted(cleanable), worktrees, dirty, main_worktree_path)
+    print(format_clean_plan(to_clean, to_skip, cleanable) + "\n")
+    if not to_clean:
+        print("Nothing to clean.")
+        return
+    selectable = {b: cleanable[b] for b in to_clean}
 
     # Build the selection list ('all' / 'all merged' / 'all closed' first, then one entry per branch).
     choices = [
@@ -908,22 +932,20 @@ def clean_cli() -> None:
         questionary.Choice(title="all merged", value=_CLEAN_ALL_MERGED),
         questionary.Choice(title="all closed", value=_CLEAN_ALL_CLOSED),
     ]
-    for branch in sorted(cleanable):
-        choices.append(
-            questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees, dirty), value=branch)
-        )
+    for branch, state in selectable.items():
+        choices.append(questionary.Choice(title=f"{branch}  [{state}]", value=branch))
 
     selected = questionary.select(
-        message="Select a branch to clean (or 'all' / 'all merged' / 'all closed')",
+        message="Select what to clean, as listed above (or 'all' / 'all merged' / 'all closed')",
         choices=choices,
         style=SHELL_FORM_STYLE,
-        instruction="(Use arrow keys, Enter to confirm)",
+        instruction="(Use arrow keys, Enter to clean, Ctrl-C to cancel)",
     ).unsafe_ask()
 
     if selected is None:
         return
 
-    branches_to_clean = resolve_branches_to_clean(selected, cleanable)
+    branches_to_clean = resolve_branches_to_clean(selected, selectable)
     if not branches_to_clean:
         state = {_CLEAN_ALL_MERGED: "merged", _CLEAN_ALL_CLOSED: "closed"}[selected]
         print(f"Nothing to clean: no local branch has a {state} PR.")
@@ -955,6 +977,58 @@ def resolve_branches_to_clean(selected: object, cleanable: dict[str, str]) -> li
     if selected is _CLEAN_ALL_CLOSED:
         return sorted(b for b, s in cleanable.items() if s == "closed")
     return [selected]  # ty: ignore
+
+
+def plan_clean(
+    branches: list[str],
+    worktrees: dict[str, Path],
+    dirty: dict[str, bool],
+    main_worktree_path: Path,
+) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """Work out what cleaning each branch will do, before anything is changed.
+
+    Returns the branches to clean, each with the actions clean_branch will take on it, and the
+    branches to skip, each with the reason.
+    """
+    to_clean: dict[str, list[str]] = {}
+    to_skip: dict[str, str] = {}
+    for branch in branches:
+        worktree_path = worktrees.get(branch)
+        if worktree_path == main_worktree_path:
+            to_skip[branch] = "it's checked out in the main repo"
+            continue
+        if dirty.get(branch):
+            to_skip[branch] = f"its worktree {worktree_path} has uncommitted changes"
+            continue
+        actions = []
+        if worktree_path is not None:
+            if claude_project_dir(worktree_path).exists():
+                actions.append("copy its Claude sessions to the main repo, so they stay resumable")
+            for name in SHARED_SCRATCH_DIRS:
+                src = worktree_path / name
+                if not src.is_symlink() and _has_content(src):
+                    actions.append(f"copy its {name}/ folder to {_namespaced_dest(main_worktree_path / name, branch)}")
+            if worktree_path.exists():
+                actions.append(f"remove the worktree {worktree_path}")
+            else:
+                actions.append(f"unregister the worktree {worktree_path}, whose folder is already gone")
+        actions.append(f"delete the local branch '{branch}'")
+        to_clean[branch] = actions
+    return to_clean, to_skip
+
+
+def format_clean_plan(to_clean: dict[str, list[str]], to_skip: dict[str, str], states: dict[str, str]) -> str:
+    """Write the plan from plan_clean as the message the user confirms."""
+    lines = []
+    if to_clean:
+        lines.append("Cleaning each of these branches will:")
+        for branch, actions in to_clean.items():
+            lines.append(f"\n  {branch}  [{states[branch]}]")
+            lines.extend(f"    - {action}" for action in actions)
+    if to_skip:
+        lines.append("\nThese branches will be skipped:")
+        lines.extend(f"  {branch}  [{states[branch]}]: {reason}" for branch, reason in to_skip.items())
+    return "\n".join(lines).strip()
 
 
 def get_main_worktree_path(repo) -> Path:
@@ -1007,26 +1081,47 @@ def worktree_blocking_changes(worktree_path: Path) -> list[str]:
     return [line for line in lines if line[3:] not in share_data_links]
 
 
-def fetch_pr_state(branch: str) -> str | None:
+def fetch_pr_state(branch: str, tip_sha: str | None = None) -> str | None:
     """Return the GitHub PR state for a branch: 'open', 'merged', 'closed', or None.
 
     None means either no PR exists for the branch or the GitHub request failed (logged as a warning);
     in both cases the branch is treated as not-cleanable and left alone. Uses GitHub's PR state rather
     than git ancestry so squash-merged PRs are correctly seen as merged.
+
+    When no PR has the branch's name, the PRs containing its last commit (`tip_sha`) are used instead.
+    If one of them was merged, the branch holds nothing that isn't on master. This fallback never
+    returns 'closed', so a branch whose last commit is only in unmerged PRs is left alone.
     """
+    prs = _fetch_prs(f"{GITHUB_API_BASE}/pulls", branch, params={"state": "all", "head": f"owid:{branch}"})
+    if prs:
+        return _pr_state(prs)
+    if prs is None or tip_sha is None:
+        return None
+    # GitHub answers 422 for a commit it doesn't have (one that was never pushed): no PR contains it.
+    prs = _fetch_prs(f"{GITHUB_API_BASE}/commits/{tip_sha}/pulls", branch, no_pr_statuses=(422,))
+    if not prs:
+        return None
+    state = _pr_state(prs)
+    return state if state != "closed" else None
+
+
+def _fetch_prs(url: str, branch: str, params: dict | None = None, no_pr_statuses: tuple[int, ...] = ()) -> list | None:
+    """Fetch a list of PRs from GitHub, or None if the request failed (logged as a warning)."""
     headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-    params = {"state": "all", "head": f"owid:{branch}", "per_page": 50}
     try:
-        response = requests.get(f"{GITHUB_API_BASE}/pulls", params=params, headers=headers, timeout=30)
+        response = requests.get(url, params={**(params or {}), "per_page": 50}, headers=headers, timeout=30)
     except requests.RequestException as e:
         log.warning(f"Could not fetch PR state for '{branch}': {e}")
         return None
+    if response.status_code in no_pr_statuses:
+        return []
     if response.status_code != 200:
         log.warning(f"Could not fetch PR state for '{branch}' (HTTP {response.status_code}).")
         return None
-    prs = response.json()
-    if not prs:
-        return None
+    return response.json()
+
+
+def _pr_state(prs: list) -> str:
     # An open PR means the branch is still active. A merged PR (state 'closed' with merged_at set)
     # wins over a plain closed one. Otherwise the branch's PRs were closed without merging.
     if any(pr.get("state") == "open" for pr in prs):
@@ -1034,16 +1129,6 @@ def fetch_pr_state(branch: str) -> str | None:
     if any(pr.get("merged_at") for pr in prs):
         return "merged"
     return "closed"
-
-
-def _branch_label(branch: str, state: str, worktrees: dict[str, Path], dirty: dict[str, bool]) -> str:
-    """Build the questionary label for a branch, e.g. 'data-foo  [merged]  <- worktree (dirty)'."""
-    label = f"{branch}  [{state}]"
-    if branch in worktrees:
-        label += "  <- worktree"
-        if dirty.get(branch):
-            label += " (dirty)"
-    return label
 
 
 def claude_project_dir(repo_path: Path) -> Path:
@@ -1092,19 +1177,29 @@ def copy_dir_namespaced(src: Path, dst_parent: Path, branch: str) -> Path | None
     lands under a branch-named (and, on collision, suffixed) folder. Slashes in the branch name are
     flattened to '-' so the result stays a single folder. Nothing already in `dst_parent` is overwritten.
     """
-    if not src.is_dir() or not any(p.name != ".DS_Store" for p in src.iterdir()):
+    if not _has_content(src):
         return None
 
+    dest = _namespaced_dest(dst_parent, branch)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
+    log.info(f"Copied '{src}' to '{dest}'.")
+    return dest
+
+
+def _has_content(path: Path) -> bool:
+    """Whether `path` is a directory holding anything besides .DS_Store."""
+    return path.is_dir() and any(p.name != ".DS_Store" for p in path.iterdir())
+
+
+def _namespaced_dest(dst_parent: Path, branch: str) -> Path:
+    """Return `dst_parent/<branch>` with '/' flattened to '-', suffixed -1, -2... if it already exists."""
     safe_branch = branch.replace("/", "-")
     dest = dst_parent / safe_branch
     i = 1
     while dest.exists():
         dest = dst_parent / f"{safe_branch}-{i}"
         i += 1
-
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
-    log.info(f"Copied '{src}' to '{dest}'.")
     return dest
 
 
@@ -1165,7 +1260,7 @@ def clean_branch(
         # Backstop only: dirty worktrees were already skipped above, but the removal can still fail
         # (e.g. changes made between the check and now, or a submodule in the worktree).
         try:
-            repo.git.worktree("remove", str(worktree_path))
+            remove_worktree(repo, worktree_path)
             log.info(f"Removed worktree '{worktree_path}'.")
         except GitCommandError as e:
             log.warning(f"Could not remove worktree '{worktree_path}'. Leaving branch '{branch}' in place.\n{e}")
@@ -1176,3 +1271,84 @@ def clean_branch(
         log.info(f"Deleted local branch '{branch}'.")
     except GitCommandError as e:
         log.warning(f"Could not delete branch '{branch}':\n{e}")
+
+
+def remove_worktree(repo: Repo, worktree_path: Path) -> None:
+    """Remove a worktree in a way that VS Code's Source Control view copes with.
+
+    `git worktree remove` deletes the files one by one. With `git.detectWorktrees` on, VS Code opens
+    each worktree as a repository of its own, and when several worktrees are removed in a row it
+    refreshes the next one while it is half deleted. It then lists every tracked file as deleted and
+    keeps showing that count until the Source Control view is opened. So the folder is first renamed
+    into the main repo's git dir in one step, which VS Code only ever sees as the worktree being gone,
+    and the files are deleted from there.
+
+    Falls back to `git worktree remove` when the worktree is already gone, isn't (or is no longer)
+    this repo's registered worktree, is locked, has changes or populated submodules that would make
+    git refuse, or can't be renamed (e.g. it is on another filesystem), so git's own checks and
+    messages still apply there.
+    """
+    common_dir = Path(repo.git.rev_parse("--path-format=absolute", "--git-common-dir"))
+    trash_dir = common_dir / "worktree-trash"
+    # Remove anything an interrupted earlier run left behind.
+    if trash_dir.exists():
+        shutil.rmtree(trash_dir, ignore_errors=True)
+
+    admin_dir = None
+    if worktree_path.exists():
+        try:
+            admin_dir = Path(Repo(worktree_path).git.rev_parse("--absolute-git-dir"))
+        except (InvalidGitRepositoryError, NoSuchPathError, GitCommandError):
+            pass
+    if (
+        admin_dir is None
+        or not _is_registered_worktree(common_dir, worktree_path, admin_dir)
+        or (admin_dir / "locked").exists()
+        or worktree_blocking_changes(worktree_path)
+        or _has_populated_submodules(worktree_path, admin_dir)
+    ):
+        repo.git.worktree("remove", str(worktree_path))
+        return
+
+    trash_dir.mkdir()
+    try:
+        worktree_path.rename(trash_dir / worktree_path.name)
+    except OSError:
+        trash_dir.rmdir()
+        repo.git.worktree("remove", str(worktree_path))
+        return
+    # Drop git's record of the worktree, whose folder is now gone. `rmtree` doesn't follow symlinks.
+    repo.git.worktree("prune")
+    shutil.rmtree(trash_dir, ignore_errors=True)
+
+
+def _is_registered_worktree(common_dir: Path, worktree_path: Path, admin_dir: Path) -> bool:
+    """Return True if `worktree_path` is the linked worktree that `common_dir` has registered there.
+
+    The folder's git dir must sit under `<common_dir>/worktrees/` and point back at the folder, as
+    git's own validation requires. This rules out a separate repo (or another repo's worktree) that
+    now occupies the path of a worktree deleted by hand.
+    """
+    if admin_dir.resolve().parent != (common_dir / "worktrees").resolve():
+        return False
+    try:
+        gitdir = Path((admin_dir / "gitdir").read_text().strip())
+    except OSError:
+        return False
+    return gitdir.resolve() == (worktree_path / ".git").resolve()
+
+
+def _has_populated_submodules(worktree_path: Path, admin_dir: Path) -> bool:
+    """Return True if the worktree has submodules that make `git worktree remove` refuse.
+
+    Mirrors git's own check: the worktree's git dir holds a `modules/` dir, or a submodule entry in
+    the index (mode 160000) is checked out, i.e. has a `.git` in its folder. A clean `git status`
+    doesn't rule these out, and removing such a worktree would delete the submodule's own files.
+    """
+    if (admin_dir / "modules").is_dir():
+        return True
+    for line in Repo(worktree_path).git.ls_files("--stage", "-z").split("\0"):
+        mode, _, path = line.partition("\t")
+        if mode.startswith("160000 ") and (worktree_path / path / ".git").exists():
+            return True
+    return False

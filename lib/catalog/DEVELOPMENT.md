@@ -127,7 +127,7 @@ make .venv          # uv sync --frozen --all-extras --group dev
 ## What actually checks your change
 
 - **The repo-root pre-commit hook does not cover this directory.** It runs the root
-  `make check`, whose `SRC` is `etl snapshots apps api_search tests docs owid_mcp
+  `make check`, whose `SRC` is `etl snapshots apps api_search tests docs
   owl_steps lib/owl/owl` — `lib/catalog` is not in it. Committing a library change from
   the repo root lints and typechecks nothing of it. Run `make check` and `make test`
   from inside `lib/catalog/`.

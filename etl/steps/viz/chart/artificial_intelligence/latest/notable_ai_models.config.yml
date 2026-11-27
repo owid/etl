@@ -1,0 +1,77 @@
+grapher_schema: "012"
+slug: notable-ai-models
+title:
+  title: Notable AI models
+  title_variant: "by training computation, parameters, and training data"
+topic_tags:
+  - Artificial Intelligence
+default_selection: []
+default_dimensions:
+  metric: compute
+  color: reporting
+
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - ScatterPlot
+        originUrl: /artificial-intelligence
+        entityType: model
+        entityTypePlural: models
+        hideScatterLabels: true
+        scatterPointLabelStrategy: y
+        xAxis:
+          label: Publication date
+        yAxis:
+          scaleType: log
+          canChangeScaleType: true
+        # Rows the grapher step adds for the yearly records, which aren't models.
+        excludedEntityNames:
+          - Maximum compute
+          - Maximum data
+          - Maximum parameters
+        hideAnnotationFieldsInTitle:
+          time: true
+          entity: true
+          changeInPrefix: true
+
+dimensions:
+  - slug: metric
+    name: Metric
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: compute
+        name: Training computation
+        description: Computation used to train each model
+      - slug: parameters
+        name: Parameters
+        description: Number of values each model adjusts during training
+      - slug: data
+        name: Training data
+        description: Number of data points used to train each model
+  - slug: color
+    name: Color by
+    choices:
+      - slug: reporting
+        name: Reported or estimated
+        description: Whether the developer reported the training computation, or Epoch AI estimated it
+      - slug: country
+        name: Country
+        description: Country of the organizations that developed the model
+      - slug: developer
+        name: Developer
+        description: Company that developed the model
+      - slug: weights
+        name: Availability of weights
+        description: Whether the model’s weights are open, available only online, or not released
+      - slug: domain
+        name: Domain
+        description: Area of machine learning the model is designed for
+      - slug: affiliation
+        name: Researcher affiliation
+        description: Type of organization the model’s authors work for
+
+# Views are built in the .py: one per metric and coloring, except "reported or estimated", which only exists for
+# training computation.
+views: []

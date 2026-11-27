@@ -35,6 +35,11 @@ def run() -> None:
     for column, label in columns.items():
         tb = find_max_label_and_concat(tb, column, label)
 
+    # Restore the garden metadata, which combining tables in find_max_label_and_concat partly drops (e.g. description_processing).
+    tb_garden = ds_garden["epoch"].reset_index()
+    for col in tb_garden.columns:
+        tb[col] = tb[col].copy_metadata(tb_garden[col])
+
     # Update metadata
     for col in ["max_compute", "max_parameters", "max_data"]:
         tb[col].metadata.origins = tb["model"].metadata.origins

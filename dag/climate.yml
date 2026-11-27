@@ -104,7 +104,7 @@ steps:
     - data://meadow/climate/2026-11-11/weekly_wildfires:
       - snapshot://climate/2026-11-11/weekly_wildfires.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/faostat/2026-11-23/faostat_rl
   data://grapher/climate/2026-11-11/weekly_wildfires:
     - data://garden/climate/2026-11-11/weekly_wildfires
   data://grapher/climate/2026-11-11/wildfires_by_year:
@@ -122,8 +122,8 @@ steps:
   data://grapher/climate/2026-11-11/sst_by_month:
     - data://garden/climate/2026-11-11/sst
 
-  # Climate change impacts data explorer.
-  viz://explorer/climate/latest/climate_change:
+  # Climate change impacts multidim, shown as a data explorer.
+  viz://chart/climate/latest/climate_change:
     # Various sources - Climate change impacts (annual).
     - data://grapher/climate/2026-11-11/climate_change_impacts_annual:
       - data://garden/climate/2026-11-11/climate_change_impacts

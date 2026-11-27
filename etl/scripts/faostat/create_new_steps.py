@@ -182,7 +182,9 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> list[str]:
 
     """
     # List all relevant snapshots.
-    snapshots = [snapshot for snapshot in snapshot_catalog(match=namespace) if snapshot.metadata.namespace == namespace]
+    # The match is anchored to the namespace folder, since a bare namespace also matches backport snapshots, which have
+    # no origin and fail to load.
+    snapshots = list(snapshot_catalog(match=f"^{namespace}/"))
 
     snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # ty: ignore
 
@@ -252,8 +254,14 @@ def find_latest_version_for_namespace_in_channel(
     # Path to folder containing steps in this channel.
     versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
 
-    # Latest version (taken from the name of the most recent folder).
-    latest_version = sorted(list(versions_dir.glob(regex_version_pattern)))[-1].name
+    # Latest version (taken from the name of the most recent folder with a step for one of the included domains).
+    # Other folders in the namespace (e.g. the trade matrix, or steps built on FAOSTAT data) lack the shared files.
+    versions = [
+        folder.name
+        for folder in versions_dir.glob(regex_version_pattern)
+        if any((folder / f"{namespace}_{code}.py").exists() for code in INCLUDED_DATASETS_CODES)
+    ]
+    latest_version = sorted(versions)[-1]
 
     return latest_version
 

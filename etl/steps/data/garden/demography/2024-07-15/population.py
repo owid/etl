@@ -52,6 +52,9 @@ def run() -> None:
     # Load inputs.
     #
     # Load UN WPP dataset.
+    # NOTE: The metadata of many downstream steps refers to the UN WPP version used and the year in which the estimates
+    # switch to projections. When updating the population data we need to check whether this metadata needs to be
+    # updated as well.
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un.read("population")
     tb_un_gr = ds_un.read("growth_rate")

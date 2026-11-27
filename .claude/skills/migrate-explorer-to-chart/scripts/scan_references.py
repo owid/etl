@@ -22,8 +22,9 @@ import json
 import re
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from etl.config import OWIDEnv
 from etl.paths import BASE_DIR
@@ -112,9 +113,45 @@ def gdoc_uses(content: dict, pat: re.Pattern) -> list[dict]:
     return found
 
 
+def unwrap(url: str) -> str:
+    """The real target of a link pasted from Google's redirect wrapper (`google.com/url?q=<url>&sa=...`).
+
+    Docs keep these when text is copied from a Google search or another doc. Resolving the wrapper
+    itself would read Google's params (`q`, `sa`, `usg`) as explorer params.
+    """
+    parts = urlsplit(url)
+    if parts.netloc.endswith("google.com") and parts.path == "/url":
+        target = dict(parse_qsl(parts.query)).get("q")
+        if target:
+            return target
+    return url
+
+
 def breaks_on_redirect(how: str) -> bool:
     # Embeds and cards render by fetching the explorer page itself; a redirect breaks them at once.
     return how in {"chart", "prominent-link", "all-charts", "key-indicator", "explorer-tiles"}
+
+
+def explorer_default_view(prod: OWIDEnv, slug: str, dim_names: list[str]) -> dict[str, str]:
+    """The explorer's default choices: the first `graphers` row with `defaultView` true.
+
+    The explorer fills a choice a link leaves out (or names wrong) from this view before falling
+    back to the first available choice. An explorer without one has no defaults.
+    """
+    tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %(s)s", params={"s": slug}).tsv[0]
+    lines = tsv.splitlines()
+    start = next((n for n, line in enumerate(lines) if line.startswith("graphers")), None)
+    if start is None:
+        return {}
+    header = lines[start + 1].split("\t")
+    for line in lines[start + 2 :]:
+        if not line.startswith("\t"):
+            break
+        row = dict(zip(header, line.split("\t")))
+        if row.get("defaultView", "").strip().lower() == "true":
+            # Columns are named "<dimension> <control>", e.g. "Metric Dropdown".
+            return {d: row[col] for d in dim_names for col in header if col.rsplit(" ", 1)[0] == d and col in row}
+    return {}
 
 
 def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | None) -> None:
@@ -124,25 +161,61 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     rules = build_source_rules(mapping)
     dim_names, choices = choice_values(mapping_dir)
     prod = OWIDEnv.from_env_file(prod_env_file)
+    default = explorer_default_view(prod, slug, dim_names)
+
+    def _loose(name: str) -> str:
+        """A choice name lowercased, with British spellings and bracketed parts removed."""
+        name = re.sub(r"\s*\([^)]*\)", "", name.lower()).replace("sulph", "sulf")
+        return re.sub(r"\s+", " ", name).strip()
 
     def repair(q: dict) -> tuple[dict, list[str]]:
         """Fix the usual damage in old explorer links, so they can land on the view they meant.
 
         A value glued to the next param by a missing `&` ("…affordhideControls=false") is cut back
         to the choice it starts with; a param named after a renamed dimension ("Metric") is moved to
-        the one dimension that offers its value.
+        the one dimension that offers its value; one that differs from a dimension name only in case
+        is that dimension.
         """
         out, notes = {}, []
-        for k, v in q.items():
+        for k, v in list(q.items()):
+            # A `;` instead of `&` ("…ZAF;hideControls=false") glues the next param onto the value.
+            if ";" in v and "=" in v.split(";", 1)[1]:
+                v, rest = v.split(";", 1)
+                rk, rv = rest.split("=", 1)
+                out.setdefault(rk, rv)
+                notes.append(f"split “{rk}={rv}” off “{k}”")
+            # A dimension name in different case ("Relative to Population") is that dimension. The
+            # explorer ignores such a param and shows its default, but the value is what the author
+            # asked for, so it wins.
+            same = [d for d in choices if d.lower() == k.lower() and d not in q]
+            if k not in choices and len(same) == 1:
+                notes.append(f"read “{k}” as “{same[0]}” (the explorer ignored it and showed its default)")
+                k = same[0]
             if k in choices and v not in choices[k]:
                 head = next((c for c in sorted(choices[k], key=len, reverse=True) if c and v.startswith(c)), None)
-                if head:
+                # Only a value glued to the next param is cut back: "Population growth" is a choice
+                # renamed to "Population growth rate", not "Population" with junk after it.
+                if head and "=" in v[len(head) :]:
                     out[k] = head
                     rest = v[len(head) :]
                     if "=" in rest:
                         rk, rv = rest.split("=", 1)
                         out[rk] = rv
                     notes.append(f"cut “{v}” to “{head}”")
+                    continue
+                # A renamed choice ("Protein per day" → "Grams of protein per day"): the one choice
+                # whose name contains the old one.
+                named = [c for c in choices[k] if c and v.lower() in c.lower()]
+                if len(named) > 1:
+                    named = [c for c in named if c.lower().startswith(v.lower())]
+                if len(named) != 1:
+                    # Compare without spelling variants and bracketed suffixes
+                    # ("Sulphur dioxide (SO₂)" → "Sulfur dioxide").
+                    nv = _loose(v)
+                    named = [c for c in choices[k] if c and (nv in _loose(c) or _loose(c) in nv)]
+                if len(named) == 1:
+                    out[k] = named[0]
+                    notes.append(f"renamed choice “{v}” to “{named[0]}”")
                     continue
             if k not in choices and k not in {
                 "country",
@@ -154,10 +227,16 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 "yScale",
                 "stackMode",
             }:
+                # A true/false value says nothing about which dimension it belongs to: an old
+                # checkbox ("Color by test positivity=false") would overwrite a real one.
                 owners = [d for d, cs in choices.items() if v in cs and d not in q]
-                if len(owners) == 1:
+                if len(owners) == 1 and v.lower() not in {"true", "false"}:
                     out[owners[0]] = v
                     notes.append(f"renamed “{k}” to “{owners[0]}”")
+                    continue
+                if not owners and k[:1].isupper():
+                    # A dimension the explorer no longer has ("Fuel"): the explorer ignores it.
+                    notes.append(f"dropped “{k}”, which the explorer no longer has")
                     continue
             out.setdefault(k, v)
         return out, notes
@@ -169,37 +248,66 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
     def fall_back(q: dict) -> tuple[dict, list[str]]:
         """Pick the view the explorer shows for a combination it doesn't have.
 
-        Like the explorer (and the multidim), keep the dimensions in order and, at the first one
-        whose value no view offers alongside the earlier ones, take the first view's value. A
-        dimension the link leaves out is filled only when the views left allow a single value.
+        Like the explorer, keep the dimensions in order and, at each one whose value the link
+        leaves out or no view offers alongside the earlier ones, take the default view's value if
+        a remaining view has it, else the first remaining view's value
+        (`ExplorerDecisionMatrix.toConstrainedOptions`).
         """
         out, notes, pool = dict(q), [], views
+        if not any(d in q for d in dim_names):
+            return q, []
         for d in dim_names:
-            if d not in out:
-                vals = {v[d] for v in pool}
-                if len(vals) != 1:
-                    return q, []
-                (val,) = vals
-                if val:
-                    out[d] = val
-                    notes.append(f"added the missing “{d}={val}” (the only value the explorer can show)")
+            if not pool:
+                return q, []
+            if d in out and any(v[d] == out[d] for v in pool):
+                pool = [v for v in pool if v[d] == out[d]]
                 continue
-            if not any(v[d] == out[d] for v in pool):
-                if not pool:
-                    return q, []
-                notes.append(f"“{d}={out[d]}” doesn't exist here; the explorer shows “{pool[0][d]}”")
-                out[d] = pool[0][d]
-            pool = [v for v in pool if v[d] == out[d]]
+            val = default.get(d) if any(v[d] == default.get(d) for v in pool) else pool[0][d]
+            if d not in out:
+                if val:
+                    notes.append(f"added the missing “{d}={val}” (what the explorer shows)")
+            else:
+                notes.append(f"“{d}={out[d]}” doesn't exist here; the explorer shows “{val}”")
+            if val:
+                out[d] = val
+            pool = [v for v in pool if v[d] == val]
         return out, notes
 
+    def clean(r):
+        """The URL to paste in a doc: without explorer params the matched view doesn't use
+        (the redirect carries them along, and the multidim ignores them)."""
+        if not r.leftover_params:
+            return r
+        parts = urlsplit(r.url)
+        q = [(k, v) for k, v in parse_qsl(parts.query) if k not in r.leftover_params]
+        return replace(r, url=urlunsplit(parts._replace(query=urlencode(q))))
+
     def new_url(old: str) -> dict:
+        old = unwrap(old)
         q = dict(parse_qsl(urlsplit(old if old.startswith("http") else SITE + old).query))
-        r = resolve_explorer_url(rules, q, SITE, choices, dim_names)
-        if r.match != "view" and q:
+        # A stray `?` before a param ("…&?country=…") makes a key the explorer doesn't read.
+        stray = [k for k in q if k.startswith("?") and k.lstrip("?") not in q]
+        q = {k.lstrip("?") if k in stray else k: v for k, v in q.items()}
+        res = resolve(q)
+        if stray:
+            res["repairs"] = [f"dropped the stray “?” in “{k}”" for k in stray] + res.get("repairs", [])
+            if res["match"] == "view":
+                res["match"] = "view, after repairing the old link"
+        # Profile templates replace the literal `$entityCode` (and the other `$` tokens), so the
+        # URL keeps them unencoded: `%24entityCode` would never become a country code.
+        res["new_url"] = res["new_url"].replace("%24", "$")
+        return res
+
+    def resolve(q: dict) -> dict:
+        r = clean(resolve_explorer_url(rules, q, SITE, choices, dim_names))
+        # A dimension name in different case must reach `repair`, even when the redirect already
+        # lands on some view without it.
+        cased = any(k not in choices and k.lower() in {d.lower() for d in choices} for k in q)
+        if (r.match != "view" or cased) and q:
             fixed, notes = repair(q)
             fixed, more = fall_back(fixed)
             notes += more
-            r2 = resolve_explorer_url(rules, fixed, SITE, choices, dim_names) if notes else None
+            r2 = clean(resolve_explorer_url(rules, fixed, SITE, choices, dim_names)) if notes else None
             if r2 and r2.match == "view":
                 # The redirect still sends the broken link to the default view; the doc edit fixes it.
                 return {
@@ -305,19 +413,24 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                 f"""SELECT cc.id, cc.slug, ch.id AS chart_id, nc.id AS narrative_id, nc.name AS narrative_name,
                            mx.multiDimId AS mdim_id, cc.`{c}` AS txt
                     FROM chart_configs cc
-                    LEFT JOIN charts ch ON ch.configId = cc.id
+                    LEFT JOIN charts ch ON cc.id IN (ch.configId, ch.patchConfigId)
                     LEFT JOIN narrative_charts nc ON nc.chartConfigId = cc.id
                     LEFT JOIN multi_dim_x_chart_configs mx ON mx.chartConfigId = cc.id
                     WHERE cc.`{c}` LIKE %s""",
                 params=(like,),
             )
+            # Missing joins come back as NaN, which is truthy: turn them into None.
+            rows = rows.astype(object).where(rows.notna(), None)
             for r in rows.to_dict("records"):
+                # Narrative charts always render with `hideRelatedQuestion` (article and slideshow
+                # embeds), so a link there reaches no reader; it sits in their stored full config.
+                related = {q.get("url") for q in json.loads(r["txt"]).get("relatedQuestions") or []}
                 for m in pat.finditer(r["txt"]):
                     if r["chart_id"]:
                         add(
                             "Chart config",
-                            f"chart {r['chart_id']} ({r['slug']})",
-                            f"{ADMIN}/charts/{r['chart_id']}/edit",
+                            f"chart {int(r['chart_id'])} ({r['slug']})",
+                            f"{ADMIN}/charts/{int(r['chart_id'])}/edit",
                             m.group(0),
                             "config text",
                         )
@@ -325,9 +438,9 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         add(
                             "Narrative chart",
                             r["narrative_name"],
-                            f"{ADMIN}/narrative-charts/{r['narrative_id']}/edit",
+                            f"{ADMIN}/narrative-charts/{int(r['narrative_id'])}/edit",
                             m.group(0),
-                            "config text",
+                            "hidden related question" if m.group(0) in related else "config text",
                         )
                     elif r["mdim_id"]:
                         add(
@@ -341,7 +454,11 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         add("Chart config (unattached)", r["id"], None, m.group(0), "config text")
         elif t == "variables":
             rows = prod.read_sql(
-                f"SELECT id, catalogPath, `{c}` AS txt FROM variables WHERE `{c}` LIKE %s", params=(like,)
+                # An archived dataset isn't shown anywhere on the site, so its text needs no swap.
+                f"""SELECT v.id, v.catalogPath, v.`{c}` AS txt FROM variables v
+                    JOIN datasets d ON d.id = v.datasetId
+                    WHERE v.`{c}` LIKE %s AND NOT d.isArchived""",
+                params=(like,),
             )
             for r in rows.to_dict("records"):
                 for m in pat.finditer(r["txt"]):

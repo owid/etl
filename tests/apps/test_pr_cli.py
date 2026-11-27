@@ -1,4 +1,4 @@
-"""Tests for the branching logic of `etl pr`.
+"""Tests for `etl pr`: branching logic, and assigning PRs opened by AI agents.
 
 The work branch must start from the latest `origin/<base_branch>`, not from a stale local base
 branch (https://github.com/owid/etl/issues/6552).
@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from git import Repo
 
-from apps.pr.cli import branch_out, branch_out_worktree
+from apps.pr.cli import branch_out, branch_out_worktree, is_run_by_ai_agent
 
 
 def _commit_file(repo: Repo, name: str, content: str, message: str):
@@ -121,3 +121,19 @@ def test_branch_out_worktree_no_update_base_keeps_stale_start_point(stale_local,
     worktree_path = tmp_path / "worktree"
     branch_out_worktree(stale_local, "master", "work-branch", worktree_path, update_base=False)
     assert Repo(worktree_path).head.commit == stale_tip
+
+
+@pytest.mark.parametrize(
+    "env, expected",
+    [
+        ({}, False),
+        ({"CLAUDECODE": "1"}, True),
+        ({"AI_AGENT": "claude-code_2-1-319_agent"}, True),
+    ],
+)
+def test_is_run_by_ai_agent(monkeypatch, env, expected):
+    monkeypatch.delenv("CLAUDECODE", raising=False)
+    monkeypatch.delenv("AI_AGENT", raising=False)
+    for key, value in env.items():
+        monkeypatch.setenv(key, value)
+    assert is_run_by_ai_agent() is expected

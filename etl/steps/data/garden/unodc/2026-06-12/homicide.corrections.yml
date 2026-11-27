@@ -1,0 +1,14 @@
+# Known errors in the UNODC source data, applied in the garden step with `paths.apply_corrections`.
+- indicator: value
+  entity: Brazil
+  years: all
+  match: {dimension: by mechanisms}
+  action: drop
+  reason: >-
+    UNODC's breakdown of Brazil's homicides by weapon now comes from the UN Crime Trends Survey (police records)
+    instead of DATASUS (death certificates), while Brazil's total homicides still come from DATASUS. The weapon
+    categories add up to only 18% (2020) and about 49% (2021–2023) of the total, so the firearm rate shows about
+    6 per 100,000 instead of about 13 to 16. The previous release (unodc/2025-05-28) had the DATASUS breakdown,
+    with full coverage and 16.3 firearm homicides per 100,000 in 2020. Drop it until UNODC restores full coverage.
+  producer: United Nations Office on Drugs and Crime
+  status: open

@@ -164,10 +164,22 @@ def diff_configs(a: dict, b: dict, prefix: str = "") -> list[dict]:
 
 
 def sample_views(pairs: list[dict], dims: list[str], max_rendered: int) -> list[int]:
-    """All views, or a sample that covers every choice of every dimension."""
+    """All views, or a sample: every view whose config, indicators or names differ, then views that
+    cover every choice of every dimension, then any others up to `max_rendered`.
+
+    A config-only difference can be explained away only if its rendered check passes, so a view
+    with one is always rendered, even past `max_rendered`.
+    """
     if len(pairs) <= max_rendered:
         return [p["id"] for p in pairs]
-    chosen, seen = [], set()
+    flagged = [
+        p["id"]
+        for p in pairs
+        if p["config_diffs"]
+        or p["explorer_indicators"] != p["multidim_indicators"]
+        or p["explorer_names"] != p["multidim_names"]
+    ]
+    chosen, seen = list(flagged), {(d, p["explorer_dims"].get(d, "")) for p in pairs if p["id"] in flagged for d in dims}
     for p in pairs:
         new = {(d, p["explorer_dims"].get(d, "")) for d in dims} - seen
         if new:
@@ -178,12 +190,17 @@ def sample_views(pairs: list[dict], dims: list[str], max_rendered: int) -> list[
             break
         if p["id"] not in chosen:
             chosen.append(p["id"])
-    return sorted(chosen[:max_rendered])
+    return sorted(chosen[: max(max_rendered, len(flagged))])
+
+
+# Times a page is loaded before a timeout is reported as a rendering difference.
+RENDER_ATTEMPTS = 3
 
 
 def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
     import glob
 
+    from playwright.sync_api import TimeoutError as PlaywrightTimeout
     from playwright.sync_api import sync_playwright
 
     exe = sorted(glob.glob(str(Path(CHROMIUM_GLOB).expanduser())))
@@ -211,6 +228,9 @@ def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
                 key = "default" if tab is None else "other"
                 urls = {"explorer": p_["explorer_url"], "multidim": p_["multidim_url"]}
                 if tab == "other":
+                    # The default render failed (reported as a page error): no tabs to pick from.
+                    if "facts" not in p_["rendered"]["default"]["explorer"]:
+                        break
                     default_tab = (p_["rendered"]["default"]["explorer"]["facts"]["activeTab"] or "").lower()
                     if "map" in default_tab:
                         other = "chart"
@@ -222,10 +242,18 @@ def render(pairs: list[dict], ids: list[int], shots: Path) -> None:
                 res = {}
                 for side, url in urls.items():
                     shot = shots / f"v{p_['id']:03d}_{key}_{side}.jpg"
-                    try:
-                        res[side] = {"url": url, "facts": capture(url, shot), "shot": f"shots/{shot.name}"}
-                    except Exception as e:  # a page that fails to render is a finding, not a crash
-                        res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                    # A timeout is usually a slow page, not a broken one: retry it before reporting it.
+                    for attempt in range(RENDER_ATTEMPTS):
+                        try:
+                            res[side] = {"url": url, "facts": capture(url, shot), "shot": f"shots/{shot.name}"}
+                            break
+                        except PlaywrightTimeout as e:
+                            res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                            if attempt + 1 < RENDER_ATTEMPTS:
+                                print(f"  view {p_['id']} {key} {side}: timed out, retrying")
+                        except Exception as e:  # a page that fails to render is a finding, not a crash
+                            res[side] = {"url": url, "error": str(e).splitlines()[0][:300]}
+                            break
                 p_["rendered"][key] = res
             print(f"  rendered view {p_['id']}")
         browser.close()
@@ -270,6 +298,22 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
     tsv = prod.read_sql("SELECT tsv FROM explorers WHERE slug = %s", params=(slug,)).iloc[0, 0]
     graphers = parse_tsv_section(tsv, "graphers")
     columns = {c.get("catalogPath") or c.get("slug"): c for c in parse_tsv_section(tsv, "columns")}
+    # Rows can list indicators as `ySlugs` instead of `yVariableIds`: slugs of columns that
+    # duplicate a variable (`transform: duplicate <id>`), often to restyle it. Resolve each to
+    # its variable's catalog path, keeping the column (and its name) for the display check.
+    dup_ids = {
+        slug: int(c["transform"].split()[1])
+        for slug, c in columns.items()
+        if (c.get("transform") or "").startswith("duplicate ")
+    }
+    id_paths = (
+        prod.read_sql("SELECT id, catalogPath FROM variables WHERE id IN %s", params=(tuple(set(dup_ids.values())),))
+        .set_index("id")["catalogPath"]
+        .to_dict()
+        if dup_ids
+        else {}
+    )
+    slug_path = {slug: id_paths.get(i) for slug, i in dup_ids.items()}
     dcols = dim_columns(list(graphers[0].keys()))
 
     # Multidim side (staging): views, indicators and full view configs.
@@ -290,10 +334,18 @@ def main(mapping_dir: Path, staging: str, prod_env_file: str, out: Path, max_ren
         row = next(g for g in graphers if all(g[c].strip() == src.get(name, "") for c, name in dcols.items()))
         e_paths = [full_catalog_path(x) for x in row.get("yVariableIds", "").split()]
         e_names = [columns.get(x, {}).get("name") or None for x in e_paths]
+        for col in row.get("ySlugs", "").split():
+            e_paths.append(slug_path.get(col) or col)
+            e_names.append(columns.get(col, {}).get("name") or None)
         mv = mviews.get(tuple(sorted((tgt or {}).get("dimensions", {}).items()))) if tgt else None
         m_full = json.loads(full[mv["fullConfigId"]]) if mv else {}
         m_paths = [y.get("catalogPath") for y in (mv or {}).get("indicators", {}).get("y", [])]
-        m_names = [((d.get("display") or {}).get("name")) or None for d in m_full.get("dimensions", [])]
+        # Only the y dimensions: a view's color (or x, size) indicator is not one of the explorer's y columns.
+        m_names = [
+            ((d.get("display") or {}).get("name")) or None
+            for d in m_full.get("dimensions", [])
+            if d.get("property", "y") == "y"
+        ]
         e_params = {k: v for k, v in src.items() if v}
         e_url = f"{PROD_SITE}/explorers/{slug}" + (f"?{urlencode(e_params)}" if e_params else "")
         m_url = f"{stg_site}/grapher/{mdim['slug']}" + (

@@ -81,6 +81,9 @@ def mock(_type: type) -> Any:
         if args and args[0].__name__ == "ChangelogEntry":
             # its date must be a real YYYY-MM-DD date
             return [args[0](date=_random_date().isoformat(), changes=[mock(str)]) for _ in range(random.randint(1, 4))]
+        if args and args[0].__name__ == "Annotation":
+            # a range must not end before it starts
+            return [args[0](text=mock(str), time=1990, time_end=random.choice([None, 2000]))]
 
         # e.g. List[int] or list[int]
         if args:

@@ -7,7 +7,7 @@ definitions:
         - Democracy
     description_key:
       - &other_sources |-
-        We have other democracy data sources that also cover more recent years and have more precise data. You can find them in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy).
+        We have other democracy data sources that also cover more recent years and have more precise data. You can find them in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/grapher/democracy).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -47,6 +47,12 @@ tables:
         presentation:
           grapher_config:
             title: Democracy Index
+            # The index runs from -10 to 10: no Marimekko, which can't draw negative values.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+              - Dumbbell
             subtitle: |-
               {definitions.subtitle_main}. Expert estimates of the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. The index ranges from -10 to 10 (fully democratic).
             hasMapTab: true
@@ -421,15 +427,6 @@ tables:
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
-
-      experience_dem_polity:
-        title: Experience with democracy
-        unit: ""
-        description_short: |-
-          Number of total years in a democracy. It sums all periods of a democracy.
-        description_key:
-          - *other_sources
-          - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
 
       group_age_dem_polity:
         title: Democracy age group

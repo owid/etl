@@ -1,8 +1,9 @@
 """Export the thousand-bins income distribution data for our bespoke income distribution chart.
 
 This step uses the thousand_bins_distribution dataset dependency as its basis, and writes one
-JSON file per year plus `income-distribution.metadata.json`, the feed's provenance derived from
-the garden columns (see `etl.viz.bespoke`).
+JSON file per year (each country with its 1000 bins, its welfare type, income or consumption, and
+how the World Bank estimated it: survey, interpolated, extrapolated or modeled) plus `income-distribution.metadata.json`, the feed's provenance derived from the garden columns
+(see `etl.viz.bespoke`).
 
 The files are written to the step's output folder; the framework syncs that folder to the R2 path
 of the environment being built, so the feed is served at
@@ -26,8 +27,12 @@ from etl.viz.bespoke import build_feed_metadata
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# The values the chart expects in `welfareType` and `estimationType`.
+WELFARE_TYPES = {"income", "consumption"}
+ESTIMATION_TYPES = {"survey", "interpolated", "extrapolated", "modeled"}
 
-def prepare_distribution_table(tb: Table) -> pd.DataFrame:
+
+def prepare_distribution_table(tb: Table, tb_welfare_type: Table) -> pd.DataFrame:
     """Prepare one row per country-year for JSON export."""
     tb = tb.reset_index()
     # Sort by quantile before grouping so each country's avgs list runs from poorest to richest bin.
@@ -43,6 +48,29 @@ def prepare_distribution_table(tb: Table) -> pd.DataFrame:
     )
     tb_export["pop"] = tb_export["pop"].round().astype(int)
     tb_export["year"] = tb_export["year"].astype(int)
+
+    # Add the welfare type (income or consumption) and estimation type of each country-year.
+    tb_welfare_type = tb_welfare_type.reset_index()
+    tb_welfare_type["year"] = tb_welfare_type["year"].astype(int)
+    tb_export = tb_export.merge(
+        tb_welfare_type[["country", "year", "welfare_type", "estimation_type"]],
+        on=["country", "year"],
+        how="left",
+        validate="one_to_one",
+        indicator=True,
+    )
+    unmatched = tb_export[tb_export["_merge"] != "both"]
+    if not unmatched.empty:
+        raise ValueError(
+            f"Country-years with no welfare type entry: {sorted(zip(unmatched['year'], unmatched['country']))}"
+        )
+    tb_export = tb_export.drop(columns=["_merge"])
+    # Plain str, so json.dump writes strings; every country-year must carry one of the expected values.
+    for column, expected in [("welfare_type", WELFARE_TYPES), ("estimation_type", ESTIMATION_TYPES)]:
+        tb_export[column] = tb_export[column].astype(object)
+        unexpected = set(tb_export[column]) - expected
+        if unexpected:
+            raise ValueError(f"Unexpected values in {column}: {unexpected}")
 
     invalid_bins = tb_export[tb_export["avgs"].str.len() != 1000]
     if not invalid_bins.empty:
@@ -77,6 +105,8 @@ def create_distribution_json(tb_export: pd.DataFrame, year: int) -> dict:
                 "country": row["country"],
                 "region": row["region"],
                 "totalPopulation": row["pop"],
+                "welfareType": row["welfare_type"],
+                "estimationType": row["estimation_type"],
                 "avgs": row["avgs"],
             }
             for row in tb_year.to_dict(orient="records")
@@ -98,11 +128,17 @@ def run() -> None:
     paths.log.info("Loading thousand_bins_distribution dataset.")
     ds_garden = paths.load_dataset("thousand_bins_distribution")
     tb = ds_garden.read("thousand_bins_distribution", reset_index=False, safe_types=False)
+    tb_welfare_type = ds_garden.read("welfare_type", reset_index=False)
 
     # The feed's provenance, derived from the origins of the data it is built on.
     feed_metadata = build_feed_metadata(
         title="Income distribution",
-        columns={"Average income or consumption": tb["avg"], "Population": tb["pop"]},
+        columns={
+            "Average income or consumption": tb["avg"],
+            "Population": tb["pop"],
+            "Welfare type": tb_welfare_type["welfare_type"],
+            "Estimation type": tb_welfare_type["estimation_type"],
+        },
         update_period_days=ds_garden.metadata.update_period_days,
     )
     save_json(feed_metadata, "income-distribution.metadata.json")
@@ -111,7 +147,7 @@ def run() -> None:
     # Prepare data.
     #
     paths.log.info("Preparing income distribution table.")
-    tb_export = prepare_distribution_table(tb)
+    tb_export = prepare_distribution_table(tb, tb_welfare_type=tb_welfare_type)
     years = sorted(tb_export["year"].unique())
 
     #

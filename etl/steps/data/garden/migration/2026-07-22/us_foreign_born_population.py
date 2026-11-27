@@ -299,12 +299,12 @@ def sanity_check_changes(tb_stock: Table, tb_stepped: Table, tb_decade: Table) -
         assert abs(decades.loc[decade] - direct) < 1, f"{decade}s value does not match the censuses."
 
 
-def make_changes(tb_census: Table, tb_acs: Table) -> tuple[Table, Table]:
+def make_changes(tb_census: Table, tb_acs: Table) -> tuple[Table, Table, str]:
     """Annual change in the foreign-born population, from consecutive observations.
 
     Observations before 2005 are 5 or 10 years apart, so the change between two observations is
     divided evenly across the years in between (like the long-run Ireland net migration series).
-    Returns two tables:
+    Returns two tables, plus the footnote text for the current decade:
     - stepped: one value per year, 1851 to the latest year. The value for year Y is the average
       annual change over the interval that ends in or contains Y.
     - by decade: the average of the stepped values over each decade, where the 1850s cover the
@@ -343,22 +343,31 @@ def make_changes(tb_census: Table, tb_acs: Table) -> tuple[Table, Table]:
     for t in (tb_stepped, tb_decade):
         t["country"] = "United States"
 
-    # Charts built on the decade table inherit this text as their subtitle, so the years covered
-    # by the current, partial decade must follow the data on every update.
+    sanity_check_changes(tb, tb_stepped, tb_decade)
+    return tb_stepped, tb_decade, describe_current_decade(tb, tb_stepped)
+
+
+def describe_current_decade(tb_stock: Table, tb_stepped: Table) -> str:
+    """Footnote text saying which years the current, partial decade covers.
+
+    The value for year Y is the change from Y-1 to Y, so the 2020s value is the change from 2020 to
+    the latest year. Any year without an estimate in the current decade is also explained, e.g.:
+    "The value for the 2020s is the average change from 2020 to 2024. There is no survey estimate
+    for 2020, so the change from 2019 to 2021 is split evenly over 2020 and 2021."
+    """
     last_year = int(tb_stepped["year"].max())
     decade_label = (last_year - 1) // 10 * 10
-    covers = f" The value for the {decade_label}s covers {decade_label + 1} to {last_year}."
-    tb_decade["annual_change"].m.description_short = (
-        "Average change per year in the number of people living in the United States who were not "
-        "US citizens at birth." + covers
-    )
-    tb_decade["annual_change_share_of_population"].m.description_short = (
-        "Average change per year in the number of people living in the United States who were not "
-        "US citizens at birth, as a share of the total US population." + covers
-    )
-
-    sanity_check_changes(tb, tb_stepped, tb_decade)
-    return tb_stepped, tb_decade
+    text = f"The value for the {decade_label}s is the average change from {decade_label} to {last_year}."
+    observed = sorted(int(y) for y in tb_stock["year"])
+    for start, end in zip(observed, observed[1:]):
+        if end > decade_label and end - start > 1:
+            missing = ", ".join(str(y) for y in range(start + 1, end))
+            bridged = " and ".join(str(y) for y in range(start + 1, end + 1))
+            text += (
+                f" There is no survey estimate for {missing}, so the change from {start} to {end} is split evenly"
+                f" over {bridged}."
+            )
+    return text
 
 
 # Continents following OWID region definitions, built from the source's own aggregate rows.
@@ -529,7 +538,7 @@ def run() -> None:
 
     tb_share_by_group = make_share_by_origin_group(tb_by_country, tb_acs_by_country, tb_census, tb_acs)
 
-    tb_change, tb_change_by_decade = make_changes(tb_census, tb_acs)
+    tb_change, tb_change_by_decade, current_decade_note = make_changes(tb_census, tb_acs)
 
     tables = [
         make_annual(tb_census, tb_acs).format(["country", "year"], short_name="us_foreign_born_population"),
@@ -543,5 +552,9 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=tables, default_metadata=ds_meadow.metadata)
+    # The footnote of the decade charts says which years the current decade covers, so it follows
+    # the data on every update.
+    ds_garden = paths.create_dataset(
+        tables=tables, default_metadata=ds_meadow.metadata, yaml_params={"current_decade_note": current_decade_note}
+    )
     ds_garden.save()

@@ -6,7 +6,10 @@ A full review runs as two lanes from the same dossier (`prepare.py`): the claims
 
   - findings from both lanes, numbered and ordered 🔴 → 🟡 → 🟢;
   - Part 0 from the claims lane; the cross-check appendix from the values lane;
-  - the SKIPPED indicators copied from `ranking.csv`, so a truncated review never reads as complete.
+  - the SKIPPED indicators copied from `ranking.csv`, so a truncated review never reads as complete;
+  - when the targeted pass on Anomalist's candidates ran (`anomalist_candidates.py`), its `lane_anomalist.result.md`
+    too: findings tagged as that lane, and its own tables in the appendix. Run the script again after that pass;
+    it rewrites the report.
 
 It refuses to write a report when a lane result or one of its required sections is missing, and when a lane left
 notes for the other lane that the caller has not settled (`--reconciled` says they are settled).
@@ -27,6 +30,10 @@ REQUIRED = {
     "lane_claims.result.md": ["Part 0", "Findings", "Notes for the other lane"],
     "lane_values.result.md": ["Findings", "Values checked", "Anomalies not checked", "Notes for the other lane"],
 }
+# The targeted pass on Anomalist's candidates (`anomalist_candidates.py`), run later in an update: optional, but
+# once its brief is in the dossier the report waits for its result.
+ANOMALIST = "lane_anomalist.result.md"
+ANOMALIST_BRIEF = "lane_anomalist.md"
 # What a lane writes under a heading when it has nothing to report there.
 EMPTY = re.compile(r"^\W*(none|no findings|nothing|n/a|no notes)\b", re.IGNORECASE)
 FINDING_START = re.compile(r"^\s*(?:[-*]\s*)?(?:\d+[.)]\s*)?(🔴|🟡|🟢)")
@@ -90,6 +97,13 @@ def assemble(dossier: Path, reconciled: bool, tldr: str | None, date: str) -> tu
             continue
         lanes[name] = sections(path.read_text())
         problems += [f"{name} has no `## {h}` section" for h in headings if section(lanes[name], h) is None]
+    anomalist: dict[str, str] | None = None
+    if (dossier / ANOMALIST).exists():
+        anomalist = sections((dossier / ANOMALIST).read_text())
+        headings = REQUIRED["lane_values.result.md"]
+        problems += [f"{ANOMALIST} has no `## {h}` section" for h in headings if section(anomalist, h) is None]
+    elif (dossier / ANOMALIST_BRIEF).exists():
+        problems.append(f"{ANOMALIST_BRIEF} is in the dossier but {ANOMALIST} is not: that lane has not reported")
     if problems:
         return "", problems, {}
 
@@ -98,6 +112,8 @@ def assemble(dossier: Path, reconciled: bool, tldr: str | None, date: str) -> tu
         "claims lane → values lane": section(claims, "Notes for the other lane"),
         "values lane → claims lane": section(values, "Notes for the other lane"),
     }
+    if anomalist is not None:
+        notes["anomalist lane → the other lanes"] = section(anomalist, "Notes for the other lane")
     open_notes = {who: body for who, body in notes.items() if not is_empty(body)}
     if open_notes and not reconciled:
         problems.append(
@@ -109,7 +125,11 @@ def assemble(dossier: Path, reconciled: bool, tldr: str | None, date: str) -> tu
 
     merged = [(severity, text, "claims") for severity, text in findings(section(claims, "Findings") or "")]
     merged += [(severity, text, "values") for severity, text in findings(section(values, "Findings") or "")]
-    for lane, parts in (("claims", claims), ("values", values)):
+    results = [("claims", claims), ("values", values)]
+    if anomalist is not None:
+        merged += [(severity, text, "anomalist") for severity, text in findings(section(anomalist, "Findings") or "")]
+        results.append(("anomalist", anomalist))
+    for lane, parts in results:
         body = section(parts, "Findings") or ""
         if not is_empty(body) and not findings(body):
             problems.append(f"the {lane} lane's Findings has text but no line starting with 🔴, 🟡 or 🟢")
@@ -139,8 +159,13 @@ def assemble(dossier: Path, reconciled: bool, tldr: str | None, date: str) -> tu
         section(values, "Values checked") or "",
         "",
     ]
+    if anomalist is not None:
+        out += ["### Values checked: Anomalist candidates", "", section(anomalist, "Values checked") or "", ""]
     out += ["### SKIPPED indicators", "", *skipped_indicators(dossier), ""]
     out += ["### Anomalies not checked", "", section(values, "Anomalies not checked") or "", ""]
+    if anomalist is not None:
+        out += ["### Anomalist candidates not checked", "", section(anomalist, "Anomalies not checked") or "", ""]
+        out += ["Every other stored candidate, with why it was left out, is in `anomalist.csv` in the dossier.", ""]
     if open_notes:
         out += ["### Notes between the lanes (settled by the caller)", ""]
         out += [f"- {who}: {' '.join(body.split())}" for who, body in open_notes.items()]

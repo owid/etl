@@ -227,7 +227,7 @@ a slug to a PNG URL that works for unpublished charts, and it can also take a br
 ## Config YAML: single chart
 
 ```yaml
-grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
+grapher_schema: "012"  # QUOTED — a bare 012 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
 slug: banning-of-chick-culling
 topic_tags:
@@ -296,10 +296,10 @@ Key fields:
 
 ```yaml
 # REQUIRED — grapher chart-config schema the view configs below are written against, as a
-# QUOTED string (a bare `011` is YAML octal). There is no fallback: ETL fails without it. Use the
+# QUOTED string (a bare `012` is YAML octal). There is no fallback: ETL fails without it. Use the
 # current DEFAULT_GRAPHER_SCHEMA_VERSION (etl/config.py) when authoring a new chart, then leave it
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
-grapher_schema: "011"
+grapher_schema: "012"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
 # chart-level pin, so the two silently disagree. ETL warns when that happens.
 
@@ -385,7 +385,14 @@ Rules:
 
 Valid topic tags (from `topic_tags` in `schemas/dataset-schema.json`):
 
-The schema enum is a static snapshot; if a tag seems missing, the canonical live list is this [Datasette query](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name).
+The schema enum is a static snapshot; if a tag seems missing, the canonical live list comes from this query against the internal Datasette (over Tailscale; `/query-grapher-db` has it and the `public.duckdb` route off the tailnet):
+
+```bash
+curl -s -G http://analytics.owid.io/owid.json -d _shape=array --data-urlencode "sql=SELECT DISTINCT t.name
+FROM tag_graph tg LEFT JOIN tags t ON tg.childId = t.id
+LEFT JOIN posts_gdocs p ON t.slug = p.slug AND p.published = 1 AND p.type IN ('article', 'topic-page', 'linear-topic-page')
+WHERE p.slug IS NOT NULL UNION SELECT 'Uncategorized' ORDER BY t.name"
+```
 
 `Access to Energy`, `Age Structure`, `Agricultural Production`, `Air Pollution`, `Alcohol Consumption`, `Animal Welfare`, `Antibiotics & Antibiotic Resistance`, `Artificial Intelligence`, `Biodiversity`, `Books`, `Burden of Disease`, `CO2 & Greenhouse Gas Emissions`, `COVID-19`, `Cancer`, `Cardiovascular Diseases`, `Causes of Death`, `Child & Infant Mortality`, `Child Labor`, `Clean Water`, `Clean Water & Sanitation`, `Climate Change`, `Corruption`, `Crop Yields`, `Democracy`, `Diarrheal Diseases`, `Diet Compositions`, `Economic Growth`, `Economic Inequality`, `Economic Inequality by Gender`, `Education Spending`, `Electricity Mix`, `Employment in Agriculture`, `Energy`, `Energy Mix`, `Environmental Impacts of Food Production`, `Eradication of Diseases`, `Famines`, `Farm Size`, `Fertility Rate`, `Fertilizers`, `Fish & Overfishing`, `Food Prices`, `Food Supply`, `Foreign Aid`, `Forests & Deforestation`, `Fossil Fuels`, `Gender Ratio`, `Global Education`, `Global Health`, `Government Spending`, `HIV/AIDS`, `Happiness & Life Satisfaction`, `Healthcare Spending`, `Homelessness`, `Homicides`, `Housing`, `Human Development Index (HDI)`, `Human Height`, `Human Rights`, `Hunger & Undernourishment`, `Illicit Drug Use`, `Indoor Air Pollution`, `Influenza`, `Internet`, `LGBT+ Rights`, `Land Use`, `Lead Pollution`, `Life Expectancy`, `Light at Night`, `Literacy`, `Loneliness & Social Connections`, `Malaria`, `Marriages & Divorces`, `Maternal Mortality`, `Meat & Dairy Production`, `Medicine & Biotechnology`, `Mental Health`, `Metals & Minerals`, `Micronutrient Deficiency`, `Migration`, `Military Personnel & Spending`, `Mpox (monkeypox)`, `Natural Disasters`, `Neglected Tropical Diseases`, `Nuclear Energy`, `Nuclear Weapons`, `Obesity`, `Oil Spills`, `Outdoor Air Pollution`, `Ozone Layer`, `Pandemics`, `Pesticides`, `Plastic Pollution`, `Pneumonia`, `Polio`, `Population Growth`, `Poverty`, `Religion`, `Renewable Energy`, `Research & Development`, `Sanitation`, `Smallpox`, `Smoking`, `Space Exploration & Satellites`, `State Capacity`, `Suicides`, `Taxation`, `Technological Change`, `Terrorism`, `Tetanus`, `Time Use`, `Tourism`, `Trade & Globalization`, `Transport`, `Trust`, `Tuberculosis`, `Uncategorized`, `Urbanization`, `Vaccination`, `Violence Against Children & Children's Rights`, `War & Peace`, `Waste Management`, `Water Use & Stress`, `Wildfires`, `Women's Employment`, `Women's Rights`, `Work & Employment`, `Working Hours`
 
@@ -500,6 +507,10 @@ Common practice in OWID charts, not a hard rule:
 
 [`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the other scheme families (diverging, perceptual, binary, categorical, `SingleColorGradient*`) are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
 
+### Map brackets
+
+Map brackets follow a regular pattern, like axis ticks: linear, log or log-like steps, 5 to 8 of them, never edges moved to make particular countries stand out. Prefer Grapher's automated brackets (the default `binningStrategy: auto`, or an `equalSizeBins-*` or `log-*` strategy, with `minValue` and `maxValue` when the default range is awkward), and use `manual` only for real-world thresholds such as poverty lines. An end bracket opens when data lies beyond its outer edge, and then starts at the next edge in; an open top in a manual scale takes one extra value, below the last edge. Patterns, strategies and examples: [`MAP_BRACKETS.md`](MAP_BRACKETS.md).
+
 ## Common dimension patterns
 
 | Domain | Dimension | Typical choices |
@@ -563,7 +574,7 @@ UUID.
 and that the file is included from `dag/main.yml`.
 
 **Preview URL shows errors**: verify that the catalogPaths in your config match actual indicators in the
-grapher dataset. Check by running the grapher step first: `.venv/bin/etlr data://grapher/{namespace}/{version}/{dataset} --grapher`.
+grapher dataset. Check by running the grapher step first: `.venv/bin/etlr grapher://grapher/{namespace}/{version}/{dataset} --grapher`.
 
 **`config must not contain {'description_key'}` or similar**: view-level metadata like `description_key`,
 `description_short`, and `presentation` belong under `metadata`, not `config`. The `config` block is for

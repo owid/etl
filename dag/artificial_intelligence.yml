@@ -8,6 +8,11 @@ steps:
     - data://garden/artificial_intelligence/2026-09-07/frontiermath:
       - data://meadow/artificial_intelligence/2026-09-07/frontiermath:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
+  #
+  # FrontierMath scores over time — chart authored in ETL.
+  #
+  viz://chart/artificial_intelligence/latest/ai_frontiermath_over_time:
+    - data://grapher/artificial_intelligence/2026-09-07/frontiermath
 
   # Stack Overflow Developer Survey – AI tool usage
   data://grapher/artificial_intelligence/2026-10-19/stackoverflow_ai_usage:
@@ -21,10 +26,16 @@ steps:
   # Main EPOCH dataset
   data://meadow/artificial_intelligence/2025-03-12/epoch:
     - snapshot://artificial_intelligence/2025-03-12/epoch.csv
+    - snapshot://artificial_intelligence/2025-03-12/epoch_all_ai_models.csv
   data://garden/artificial_intelligence/2025-03-12/epoch:
     - data://meadow/artificial_intelligence/2025-03-12/epoch
   data://grapher/artificial_intelligence/2025-03-12/epoch:
     - data://garden/artificial_intelligence/2025-03-12/epoch
+  #
+  # Notable AI models, by training computation, parameters, or training data — multidim authored in ETL.
+  #
+  viz://chart/artificial_intelligence/latest/notable_ai_models:
+    - data://grapher/artificial_intelligence/2025-03-12/epoch
 
   # Main EPOCH dataset regression lines
   data://grapher/artificial_intelligence/2025-03-12/epoch_regressions:
@@ -108,10 +119,10 @@ steps:
           - snapshot://ifr/2026-01-14/robot_density.xlsx
 
   # Robotaxis dataset
-  data://grapher/artificial_intelligence/2026-08-20/robotaxis:
-    - data://garden/artificial_intelligence/2026-08-20/robotaxis:
-      - data://meadow/artificial_intelligence/2026-08-20/robotaxis:
-        - snapshot://artificial_intelligence/2026-08-20/robotaxis.csv
+  data://grapher/artificial_intelligence/2026-11-20/robotaxis:
+    - data://garden/artificial_intelligence/2026-11-20/robotaxis:
+      - data://meadow/artificial_intelligence/2026-11-20/robotaxis:
+        - snapshot://artificial_intelligence/2026-11-20/robotaxis.csv
 
   # NVIDIA quarterly revenue dataset
   data://grapher/artificial_intelligence/2026-09-02/nvidia_revenue:

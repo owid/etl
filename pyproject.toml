@@ -66,8 +66,6 @@ dependencies = [
     "sentry-sdk>=2.43.0",
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
-    # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
-    "fastmcp>=3.2.0",
     "pyproj>=3.7.2",
     "pydantic-ai-slim[anthropic,google,mcp,openai]>=2.55.0,<3",
     "anthropic>=1.13.0",
@@ -237,6 +235,22 @@ unused-type-ignore-comment = "ignore"
 unused-ignore-comment = "ignore"
 call-top-callable = "ignore"
 possibly-missing-submodule = "ignore"
+
+# `make check` skips ETL steps and snapshots, but editors type-check every open file. In those files, silence the rules
+# that mostly flag pandas and Table typing quirks, and keep the ones that catch real bugs (e.g. undefined names).
+[[tool.ty.overrides]]
+include = ["etl/steps/**", "snapshots/**"]
+
+[tool.ty.overrides.rules]
+unresolved-attribute = "ignore"
+invalid-return-type = "ignore"
+invalid-assignment = "ignore"
+call-non-callable = "ignore"
+unresolved-import = "ignore"
+unknown-argument = "ignore"
+unsupported-operator = "ignore"
+not-subscriptable = "ignore"
+not-iterable = "ignore"
 
 [tool.owl]
 steps-dir = "owl_steps"
