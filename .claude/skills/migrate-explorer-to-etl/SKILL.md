@@ -125,9 +125,8 @@ Do not trust type labels in old issues; check the columns.
 
 Some production TSVs carry invisible Unicode prefixes on dropdown display names, almost always SOFT
 HYPHEN (`\xad`), occasionally ZWSP or ZWNJ: a curator's hack to coerce Grapher's first-appearance
-dropdown ordering when sub-collections share choice names. Democracy is the canonical case;
-the prefixes are preserved in
-`etl/steps/viz/explorer/democracy/latest/democracy.*.config.yml`.
+dropdown ordering when sub-collections share choice names. Democracy is the canonical case: its
+`Metric` and `Sub-metric` choices carry up to five soft hyphens each.
 
 **Preserve them byte for byte.** Grapher uses the choice's display name, not its slug, as the URL
 query parameter, so stripping a prefix silently breaks every shared link that targeted the value.

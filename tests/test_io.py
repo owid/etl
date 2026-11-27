@@ -42,16 +42,16 @@ def test_get_all_changed_catalog_paths_yaml_only_chart_and_export_steps(mock_loa
 def test_get_all_changed_catalog_paths_viz_subconfig(mock_load_dag):
     """A viz step's sub-config maps to its parent `<short>` explorer step, not a phantom step.
 
-    The democracy explorer is built by `democracy.py` from companion configs like
+    The democracy multidim is built by `democracy.py` from companion configs like
     `democracy.eiu.config.yml`. Editing only a sub-config must select the real
-    `viz://explorer/democracy/latest/democracy` step; naive suffix-stripping would invent a
+    `viz://chart/democracy/latest/democracy` step; naive suffix-stripping would invent a
     nonexistent `...democracy.eiu` step and make the staging deploy fail with "No steps matched".
     Resolution relies on the sibling `democracy.py` recipe existing on disk.
     """
     mock_load_dag.return_value = {}
-    files_changed = {"etl/steps/viz/explorer/democracy/latest/democracy.eiu.config.yml": "M"}
+    files_changed = {"etl/steps/viz/chart/democracy/latest/democracy.eiu.config.yml": "M"}
     assert get_all_changed_catalog_paths(files_changed, include_export=True) == [
-        "viz://explorer/democracy/latest/democracy"
+        "viz://chart/democracy/latest/democracy"
     ]
 
 
