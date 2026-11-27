@@ -308,7 +308,7 @@ ol.next{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;m
   </section>
 
   <section id="links">
-    <div class="sec-head"><h2>Links to replace</h2><p id="linkscope"></p></div>
+    <div class="sec-head"><h2>Links to replace</h2><p id="linkscope"></p><label id="hideDoneBox" class="small" hidden><input type="checkbox" id="hideDone"> Hide links already swapped</label></div>
     <div id="linkgroups" class="group"></div>
   </section>
 
@@ -461,9 +461,18 @@ return order.length ? order.map(([k, rs]) => {
     <div class="tablebox"><table><thead><tr><th>Use</th><th>Find in the doc</th><th>Old URL</th><th>New URL</th><th>Lands on</th><th></th></tr></thead><tbody>${rs.map((r,i)=>`<tr><td>${statusLabel(r)}${howLabel(r)}${r.where.match(/:\d+$/)?`<div class="small mono">line ${r.where.split(":").pop()}</div>`:""}</td><td class="find">${findCell(r)}</td><td class="url">${urlLink(r.old_url)}</td><td class="url">${urlLink(r.new_url)}</td><td>${esc(r.match)}${(r.repairs||[]).length?`<div class="small">${r.repairs.map(esc).join("; ")}</div>`:""}${Object.keys(r.stale_params||{}).length&&!(r.repairs||[]).length?` <span class="pill warn">stale params</span>`:""}</td><td><button data-copy="${esc(r.new_url)}">Copy new</button></td></tr>`).join("")}</tbody></table></div></div>`;
 }).join("") : empty;
 };
-$("linkgroups").innerHTML = renderGroups(R, `<div class="okline">✓ Nothing to replace.</div>`)
-  + (RI.length ? `<details class="info"><summary>WordPress: ${RI.length} link${RI.length===1?"":"s"}, nothing to do</summary><p class="small">Legacy WordPress posts are private copies of pages now served from Google Docs, and unused reusable blocks render nowhere, so no reader sees these. A block still shown on another explorer holds only plain links, which the redirect covers.</p>${renderGroups(RI, "")}</details>` : "");
-document.querySelectorAll("button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
+// "Hide links already swapped" filters the list down to what is left to do (remembered per browser).
+const drawLinks = () => {
+  const hide = $("hideDone").checked, shown = hide ? R.filter(r=>r.status!=="done") : R;
+  $("linkgroups").innerHTML = renderGroups(shown, `<div class="okline">✓ Nothing ${hide && nDone ? "left " : ""}to replace.</div>`)
+    + (RI.length ? `<details class="info"><summary>WordPress: ${RI.length} link${RI.length===1?"":"s"}, nothing to do</summary><p class="small">Legacy WordPress posts are private copies of pages now served from Google Docs, and unused reusable blocks render nowhere, so no reader sees these. A block still shown on another explorer holds only plain links, which the redirect covers.</p>${renderGroups(RI, "")}</details>` : "");
+  document.querySelectorAll("#linkgroups button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
+};
+$("hideDoneBox").hidden = !nDone;
+try{ $("hideDone").checked = !!nDone && localStorage.getItem("hideDone")==="1"; }catch(e){}
+$("hideDone").onchange = () => { try{ localStorage.setItem("hideDone", $("hideDone").checked ? "1" : "0"); }catch(e){} drawLinks(); };
+drawLinks();
+document.querySelectorAll("button[data-copy]:not(#linkgroups button)").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
 
 // Dimension mapping.
 $("dimtext").innerHTML = `Explorer URLs name dimensions and choices by their labels (<code>?Measure=Conflict+deaths</code>); multidim URLs by slug (<code>?measure=deaths</code>). Each redirect rewrites one into the other and keeps every other parameter (<code>country</code>, <code>time</code>, <code>tab</code>). A bare <code>/explorers/${esc(E.explorer.slug)}</code> goes to the multidim's default view.`;
