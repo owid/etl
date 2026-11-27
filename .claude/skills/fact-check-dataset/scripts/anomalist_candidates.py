@@ -285,12 +285,12 @@ def table_section(text: str, heading: str) -> list[str]:
 def status_of(identity: str, entity: str, year: str, first_pass: dict) -> str:
     """Whether the first pass already checked this value, or its scan flagged it, or neither.
 
-    A checked row names its indicator loosely (a column, a title), so it matches when it names this column; a scan
-    flag names the garden column, which a grapher name extends (`rate__sex_female` is garden `rate`).
+    A checked row counts when its indicator cell names this exact column (`names_column`); a scan flag names the
+    garden column, which a grapher name extends (`rate__sex_female` is garden `rate`).
     """
     table, _, column = identity.partition("#")
     for indicator, checked_entity, checked_year in first_pass["checked"]:
-        names_it = bool(indicator) and (column.lower() in indicator or indicator in (column.lower(), identity.lower()))
+        names_it = names_column(indicator, identity)
         if names_it and checked_entity == entity.lower() and checked_year in (str(year).lower(), ""):
             return CHECKED
     for key, detail, period in first_pass["flagged"]:
@@ -299,6 +299,23 @@ def status_of(identity: str, entity: str, year: str, first_pass: dict) -> str:
             if not period or str(period).removesuffix(".0") == str(year):
                 return FLAGGED
     return NEW
+
+
+def names_column(cell: str, identity: str) -> bool:
+    """Whether a *Values checked* indicator cell names this exact column, as `column` or `table#column`.
+
+    The cell is free text, so the name may also sit in backticks inside a title (``GDP per capita (`gdp_pc`)``).
+    A related column (`gdp_per_capita` for `gdp`) or a bare title names no column: the candidate is then checked
+    again rather than skipped.
+    """
+    table, _, column = identity.lower().partition("#")
+    if not column:
+        return False
+    for name in {cell, *cell.split("`")}:
+        name_table, has_table, name_column = name.strip().lower().rpartition("#")
+        if name_column == column and (not has_table or name_table.rpartition("/")[2] == table):
+            return True
+    return False
 
 
 def names_entity(detail: str, entity: str) -> bool:

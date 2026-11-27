@@ -841,10 +841,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      3. Start one background agent with the prompt it prints, and when it is back run `assemble_report.py` again. The report gains the pass's findings and tables. With no new candidate, there is no agent: put its coverage section in the PR body instead.
      4. Route its findings as in 6c-bis, and log every source-attributed one in the producer-issue log ("Producer issues").
 
-     **Upgrade-detector coverage.** Anomalist's `upgrade_missing` / `upgrade_change` detectors only compare old→new variable pairs from the wizard's variable-mapping table — and the indicator upgrader persists mappings **only for charted indicators**. If only some of the dataset's indicators are used in charts (the common case), the upgrade detectors silently skip the rest, and a partial mapping suppresses the shortName-inference fallback that would otherwise cover everything. Verify with `WizardDB.get_variable_mapping_raw()`: if it has fewer pairs than the dataset has indicators, rebuild the full mapping by shortName (old vs. new `variables` rows by `datasetId`) and re-run:
+     **Upgrade-detector coverage.** Anomalist's `upgrade_missing` / `upgrade_change` detectors compare only the old→new pairs in their variable mapping. owidbot builds it with `load_variable_mapping()` (`apps/wizard/app_pages/anomalist/utils.py`): the indicator upgrader's pairs, which exist only for charted indicators and are the only pairs for an indicator whose short name changed, plus pairs inferred by identical short name for the rest. An indicator that is neither charted nor under the same short name is therefore not compared. When the detectors are missing, stale, or skip indicators they should cover, re-run them with that same merged mapping, adding by hand any renamed pair it lacks. `--variable-mapping` replaces the mapping rather than adding to it, so never pass the short-name pairs alone: that drops the upgrader's pairs for renamed indicators.
      ```bash
+     STAGING=<branch> .venv/bin/python -c "import json; from apps.wizard.app_pages.anomalist.utils import load_variable_mapping; print(json.dumps(load_variable_mapping([<new_dataset_id>], {<new_dataset_id>: <old_dataset_id>})))" > workbench/<short_name>/anomalist_mapping.json
      STAGING=<branch> .venv/bin/etl anomalist --anomaly-types upgrade_missing --anomaly-types upgrade_change \
-         --dataset-ids <new_dataset_id> --variable-mapping '<full json mapping>' --force
+         --dataset-ids <new_dataset_id> --variable-mapping "$(cat workbench/<short_name>/anomalist_mapping.json)" --force
      ```
      Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
 

@@ -116,7 +116,7 @@ A mismatch beyond the Tolerance in SKILL.md, an accounting identity that does no
 
 ### Result
 
-`lane_values.result.md` in the dossier directory, with exactly these headings:
+`lane_values.result.md` in the dossier directory, with exactly these headings. In *Values checked*, the indicator cell names the column (`gdp` or `table#column`, alone or in backticks after a title): the Anomalist pass skips only the values whose column it recognizes there.
 
 ```
 ## Findings
