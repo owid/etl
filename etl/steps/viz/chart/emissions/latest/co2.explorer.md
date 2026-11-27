@@ -93,7 +93,7 @@ We calculate this metric by dividing the total annual emissions of a country or 
 
 The source for the annual CO2 emissions data is the Global Carbon Project, as described above.
 
-For annual energy consumption, we combined two sources. Our primary data source is the [Energy Institute Statistical Review of World Energy](https://www.energyinst.org/statistical-review). However, it does not provide energy data for all countries. For countries absent from this dataset, we rely on the [international energy data from the U.S. Energy Information Administration (EIA)](https://www.eia.gov/international/data/world/total-energy/more-total-energy-data).
+For annual energy supply, we combined three sources. Our primary data source is the [Energy Institute Statistical Review of World Energy](https://www.energyinst.org/statistical-review). However, it does not provide energy data for all countries. For countries absent from this dataset, we rely on the [international energy data from the U.S. Energy Information Administration (EIA)](https://www.eia.gov/international/data/world/total-energy/more-total-energy-data). For the world as a whole, we extend the series back to 1800 with historical estimates by Vaclav Smil.
 
 ### CO2 emissions per dollar of GDP (carbon intensity of economies)
 
