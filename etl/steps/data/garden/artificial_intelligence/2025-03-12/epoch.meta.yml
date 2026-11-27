@@ -157,6 +157,15 @@ tables:
           zeroDay: '1949-01-01'
           timeInterval: day
 
+      country_detail:
+        title: Country of developer (test, unbinned)
+        unit: ''
+        short_unit: ''
+        description_short: Country of the organizations that developed an AI model.
+        display:
+          zeroDay: '1949-01-01'
+          timeInterval: day
+
       publication_date:
         title: Publication date
         unit: ''

@@ -119,6 +119,7 @@ def run() -> None:
     # to color charts by.
     tb = add_developer_group(tb)
     tb = add_country_group(tb)
+    tb = add_country_detail(tb)
     tb = add_weights_availability(tb)
 
     # Convert training dataset size to numeric
@@ -293,4 +294,20 @@ def add_weights_availability(tb):
     tb["weights_availability"] = accessibility
     tb.loc[:, "weights_availability"] = accessibility.map(WEIGHTS_AVAILABILITY)
 
+    return tb
+
+
+def add_country_detail(tb):
+    """TEST: the country of the organizations that developed each model, unbinned ("Multiple countries" when several)."""
+    values = []
+    for countries in tb["country__from_organization"]:
+        countries = _split_list(countries)
+        if not countries:
+            values.append(None)
+        elif len(countries) > 1 or countries[0] == "Multinational":
+            values.append("Multiple countries")
+        else:
+            values.append(COUNTRY_GROUPS.get(countries[0], countries[0]))
+    tb["country_detail"] = tb["country__from_organization"].astype("object")
+    tb.loc[:, "country_detail"] = values
     return tb
