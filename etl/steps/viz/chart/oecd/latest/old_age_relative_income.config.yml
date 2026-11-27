@@ -1,0 +1,163 @@
+grapher_schema: "011"
+slug: old-age-relative-income
+
+title:
+  title: Income of older people relative to the whole population
+  title_variant: ""
+topic_tags:
+  - Economic Inequality
+  - Poverty
+
+default_selection:
+  - OECD countries
+  - United States
+  - United Kingdom
+  - France
+  - Germany
+  - Japan
+  - Netherlands
+  - Denmark
+
+default_dimensions:
+  age: aged_66_and_older
+  sex: both
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: chart
+        chartTypes: ["LineChart", "DiscreteBar", "Marimekko"]
+        # Marimekkos only show entities with a region, which leaves out aggregates like OECD countries.
+        matchingEntitiesOnly: true
+        yAxis:
+          min: auto
+        map:
+          colorScale:
+            baseColorScheme: BuGn
+    # The OECD only publishes men's and women's incomes for 2022, so these views open on the bar chart.
+    - dimensions:
+        sex: men
+      config:
+        tab: discrete-bar
+    - dimensions:
+        sex: women
+      config:
+        tab: discrete-bar
+    - dimensions:
+        age: by_age
+      config:
+        hasMapTab: false
+        chartTypes: ["LineChart", "DiscreteBar"]
+        selectedFacetStrategy: entity
+    - dimensions:
+        sex: men_vs_women
+      config:
+        hasMapTab: false
+        tab: chart
+        chartTypes: ["Dumbbell"]
+        dumbbell:
+          connectorStyle: line
+        # Sort countries by men's value (the first indicator), highest first.
+        sortBy: startValue
+        sortOrder: desc
+
+dimensions:
+  - slug: age
+    name: Age
+    choices:
+      - slug: aged_66_and_older
+        name: 66 and older
+      - slug: aged_66_to_75
+        name: 66 to 75
+      - slug: aged_76_and_older
+        name: 76 and older
+      - slug: by_age
+        name: 66 to 75 vs. 76 and older
+        description: Compare older people of different ages
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: both
+        name: Both sexes
+      - slug: men
+        name: Men
+        description: Only available for people aged 66 and older, in 2022
+      - slug: women
+        name: Women
+        description: Only available for people aged 66 and older, in 2022
+      - slug: men_vs_women
+        name: Men vs. women
+        description: Compare older men and women; only available for people aged 66 and older, in 2022
+
+views:
+  - dimensions:
+      age: aged_66_and_older
+      sex: both
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_both_sexes__age_66_years_and_older
+      color: regions#owid_region
+
+  - dimensions:
+      age: aged_66_and_older
+      sex: men
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_men__age_66_years_and_older
+      color: regions#owid_region
+
+  - dimensions:
+      age: aged_66_and_older
+      sex: women
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_women__age_66_years_and_older
+      color: regions#owid_region
+
+  - dimensions:
+      age: aged_66_to_75
+      sex: both
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_both_sexes__age_66_75_years
+      color: regions#owid_region
+
+  - dimensions:
+      age: aged_76_and_older
+      sex: both
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_both_sexes__age_76_years_and_older
+      color: regions#owid_region
+
+  # Comparison views.
+  - dimensions:
+      age: by_age
+      sex: both
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_both_sexes__age_66_75_years
+          display:
+            name: 66 to 75
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_both_sexes__age_76_years_and_older
+          display:
+            name: 76 and older
+    config:
+      title: Average income of people aged 66 to 75 and 76 and older, relative to the whole population
+      subtitle: Average disposable income of people aged 66 to 75 and of people aged 76 and older, as a share of the average disposable income of the whole population.
+
+  - dimensions:
+      age: aged_66_and_older
+      sex: men_vs_women
+    indicators:
+      y:
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_men__age_66_years_and_older
+          display:
+            name: Men
+        - catalogPath: incomes_of_older_people#relative_disposable_income__sex_women__age_66_years_and_older
+          display:
+            name: Women
+    config:
+      title: Average income of men and women aged 66 and older, relative to the whole population
+      subtitle: Average disposable income of men and of women aged 66 and older, as a share of the average disposable income of the whole population.

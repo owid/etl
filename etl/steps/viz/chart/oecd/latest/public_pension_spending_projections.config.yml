@@ -1,0 +1,35 @@
+chart_config_id: 01a18dd8-78bb-70a7-a6f2-f09debe0d762
+slug: public-pension-spending-projections
+grapher_schema: "011"
+topic_tags:
+  - Government Spending
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      # Legend labels ("Past spending", "Projections") and the dashed projection line come from the garden metadata.
+      y:
+        - catalogPath: pension_expenditure#public_pension_expenditure
+        - catalogPath: pension_expenditure#public_pension_expenditure_projected
+    config:
+      title: Public spending on pensions, past and projected
+      subtitle: Government spending on old-age and survivors’ pensions, as a share of [gross domestic product](#dod:gdp). Projections come from the European Commission and from each country’s government.
+      note: Past spending and projections come from different sources, which don’t always count the same benefits, so the two lines don’t always meet.
+      tab: chart
+      hasMapTab: false
+      chartTypes:
+        - LineChart
+      yAxis:
+        min: 0
+      selectedFacetStrategy: entity
+      # The OECD average and large economies, including South Korea, where spending is projected to rise the most.
+      selectedEntityNames:
+        - OECD countries
+        - Italy
+        - France
+        - Germany
+        - Japan
+        - United Kingdom
+        - United States
+        - South Korea
+      addCountryMode: add-country
