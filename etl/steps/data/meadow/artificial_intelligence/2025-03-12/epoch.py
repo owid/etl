@@ -41,6 +41,7 @@ def run() -> None:
         "Training compute (FLOP)",
         "Training dataset size (total)",
         "Notability criteria",
+        "Model accessibility",
     ]
 
     # Check that the columns of interest are present

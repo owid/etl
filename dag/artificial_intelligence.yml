@@ -36,6 +36,11 @@ steps:
   #
   viz://chart/artificial_intelligence/latest/computation_used_to_train_notable_artificial_intelligence_systems:
     - data://grapher/artificial_intelligence/2025-03-12/epoch
+  #
+  # Notable AI models, by training computation, parameters, or training data — multidim authored in ETL.
+  #
+  viz://chart/artificial_intelligence/latest/notable_ai_models:
+    - data://grapher/artificial_intelligence/2025-03-12/epoch
 
   # Main EPOCH dataset regression lines
   data://grapher/artificial_intelligence/2025-03-12/epoch_regressions:
