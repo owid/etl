@@ -423,6 +423,17 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
+  # Births and fertility rates from national statistics, compared with UN WPP 2024 (compiled by OWID).
+  data://grapher/demography/2026-11-27/births_fertility_national_vs_un:
+    - data://garden/demography/2026-11-27/births_fertility_national_vs_un:
+      - data://meadow/demography/2026-11-27/births_fertility_national_vs_un:
+        - snapshot://demography/2026-11-27/births_fertility_national_vs_un.xlsx
+      - data://garden/un/2024-07-12/un_wpp
+  viz://chart/demography/latest/births_fertility_national_vs_un:
+    - data://grapher/demography/2026-11-27/births_fertility_national_vs_un
+  viz://chart/demography/latest/births_fertility_national_vs_un_coverage:
+    - data://grapher/demography/2026-11-27/births_fertility_national_vs_un
+
   ##########
   # OTHERS (legacy, used downstream -- regularly check)
   ##########
