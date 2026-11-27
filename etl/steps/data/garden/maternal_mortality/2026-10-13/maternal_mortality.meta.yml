@@ -44,7 +44,7 @@ tables:
           - entities: [United States]
             time: 2003
             time_end: 2017
-            text: Values affected by a change in measurement.
+            text: Values affected by a [change in measurement](https://ourworldindata.org/rise-us-maternal-mortality-rates-measurement).
         description_key:
           - "{definitions.description_maternal_mortality}"
 
