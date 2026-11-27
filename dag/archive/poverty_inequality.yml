@@ -659,3 +659,12 @@ steps:
   # archived; last active in 56a286fad9f7 on 2026-11-18
   viz://explorer/lis/latest/poverty_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
+  # archived; last active in bcadd434aa8c on 2026-11-27
+  data://garden/oecd/2026-04-23/income_distribution_database:
+    - data://meadow/oecd/2026-04-23/income_distribution_database
+  # archived; last active in bcadd434aa8c on 2026-11-27
+  data://meadow/oecd/2026-04-23/income_distribution_database:
+    - snapshot://oecd/2026-04-23/income_distribution_database.csv
+  # archived; last active in bcadd434aa8c on 2026-11-27
+  data://grapher/oecd/2026-04-23/income_distribution_database:
+    - data://garden/oecd/2026-04-23/income_distribution_database
