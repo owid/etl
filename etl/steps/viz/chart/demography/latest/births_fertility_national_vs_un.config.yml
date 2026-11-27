@@ -44,7 +44,6 @@ definitions:
         chartTypes:
           - LineChart
           - DiscreteBar
-          - Marimekko
         hasMapTab: true
         tab: map
         map:
