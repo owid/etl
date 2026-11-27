@@ -60,12 +60,14 @@ Assumptions:
 - [ ] Changelog: decide whether this release deserves an entry in `dataset.changelog` of the garden `.meta.yml`, dated with the new version, whether or not the dataset has a changelog yet. Entries are optional. They are release notes for the people who use the data, so capture only changes that matter to them, briefly. Show the user the draft before committing it.
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c). This covers the links in chart configs too (`relatedQuestions`, links in notes and subtitles), and for those also that each one points at the right chart
 - [ ] Run the adversarial review (`/fact-check-dataset`) once the garden step is built: its `prepare.py` command, then its two lanes as background agents, then the assembled report (see 6c-bis)
+- [ ] Keep the producer-issue log from the first problem found in the producer's data on: one entry per problem in `workbench/<short_name>/producer-issues.yml`, attributed to the raw snapshot and checked against every kind of producer documentation (see "Producer issues")
 - [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Pull admin edits of the dataset's ETL-authored single charts into ETL (`/pull-chart`) before pushing their `viz://chart` steps: pull admin drift into the YAML, list it in the PR description, and confirm `in sync` on staging afterwards (see step 7)
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Run `check-hardcoded-years` after all remaps — numeric time pins below the new data's latest time hide the update; propose `"latest"` fixes with user sign-off (see step 7)
 - [ ] Run the empty-entity audit (`check-empty-entities`) as a background agent after the indicator upgrade: full automated pass, scaled follow-up; regressions vs production = fix, pre-existing = document (see step 7)
+- [ ] Run the Anomalist pass of the fact check after the indicator upgrade: check Anomalist's coverage on staging, `anomalist_candidates.py`, one background agent on its new candidates, then `assemble_report.py` again (see step 7)
 - [ ] Run the referencing-prose audit — read every document the sweep found **in full**, check every claim it makes about the data (numeric or not) and the parameters of every embed and link against the new data and the new chart configs, and hand the findings to content — never edit published prose yourself (see step 7)
 - [ ] Post `@codex review` as a separate PR comment once the last data or metadata change is pushed, then address its comments (fix valid ones + resolve all threads). Request it again after every later push that changes the PR's own content (step code, metadata, snapshots, DAG entries), including fixes from the QA review, so the merged and announced version is the reviewed one; merging master or deleting the old version's files doesn't need one
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
@@ -76,6 +78,7 @@ Assumptions:
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
 - [ ] Render Slack announcement via `draft-data-update-slack-post` (only after the QA sign-off), save to workbench, and notify user to post it to #data-updates-comms
 - [ ] Draft the public-facing "Data update" post for OWID /latest via `/owid-staff:draft-data-update-post` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
+- [ ] After the QA sign-off, run `producer_issues.py check`; when entries are ready, look for earlier reports, find the contact, and offer the draft message to the producer (the user picks the entries; Claude never sends it). An empty log completes this item (see "Producer issues")
 - [ ] Right before merging, check the producer hasn't published a newer release since the snapshot (see "Final QA hand-off")
 <!-- checkpoint: merge -->
 - [ ] After the merge, show both announcements again in the session: the Slack text in full, and the /latest Doc link (or, when the post was declined, its eligible date), with any number the merged data changed corrected (see step 8)
@@ -620,7 +623,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    **For sources that compile national-office figures (OECD, Eurostat, UN agencies), compare a few countries' new years with the national office.** A series shifted by one year at the source passes every diff and bound check.
 
-   Scope for an update: focus the metadata claim review on new/changed text, and the value cross-checks (a few per indicator on a large dataset) on the newly added data (latest wave/year) plus that skill's standard anchors; deep-review the top-viewed indicators + anomaly-flagged ones per its prioritization step. Apply its routing table: metadata fixes → propose them to the user and apply only the ones they approve (its suggested rewrites are reader-facing text), then re-run the step; confirmed source errors → `<short_name>.corrections.yml`; unconfirmed suspicions → list under "Not covered in this PR" for the reviewer. Save the report path (`ai/adversarial-review-<short_name>-<date>.md`) in `update-context.yml` and summarize any 🔴/🟡 findings in the PR body.
+   Scope for an update: focus the metadata claim review on new/changed text, and the value cross-checks (a few per indicator on a large dataset) on the newly added data (latest wave/year) plus that skill's standard anchors; deep-review the top-viewed indicators + anomaly-flagged ones per its prioritization step. Apply its routing table: metadata fixes → propose them to the user and apply only the ones they approve (its suggested rewrites are reader-facing text), then re-run the step; confirmed source errors → `<short_name>.corrections.yml`; unconfirmed suspicions → list under "Not covered in this PR" for the reviewer. Every finding the report attributes to the source (confirmed, suspected, or a mismatch between the producer's documentation and its file) also goes in the producer-issue log ("Producer issues"). Save the report path (`ai/adversarial-review-<short_name>-<date>.md`) in `update-context.yml` and summarize any 🔴/🟡 findings in the PR body.
 
 6d) Scheduled-issue workflow check (owid-issues)
    Every recurring data update is driven by a scheduled GitHub Actions workflow in the `owid/owid-issues` repo (`.github/workflows/update-*.yml`) that periodically opens a "Data update" issue. The conventions: schedule anything updated at least once per year but less than daily; filename `update-{namespace}-{short_name}.yml`; a cron `schedule:` trigger + `imjohnbo/issue-bot` creating the issue. This step runs now because 6c just established the two cadence facts the cron must match — `dataset.update_period_days` and the producer's actual release rhythm (`source.release_date` / `next_release` in `update-context.yml`).
@@ -828,6 +831,31 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      rather than dropping them. The same applies to every other reference list you hand to a person — empty
      entities, hardcoded years, Codex follow-ups: name the surface *and* link it.
    - **Empty-entity audit (mandatory — run it in the background after the indicator upgrade).** An upgrade can leave a view pinned to entities that have no data in the new indicators — it renders with those series missing (or empty) and no error anywhere. The **`check-empty-entities` skill** audits charts (entity selections + map `columnSlug`), MDim views, explorer views, narrative charts, and published-gdoc `country=` references, and grades every finding against production. Its automated pass always covers every surface; on widely charted datasets, scale only the follow-up (start with changed data, most-viewed charts, and views most likely to break) and report unchecked surfaces as coverage gaps. When it runs: a pinned entity that had data on production and lost it on staging is a **regression from this update — fix it before merge** (remap the view or restore the entities); a gap identical on production is pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so list it in the PR body with a planned fix.
+   - **Anomalist pass of the fact check (mandatory — run it in the background after the indicator upgrade).** owidbot runs Anomalist on every push and stores its results in the branch's staging DB. They see what 6c-bis could not: the old-vs-new comparison (`upgrade_change`, `upgrade_missing`) and Gaussian-process outliers (`gp_outlier`). They add candidates to the fact check and replace none of its own. Once the staging build of your latest push is green:
+     1. Check coverage: `STAGING=<branch> .venv/bin/etl anomalist-view --dataset-ids <new_dataset_id>` lists the stored types and warns when a stored result is stale. When the upgrade detectors are missing, stale or partial, re-run them with the full mapping (see "Upgrade-detector coverage" below).
+     2. Build the candidates and the brief:
+        ```bash
+        .venv/bin/python .claude/skills/fact-check-dataset/scripts/anomalist_candidates.py <namespace>/<new_version>/<short_name> --staging <branch>
+        ```
+        It ranks the stored anomalies as the Wizard does, marks the ones 6c-bis already checked or flagged, adds each value's neighbors and old-version value, and writes `lane_anomalist.md` into the fact-check dossier.
+     3. Start one background agent with the prompt it prints, and when it is back run `assemble_report.py` again. The report gains the pass's findings and tables. With no new candidate, there is no agent: put its coverage section in the PR body instead.
+     4. Route its findings as in 6c-bis, and log every source-attributed one in the producer-issue log ("Producer issues").
+
+     **Upgrade-detector coverage.** Anomalist's `upgrade_missing` / `upgrade_change` detectors only compare old→new variable pairs from the wizard's variable-mapping table — and the indicator upgrader persists mappings **only for charted indicators**. If only some of the dataset's indicators are used in charts (the common case), the upgrade detectors silently skip the rest, and a partial mapping suppresses the shortName-inference fallback that would otherwise cover everything. Verify with `WizardDB.get_variable_mapping_raw()`: if it has fewer pairs than the dataset has indicators, rebuild the full mapping by shortName (old vs. new `variables` rows by `datasetId`) and re-run:
+     ```bash
+     STAGING=<branch> .venv/bin/etl anomalist --anomaly-types upgrade_missing --anomaly-types upgrade_change \
+         --dataset-ids <new_dataset_id> --variable-mapping '<full json mapping>' --force
+     ```
+     Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
+
+     **Read `upgrade_missing` flags before calling them data loss.** The detector pairs old and new indicators by shortName, so when the producer re-splits a dimension that is part of the shortName — comparability spells renumbered, a category recoded — the points move from one indicator to its sibling and every move is flagged as missing. Check whether the flagged points reappear under a sibling indicator with identical values before reporting a loss; if they do, it is a relabel to describe in the PR body (and, when the producer's release notes don't mention it, an entry in the producer-issue log).
+
+     The upgrade detectors also need the **old** grapher dataset in the local catalog (`data/grapher/<ns>/<old_version>/<short>`) — the `FileNotFoundError` names the *new* dataset id, but the missing files are usually the old version's. If the old chain has already been removed from the DAG (so `etlr` can't rebuild it), fetch its files straight from the public catalog (the table files are named after the tables, so read `index.json` first if unsure):
+     ```bash
+     mkdir -p data/grapher/<ns>/<old_v>/<short> && cd data/grapher/<ns>/<old_v>/<short> && \
+       for f in index.json <short>.feather <short>.meta.json; do \
+         curl -sL -O "https://catalog.ourworldindata.org/grapher/<ns>/<old_v>/<short>/$f"; done
+     ```
 
 8) Update context for public announcement
    - **Steps 8, 9 and 9b run only after the user has signed off the final QA hand-off.** An announcement describes the data, and the review can still change it.
@@ -1118,29 +1146,22 @@ Workflow when the user agrees:
 
 **Expect a Codex false-positive on the archive edit.** Because this step touches `dag/archive/*.yml`, Codex often flags it ("avoid updating archived DAG entries" — the AGENTS.md rule against editing archived files). This is expected: the entries are `etl archive-dag` output, which is how `CLAUDE.md` says to archive a step. Reply citing that and resolve the thread — don't revert the archive. A second recurring flag on this step: Codex warns that removing the old chain will "leave the published chart on archived variables" / "remap charts before versioning the grapher step". If the indicator upgrade already ran on staging (step 7) and the old-variable scan came back empty, reply with that verification (the remapped configs sync to production on merge) and resolve.
 
+## Producer issues
+
+Problems in the producer's data surface all through an update: the snapshot diff, sanity checks, harmonization, both fact-check passes, data-diff, the user's QA. Collect every one in `workbench/<short_name>/producer-issues.yml` the moment it appears, and before the merge offer one message to the producer built from them. The procedure, and the script that runs its checks, are in [reference/producer-issues.md](reference/producer-issues.md). Its rules:
+
+- An entry goes in a message only when the raw snapshot carries the problem (ours are fixed in the step, never sent) and every kind of producer documentation was searched for an explanation: methodology, codebook, country notes, release notes, and the notes and flags inside the data file. An explained problem is not sent; a partly explained one goes as a question quoting the passage. `producer_issues.py check` enforces both.
+- Look for earlier reports first (the repo, owid-issues on the dataset and its topic page, Slack, Gmail), so a known problem goes out as a follow-up.
+- Find the contact in this order: OWID's Notion producer contacts table, a contact the producer publishes for the data (email, then form), the authors' own published addresses. Never guess an address. When the contact isn't in the table yet, suggest adding it, and add it only on the user's yes.
+- Claude drafts and never sends: the draft goes to `workbench/<short_name>/producer-message.md` and the reply, with a Gmail draft on request.
+
 ## Final QA hand-off — Anomalist, Chart Diff, Metadata Diff and data-diff
 
-This is the **last step** of the pre-review work, and it comes **before the announcements** (steps 8, 9 and 9b): wait for the user's sign-off here before drafting either one. The old step files are still on disk at this point (deleting them is the final commit after review sign-off; see "Removing the old version & reordering the DAG"). Don't auto-run these — they're human-judgment tools. Hand off the four links so the user can review and click through, together with the 5 most-viewed data pages (see "The 5 most-viewed data pages" below):
+This is the **last step** of the pre-review work, and it comes **before the announcements** (steps 8, 9 and 9b): wait for the user's sign-off here before drafting either one. The old step files are still on disk at this point (deleting them is the final commit after review sign-off; see "Removing the old version & reordering the DAG"). These pages are for the user's own judgment: hand off the four links so the user can review and click through, together with the 5 most-viewed data pages (see "The 5 most-viewed data pages" below). The Anomalist pass of step 7 has already fact-checked Anomalist's top candidates; the Wizard page is still worth the user's look, because it shows every flagged series on a chart.
 
-- **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
+- **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops. Its coverage (missing or partial upgrade detectors) is settled in step 7, "Upgrade-detector coverage".
   ```
   http://staging-site-<container_branch>/etl/wizard/anomalist
-  ```
-
-  **Check the upgrade detectors' coverage before handing off.** Anomalist's `upgrade_missing` / `upgrade_change` detectors only compare old→new variable pairs from the wizard's variable-mapping table — and the indicator upgrader persists mappings **only for charted indicators**. If only some of the dataset's indicators are used in charts (the common case), the upgrade detectors silently skip the rest, and a partial mapping suppresses the shortName-inference fallback that would otherwise cover everything. Verify with `WizardDB.get_variable_mapping_raw()`: if it has fewer pairs than the dataset has indicators, rebuild the full mapping by shortName (old vs. new `variables` rows by `datasetId`) and re-run:
-  ```bash
-  STAGING=<branch> .venv/bin/etl anomalist --anomaly-types upgrade_missing --anomaly-types upgrade_change \
-      --dataset-ids <new_dataset_id> --variable-mapping '<full json mapping>' --force
-  ```
-  Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
-
-  **Read `upgrade_missing` flags before calling them data loss.** The detector pairs old and new indicators by shortName, so when the producer re-splits a dimension that is part of the shortName — comparability spells renumbered, a category recoded — the points move from one indicator to its sibling and every move is flagged as missing. Check whether the flagged points reappear under a sibling indicator with identical values before reporting a loss; if they do, it is a relabel to describe in the PR body (and, when the producer's release notes don't mention it, a question for the producer).
-
-  The upgrade detectors also need the **old** grapher dataset in the local catalog (`data/grapher/<ns>/<old_version>/<short>`) — the `FileNotFoundError` names the *new* dataset id, but the missing files are usually the old version's. If the old chain has already been removed from the DAG (so `etlr` can't rebuild it), fetch its files straight from the public catalog:
-  ```bash
-  mkdir -p data/grapher/<ns>/<old_v>/<short> && cd data/grapher/<ns>/<old_v>/<short> && \
-    for f in index.json <short>.feather <short>.meta.json; do \
-      curl -sL -O "https://catalog.ourworldindata.org/grapher/<ns>/<old_v>/<short>/$f"; done
   ```
 - **Chart Diff** — shows side-by-side before/after thumbnails for every chart that uses an upgraded indicator. Catches visual regressions the schema-level checks miss (axis ranges, color steps, legend changes).
   ```
@@ -1231,9 +1252,11 @@ Give the user the 5 staging links (`http://<container_name>/grapher/<slug>`), mo
 
 In the same message, remind the user that when the dataset is important and the update isn't urgent, it helps to ask a colleague, ideally one who isn't an expert in the topic, to read the WYSK ("What you should know") of these 5 pages and say what was unclear, what they had to read twice, and what they expected to find but didn't. The user decides whether that applies; it's a suggestion, so the hand-off doesn't wait for the colleague's feedback.
 
-**Close every hand-off with an explicit list of what's still open — in the PR body, not just chat** (chat scrolls away; the PR is what the reviewer and future-you actually read). This is one of the two cases where the list is worth writing out formally rather than as a sentence; see `.claude/docs/open-items.md` for what tends to get dropped. An update generates far more loose ends than it closes; this workflow's usual danglers: content/gdoc edits, producer error reports and any Metadata Diff rejection still unactioned (handed off — `metadata-rejections.md` is addressed to the dataset owner and nothing in the merge enforces it), reader-facing config changes held for sign-off (awaiting a decision), audits skipped at the user's request and anything the staging build didn't cover (nobody checked it) — plus a **fourth category, deferred to a follow-up PR**, where the two-PR pattern is in play (downstream consumers to repoint, old-version archiving, charts on retired indicators): that list is the follow-up PR's scope, so losing it means redoing the analysis.
+**Close every hand-off with an explicit list of what's still open — in the PR body, not just chat** (chat scrolls away; the PR is what the reviewer and future-you actually read). This is one of the two cases where the list is worth writing out formally rather than as a sentence; see `.claude/docs/open-items.md` for what tends to get dropped. An update generates far more loose ends than it closes; this workflow's usual danglers: content/gdoc edits, producer reports from the producer-issue log (drafted but not sent, or sent and unanswered) and any Metadata Diff rejection still unactioned (handed off — `metadata-rejections.md` is addressed to the dataset owner and nothing in the merge enforces it), reader-facing config changes held for sign-off (awaiting a decision), audits skipped at the user's request and anything the staging build didn't cover (nobody checked it) — plus a **fourth category, deferred to a follow-up PR**, where the two-PR pattern is in play (downstream consumers to repoint, old-version archiving, charts on retired indicators): that list is the follow-up PR's scope, so losing it means redoing the analysis.
 
 **Before the QA hand-off, run `.venv/bin/python .claude/skills/update-dataset/scripts/progress.py check <short_name> --before handoff`, and before saying the update is ready to merge, the same with `--before merge`.** It must report nothing open: every item due by that checkpoint, including the checks you told the user you'd run, closed with its evidence, and every item that names a skill closed by that skill, background audits included, with their findings handled. Run anything missing now, and wait for any audit still running.
+
+**After the sign-off, offer the message to the producer** when the producer-issue log has ready entries ("Producer issues"). It comes before the release check below, so that a newer release can still change what goes in it.
 
 **Right before merging, check that the producer hasn't published a newer release since the snapshot.** Updates take days, and some producers release monthly. Read the current release date where the snapshot got `date_published` (the API's publication-date attribute, the dataset page's stamp) and spot-check a few values against the snapshot. A newer release goes back to the user before the merge.
 
@@ -1288,7 +1311,8 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/harmonization.log` and `harmonization_audit.md` (from step 5c)
-- `ai/adversarial-review-<short_name>-<date>.md` (from step 6c-bis)
+- `ai/adversarial-review-<short_name>-<date>.md` (from step 6c-bis, rewritten by the Anomalist pass of step 7)
+- `workbench/<short_name>/producer-issues.yml` and, when a message is drafted, `producer-message.md` (see "Producer issues")
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
 - `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `draft-data-update-slack-post`)
 - `workbench/<short_name>/slack-announcement.md`

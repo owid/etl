@@ -249,6 +249,8 @@ Five further prose checks from `/update-dataset` § 6b that the skills don't aut
 
 When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`producer`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself (`.venv/bin/python .claude/skills/fact-check-dataset/scripts/prepare.py <ns>/<version>/<short_name>` puts the producer's documentation, the ranking and the anomaly candidates on disk in one command), following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
 
+The report also carries the **Anomalist pass** of `/update-dataset` step 7 (findings marked _(anomalist lane)_ and a *Values checked: Anomalist candidates* table). It is mandatory once the indicators are on staging: a report without it, and without a PR note on Anomalist's coverage (no new candidate, or detectors missing), is 🟡. Spot-check one of its `upgrade_change` verdicts against the two raw snapshots.
+
 ### 10c. Referencing-prose check
 
 `/update-dataset` step 7 asks the author to read the prose of every surface citing the dataset — articles, data
@@ -356,7 +358,7 @@ A **clean Codex review has a different shape**: no inline comments and zero revi
 
 **Out of scope for review:** Slack announcement and the QA hand-off (Anomalist, Chart Diff, data-diff report) are author-side concerns, not reviewer checks.
 
-**Producer-docs vs. data consistency.** If the PR description notes a discrepancy between the producer's documentation (codebook, methodology page, README, release notes — whatever is available) and the actual file shipped, that's a 🟢 informational item — the author has surfaced it for producer follow-up. **Don't ask them to "fix" the data to match the docs**; the PR should preserve what the source shipped and flag the discrepancy.
+**Producer-docs vs. data consistency.** If the PR description notes a discrepancy between the producer's documentation (codebook, methodology page, README, release notes — whatever is available) and the actual file shipped, that's a 🟢 informational item — the author has surfaced it for producer follow-up. **Don't ask them to "fix" the data to match the docs**; the PR should preserve what the source shipped and flag the discrepancy. The same holds for any problem the author attributes to the producer: `/update-dataset` collects them in its producer-issue log and offers a message to the producer before merge, so the PR's open items should say for each one whether it was reported (and when), explained by the producer's own documentation, or held back with a reason. A source problem in the report or the PR body that none of those covers is a 🟢 to raise.
 
 ### 14. Final report
 
