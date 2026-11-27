@@ -31,6 +31,8 @@ METRICS = {
 
 # Color indicator and chart text for each coloring. "Other" and missing categories are gray.
 GRAY = "#6e7581"
+# Lighter gray for "Other" when the named categories are the point of the chart, so that they stand out.
+LIGHT_GRAY = "#b9bdc4"
 COLORS = {
     "reporting": {
         "indicator": "training_compute_reporting",
@@ -79,9 +81,18 @@ COLORS = {
         "indicator": "country_group",
         "sentence": "Colors show the country of the organizations that developed it.",
         "by": "by country of developer",
+        # The United States and China get their flags' blue and red. The UK and France, whose flags use the same
+        # colors, get purple and teal so that the four stay easy to tell apart.
         "color_scale": {
-            "baseColorScheme": "OwidCategoricalB",
-            "customCategoryColors": {"Other": GRAY, "No data": "#a2a6ad"},
+            "customCategoryColors": {
+                "United States": "#2F5DA8",
+                "China": "#D52B1E",
+                "United Kingdom": "#7B4BA8",
+                "France": "#00847E",
+                "Multiple countries": "#E0A000",
+                "Other": LIGHT_GRAY,
+                "No data": "#dcdee2",
+            },
             "customCategoryLabels": {"No data": "Not recorded"},
         },
     },
@@ -89,7 +100,17 @@ COLORS = {
         "indicator": "developer_group",
         "sentence": "Colors show the company that developed it.",
         "by": "by developer",
-        "color_scale": {"baseColorScheme": "OwidCategoricalE", "customCategoryColors": {"Other": GRAY}},
+        # Colors close to each company's brand, adjusted so that none of them clash (Google and Meta are both blue).
+        "color_scale": {
+            "customCategoryColors": {
+                "OpenAI": "#10A37F",
+                "Google": "#4285F4",
+                "Anthropic": "#D97757",
+                "xAI": "#1F1F1F",
+                "Meta": "#8E44AD",
+                "Other": LIGHT_GRAY,
+            },
+        },
     },
 }
 
