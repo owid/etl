@@ -211,6 +211,8 @@ def test_organization_domain():
     assert pi.organization("health.govt.nz") == "health.govt.nz"
     assert pi.organization("www.ine.gob.cl") == "ine.gob.cl"
     assert pi.organization("insee.fr") == "insee.fr"
+    assert pi.organization("www150.statcan.gc.ca") == "statcan.gc.ca"
+    assert pi.organization("hc-sc.gc.ca") == "hc-sc.gc.ca"
 
 
 def test_contacts_in_text_finds_emails_and_contact_pages_only():

@@ -23,6 +23,7 @@ Each run starts over: an earlier run's result answers another candidate set, so 
 
 import argparse
 import csv
+import json
 import os
 import re
 import sys
@@ -115,7 +116,13 @@ def run(step: str, top: int, min_score: float) -> str:
     stored, indicators, notes = load_scores(engine, int(dataset["id"]), min_score)
     first_pass = first_pass_keys(dossier)
     rows = candidates(stored, indicators, first_pass, top, stale_types(notes, dataset))
-    add_values(rows, paths.DATA_DIR, f"{namespace}/{version}/{short_name}", old_dataset(engine, dataset))
+    add_values(
+        rows,
+        paths.DATA_DIR,
+        f"{namespace}/{version}/{short_name}",
+        old_dataset(engine, dataset),
+        dataset["sourceChecksum"],
+    )
     write_csv(rows, dossier / "anomalist.csv")
     coverage = coverage_notes(stored, indicators, dataset, notes) + set_aside
     text = render(step, rel, rows, coverage, first_pass, min_score, replaced=report_is_stale(dossier))
@@ -429,18 +436,32 @@ def candidates(
     return rows
 
 
-def add_values(rows: list[dict], data_dir: Path, new: str, old: tuple[str | None, dict[int, str], str]) -> None:
-    """The flagged value, its neighbors and the old version's value, from the grapher datasets on disk."""
+def add_values(
+    rows: list[dict],
+    data_dir: Path,
+    new: str,
+    old: tuple[str | None, dict[int, str], str],
+    staging_checksum: str | None = None,
+) -> None:
+    """The flagged value, its neighbors and the old version's value, from the grapher datasets on disk.
+
+    The new values are read only from a local build of the same revision as staging (same source checksum): a
+    stale local build would put another revision's values next to staging's anomalies.
+    """
     old_path, old_identities, no_old = old
     new_dir = data_dir / "grapher" / new
     old_dir = data_dir / "grapher" / old_path if old_path else None
+    other_build = local_build_differs(new_dir, staging_checksum)
     cache: dict = {}
     for row in rows:
         if not row["selected"]:
             continue
         table, _, column = row["identity"].partition("#")
         year = int(row["year"]) if row["year"] else None
-        series, reason = read_series(cache, new_dir, table, column, row["entity"])
+        if other_build:
+            series, reason = None, other_build
+        else:
+            series, reason = read_series(cache, new_dir, table, column, row["entity"])
         row["value"], row["previous"], row["next"] = neighbors(series, year, reason)
         if old_dir is None:
             row["old_value"] = no_old
@@ -448,6 +469,20 @@ def add_values(rows: list[dict], data_dir: Path, new: str, old: tuple[str | None
         old_table, _, old_column = old_identities.get(row["indicator_id"], row["identity"]).partition("#")
         old_series, old_reason = read_series(cache, old_dir, old_table, old_column, row["entity"])
         row["old_value"] = f"{old_path}: {old_reason}" if old_series is None else value_at(old_series, year)
+
+
+def local_build_differs(directory: Path, staging_checksum: str | None) -> str:
+    """Why the local build is not staging's revision, or "" when it is (or cannot be told)."""
+    index = directory / "index.json"
+    if not staging_checksum or not index.exists():
+        return ""
+    try:
+        local = str(json.loads(index.read_text()).get("source_checksum") or "").removesuffix("_instant")
+    except ValueError:
+        return ""  # `read_series` reports the unreadable dataset itself
+    if local and local != staging_checksum:
+        return "local build is another revision than staging (source checksum differs): rebuild the grapher step"
+    return ""
 
 
 def read_series(

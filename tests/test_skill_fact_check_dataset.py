@@ -858,6 +858,19 @@ def test_anomalist_stale_report_stays_flagged_over_reruns_until_reassembled(tmp_
     assert not anomalist_candidates.report_is_stale(dossier)
 
 
+def test_anomalist_values_are_not_read_from_another_revision(tmp_path):
+    """A local build with another source checksum than staging must not supply the values next to its anomalies."""
+    new = tmp_path / "grapher" / "ns" / "v" / "thing"
+    new.mkdir(parents=True)
+    (new / "index.json").write_text(json.dumps({"source_checksum": "local"}))
+    rows: list[dict] = [{"selected": True, "identity": "t#gdp", "year": "2020", "entity": "Chad", "indicator_id": 2}]
+    old = (None, {}, "no older version in the DB")
+    anomalist_candidates.add_values(rows, tmp_path, "ns/v/thing", old, "staging")
+    assert str(rows[0]["value"]).startswith("local build is another revision than staging")
+    assert anomalist_candidates.local_build_differs(new, "local") == ""
+    assert anomalist_candidates.local_build_differs(new, None) == ""
+
+
 def test_anomalist_values_tell_a_corrupt_dataset_from_a_missing_one(tmp_path):
     """A dataset that is on disk but fails to read must say so, not pass as "not on disk"."""
     (tmp_path / "index.json").write_text("{not json")

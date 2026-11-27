@@ -55,6 +55,7 @@ GENERIC_SECOND_LEVEL = {
     "co",
     "com",
     "edu",
+    "gc",
     "go",
     "gob",
     "gouv",
