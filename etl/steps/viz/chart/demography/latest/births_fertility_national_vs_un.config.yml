@@ -41,6 +41,9 @@ definitions:
     - dimensions:
         comparison: relative_difference
       config:
+        chartTypes:
+          - LineChart
+          - DiscreteBar
         hasMapTab: true
         tab: map
         map:
