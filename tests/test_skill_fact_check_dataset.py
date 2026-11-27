@@ -804,6 +804,25 @@ def test_anomalist_rerun_without_candidates_asks_to_reassemble_the_report():
     assert "assemble_report.py" not in anomalist_candidates.render(*args)
 
 
+def test_anomalist_stale_report_stays_flagged_over_reruns_until_reassembled(tmp_path):
+    """A second rerun finds nothing left to set aside, but the report still carries the first result."""
+    import os
+
+    dossier = tmp_path / "ai" / "fact-check" / "ns" / "v" / "thing"
+    dossier.mkdir(parents=True)
+    report = tmp_path / "ai" / "adversarial-review-thing-2026-11-27.md"
+    report.write_text("old findings")
+    os.utime(report, (1_000_000_000, 1_000_000_000))
+    (dossier / "lane_anomalist.result.md").write_text("old")
+    assert not anomalist_candidates.report_is_stale(dossier)
+    anomalist_candidates.clear_previous_run(dossier)
+    assert anomalist_candidates.report_is_stale(dossier)
+    assert anomalist_candidates.clear_previous_run(dossier) == []  # second rerun: nothing to set aside
+    assert anomalist_candidates.report_is_stale(dossier)
+    report.write_text("reassembled")  # assemble_report.py ran again
+    assert not anomalist_candidates.report_is_stale(dossier)
+
+
 def test_anomalist_values_tell_a_corrupt_dataset_from_a_missing_one(tmp_path):
     """A dataset that is on disk but fails to read must say so, not pass as "not on disk"."""
     (tmp_path / "index.json").write_text("{not json")

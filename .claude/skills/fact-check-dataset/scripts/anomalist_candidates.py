@@ -106,7 +106,7 @@ def run(step: str, top: int, min_score: float) -> str:
             f"grapher://grapher/{namespace}/{version}/{short_name} --grapher`) and run this again.\n"
         )
         text += "".join(f"\n- {note}\n" for note in set_aside)
-        if set_aside:
+        if report_is_stale(dossier):
             text += f"\n{reassemble(rel)}\n"
         (dossier / "anomalist.md").write_text(text)
         return text
@@ -117,7 +117,7 @@ def run(step: str, top: int, min_score: float) -> str:
     add_values(rows, paths.DATA_DIR, f"{namespace}/{version}/{short_name}", old_dataset(engine, dataset))
     write_csv(rows, dossier / "anomalist.csv")
     coverage = coverage_notes(stored, indicators, dataset, notes) + set_aside
-    text = render(step, rel, rows, coverage, first_pass, min_score, replaced=bool(set_aside))
+    text = render(step, rel, rows, coverage, first_pass, min_score, replaced=report_is_stale(dossier))
     (dossier / "anomalist.md").write_text(text)
     # The brief exists only when there is something to check: `assemble_report.py` waits for the result of a brief.
     if any(r["selected"] for r in rows):
@@ -131,6 +131,8 @@ def clear_previous_run(dossier: Path) -> list[str]:
     result = dossier / RESULT
     if result.exists():
         result.replace(dossier / PREVIOUS_RESULT)
+        # The moved file's time is when it was set aside: `report_is_stale` compares the report with it.
+        os.utime(dossier / PREVIOUS_RESULT)
         notes.append(
             f"An earlier run's `{RESULT}` answered another candidate set: it was moved to `{PREVIOUS_RESULT}`, "
             "and the report ignores it."
@@ -138,6 +140,19 @@ def clear_previous_run(dossier: Path) -> list[str]:
     for name in (BRIEF, "anomalist.csv"):
         (dossier / name).unlink(missing_ok=True)
     return notes
+
+
+def report_is_stale(dossier: Path) -> bool:
+    """Whether an assembled report predates the setting aside of an earlier result, so it still carries it.
+
+    Stays true over any number of reruns until `assemble_report.py` writes the report again.
+    The report is `<repo>/ai/adversarial-review-<short_name>-<date>.md`, next to `ai/fact-check/`.
+    """
+    previous = dossier / PREVIOUS_RESULT
+    reports = list(dossier.parents[3].glob(f"adversarial-review-{dossier.name}-*.md"))
+    if not previous.exists() or not reports:
+        return False
+    return max(report.stat().st_mtime for report in reports) < previous.stat().st_mtime
 
 
 # ----------------------------------------------------------------------------------------------------------------
