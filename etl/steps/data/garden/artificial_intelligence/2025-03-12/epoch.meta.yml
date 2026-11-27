@@ -95,6 +95,40 @@ tables:
           zeroDay: '1949-01-01'
           timeInterval: day
 
+      developer_group:
+        title: Developer
+        unit: ''
+        short_unit: ''
+        description_short: Company that developed an AI model.
+        description_processing: |-
+          We show OpenAI, Google, Anthropic, xAI, and Meta separately, and group all other developers as “Other”. A model counts toward one of these companies when it is among the organizations that developed it, even alongside universities or other organizations. Google includes the AI labs that Epoch AI lists separately, such as DeepMind and Google Brain, and Meta includes Facebook AI Research. Models developed by several of these companies count as “Other”.
+        display:
+          zeroDay: '1949-01-01'
+          timeInterval: day
+
+      country_group:
+        title: Country of developer
+        unit: ''
+        short_unit: ''
+        description_short: Country of the organizations that developed an AI model.
+        description_from_producer: Country/countries associated with the developing organization(s). Multinational is used to mark organizations associated with multiple countries.
+        description_processing: |-
+          We show the United States, China, the United Kingdom, and France separately, and group all other countries as “Other”. Models developed by organizations in several countries, or by organizations that Epoch AI marks as multinational, count as “Multiple countries”.
+        display:
+          zeroDay: '1949-01-01'
+          timeInterval: day
+
+      weights_availability:
+        title: Availability of model weights
+        unit: ''
+        short_unit: ''
+        description_short: Whether the weights of an AI model are openly available, whether the model can only be used through an API or another hosted service, or whether it was not released.
+        description_processing: |-
+          We group Epoch AI’s categories as follows: “Open weights” covers open weights with unrestricted, non-commercial, or restricted use; “API or hosted access only” covers API access, hosted access without an API, and limited access; and “Not released” covers unreleased models. Models whose accessibility Epoch AI has not recorded have no value.
+        display:
+          zeroDay: '1949-01-01'
+          timeInterval: day
+
       publication_date:
         title: Publication date
         unit: ''

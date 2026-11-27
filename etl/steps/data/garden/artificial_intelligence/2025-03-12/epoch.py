@@ -115,6 +115,12 @@ def run() -> None:
     # Classify each model's training compute as reported by the developer or estimated by Epoch AI.
     tb = add_training_compute_reporting(tb)
 
+    # Group each model's developers, their countries, and the availability of its weights into a few categories,
+    # to color charts by.
+    tb = add_developer_group(tb)
+    tb = add_country_group(tb)
+    tb = add_weights_availability(tb)
+
     # Convert training dataset size to numeric
     tb["training_dataset_size__total"] = pd.to_numeric(tb["training_dataset_size__total"], errors="coerce")
 
@@ -147,6 +153,7 @@ def run() -> None:
             "organization",
             "authors",
             "country__from_organization",
+            "model_accessibility",
         ],
         axis=1,
     )
@@ -185,5 +192,104 @@ def add_training_compute_reporting(tb):
     # Every model with a compute figure falls in one of the two groups, and only those models do.
     assert (tb["training_compute_reporting"].notna() == has_compute).all(), "Unexpected training compute reporting."
     assert set(tb["training_compute_reporting"].dropna()) == {"Estimated by Epoch AI", "Reported by the developer"}
+
+    return tb
+
+
+# Companies shown separately when coloring by developer, with the names Epoch AI gives their organizations.
+# Epoch AI lists Google's AI labs under several names; MetaMind is a Salesforce company, not Meta's.
+DEVELOPER_GROUPS = {
+    "OpenAI": ["OpenAI"],
+    "Google": ["Google", "Google AI", "Google Brain", "Google Cloud", "Google DeepMind", "Google Research", "DeepMind"],
+    "Anthropic": ["Anthropic"],
+    "xAI": ["xAI"],
+    "Meta": ["Meta AI", "Facebook", "Facebook AI", "Facebook AI Research"],
+}
+
+# Countries shown separately when coloring by country, with the names Epoch AI gives them.
+COUNTRY_GROUPS = {
+    "United States of America": "United States",
+    "China": "China",
+    "United Kingdom": "United Kingdom",
+    "France": "France",
+}
+
+# Epoch AI's model accessibility categories, grouped by whether and how the model can be used.
+WEIGHTS_AVAILABILITY = {
+    "Open weights (unrestricted)": "Open weights",
+    "Open weights (non-commercial)": "Open weights",
+    "Open weights (restricted use)": "Open weights",
+    "API access": "API or hosted access only",
+    "Hosted access (no API)": "API or hosted access only",
+    "Limited access": "API or hosted access only",
+    "Unreleased": "Not released",
+}
+
+
+def _split_list(value) -> list[str]:
+    """Split one of Epoch AI's comma-separated lists, dropping blanks and duplicates."""
+    if pd.isna(value) or value in ("", "nan", "Not specified"):
+        return []
+    return list(dict.fromkeys(item.strip() for item in str(value).split(",") if item.strip()))
+
+
+def add_developer_group(tb):
+    """Add the company that developed each model: one of DEVELOPER_GROUPS, or "Other".
+
+    A model counts toward a company when one of its developers is that company, even alongside universities or other
+    organizations. A model developed by several of these companies, or by none of them, counts as "Other".
+    """
+    group_of = {
+        organization: group for group, organizations in DEVELOPER_GROUPS.items() for organization in organizations
+    }
+    values = []
+    for organizations in tb["organization"]:
+        groups = {group_of[organization] for organization in _split_list(organizations) if organization in group_of}
+        values.append(groups.pop() if len(groups) == 1 else "Other")
+
+    tb["developer_group"] = tb["organization"].astype("object")
+    tb.loc[:, "developer_group"] = values
+    assert set(tb["developer_group"]) <= set(DEVELOPER_GROUPS) | {"Other"}, "Unexpected developer group."
+    for group in DEVELOPER_GROUPS:
+        assert (tb["developer_group"] == group).any(), f"No notable model developed by {group}: has its name changed?"
+
+    return tb
+
+
+def add_country_group(tb):
+    """Add the country of the organizations that developed each model: one of COUNTRY_GROUPS, "Other",
+    "Multiple countries", or no value when Epoch AI lists no country.
+
+    Epoch AI marks organizations associated with several countries as "Multinational", so those count as
+    "Multiple countries" too.
+    """
+    values = []
+    for countries in tb["country__from_organization"]:
+        countries = _split_list(countries)
+        if not countries:
+            values.append(None)
+        elif len(countries) > 1 or countries[0] == "Multinational":
+            values.append("Multiple countries")
+        else:
+            values.append(COUNTRY_GROUPS.get(countries[0], "Other"))
+
+    tb["country_group"] = tb["country__from_organization"].astype("object")
+    tb.loc[:, "country_group"] = values
+    expected = set(COUNTRY_GROUPS.values()) | {"Other", "Multiple countries"}
+    assert set(tb["country_group"].dropna()) == expected, "Unexpected or missing country group."
+
+    return tb
+
+
+def add_weights_availability(tb):
+    """Add whether each model's weights are open, whether it can only be used through an API or another hosted
+    service, or whether it was not released. Models whose accessibility Epoch AI hasn't recorded get no value.
+    """
+    accessibility = tb["model_accessibility"].astype("object")
+    unexpected = set(accessibility.dropna()) - set(WEIGHTS_AVAILABILITY)
+    assert not unexpected, f"Unexpected model accessibility values: {unexpected}"
+
+    tb["weights_availability"] = accessibility
+    tb.loc[:, "weights_availability"] = accessibility.map(WEIGHTS_AVAILABILITY)
 
     return tb
