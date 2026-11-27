@@ -162,6 +162,12 @@ tables:
       status:
         title: Whether national births and fertility rates are included in the comparison with UN estimates
         unit: ""
+        type: ordinal
+        sort:
+          - Included
+          - Birth registration under 90% or unknown
+          - Left out for another reason
+          - Population under 1 million
         description_short: Whether a country's births and fertility rates from national statistics are included in our comparison with UN estimates, and if not, the main reason.
         description_key:
           - "{definitions.key_inclusion}"
