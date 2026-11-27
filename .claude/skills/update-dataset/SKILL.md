@@ -843,11 +843,12 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
      **Upgrade-detector coverage.** Anomalist's `upgrade_missing` / `upgrade_change` detectors compare only the old→new pairs in their variable mapping. owidbot builds it with `load_variable_mapping()` (`apps/wizard/app_pages/anomalist/utils.py`): the indicator upgrader's pairs, which exist only for charted indicators and are the only pairs for an indicator whose short name changed, plus pairs inferred by identical short name for the rest. An indicator that is neither charted nor under the same short name is therefore not compared. When the detectors are missing, stale, or skip indicators they should cover, re-run them with that same merged mapping, adding by hand any renamed pair it lacks. `--variable-mapping` replaces the mapping rather than adding to it, so never pass the short-name pairs alone: that drops the upgrader's pairs for renamed indicators.
      ```bash
-     STAGING=<branch> .venv/bin/python -c "import json; from apps.wizard.app_pages.anomalist.utils import load_variable_mapping; print(json.dumps(load_variable_mapping([<new_dataset_id>], {<new_dataset_id>: <old_dataset_id>})))" > workbench/<short_name>/anomalist_mapping.json
+     STAGING=<branch> .venv/bin/python -c "import json, pathlib; from apps.wizard.app_pages.anomalist.utils import load_variable_mapping; pathlib.Path('workbench/<short_name>/anomalist_mapping.json').write_text(json.dumps(load_variable_mapping([<new_dataset_id>], {<new_dataset_id>: <old_dataset_id>})))"
      STAGING=<branch> .venv/bin/etl anomalist --anomaly-types upgrade_missing --anomaly-types upgrade_change \
-         --dataset-ids <new_dataset_id> --variable-mapping "$(cat workbench/<short_name>/anomalist_mapping.json)" --force
+         --dataset-ids <new_dataset_id> --variable-mapping "$(cat workbench/<short_name>/anomalist_mapping.json)" \
+         --sample-n 0 --force
      ```
-     Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
+     The script writes the file itself because the helper logs to stdout, and a log line in the file breaks the JSON. `--sample-n 0` turns off the CLI's default sample of 500 indicators per dataset, which would otherwise leave the rest of a large dataset uncompared. Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
 
      **Read `upgrade_missing` flags before calling them data loss.** The detector pairs old and new indicators by shortName, so when the producer re-splits a dimension that is part of the shortName — comparability spells renumbered, a category recoded — the points move from one indicator to its sibling and every move is flagged as missing. Check whether the flagged points reappear under a sibling indicator with identical values before reporting a loss; if they do, it is a relabel to describe in the PR body (and, when the producer's release notes don't mention it, an entry in the producer-issue log).
 
