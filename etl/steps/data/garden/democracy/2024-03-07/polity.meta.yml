@@ -7,7 +7,7 @@ definitions:
         - Democracy
     description_key:
       - &other_sources |-
-        We have other democracy data sources that also cover more recent years and have more precise data. You can find them in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy).
+        We have other democracy data sources that also cover more recent years and have more precise data. You can find them in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/grapher/democracy).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
