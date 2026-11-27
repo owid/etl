@@ -355,8 +355,17 @@ tables:
           V-Dem indicator name: `v2eltrnout`
         unit: "%"
         presentation:
-          <<: *ppt_uni_w_regions
           title_public: Voter turnout of registered voters
+          grapher_config: &grapher_config_turnout
+            selectedEntityNames:
+              - "United States"
+              - "United Kingdom"
+              - "France"
+              - "Germany"
+              - "Japan"
+              - "India"
+              - "Brazil"
+              - "South Africa"
         display:
           numDecimalPlaces: 2
 
@@ -373,8 +382,8 @@ tables:
           V-Dem indicator name: `v2elvaptrn`
         unit: "%"
         presentation:
-          <<: *ppt_uni_w_regions
           title_public: Voter turnout of voting-age population
+          grapher_config: *grapher_config_turnout
         display:
           numDecimalPlaces: 2
 
