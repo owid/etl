@@ -13,6 +13,7 @@ The procedure behind the dataset contexts of [SKILL.md](../SKILL.md). `prepare.p
 | Metadata as readers see it | `metadata.md` (rendered, Jinja resolved) and `metadata_changes.diff` | the claims review |
 | Indicators for the deep review | `ranking.csv`: views, rank, anomaly flags, selected or SKIPPED with a reason | override with `--indicators`, `--top`, `--full` when the selection misses the point of the review |
 | Anomaly candidates | `anomalies.csv` | the triage: which are real |
+| Anomalist candidates (update, after the indicator upgrade) | `anomalist.csv`, `anomalist.md`, from `anomalist_candidates.py` | the triage of the selected ones |
 | Details on Demand | `dods.md` | hold each relevant DoD to the documentation |
 | Earlier reviews | their paths | reuse what they established about the source |
 
@@ -90,6 +91,16 @@ This is the half that catches the *source's* mistakes.
 
 The scan's thresholds are constants at the top of `scripts/anomaly_scan.py`; run it with `--columns` or `--entities` to look at one indicator or country alone. Its `WORLD_SUM` flag applies only to additive units (counts, tonnes, deaths; never rates, shares or indices).
 
+### Anomalist candidates
+
+The Anomalist pass of an update reads `anomalist.csv` instead of `anomalies.csv`, and checks only the rows with `selected` = True. Each row is the worst year of one indicator for one entity, so other years of the same series can be off too: look at the whole series before closing it. Read each type for what it is:
+
+- `upgrade_change`: a value moved between the old and the new version. Compare the two raw snapshots first. A move present in both is a producer revision: say whether their release notes mention it. A move absent from the raw files entered in our processing.
+- `upgrade_missing`: a point that had data and no longer does. Before calling it data loss, check whether it moved to a sibling indicator with the same value (a relabel), and whether the producer dropped it on purpose (release notes, a suppression flag).
+- `time_change` and `gp_outlier`: a jump or an outlier within the series. Triage them like the scan's `BREAK` and `OUTLIER`.
+
+`anomalist.md` says what Anomalist did not cover (indicators sampled out, types not stored, stale results). Copy that into *Anomalies not checked*: a short candidate list is not a clean dataset.
+
 ### What to cross-check online
 
 - **Our output against the producer's own figures**, first, because it needs no search: for the newly added period (and the anchors below), compare our values with what the producer publishes, in the saved documentation or the raw snapshot. A difference there entered in our processing.
@@ -105,7 +116,7 @@ A mismatch beyond the Tolerance in SKILL.md, an accounting identity that does no
 
 ### Result
 
-`lane_values.result.md` in the dossier directory, with exactly these headings:
+`lane_values.result.md` in the dossier directory, with exactly these headings. In *Values checked*, the indicator cell names the column (`gdp` or `table#column`, alone or in backticks after a title): the Anomalist pass skips only the values whose column it recognizes there.
 
 ```
 ## Findings
@@ -126,7 +137,7 @@ N. 🔴|🟡|🟢 [data-level] <one-line defect>
 
 ## The report
 
-`assemble_report.py <dossier> --reconciled` writes `ai/adversarial-review-<short_name>-<YYYY-MM-DD>.md` from the two results:
+`assemble_report.py <dossier> --reconciled` writes `ai/adversarial-review-<short_name>-<YYYY-MM-DD>.md` from the two results (and from `lane_anomalist.result.md`, when the Anomalist pass ran, adding its own tables to Part 2):
 
 ```
 # Adversarial data review — <ns>/<version>/<short_name>

@@ -11,6 +11,7 @@ import importlib.util
 import json
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -37,6 +38,7 @@ anomaly_scan = _load("anomaly_scan")
 fetch_docs = _load("fetch_docs")
 assemble_report = _load("assemble_report")
 prepare = _load("prepare")
+anomalist_candidates = _load("anomalist_candidates")
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -631,6 +633,298 @@ def test_assemble_clean_review(tmp_path):
     text, problems, counts = assemble_report.assemble(_dossier(tmp_path, claims, values), False, None, "2026-11-16")
     assert problems == [] and sum(counts.values()) == 0
     assert "No findings: the review came back clean." in text
+
+
+ANOMALIST_RESULT = """## Findings
+1. 🟡 [data-level] anomalist:upgrade_change Germany 2022 revised by 40% with no release note
+   Evidence: old 45.9, new 64.3
+
+## Values checked
+| indicator | entity | year | our value | independent value(s) | source link | verdict | anchor or anomaly |
+|---|---|---|---|---|---|---|---|
+| point_in_time_1 | Germany | 2022 | 64.3 | 64.3 (Destatis) | https://y.org | ✓ | anomalist:upgrade_change |
+
+## Anomalies not checked
+- Japan 2023: past the cap
+
+## Notes for the other lane
+none
+"""
+
+
+def test_assemble_folds_in_the_anomalist_pass(tmp_path):
+    dossier = _dossier(tmp_path)
+    (dossier / "lane_anomalist.result.md").write_text(ANOMALIST_RESULT)
+    text, problems, counts = assemble_report.assemble(dossier, False, None, "2026-11-27")
+    assert problems == [] and counts == {"🔴": 1, "🟡": 2, "🟢": 1}
+    assert "Germany 2022 revised by 40% with no release note _(anomalist lane)_" in text
+    assert "### Values checked: Anomalist candidates" in text and "Destatis" in text
+    assert "### Anomalist candidates not checked" in text and "Japan 2023: past the cap" in text
+
+
+def test_assemble_waits_for_a_started_anomalist_pass(tmp_path):
+    dossier = _dossier(tmp_path)
+    (dossier / "lane_anomalist.md").write_text("brief")
+    text, problems, _ = assemble_report.assemble(dossier, False, None, "2026-11-27")
+    assert text == "" and "lane_anomalist.result.md is not" in problems[0]
+    # Without a brief, the first pass assembles on its own.
+    (dossier / "lane_anomalist.md").unlink()
+    assert assemble_report.assemble(dossier, False, None, "2026-11-27")[1] == []
+
+
+def test_assemble_holds_unsettled_anomalist_notes(tmp_path):
+    dossier = _dossier(tmp_path)
+    notes = ANOMALIST_RESULT.replace("## Notes for the other lane\nnone", "## Notes for the other lane\nUnit is %.")
+    (dossier / "lane_anomalist.result.md").write_text(notes)
+    _, problems, _ = assemble_report.assemble(dossier, False, None, "2026-11-27")
+    assert "anomalist lane → the other lanes" in problems[0]
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# Anomalist candidates
+# ----------------------------------------------------------------------------------------------------------------
+
+
+def _stored(rows: list[tuple]) -> pd.DataFrame:
+    """Stored anomalies as `view.build_table` returns them: (type, indicator_id, entity, year, relevance 0-1)."""
+    frame = pd.DataFrame(rows, columns=["type", "indicator_id", "entity_name", "year", "score_weighted"])
+    frame["indicator"] = frame["indicator_id"].map(lambda i: f"col{i}")
+    frame["indicator_name"], frame["unit"] = "Title", "%"
+    frame["anomaly"], frame["relevance"] = 100, (frame["score_weighted"] * 100).round().astype(int)
+    return frame
+
+
+INDICATORS = pd.DataFrame(
+    {"indicator_id": [1, 2], "catalogPath": ["grapher/ns/v/thing/t#rate__sex_female", "grapher/ns/v/thing/t#gdp"]}
+)
+NO_FIRST_PASS = {"checked": set(), "flagged": set(), "has_result": False, "has_scan": False}
+
+
+def test_anomalist_candidates_keep_the_ranking_and_list_everything_past_the_cap():
+    stored = _stored(
+        [
+            ("time_change", 2, "Chad", 2020, 0.5),
+            ("upgrade_change", 1, "France", 2023, 0.9),
+            ("gp_outlier", 2, "Peru", 2021, 0.4),
+        ]
+    )
+    rows = anomalist_candidates.candidates(stored, INDICATORS, NO_FIRST_PASS, top=2)
+    assert [r["entity"] for r in rows] == ["France", "Chad", "Peru"]
+    assert [r["selected"] for r in rows] == [True, True, False]
+    assert "past the cap of 2" in rows[2]["why"]
+    assert rows[0]["identity"] == "t#rate__sex_female" and rows[0]["year"] == "2023"
+
+
+def test_anomalist_candidates_skip_what_the_first_pass_covered(tmp_path):
+    (tmp_path / "lane_values.result.md").write_text(VALUES.replace("| gdp | World | 2024 |", "| gdp | Chad | 2020 |"))
+    anomaly_scan.write_csv(
+        [
+            {
+                "table": "t",
+                "column": "rate",
+                "kind": "OUTLIER",
+                "period": 2023,
+                "detail": "France, sex=female 2023: 9.9 (|z|>6)",
+            }
+        ],
+        tmp_path / "anomalies.csv",
+    )
+    first_pass = anomalist_candidates.first_pass_keys(tmp_path)
+    stored = _stored(
+        [
+            ("upgrade_change", 1, "France", 2023, 0.9),
+            ("time_change", 2, "Chad", 2020, 0.5),
+            ("time_change", 2, "Peru", 2020, 0.5),
+        ]
+    )
+    rows = anomalist_candidates.candidates(stored, INDICATORS, first_pass, top=5)
+    assert [r["status"] for r in rows] == [
+        anomalist_candidates.FLAGGED,  # garden `rate` at sex=female is the grapher slice `rate__sex_female`
+        anomalist_candidates.CHECKED,
+        anomalist_candidates.NEW,
+    ]
+    assert [r["selected"] for r in rows] == [False, False, True]
+
+
+def test_anomalist_stale_types_are_never_selected():
+    """Results stored for an earlier build must not reach the lane, and the output says to re-run."""
+    stored = _stored([("upgrade_change", 1, "France", 2023, 0.9), ("time_change", 2, "Chad", 2020, 0.5)])
+    notes = {"checksums": {"upgrade_change": "old", "time_change": "new"}}
+    stale = anomalist_candidates.stale_types(notes, {"sourceChecksum": "new"})
+    assert stale == ["upgrade_change"]
+    rows = anomalist_candidates.candidates(stored, INDICATORS, NO_FIRST_PASS, top=5, stale=stale)
+    assert [(r["entity"], r["selected"], r["why"]) for r in rows] == [
+        ("France", False, anomalist_candidates.STALE),
+        ("Chad", True, "new candidate"),
+    ]
+    text = anomalist_candidates.render("ns/v/thing", "ai/fact-check/ns/v/thing", rows, [], NO_FIRST_PASS, 0.3)
+    assert "earlier build and are not selected" in text
+    # A forced re-run that finds nothing keeps the stale record: the output says how to get out of that loop.
+    assert "still stale after a forced re-run" in text and "Upgrade-detector coverage" in text
+
+
+def test_anomalist_old_values_come_from_the_version_being_replaced():
+    """A mapping with rows from several older versions pairs indicators only with the latest of them."""
+    mapping = pd.DataFrame(
+        {
+            "id_new": [10, 11, 10],
+            "old_path": [
+                "grapher/ns/2025/thing/t#gdp",
+                "grapher/ns/2025/thing/t#pop",
+                "grapher/ns/2020/thing/t#gdp_old",
+            ],
+            "old_dataset": ["ns/2025/thing", "ns/2025/thing", "ns/2020/thing"],
+            "old_version": ["2025", "2025", "2020"],
+        }
+    ).iloc[[2, 0, 1]]
+    old_path, olds = anomalist_candidates.replaced_by_mapping(mapping)
+    assert old_path == "ns/2025/thing" and olds == {10: "t#gdp", 11: "t#pop"}
+
+
+def test_anomalist_first_pass_flag_needs_the_same_year():
+    first_pass = {**NO_FIRST_PASS, "flagged": {("t#rate", "France: 9.9", "2019")}}
+    assert anomalist_candidates.status_of("t#rate", "France", "2023", first_pass) == anomalist_candidates.NEW
+    assert anomalist_candidates.status_of("t#rate", "France", "2019", first_pass) == anomalist_candidates.FLAGGED
+
+
+def test_anomalist_scan_flag_covers_only_the_dimension_slice_it_names():
+    flagged = {("t#rate", "France, sex=male, age=0-4 2023: ≥×10 jump from the previous period", "2023")}
+    first_pass = {**NO_FIRST_PASS, "flagged": flagged}
+    status = anomalist_candidates.status_of
+    assert status("t#rate__sex_male__age_0_4", "France", "2023", first_pass) == anomalist_candidates.FLAGGED
+    assert status("t#rate__sex_female__age_0_4", "France", "2023", first_pass) == anomalist_candidates.NEW
+    assert status("t#rate__sex_male", "France", "2023", first_pass) == anomalist_candidates.NEW
+    # A flag on a series with no dimensions covers the undimensioned column only.
+    plain = {**NO_FIRST_PASS, "flagged": {("t#rate", "France 2023: 9.9 (|z|>6)", "2023")}}
+    assert status("t#rate", "France", "2023", plain) == anomalist_candidates.FLAGGED
+    assert status("t#rate__sex_female", "France", "2023", plain) == anomalist_candidates.NEW
+
+
+def test_anomalist_checked_row_names_the_exact_column_not_a_related_one():
+    first_pass = {**NO_FIRST_PASS, "checked": {("gdp_per_capita", "chad", "2020")}}
+    assert anomalist_candidates.status_of("t#gdp", "Chad", "2020", first_pass) == anomalist_candidates.NEW
+    assert anomalist_candidates.names_column("gdp", "t#gdp")
+    assert anomalist_candidates.names_column("t#gdp", "t#gdp")
+    assert anomalist_candidates.names_column("grapher/ns/v/thing/t#gdp", "t#gdp")
+    assert anomalist_candidates.names_column("gdp per person (`gdp`)", "t#gdp")
+    assert not anomalist_candidates.names_column("other#gdp", "t#gdp")
+    assert not anomalist_candidates.names_column("deaths_per_100k", "t#deaths")
+    assert not anomalist_candidates.names_column("gdp per capita", "t#gdp")
+
+
+def test_anomalist_first_pass_flag_names_the_entity_not_a_longer_name_containing_it():
+    first_pass = {**NO_FIRST_PASS, "flagged": {("t#rate", "Equatorial Guinea 2023: 9.9 (|z|>6)", "2023")}}
+    assert anomalist_candidates.status_of("t#rate", "Guinea", "2023", first_pass) == anomalist_candidates.NEW
+    assert anomalist_candidates.status_of("t#rate", "Equatorial Guinea", "2023", first_pass) == (
+        anomalist_candidates.FLAGGED
+    )
+    assert anomalist_candidates.names_entity("Niger, sex=female 2020: ≥×10 jump", "Niger")
+    assert not anomalist_candidates.names_entity("Nigeria 2020: ≥×10 jump", "Niger")
+    assert not anomalist_candidates.names_entity("United States Virgin Islands 2020: 1", "United States")
+
+
+def test_anomalist_neighbors_and_old_values():
+    series = pd.Series([1.0, 2.0, 30.0], index=[2019, 2020, 2022])
+    assert anomalist_candidates.neighbors(series, 2020) == ("2", "1 (2019)", "30 (2022)")
+    assert anomalist_candidates.value_at(series, 2021) == "missing"
+    assert anomalist_candidates.neighbors(None, 2020)[0].startswith("not on disk")
+
+
+def test_anomalist_rerun_without_candidates_asks_to_reassemble_the_report():
+    """The earlier result was set aside, so the assembled report must be rebuilt without its findings."""
+    args = ("ns/v/thing", "ai/fact-check/ns/v/thing", [], ["note"], NO_FIRST_PASS, 0.3)
+    assert "assemble_report.py ai/fact-check/ns/v/thing --reconciled" in anomalist_candidates.render(
+        *args, replaced=True
+    )
+    assert "assemble_report.py" not in anomalist_candidates.render(*args)
+
+
+def test_anomalist_stale_report_stays_flagged_over_reruns_until_reassembled(tmp_path):
+    """A second rerun finds nothing left to set aside, but the report still carries the first result."""
+    import os
+
+    dossier = tmp_path / "ai" / "fact-check" / "ns" / "v" / "thing"
+    dossier.mkdir(parents=True)
+    report = tmp_path / "ai" / "adversarial-review-thing-2026-11-27.md"
+    report.write_text("old findings")
+    os.utime(report, (1_000_000_000, 1_000_000_000))
+    (dossier / "lane_anomalist.result.md").write_text("old")
+    assert not anomalist_candidates.report_is_stale(dossier)
+    anomalist_candidates.clear_previous_run(dossier)
+    assert anomalist_candidates.report_is_stale(dossier)
+    assert anomalist_candidates.clear_previous_run(dossier) == []  # second rerun: nothing to set aside
+    assert anomalist_candidates.report_is_stale(dossier)
+    report.write_text("reassembled")  # assemble_report.py ran again
+    assert not anomalist_candidates.report_is_stale(dossier)
+
+
+def test_anomalist_values_are_not_read_from_another_revision(tmp_path):
+    """A local build with another source checksum than staging must not supply the values next to its anomalies."""
+    new = tmp_path / "grapher" / "ns" / "v" / "thing"
+    new.mkdir(parents=True)
+    (new / "index.json").write_text(json.dumps({"source_checksum": "local"}))
+    rows: list[dict] = [{"selected": True, "identity": "t#gdp", "year": "2020", "entity": "Chad", "indicator_id": 2}]
+    old = (None, {}, "no older version in the DB")
+    anomalist_candidates.add_values(rows, tmp_path, "ns/v/thing", old, "staging")
+    assert str(rows[0]["value"]).startswith("local build is another revision than staging")
+    assert anomalist_candidates.local_build_differs(new, "local") == ""
+    assert anomalist_candidates.local_build_differs(new, None) == ""
+
+
+def test_anomalist_values_tell_a_corrupt_dataset_from_a_missing_one(tmp_path):
+    """A dataset that is on disk but fails to read must say so, not pass as "not on disk"."""
+    (tmp_path / "index.json").write_text("{not json")
+    series, reason = anomalist_candidates.read_series({}, tmp_path, "t", "gdp", "Chad")
+    assert series is None and reason.startswith("READ FAILED")
+    assert anomalist_candidates.neighbors(series, 2020, reason)[0] == reason
+    series, reason = anomalist_candidates.read_series({}, tmp_path / "absent", "t", "gdp", "Chad")
+    assert series is None and reason == anomalist_candidates.NOT_ON_DISK
+
+
+def test_anomalist_coverage_says_what_was_not_looked_at():
+    stored = _stored([("time_change", 1, "Chad", 2020, 0.5)])
+    notes = {"types": ["time_change"], "checksums": {"time_change": "old"}, "relevance": "KeyError: population"}
+    text = " ".join(anomalist_candidates.coverage_notes(stored, INDICATORS, {"sourceChecksum": "new"}, notes))
+    assert "1 of 2 indicators" in text
+    assert "upgrade_change, upgrade_missing, gp_outlier" in text and "old-vs-new detectors are missing" in text
+    assert "Stale: time_change" in text and "raw anomaly score" in text
+
+
+def test_anomalist_rerun_sets_aside_the_previous_brief_and_result(tmp_path):
+    """A rerun answers a new candidate set: the report must not fold in a result written for the old one."""
+    for name in ("lane_anomalist.md", "lane_anomalist.result.md", "anomalist.csv"):
+        (tmp_path / name).write_text("old")
+    notes = anomalist_candidates.clear_previous_run(tmp_path)
+    assert not (tmp_path / "lane_anomalist.md").exists() and not (tmp_path / "anomalist.csv").exists()
+    assert not (tmp_path / "lane_anomalist.result.md").exists()
+    assert (tmp_path / anomalist_candidates.PREVIOUS_RESULT).read_text() == "old"
+    assert notes and "another candidate set" in notes[0]
+    assert anomalist_candidates.clear_previous_run(tmp_path) == []
+
+
+def test_anomalist_mapping_failure_leaves_old_values_unavailable():
+    """Only a missing mapping table falls back to the same-named dataset; any other DB error is reported."""
+    from sqlalchemy.exc import OperationalError, ProgrammingError
+
+    class Engine:
+        def __init__(self, error):
+            self.error = error
+
+    def fake_read_sql(sql, engine, params=None):
+        if "wiz__variable_mapping" in sql:
+            raise engine.error
+        return pd.DataFrame({"catalogPath": ["ns/2025-01-01/thing"]})
+
+    dataset = {"id": 7, "namespace": "ns", "shortName": "thing", "version": "2026-01-01"}
+    missing = ProgrammingError("SELECT", {}, Exception(1146, "Table 'wiz__variable_mapping' doesn't exist"))
+    denied = OperationalError("SELECT", {}, Exception(1142, "SELECT command denied"))
+    with patch("etl.db.read_sql", fake_read_sql):
+        assert anomalist_candidates.old_dataset(Engine(missing), dataset) == ("ns/2025-01-01/thing", {}, "")
+        old_path, olds, reason = anomalist_candidates.old_dataset(Engine(denied), dataset)
+    assert old_path is None and olds == {} and "could not be read" in reason and "denied" in reason
+    rows = [{"selected": True, "identity": "t#gdp", "year": "2020", "entity": "Chad", "indicator_id": 2}]
+    anomalist_candidates.add_values(rows, Path("/nonexistent"), "ns/2026-01-01/thing", (old_path, olds, reason))
+    assert rows[0]["old_value"] == reason
 
 
 # ----------------------------------------------------------------------------------------------------------------
