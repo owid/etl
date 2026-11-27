@@ -1,0 +1,108 @@
+grapher_schema: "012"
+
+title:
+  title: Live animals
+  title_variant: ""
+slug: live-animals
+topic_tags:
+  - Animal Welfare
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+  - Spain
+default_dimensions:
+  animal: land_animals_stacked
+  per_capita: total
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/animal-welfare
+        entityType: country
+        hasMapTab: true
+        # Views of a single animal (the stacked view has its own chart type).
+        chartTypes: ["LineChart", "DiscreteBar", "SlopeChart"]
+        hideRelativeToggle: false
+
+# The step creates the views of live animals from the dimensions of the indicator, and adds the stacked view.
+dimensions:
+  - slug: animal
+    name: Animal
+    presentation:
+      type: dropdown-with-search
+    choices:
+      - slug: all_land_animals
+        name: Land animals
+        group: Aggregates
+      - slug: land_animals_stacked
+        name: Land animals (stacked)
+        group: Aggregates
+      - slug: buffaloes
+        name: Buffaloes
+        group: Land animals
+      - slug: camels
+        name: Camels
+        group: Land animals
+      - slug: cattle
+        name: Cattle (all)
+        group: Land animals
+      - slug: milk_cattle
+        name: Cattle (milk cows)
+        group: Land animals
+      - slug: chickens
+        name: Chickens (all)
+        group: Land animals
+      - slug: laying_hens
+        name: Chickens (laying hens)
+        group: Land animals
+      - slug: donkeys
+        name: Donkeys
+        group: Land animals
+      - slug: ducks
+        name: Ducks
+        group: Land animals
+      - slug: geese
+        name: Geese
+        group: Land animals
+      - slug: goats
+        name: Goats
+        group: Land animals
+      - slug: horses
+        name: Horses
+        group: Land animals
+      - slug: mules
+        name: Mules
+        group: Land animals
+      - slug: other_camelids
+        name: Other camelids
+        group: Land animals
+      - slug: other_rodents
+        name: Other rodents
+        group: Land animals
+      - slug: pigs
+        name: Pigs
+        group: Land animals
+      - slug: rabbits
+        name: Rabbits
+        group: Land animals
+      - slug: sheep
+        name: Sheep
+        group: Land animals
+      - slug: turkeys
+        name: Turkeys
+        group: Land animals
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+
+views: []

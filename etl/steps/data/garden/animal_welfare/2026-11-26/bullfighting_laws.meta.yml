@@ -1,0 +1,44 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  bullfighting_laws:
+    variables:
+      status:
+        title: Bans on bullfighting
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned bullfighting?
+            subtitle: >-
+              Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
+            note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that the bull cannot be severely injured or killed during the event."
+            chartTypes: []
+            hasMapTab: true
+            tab: map
+            map:
+              hideTimeline: true
+              # NOTE: The grapher step gives each status-year value (e.g. "Banned (2015)") the color of its status.
+              colorScale:
+                binningStrategy: manual
+                customNumericColorsActive: true
+                customCategoryColors:
+                  Banned: '#759ac8'
+                  Banned but not yet in effect: '#058580'
+                  Not banned: '#ae2e3f'
+                  Partially banned: '#ca9773'
+      year_effective:
+        title: Year when the ban on bullfighting took effect
+        unit: ""
+        short_unit: ""
+        processing_level: minor

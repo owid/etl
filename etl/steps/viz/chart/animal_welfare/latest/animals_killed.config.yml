@@ -1,0 +1,139 @@
+grapher_schema: "012"
+
+title:
+  title: Animals killed for food
+  title_variant: ""
+slug: animals-killed
+topic_tags:
+  - Animal Welfare
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+  - Spain
+default_dimensions:
+  animal: land_animals_stacked
+  metric: animals_killed
+  per_capita: total
+
+definitions:
+  common_views:
+    - config:
+        originUrl: https://ourworldindata.org/animal-welfare
+        entityType: country
+        hasMapTab: true
+        # Views of a single animal (views that combine several animals have their own chart types).
+        chartTypes: ["LineChart", "DiscreteBar", "SlopeChart"]
+        hideRelativeToggle: false
+
+# The step creates the views from the dimensions of the indicators, and adds those that combine several animals.
+dimensions:
+  - slug: animal
+    name: Animal
+    presentation:
+      type: dropdown-with-search
+    choices:
+      - slug: all_land_animals
+        name: Land animals
+        group: Aggregates
+      - slug: land_animals_stacked
+        name: Land animals (stacked)
+        group: Aggregates
+      - slug: land_and_aquatic_animals
+        name: Land and aquatic animals
+        group: Aggregates
+      - slug: buffaloes
+        name: Buffaloes
+        group: Land animals
+      - slug: camels
+        name: Camels
+        group: Land animals
+      - slug: cattle
+        name: Cattle
+        group: Land animals
+      - slug: chickens_killed_for_eggs
+        name: Chickens (eggs)
+        group: Land animals
+      - slug: chickens
+        name: Chickens (meat)
+        group: Land animals
+      - slug: donkeys
+        name: Donkeys
+        group: Land animals
+      - slug: ducks
+        name: Ducks
+        group: Land animals
+      - slug: game_animals
+        name: Game animals
+        group: Land animals
+      - slug: geese
+        name: Geese
+        group: Land animals
+      - slug: goats
+        name: Goats
+        group: Land animals
+      - slug: horses
+        name: Horses
+        group: Land animals
+      - slug: mules
+        name: Mules
+        group: Land animals
+      - slug: other_camelids
+        name: Other camelids
+        group: Land animals
+      - slug: other_rodents
+        name: Other rodents
+        group: Land animals
+      - slug: pigeons
+        name: Pigeons
+        group: Land animals
+      - slug: pigs
+        name: Pigs
+        group: Land animals
+      - slug: rabbits
+        name: Rabbits
+        group: Land animals
+      - slug: sheep
+        name: Sheep
+        group: Land animals
+      - slug: turkeys
+        name: Turkeys
+        group: Land animals
+      - slug: farmed_crustaceans
+        name: Farmed crustaceans
+        group: Aquatic animals
+      - slug: farmed_fish
+        name: Farmed fish
+        group: Aquatic animals
+      - slug: wild_caught_fish
+        name: Wild-caught fish
+        group: Aquatic animals
+      - slug: wild_caught_fish_for_fishmeal_and_fish_oil
+        name: Fish for fishmeal and oil
+        group: Aquatic animals
+  # Only the animals with consumption-based numbers can switch to them (the toggle is disabled for the others).
+  - slug: metric
+    name: Based on
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: animals_killed
+        name: Production
+        description: Includes animals whose meat is exported
+      - slug: animals_killed_for_consumption
+        name: Consumption
+        description: Adjusted for trade in meat
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: toggle-buttons
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+
+views: []
