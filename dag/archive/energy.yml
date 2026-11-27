@@ -1556,3 +1556,29 @@ steps:
   # archived; last active in 274982d3cba6 on 2026-10-27
   data://grapher/energy/2026-07-28/photovoltaic_cost_and_capacity:
     - data://garden/energy/2026-07-28/photovoltaic_cost_and_capacity
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://garden/light/2025-12-29/energy_innovation_long_run:
+    - data://meadow/light/2025-12-29/energy_innovation_long_run
+    - data://garden/ons/2025-12-31/cpi_uk
+    - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
+    - data://garden/ons/2025-12-31/average_weekly_earnings_uk
+  # archived; last active in 5b22a81a53a5 on 2026-11-04
+  data://grapher/light/2025-12-29/energy_innovation_long_run:
+    - data://garden/light/2025-12-29/energy_innovation_long_run
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2026-11-10/carbon_intensity_of_energy:
+    - data://garden/gcp/2026-11-10/global_carbon_budget
+    - data://garden/energy/2026-06-30/energy_mix
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2026-06-30/carbon_intensity_of_energy:
+    - data://garden/energy/2026-06-30/carbon_intensity_of_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://grapher/energy/2026-11-10/carbon_intensity_of_energy:
+    - data://garden/energy/2026-11-10/carbon_intensity_of_energy
+  # archived; last active in 41e1c3d8d33d on 2026-11-10
+  data://garden/energy/2026-06-30/carbon_intensity_of_energy:
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/energy/2026-06-30/energy_mix
+  # archived; last active in 2b4dccba1a84 on 2026-11-11
+  viz://explorer/energy/latest/impacts_of_energy_sources:
+    - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity

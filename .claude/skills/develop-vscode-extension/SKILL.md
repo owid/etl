@@ -18,12 +18,7 @@ Extensions live in `vscode_extensions/<name>/`. Each has:
 
 ## Build & install workflow
 
-**CRITICAL**: VSCode runs the **installed `.vsix`** from `~/.vscode/extensions/`, NOT the `dist/` in the repo. After every code change you MUST:
-
-1. **Compile**: `cd vscode_extensions/<name> && npm run compile`
-2. **Package**: `npx @vscode/vsce package --out install/<name>-<version>.vsix`
-3. **Install**: `code --install-extension install/<name>-<version>.vsix --force`
-4. **Tell user** to reload: `Cmd+Shift+P` → "Developer: Reload Window"
+VS Code runs the installed `.vsix` from `~/.vscode/extensions/`, not the repo's `dist/`, so a change takes effect only once it is packaged and installed: `make vsce-compile EXT=<name> INSTALL=1` (add `BUMP=patch` before committing a new feature), then ask the user to reload the window (`Cmd+Shift+P` → "Developer: Reload Window").
 
 ## Verifying installed code
 
@@ -35,5 +30,4 @@ grep "some_unique_string" ~/.vscode/extensions/<publisher>.<name>-<version>/dist
 
 ## Common pitfalls
 
-- **esbuild watch mode**: `npm run compile` may start a watcher that blocks. This is fine for compilation but you still need to package + install.
 - **Version conflicts**: If the installed `.vsix` version matches, VSCode may cache. Use `--force` flag on install.

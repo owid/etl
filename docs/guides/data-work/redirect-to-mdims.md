@@ -156,8 +156,9 @@ curl -sI "https://ourworldindata.org/explorers/<slug>?<one view's params>" \
 
 Allow the bake plus a couple of minutes for the edge cache.
 
-!!! note "The redirect darkens the explorer immediately"
-    It is checked on *every* `/explorers/*` request, before the explorer page is served. So
+!!! note "The redirect darkens the explorer with the next deploy"
+    Once the deploy the paste queues goes out, it is checked on *every* `/explorers/*` request,
+    before the explorer page is served. So
     creating it is what retires the explorer — you cannot stage the two separately.
 
 ### 5. Retire the explorer and its ETL step

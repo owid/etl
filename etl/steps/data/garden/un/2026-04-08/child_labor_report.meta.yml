@@ -77,10 +77,32 @@ definitions:
   title_age_suffix: |-
     <% if age == "5-17" %><%- else %> aged <<age>><%- endif %>
 
+  description_key_non_hazardous_child_labor: |-
+    Non-hazardous child labor counts children whose work isn't hazardous, but who are still in child labor because they are too young to work, or work too many hours for their age. Work by children aged 15 to 17 only counts as child labor if it's hazardous, so at those ages non-hazardous child labor is zero.
+
+  description_key_hazardous_work_definition_changes: |-
+    To keep the estimates comparable over time, the ILO and UNICEF still measure child labor with the framework of earlier rounds. Some details have changed, though: the 2008, 2012 and 2016 estimates also counted children in other hazardous conditions, such as night work, where surveys asked about them, and the 2024 estimates use an updated list of hazardous occupations. They don't say how much this affects the trend.
+
+  # The 2024 report has World estimates by age from 2008 (child labor) and 2016 (hazardous work); earlier years come from the 2013 report.
+  text_age_2013_report: |-
+    The 2024 report breaks the world estimates down by age only from 2008 for child labor, and from 2016 for hazardous work. For the world, we fill the earlier years with the estimates by age in Table 5 of the ILO's 2013 report, "Marking progress against child labour", where it has them. That report's world totals for 2000 to 2012 match those in the 2024 report.
+
+  description_processing_age_2013_report: |-
+    <% if sex == "total" and age in ["5-11", "12-14", "5-14", "15-17"] %>
+    {definitions.text_age_2013_report}
+    <%- endif %>
+
+  description_processing_non_hazardous_child_labor: |-
+    We calculate non-hazardous child labor by subtracting the children in hazardous work from the children in child labor.
+    <%- if sex == "total" and age in ["5-11", "12-14", "5-14", "15-17"] %> {definitions.text_age_2013_report}
+    <%- endif %>
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  # Set explicitly because the dataset now combines two ILO reports, so no single origin title is inherited.
+  title: ILO-UNICEF Global Estimates of Child Labour
   update_period_days: 429
 
 
@@ -100,6 +122,7 @@ tables:
           - "{definitions.description_key_household_chores_not_included}"
           - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        description_processing: "{definitions.description_processing_age_2013_report}"
         presentation:
           grapher_config:
             title: Share of {definitions.sex}{definitions.title_age_suffix} in child labor
@@ -121,6 +144,7 @@ tables:
           - "{definitions.description_key_household_chores_not_included}"
           - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        description_processing: "{definitions.description_processing_age_2013_report}"
         presentation:
           grapher_config:
             title: Number of {definitions.sex}{definitions.title_age_suffix} in child labor
@@ -138,9 +162,11 @@ tables:
         description_short: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_hazardous_work_definition_changes}"
           - "{definitions.description_key_household_chores_not_included}"
           - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        description_processing: "{definitions.description_processing_age_2013_report}"
         presentation:
           grapher_config:
             title: Share of {definitions.sex}{definitions.title_age_suffix} in hazardous work
@@ -158,9 +184,11 @@ tables:
         description_short: Number of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_hazardous_work_definition_changes}"
           - "{definitions.description_key_household_chores_not_included}"
           - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        description_processing: "{definitions.description_processing_age_2013_report}"
         presentation:
           grapher_config:
             title: Number of {definitions.sex}{definitions.title_age_suffix} in hazardous work
@@ -168,6 +196,50 @@ tables:
             note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in hazardous work (<<age>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      share_non_hazardous_child_labor:
+        title: Share of children in non-hazardous child labor (<<sex>>, <<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of {definitions.sex} aged <<age>> who are in [child labor](#dod:child-labor) but not doing hazardous work.
+        description_key:
+          - "{definitions.description_key_non_hazardous_child_labor}"
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_hazardous_work_definition_changes}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
+          - "{definitions.description_key_modelled_data}"
+        description_processing: "{definitions.description_processing_non_hazardous_child_labor}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
+        display:
+          name: Share of {definitions.sex} in non-hazardous child labor (<<age>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      number_non_hazardous_child_labor:
+        title: Number of children in non-hazardous child labor (<<sex>>, <<age>>)
+        unit: "children"
+        short_unit: ""
+        description_short: Number of {definitions.sex} aged <<age>> who are in [child labor](#dod:child-labor) but not doing hazardous work.
+        description_key:
+          - "{definitions.description_key_non_hazardous_child_labor}"
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_hazardous_work_definition_changes}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
+          - "{definitions.description_key_modelled_data}"
+        description_processing: "{definitions.description_processing_non_hazardous_child_labor}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
+        display:
+          name: Number of {definitions.sex} in non-hazardous child labor (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 

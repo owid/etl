@@ -10,7 +10,7 @@ from etl.paths import BASE_DIR
 
 log = get_logger()
 
-SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails")
+SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails", "mobile")
 
 # Written by devTools/svgTester/verify-graphs.ts, one per suite
 VERIFY_RESULTS_FILENAME = "verify-results.json"
@@ -62,7 +62,7 @@ def run(branch: str, head_sha: str | None = None) -> str:
 - [Data page with archive citation](http://{container_name}/grapher/life-expectancy)
 - [Archived data page](http://{container_name}:8789/latest/grapher/life-expectancy.html)
 - [Archived grapher page](http://{container_name}:8789/latest/grapher/life-expectancy-vs-healthcare-expenditure.html)
-- [Archived indicator-based explorer](http://{container_name}:8789/latest/explorers/air-pollution.html)
+- [Archived indicator-based explorer](http://{container_name}:8789/latest/explorers/ipcc-scenarios.html)
 - [Archived grapher-based explorer](http://{container_name}:8789/latest/explorers/co2.html)
 - [Archived multidimensional data page](http://{container_name}:8789/latest/grapher/vaccination-coverage-who-unicef.html)
 - [Archived article](http://{container_name}:8789/latest/vaping-vs-smoking-health-risks.html)

@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Deaths from natural disasters
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on deaths from natural disasters.
 default_selection:
   - World
 topic_tags:

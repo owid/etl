@@ -117,12 +117,14 @@ def run() -> None:
         age_group_number="0",
     )
     tb = add_historical_polio(tb)
+    # Build the number of newborns and one-year-olds (UN WPP estimates + medium projection), over the WUENIC years.
+    tb_cohorts = make_cohort_population_table(tb=tb, ds_population=ds_population)
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb],
+        tables=[tb, tb_cohorts],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
@@ -183,10 +185,64 @@ def calculate_coverage_for_regions_for_age_group(
 
 
 def get_population_of_age_group(ds_population: Dataset, age: str) -> Table:
+    # NOTE: This includes projections from 2024 onwards. We are using the UN WPP "medium" variant for these projections.
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
-    tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
+    tb_pop = tb_pop[
+        (tb_pop["age"] == age)
+        & ((tb_pop["variant"] == "estimates") | (tb_pop["variant"] == "medium"))
+        & (tb_pop["sex"] == "all")
+    ]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
+    tb_pop["population"].metadata.origins = get_used_population_origins(tb_pop)
     return tb_pop
+
+
+def get_used_population_origins(tb_pop: Table) -> list:
+    """
+    The UN WPP population table carries one origin per WPP file: every projection scenario, plus the 1 January files
+    (which feed a separate table). Keep only the files behind the mid-year estimates and medium projection we use, plus
+    the interim update (which corrects the estimates). Matched on the download file, since some titles are mislabeled.
+    """
+    used_files = [
+        "WPP2024_PopulationBySingleAgeSex_Medium_1950-2023.csv.gz",  # Estimates.
+        "WPP2024_PopulationBySingleAgeSex_Medium_2024-2100.csv.gz",  # Medium projection.
+        "WPP2024_CSV_files_update.zip",  # Interim update.
+    ]
+    origins = [
+        origin
+        for origin in tb_pop["population"].metadata.origins
+        if (origin.url_download or "").split("/")[-1] in used_files
+    ]
+    assert len(origins) == len(used_files), f"Expected {len(used_files)} UN WPP origins, got {len(origins)}."
+    return origins
+
+
+def make_cohort_population_table(tb: Table, ds_population: Dataset) -> Table:
+    """
+    Number of newborns (age 0) and one-year-olds (age 1) from the UN WPP, combining the estimates with the medium
+    projection (which starts after the last estimate year), over the years covered by WUENIC data.
+    """
+    tb_newborns = get_population_of_age_group(ds_population=ds_population, age="0")
+    tb_one_year_olds = get_population_of_age_group(ds_population=ds_population, age="1")
+    tb_newborns = tb_newborns[["country", "year", "population"]].rename(columns={"population": "newborns"})
+    tb_one_year_olds = tb_one_year_olds[["country", "year", "population"]].rename(
+        columns={"population": "one_year_olds"}
+    )
+    tb_cohorts = pr.merge(tb_newborns, tb_one_year_olds, on=["country", "year"], how="outer")
+
+    # Keep the years and entities covered by the vaccination data (WPP already includes our continents and World).
+    first_year, last_year = tb["year"].min(), tb["year"].max()
+    entities = set(tb["country"]) | set(REGIONS_TO_ADD) | {"World"}
+    tb_cohorts = tb_cohorts[
+        (tb_cohorts["year"] >= first_year) & (tb_cohorts["year"] <= last_year) & (tb_cohorts["country"].isin(entities))
+    ]
+
+    # Sanity checks.
+    assert not tb_cohorts.duplicated(subset=["country", "year"]).any(), "Estimates and medium projection overlap."
+    assert tb_cohorts["year"].max() == last_year, "Population data does not reach the last year of WUENIC data."
+    assert tb_cohorts[["newborns", "one_year_olds"]].notna().all().all(), "Missing population values."
+
+    return tb_cohorts.format(["country", "year"], short_name="cohort_population")
 
 
 def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Table:

@@ -21,7 +21,9 @@ from pathlib import Path
 
 import yaml
 
-from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.analytics.config import OWID_DATASETTE_JSON_URL
+from etl.config import DEFAULT_GRAPHER_SCHEMA, DEFAULT_GRAPHER_SCHEMA_VERSION
+from etl.files import get_schema_from_url
 from etl.http import session as http_session
 
 HERE = Path(__file__).parent
@@ -36,7 +38,9 @@ DATASET_SCHEMA = REPO / "schemas" / "dataset-schema.json"
 EXAMPLE_INDICATOR = ("worldbank_wdi", "wdi", "wdi", "it_net_user_zs_number")  # namespace, dataset, table, indicator
 PACKAGE_BASE = "https://owid-packages.tail6e23.ts.net/ourworldindata/grapher/v0.2.0"
 DEFAULT_SELECTION = ["World", "Africa", "Asia", "Europe", "North America", "South America", "Oceania"]
-DATASETTE = "https://datasette-public.owid.io/owid.json"
+# The internal Datasette, reachable only over Tailscale (which the page needs for Grapher anyway).
+DATASETTE = OWID_DATASETTE_JSON_URL
+DATASETTE_VARIABLES = DATASETTE.replace(".json", "/variables.json")
 API = "https://api.ourworldindata.org/v1/indicators"
 CATALOG = "https://catalog.ourworldindata.org"
 
@@ -70,17 +74,9 @@ def topic_tags() -> tuple[list[str], dict[str, str]]:
     return tags, slugs
 
 
-def grapher_schema_version() -> str:
-    """The version an MDim pins in `grapher_schema`, e.g. "011", taken from ETL's default schema URL."""
-    match = re.search(r"grapher-schema\.(\d+)\.json", DEFAULT_GRAPHER_SCHEMA)
-    assert match, f"Can't read a version from {DEFAULT_GRAPHER_SCHEMA}"
-    return match.group(1)
-
-
 def color_schemes() -> list[str]:
-    """Map colour schemes the vendored grapher schema accepts."""
-    (schema_path,) = (REPO / "schemas").glob(f"grapher-schema.{grapher_schema_version()}.json")
-    return json.loads(schema_path.read_text())["$defs"]["colorScheme"]["enum"]
+    """Map colour schemes the grapher schema ETL pins accepts."""
+    return get_schema_from_url(DEFAULT_GRAPHER_SCHEMA)["$defs"]["colorScheme"]["enum"]
 
 
 def latest_indicator(namespace: str, dataset: str, table: str, indicator: str) -> tuple[int, str]:
@@ -108,7 +104,7 @@ def indicator_id(catalog_path: str) -> int:
             f"Use full catalog paths in the setup (grapher/<namespace>/<version>/<dataset>/<table>#<indicator>): {catalog_path}"
         )
     rows = http_session.get(
-        DATASETTE.replace(".json", "/variables.json"),
+        DATASETTE_VARIABLES,
         params={"catalogPath__exact": catalog_path, "_shape": "array", "_col": "id"},
     ).json()
     if not rows:
@@ -284,13 +280,14 @@ def build(out: Path, setup_path: Path | None = None) -> None:
         TEMPLATE.read_text()
         .replace("__SCRIPT__", SCRIPT.read_text())
         .replace("__PACKAGE_BASE__", PACKAGE_BASE)
+        .replace("__DATASETTE_VARIABLES__", DATASETTE_VARIABLES)
         .replace("__FONT_FACES__", "\n".join(font_faces))
         .replace("__INITIAL_STATE__", as_js(state))
         .replace("__INITIAL_INDICATORS__", as_js(indicators))
         .replace("__EXAMPLE_PATH__", as_js(example_path))
         .replace("__STORAGE_KEY__", as_js(storage_key))
         .replace("__DEFAULT_SELECTION__", as_js(DEFAULT_SELECTION))
-        .replace("__GRAPHER_SCHEMA_VERSION__", as_js(grapher_schema_version()))
+        .replace("__GRAPHER_SCHEMA_VERSION__", as_js(DEFAULT_GRAPHER_SCHEMA_VERSION))
         .replace("__TOPIC_TAGS__", as_js(tags))
         .replace("__TAG_SLUGS__", as_js(tag_slugs))
         .replace("__COLOR_SCHEMES__", as_js(color_schemes()))

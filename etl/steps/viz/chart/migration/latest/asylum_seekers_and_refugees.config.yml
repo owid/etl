@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Asylum seekers and refugees
   title_variant: ""
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore data on refugees and asylum seekers, by country of origin and country of asylum.
 topic_tags:
   - Migration
   - War & Peace
@@ -42,7 +45,7 @@ definitions:
   # Footnotes
   footnote_refugees: This data includes all refugees, not just those who fled that year.
   footnote_asylum: This data includes all asylum-seekers, not just those who fled or applied for asylum that year.
-  footnote_refugees_asylum: This data includes all refugees who live in this country, not just those who arrived that year.
+  footnote_refugees_asylum: This data includes all refugees who live in the country, not just those who arrived that year.
   footnote_asylum_asylum: This data includes all asylum-seekers who live in this country, not just those who arrived or applied for asylum that year.
 
 dimensions:
@@ -70,8 +73,6 @@ dimensions:
       - slug: asylum
         name: By country of asylum
         description: The country where people are seeking or have been granted asylum.
-    presentation:
-      type: radio
   - slug: unit
     name: Unit
     choices:
@@ -79,8 +80,6 @@ dimensions:
         name: Total number
       - slug: per_capita
         name: Rate (per 1,000 or 100,000)
-    presentation:
-      type: radio
   - slug: age
     name: Age
     choices:
@@ -88,8 +87,6 @@ dimensions:
         name: All ages
       - slug: under_18
         name: Under 18
-    presentation:
-      type: radio
 
 views:
   # Refugees

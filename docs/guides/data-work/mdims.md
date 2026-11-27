@@ -17,7 +17,7 @@ MDIMs and Explorer (simply referred t as "MDIMs" from now on) steps are [viz ste
 These have a similar structure to regular steps. They write to the grapher DB with the `--grapher` flag (without it, the step only writes the expanded config under `viz/`):
 
 ```bash
-etlr viz://explorer/minerals/latest/minerals --grapher
+etlr viz://chart/minerals/latest/minerals --grapher
 ```
 
 Instead of creating a `Dataset` object, these create `Chart` or `Explorer` objects and save them to the database. Both share the same data structure (class `Chart`, see [:fontawesome-brands-github: `etl.viz.chart.model`](https://github.com/owid/etl/blob/master/etl/viz/chart/model/core.py)); `Explorer` is a subclass with minor differences due to legacy reasons.
@@ -46,8 +46,8 @@ MDIMs can be crafted in various ways, going from totally manual to fully automat
 
 Below is a simple MDIM configuration file (modified for demo purposes):
 
-```yaml title="etl/steps/viz/chart/covid/latest/covid.deaths.yml"
-grapher_schema: "011"
+```yaml title="etl/steps/viz/chart/covid/latest/deaths.config.yml"
+grapher_schema: "012"
 title:
   title: COVID-19 confirmed deaths
   title_variant: ""
@@ -114,9 +114,11 @@ In this example, we note that we can group together indicators from any dataset.
     Two forms are accepted — the short version, or the full URL:
 
     ```yaml
-    grapher_schema: "011"
-    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json
+    grapher_schema: "012"
+    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.012.json
     ```
+
+    A new MDIM pins the current version, `DEFAULT_GRAPHER_SCHEMA_VERSION` in `etl/config.py`.
 
     **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
 
@@ -130,10 +132,10 @@ In this example, we note that we can group together indicators from any dataset.
 
     | Where | Key | Value |
     |---|---|---|
-    | config YAML | `grapher_schema` | `"011"` |
-    | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"011"` |
-    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
-    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.011.json` |
+    | config YAML | `grapher_schema` | `"012"` |
+    | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"012"` |
+    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.012.json` |
+    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.012.json` |
 
     The generated JSON keeps the authored short form because `ChartSet.read()` loads it back through `Chart.from_dict`; only the upsert payload is camelized and resolved to a full URL. So grepping the generated JSON for `grapherConfigSchema` finds nothing even when the pin is working perfectly.
 
@@ -145,6 +147,17 @@ In this example, we note that we can group together indicators from any dataset.
     There are more options available in the schema that are not covered here. E.g. you can set chart configurations for each view (`.config`), or indicator-level display settings (`.display`). You can even tweak the presentation fields like `description_key` for a specific view (`.metadata`).
 
     Proper documentation of all available options will be available soon.
+
+!!! info "Showing an MDIM as a data explorer"
+    A top-level `presentation` block makes the MDIM a data explorer page, listed on [ourworldindata.org/explorers](https://ourworldindata.org/explorers). `explorer_subtitle` is the text on its card there. Without the block, the MDIM is a plain data page.
+
+    ```yaml
+    presentation:
+      page_type: data-explorer
+      explorer_subtitle: Explore data on the population of every country.
+    ```
+
+    It only applies to MDIMs: single charts and explorers reject it.
 
 ### Automated MDIMs
 MDIMs are very suitable for those datasets that have a lot of dimensions in them. For these, one can leverage functions like `etl.viz.expand_config`, which programmatically generates all possible views from an indicator (or multiple ones) in a table.
@@ -254,16 +267,16 @@ def add_display_settings(mdim):
 
 Also, you can use the fields `common_views` in the YAML file to define a common configuration for certain subset of views. This is very useful (and recommended) when you want to define different-level of granularity of configs. For instance, imagine you want to define the same subtitle for all views with dimension `sex=age`, but then if you have a view with `sex=age, year=2020`, you want to be able to a different subtitle. etc.
 
-As a reference, you can look at the explorer config of the [:fontawesome-brands-github:  Population and Demography explorer](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/un/latest/un_wpp.manual.config.yml). Below is a snippet of the `common_views` field. In it, we define different general configurations: (i) one for views with `indicator=age_structure`, (ii) one for views with `indicator=age_structure` and `sex=female`, and (iii) one for views with `indicator=age_structure` and `sex=male`.
+As a reference, you can look at the config of the [:fontawesome-brands-github:  Population and Demography multidim](https://github.com/owid/etl/blob/master/etl/steps/viz/chart/un/latest/un_wpp.manual.config.yml). Below is a snippet of the `common_views` field. In it, we define different general configurations: (i) one for views with `indicator=age_structure`, (ii) one for views with `indicator=age_structure` and `sex=female`, and (iii) one for views with `indicator=age_structure` and `sex=male`.
 
-```yaml title="etl/steps/viz/explorer/un/latest/un_wpp.yaml"
+```yaml title="etl/steps/viz/chart/un/latest/un_wpp.manual.config.yml"
 common_views:
   # Age structure
   - dimensions:
       indicator: age_structure
     config:
       title: Age structure
-      type: StackedDiscreteBar
+      chartTypes: [StackedDiscreteBar]
       hasMapTab: false
       stackMode: relative
   - dimensions:
@@ -280,11 +293,13 @@ common_views:
 
 You can also define general configs if you skip the `dimensions` bit:
 
-```yaml title="etl/steps/viz/explorer/who/latest/monkeypox.yaml"
+```yaml title="etl/steps/viz/chart/who/latest/monkeypox.config.yml"
 common_views:
 - config:
-    hideAnnotationFieldsInTitle: "true"
-    yScaleToggle: "true"
+    hasMapTab: true
+    yAxis:
+      min: 0
+      canChangeScaleType: true
 ```
 
 ### Save and preview an MDIM
@@ -316,10 +331,7 @@ The same helpers work for explorers: call `paths.create_explorer` instead of `pa
 
 
 ### Explorer examples:
-- [:fontawesome-brands-github:  Population and Demography](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/un/latest/un_wpp.py): Configuration automatically generated (mostly) from dimensions, using `expand_config` and other tools. This one is a good example for explorers with a large number of views.
-- [:fontawesome-brands-github:  COVID-19](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/covid/latest/covid.config.yml): Manually crafted.
-- [:fontawesome-brands-github:  Monkeypox](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/monkeypox.py): Manually crafted.
-- [:fontawesome-brands-github:  Climate change](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/climate/latest/climate_change.config.yml): Manually crafted.
+- [:fontawesome-brands-github:  Influenza](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/who/latest/influenza.py): Manually crafted.
 
 ### How are explorers saved in admin?
 Like MDIMs, explorers are upserted to the grapher DB when calling `.save()`. Staging servers write to their own DB, and production is updated when the PR is merged.
@@ -329,4 +341,4 @@ For better reference, read [:fontawesome-brands-github: this issue](https://gith
 
 - MDIMs are not yet public.
 - MDIMs are not yet embeddable.
-- MDIMs only support dropdowns (explorers support other UI elements: radio buttons, checkboxes)
+- MDIMs support dropdowns, dropdowns with search, and toggle buttons (set with a dimension's `presentation.type`; see the schema), but not checkboxes like explorers.

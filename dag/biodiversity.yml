@@ -45,8 +45,8 @@ steps:
     - data://garden/biodiversity/2026-09-30/living_planet_index_completeness:
       - snapshot://biodiversity/2026-09-30/living_planet_index_completeness.csv
 
-  # Habitat loss
-  viz://explorer/biodiversity/latest/habitat_loss:
+  # Habitat loss multidim (shown as a data explorer).
+  viz://chart/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss:
       - data://garden/biodiversity/2021-01-01/habitat_loss:
         - snapshot://biodiversity/2021-01-01/habitat_loss.feather
@@ -77,8 +77,8 @@ steps:
       - data://meadow/iucn/2026-01-05/iucn_number_each_status:
         - snapshot://iucn/2026-01-05/iucn_number_each_status.csv
 
-  # Fish stocks explorer.
-  viz://explorer/biodiversity/latest/fish_stocks:
+  # Fish stocks, as a multidim shown as a data explorer.
+  viz://chart/biodiversity/latest/fish_stocks:
     # Fish stocks (RAM Legacy).
     - data://grapher/biodiversity/2024-10-30/fish_stocks:
       - data://garden/biodiversity/2024-10-30/fish_stocks:

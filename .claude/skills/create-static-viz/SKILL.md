@@ -5,9 +5,9 @@ description: >-
   static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own
   site for a newer release and route to /create-dataset or /update-dataset when one exists; write the
   viz://static matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates'
-  proportions; then hand off to /owid-staff:create-figma-chart. Sketch mode: prototype a NEW static viz
-  from a CSV/Excel/parquet file (or a quick data pull) in a gitignored scratch dir, iterate visually in
-  matplotlib and Figma, then promote it to a viz://static step. Trigger when the user asks to "refresh
+  proportions; then hand off to /owid-staff:create-figma-chart. Sketch (draft) mode: prototype from a
+  CSV/Excel/parquet file or a data pull in a gitignored scratch dir, iterate in matplotlib and Figma,
+  then finalize it into a viz://static step; with no mode named, it asks: sketch first or full flow. Trigger when the user asks to "refresh
   this static viz", "remake this chart as a static image", "create a static viz", "sketch a static viz
   from this CSV", "brainstorm a chart from this data", pastes an old static viz image or filename and
   asks for a better version, or picks up a viz from the static-viz refresh queue.
@@ -43,9 +43,12 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > | Which text slots this step fills vs. leaves to the template | this skill | that skill's Step 6 |
 > | Type and palette — this step sets neither | that skill | this skill defers to it |
 > | The design vocabulary (per chart type, labeling, colors) | that skill's `GUIDELINES.md` | both |
-> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, local-SVG route |
+> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, its `local-svg` stage |
+> | A sketch frame's render size: the `W×H px` its band leaves, reported by the `local-svg` stage and recorded as `Render size` in the `Figma handoff` | that skill measures it (`SKETCH-AND-FINALIZE.md` §2.6) | this skill renders at it ([reference/SKETCHING.md](reference/SKETCHING.md) §5) |
+> | A year axis opens on the data's first year and closes on its last, each as a tick; a date axis takes grapher's calendar grid for its `display.timeInterval`; either is a 1px `#999` line with 5px `#999` marks | this skill draws it ([reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md)) | that skill's restyle warns when it does not |
 > | The sketch marker — page `… [sketch]`, frame `<slug>--sketch`; no sketch carries the bare website slug | that skill | this skill reports it |
-> | Finalize mode as the re-entry point once a sketch is promoted | that skill | this skill's Sketch mode, §8 |
+> | Finalize mode as the re-entry point once a sketch has its `viz://static` step | that skill | this skill's Sketch mode, §8 (its own finalize hands off to it) |
+> | The finalize split for a sketch with no step: both halves, the ETL steps only, or the Figma checks only, asked by whichever skill the finalize starts in | the Figma-checks-only rules: that skill (`SKETCH-AND-FINALIZE.md` F1); the ETL half: this skill ([reference/SKETCHING.md](reference/SKETCHING.md) §7) | both |
 >
 > The asymmetry worth remembering: **this skill owns the data, the geometry and the proportions; that
 > one owns the type and the palette.** A change that crosses that line belongs in both files. In
@@ -74,7 +77,7 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 |---|---|---|
 | [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) | Step 4 | The handoff contract, grapher's axis and tick treatment, encoding diagrams, desktop/mobile pairing, text slots, labelling many categories, Figma-surviving anchors, the assertions to write. |
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
-| [reference/SKETCHING.md](reference/SKETCHING.md) | Sketch mode, instead of Steps 1–4 | Data pull, scaffold, render, verify, the Figma sketch handoff, iterating, promotion to a step. |
+| [reference/SKETCHING.md](reference/SKETCHING.md) | Sketch mode, instead of Steps 1–4 | Data pull, scaffold, render, verify, the Figma sketch handoff, iterating, finalizing into a step. |
 
 **Size budget, enforced by `--structure`: this spine under 40 KB, TEMPLATES.md under 25 KB.** Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
@@ -104,8 +107,12 @@ turn 80% of the cost rather than 46%.
 Reads always; writes only when they target different pages. If the Figma tools arrive deferred —
 a harness setting, not an environment — load the ones you need in a single `ToolSearch`, taking the
 prefix from your own session's tool list rather than assuming one; skip that where
-they are already loaded. `/owid-staff:create-figma-chart` → **Round-trip budget** has the full
-rule and the list of what is genuinely serial.
+they are already loaded. Before the first file call, `create_session` (its UUID goes as `sessionId`
+on every later call) and load Figma's current `figma-use` with `get_figma_skill`, both in one message;
+a render you need right after a write goes inside that write as `node.screenshot()`.
+`/owid-staff:create-figma-chart` → **Round-trip budget** has the full rule and the list of what is
+genuinely serial. It also says when to use subagents instead: when the time goes into the model's
+own writing or research rather than into waiting for Figma, as in Step 2's two sides.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
@@ -174,19 +181,28 @@ Any one of:
 - **An indicator** — a catalogPath, or a description of one.
 - **A grapher chart** — live URL, staging URL, admin edit URL, bare slug, or chart id.
 - **Just a description** of the chart wanted, plus a source.
-- **A data file** — CSV, Excel or parquet, for a **sketch** of a new viz: see Sketch mode below.
-- **"Sketch", "brainstorm" or "prototype" plus an indicator or chart** — pull its data to a CSV first,
-  then Sketch mode.
+- **A data file** — CSV, Excel or parquet, usually for a **sketch** of a new viz: see Sketch mode below.
+- **"Sketch", "draft", "brainstorm" or "prototype" plus an indicator or chart** — pull its data to a
+  CSV first, then Sketch mode.
 
 Optionally: the article or topic page the viz belongs to, and a reference page in the Charts file
 to work like (`/owid-staff:create-figma-chart` has a whole mode for that).
 
 ## Sketch mode — a data file in, no ETL until the visuals settle
 
-For a **new** static viz that starts from data rather than from an existing viz. The input decides the
-mode — a data file, or a sketch/brainstorm/prototype ask, is a sketch. **Read
-[reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of Steps 1–4.** A Data Insight
-image is not a static-viz sketch — it is sketched in that skill directly, from the grapher chart.
+**Settle the mode first, from the words, before Step 1 and before any branch:** "sketch / draft /
+brainstorm / prototype" is a sketch; "full flow" or "full build" is the full flow (Steps 1–9);
+"finalize" on a sketch that already exists skips the question and goes straight to §7 of
+[reference/SKETCHING.md](reference/SKETCHING.md), which asks its own: both halves of finalizing,
+the ETL steps only, or the Figma checks only. Any other ask — an old viz, an indicator, a chart, a
+bare data file — gets **one question**: sketch first (a scratch folder, no ETL and none of the full
+flow's gates while the visuals settle, only the emitted-file verifier and a look at the PNG; you
+finalize when they do) or the full flow now (an ETL step in a PR, and every check before Figma).
+Recommend the sketch for a new viz or a refresh that changes the design, the full flow for a refresh
+that only needs the new data. A full flow from a data file starts with `/create-dataset` (Step 2). **For
+a sketch, read [reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of Steps 1–4.** A
+Data Insight image is not a static-viz sketch — it is sketched in that skill directly, from the grapher
+chart.
 
 ## Step 1 — Resolve the input to data
 
@@ -212,7 +228,7 @@ so the DB path reports *"Staging server … is not reachable. Run `etl pr` first
 staging build to finish"* — which invites waiting for something that will never arrive here. Don't
 wait, and don't run `etl pr` for it. Fall back to the read-only routes in
 [cloud-sandbox.md](../../docs/cloud-sandbox.md) —
-`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, the public Datasette
+`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, public.duckdb
 for `variables` and `chart_dimensions` — or ask the user to run the resolver locally and paste the
 output. This is a fallback for one environment, not a replacement: use the resolver with its DB
 wherever MySQL is reachable, since it does strictly more than the fallbacks do.
@@ -220,8 +236,8 @@ wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
 1. The grapher `static_viz` table carries a **`grapherSlug`** column. That gives a slug, and the
-   slug goes through the resolver above. Note this table is **not** mirrored to the public
-   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
+   slug goes through the resolver above. Note this table is **not** in the internal Datasette or public.duckdb,
+   so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
    cloud session cannot reach it either, and the slug has to come from the user.
 2. `ai/static_viz_popularity/static_viz_popular.csv` gives rank, the pages it appears on, views,
    authors and tags — useful context, but it has **no slug or indicator column**, so it cannot
@@ -248,7 +264,10 @@ Then report what you found: which dataset, which version, and how many charts us
 ## Step 2 — Check for newer data. Always, even when it is already in ETL
 
 Two sides, and both are needed. The ETL side tells you whether a newer *version in our catalog*
-exists; only the producer side tells you whether newer *data* exists at all.
+exists; only the producer side tells you whether newer *data* exists at all. **Run them as two
+subagents, launched in one message**, on the session's model: they need nothing from each other,
+and the producer side's web research is the slow half. Each one's brief is its paragraph below;
+read both reports before routing.
 
 **ETL side.**
 
@@ -333,8 +352,7 @@ the *main* checkout's path, so `paths.BASE_DIR` resolves to the main checkout wh
 reports `Finished`, your worktree's files never change, and that reads exactly like a no-op render.
 
 ```bash
-make .venv                             # uv sync --all-extras --group dev; the pre-commit hook also does this
-ln -s /path/to/main/checkout/data data # gitignored; the built deps only exist in the main checkout
+make .venv                             # uv sync --frozen --all-extras --group dev; the pre-commit hook also does this
 .venv/bin/etlr viz://static/...
 ```
 
@@ -362,7 +380,9 @@ Then, in this order:
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
 3. **Check every reader-facing string before the Figma handoff**:
    `.venv/bin/codespell --ignore-words=.codespell-ignore.txt <step-dir>`,
-   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note.
+   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note
+   (the fact check's chart-texts context: its `prepare.py` takes the strings as a file). Start both
+   as background agents in one message and read the PNG meanwhile.
    Each wording fix after the import costs a re-import, the colour bindings again and a full Step 8c
    pass.
 
@@ -383,7 +403,8 @@ fixes those without a confirmation step.
 
 ## Step 7 — Hand off to `/owid-staff:create-figma-chart`
 
-Give it the local SVG path. That skill's Step 1/3 cover the local-file route: there is nothing to
+Give it the local SVG path and say **full build**: this flow has already chosen it, so that skill skips
+its sketch-or-full-build question. That skill's Step 1/3 cover the local-file route: there is nothing to
 export, and none of the `.metadata.json` text sourcing applies because the text is already in the
 file. Its `upload_assets` import is already file-based.
 
@@ -503,7 +524,10 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 4. Child issue opened (Bertha).
 5. **Pull the data, rebuild, import to Figma** — Steps 4–7 here.
 6. Review as needed (Bertha) → **design review with @mrwbkrm, mandatory** → final edits →
-   final review with @edomt. Each round's feedback goes through the Step 6 ledger.
+   final review with @edomt. Each round's feedback goes through the Step 6 ledger. Ask for every
+   round, the final one included, with the before-and-after comment template in
+   [reference/PUBLISHING.md](reference/PUBLISHING.md) → *Ask for each review with the same template*,
+   and publish nothing before the final reviewer approves in a reply.
 7. **Upload the refreshed image under a new filename** and repoint the references. The API rejects
    a duplicate name, and the old file must stay reachable for anything still pointing at it.
    **Register it as a static viz** (`/admin/static-viz/`) and swap each `{.image}` block for a

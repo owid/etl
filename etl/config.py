@@ -179,7 +179,13 @@ def load_STAGING() -> str | None:
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
-        branch_name = git.Repo(BASE_DIR).active_branch.name
+        repo = git.Repo(BASE_DIR)
+        if repo.head.is_detached:
+            # No branch, so no branch's staging server to target.
+            if not is_run_python_step:
+                log.warning("HEAD is detached, using local env instead of a staging server")
+            return None
+        branch_name = repo.active_branch.name
         if branch_name == "master":
             if not is_run_python_step:
                 log.warning("You're on master branch, using local env instead of STAGING=master")
@@ -229,6 +235,9 @@ else:
 
 # Override URLs from env variables if set
 SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
+
+# Where the Search API reads the indicators it ranks: MySQL when unset, else this published copy (api_search/indicators.py).
+SEARCH_INDICATORS_URL = env.get("SEARCH_INDICATORS_URL")
 
 
 def variable_data_url(variable_id):
@@ -345,8 +354,11 @@ GRAPHER_SCHEMA_LATEST_URL = "https://files.ourworldindata.org/schemas/grapher-sc
 # indicator-level `presentation.grapher_config`, and the version a new chart config should pin.
 # Grapher keys its config migrations on this, so it must name a version grapher renders; stamping
 # an older one is safe (grapher migrates the config forward), a newer one is rejected.
-# `test_no_newer_grapher_schema_version` watches for a new version upstream.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
+# `test_no_newer_grapher_schema_version` watches for a new version upstream. Bump the version only
+# once grapher has deployed it; everything else (URL, scaffolds, error hints) derives from it.
+GRAPHER_SCHEMA_URL_TEMPLATE = "https://files.ourworldindata.org/schemas/grapher-schema.{version}.json"
+DEFAULT_GRAPHER_SCHEMA_VERSION = "012"
+DEFAULT_GRAPHER_SCHEMA = GRAPHER_SCHEMA_URL_TEMPLATE.format(version=DEFAULT_GRAPHER_SCHEMA_VERSION)
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -682,9 +694,9 @@ class OWIDEnv:
     def thumb_url(self, slug: str):
         """
         Turn https://ourworldindata.org/grapher/life-expectancy"
-        Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
+        Into https://ourworldindata.org/grapher/life-expectancy.png
         """
-        return f"{self.site}/grapher/thumbnail/{slug}.png"
+        return f"{self.site}/grapher/{slug}.png"
 
     def indicator_metadata_url(self, variable_id):
         return f"{self.indicators_url}/{variable_id}.metadata.json"
@@ -762,7 +774,7 @@ METABASE_URL = os.environ.get("METABASE_URL")
 # Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
 # The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
-METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+METABASE_URL = os.environ.get("METABASE_URL", "https://metabase.owid.io")
 
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.

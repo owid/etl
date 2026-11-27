@@ -61,34 +61,33 @@ class CannotPublish(Exception):
     help="Publish only selected channel (subfolder of data/), push all by default.",
 )
 @click.option(
-    "--jsonld",
+    "--dataset-pages",
     is_flag=True,
     default=False,
-    help="Generate and publish the public page files (CSV, XLSX, codebook, README, manifest) and the "
-    "Schema.org JSON-LD side product for catalog datasets that opt in via `dataset: jsonld: true` "
-    "in their metadata.",
+    help="Generate and publish the page files (CSV, XLSX, codebook, README, manifest, Schema.org JSON-LD) "
+    "of the datasets that opt in via `dataset: dataset_page: true` in their metadata.",
 )
 @click.option(
-    "--jsonld-base-url",
+    "--dataset-pages-base-url",
     type=str,
     default="https://catalog.ourworldindata.org",
     help="Base URL to use in generated manifest, README, JSON-LD and sitemap URLs.",
 )
 @click.option(
-    "--jsonld-only",
+    "--dataset-pages-only",
     multiple=True,
     help="Restrict page generation to these datasets, as '<namespace>/<dataset>' "
     "(repeatable). Overrides the metadata opt-in: listed datasets are considered even "
-    "without `dataset: jsonld: true`.",
+    "without `dataset: dataset_page: true`.",
 )
 def publish_cli(
     dry_run: bool,
     private: bool,
     bucket: str,
     channel: Iterable[CHANNEL],
-    jsonld: bool,
-    jsonld_base_url: str,
-    jsonld_only: tuple[str, ...],
+    dataset_pages: bool,
+    dataset_pages_base_url: str,
+    dataset_pages_only: tuple[str, ...],
 ) -> None:
     """Publish the generated data catalog to S3."""
     return publish(
@@ -96,10 +95,27 @@ def publish_cli(
         private=private,
         bucket=bucket,
         channel=channel,
-        jsonld=jsonld,
-        jsonld_base_url=jsonld_base_url,
-        jsonld_only=jsonld_only,
+        dataset_pages=dataset_pages,
+        dataset_pages_base_url=dataset_pages_base_url,
+        dataset_pages_only=dataset_pages_only,
     )
+
+
+@click.command(name="publish-dataset-pages")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Build the pages without publishing them.",
+)
+def publish_dataset_pages_cli(dry_run: bool) -> None:
+    """Publish the dataset pages of the steps that this branch changed, into the staging server's own folder.
+
+    For staging servers only: production pages are published by `etl d publish --dataset-pages`.
+    """
+    from etl.catalog_pages.publish import publish_staging_dataset_pages
+
+    publish_staging_dataset_pages(dry_run=dry_run)
 
 
 def publish(
@@ -107,9 +123,9 @@ def publish(
     private: bool = False,
     bucket: str = config.R2_BUCKET,
     channel: Iterable[CHANNEL] = CHANNEL.__args__,
-    jsonld: bool = False,
-    jsonld_base_url: str = "https://catalog.ourworldindata.org",
-    jsonld_only: Iterable[str] = (),
+    dataset_pages: bool = False,
+    dataset_pages_base_url: str = "https://catalog.ourworldindata.org",
+    dataset_pages_only: Iterable[str] = (),
 ) -> None:
     catalog = Path(DATA_DIR)
     if not dry_run and not private:
@@ -122,20 +138,21 @@ def publish(
     for c in channel:
         sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, private_bucket=config.R2_BUCKET_PRIVATE)
 
-    if jsonld:
-        from etl.catalog_pages.publish import build_and_publish_catalog_pages
+    if dataset_pages:
+        from etl.catalog_pages.publish import PAGE_CHANNELS, build_and_publish_catalog_pages
 
-        jsonld_allowlist = set(jsonld_only) or None
-        for c in channel:
-            if c == "garden":
-                build_and_publish_catalog_pages(
-                    bucket=bucket,
-                    catalog_dir=catalog,
-                    channel=c,
-                    dry_run=dry_run,
-                    base_url=jsonld_base_url,
-                    only=jsonld_allowlist,
-                )
+        dataset_pages_allowlist = set(dataset_pages_only) or None
+        # All the channels that can have pages go through one build, which decides which step owns each page.
+        page_channels = tuple(c for c in PAGE_CHANNELS if c in channel)
+        if page_channels:
+            build_and_publish_catalog_pages(
+                bucket=bucket,
+                catalog_dir=catalog,
+                channel=page_channels,
+                dry_run=dry_run,
+                base_url=dataset_pages_base_url,
+                only=dataset_pages_allowlist,
+            )
 
 
 def sanity_checks(catalog: Path, channel: CHANNEL) -> None:

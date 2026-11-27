@@ -38,6 +38,8 @@ tables:
           the value 0 to this variable when these tasks were absorbed by
           several government offices that performed other functions besides
           collecting and maintaining numerical in-formation.
+        description_processing: |-
+          We show the source's values 1 and 0 as "Yes" and "No".
         processing_level: minor
         display:
           name: Statistical agency operating
@@ -68,7 +70,7 @@ tables:
         short_unit: ""
         description_short: "{definitions.census}"
         description_processing: |
-          This indicator is constructed by taking the value of the `Census was run` variable for the current year and the previous nine years and summing them up. The indicator takes the value 1 if the sum is greater than 0 and 0 otherwise.
+          This indicator is constructed by taking the value of the `Census was run` variable for the current year and the previous nine years and summing them up. The indicator is "Yes" if the sum is greater than 0 and "No" otherwise.
         processing_level: major
         display:
           name: Census was run within 10 years
@@ -114,7 +116,7 @@ tables:
         short_unit: ""
         description_short: "{definitions.modern_census}. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
         description_processing: |
-          This indicator is constructed by taking the value of the `Census based on population register` variable for the current year and the previous nine years and summing them up. The indicator takes the value 1 if the sum is greater than 0 and 0 otherwise.
+          This indicator is constructed by taking the value of the `Census based on population register` variable for the current year and the previous nine years and summing them up. The indicator is "Yes" if the sum is greater than 0 and "No" otherwise.
         processing_level: major
         display:
           name: Census based on population register within 10 years
@@ -167,6 +169,8 @@ tables:
           We include parish registers when they were administered by official
           state churches (as in the Nordic countries) but not when the Church
           was not part of the state (as in the Catholic world).
+        description_processing: |-
+          We show the source's values 1 and 0 as "Yes" and "No".
         processing_level: minor
         display:
           name: Civil register implemented
@@ -183,6 +187,8 @@ tables:
           maintained a population register that year and 0 otherwise.
           Population registers are centralized state agencies that keep detailed
           and permanently updated records of every person in the territory.
+        description_processing: |-
+          We show the source's values 1 and 0 as "Yes" and "No".
         processing_level: minor
         display:
           name: Population register implemented

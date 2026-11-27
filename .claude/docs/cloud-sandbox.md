@@ -9,12 +9,48 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **Rename the pre-created `claude/<slug>-<suffix>` branch before pushing** —
   `git branch -m <short-name>`, or let `etl pr` name it (see the root CLAUDE.md).
+  If the session may only push to its own branch, keep the name: it's cosmetic,
+  and not a reason to delay a PR.
 
 - **No MySQL here, and staging is on Tailscale**, so `--grapher`, `make query`
   and `OWID_ENV.read_sql` don't work. **This overrides the root CLAUDE.md's
   "always add `--grapher`" rule** — run steps without it and meadow, garden and
   the grapher feather still build. Upserts, chart-diff and the admin happen on
   the PR's staging server after you push.
+
+- **A branch gets a staging server only once it has an open PR.** A chart,
+  MDim or metadata edit can only be seen there, so open a draft PR
+  (`gh pr create --draft`) with the first push, without being asked. Don't
+  build `viz://` steps here; the staging build does it.
+  Tell the user the moment the preview is ready, in one short message whose
+  first line is the full preview link, which works before the step is published:
+
+  ```bash
+  # MDim: pass its catalog path. Chart: pass "chart" and its slug.
+  .venv/bin/python -c "import sys, subprocess, urllib.parse as u; from etl.config import get_container_name as g; \
+    h = 'http://' + g(subprocess.check_output(['git','branch','--show-current'], text=True).strip()); \
+    print(h + ('/grapher/' + sys.argv[2] if sys.argv[1] == 'chart' else '/admin/grapher/' + u.quote(sys.argv[1], safe='')))" \
+    '<namespace>/latest/<short_name>#<short_name>'
+  ```
+
+  Send the link only once it's ready, not with a guess at how long it will
+  take. Run this in the background (`run_in_background`), which wakes you when
+  it ends:
+
+  ```bash
+  sha=$(git rev-parse HEAD)
+  for i in $(seq 60); do
+    s=$(curl -s "https://api.github.com/repos/owid/etl/commits/$sha/statuses" | .venv/bin/python -c "import json, sys; d = {}; [d.setdefault(x['context'], x['state']) for x in json.load(sys.stdin)]; c = 'buildkite/etl-automated-staging-environment'; print(d.get(c + '/etl-build') or d.get(c) or 'none')")
+    case $s in success|failure|error) echo "$s"; break;; esac
+    sleep 20
+  done
+  ```
+
+  It reads the public API without auth, so it works when this session's `gh`
+  is limited, and it stays inside the unauthenticated rate limit. The
+  `etl-build` status passes once the build has written the push's charts and
+  MDims to staging, about a minute after the push; the whole build's status,
+  which it falls back to, comes later.
 
 - **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
@@ -25,7 +61,7 @@ For agent sessions running in a Claude Code cloud sandbox
   (`--output-html` writes a report). Needs no MySQL.
 
 - **OWID hosts require `Full` network access.** Under `Trusted` the gateway
-  refuses snapshots, the catalog and Datasette together — a setting to fix, not
+  refuses snapshots, the catalog and `public.duckdb` together — a setting to fix, not
   to work around, so ask the user to switch it. Creating snapshots with `etls`
   needs the `R2_*` variables (in 1Password — never scrape credentials elsewhere).
 
@@ -49,23 +85,32 @@ For agent sessions running in a Claude Code cloud sandbox
 
   `"kind": "connect_rejected"` means the gateway refused it before TLS.
 
-- **Resolve `admin.owid.io` links through the public Datasette instead of opening
-  them:**
+- **Resolve `admin.owid.io` links through the public indicator API and
+  `public.duckdb` instead of opening them** (`public.duckdb` is the nightly
+  public copy of the grapher DB; `/query-grapher-db` has the recipe). It also
+  stands in wherever a skill queries the internal Datasette
+  (`analytics.owid.io`), which is reachable only over Tailscale:
 
   ```bash
-  # /admin/variables/<id> — indicator metadata, including unpublished
-  curl -s "https://datasette-public.owid.io/owid/variables.json?id__in=<id>&_shape=array"
+  # /admin/variables/<id> — indicator metadata, also for indicators in no chart
+  curl -s "https://api.ourworldindata.org/v1/indicators/<id>.metadata.json"
 
   # /admin/charts/<id>/edit — config arrives as a JSON string, so unwrap it
-  curl -s "https://datasette-public.owid.io/owid/charts.json?id__exact=<id>&_shape=array&_col=config" \
-    | .venv/bin/python -c "import json,sys; print(json.dumps(json.loads(json.load(sys.stdin)[0]['config']), indent=2))"
+  uvx --from duckdb-cli duckdb -noheader -list -c \
+    "ATTACH 'https://files.ourworldindata.org/public.duckdb' AS owid (READ_ONLY);
+     SET enable_external_access=false; SET lock_configuration=true; USE owid;
+     SELECT config FROM charts WHERE id = <id>" \
+    | .venv/bin/python -m json.tool
   ```
 
-  `chart_dimensions?chartId__exact=<id>` maps a chart to its indicators; if you
-  have the slug, `https://ourworldindata.org/grapher/<slug>.config.json` does it
-  in one call. Prefer `?<col>__exact=` filters over `?sql=`, which 403s
-  intermittently on long queries. Charts and gdocs are published-only, so an
-  empty result usually means a draft — ask the user to paste
+  `SELECT variableId, property FROM chart_dimensions WHERE chartId = <id>` maps
+  a chart to its indicators; if you have the slug,
+  `https://ourworldindata.org/grapher/<slug>.config.json` does it in one call.
+  On first use DuckDB fetches its `httpfs` extension from
+  `extensions.duckdb.org`; where only `files.ourworldindata.org` is reachable,
+  download `public.duckdb.gz` from there (~80 MB, ~1 GB unzipped) and `ATTACH`
+  the local file, with the same two `SET`s after it. Charts and gdocs are published-only, so an empty result
+  usually means a draft — ask the user to paste
   `admin.owid.io/admin/api/charts/<id>.config.json` rather than guessing.
 
 - **MCP connectors are not the reason a session feels slow.** Figma, Slack, Notion
@@ -110,11 +155,3 @@ For agent sessions running in a Claude Code cloud sandbox
   session's tool list rather than inferring it from the environment; where they
   are deferred, load the ones a run needs in a single `ToolSearch` instead of
   one per turn.
-
-- **After pushing, give the user a deep-linked staging URL** (it takes a while to
-  build, especially the first time):
-
-  ```bash
-  .venv/bin/python -c "from etl.config import get_container_name; import subprocess; \
-    print('http://' + get_container_name(subprocess.check_output(['git','branch','--show-current'], text=True).strip()))"
-  ```

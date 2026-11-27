@@ -19,7 +19,7 @@ etl autoupdate --filter "population"
 import datetime as dt
 import subprocess
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import click
@@ -47,14 +47,26 @@ class SnapshotUpdate:
     name: str
     snapshot_script: Path
     dvc_files: list[Path]
+    # GitHub handles to assign the update's PR to, from `autoupdate.assignees` in the .dvc file.
+    assignees: list[str] = field(default_factory=list)
 
 
-def create_autoupdate_pr(update_name: str, files: list[Path]):
+def group_assignees(group_updates: list[SnapshotUpdate]) -> list[str]:
+    """GitHub handles to assign a group's PR to: every assignee listed by any of its snapshots, in order, once."""
+    return list(dict.fromkeys(handle for update in group_updates for handle in update.assignees))
+
+
+def autoupdate_branch_name(update_name: str) -> str:
+    """Branch that holds the PR of an autoupdate group."""
+    return f"auto-{underscore(update_name).replace('_', '-')}"
+
+
+def create_autoupdate_pr(update_name: str, files: list[Path], assignees: list[str] | None = None):
     """Create a pull request with given files. It creates it via API without modifying the local repo."""
     # name = Path(snapshot).stem.replace("_", "-")
     # version = snapshot.split("/")[1]
     # snapshot_hash = hashlib.md5(snapshot.encode()).hexdigest()[:3]
-    branch_name = f"auto-{underscore(update_name).replace('_', '-')}"
+    branch_name = autoupdate_branch_name(update_name)
     title = f"🤖 Autoupdate: {update_name}"
 
     # Get the latest commit SHA on master
@@ -101,6 +113,8 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     # Don't create PR if there are no changes
     if not has_changes:
         log.info(f"No changes in {update_name}")
+        # A PR that already holds the latest files still gets any assignee added to the .dvc files since.
+        assign_open_prs(branch_name, assignees)
         return
 
     existing_prs = github_repo.get_open_prs(branch_name)
@@ -112,6 +126,18 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
         body = "" if has_changes else "This PR was created without file changes but includes a merge with master."
         pr_url = github_repo.create_pull_request(title, branch_name, body)
         log.info(f"Pull request created: {pr_url}")
+
+    # Assign the PR, so that someone is responsible for reviewing and merging it.
+    assign_open_prs(branch_name, assignees)
+
+
+def assign_open_prs(branch_name: str, assignees: list[str] | None) -> None:
+    """Assign the open PRs of a branch. Run on every update, so that an assignee added to the .dvc files takes effect
+    on the next run, even for a PR that already exists."""
+    if not assignees:
+        return
+    for pr in github_repo.get_open_prs(branch_name):
+        pr.add_to_assignees(*assignees)
 
 
 def run_updates(
@@ -188,7 +214,14 @@ def run_updates(
 
     # If MD5 has changed, create a PR.
     if create_pr and not any(identical for identical in identicals):
-        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # ty: ignore
+        create_autoupdate_pr(
+            update_name=update.name,  # ty: ignore
+            files=files_to_update,
+            assignees=group_assignees(group_updates),
+        )
+    elif create_pr and not dry_run:
+        # Some snapshot is unchanged, so the PR isn't updated, but an open one still gets any new assignee.
+        assign_open_prs(autoupdate_branch_name(group_updates[0].name), group_assignees(group_updates))
 
     # Restore the DVC files to their original state after processing
     if not dry_run:
@@ -259,6 +292,7 @@ def cli(
                 name=meta["autoupdate"]["name"],
                 snapshot_script=snapshot_script,
                 dvc_files=dvc_files,
+                assignees=meta["autoupdate"].get("assignees", []),
             )
         )
 

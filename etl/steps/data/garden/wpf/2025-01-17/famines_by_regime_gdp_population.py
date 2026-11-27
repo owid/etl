@@ -138,6 +138,19 @@ def add_regime(tb_famines: Table, ds_regime: Dataset) -> Table:
 
     reduced_regime = tb_regime.loc[:, ["country", "year", "regime_redux_row_owid"]]
 
+    # V-Dem stores the regime as text; turn it back into the codes the rules below use.
+    regime_codes = {"Closed autocracy": 0, "Electoral autocracy": 1, "Electoral democracy": 2}
+    unknown = set(reduced_regime["regime_redux_row_owid"].dropna().astype(str)) - set(regime_codes)
+    assert not unknown, f"Unexpected regime labels: {unknown}"
+    reduced_regime["regime_redux_row_owid"] = (
+        reduced_regime["regime_redux_row_owid"].astype(object).map(regime_codes).astype("Int64")
+    ).copy_metadata(reduced_regime["regime_redux_row_owid"])
+    reduced_regime["regime_redux_row_owid"].metadata.type = None
+    reduced_regime["regime_redux_row_owid"].metadata.sort = []
+    # The chart config of V-Dem's categories (Swimlane, category colors) doesn't fit these codes.
+    if reduced_regime["regime_redux_row_owid"].metadata.presentation:
+        reduced_regime["regime_redux_row_owid"].metadata.presentation.grapher_config = None
+
     # Combine autocracies
     reduced_regime.loc[reduced_regime["regime_redux_row_owid"].isin([0, 1]), "regime_redux_row_owid"] = 3
 

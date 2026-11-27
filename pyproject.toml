@@ -3,7 +3,7 @@ name = "etl"
 version = "0.1.0"
 description = ""
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
-requires-python = ">=3.11, <3.15"
+requires-python = ">=3.11.5, <3.15"
 dependencies = [
     "owid-owl",
     "click>=8.0.1",
@@ -24,7 +24,7 @@ dependencies = [
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
     "xlrd>=2.0.1",
-    "pypdf>=6.19.0",
+    "pypdf>=6.21.4",
     "ruamel.yaml>=0.17.21",
     "gitpython>=3.1.62",
     "rapidfuzz>=2.13.7",
@@ -66,8 +66,6 @@ dependencies = [
     "sentry-sdk>=2.43.0",
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
-    # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
-    "fastmcp>=3.2.0",
     "pyproj>=3.7.2",
     "pydantic-ai-slim[anthropic,google,mcp,openai]>=2.55.0,<3",
     "anthropic>=1.13.0",
@@ -77,7 +75,7 @@ dependencies = [
     "tomli>=2.2.1",
     "genai-prices",
     "marshmallow>=3.26.2",
-    "brotli>=1.2.0",
+    "brotli>=1.2.1",
     "pyopenssl>=26.0.0",
     "h5py>=3.15.1",
     "html5lib>=1.1",
@@ -93,7 +91,9 @@ exclude-newer = "3 days"
 # only keep forged certificates trusted for longer.
 # grpcio ignores certifi and ships its own root certificates (roots.pem), so the same applies.
 exclude-newer-package = { genai-prices = false, certifi = false, grpcio = false }
-link-mode = "hardlink"
+# Don't pin `link-mode`: uv's default is already the cheapest per platform. On macOS it
+# clones (APFS copy-on-write), so a worktree's venv shares the cache's disk blocks just
+# like a hardlink would, but builds in ~3s instead of ~40s; on Linux it hardlinks.
 
 # PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*
 # wheels). We run embeddings on CPU everywhere, so take the CPU build instead.
@@ -122,7 +122,7 @@ dev = [
     "plotly>=5.23.0",
     "cookiecutter>=2.6.0",
     "types-pyyaml>=6.0.12.20240808",
-    "hydra-core>=1.3.4",
+    "hydra-core>=1.3.8",
     "gspread>=5.12.4",
     "jsonref>=1.1.0",
     "kaleido==1.1.0",
@@ -235,6 +235,22 @@ unused-type-ignore-comment = "ignore"
 unused-ignore-comment = "ignore"
 call-top-callable = "ignore"
 possibly-missing-submodule = "ignore"
+
+# `make check` skips ETL steps and snapshots, but editors type-check every open file. In those files, silence the rules
+# that mostly flag pandas and Table typing quirks, and keep the ones that catch real bugs (e.g. undefined names).
+[[tool.ty.overrides]]
+include = ["etl/steps/**", "snapshots/**"]
+
+[tool.ty.overrides.rules]
+unresolved-attribute = "ignore"
+invalid-return-type = "ignore"
+invalid-assignment = "ignore"
+call-non-callable = "ignore"
+unresolved-import = "ignore"
+unknown-argument = "ignore"
+unsupported-operator = "ignore"
+not-subscriptable = "ignore"
+not-iterable = "ignore"
 
 [tool.owl]
 steps-dir = "owl_steps"

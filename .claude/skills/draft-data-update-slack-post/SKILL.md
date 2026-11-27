@@ -1,7 +1,7 @@
 ---
 name: draft-data-update-slack-post
 description: >-
-  Draft answers for OWID's draft-data-update-slack-post Slack template using snapshot DVC + garden metadata
+  Draft answers for OWID's #data-updates-comms Slack form using snapshot DVC + garden metadata
   + staging DB queries. Use when the user wants to fill the "Message about new data update" form,
   announce a dataset update to the internal #data-updates-comms channel, or generate the FAQ-style
   Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count,
@@ -31,7 +31,7 @@ So the form's editorial fields are written for Ed _and indirectly for the genera
 
 What Ed needs from each field is a **reader-centric view**: what work was done, what it changes or enables, what's interesting about the source, what it helps people understand about the world, and why anyone should care that it's been updated.
 
-**This skill must surface this framing to the user** — both at the top of the output draft file and inside each editorial-field prompt block — so the user has it in front of them when they sit down to write. Do not delete or paraphrase the framing.
+**Apply this framing when you select and phrase the editorial snippets** (see "Editorial framing" below). It guides the draft and is not copied into the output file.
 
 ## When to use
 
@@ -296,8 +296,8 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 
 > Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.
 
-1. **<title>** — `<slug>` — <rationale>
-2. **<title>** — `<slug>` — <rationale>
+1. [<chart title>](<admin edit URL>) — <rationale that names the change>
+2. [<chart title>](<admin edit URL>) — <rationale that names the change>
 
 ## Link to the updated charts as a search result (not a chart collection anymore). Ask Ed if you need help with this. (optional)
 

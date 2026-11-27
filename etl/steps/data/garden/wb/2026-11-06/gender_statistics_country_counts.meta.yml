@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  description_key_equal_pay: &description_key_equal_pay |-
+    “Equal pay for work of equal value” means that employers must pay women and men the same when their jobs are of equal value, even if the jobs themselves are different. This is also called “pay equity”. It goes further than “equal pay for equal work”, which only covers people doing the same job.
+
+    Jobs are compared by the skills, effort, responsibility, and working conditions they involve. For example, in a 1988 UK case, Julie Hayward, a cook at the Cammell Laird shipyard, won the right to the same pay as the male painters and joiners working there, after an independent expert had assessed the demands of each job.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: World Bank Gender Statistics (country counts)
+  owners:
+    - Tuna Acisu
+    - Edouard Mathieu
+
+tables:
+  gender_statistics:
+    variables:
+      sg_law_eqrm_wk_yes_count:
+        description_key: *description_key_equal_pay
+
+      sg_law_eqrm_wk_no_count:
+        description_key: *description_key_equal_pay
+
+      sg_law_eqrm_wk_missing_count:
+        description_key: *description_key_equal_pay
+
+      sg_law_eqrm_wk_yes_pop:
+        description_key: *description_key_equal_pay
+
+      sg_law_eqrm_wk_no_pop:
+        description_key: *description_key_equal_pay
+
+      sg_law_eqrm_wk_missing_pop:
+        description_key: *description_key_equal_pay

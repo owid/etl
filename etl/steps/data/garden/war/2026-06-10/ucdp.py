@@ -37,6 +37,7 @@ from shared import (
     add_indicators_extra,
     add_suffix_to_regions,
     aggregate_conflict_types,
+    flags_to_no_yes,
     get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
@@ -132,6 +133,16 @@ def run() -> None:
         last_year=LAST_YEAR,
         tolerance_unk_ctype=0,
     )
+
+    # Store the country-level conflict flags as No/Yes, so the Swimlane chart can show them. Done after the regional counts, which sum the flags.
+    columns_flags = {
+        f"{paths.short_name}_country": "participated_in_conflict",
+        f"{paths.short_name}_locations": "is_location_of_conflict",
+    }
+    tables = [
+        flags_to_no_yes(tb, [columns_flags[tb.m.short_name]]) if tb.m.short_name in columns_flags else tb
+        for tb in tables
+    ]
 
     #
     # Save outputs.

@@ -130,7 +130,7 @@ views:
       y:
         - catalogPath: bti#regime_bti
     config:
-      colorVariableId: bti#regime_bti
+      type: Swimlane
   - dimensions:
       metric: political_regime
       sub_metric: basic_state_functions_score

@@ -1,5 +1,6 @@
 definitions:
   desc_update: Data for {year} is incomplete and includes reported cases up to {latest_date_published}.
+  desc_population: We calculate the case rate by dividing the number of reported cases by population, using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
 dataset:
   title: Long-run reported cases of measles in the United States
   update_period_days: 7
@@ -18,6 +19,7 @@ tables:
         title: Reported measles case rate (updated weekly)
         unit: cases per 100,000 people
         description_short: Reported number of measles cases in the United States per 100,000 people. {definitions.desc_update}
+        description_processing: "{definitions.desc_population}"
         display:
           entityAnnotationsMap: "United States: Data for {year} is incomplete"
         presentation:
@@ -30,3 +32,4 @@ tables:
         title: Reported measles case rate
         description_short: Reported number of measles cases in the United States per 100,000 people.
         unit: cases per 100,000 people
+        description_processing: "{definitions.desc_population}"

@@ -26,7 +26,7 @@ def run() -> None:
     for disorder, (name, dod) in DISORDERS.items():
         subtitle = (
             f"Estimated share of women and men who have [{name}](#dod:{dod}), whether or not they are diagnosed, "
-            "based on representative surveys, medical data and statistical modelling."
+            "based on representative surveys, medical data, and statistical modeling."
         )
         if disorder in DISORDER_NOTES:
             subtitle += " " + DISORDER_NOTES[disorder]
@@ -57,8 +57,14 @@ def run() -> None:
 
 def _share(disorder: str, sex: str) -> dict:
     """Age-standardized share of the population with the disorder, for one sex, with a short name for tooltips."""
-    who = {"female": "women and girls", "male": "men and boys"}[sex]
+    who = {"female": "women", "male": "men"}[sex]
     return {
         "catalogPath": f"gbd_mental_health#value__cause_{disorder}__metric_share__sex_{sex}__age_age_standardized",
-        "display": {"name": f"Share of {who}"},
+        "display": {
+            "name": f"Share of {who}",
+            "roundingMode": "significantFigures",
+            "numSignificantFigures": 2,
+            # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 5 so shares down to 0.0001% keep 2 significant figures.
+            "numDecimalPlaces": 5,
+        },
     }

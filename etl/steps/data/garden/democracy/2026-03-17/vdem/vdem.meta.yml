@@ -33,6 +33,7 @@ definitions:
       - SlopeChart
       - DiscreteBar
       - Marimekko
+      - Dumbbell
     # 0-1 (10 bins), YlGnBu
     gconfig_a1: &gconfig_a1
       <<: *gconfig_base
@@ -70,31 +71,29 @@ definitions:
           baseColorScheme: Blues
           <<: *map_colorscale_1
 
-    # 0-1 (binary), RdYlBu
+    # No/Yes categories
     gconfig_b1: &gconfig_b1
-      <<: *gconfig_base
-      selectedFacetStrategy: entity
+      hasMapTab: true
+      tab: map
+      chartTypes:
+        - Swimlane
       colorScale: &color_b1
-        binningStrategy: manual
-        customNumericColorsActive: true
-        customNumericColors:
-          - "#ef8a62"
-          - "#2c7bb6"
-        customNumericLabels:
-          - "No"
-          - "Yes"
-        customNumericValues:
-          - 0
-          - 0
-          - 1
+        customCategoryColors:
+          "No": "#ef8a62"
+          "Yes": "#2c7bb6"
       map:
         colorScale: *color_b1
-        tooltipUseCustomLabels: true
 
     # -4 to 4, RdBu
     gconfig_c1: &gconfig_c1
       hasMapTab: true
       tab: map
+      # Scores centered on zero: no Marimekko, which can't draw negative values.
+      chartTypes:
+        - LineChart
+        - SlopeChart
+        - DiscreteBar
+        - Dumbbell
       yAxis:
         max: 4
         min: -4
@@ -155,9 +154,10 @@ definitions:
       We classify a country as a closed autocracy in any year in which it had no regularly scheduled legislative elections on course (V-Dem's `v2xlg_elecreg` indicator), for example because the country had no elected legislature, the legislature was suspended, or elections were postponed. In those years, citizens could not choose the legislature through multi-party elections, which the classification requires of electoral autocracies. This follows Lührmann et al.'s definition, but V-Dem's own Regimes of the World (RoW) data codes some of these years as electoral autocracies, so our classification differs from V-Dem's in those years.
     description_processing_corruption: |-
       ### Region aggregates
-      The default regional aggregates have been estimated by averaging the country values. These are only estimated since 1900 and when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
+      The default regional aggregates are averages of the country values. They are only estimated since 1900. For each continent, we take the countries we have data for in 1900 as a reference, and only estimate an average when enough of them have data (usually two-thirds).
 
-      In addition, regional aggregates with names like "Region (population-weighted)" have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+      In addition, regional aggregates with names like "Region (population-weighted)" are averages of the country values weighted by population, counting only the countries with data. We use Our World in Data's population data, which combines several sources ([learn more](https://ourworldindata.org/population-sources)). These averages are only estimated when the countries with data are home to at least two-thirds of the region's population in that year.
+      Population estimates from 2024 onwards are projections released by the UN.
     description_imputes: |-
       ### Data imputation
       We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
@@ -179,7 +179,7 @@ definitions:
     key_regions: &key_regions |-
       V-Dem covers many more countries since 1900, which affects regional averages.
     key_regions_agg: &key_regions_agg |-
-      We provide two kinds of regional averages: **country averages** and **population-weighted averages**. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience.
+      We provide two kinds of regional averages: **country averages** and **population-weighted averages**. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience. These population-weighted averages use our [long-term population estimates](https://ourworldindata.org/population-sources). From 2024 onwards, these population estimates are projections released by the UN.
   common:
     presentation:
       topic_tags:
@@ -233,9 +233,10 @@ tables:
         numDecimalPlaces: 0
       description_processing: &processing_regions |-
         ### Region aggregates
-        The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
+        The default regional aggregates (including values for the World) are averages of the country values. For each continent, we take the countries we have data for in 1900 as a reference, and only estimate an average when enough of them have data (usually two-thirds).
 
-        In addition, regional aggregates with names like "Region (population-weighted)" (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+        In addition, regional aggregates with names like "Region (population-weighted)" (including values for World) are averages of the country values weighted by population, counting only the countries with data. We use Our World in Data's population data, which combines several sources ([learn more](https://ourworldindata.org/population-sources)). These averages are only estimated when the countries with data are home to at least two-thirds of the region's population in that year.
+        Population estimates from 2024 onwards are projections released by the UN.
 
         {definitions.aux.description_imputes}
       description_key:
@@ -444,18 +445,11 @@ tables:
           numDecimalPlaces: 2
 
       # NEW
-      num_years_in_electdem: # electdem_exp_row_owid
-        title: Experience with electoral democracy
-        description_short: |-
-          Number of total years in electoral democracy. It sums all periods of electoral democracy.
-        description_key: &description_key_num_electdem
-          - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
-        unit: years
-
       num_years_in_electdem_consecutive: # electdem_age_row_owid
         title: Age of electoral democracy
         description_short: Number of consecutive years in electoral democracy.
-        description_key: *description_key_num_electdem
+        description_key: &description_key_num_electdem
+          - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         unit: years
         short_unit: years
         presentation:
@@ -473,18 +467,11 @@ tables:
         description_key: *description_key_num_electdem
         unit: ""
 
-      num_years_in_libdem: # libdem_exp_row_owid
-        title: Experience with liberal democracy
-        description_short: |-
-          Number of total years in liberal democracy. It sums all periods of liberal democracy.
-        description_key: &description_key_num_libdem
-          - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
-        unit: years
-
       num_years_in_libdem_consecutive: # libdem_age_row_owid
         title: Age of liberal democracy
         description_short: Number of consecutive years in electoral democracy.
-        description_key: *description_key_num_libdem
+        description_key: &description_key_num_libdem
+          - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         unit: years
         short_unit: years
         presentation:
@@ -802,9 +789,9 @@ tables:
         description_short: |-
           Identifies the political regime of a country by distinguishing between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
         unit: ""
-        description_key:
+        description_key: &regime_row_owid_key
           - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
-          - The classification distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).
+          - The classification distinguishes between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
           - In _closed autocracies_, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
           - In _electoral autocracies_, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In _electoral democracies_, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
@@ -818,29 +805,30 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}."
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 0
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &colorscale_regime
               baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericLabels:
-                - Closed autocracy
-                - Electoral autocracy
-                - Electoral democracy
-                - Liberal democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
             map:
               colorScale: *colorscale_regime
-              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
+
+      regime_row_owid_score:
+        title: Political regime (score)
+        description_short: |-
+          Identifies the political regime of a country by distinguishing between closed autocracies (0), electoral autocracies (1), electoral democracies (2), and liberal democracies (3).
+        unit: ""
+        description_key: *regime_row_owid_key
+        description_processing: |-
+          {definitions.aux.description_processing_row_no_legislative_elections}
+
+          {definitions.aux.description_processing_row}
+        presentation:
+          title_public: Political regime
+          title_variant: score
         display:
           numDecimalPlaces: 0
 
@@ -850,12 +838,12 @@ tables:
         description_short: |-
           Political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg, including ambiguous categories.
         description_key:
-          - It distinguishes between closed autocracies (score 0), electoral autocracies (score 3), electoral democracies (score 6), and liberal democracies (score 9) as the main types.
+          - It distinguishes between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies as the main types.
           - In closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
           - In electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
           - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislature and the courts.
-          - It further includes intermediate categories for closed autocracies that may be electoral autocracies (score 1), electoral autocracies that may be closed autocracies (score 2), electoral autocracies that may be electoral democracies (score 4), electoral democracies that may be electoral autocracies (score 5), electoral democracies that may be liberal democracies (score 7) and liberal democracies that may be electoral democracies (score 8).
+          - It further includes intermediate categories for closed autocracies that may be electoral autocracies, electoral autocracies that may be closed autocracies, electoral autocracies that may be electoral democracies, electoral democracies that may be electoral autocracies, electoral democracies that may be liberal democracies, and liberal democracies that may be electoral democracies.
         description_processing: |-
           {definitions.aux.description_processing_row_no_legislative_elections}
 
@@ -867,55 +855,23 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. The intermediate categories indicate that the country may belong in the next-higher or next-lower group."
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            yAxis:
-              max: 9
-              min: 0
-            selectedFacetStrategy: entity
             colorScale: &colorscale_regime_amb
               baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#d7191c"
-                - "#e74731"
-                - "#f88e52"
-                -
-                - "#f0cda5"
-                - "#d0dcc1"
-                -
-                - "#8dc1dc"
-                - "#5496c5"
-                - "#2c7bb6"
-              customNumericLabels:
-                - Closed autocracy
-                - ""
-                - "2"
-                - Electoral autocracy
-                - ""
-                - "5"
-                - Electoral democracy
-                - ""
-                - "8"
-                - Liberal democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-                - 6
-                - 7
-                - 8
-                - 9
-              customCategoryLabels:
-                No data: No data
-              customNumericColorsActive: true
+              customCategoryColors:
+                Closed autocracy: "#d7191c"
+                Closed autocracy, maybe electoral: "#e74731"
+                Electoral autocracy, maybe closed: "#f88e52"
+                Electoral autocracy, maybe democracy: "#f0cda5"
+                Electoral democracy, maybe autocracy: "#d0dcc1"
+                Electoral democracy, maybe liberal: "#8dc1dc"
+                Liberal democracy, maybe electoral: "#5496c5"
+                Liberal democracy: "#2c7bb6"
             map:
               colorScale: *colorscale_regime_amb
-              tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
 
@@ -924,7 +880,7 @@ tables:
         description_short: |-
           Identifies the political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
         description_key:
-          - It distinguishes between closed autocracies (score 0), electoral autocracies (score 1), and electoral democracies (score 2, including liberal democracies).
+          - It distinguishes between closed autocracies, electoral autocracies, and electoral democracies (including liberal democracies).
           - In closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
           - In electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
@@ -940,30 +896,17 @@ tables:
           grapher_config:
             title: Electoral democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+            chartTypes:
+              - Swimlane
             hasMapTab: true
             tab: map
-            selectedFacetStrategy: entity
-
             colorScale: &colorscale_regime_redux
-              baseColorScheme: RdYlBu
-              binningStrategy: manual
-              customNumericColors:
-                - "#8d6e71"
-                - "#c6a1a5"
-                - "#abd9e9"
-              customNumericLabels:
-                - Closed autocracy
-                - Electoral autocracy
-                - Electoral democracy
-              customNumericValues:
-                - 0
-                - 0
-                - 1
-                - 3
-              customNumericColorsActive: true
+              customCategoryColors:
+                Closed autocracy: "#8d6e71"
+                Electoral autocracy: "#c6a1a5"
+                Electoral democracy: "#abd9e9"
             map:
               colorScale: *colorscale_regime_redux
-              tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
 
@@ -1085,7 +1028,7 @@ tables:
         description_short: &description_prod_electdem_vdem |-
           {definitions.aux.estimate_title} estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
         description_key:
-          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/grapher/democracy?country=ARG~AUS~BWA~CHN~OWID_WRL&dataset=vdem&metric=electoral_democracy&sub_metric=main_index).
           - "It takes a narrow view of democracy by focusing on electoral political institutions: broad voting rights and free, fair, and meaningful elections."
           - The index is based mainly on assessments by V-Dem's country experts. It also uses some factual information coded by its own researchers.
           - |-
@@ -1126,7 +1069,7 @@ tables:
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_key:
-          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/grapher/democracy?country=ARG~AUS~BWA~CHN~OWID_WRL&dataset=vdem&metric=electoral_democracy&sub_metric=main_index).
           - It takes a narrow view of democracy by focusing on electoral (free and fair elections) and liberal political institutions (civil rights and protection from the state).
           - The index is based mainly on assessments by V-Dem's country experts. It also uses some factual information coded by its own researchers.
           - |-
@@ -2153,7 +2096,7 @@ tables:
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_key:
-          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/grapher/democracy?country=ARG~AUS~BWA~CHN~OWID_WRL&dataset=vdem&metric=electoral_democracy&sub_metric=main_index).
           - It is based on assessments by V-Dem's country experts.
           - It combines information on free and fair elections, the autonomy and capacity of the electoral management body, election voter registry, election vote buying, electoral intimidation by the government, electoral violence by non-state actors, and other voting irregularities.
           - *key_regions
@@ -2785,7 +2728,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2821,7 +2764,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2844,7 +2787,7 @@ tables:
             <<: *gconfig_b1
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2868,7 +2811,7 @@ tables:
         description_key:
           - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
           - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
-          - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
+          - We classify each election as free and fair ("Yes") or not ("No").
         description_from_producer: |-
           Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
 
@@ -2883,7 +2826,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2966,7 +2909,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into "No" and "Yes" categories.
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -2989,7 +2932,7 @@ tables:
             <<: *gconfig_b1
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -3024,7 +2967,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2cltrnslw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2cltrnslw_osp*`) into two categories: "No" and "Yes".
 
           {definitions.aux.description_processing_row}
         unit: ""
@@ -3283,6 +3226,8 @@ tables:
   vdem_population:
     common:
       unit: "people"
+      description_processing: &description_population |-
+        We calculate the number of people living under each type of regime using our [long-term population estimates](https://ourworldindata.org/population-sources). Population estimates from 2024 onwards are projections released by the UN.
     variables:
       population_regime:
         title: |-

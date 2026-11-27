@@ -104,6 +104,15 @@ COLUMNS = [
 ]  # fmt: skip
 
 
+def chart_slug(value) -> str | None:
+    """A `chart_configs.slug` value, or None when the chart has none.
+
+    A NULL slug comes back as NaN, not None, once the column also holds strings — and NaN is
+    truthy, so `r["slug"] or ...` lets it through as a float `where` that breaks sorting.
+    """
+    return value if isinstance(value, str) and value else None
+
+
 def gdoc_path(r: dict) -> str:
     """Public path of a posts_gdocs row: data insights live under /data-insights/, the rest at the root.
 
@@ -169,7 +178,7 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
         f"SELECT c.id, cc.slug FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE {' OR '.join(where)}",
         params=params,
     )
-    charts = {int(r["id"]): r["slug"] for r in df.to_dict("records") if r["slug"]}
+    charts = {int(r["id"]): r["slug"] for r in df.to_dict("records") if chart_slug(r["slug"])}
     by_slug = {slug: {"id": cid, "slug": slug} for cid, slug in charts.items()}
     if charts:
         # Old slugs still reach the chart, so references may point at them.
@@ -883,25 +892,28 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
         params={"ids": tuple(variable_ids)},
     )
-    return [
-        rec(
-            "indicator",
-            str(r["variableId"]),
-            int(r["variableId"]),
-            "chart",
-            RENDER,
-            # A chart can have no slug (drafts never given one). Label it by id rather
-            # than emitting a null `where`, which breaks any caller that sorts or groups.
-            r["slug"] or f"(chart {r['chart_id']}, no slug)",
-            f"/grapher/{r['slug']}" if r["slug"] else "",
-            surface_id=int(r["chart_id"]),
-            config_id=r["config_id"],
-            context=f"inheritance {'on' if r['inheritance'] else 'off'}"
-            + ("" if r["slug"] else " — draft with no slug"),
-            published=r["published"],
-        )  # fmt: skip
-        for r in df.to_dict("records")
-    ]
+    out = []
+    for r in df.to_dict("records"):
+        slug = chart_slug(r["slug"])
+        out.append(
+            rec(
+                "indicator",
+                str(r["variableId"]),
+                int(r["variableId"]),
+                "chart",
+                RENDER,
+                # A chart can have no slug (drafts never given one). Label it by id rather
+                # than emitting a null `where`, which breaks any caller that sorts or groups.
+                slug or f"(chart {r['chart_id']}, no slug)",
+                f"/grapher/{slug}" if slug else "",
+                surface_id=int(r["chart_id"]),
+                config_id=r["config_id"],
+                context=f"inheritance {'on' if r['inheritance'] else 'off'}"
+                + ("" if slug else " — draft with no slug"),
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
 
 
 def entry_variable_id(entry, by_path: dict[str, int]) -> int | None:
@@ -1820,7 +1832,13 @@ def main() -> int:
         explorer_hits = sweep_explorer_views_of_indicators(variable_ids)
         findings += explorer_hits
         if args.transitive:
-            # Slugless drafts have no URL, so nothing can reference them by slug.
+            # Slugless drafts have no URL, so nothing can reference them by slug. The hop below
+            # skips them, including its by-id narrative-chart sweep, so record that as a gap.
+            slugless = sorted({f["surface_id"] for f in chart_hits if not f["where_path"]})
+            if slugless:
+                gap(f"{len(slugless)} chart(s) rendering these indicators have no slug, so the transitive "
+                    f"hop did NOT sweep their articles, data insights, narrative charts or featured "
+                    f"metrics: chart id(s) {slugless}")  # fmt: skip
             hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits if f["where_path"]}))
             if hop:
                 print(f"  transitive: sweeping articles for {len(hop)} chart slug(s)")

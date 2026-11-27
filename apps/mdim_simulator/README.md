@@ -46,7 +46,7 @@ The dropdowns, the views and their catalog paths, `default_dimensions`, `default
 
 - `template.html` holds the markup and styles; `simulator.js` holds the page's code.
 - `build.py` inlines both, with the pre-filled indicators' data and metadata, OWID's fonts, the valid topic tags (from `schemas/dataset-schema.json`) and their topic pages, and the map colour schemes from the vendored grapher schema, so the page is one self-contained file.
-- Indicators linked in the page are looked up live: a catalog path through the public Datasette, then data and metadata from `api.ourworldindata.org`.
+- Indicators linked in the page are looked up live: a catalog path through the internal Datasette (over Tailscale, like Grapher), then data and metadata from `api.ourworldindata.org`.
 - The setup is saved in the browser (`localStorage`), so it survives a reload.
 
 ## Check it in a browser

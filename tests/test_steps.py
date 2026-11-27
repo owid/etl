@@ -9,6 +9,7 @@ Test that the different step types work as expected.
 import json
 import random
 import shutil
+import socket
 import string
 import sys
 import tempfile
@@ -59,6 +60,105 @@ def test_data_step():
         _create_mock_py_file(step_name)
         DataStep(step_name, []).run()
         Dataset((paths.DATA_DIR / step_name).as_posix())
+
+
+def test_data_step_edited_while_running_stays_dirty():
+    # The recorded checksum is of the inputs the step was built from. A file saved mid-run must
+    # leave the step dirty, or `etlr --watch` reports that edit as up to date and never builds it.
+    with temporary_step() as step_name:
+        _create_mock_py_file(step_name)
+        step = DataStep(step_name, [])
+        py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
+        run_py = DataStep._run_py
+
+        def run_then_edit(self: DataStep) -> None:
+            run_py(self)
+            with open(py_file, "a") as ostream:
+                ostream.write("# edited while the step was running\n")
+
+        # DEBUG off, so the step goes through _run_py whatever the local .env says.
+        with patch.object(DataStep, "_run_py", run_then_edit), patch("etl.config.DEBUG", False):
+            step.run()
+        assert step.is_dirty()
+
+        # The next run builds from the edited file and comes out clean.
+        step.run()
+        assert not step.is_dirty()
+
+
+def test_static_viz_step_writing_its_image_comes_out_clean():
+    # A static step saves its image next to its recipe, where the image counts as one of its inputs.
+    # A changed image must not leave the step dirty, or every redraw costs a second run.
+    from etl.steps import VizStep
+
+    namespace = "".join(random.choice(string.ascii_lowercase) for i in range(10))
+    step_dir = paths.STEP_DIR / "viz" / "static" / namespace / "latest"
+    step = VizStep(f"static/{namespace}/latest/chart", dependencies=[])
+    try:
+        step_dir.mkdir(parents=True)
+        (step_dir / "chart.py").write_text(
+            "import uuid\nfrom pathlib import Path\n\n"
+            "def run() -> None:\n"
+            "    (Path(__file__).parent / 'chart.svg').write_text(uuid.uuid4().hex)\n"
+        )
+        with patch("etl.config.DEBUG", False):
+            step.run()
+        assert (step_dir / "chart.svg").exists()
+        assert not step.is_dirty()
+    finally:
+        shutil.rmtree(paths.STEP_DIR / "viz" / "static" / namespace, ignore_errors=True)
+        shutil.rmtree(paths.VIZ_DIR / "static" / namespace, ignore_errors=True)
+
+
+def test_viz_step_publishes_again_to_a_new_target(monkeypatch):
+    # A chart published to one database has to be written again when the next run targets another
+    # (STAGING=1 after a local publish), even though nothing in the repo changed.
+    from etl import config
+    from etl.steps import VizStep
+
+    namespace = "".join(random.choice(string.ascii_lowercase) for i in range(10))
+    step_dir = paths.STEP_DIR / "viz" / "chart" / namespace / "latest"
+    step = VizStep(f"chart/{namespace}/latest/chart", dependencies=[])
+    monkeypatch.setattr(config, "DEBUG", False)
+    monkeypatch.setattr(config, "GRAPHER_ENABLED", True)
+    monkeypatch.setattr(config, "DB_HOST", "staging-site-a")
+    try:
+        step_dir.mkdir(parents=True)
+        (step_dir / "chart.py").write_text("def run() -> None:\n    pass\n")
+        step.run()
+        assert not step.is_dirty()
+
+        monkeypatch.setattr(config, "DB_HOST", "staging-site-b")
+        assert step.is_dirty()
+        # A build that doesn't publish has nothing to write there.
+        monkeypatch.setattr(config, "GRAPHER_ENABLED", False)
+        assert not step.is_dirty()
+        monkeypatch.setattr(config, "GRAPHER_ENABLED", True)
+
+        step.run()
+        assert not step.is_dirty()
+
+        # staging-site-master publishes to its own DB; a server cloned from it, output and DB included,
+        # targets its own DB under its own name and must see the inherited output as published.
+        monkeypatch.setattr(socket, "gethostname", lambda: "staging-site-master")
+        monkeypatch.setattr(config, "DB_HOST", "staging-site-master")
+        step.run()
+        monkeypatch.setattr(socket, "gethostname", lambda: "staging-site-clone")
+        monkeypatch.setattr(config, "DB_HOST", "staging-site-clone")
+        assert not step.is_dirty()
+        monkeypatch.setattr(config, "DB_HOST", "127.0.0.1")
+        assert not step.is_dirty()
+
+        # An output recorded before targets were tracked counts as current, so deploying this
+        # doesn't republish every chart.
+        ds = step._output_dataset
+        ds.metadata.additional_info = None
+        ds.metadata.save(ds._index_file)
+        monkeypatch.setattr(config, "DB_HOST", "staging-site-a")
+        assert not step.is_dirty()
+    finally:
+        shutil.rmtree(paths.STEP_DIR / "viz" / "chart" / namespace, ignore_errors=True)
+        shutil.rmtree(paths.VIZ_DIR / "chart" / namespace, ignore_errors=True)
 
 
 def test_data_step_recovers_from_partial_output():

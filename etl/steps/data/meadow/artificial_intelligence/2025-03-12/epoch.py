@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
 import numpy as np
+import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder
 
@@ -14,11 +15,13 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshot.
+    # Retrieve snapshots.
     snap = paths.load_snapshot("epoch.csv")
+    snap_all = paths.load_snapshot("epoch_all_ai_models.csv")
 
-    # Read snapshot
+    # Read snapshots.
     tb = snap.read()
+    tb_all = snap_all.read()
 
     tb = tb.rename(columns={"Country (of organization)": "Country (from Organization)"})
 
@@ -38,6 +41,7 @@ def run() -> None:
         "Training compute (FLOP)",
         "Training dataset size (total)",
         "Notability criteria",
+        "Model accessibility",
     ]
 
     # Check that the columns of interest are present
@@ -50,6 +54,9 @@ def run() -> None:
     tb = tb.replace("", np.nan)
     # Remove rows where all values are NaN
     tb = tb.dropna(how="all")
+
+    # Add how training compute was found, which only the file of all models has.
+    tb = add_training_compute_estimation_method(tb=tb, tb_all=tb_all)
 
     # Convert the training compute column to float
     tb["Training compute (FLOP)"] = tb["Training compute (FLOP)"].astype(float)
@@ -71,3 +78,20 @@ def run() -> None:
     ds_meadow.save()
 
     paths.log.info("epoch.end")
+
+
+def add_training_compute_estimation_method(tb, tb_all):
+    """Add Epoch's training compute estimation method to the notable models, matched by model name."""
+    column = "Training compute estimation method"
+    assert column in tb_all.columns, f"Column '{column}' is missing from the file of all models."
+    tb_all = tb_all[tb_all["Model"].isin(tb["Model"])][["Model", column]]
+
+    # Every notable model should be in the file of all models, once.
+    missing = set(tb["Model"]) - set(tb_all["Model"])
+    assert not missing, f"Notable models missing from the file of all models: {sorted(missing)}"
+    duplicated = tb_all[tb_all["Model"].duplicated()]["Model"].tolist()
+    assert not duplicated, f"Notable models listed more than once in the file of all models: {duplicated}"
+
+    tb = pr.merge(tb, tb_all, on="Model", how="left")
+
+    return tb

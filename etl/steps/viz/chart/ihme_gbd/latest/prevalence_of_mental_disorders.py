@@ -19,8 +19,8 @@ DISORDER_NOTES = {
 # Sexes: slug in the MDim and the source, and who it refers to in titles, for children (under 15), adults and all ages.
 SEXES = {
     "both": {"child": "people", "adult": "people", "all": "people"},
-    "female": {"child": "girls", "adult": "women", "all": "women and girls"},
-    "male": {"child": "boys", "adult": "men", "all": "men and boys"},
+    "female": {"child": "girls", "adult": "women", "all": "women"},
+    "male": {"child": "boys", "adult": "men", "all": "men"},
 }
 # Ages: slug in the MDim -> (slug in the source, phrase used in titles, age bracket for SEXES).
 AGES = {
@@ -85,7 +85,7 @@ def _view(
     measure = "number" if metric == "number" else "share"
     subtitle = (
         f"Estimated {measure} of {subtitle_end}, whether or not they are diagnosed, "
-        "based on representative surveys, medical data and statistical modelling."
+        "based on representative surveys, medical data, and statistical modeling."
     )
     if disorder in DISORDER_NOTES:
         subtitle += " " + DISORDER_NOTES[disorder]
@@ -94,10 +94,17 @@ def _view(
         " It does not measure lifetime prevalence."
     )
     note = {"share_age_standardized": NOTE_AGE_STANDARDIZED, "share_crude": NOTE_CRUDE, "number": NOTE_NUMBER}[metric]
+    # Shares to 2 significant figures, numbers of people to 3.
+    display = {"name": display_name, "roundingMode": "significantFigures"}
+    if measure == "share":
+        # Grapher caps sig-fig rounding of values below 1 at numDecimalPlaces; allow 5 so shares down to 0.0001% keep 2 significant figures.
+        display |= {"numSignificantFigures": 2, "numDecimalPlaces": 5}
+    else:
+        display |= {"numSignificantFigures": 3, "numDecimalPlaces": 0}
 
     return {
         "dimensions": {"disorder": disorder, "sex": sex, "age": age, "metric": metric},
-        "indicators": {"y": [{"catalogPath": catalog_path, "display": {"name": display_name}}]},
+        "indicators": {"y": [{"catalogPath": catalog_path, "display": display}]},
         "config": {
             "title": f"{measure.capitalize()} of {title_end}",
             "subtitle": subtitle,

@@ -37,7 +37,7 @@ tables:
         description_key: |-
           {definitions.counting_changes}
         description_processing: |-
-          We calculated this indicator by dividing the number of people granted permanent residency by the population of the United States, using the [long-run population data](https://ourworldindata.org/population-sources) published by Our World in Data.
+          We calculated this indicator by dividing the number of people granted permanent residency by the population of the United States, using the [long-run population data](https://ourworldindata.org/population-sources) published by Our World in Data. Population estimates from 2024 onwards are projections released by the UN.
         processing_level: major
         display:
           numDecimalPlaces: 1

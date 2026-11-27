@@ -17,16 +17,18 @@ steps:
   data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
     - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
 
-  # Number of wild-caught fish killed for food.
-  data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-    - data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-      - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
-      - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_by_country.pdf
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2026-07-01/income_groups
-    - data://garden/demography/2024-07-15/population
-  data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+  # Fishcount - Number of wild-caught fish killed for food, and wild fish caught for fishmeal and fish oil.
+  data://grapher/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
+    - data://garden/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
+      - data://meadow/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food:
+        - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food_global.html
+        - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food_by_country.html
+        - snapshot://animal_welfare/2026-11-24/number_of_wild_fish_caught_for_fishmeal_and_fish_oil.html
+        # Mood and Brooke (2024), used for the world totals before 2003.
+        - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
 
   # Fishcount - Number of farmed crustaceans killed for food.
   data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
@@ -38,8 +40,8 @@ steps:
   data://grapher/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
     - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
 
-  # Animal welfare data explorer.
-  viz://explorer/animal_welfare/latest/animal_welfare:
+  # Animal welfare multidim, shown as a data explorer (replaced the animal-welfare explorer).
+  viz://chart/animal_welfare/latest/animal_welfare:
     # Chick culling laws (Various sources).
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws:
       - data://garden/animal_welfare/2026-09-01/chick_culling_laws:
@@ -53,12 +55,7 @@ steps:
           - snapshot://animal_welfare/2026-07-01/fur_laws.csv
         - data://garden/regions/2023-01-01/regions
     # Total number of animals used for food.
-    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food:
-      - data://garden/animal_welfare/2026-03-03/animals_used_for_food:
-        - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
-        - data://garden/faostat/2026-02-25/faostat_qcl
-        - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
-        - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+    - data://grapher/animal_welfare/2026-11-23/animals_used_for_food
     # Eggs and hens statistics (various sources).
     - data://grapher/animal_welfare/2026-06-11/eggs_and_hens_statistics:
       - data://garden/animal_welfare/2026-06-11/eggs_and_hens_statistics:
@@ -95,10 +92,64 @@ steps:
         - data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
           - snapshot://animal_welfare/2024-06-04/bullfighting_laws.csv
 
-  # Land animals killed for food (grouped into main animals and "other").
-  data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
-    - data://garden/faostat/2026-02-25/faostat_qcl
+  # Defra - Laying hens and chicks in the United Kingdom (poultry and poultry meat statistics, and June survey).
+  data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks:
+    - snapshot://defra/2026-10-18/uk_poultry_placings.ods
+    - snapshot://defra/2026-10-18/uk_poultry_slaughterings.ods
+    - snapshot://animal_welfare/2026-04-16/uk_livestock_populations.ods
+  data://garden/defra/2026-10-18/uk_laying_hens_and_chicks:
+    - data://meadow/defra/2026-10-18/uk_laying_hens_and_chicks
+
+  # Eurostat - Laying hen chicks hatched in European countries (activity of hatcheries).
+  data://meadow/eurostat/2026-10-18/poultry_hatcheries:
+    - snapshot://eurostat/2026-10-18/poultry_hatcheries.gz
+  data://garden/eurostat/2026-10-18/laying_hen_chicks:
+    - data://meadow/eurostat/2026-10-18/poultry_hatcheries
+    - data://garden/regions/2023-01-01/regions
+
+  # USDA NASS - Laying hens and egg-type chicks in the United States (Quick Stats).
+  data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks:
+    - snapshot://usda_nass/2026-10-18/us_laying_hens_and_chicks.csv
+  data://garden/usda_nass/2026-10-18/us_laying_hens_and_chicks:
+    - data://meadow/usda_nass/2026-10-18/us_laying_hens_and_chicks
+
+  # Chickens killed for eggs (OWID estimate based on FAOSTAT).
+  data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs:
+    - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs:
+      - data://garden/faostat/2026-11-23/faostat_qcl
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+  viz://chart/animal_welfare/latest/chickens_killed_for_eggs:
+    - data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs
+
+  # Static chart of land animals killed for food (drawn in Figma); this step only checks the numbers it shows.
+  viz://static/animal_welfare/2026-10-28/land_animals_killed_for_food:
+    - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs
+    - data://garden/faostat/2026-11-23/faostat_qcl
+
+  # Data used in the technical publication "How many chickens are killed in egg production?" (a notebook in
+  # docs/analyses).
+  data://external/animal_welfare/2026-11-09/chickens_killed_in_egg_production:
+    - data://garden/faostat/2026-11-23/faostat_qcl
+    - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs
+    - data://garden/usda_nass/2026-10-18/us_laying_hens_and_chicks
+    - data://garden/defra/2026-10-18/uk_laying_hens_and_chicks
+    - data://garden/eurostat/2026-10-18/laying_hen_chicks
+    - data://garden/wb/2026-07-01/income_groups
 
   # Banning of chick culling — chart authored in ETL.
   viz://chart/animal_welfare/latest/banning_of_chick_culling:
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws
+
+  # Land animals killed for food (grouped into main animals and "other").
+  data://grapher/animal_welfare/2026-11-23/land_animals_killed_for_food:
+    - data://garden/faostat/2026-11-23/faostat_qcl
+
+  data://garden/animal_welfare/2026-11-23/animals_used_for_food:
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+    - data://garden/faostat/2026-11-23/faostat_qcl
+    - data://garden/animal_welfare/2026-11-24/number_of_wild_fish_killed_for_food
+  data://grapher/animal_welfare/2026-11-23/animals_used_for_food:
+    - data://garden/animal_welfare/2026-11-23/animals_used_for_food

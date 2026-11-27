@@ -19,6 +19,8 @@ definitions:
 dataset:
   title: Long-run data on employment by economic sector
   update_period_days: 365
+  owners:
+    - Pablo Arriagada
 
 tables:
   structural_transformation_omm:

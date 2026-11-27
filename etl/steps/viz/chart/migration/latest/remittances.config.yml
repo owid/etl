@@ -41,8 +41,6 @@ dimensions:
       - slug: cost_of_receiving
         name: Cost of receiving remittances
         description: The average cost of receiving remittances from abroad, as a share of the amount sent.
-    presentation:
-      type: radio
 
 views:
   - dimensions:
@@ -50,6 +48,9 @@ views:
     indicators:
       y:
         - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
     config:
       title: Remittances as a share of GDP
       subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. This received sum is given as a share of [gross domestic product](#dod:gdp) (GDP).
@@ -68,6 +69,9 @@ views:
     indicators:
       y:
         - catalogPath: wdi#si_rmt_cost_ob_zs
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
     config:
       title: Average cost of sending remittances from a given country
       subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. Shown is the average transaction cost of sending US$200, given as a percentage of the total.
@@ -86,6 +90,9 @@ views:
     indicators:
       y:
         - catalogPath: wdi#si_rmt_cost_ib_zs
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
     config:
       title: Average cost of receiving remittances in a given country
       subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. Shown is the average transaction cost of receiving US$200, given as a percentage of the total.

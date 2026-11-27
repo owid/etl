@@ -411,9 +411,10 @@ class Table(pd.DataFrame):
         """One row per unique origin used by any column of this table.
 
         Columns: ``label`` (as printed in the codebook's ``source`` column), ``producer``, ``title``,
-        ``description``, ``date_published``, ``date_accessed``, ``url_main``, ``url_download``,
-        ``citation_full``, ``license_name``, ``license_url``. Origins that render identically are
-        one row; rows are ordered by how many columns reference them.
+        ``title_snapshot``, ``description``, ``date_published``, ``date_accessed``, ``url_main``,
+        ``url_download``, ``citation_full``, ``license_name``, ``license_url``. Origins that render
+        identically are one row; rows are ordered by how many columns reference them. Several files
+        of one data product share a ``label`` and are told apart by their ``title_snapshot``.
         """
         origins = {column: list(self.get_column_or_index(column).metadata.origins) for column in self.all_columns}
         return docs.sources_frame(origins)

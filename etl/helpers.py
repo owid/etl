@@ -133,6 +133,9 @@ def create_dataset(
     # it (its grapher step, which keeps the short name, does).
     if inherited_short_name and inherited_short_name != ds.metadata.short_name:
         ds.metadata.changelog = []
+    # Only the metadata file of the step itself opts the dataset into a dataset page: a dataset built from another
+    # one's metadata (even its own grapher step) doesn't inherit the flag.
+    ds.metadata.dataset_page = False
 
     meta_path = get_metadata_path(str(dest_dir))
 
@@ -141,6 +144,8 @@ def create_dataset(
 
     # add tables to dataset
     used_short_names = set()
+    # Long tables flattened here whose annotations are scoped to dimensions, to check those scopes at the end
+    flattened_tables_with_scopes = []
     for table in tables:
         if underscore_table:
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
@@ -164,6 +169,8 @@ def create_dataset(
                 # First pass to update metadata from YAML
                 if meta_path.exists():
                     table.update_metadata_from_yaml(meta_path, table.m.short_name)  # ty: ignore
+                if gh.has_scoped_annotations(table):
+                    flattened_tables_with_scopes.append(table)
                 log.info("long_to_wide.start", shape=table.shape, short_name=table.m.short_name, dim_names=dim_names)
                 t = time.time()
                 table = gh.long_to_wide(table)
@@ -189,6 +196,11 @@ def create_dataset(
     meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")
     if meta_override_path.exists():
         ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist, extra_variables=extra_variables)
+
+    # Check that each annotation scoped to dimensions has data in some table of the dataset
+    from etl.grapher import helpers as gh
+
+    gh.check_annotation_scopes_match(flattened_tables_with_scopes + gh.tables_with_scoped_annotations(ds))
 
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:

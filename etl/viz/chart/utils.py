@@ -15,7 +15,13 @@ from owid.catalog import Dataset, Table
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
-from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
+from etl.config import (
+    DEFAULT_GRAPHER_SCHEMA,
+    DEFAULT_GRAPHER_SCHEMA_VERSION,
+    GRAPHER_SCHEMA_URL_TEMPLATE,
+    OWID_ENV,
+    OWIDEnv,
+)
 from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR
@@ -27,16 +33,8 @@ INDICATORS_SLUG = "indicator"
 # A choice of a dimension, as stored in the dimensional metadata of a column (e.g. "female", or 2021).
 DimensionChoice = str | int
 
-# Grapher chart-config schemas are published as
-# https://files.ourworldindata.org/schemas/grapher-schema.011.json
-GRAPHER_SCHEMA_URL_TEMPLATE = "https://files.ourworldindata.org/schemas/grapher-schema.{version}.json"
 _GRAPHER_SCHEMA_VERSION_PATTERN = re.compile(r"^\d{3}$")
 _GRAPHER_SCHEMA_URL_PATTERN = re.compile(r"^https://files\.ourworldindata\.org/schemas/grapher-schema\.\d{3}\.json$")
-
-
-def default_grapher_schema_version() -> str:
-    """Three-digit version of `DEFAULT_GRAPHER_SCHEMA` — the value a new config should pin."""
-    return DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]
 
 
 def resolve_grapher_schema(value: str | int | None) -> str:
@@ -57,8 +55,8 @@ def resolve_grapher_schema(value: str | int | None) -> str:
         raise ValueError(
             "No `grapher_schema` pinned. Add a top-level `grapher_schema` to the config YAML "
             f'recording the version its view configs were authored against — `grapher_schema: "'
-            f'{default_grapher_schema_version()}"` for a config written today. Quote it: an '
-            "unquoted YAML value like `011` is parsed as octal."
+            f'{DEFAULT_GRAPHER_SCHEMA_VERSION}"` for a config written today. Quote it: an '
+            f"unquoted YAML value like `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is parsed as octal."
         )
 
     if isinstance(value, str):
@@ -72,12 +70,13 @@ def resolve_grapher_schema(value: str | int | None) -> str:
     hint = ""
     if isinstance(value, int) or (isinstance(value, str) and re.match(r"^\d{1,2}$", value)):
         hint = (
-            " Quote it: an unquoted YAML value like `011` is parsed as octal and silently becomes"
-            ' a different version, so write `grapher_schema: "011"`.'
+            f" Quote it: an unquoted YAML value like `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is parsed as"
+            f' octal and silently becomes a different version, so write `grapher_schema: "'
+            f'{DEFAULT_GRAPHER_SCHEMA_VERSION}"`.'
         )
     raise ValueError(
         f"Invalid `grapher_schema` value {value!r}. Expected a three-digit version as a quoted "
-        f'string (e.g. "011") or a full schema URL (e.g. {DEFAULT_GRAPHER_SCHEMA}).{hint}'
+        f'string (e.g. "{DEFAULT_GRAPHER_SCHEMA_VERSION}") or a full schema URL (e.g. {DEFAULT_GRAPHER_SCHEMA}).{hint}'
     )
 
 
@@ -110,20 +109,52 @@ def map_indicator_path_to_id(catalog_path: str, owid_env: OWIDEnv | None = None)
         return db_indicator.id
 
 
-# .load_table_names_from_dependencies
-def load_dataset_from_step(step: str) -> Dataset:
+def _is_grapher_step(step: str) -> bool:
+    return re.match(r"^(data|data-private)://grapher/", step) is not None
+
+
+def _table_names_in_db(dataset_uri: str) -> list[str]:
+    """Names of the tables of a grapher dataset, read off the catalog paths of its indicators in the DB."""
+    # `datasets.catalogPath` is the dataset URI without its `grapher/` channel.
+    q = """
+    select distinct substring_index(substring_index(v.catalogPath, '#', 1), '/', -1) as table_name
+    from variables v
+    join datasets d on d.id = v.datasetId
+    where d.catalogPath = %(dataset_path)s and v.catalogPath is not null
+    """
+    df = read_sql(q, OWID_ENV.engine, params={"dataset_path": dataset_uri.removeprefix("grapher/")})
+    return sorted(df["table_name"])
+
+
+# .load_table_names_from_dependencies, .get_tables_by_name_mapping
+def load_table_names_from_step(step: str) -> list[str]:
+    """Names of the tables in the dataset of a dependency step.
+
+    They come from the dataset on disk. When a grapher dataset isn't on disk, they come from the grapher DB
+    instead: a chart only needs the names of the tables to resolve `table#indicator`, and its indicators have
+    to be in the DB anyway. That lets a chart step run with `--only` against a staging server without building
+    or downloading its upstream datasets.
+    """
     uri = re.sub(r"^(data|data-private)://", "", step)
-    # TODO: read no metadata
-    return Dataset(DATA_DIR / uri)
+    if (DATA_DIR / uri / "index.json").exists():
+        return Dataset(DATA_DIR / uri).table_names
+    if not _is_grapher_step(step):
+        raise FileNotFoundError(f"Dataset `{uri}` is not on disk. Build it first: `etlr {uri}`.")
+    table_names = _table_names_in_db(uri)
+    if not table_names:
+        raise FileNotFoundError(
+            f"Dataset `{uri}` is neither on disk nor in the grapher DB at `{OWID_ENV.conf.DB_HOST}`. "
+            "If that is a staging server, push the branch and wait for its build to finish. "
+            f"Otherwise build the dataset: `etlr {uri} --grapher`."
+        )
+    return table_names
 
 
 # .has_duplicate_table_names
 def load_table_names_from_dependencies(dependencies: set[str]) -> list[str]:
     table_names = []
-    for uri in dependencies:
-        ds = load_dataset_from_step(uri)
-        for table_name in ds.table_names:
-            table_names.append(table_name)
+    for step in dependencies:
+        table_names.extend(load_table_names_from_step(step))
     return table_names
 
 
@@ -143,18 +174,18 @@ def get_tables_by_name_mapping(dependencies: set[str]) -> dict[str, list[str]]:
 
     for dep in dependencies:
         ## Ignore non-grapher dependencies
-        if not re.match(r"^(data|data-private)://grapher/", dep):
+        if not _is_grapher_step(dep):
             continue
 
-        ds = load_dataset_from_step(dep)
-        for table_name in ds.table_names:
-            tb = ds.read(table_name, load_data=False)
-            assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
-            table_uri = f"{tb.m.dataset.uri}/{table_name}"
+        # A dataset's URI is its path in the catalog, so it can be read off the step.
+        dataset_uri = re.sub(r"^(data|data-private)://", "", dep)
+        dataset_short_name = dataset_uri.split("/")[-1]
+        for table_name in load_table_names_from_step(dep):
+            table_uri = f"{dataset_uri}/{table_name}"
             # Add table -> uri
             tb_name_to_tb[table_name].append(table_uri)
             # Add dataset -> uri
-            tb_name_to_tb[f"{ds.m.short_name}/{table_name}"].append(table_uri)
+            tb_name_to_tb[f"{dataset_short_name}/{table_name}"].append(table_uri)
 
     return tb_name_to_tb
 

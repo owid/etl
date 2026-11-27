@@ -254,8 +254,8 @@ def summarize_production_edits(
 
     `revisions` are the production revisions recorded since the staging server was created, newest
     first; `baseline_config` is the config immediately before them. A chart can be in conflict with no
-    revisions at all — `charts.updatedAt` also moves on bulk and ETL-driven writes, which leave no
-    admin revision — and that is reported as such rather than guessed at.
+    revisions at all — `charts.lastEditedAt` also moves on tag changes and ETL-driven writes, which
+    leave no admin revision — and that is reported as such rather than guessed at.
     """
     if not revisions:
         return {"kind": "no_revision"}
@@ -358,12 +358,12 @@ class ChartDiffConflictResolver:
         link = f"[revision history]({ADMIN_REVISIONS_URL.format(chart_id=self.diff.chart_id)})"
 
         if summary["kind"] == "no_revision":
-            # `charts.updatedAt` moved but no admin revision was recorded, which is what a bulk or
-            # ETL-driven write looks like. Saying "last edited by X" here would name whoever happened
-            # to make the previous manual edit, months earlier.
+            # `charts.lastEditedAt` moved but no admin revision was recorded, which is what a tag
+            # change or an ETL-driven write looks like. Saying "last edited by X" here would name
+            # whoever happened to make the previous manual edit, months earlier.
             st.caption(
                 "Production's timestamp moved but no chart revision was recorded, so this is most "
-                f"likely a bulk or ETL-driven write rather than someone editing the chart · {link}"
+                f"likely a tag change or an ETL-driven write rather than an edit in the chart editor · {link}"
             )
             return
 

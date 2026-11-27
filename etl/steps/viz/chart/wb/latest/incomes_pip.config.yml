@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Incomes across the distribution
   title_variant: World Bank
+presentation:
+  page_type: data-explorer
+  explorer_subtitle: Explore World Bank data on the distribution of incomes.
 topic_tags:
   - Economic Inequality
 

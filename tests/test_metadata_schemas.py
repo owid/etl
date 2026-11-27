@@ -357,7 +357,8 @@ def test_multidim_configs_pin_grapher_schema():
     catches a *malformed* pin (`grapher_schema:` with no value, an unquoted octal `011`) that a
     key-presence check would wave through.
     """
-    from etl.viz.chart.utils import default_grapher_schema_version, resolve_grapher_schema
+    from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION
+    from etl.viz.chart.utils import resolve_grapher_schema
 
     broken = []
     for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.y*ml")):
@@ -374,7 +375,7 @@ def test_multidim_configs_pin_grapher_schema():
     assert not broken, (
         "These multidim configs don't pin a valid `grapher_schema`. Add the current version as a "
         f'**quoted** string (an unquoted `011` is parsed as octal) — `grapher_schema: "'
-        f'{default_grapher_schema_version()}"`:\n  ' + "\n  ".join(broken)
+        f'{DEFAULT_GRAPHER_SCHEMA_VERSION}"`:\n  ' + "\n  ".join(broken)
     )
 
 
@@ -395,7 +396,7 @@ def test_no_newer_grapher_schema_version():
     assert latest_id == DEFAULT_GRAPHER_SCHEMA, (
         f"Upstream published a newer grapher schema: {latest_id} "
         f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
-        "Bump DEFAULT_GRAPHER_SCHEMA in etl/config.py once grapher renders the new version."
+        "Bump DEFAULT_GRAPHER_SCHEMA_VERSION in etl/config.py once grapher has deployed the new version."
     )
 
 
@@ -417,3 +418,25 @@ def test_schemas_have_no_duplicate_keys():
         except ValueError as e:
             broken.append(f"{path.name}: {e}")
     assert not broken, "Schemas with duplicate keys:\n  " + "\n  ".join(broken)
+
+
+def test_at_most_one_step_opts_in_to_each_dataset_page():
+    """A dataset page lives at `<namespace>/<dataset>`, whatever the channel and version, so two active steps there
+    (e.g. a garden step and its grapher step) can't both set `dataset: dataset_page: true`: publishing would fail."""
+    active_steps = get_active_steps()
+    steps_by_page: dict[str, list[str]] = {}
+    for meta_file_path in Path(STEPS_DATA_DIR).glob("**/*.meta.yml"):
+        text = meta_file_path.read_text()
+        if "dataset_page" not in text:
+            continue
+        step = str(meta_file_path.relative_to(STEPS_DATA_DIR)).rsplit(".meta.yml", 1)[0]
+        if step not in active_steps:
+            # A step whose files live in their own folder, e.g. `garden/owid/latest/key_indicators/key_indicators`.
+            step = step.rsplit("/", 1)[0]
+        if step not in active_steps or not (yaml.safe_load(text).get("dataset") or {}).get("dataset_page"):
+            continue
+        channel, namespace, _, short_name = step.split("/")
+        if channel in ("garden", "grapher"):
+            steps_by_page.setdefault(f"{namespace}/{short_name}", []).append(step)
+    shared = {page: steps for page, steps in steps_by_page.items() if len(steps) > 1}
+    assert not shared, f"Several steps opt in to the same dataset page: {shared}"

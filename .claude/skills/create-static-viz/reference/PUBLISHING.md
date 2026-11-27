@@ -1,17 +1,73 @@
 # Publishing a static viz on the site
 
-Read this at Step 9, items 7 to 9, once the Figma frames are final. A flagship static viz goes on the site as
+Read this at Step 9, items 6 to 9, once the Figma frames are final. A flagship static viz goes on the site as
 a **static viz** (Admin → Static viz, `/admin/static-viz/`), not as a bare image. The `{.static-viz}`
 gdoc block renders the image like `{.image}` does, and adds a Download button whose modal shows the
 description, both image versions and the data link. The admin is behind Cloudflare Access, so a cloud
 session cannot reach it: prepare the files and the texts, and the user enters them.
 
+## Ask for each review with the same template
+
+Every review round in Step 9, item 6 (Bertha, the design review, the author, the final review) is asked
+for with one comment on the viz's child issue in `owid/owid-issues`, drafted for the user to post. That
+repo is private, so naming the colleagues who gave feedback is fine there; never post the comment in
+this public repo, where CLAUDE.md's rule on internal context applies. Use this template, filling
+the angle brackets and dropping the lines that don't apply. Nothing goes on the site before the final
+reviewer approves in a reply. Export the PNGs first (section 1).
+
+- **Ask for a written reply, never "a thumbs-up is enough".** A reaction sends the user no
+  notification, so an approval given that way is easy to miss.
+
+```markdown
+> _Written by Claude <model name> — @<handle> at the wheel._
+
+Hi @<reviewer>!
+
+<The ask, in one or two sentences. Final review: "Here's the <subject> static chart, ready for
+publication. Could you take a final look and let us know if it's good to go? We'd mostly like to check
+that the chart and its text read well." Earlier rounds: what is ready, and the one to three points you'd
+most like their eye on.> Could you reply here when you've had a look, even if it's just to say it's fine?
+
+It includes feedback from <names>. The main changes from <the original | the last version>:
+- <change, with the reason when it isn't obvious>
+- <change>
+
+<Text on the page that changes with the chart, in one sentence, when there is any (section 4 finds it).>
+
+[Figma](https://www.figma.com/design/<fileKey>/<FileName>?node-id=<desktop frame id>)
+
+**Before (published <year>)**
+<img src="<old image>" width="850">
+
+**Desktop**
+<img src="<desktop PNG>" width="850">
+
+**Mobile**
+<img src="<mobile PNG>" width="360">
+```
+
+- **The images stay HTML tags** at those widths, so they render at a set size; GitHub's drag-and-drop
+  inserts full-width Markdown images instead. A session cannot upload to GitHub, so each `src` is a
+  placeholder naming its file (the old image from `scripts/fetch_original_image.py`, the new PNGs from
+  section 1); the user drags each file into the comment box and moves the `user-attachments` URL
+  GitHub inserts into its tag.
+- **A follow-up after a round** ("Thanks @<reviewer>! I applied your suggestions…") keeps the same
+  shape: what changed and anything not applied, with the reason, then the Figma link and the images of
+  the new version only, without the before.
+- **The same template works outside the issue** (a Slack message to a colleague), with the images
+  attached in that order instead of the tags.
+
 ## 1. Export and upload the images
 
 - **Export each frame at its family's scale** (`/owid-staff:create-figma-chart` →
   `reference/NODE-MAP.md` → *Export scale per family*: 2× for the 850-wide desktop frames, 3× for
-  the 540-wide mobile ones). From a session, clone the frame, `rescale` the clone, `get_screenshot` it
-  at its natural size, and delete the clone. Save the files under the user's `ai/` folder.
+  the 540-wide mobile ones). From a session, use Figma's own exporter, all frames in one read-only
+  `use_figma`: per frame, `const bytes = await frame.exportAsync({ format: "PNG", constraint: { type:
+  "SCALE", value: <scale> } })`, then `figma.io.write("<frame name>.png", bytes)`. Claude Code saves
+  each file and names its path in the result, and nothing is written to the shared file. This is the
+  export itself, not a render of it (`/owid-staff:create-figma-chart` → SKILL.md → Step 9 has the
+  measurements), and it runs through the Figma connector, so it works in a cloud session too. Save
+  the files under the user's `ai/` folder, named after their frames.
 - **Upload them in Admin → Images under a filename the library does not hold yet**: each frame's name
   plus `.png` the first time, and the frame's name plus the refresh's date
   (`<frame name>-2027-03-14.png`) when a later refresh finds that taken; if that is taken too, add

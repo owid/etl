@@ -286,7 +286,7 @@ def insert_media_mentions_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, place
     end_index = insert_index
     for _, row in df.iterrows():
         date_str = row["Date"].strftime("%Y-%m-%d")
-        url = row.get("Source link")
+        url = row.get("Link")
         has_link = pd.notna(url) and bool(url)
 
         line = f"• {date_str}: {row['Highlight']}."
@@ -796,7 +796,7 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
         )
         for _, highlight in highlights.iterrows():
             log.info(f"* {highlight['Highlight']}")
-            log.info(f"Source link: {highlight['Source link']}")
+            log.info(f"Source link: {highlight['Link']}")
             # log.info(f"Notion highlight: {highlight['notion_url']}")
 
 

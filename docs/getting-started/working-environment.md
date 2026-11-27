@@ -315,14 +315,16 @@ Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks
 
 ## GitHub Actions
 
-We use [:octicons-link-external-16: pinact](https://github.com/suzuki-shunsuke/pinact)
-to manage GitHub Actions and workflow versions. Action references in
-`.github/workflows/*` and `.github/actions/*` should be pinned to immutable commit SHAs
-with a version comment, rather than to a mutable tag like `@v5`. Pinning to a SHA means a
-compromised or retagged action can't silently change what runs in our CI, while the
-trailing comment keeps the human-readable version visible.
+GitHub Actions dependencies, including transitive ones, are locked to commit SHAs in
+[:octicons-link-external-16: `.github/workflows/actions.lock`](https://docs.github.com/actions/concepts/security/workflow-dependency-lockfiles),
+and the runner refuses any action that isn't in it. That way a compromised or retagged
+action can't silently change what runs in our CI. Workflows reference actions by a full
+version tag (e.g. `actions/checkout@v7.0.1`) rather than a SHA.
 
-Run `pinact run -update` to update and pin every action and workflow in the repository.
+After adding or changing any `uses:` in `.github/workflows/*` or `.github/actions/*`,
+run `gh actions-lock` (install once with `gh extension install github/gh-actions-lock`)
+and commit the updated lockfile. CI verifies it on every change under `.github/`.
+Dependabot bumps action versions weekly and regenerates the lockfile itself.
 
 ## VSCode setup
 

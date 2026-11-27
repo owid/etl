@@ -37,3 +37,63 @@
   reason: *reason
   producer: WHO Mortality Database
   status: open
+
+# WHO reports no injury deaths for Albania in 2005, 2006 and 2009 (Unintentional injuries: 0, 3 and 0, against
+# 582-900 in the neighbouring years), yet All Causes exceeds the sum of its cause groups by 1,214, 970 and 891
+# deaths, about Albania's usual injury total: the deaths were registered but not coded to an injury group. The
+# zeros would read as years without homicides or suicides, so the four injury causes are blanked there.
+
+# Guard: fails once WHO assigns these deaths to the injury groups. Keep it first, as for Malta above.
+- indicator: deaths
+  entity: Albania
+  years: [2005, 2006, 2009]
+  match: {sex: Both sexes, age_group: all ages, cause: Intentional injuries}
+  action: override
+  value: null
+  expect: {eq: 0}
+  reason: &reason_albania >-
+    WHO reports no injury deaths for Albania in 2005, 2006 and 2009, yet All Causes exceeds the sum of its
+    cause groups by 891-1,214 deaths, close to Albania's usual injury total: the deaths were not coded to
+    an injury group.
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: &injury_indicators [deaths, share_of_deaths, death_rate, death_rate_age_standardized]
+  entity: Albania
+  years: [2005, 2006, 2009]
+  match: {cause: Intentional injuries}
+  action: override
+  value: null
+  reason: *reason_albania
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: *injury_indicators
+  entity: Albania
+  years: [2005, 2006, 2009]
+  match: {cause: Self-inflicted injuries}
+  action: override
+  value: null
+  reason: *reason_albania
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: *injury_indicators
+  entity: Albania
+  years: [2005, 2006, 2009]
+  match: {cause: Violence}
+  action: override
+  value: null
+  reason: *reason_albania
+  producer: WHO Mortality Database
+  status: open
+
+- indicator: *injury_indicators
+  entity: Albania
+  years: [2005, 2006, 2009]
+  match: {cause: Unintentional injuries}
+  action: override
+  value: null
+  reason: *reason_albania
+  producer: WHO Mortality Database
+  status: open

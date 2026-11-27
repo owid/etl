@@ -21,7 +21,7 @@ from typing_extensions import Self
 
 import etl.config as etl_config
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA_VERSION, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import SCHEMAS_DIR, VIZ_DIR
 from etl.viz.chart.exceptions import DuplicateChartViews, DuplicateValuesError
@@ -30,7 +30,6 @@ from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.params import GroupViewsConfig
 from etl.viz.chart.model.view import CommonView, View, ViewIndicators
 from etl.viz.chart.utils import (
-    default_grapher_schema_version,
     fill_placeholders,
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
@@ -108,6 +107,29 @@ class Definitions(MDIMBase):
                 raise ValueError(f"Duplicate common views found! {info}")
 
 
+# Page types a multidim can be shown as (grapher's `MultiDimExplorerPresentation.pageType`).
+CHART_PAGE_TYPES = ("data-explorer",)
+
+
+@pruned_json
+@dataclass
+class ChartPresentation(MDIMBase):
+    """The kind of page a multidim is shown as. Without it, the multidim is a plain data page.
+
+    Uploaded camelCased (`pageType`, `explorerSubtitle`), as grapher expects.
+    """
+
+    page_type: str
+    # Shown on the multidim's card on the explorers page.
+    explorer_subtitle: str
+
+    def __post_init__(self):
+        if self.page_type not in CHART_PAGE_TYPES:
+            raise ValueError(f"Invalid `presentation.page_type`: {self.page_type}. Accepted values: {CHART_PAGE_TYPES}")
+        if not self.explorer_subtitle:
+            raise ValueError("`presentation.explorer_subtitle` must not be empty.")
+
+
 @pruned_json
 @dataclass
 class Chart(MDIMBase):
@@ -135,6 +157,8 @@ class Chart(MDIMBase):
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
+    # Only valid on mdims. See `validate_presentation()`.
+    presentation: ChartPresentation | None = None
     # Grapher chart-config schema version that this chart's view configs were authored
     # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
     # `$schema` of every view config, and skips config migrations entirely when it is missing.
@@ -321,6 +345,9 @@ class Chart(MDIMBase):
 
         # Single charts must declare their slug.
         self.validate_slug()
+
+        # Only mdims can set a page presentation.
+        self.validate_presentation()
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
@@ -878,6 +905,18 @@ class Chart(MDIMBase):
                 "current slug; for a new one, preferably the step's short name with dashes."
             )
 
+    def validate_presentation(self):
+        """`presentation` sets the kind of multidim page, so a single chart can't carry it.
+
+        A single chart is pushed as a regular grapher chart, which has no such field: it would
+        silently do nothing. Explorers reject it on construction.
+        """
+        if self.presentation is not None and self._chart_type == "multidim" and not self.dimensions:
+            raise ValueError(
+                f"Chart '{self.catalog_path}' is a single chart (`dimensions: []`) but declares a top-level "
+                "`presentation`, which only applies to multidims. Remove it."
+            )
+
     def validate_default_selection(self):
         """Warn per-view when a non-map-only view has no entity-selection fallback.
 
@@ -965,8 +1004,8 @@ class Chart(MDIMBase):
             raise ValueError(
                 f"Chart '{self.catalog_path}' pins no `grapher_schema`. Add a top-level "
                 "`grapher_schema` to the config YAML recording the version its view configs were "
-                f'authored against — `grapher_schema: "{default_grapher_schema_version()}"` for a '
-                "config written today (quoted: an unquoted `011` is YAML octal)."
+                f'authored against — `grapher_schema: "{DEFAULT_GRAPHER_SCHEMA_VERSION}"` for a '
+                f"config written today (quoted: an unquoted `{DEFAULT_GRAPHER_SCHEMA_VERSION}` is YAML octal)."
             )
 
     def validate_description_keys(self):
