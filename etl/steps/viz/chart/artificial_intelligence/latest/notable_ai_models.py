@@ -65,13 +65,25 @@ COLORS = {
         "indicator": "weights_availability",
         "sentence": "Colors show whether its weights are openly available, whether it can only be used through an API or another hosted service, or whether it was not released.",
         "by": "by availability of weights",
-        "color_scale": {"baseColorScheme": "OwidCategoricalD"},
+        "color_scale": {
+            "customCategoryColors": {
+                "Open weights": "#00847E",
+                "API or hosted access only": "#4C6A9C",
+                "Not released": "#996D36",
+                "No data": "#a2a6ad",
+            },
+            "customCategoryLabels": {"No data": "Not recorded"},
+        },
     },
     "country": {
         "indicator": "country_group",
         "sentence": "Colors show the country of the organizations that developed it.",
         "by": "by country of developer",
-        "color_scale": {"baseColorScheme": "OwidCategoricalB", "customCategoryColors": {"Other": GRAY}},
+        "color_scale": {
+            "baseColorScheme": "OwidCategoricalB",
+            "customCategoryColors": {"Other": GRAY, "No data": "#a2a6ad"},
+            "customCategoryLabels": {"No data": "Not recorded"},
+        },
     },
     "developer": {
         "indicator": "developer_group",
