@@ -16,6 +16,8 @@ default_selection:
   - Mexico
   - Chile
   - Colombia
+  - China
+  - Egypt
 
 default_dimensions:
   measure: births
@@ -92,12 +94,12 @@ views:
             name: UN estimates
     config:
       title: "Births: national statistics compared with UN estimates"
-      subtitle: "Number of live births in the year, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN. UN figures for 2024 and 2025 are projections."
+      subtitle: "Number of live births in the year, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN."
     metadata:
       presentation:
         title_public: "Births: national statistics compared with UN estimates"
         attribution_short: National statistics and UN WPP
-      description_short: Number of live births in the year, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN. UN figures for 2024 and 2025 are projections.
+      description_short: Number of live births in the year, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN.
 
   - dimensions:
       measure: births
@@ -111,7 +113,7 @@ views:
             numDecimalPlaces: 0
     config:
       title: "Difference in births between national statistics and UN estimates"
-      subtitle: "Number of live births published by national statistics, minus the number the UN estimates. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
+      subtitle: "Number of live births published by national statistics, minus the number the UN estimates. A positive number means the national figure is higher."
 
   - dimensions:
       measure: births
@@ -125,7 +127,7 @@ views:
             numDecimalPlaces: 2
     config:
       title: "Relative difference in births between national statistics and UN estimates"
-      subtitle: "How far the number of live births published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
+      subtitle: "How far the number of live births published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher."
 
   - dimensions:
       measure: fertility_rate
@@ -146,12 +148,12 @@ views:
             name: UN estimates
     config:
       title: "Fertility rate: national statistics compared with UN estimates"
-      subtitle: "[Total fertility rate](#dod:fertility-rate), as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN. UN figures for 2024 and 2025 are projections."
+      subtitle: "[Total fertility rate](#dod:fertility-rate), as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN."
     metadata:
       presentation:
         title_public: "Fertility rate: national statistics compared with UN estimates"
         attribution_short: National statistics and UN WPP
-      description_short: Total fertility rate, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN. UN figures for 2024 and 2025 are projections.
+      description_short: Total fertility rate, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN.
 
   - dimensions:
       measure: fertility_rate
@@ -165,7 +167,7 @@ views:
             numDecimalPlaces: 2
     config:
       title: "Difference in the fertility rate between national statistics and UN estimates"
-      subtitle: "[Total fertility rate](#dod:fertility-rate) published by national statistics, minus the rate the UN estimates, in live births per woman. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
+      subtitle: "[Total fertility rate](#dod:fertility-rate) published by national statistics, minus the rate the UN estimates, in live births per woman. A positive number means the national figure is higher."
       hasMapTab: true
       map:
         timeTolerance: 1
@@ -190,4 +192,4 @@ views:
             numDecimalPlaces: 2
     config:
       title: "Relative difference in the fertility rate between national statistics and UN estimates"
-      subtitle: "How far the [total fertility rate](#dod:fertility-rate) published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher. UN figures for 2024 and 2025 are projections."
+      subtitle: "How far the [total fertility rate](#dod:fertility-rate) published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher."

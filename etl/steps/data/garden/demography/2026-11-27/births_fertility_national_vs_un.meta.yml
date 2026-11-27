@@ -49,7 +49,7 @@ tables:
       births_un:
         title: Births (UN estimates)
         unit: births
-        description_short: Number of live births in the year, as estimated by the UN. Figures for 2024 and 2025 are projections.
+        description_short: Number of live births in the year, as estimated by the UN.
         description_key:
           - "{definitions.key_un}"
           - "{definitions.key_inclusion}"
@@ -109,7 +109,7 @@ tables:
       fertility_rate_un:
         title: Fertility rate (UN estimates)
         unit: live births per woman
-        description_short: "[Total fertility rate](#dod:fertility-rate), as estimated by the UN: {definitions.description_short_tfr} Figures for 2024 and 2025 are projections."
+        description_short: "[Total fertility rate](#dod:fertility-rate), as estimated by the UN: {definitions.description_short_tfr}"
         description_key:
           - "{definitions.key_un}"
           - "{definitions.key_inclusion}"
