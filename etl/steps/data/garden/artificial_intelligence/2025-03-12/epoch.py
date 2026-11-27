@@ -211,6 +211,7 @@ COUNTRY_GROUPS = {
     "United States of America": "United States",
     "China": "China",
     "United Kingdom": "United Kingdom",
+    "South Korea": "South Korea",
     "France": "France",
 }
 

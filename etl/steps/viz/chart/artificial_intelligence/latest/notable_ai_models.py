@@ -81,13 +81,14 @@ COLORS = {
         "indicator": "country_group",
         "sentence": "Colors show the country of the organizations that developed it.",
         "by": "by country of developer",
-        # The United States and China get their flags' blue and red. The UK and France, whose flags use the same
-        # colors, get purple and teal so that the four stay easy to tell apart.
+        # The United States and China get their flags' blue and red, and South Korea the black of its flag. The UK and
+        # France, whose flags also use blue and red, get purple and teal so that the five stay easy to tell apart.
         "color_scale": {
             "customCategoryColors": {
                 "United States": "#2F5DA8",
                 "China": "#D52B1E",
                 "United Kingdom": "#7B4BA8",
+                "South Korea": "#3A3A3A",
                 "France": "#00847E",
                 "Multiple countries": "#E0A000",
                 "Other": LIGHT_GRAY,

@@ -126,13 +126,14 @@ tables:
         description_short: Country of the organizations that developed an AI model.
         description_from_producer: Country/countries associated with the developing organization(s). Multinational is used to mark organizations associated with multiple countries.
         description_processing: |-
-          We show the United States, China, the United Kingdom, and France separately, and group all other countries as “Other”. Models developed by organizations in several countries, or by organizations that Epoch AI marks as multinational, count as “Multiple countries”.
+          We show the United States, China, the United Kingdom, South Korea, and France separately, and group all other countries as “Other”. Models developed by organizations in several countries, or by organizations that Epoch AI marks as multinational, count as “Multiple countries”.
         # Order of the categories in chart legends.
         type: ordinal
         sort:
           - United States
           - China
           - United Kingdom
+          - South Korea
           - France
           - Multiple countries
           - Other
