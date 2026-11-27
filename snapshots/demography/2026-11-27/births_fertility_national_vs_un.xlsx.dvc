@@ -5,15 +5,15 @@ meta:
     # Data product / Snapshot
     title: Births and fertility rates from national statistics
     description: |-
-      Our World in Data compiled the yearly number of births and the total fertility rate for 2010–2025 from each country's national statistics office, civil registry, or health ministry. The figures are used as published, and the most recent published figure is used for each year.
+      This data is compiled by Our World in Data, based on the figures published by national statistics offices, civil registries, and health ministries, for the yearly number of births and the total fertility rate. The data spans 2010 to 2025. We use the figures as published and do not calculate any of them ourselves; the only exception is the United Kingdom's births for 2022–2025, which are calculated as the sum of those of England and Wales, Scotland, and Northern Ireland. For each year, we use the most recent published figure.
 
-      A country or area is included when all of the following are true:
+      We include a country or area when all of the following are true:
 
-      1. It is a country or area in the UN's World Population Prospects, and had at least 1 million people in 2023, according to those estimates.
-      2. Its yearly count of births is at least 90% complete. We go by what the country reports, to the UN or in a household survey since 2010, unless a census or survey shows the count is less complete than that.
-      3. A national government body publishes this yearly count, such as the civil registry, the statistics office, or the health ministry. Model estimates and survey results don't count.
+      1. It is a country or area in the UN's World Population Prospects (2024 edition), and had at least 1 million people in 2023, according to those estimates.
+      2. Its yearly count of births is at least 90% complete. We go by what the country reports, either to the UN ([source](https://unstats.un.org/unsd/demographic-social/crvs/#Completeness)) or in a household survey since 2010 ([source](https://data.worldbank.org/indicator/SP.REG.BRTH.ZS)), unless a later census or survey has shown that the count is less complete than that.
+      3. A national government body publishes this yearly count, such as the civil registry, the statistics office, or the health ministry. Model estimates and survey results are not included.
       4. The count is available for at least one year from 2020 onward.
-      5. The count covers the same population the UN covers. If the national figures leave out or add areas or groups making up 3% or more of births, the country is left out. Below that, it is included with a note.
+      5. The count covers the same population the UN covers. If the national figures leave out or add areas or groups making up 3% or more of births, the country is not included in our dataset. Below that, we include it with a note.
 
       The spreadsheet has four tabs: an introduction, the data (with the sources and notes for each year), the sources, and every country or area in the UN's World Population Prospects 2024, with whether it is included and why not.
     date_published: "2026-11-27"
@@ -22,7 +22,7 @@ meta:
     producer: Official data collated by Our World in Data
     # NOTE: The snapshot script builds citation_full from the spreadsheet's Data and Sources tabs. Don't edit it by hand.
     citation_full: |-
-      Our World in Data (2026). Births and fertility rates from national statistics. Compiled from the published figures of national statistics offices, civil registries, and health ministries: [spreadsheet with the data, sources, and notes for each year, and the reason each country is left out](https://docs.google.com/spreadsheets/d/1Fq9XJFC4GHmNYSjheURb9xeEZAMSw5-UISrxfQG2tTg/edit).
+      Our World in Data (2026). Births and fertility rates from national statistics. Compiled from the published figures of national statistics offices, civil registries, and health ministries: [spreadsheet with the data, sources, and notes for each year, and the reason each country is left out](https://docs.google.com/spreadsheets/d/1XHOgL1AHnhBqiajL5XuFMwiWLmRWlld-r85jv5R5A8I/edit).
 
       Sources for each country, with the years each one covers, and notes on the data (the spreadsheet also gives each source's title):
 
@@ -107,8 +107,8 @@ meta:
       - Uzbekistan: [National Statistics Committee of the Republic of Uzbekistan](https://siat.stat.uz/data/223/?lang=en) (2010–2025); [National Statistics Committee of the Republic of Uzbekistan](https://siat.stat.uz/data/665/?lang=en) (2010–2025).
 
     # Files
-    url_main: https://docs.google.com/spreadsheets/d/1Fq9XJFC4GHmNYSjheURb9xeEZAMSw5-UISrxfQG2tTg/edit
-    url_download: https://docs.google.com/spreadsheets/d/1Fq9XJFC4GHmNYSjheURb9xeEZAMSw5-UISrxfQG2tTg/export?format=xlsx
+    url_main: https://docs.google.com/spreadsheets/d/1XHOgL1AHnhBqiajL5XuFMwiWLmRWlld-r85jv5R5A8I/edit
+    url_download: https://docs.google.com/spreadsheets/d/1XHOgL1AHnhBqiajL5XuFMwiWLmRWlld-r85jv5R5A8I/export?format=xlsx
     date_accessed: "2026-11-27"
 
     # License
@@ -116,6 +116,6 @@ meta:
       name: CC BY 4.0
       url: https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data
 outs:
-  - md5: f4b3eefdeba8a58101f66f2f8ff4af51
+  - md5: 0ae8e375c18a5a02cb11692e465dce3c
     size: 96184
     path: births_fertility_national_vs_un.xlsx
