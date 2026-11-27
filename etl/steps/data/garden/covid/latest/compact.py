@@ -393,6 +393,8 @@ def add_external_indicators(
     tb_pip = _ffill_and_keep_latest(tb_pip, cols)
     ## rename cols
     tb_pip = tb_pip.rename(columns={"headcount_ratio_300": "extreme_poverty"})
+    ## drop the notes on breaks in comparability: they describe the full series, not its latest value
+    tb_pip["extreme_poverty"].metadata.annotations = []
 
     # WHO
     tb_who = ds_who.read("household")

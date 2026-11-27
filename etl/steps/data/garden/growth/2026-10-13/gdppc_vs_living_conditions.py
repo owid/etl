@@ -248,6 +248,10 @@ def run() -> None:
         errors="raise",
     )
 
+    # Drop the notes on breaks in comparability: they are scoped to a dimension this table no longer has
+    for column in ["mean_income", "median_income"]:
+        tb_pip[column].metadata.annotations = []
+
     # UNDP HDR
     check_columns_and_categories(tb=tb_undp_hdr, table_name="undp_hdr")
     tb_undp_hdr = filter_table(tb=tb_undp_hdr, table_name="undp_hdr")

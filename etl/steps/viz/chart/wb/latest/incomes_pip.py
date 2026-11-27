@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
+
 from etl.helpers import PathFinder
 from etl.viz import filter_columns_by_dimension_choices
 
@@ -22,6 +24,11 @@ DIMENSIONS_CONFIG = {
 
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
+# Settings every view gets, grouped ones included (they are created after `common_views` would apply).
+ALL_VIEWS_CONFIG = {
+    "originUrl": "ourworldindata.org/economic-inequality",
+}
+
 # Set x (population) and color (region) indicators needed by the Marimekko tab.
 # Given in short form (`table#column`); `Chart.save` resolves them against the step's
 # dependencies, so the dataset versions are not hardcoded here.
@@ -39,6 +46,10 @@ OLD_INCOME_CONSUMPTION = "For a small number of countries and years, the data so
 NEW_INCOME_CONSUMPTION_NO_BREAKS = "For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations."
 OLD_SHARE_DECILE = "This data shows the share of total income or consumption received by each decile — a tenth of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality)."
 NEW_SHARE_GROUPS = "This data shows the share of total income or consumption received by different groups of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality)."
+
+# The garden note links "breaks in comparability" to the view that shows the breaks of the same indicator. Grouped
+# views have no such view, so their note keeps the words without the link.
+BREAKS_LINK = re.compile(r"\[(breaks in comparability)\]\([^)]*\)")
 
 
 def run() -> None:
@@ -67,7 +78,9 @@ def run() -> None:
     for col in tb.columns:
         if tb[col].metadata.dimensions and "survey_comparability" in tb[col].metadata.dimensions:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
-    survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
+    survey_comp_spells = sorted(
+        (v for v in survey_comp_values if v != "No spells"), key=lambda v: (len(str(v)), str(v))
+    )
 
     #
     # Create chart object
@@ -269,6 +282,20 @@ def run() -> None:
                     new_bullets.append(bullet)
             view.metadata = view.metadata or {}
             view.metadata["description_key"] = new_bullets
+
+    # Grouped views inherit the note of their first indicator, which links to that decile's breaks view: drop the link.
+    for view in c.views:
+        if view.matches(decile=["all", "p10_p50_p90"]) and view.indicators.y:
+            col_name = view.indicators.y[0].catalogPath.split("#")[-1]
+            note = tb[col_name].metadata.presentation.grapher_config["note"]
+            note_unlinked, n_links = BREAKS_LINK.subn(r"\1", note)
+            assert n_links == 1, f"Expected one breaks link in the note of {col_name} — garden text changed, review it."
+            view.config = view.config or {}
+            view.config["note"] = note_unlinked
+
+    # Add the settings shared by all views.
+    for view in c.views:
+        view.config = {**ALL_VIEWS_CONFIG, **(view.config or {})}
 
     #
     # Save garden dataset.

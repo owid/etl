@@ -9,6 +9,11 @@ DIMENSIONS_CONFIG = {
     "survey_comparability": "*",
 }
 
+# Settings every view gets, grouped ones included (they are created after `common_views` would apply).
+ALL_VIEWS_CONFIG = {
+    "originUrl": "ourworldindata.org/economic-inequality",
+}
+
 
 def run() -> None:
     config = paths.load_config()
@@ -29,7 +34,9 @@ def run() -> None:
     for col in tb.columns:
         if tb[col].metadata.dimensions and "survey_comparability" in tb[col].metadata.dimensions:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
-    survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
+    survey_comp_spells = sorted(
+        (v for v in survey_comp_values if v != "No spells"), key=lambda v: (len(str(v)), str(v))
+    )
 
     # Create chart
     c = paths.create_chart(
@@ -77,5 +84,9 @@ def run() -> None:
             },
         ],
     )
+
+    # Add the settings shared by all views.
+    for view in c.views:
+        view.config = {**ALL_VIEWS_CONFIG, **(view.config or {})}
 
     c.save()

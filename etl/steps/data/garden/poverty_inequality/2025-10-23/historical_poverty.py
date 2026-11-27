@@ -1338,6 +1338,10 @@ def prepare_pip_data(tb_pip_inequality: Table, tb_pip_incomes: Table, tb_thousan
         & (tb_pip_incomes["period"] == "day")
     ][["country", "year", "welfare_type", "table", "survey_comparability", "mean"]]
 
+    # Drop the notes on breaks in comparability: they describe PIP's series, not the estimates built from them
+    tb_pip_inequality["gini"].metadata.annotations = []
+    tb_pip_incomes["mean"].metadata.annotations = []
+
     # Now merge both tables
     tb_pip = pr.merge(
         tb_pip_inequality,
