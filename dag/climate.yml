@@ -46,6 +46,8 @@ steps:
   viz://explorer/emissions/latest/ipcc_scenarios:
     - data://grapher/emissions/2022-08-30/ipcc_scenarios:
       - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
+  viz://chart/emissions/latest/ipcc_scenarios:
+    - data://grapher/emissions/2022-08-30/ipcc_scenarios
 
   # EPA - Climate change indicators (frozen). Consumed by climate_change_impacts below.
   data://garden/epa/2024-04-17/ghg_concentration:
