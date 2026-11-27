@@ -41,6 +41,10 @@ definitions:
     - dimensions:
         comparison: relative_difference
       config:
+        chartTypes:
+          - LineChart
+          - DiscreteBar
+          - Marimekko
         hasMapTab: true
         tab: map
         map:
