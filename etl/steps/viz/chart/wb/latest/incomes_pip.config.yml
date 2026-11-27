@@ -115,7 +115,8 @@ views:
     config:
       title: Distribution of income across richer and poorer groups
       subtitle: Share of income received by different income groups.
-      note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+      # Copied from the note of the share indicators in the garden metadata of world_bank_pip. Keep in sync.
+      note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita). Country series contain breaks in comparability.
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
       hideTotalValueLabel: true

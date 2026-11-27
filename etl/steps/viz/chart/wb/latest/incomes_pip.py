@@ -22,6 +22,11 @@ DIMENSIONS_CONFIG = {
 
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
+# Settings every view gets, grouped ones included (they are created after `common_views` would apply).
+ALL_VIEWS_CONFIG = {
+    "originUrl": "ourworldindata.org/economic-inequality",
+}
+
 # Set x (population) and color (region) indicators needed by the Marimekko tab.
 # Given in short form (`table#column`); `Chart.save` resolves them against the step's
 # dependencies, so the dataset versions are not hardcoded here.
@@ -67,7 +72,9 @@ def run() -> None:
     for col in tb.columns:
         if tb[col].metadata.dimensions and "survey_comparability" in tb[col].metadata.dimensions:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
-    survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
+    survey_comp_spells = sorted(
+        (v for v in survey_comp_values if v != "No spells"), key=lambda v: (len(str(v)), str(v))
+    )
 
     #
     # Create chart object
@@ -269,6 +276,10 @@ def run() -> None:
                     new_bullets.append(bullet)
             view.metadata = view.metadata or {}
             view.metadata["description_key"] = new_bullets
+
+    # Add the settings shared by all views.
+    for view in c.views:
+        view.config = {**ALL_VIEWS_CONFIG, **(view.config or {})}
 
     #
     # Save garden dataset.

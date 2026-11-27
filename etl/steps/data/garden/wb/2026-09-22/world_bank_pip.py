@@ -11,7 +11,7 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Annotation, Table
 from structlog import get_logger
 from tabulate import tabulate
 
@@ -58,44 +58,48 @@ REGIONS_LIST = [
     "World (excluding India)",
 ]
 
-# Define countries expected to have both income and consumption data
-COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
-    "Albania",
-    "Armenia",
-    "Belarus",
-    "Belize",
-    "Bulgaria",
-    "China",
-    "China (rural)",
-    "China (urban)",
-    "Croatia",
-    "Estonia",
-    "Haiti",
-    "Hungary",
-    "Kazakhstan",
-    "Kosovo",
-    "Kyrgyzstan",
-    "Latvia",
-    "Lithuania",
-    "Montenegro",
-    "Namibia",
-    "Nepal",
-    "Nicaragua",
-    "North Macedonia",
-    "Peru",
-    "Philippines",
-    "Poland",
-    "Romania",
-    "Russia",
-    "Saint Lucia",
-    "Serbia",
-    "Seychelles",
-    "Slovakia",
-    "Slovenia",
-    "Turkey",
-    "Ukraine",
-    "Uzbekistan",
-]
+# Define countries with both income and consumption data, and how their consolidated series is built:
+# - "keep": the surveys the series uses, either "income", "consumption" or "both". With "both", the series changes
+#   from one type of survey to the other, and years with both types keep the type of the latest year.
+# - "latest": the type(s) of survey available in the latest year, which is what the choice was based on.
+# NOTE: Review at each update: the step fails if a country is missing here or its latest surveys change.
+COUNTRIES_WITH_INCOME_AND_CONSUMPTION = {
+    "Albania": {"keep": "consumption", "latest": ["consumption"]},
+    "Armenia": {"keep": "consumption", "latest": ["consumption"]},
+    "Belarus": {"keep": "consumption", "latest": ["consumption"]},
+    "Belize": {"keep": "consumption", "latest": ["consumption"]},
+    "Bulgaria": {"keep": "income", "latest": ["income"]},
+    "China": {"keep": "both", "latest": ["consumption"]},
+    "China (rural)": {"keep": "both", "latest": ["consumption"]},
+    "China (urban)": {"keep": "both", "latest": ["consumption"]},
+    "Croatia": {"keep": "income", "latest": ["income"]},
+    "Estonia": {"keep": "income", "latest": ["income"]},
+    "Haiti": {"keep": "income", "latest": ["consumption", "income"]},
+    "Hungary": {"keep": "income", "latest": ["income"]},
+    "Kazakhstan": {"keep": "both", "latest": ["consumption"]},
+    "Kosovo": {"keep": "income", "latest": ["income"]},
+    "Kyrgyzstan": {"keep": "consumption", "latest": ["consumption"]},
+    "Latvia": {"keep": "income", "latest": ["income"]},
+    "Lithuania": {"keep": "income", "latest": ["income"]},
+    "Montenegro": {"keep": "income", "latest": ["income"]},
+    "Namibia": {"keep": "both", "latest": ["consumption"]},
+    "Nepal": {"keep": "both", "latest": ["consumption"]},
+    "Nicaragua": {"keep": "income", "latest": ["income"]},
+    "North Macedonia": {"keep": "income", "latest": ["income"]},
+    "Peru": {"keep": "income", "latest": ["income"]},
+    "Philippines": {"keep": "consumption", "latest": ["consumption", "income"]},
+    "Poland": {"keep": "income", "latest": ["income"]},
+    "Romania": {"keep": "income", "latest": ["income"]},
+    "Russia": {"keep": "consumption", "latest": ["income"]},
+    "Saint Lucia": {"keep": "income", "latest": ["consumption", "income"]},
+    "Serbia": {"keep": "income", "latest": ["income"]},
+    "Seychelles": {"keep": "both", "latest": ["income"]},
+    "Slovakia": {"keep": "income", "latest": ["income"]},
+    "Slovenia": {"keep": "income", "latest": ["income"]},
+    "Turkey": {"keep": "both", "latest": ["income"]},
+    "Ukraine": {"keep": "consumption", "latest": ["consumption"]},
+    "Uzbekistan": {"keep": "income", "latest": ["income"]},
+}
 
 # Define inequality indicators
 INDICATORS_INEQUALITY = [
@@ -135,6 +139,28 @@ INDICATORS_NOT_USED = [
     "estimate_type",
     "pop_in_poverty",
 ]
+
+# Define the table with one series per country, and the tables that keep the survey behind each of its points
+TABLE_CONSOLIDATED = "Income or consumption consolidated"
+TABLES_WITH_SPELLS = ["Income with spells", "Consumption with spells"]
+
+# Define the columns that identify a run of comparable surveys
+SURVEY_COLUMNS = ["welfare_type", "survey_comparability"]
+
+# Define the poverty indicators that have no value where nobody lives below the poverty line.
+# Their first point after a break can fall in a different year for each poverty line, so they are not annotated.
+INDICATORS_WITH_BREAKS_BY_POVERTY_LINE = ["avg_shortfall", "income_gap_ratio", "watts"]
+
+# Define the range of countries expected to have breaks (144 in the September 2026 release)
+COUNTRIES_WITH_BREAKS_RANGE = (125, 165)
+
+# Define the notes shown at each break, by kind of break
+# NOTE: Keep them short. A chart lists the notes of all the breaks of a country together, one per year.
+BREAK_TEXTS = {
+    "survey": "Less comparable with the previous survey.",
+    "income to consumption": "Switch from income to consumption survey.",
+    "consumption to income": "Switch from consumption to income survey.",
+}
 
 
 def run() -> None:
@@ -223,6 +249,15 @@ def run() -> None:
     # Add period dimension (day, month, year) to tb_incomes
     tb_incomes = add_period_dimension(tb=tb_incomes)
 
+    # Annotate the consolidated series with the years where the comparability of each country's surveys breaks.
+    tb_poverty = add_comparability_break_annotations(
+        tb=tb_poverty,
+        dimensions=["ppp_version", "poverty_line"],
+        indicators_to_skip=INDICATORS_WITH_BREAKS_BY_POVERTY_LINE,
+    )
+    tb_incomes = add_comparability_break_annotations(tb=tb_incomes, dimensions=["ppp_version", "decile", "period"])
+    tb_inequality = add_comparability_break_annotations(tb=tb_inequality, dimensions=[])
+
     # Define tb_rest_inc_or_cons_smooth as tb_rest and drop table and survey_comparability columns
     tb_rest = tb_rest_inc_or_cons_smooth.drop(columns=["table"], errors="raise")
 
@@ -252,6 +287,11 @@ def run() -> None:
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile"],
         short_name="complete_series",
     )
+
+    # The break annotations are scoped to the consolidated series, which only these three tables have.
+    for tb_other in [tb_cpi, tb_survey, tb_rest, tb_percentiles, tb_complete]:
+        columns_annotated = [column for column in tb_other.columns if tb_other[column].metadata.annotations]
+        assert not columns_annotated, f"Unexpected annotations in {tb_other.metadata.short_name}: {columns_annotated}"
 
     #
     # Save outputs.
@@ -1071,105 +1111,10 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: list[str]) -> Table:
             # Filter country
             tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True)
 
-            # Save the max_year for the country
-            max_year = tb_country["year"].max()
-
-            # Define last_welfare_type for income and consumption
-            last_welfare_type = list(tb_country[tb_country["year"] == max_year]["welfare_type"].unique())
-            last_welfare_type.sort()
-
-            # Count how many times welfare_type switches
-            number_of_welfare_series = (
-                (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1).fillna(""))
-                .astype(int)
-                .cumsum()
-                .max()
+            # Keep the surveys that go into the consolidated series of the country
+            tb_country = keep_surveys_of_consolidated_series(
+                tb_country=tb_country, country=country, year_col="year", welfare_type_col="welfare_type"
             )
-
-            # If there are only two welfare series, use one for these countries
-            if number_of_welfare_series == 2:
-                # assert if last_welfare type values are expected
-                if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
-                    welfare_expected = ["consumption"]
-                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                    )
-                    tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
-
-                elif country in ["Kosovo", "North Macedonia", "Peru", "Uzbekistan"]:
-                    assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
-                    )
-                    tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
-
-            # Don't do anything for the rest (keep both)
-            # [
-            #     "China",
-            #     "China (urban)",
-            #     "China (rural)",
-            #     "Kazakhstan",
-            #     "Namibia",
-            #     "Nepal",
-            #     "Seychelles",
-            # ]
-
-            # With Turkey I also want to keep both series, but there are duplicates for some years
-            elif country in ["Turkey"]:
-                welfare_expected = ["income"]
-                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
-                )
-                tb_country = tb_country[
-                    (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"].isin(last_welfare_type))
-                ].reset_index(drop=True)
-
-            # With Russia, though the last welfare type is income, I want to keep consumption, being the longest series
-            elif country in ["Russia"]:
-                welfare_expected = ["consumption"]
-                assert len(last_welfare_type) == 1 and last_welfare_type != welfare_expected, log.fatal(
-                    f"For {country} we expect to use {welfare_expected}, which should be different from the last welfare type: {last_welfare_type}"
-                )
-                tb_country = tb_country[tb_country["welfare_type"].isin(welfare_expected)].reset_index(drop=True)
-
-            # These are countries with both income and consumption as the last welfare type, so I decide case by case
-            elif country in ["Haiti", "Philippines", "Saint Lucia"]:
-                welfare_expected = ["consumption", "income"]
-                assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
-                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
-                )
-                if country in ["Haiti", "Saint Lucia"]:
-                    tb_country = tb_country[tb_country["welfare_type"] == "income"].reset_index(drop=True)
-                elif country in ["Philippines"]:
-                    tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
-
-            else:
-                # Here I keep the most recent welfare type
-                if country in ["Albania", "Belize", "Ukraine"]:
-                    welfare_expected = ["consumption"]
-                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                    )
-                elif country in [
-                    "Bulgaria",
-                    "Croatia",
-                    "Estonia",
-                    "Hungary",
-                    "Latvia",
-                    "Lithuania",
-                    "Montenegro",
-                    "Nicaragua",
-                    "Poland",
-                    "Romania",
-                    "Serbia",
-                    "Slovakia",
-                    "Slovenia",
-                ]:
-                    welfare_expected = ["income"]
-                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                    )
-
-                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
             tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
@@ -1236,107 +1181,10 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: list[str]) -> Table:
         # Filter country
         tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons[country_col] == country].reset_index(drop=True)
 
-        # Save the max_year for the country
-        max_year = tb_country[year_col].max()
-
-        # Define last_welfare_type for income and consumption. If both, list is saved as ['income', 'consumption']
-        last_welfare_type = list(tb_country[tb_country[year_col] == max_year][welfare_type_col].unique())
-        last_welfare_type.sort()
-
-        # Count how many times welfare_type switches from income to consumption and vice versa
-        number_of_welfare_series = (
-            (tb_country[welfare_type_col] != tb_country[welfare_type_col].shift(1).fillna(""))
-            .astype(int)
-            .cumsum()
-            .max()
+        # Keep the surveys that go into the consolidated series of the country
+        tb_country = keep_surveys_of_consolidated_series(
+            tb_country=tb_country, country=country, year_col=year_col, welfare_type_col=welfare_type_col
         )
-
-        # If there are only two welfare series, use one for these countries
-        if number_of_welfare_series == 2:
-            # assert if last_welfare type values are expected
-            if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
-                welfare_expected = ["consumption"]
-                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                )
-                tb_country = tb_country[tb_country[welfare_type_col].isin(last_welfare_type)].reset_index(drop=True)
-
-            elif country in ["Kosovo", "North Macedonia", "Peru", "Uzbekistan"]:
-                assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
-                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
-                )
-                tb_country = tb_country[tb_country[welfare_type_col].isin(last_welfare_type)].reset_index(drop=True)
-
-            # Don't do anything for the rest
-            # [
-            #     "China",
-            #     "China (urban)",
-            #     "China (rural)",
-            #     "Kazakhstan",
-            #     "Namibia",
-            #     "Nepal",
-            #     "Seychelles",
-            # ]
-
-        # With Turkey I want to keep both series, but there are duplicates for some years
-        elif country in ["Turkey"]:
-            welfare_expected = ["income"]
-            assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
-            )
-
-            tb_country = tb_country[
-                (~tb_country["duplicate_flag"]) | (tb_country[welfare_type_col].isin(last_welfare_type))
-            ].reset_index(drop=True)
-
-        # With Russia, though the last welfare type is income, I want to keep consumption, being the longest series
-        elif country in ["Russia"]:
-            welfare_expected = ["consumption"]
-            assert len(last_welfare_type) == 1 and last_welfare_type != welfare_expected, log.fatal(
-                f"For {country} we expect to use {welfare_expected}, which should be different from the last welfare type: {last_welfare_type}"
-            )
-
-            tb_country = tb_country[tb_country[welfare_type_col].isin(welfare_expected)].reset_index(drop=True)
-
-        # These are countries with both income and consumption as the last welfare type, so I decide case by case
-        elif country in ["Haiti", "Philippines", "Saint Lucia"]:
-            welfare_expected = ["consumption", "income"]
-            assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
-                f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
-            )
-            if country in ["Haiti", "Saint Lucia"]:
-                tb_country = tb_country[tb_country[welfare_type_col] == "income"].reset_index(drop=True)
-            elif country in ["Philippines"]:
-                tb_country = tb_country[tb_country[welfare_type_col] == "consumption"].reset_index(drop=True)
-
-        else:
-            # Here I keep the most recent welfare type
-            if country in ["Albania", "Belize", "Ukraine"]:
-                welfare_expected = ["consumption"]
-                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                )
-            elif country in [
-                "Bulgaria",
-                "Croatia",
-                "Estonia",
-                "Hungary",
-                "Latvia",
-                "Lithuania",
-                "Montenegro",
-                "Nicaragua",
-                "Poland",
-                "Romania",
-                "Serbia",
-                "Slovakia",
-                "Slovenia",
-            ]:
-                welfare_expected = ["income"]
-                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                )
-
-            tb_country = tb_country[tb_country[welfare_type_col].isin(last_welfare_type)].reset_index(drop=True)
 
         tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
@@ -1363,6 +1211,33 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: list[str]) -> Table:
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
 
     return tb_inc_or_cons
+
+
+def keep_surveys_of_consolidated_series(
+    tb_country: Table, country: str, year_col: str | tuple, welfare_type_col: str | tuple
+) -> Table:
+    """
+    Keep the surveys that go into the consolidated series of a country with both income and consumption data.
+
+    The choice for each country is defined in COUNTRIES_WITH_INCOME_AND_CONSUMPTION.
+    """
+    rule = COUNTRIES_WITH_INCOME_AND_CONSUMPTION[country]
+
+    # Check the types of survey available in the latest year, since the choice was based on them.
+    max_year = tb_country[year_col].max()
+    latest_welfare_types = sorted(tb_country[tb_country[year_col] == max_year][welfare_type_col].unique())
+    assert latest_welfare_types == rule["latest"], (
+        f"{country} has {latest_welfare_types} surveys in its latest year instead of {rule['latest']}. "
+        "Review its rule in COUNTRIES_WITH_INCOME_AND_CONSUMPTION."
+    )
+
+    if rule["keep"] == "both":
+        # Keep both types of survey, and only the latest type in the years that have both.
+        is_kept = (~tb_country["duplicate_flag"]) | (tb_country[welfare_type_col].isin(latest_welfare_types))
+    else:
+        is_kept = tb_country[welfare_type_col] == rule["keep"]
+
+    return tb_country[is_kept].reset_index(drop=True)
 
 
 def check_jumps_in_grapher_dataset(tb: Table) -> None:
@@ -1747,3 +1622,145 @@ def concatenate_and_fill_empty_spells(tb_list: list[Table], add_no_spells: bool)
         tb["survey_comparability"] = tb["survey_comparability"].fillna("No spells").replace("<NA>", "No spells")
 
     return tb
+
+
+def add_comparability_break_annotations(
+    tb: Table, dimensions: list[str], indicators_to_skip: list[str] | None = None
+) -> Table:
+    """
+    Annotate the consolidated series of each indicator with the points where the comparability of surveys breaks.
+
+    The World Bank groups each country's surveys into spells of comparable surveys. A point of the consolidated series
+    is a break when its survey belongs to a different spell, or measures a different welfare type, than the previous
+    point. For example, Comoros has surveys in 2004 (spell 0), 2014 (spell 1), 2020 and 2024 (both spell 2), so its
+    breaks are 2014 and 2020.
+    """
+    tb_breaks = find_comparability_breaks(tb=tb, dimensions=dimensions)
+    tb_breaks = tb_breaks[~tb_breaks["indicator"].isin(indicators_to_skip or [])].reset_index(drop=True)
+
+    sanity_check_comparability_breaks(tb=tb, tb_breaks=tb_breaks, dimensions=dimensions)
+
+    # Breaks are the same in every series of an indicator, so one list of notes covers them all.
+    for indicator, tb_indicator in tb_breaks.groupby("indicator", observed=True):
+        tb_indicator = tb_indicator.drop_duplicates(subset=["country", "year", "break_kind"])
+        countries_by_break = tb_indicator.groupby(["year", "break_kind"], observed=True)["country"].agg(list)
+        tb[indicator].metadata.annotations = [
+            Annotation(
+                text=BREAK_TEXTS[break_kind],
+                entities=sorted(countries),
+                time=int(year),
+                dimensions={"table": TABLE_CONSOLIDATED},
+            )
+            for (year, break_kind), countries in countries_by_break.items()
+        ]
+
+    return tb
+
+
+def find_comparability_breaks(tb: Table, dimensions: list[str]) -> Table:
+    """
+    Find the points of the consolidated series that are less comparable with the previous point with data.
+
+    Returns one row per indicator, country, year and combination of dimensions, with the kind of break.
+    """
+    keys = ["country", "year"] + dimensions
+    indicators = [column for column in tb.columns if column not in keys + SURVEY_COLUMNS + ["table"]]
+
+    # Get the survey behind each point of the consolidated series.
+    tb_surveys = tb.loc[tb["table"].isin(TABLES_WITH_SPELLS), keys + SURVEY_COLUMNS]
+    assert (tb_surveys["survey_comparability"] != "No spells").all(), "There are surveys without a comparable spell."
+    tb_consolidated = tb[tb["table"] == TABLE_CONSOLIDATED].drop(columns=SURVEY_COLUMNS + ["table"])
+    tb_consolidated = pr.merge(tb_consolidated, tb_surveys, on=keys, how="left", validate="one_to_one")
+
+    # Keep countries only: regional aggregates are not based on one survey, so they have no spells.
+    has_survey = tb_consolidated["survey_comparability"].notna()
+    entities_without_survey = set(tb_consolidated.loc[~has_survey, "country"])
+    assert entities_without_survey <= set(REGIONS_LIST), (
+        f"No survey found for {entities_without_survey - set(REGIONS_LIST)}"
+    )
+    assert has_survey.sum() == len(tb_surveys), "Some surveys are not in the consolidated series."
+    tb_consolidated = tb_consolidated[has_survey]
+
+    # Create one row per indicator and point with data.
+    tb_points = pr.melt(
+        tb_consolidated, id_vars=keys + SURVEY_COLUMNS, value_vars=indicators, var_name="indicator", value_name="value"
+    )
+    tb_points = tb_points.dropna(subset=["value"]).drop(columns=["value"])
+    tb_points = tb_points.sort_values(["indicator"] + dimensions + ["country", "year"]).reset_index(drop=True)
+
+    # Compare the survey of each point with the survey of the previous point of its series.
+    tb_previous = tb_points.groupby(["indicator", "country"] + dimensions, observed=True, dropna=False)[
+        SURVEY_COLUMNS
+    ].shift(1)
+    has_previous = tb_previous["welfare_type"].notna()
+    changes_welfare_type = has_previous & (tb_previous["welfare_type"] != tb_points["welfare_type"])
+    changes_spell = has_previous & (tb_previous["survey_comparability"] != tb_points["survey_comparability"])
+
+    # Name the kind of break.
+    tb_points["break_kind"] = "survey"
+    tb_points.loc[changes_welfare_type, "break_kind"] = (
+        tb_previous.loc[changes_welfare_type, "welfare_type"]
+        + " to "
+        + tb_points.loc[changes_welfare_type, "welfare_type"]
+    )
+
+    tb_breaks = tb_points.loc[changes_welfare_type | changes_spell, ["indicator"] + keys + ["break_kind"]]
+
+    return tb_breaks.reset_index(drop=True)
+
+
+def sanity_check_comparability_breaks(tb: Table, tb_breaks: Table, dimensions: list[str]) -> None:
+    """
+    Check the breaks against the consolidated series they annotate.
+    """
+    keys = ["country", "year"] + dimensions
+
+    assert not tb_breaks.duplicated(subset=["indicator"] + keys).any(), "A point has more than one break."
+    assert set(tb_breaks["break_kind"]) <= set(BREAK_TEXTS), f"Unknown kinds of break: {set(tb_breaks['break_kind'])}"
+
+    regions_with_breaks = set(tb_breaks["country"]) & set(REGIONS_LIST)
+    assert not regions_with_breaks, f"Regional aggregates should have no breaks: {regions_with_breaks}"
+
+    # Changes of welfare type happen only in the countries where we keep both income and consumption surveys.
+    countries_switching = set(tb_breaks.loc[tb_breaks["break_kind"] != "survey", "country"])
+    countries_keeping_both = {
+        country for country, rule in COUNTRIES_WITH_INCOME_AND_CONSUMPTION.items() if rule["keep"] == "both"
+    }
+    assert countries_switching == countries_keeping_both, (
+        f"Countries changing welfare type differ from the expected ones: {countries_switching ^ countries_keeping_both}"
+    )
+
+    n_countries = tb_breaks["country"].nunique()
+    assert COUNTRIES_WITH_BREAKS_RANGE[0] <= n_countries <= COUNTRIES_WITH_BREAKS_RANGE[1], (
+        f"{n_countries} countries have breaks, outside the expected range {COUNTRIES_WITH_BREAKS_RANGE}."
+    )
+
+    # Compare dimensions as text: an indicator can have a dimension that is empty in all its rows (e.g. the period of
+    # income shares), which would otherwise change its type between the tables compared below.
+    tb_consolidated = tb[tb["table"] == TABLE_CONSOLIDATED].copy()
+    tb_breaks = tb_breaks.copy()
+    for dimension in dimensions:
+        tb_consolidated[dimension] = tb_consolidated[dimension].astype("string").fillna("")
+        tb_breaks[dimension] = tb_breaks[dimension].astype("string").fillna("")
+
+    for indicator, tb_indicator in tb_breaks.groupby("indicator", observed=True):
+        tb_data = tb_consolidated.loc[tb_consolidated[indicator].notna(), keys]
+
+        # Every break is a point with data, and never the first point of its series.
+        tb_first = tb_data.groupby(["country"] + dimensions, observed=True, dropna=False, as_index=False).agg(
+            {"year": "min"}
+        )
+        tb_first = tb_first.rename(columns={"year": "first_year"})
+        tb_check = pr.merge(tb_indicator, tb_data, on=keys, how="left", indicator=True)
+        assert (tb_check["_merge"] == "both").all(), f"A break of {indicator} falls on a year without data."
+        tb_check = pr.merge(tb_indicator, tb_first, on=["country"] + dimensions, how="left")
+        assert (tb_check["year"] > tb_check["first_year"]).all(), f"A break of {indicator} falls on a first point."
+
+        # Every series of the indicator has the same breaks, so the notes need no scope by series.
+        n_series = len(tb_data[dimensions].drop_duplicates()) if dimensions else 1
+        n_series_with_break = tb_indicator.groupby(["country", "year", "break_kind"], observed=True)[
+            "indicator"
+        ].count()
+        assert (n_series_with_break.to_numpy() == n_series).all(), (
+            f"The breaks of {indicator} differ between its series. Annotate them by series, or skip the indicator."
+        )

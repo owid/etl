@@ -363,6 +363,8 @@ definitions:
 
   ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices.
 
+  ppp_adjustment_note_short: Expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices.
+
   ppp_adjustment_note_longer: This data is measured in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices to adjust for inflation and differences in living costs between countries.
 
   relative_poverty_percentage: |-
@@ -518,7 +520,7 @@ definitions:
 
   note_ppp: |-
     <% if welfare_type == "income or consumption" or (survey_comparability is defined and survey_comparability != "No spells") %>
-    {definitions.ppp_adjustment_note} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+    {definitions.ppp_adjustment_note_short} Depending on the country and year, it relates to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita).{definitions.note_breaks}
     <%- elif welfare_type == "income" %>
     {definitions.ppp_adjustment_note} It relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -527,7 +529,7 @@ definitions:
 
   note_ppp_longer: |-
     <% if welfare_type == "income or consumption" or (survey_comparability is defined and survey_comparability != "No spells") %>
-    {definitions.ppp_adjustment_note_longer} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+    {definitions.ppp_adjustment_note_longer} Depending on the country and year, it relates to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita).{definitions.note_breaks}
     <%- elif welfare_type == "income" %>
     {definitions.ppp_adjustment_note_longer} It relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -543,9 +545,31 @@ definitions:
     The data relates to consumption [per capita](#dod:per-capita).
     <%- endif %>
 
+  # Sentence added to the note of the consolidated series, which shows one line per country without its breaks.
+  note_breaks: |-
+    <% if table is defined and table == "Income or consumption consolidated" %>
+     Country series contain {definitions.breaks_in_comparability}.
+    <%- endif %>
+
+  # The words link to the view of a multidimensional chart that shows the breaks, where one exists. An indicator
+  # names its view by starting its note with `<% set breaks_view = "<its slug in the chart>" %>`.
+  # NOTE: Update the slugs, poverty lines and deciles here when the multidimensional charts change.
+  breaks_in_comparability: |-
+    <% if breaks_view is defined and breaks_view in ["headcount_ratio", "headcount"] and ppp_version == 2021 and poverty_line in ["100", "300", "420", "830", "1000", "2000", "3000", "4000"] %>
+    [breaks in comparability](https://ourworldindata.org/grapher/poverty-wb?indicator=<<breaks_view>>&poverty_line=_<<poverty_line>>&survey_comparability=spells)
+    <%- elif breaks_view is defined and breaks_view == "gini" %>
+    [breaks in comparability](https://ourworldindata.org/grapher/gini-coefficient-wb?survey_comparability=spells)
+    <%- elif breaks_view is defined and breaks_view == "palma_ratio" %>
+    [breaks in comparability](https://ourworldindata.org/grapher/palma-ratio-wb?survey_comparability=spells)
+    <%- elif breaks_view is defined and ppp_version is defined and ppp_version == 2021 and (breaks_view in ["mean", "median"] or (decile is defined and ((breaks_view == "thr" and decile in ["1", "5", "9"]) or (breaks_view in ["avg", "share"] and decile in ["1", "10"])))) %>
+    [breaks in comparability](https://ourworldindata.org/grapher/incomes-across-distribution-wb?indicator=<<breaks_view>>&decile=<% if decile is defined %>_<<decile>><% else %>nan<% endif %>&period=<% if period is defined %><<period>><% else %>nan<% endif %>&survey_comparability=spells)
+    <%- else %>
+    breaks in comparability
+    <%- endif %>
+
   note_for_absolute_or_relative_poverty: |-
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    {definitions.note_without_ppp}
+    {definitions.note_without_ppp}{definitions.note_breaks}
     <%- else %>
     {definitions.note_ppp}
     <%- endif %>
@@ -795,7 +819,9 @@ tables:
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
             subtitle: "{definitions.poverty_line_subtitle}{definitions.spells_subtitle}"
-            note: "{definitions.note_for_absolute_or_relative_poverty}"
+            note: |-
+              <% set breaks_view = "headcount_ratio" %>
+              {definitions.note_for_absolute_or_relative_poverty}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -896,7 +922,9 @@ tables:
           grapher_config:
             title: "{definitions.headcount_title}"
             subtitle: "{definitions.poverty_line_subtitle}{definitions.spells_subtitle}"
-            note: "{definitions.note_for_absolute_or_relative_poverty}"
+            note: |-
+              <% set breaks_view = "headcount" %>
+              {definitions.note_for_absolute_or_relative_poverty}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1269,7 +1297,9 @@ tables:
           grapher_config:
             title: "Gini coefficient"
             subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}{definitions.spells_subtitle}
-            note: ""
+            note: |-
+              <% set breaks_view = "gini" %>
+              {definitions.note_breaks}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1316,7 +1346,9 @@ tables:
             title: "Palma ratio"
             subtitle: |-
               The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.note_without_ppp}{definitions.spells_subtitle}
-            note: ""
+            note: |-
+              <% set breaks_view = "palma_ratio" %>
+              {definitions.note_breaks}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1494,7 +1526,7 @@ tables:
             title: "Mean log deviation"
             subtitle: |-
               The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.{definitions.spells_subtitle}
-            note: "{definitions.note_without_ppp}"
+            note: "{definitions.note_without_ppp}{definitions.note_breaks}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1714,7 +1746,9 @@ tables:
               Mean income or consumption {definitions.per_period}
               <%- endif %>
             subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
-            note: "{definitions.note_ppp}"
+            note: |-
+              <% set breaks_view = "mean" %>
+              {definitions.note_ppp}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1774,7 +1808,9 @@ tables:
               Median income or consumption {definitions.per_period}
               <%- endif %>
             subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
-            note: "{definitions.note_ppp}"
+            note: |-
+              <% set breaks_view = "median" %>
+              {definitions.note_ppp}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1842,7 +1878,9 @@ tables:
               <%- else %>
               Mean income or consumption {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- endif %>
-            note: "{definitions.note_ppp}"
+            note: |-
+              <% set breaks_view = "avg" %>
+              {definitions.note_ppp}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1910,7 +1948,9 @@ tables:
               <%- else %>
               Share of income or consumption received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
               <%- endif %>
-            note: "{definitions.note_without_ppp}"
+            note: |-
+              <% set breaks_view = "share" %>
+              {definitions.note_without_ppp}{definitions.note_breaks}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1969,7 +2009,9 @@ tables:
               <%- else %>
               Level of income or consumption per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- endif %>
-            note: "{definitions.note_ppp}"
+            note: |-
+              <% set breaks_view = "thr" %>
+              {definitions.note_ppp}
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
