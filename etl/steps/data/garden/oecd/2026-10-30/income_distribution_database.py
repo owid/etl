@@ -2,16 +2,12 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from structlog import get_logger
 from tabulate import tabulate
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Initialize logger.
-log = get_logger()
 
 # Define new names for categories
 INDICATOR_NAMES = {
@@ -230,7 +226,37 @@ def sanity_checks(tb: Table) -> None:
 
     check_negative_values(tb)
 
+    check_over_65_within_subgroups(tb)
+
     return None
+
+
+def check_over_65_within_subgroups(tb: Table) -> None:
+    """
+    Check that the value for people over 65 lies between those of its two subgroups (66 to 75, and 76 and older).
+    """
+    # Values are rounded at the source, so allow a small margin (in the indicators' units: % and % of the average).
+    tolerance = 0.05
+
+    # NOTE: In the June 2026 release, these German rows break the rule in the OECD's own data (logged as a producer
+    # issue). Remove each one once the OECD fixes it.
+    known_exceptions = {
+        ("headcount_ratio_disposable_50_median", "Germany", 2016),
+        ("relative_disposable_income", "Germany", 2021),
+        ("relative_disposable_income", "Germany", 2023),
+    }
+
+    for v in ["headcount_ratio_disposable_50_median", "relative_disposable_income"]:
+        tb_groups = tb[tb["age"].isin(["Over 65 years", "66 to 75 years", "76 years and older"])]
+        tb_groups = tb_groups.pivot(index=["country", "year"], columns="age", values=v).dropna().reset_index()
+        low = tb_groups[["66 to 75 years", "76 years and older"]].min(axis=1)
+        high = tb_groups[["66 to 75 years", "76 years and older"]].max(axis=1)
+        mask = (tb_groups["Over 65 years"] < low - tolerance) | (tb_groups["Over 65 years"] > high + tolerance)
+        tb_error = tb_groups[mask]
+        tb_error = tb_error[[(v, c, y) not in known_exceptions for c, y in zip(tb_error["country"], tb_error["year"])]]
+
+        assert tb_error.empty, f"""Values of {v} for people over 65 are outside the range of their two subgroups:
+            {tabulate(tb_error, headers="keys", tablefmt=TABLEFMT)}"""
 
 
 def check_between_0_and_1(tb: Table, variables: list[str]) -> None:
@@ -245,11 +271,8 @@ def check_between_0_and_1(tb: Table, variables: list[str]) -> None:
         mask = (tb[v] > 1) | (tb[v] < 0)
         tb_error = tb[mask].copy().reset_index()
 
-        if not tb_error.empty:
-            log.fatal(
-                f"""Values for {v} are not between 0 and 1:
-                {tabulate(tb_error[["country", "year", "poverty_line", "age", v]], headers="keys", tablefmt=TABLEFMT)}"""
-            )
+        assert tb_error.empty, f"""Values for {v} are not between 0 and 1:
+            {tabulate(tb_error[["country", "year", "age", v]], headers="keys", tablefmt=TABLEFMT)}"""
 
     return None
 
@@ -269,10 +292,7 @@ def check_negative_values(tb: Table) -> None:
         mask = tb[v] < 0
         tb_error = tb[mask].reset_index(drop=True).copy()
 
-        if not tb_error.empty:
-            log.fatal(
-                f"""{len(tb_error)} observations for {v} are negative:
-                {tabulate(tb_error[["country", "year", "poverty_line", "age", v]], headers="keys", tablefmt=TABLEFMT)}"""
-            )
+        assert tb_error.empty, f"""{len(tb_error)} observations for {v} are negative:
+            {tabulate(tb_error[["country", "year", "age", v]], headers="keys", tablefmt=TABLEFMT)}"""
 
     return None
