@@ -12,7 +12,7 @@ views:
         - catalogPath: coverage#status
     config:
       title: "Which countries are included in our comparison of national births and fertility rates with UN estimates?"
-      subtitle: "Countries with at least 1 million people, whose yearly count of births is at least 90% complete, published by a national government body, available for at least one year from 2020 onward, and covering the same population as the UN's figures."
+      subtitle: "Countries with at least 1 million people, whose yearly count of births is at least 90% complete, published by a national government body, available for at least one year from 2020 onward, and covering the same population as the UN’s figures."
       note: "Detailed criteria, and the reason each country is left out, are in [this spreadsheet](https://docs.google.com/spreadsheets/d/1XHOgL1AHnhBqiajL5XuFMwiWLmRWlld-r85jv5R5A8I/edit)."
       originUrl: /fertility-rate
       addCountryMode: disabled

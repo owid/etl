@@ -44,7 +44,7 @@ definitions:
         hasMapTab: true
         tab: map
         map:
-          # Diverging scale centered on 0: red where the national figure is below the UN's, blue where it is above.
+          # Diverging scale centered on 0: red where the national figure is below the UN’s, blue where it is above.
           timeTolerance: 1
           toleranceStrategy: backwards
           colorScale:
@@ -94,12 +94,12 @@ views:
             name: UN estimates
     config:
       title: "Births: national statistics compared with UN estimates"
-      subtitle: "Number of live births in the year, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN."
+      subtitle: "Number of live births in the year, as published by each country’s statistics office, civil registry, or health ministry, and as estimated by the UN."
     metadata:
       presentation:
         title_public: "Births: national statistics compared with UN estimates"
         attribution_short: National statistics and UN WPP
-      description_short: Number of live births in the year, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN.
+      description_short: Number of live births in the year, as published by each country’s statistics office, civil registry, or health ministry, and as estimated by the UN.
 
   - dimensions:
       measure: births
@@ -127,7 +127,7 @@ views:
             numDecimalPlaces: 2
     config:
       title: "Relative difference in births between national statistics and UN estimates"
-      subtitle: "How far the number of live births published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher."
+      subtitle: "How far the number of live births published by national statistics is from the UN’s estimate, as a percentage of the UN’s figure. A positive number means the national figure is higher."
 
   - dimensions:
       measure: fertility_rate
@@ -148,12 +148,12 @@ views:
             name: UN estimates
     config:
       title: "Fertility rate: national statistics compared with UN estimates"
-      subtitle: "[Total fertility rate](#dod:fertility-rate), as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN."
+      subtitle: "[Total fertility rate](#dod:fertility-rate), as published by each country’s statistics office, civil registry, or health ministry, and as estimated by the UN."
     metadata:
       presentation:
         title_public: "Fertility rate: national statistics compared with UN estimates"
         attribution_short: National statistics and UN WPP
-      description_short: Total fertility rate, as published by each country's statistics office, civil registry, or health ministry, and as estimated by the UN.
+      description_short: Total fertility rate, as published by each country’s statistics office, civil registry, or health ministry, and as estimated by the UN.
 
   - dimensions:
       measure: fertility_rate
@@ -192,4 +192,4 @@ views:
             numDecimalPlaces: 2
     config:
       title: "Relative difference in the fertility rate between national statistics and UN estimates"
-      subtitle: "How far the [total fertility rate](#dod:fertility-rate) published by national statistics is from the UN's estimate, as a percentage of the UN's figure. A positive number means the national figure is higher."
+      subtitle: "How far the [total fertility rate](#dod:fertility-rate) published by national statistics is from the UN’s estimate, as a percentage of the UN’s figure. A positive number means the national figure is higher."

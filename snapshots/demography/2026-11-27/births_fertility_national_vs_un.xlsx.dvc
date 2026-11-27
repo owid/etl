@@ -5,17 +5,17 @@ meta:
     # Data product / Snapshot
     title: Births and fertility rates from national statistics
     description: |-
-      This data is compiled by Our World in Data, based on the figures published by national statistics offices, civil registries, and health ministries, for the yearly number of births and the total fertility rate. The data spans 2010 to 2025. We use the figures as published and do not calculate any of them ourselves; the only exception is the United Kingdom's births for 2022–2025, which are calculated as the sum of those of England and Wales, Scotland, and Northern Ireland. For each year, we use the most recent published figure.
+      This data is compiled by Our World in Data, based on the figures published by national statistics offices, civil registries, and health ministries, for the yearly number of births and the total fertility rate. The data spans 2010 to 2025. We use the figures as published and do not calculate any of them ourselves; the only exception is the United Kingdom’s births for 2022–2025, which are calculated as the sum of those of England and Wales, Scotland, and Northern Ireland. For each year, we use the most recent published figure.
 
       We include a country or area when all of the following are true:
 
-      1. It is a country or area in the UN's World Population Prospects (2024 edition), and had at least 1 million people in 2023, according to those estimates.
+      1. It is a country or area in the UN’s World Population Prospects (2024 edition), and had at least 1 million people in 2023, according to those estimates.
       2. Its yearly count of births is at least 90% complete. We go by what the country reports, either to the UN ([source](https://unstats.un.org/unsd/demographic-social/crvs/#Completeness)) or in a household survey since 2010 ([source](https://data.worldbank.org/indicator/SP.REG.BRTH.ZS)), unless a later census or survey has shown that the count is less complete than that.
       3. A national government body publishes this yearly count, such as the civil registry, the statistics office, or the health ministry. Model estimates and survey results are not included.
       4. The count is available for at least one year from 2020 onward.
       5. The count covers the same population the UN covers. If the national figures leave out or add areas or groups making up 3% or more of births, the country is not included in our dataset. Below that, we include it with a note.
 
-      The spreadsheet has four tabs: an introduction, the data (with the sources and notes for each year), the sources, and every country or area in the UN's World Population Prospects 2024, with whether it is included and why not.
+      The spreadsheet has four tabs: an introduction, the data (with the sources and notes for each year), the sources, and every country or area in the UN’s World Population Prospects 2024, with whether it is included and why not.
     date_published: "2026-11-27"
 
     # Citation
