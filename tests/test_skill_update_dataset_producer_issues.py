@@ -53,6 +53,7 @@ def _issue(**overrides) -> dict:
         "in_raw_snapshot": True,
         "docs_checked": _docs(),
         "explained": "no",
+        "previously_reported": "none",
         "status": "open",
     }
     issue.update(overrides)
@@ -109,6 +110,17 @@ def test_bare_yaml_no_and_yes_are_read_as_written():
     issue = pi.yaml.safe_load("explained: no\n") | {k: v for k, v in _issue().items() if k != "explained"}
     assert issue["explained"] is False and pi.verdict(issue)[0] == "ready"
     assert pi.verdict(_issue(explained=True, explanation="Methods p. 4."))[0] == "explained"
+
+
+def test_earlier_reports_must_be_searched_before_an_entry_is_ready():
+    """A missing `previously_reported` means the history search did not run, not that nothing was reported."""
+    issue = {k: v for k, v in _issue().items() if k != "previously_reported"}
+    state, reasons = pi.verdict(issue)
+    assert state == "held" and any("previously_reported" in r for r in reasons)
+    assert pi.verdict(_issue(previously_reported=None))[0] == "held"
+    assert pi.verdict(_issue(previously_reported="issue owid-issues#1, 2025-03"))[0] == "ready"
+    with pytest.raises(SystemExit, match="#1: held"):
+        pi.draft({"issues": [issue]}, ["1"])
 
 
 def test_our_own_error_is_never_sent():

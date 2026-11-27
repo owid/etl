@@ -48,6 +48,7 @@ UPGRADE_TYPES = ("upgrade_change", "upgrade_missing")
 NEW = "new"
 CHECKED = "checked in the first pass"
 FLAGGED = "flagged by the first pass's scan"
+STALE = "stale: ran on an earlier build of the dataset (re-run Anomalist, then this script)"
 COLUMNS = [
     "rank",
     "selected",
@@ -113,7 +114,7 @@ def run(step: str, top: int, min_score: float) -> str:
 
     stored, indicators, notes = load_scores(engine, int(dataset["id"]), min_score)
     first_pass = first_pass_keys(dossier)
-    rows = candidates(stored, indicators, first_pass, top)
+    rows = candidates(stored, indicators, first_pass, top, stale_types(notes, dataset))
     add_values(rows, paths.DATA_DIR, f"{namespace}/{version}/{short_name}", old_dataset(engine, dataset))
     write_csv(rows, dossier / "anomalist.csv")
     coverage = coverage_notes(stored, indicators, dataset, notes) + set_aside
@@ -195,8 +196,8 @@ def old_dataset(engine, dataset: dict) -> tuple[str | None, dict[int, str], str]
 
     try:
         mapping = read_sql(
-            "SELECT m.id_new, v.catalogPath AS old_path, d.catalogPath AS old_dataset FROM wiz__variable_mapping m "
-            "JOIN variables v ON v.id = m.id_old JOIN datasets d ON d.id = m.dataset_id_old "
+            "SELECT m.id_new, v.catalogPath AS old_path, d.catalogPath AS old_dataset, d.version AS old_version "
+            "FROM wiz__variable_mapping m JOIN variables v ON v.id = m.id_old JOIN datasets d ON d.id = m.dataset_id_old "
             "WHERE m.dataset_id_new = %(d)s ORDER BY m.timestamp DESC",
             engine,
             params={"d": int(dataset["id"])},
@@ -207,8 +208,8 @@ def old_dataset(engine, dataset: dict) -> tuple[str | None, dict[int, str], str]
             return None, {}, reason[:240]
         mapping = pd.DataFrame()
     if not mapping.empty:
-        olds = {int(r.id_new): identity_of(r.old_path, "") for r in mapping.drop_duplicates("id_new").itertuples()}
-        return str(mapping["old_dataset"].iloc[0]), olds, ""
+        old_path, olds = replaced_by_mapping(mapping)
+        return old_path, olds, ""
     df = read_sql(
         "SELECT catalogPath FROM datasets WHERE namespace = %(n)s AND shortName = %(s)s AND version < %(v)s "
         "ORDER BY version DESC LIMIT 1",
@@ -218,6 +219,20 @@ def old_dataset(engine, dataset: dict) -> tuple[str | None, dict[int, str], str]
     if df.empty:
         return None, {}, "no older version in the DB"
     return str(df["catalogPath"].iloc[0]), {}, ""
+
+
+def replaced_by_mapping(mapping: pd.DataFrame) -> tuple[str, dict[int, str]]:
+    """The dataset the upgrader's mapping replaces, and the old identity of each new indicator, from it alone.
+
+    The mapping table keeps a row per upgrade ever made, so it can map this dataset from several older versions.
+    Only the latest of them is the version being replaced: rows from earlier ones would pair indicators with columns
+    of a dataset other than the one the old values are read from.
+    """
+    latest = mapping[mapping["old_version"] == mapping["old_version"].max()]
+    old_path = str(latest["old_dataset"].iloc[0])
+    latest = latest[latest["old_dataset"] == old_path]
+    olds = {int(r.id_new): identity_of(r.old_path, "") for r in latest.drop_duplicates("id_new").itertuples()}
+    return old_path, olds
 
 
 def is_missing_table(error: Exception) -> bool:
@@ -363,8 +378,18 @@ def names_entity(detail: str, entity: str) -> bool:
     return bool(entity) and re.match(rf"{re.escape(entity)}(?=, | \d|: )", detail) is not None
 
 
-def candidates(stored: pd.DataFrame, indicators: pd.DataFrame, first_pass: dict, top: int) -> list[dict]:
-    """One row per stored anomaly, most relevant first; the top `top` new ones are selected, the rest say why not."""
+def stale_types(notes: dict, dataset: dict) -> list[str]:
+    """Anomaly types whose stored results ran on an earlier build of the dataset (their checksum differs)."""
+    return [t for t, checksum in notes["checksums"].items() if checksum != dataset["sourceChecksum"]]
+
+
+def candidates(
+    stored: pd.DataFrame, indicators: pd.DataFrame, first_pass: dict, top: int, stale: tuple | list = ()
+) -> list[dict]:
+    """One row per stored anomaly, most relevant first; the top `top` new ones are selected, the rest say why not.
+
+    A row of a `stale` type describes an earlier build, so it is never selected: re-run Anomalist on this one.
+    """
     if stored.empty:
         return []
     paths_by_id = {}
@@ -392,7 +417,9 @@ def candidates(stored: pd.DataFrame, indicators: pd.DataFrame, first_pass: dict,
     selected = 0
     for rank, row in enumerate(rows, start=1):
         row["rank"] = rank
-        if row["status"] != NEW:
+        if row["type"] in stale:
+            row["selected"], row["why"] = False, STALE
+        elif row["status"] != NEW:
             row["selected"], row["why"] = False, row["status"]
         elif selected < top:
             row["selected"], row["why"] = True, "new candidate"
@@ -498,10 +525,11 @@ def coverage_notes(stored: pd.DataFrame, indicators: pd.DataFrame, dataset: dict
             "The old-vs-new detectors are missing: they run only with a variable mapping and the old grapher "
             "dataset on disk. See `/update-dataset` step 7 for the full-mapping re-run."
         )
-    stale = [t for t, checksum in notes["checksums"].items() if checksum != dataset["sourceChecksum"]]
+    stale = stale_types(notes, dataset)
     if stale:
         out.append(
-            f"Stale: {', '.join(stale)} ran on an earlier build of the dataset (checksum differs). Wait for the "
+            f"Stale: {', '.join(stale)} ran on an earlier build of the dataset (checksum differs), so none of "
+            "their candidates is selected. Wait for the "
             "staging build of your latest push, or re-run `etl anomalist` with `--force`."
         )
     if notes["relevance"] is not True:
@@ -565,6 +593,14 @@ def render(
             for r in selected
         ]
     out += ["", "## Next", ""]
+    held_back = sum(1 for r in rows if r["why"] == STALE)
+    if held_back:
+        out += [
+            f"{held_back:,} candidates come from Anomalist results of an earlier build and are not selected. Wait for "
+            "the staging build of your latest push (or re-run `etl anomalist` with `--force`), then run this "
+            "script again before closing the Anomalist pass.",
+            "",
+        ]
     if selected:
         out += [
             f"Start one background agent with the prompt `Read {rel}/lane_anomalist.md and do what it says.` When it "

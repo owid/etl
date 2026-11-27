@@ -10,8 +10,9 @@ fact check and its Anomalist pass, data-diff, the user's QA) adds an entry to
     producer_issues.py history <namespace>/<version>/<short_name>    earlier reports: corrections, owid-issues, PRs
     producer_issues.py draft <short_name> [--ids 1,3]      the message skeleton, from ready entries only
 
-An entry is ready only when the problem is in the raw snapshot (so it is the producer's, not ours) and every kind of
-producer documentation was searched for an explanation and none fully explains it. The script never sends anything.
+An entry is ready only when the problem is in the raw snapshot (so it is the producer's, not ours), earlier reports
+were searched for (`previously_reported`: where and when, or `none`), and every kind of producer documentation was
+searched for an explanation and none fully explains it. The script never sends anything.
 """
 
 import argparse
@@ -108,6 +109,11 @@ def verdict(issue: dict) -> tuple[str, list[str]]:
         empty = [field for field in ("document", "looked_for", "result") if not entry.get(field)]
         if kind in DOC_KINDS and empty and str(entry.get("document", "")).strip() != "not published":
             reasons.append(f"`docs_checked` {kind}: no {', '.join(empty)}")
+    if issue.get("previously_reported") in (None, ""):
+        reasons.append(
+            "`previously_reported` not recorded: search for earlier reports first (`history`), then write where and "
+            "when it was reported, or `none`"
+        )
     explained = explained_of(issue)
     if explained not in EXPLAINED:
         reasons.append("`explained` must be no, partly or yes, once the documentation is checked")

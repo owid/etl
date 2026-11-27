@@ -746,6 +746,39 @@ def test_anomalist_candidates_skip_what_the_first_pass_covered(tmp_path):
     assert [r["selected"] for r in rows] == [False, False, True]
 
 
+def test_anomalist_stale_types_are_never_selected():
+    """Results stored for an earlier build must not reach the lane, and the output says to re-run."""
+    stored = _stored([("upgrade_change", 1, "France", 2023, 0.9), ("time_change", 2, "Chad", 2020, 0.5)])
+    notes = {"checksums": {"upgrade_change": "old", "time_change": "new"}}
+    stale = anomalist_candidates.stale_types(notes, {"sourceChecksum": "new"})
+    assert stale == ["upgrade_change"]
+    rows = anomalist_candidates.candidates(stored, INDICATORS, NO_FIRST_PASS, top=5, stale=stale)
+    assert [(r["entity"], r["selected"], r["why"]) for r in rows] == [
+        ("France", False, anomalist_candidates.STALE),
+        ("Chad", True, "new candidate"),
+    ]
+    text = anomalist_candidates.render("ns/v/thing", "ai/fact-check/ns/v/thing", rows, [], NO_FIRST_PASS, 0.3)
+    assert "earlier build and are not selected" in text
+
+
+def test_anomalist_old_values_come_from_the_version_being_replaced():
+    """A mapping with rows from several older versions pairs indicators only with the latest of them."""
+    mapping = pd.DataFrame(
+        {
+            "id_new": [10, 11, 10],
+            "old_path": [
+                "grapher/ns/2025/thing/t#gdp",
+                "grapher/ns/2025/thing/t#pop",
+                "grapher/ns/2020/thing/t#gdp_old",
+            ],
+            "old_dataset": ["ns/2025/thing", "ns/2025/thing", "ns/2020/thing"],
+            "old_version": ["2025", "2025", "2020"],
+        }
+    ).iloc[[2, 0, 1]]
+    old_path, olds = anomalist_candidates.replaced_by_mapping(mapping)
+    assert old_path == "ns/2025/thing" and olds == {10: "t#gdp", 11: "t#pop"}
+
+
 def test_anomalist_first_pass_flag_needs_the_same_year():
     first_pass = {**NO_FIRST_PASS, "flagged": {("t#rate", "France: 9.9", "2019")}}
     assert anomalist_candidates.status_of("t#rate", "France", "2023", first_pass) == anomalist_candidates.NEW

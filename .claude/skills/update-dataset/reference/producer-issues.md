@@ -75,7 +75,8 @@ So that a known problem goes out as a follow-up rather than as news, look before
 - **Gmail**, with the Gmail connector, read-only: only the contact addresses found below
   (`from:<address> OR to:<address>`), never the producer's name or domain, which return unrelated mail.
 
-Record what you found in `previously_reported`. A connector that isn't available is a check not run: say so.
+Record what you found in `previously_reported`: where and when it was reported, or `none`. A connector that isn't
+available is a check not run: say so. `check` holds back an entry until the field is filled.
 
 ## Finding the contact
 
