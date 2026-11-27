@@ -744,6 +744,17 @@ def test_anomalist_first_pass_flag_needs_the_same_year():
     assert anomalist_candidates.status_of("t#rate", "France", "2019", first_pass) == anomalist_candidates.FLAGGED
 
 
+def test_anomalist_first_pass_flag_names_the_entity_not_a_longer_name_containing_it():
+    first_pass = {**NO_FIRST_PASS, "flagged": {("t#rate", "Equatorial Guinea 2023: 9.9 (|z|>6)", "2023")}}
+    assert anomalist_candidates.status_of("t#rate", "Guinea", "2023", first_pass) == anomalist_candidates.NEW
+    assert anomalist_candidates.status_of("t#rate", "Equatorial Guinea", "2023", first_pass) == (
+        anomalist_candidates.FLAGGED
+    )
+    assert anomalist_candidates.names_entity("Niger, sex=female 2020: ≥×10 jump", "Niger")
+    assert not anomalist_candidates.names_entity("Nigeria 2020: ≥×10 jump", "Niger")
+    assert not anomalist_candidates.names_entity("United States Virgin Islands 2020: 1", "United States")
+
+
 def test_anomalist_neighbors_and_old_values():
     series = pd.Series([1.0, 2.0, 30.0], index=[2019, 2020, 2022])
     assert anomalist_candidates.neighbors(series, 2020) == ("2", "1 (2019)", "30 (2022)")

@@ -295,10 +295,19 @@ def status_of(identity: str, entity: str, year: str, first_pass: dict) -> str:
             return CHECKED
     for key, detail, period in first_pass["flagged"]:
         key_table, _, key_column = key.partition("#")
-        if key_table == table and anomaly_scan.column_matches(column, key_column) and entity and entity in detail:
+        if key_table == table and anomaly_scan.column_matches(column, key_column) and names_entity(detail, entity):
             if not period or str(period).removesuffix(".0") == str(year):
                 return FLAGGED
     return NEW
+
+
+def names_entity(detail: str, entity: str) -> bool:
+    """Whether a scan flag's detail is about this entity, and not one whose name contains it.
+
+    `anomaly_scan.py` opens a per-entity detail with the entity's name, followed by the dimensions (`, sex=female`),
+    the period (` 2023`) or a colon: `Guinea 2023: ...` names Guinea, `Equatorial Guinea 2023: ...` does not.
+    """
+    return bool(entity) and re.match(rf"{re.escape(entity)}(?=, | \d|: )", detail) is not None
 
 
 def candidates(stored: pd.DataFrame, indicators: pd.DataFrame, first_pass: dict, top: int) -> list[dict]:

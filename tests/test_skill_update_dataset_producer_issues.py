@@ -194,6 +194,11 @@ def test_organization_domain():
     assert pi.organization("datacatalog.worldbank.org") == "worldbank.org"
     assert pi.organization("www.ons.gov.uk") == "ons.gov.uk"
     assert pi.organization("lse.ac.uk") == "lse.ac.uk"
+    # Agencies under a generic second level of a country domain stay apart.
+    assert pi.organization("www.stats.govt.nz") == "stats.govt.nz"
+    assert pi.organization("health.govt.nz") == "health.govt.nz"
+    assert pi.organization("www.ine.gob.cl") == "ine.gob.cl"
+    assert pi.organization("insee.fr") == "insee.fr"
 
 
 def test_contacts_in_text_finds_emails_and_contact_pages_only():
@@ -216,7 +221,7 @@ def test_contacts_in_html_reads_mailto_links_that_the_saved_text_drops():
     assert not any("methods" in value or "#" in value for _, value in found)
 
 
-def test_rank_prefers_a_data_mailbox_at_the_producer_and_never_adds_addresses():
+def test_rank_prefers_a_data_mailbox_then_a_producer_form_and_never_adds_addresses():
     found = [
         {"kind": "email", "value": "jane.doe@university.edu", "source": "paper"},
         {"kind": "form or page", "value": "https://producer.org/contact", "source": "page"},
@@ -227,8 +232,8 @@ def test_rank_prefers_a_data_mailbox_at_the_producer_and_never_adds_addresses():
     ranked = pi.rank(found, {"producer.org"})
     assert [item["value"] for item in ranked] == [
         "data@producer.org",
-        "admin@producer.org",
         "https://producer.org/contact",
+        "admin@producer.org",
         "jane.doe@university.edu",
     ]
     assert ranked[0]["also_on"] == ["codebook"]

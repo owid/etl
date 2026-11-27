@@ -47,8 +47,25 @@ JUNK_EMAIL = re.compile(
     r"(example\.(com|org)|noreply|no-reply|donotreply|sentry|wixpress|\.(png|jpe?g|gif|svg|webp)$|@2x|@\d+x)",
     re.IGNORECASE,
 )
-# Public suffixes with two labels: an organization's domain is the label before them.
-TWO_LABEL_SUFFIXES = ("ac.uk", "co.uk", "gov.uk", "org.uk", "edu.au", "gov.au", "org.au", "ac.jp", "go.jp", "co.jp")
+# Generic second-level labels of country-code domains (`gov.uk`, `govt.nz`, `gob.cl`): under them each label is a
+# separate organization, so `stats.govt.nz` and `health.govt.nz` are two agencies, not one.
+GENERIC_SECOND_LEVEL = {
+    "ac",
+    "co",
+    "com",
+    "edu",
+    "go",
+    "gob",
+    "gouv",
+    "gov",
+    "govt",
+    "mil",
+    "ne",
+    "net",
+    "nic",
+    "or",
+    "org",
+}
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -227,10 +244,14 @@ def draft(log: dict, ids: list[str] | None) -> str:
 
 
 def organization(host: str) -> str:
-    """The organization's domain of a host: `datacatalog.worldbank.org` → `worldbank.org`."""
-    labels = host.lower().removeprefix("www.").split(".")
-    size = 3 if ".".join(labels[-2:]) in TWO_LABEL_SUFFIXES else 2
-    return ".".join(labels[-size:])
+    """The organization's domain of a host: `datacatalog.worldbank.org` → `worldbank.org`, `stats.govt.nz` stays.
+
+    Under a country-code domain with a generic second level (`gov.uk`, `govt.nz`), the organization is the label
+    before it. A heuristic, not the full public-suffix list: an unusual suffix can still merge two organizations.
+    """
+    labels = host.lower().rstrip(".").removeprefix("www.").split(".")
+    generic = len(labels) >= 3 and len(labels[-1]) == 2 and labels[-2] in GENERIC_SECOND_LEVEL
+    return ".".join(labels[-(3 if generic else 2) :])
 
 
 def contacts_in_text(text: str, source: str) -> list[dict]:
@@ -263,7 +284,11 @@ def contacts_in_html(html: str, url: str) -> list[dict]:
 
 
 def rank(found: list[dict], producer_domains: set[str]) -> list[dict]:
-    """Deduplicated, best first: a data mailbox at the producer, any producer address, a producer form, the rest."""
+    """Deduplicated, best first: a data mailbox at the producer, a producer form, other producer addresses, the rest.
+
+    The order of reference/producer-issues.md: a form the producer set up for questions beats a mailbox of theirs
+    that is not meant for data (`admin@`, a person's address).
+    """
     unique: dict[tuple[str, str], dict] = {}
     for item in found:
         key = (item["kind"], item["value"].lower())
@@ -276,9 +301,9 @@ def rank(found: list[dict], producer_domains: set[str]) -> list[dict]:
         own = organization(host) in producer_domains
         local = item["value"].partition("@")[0].lower()
         if item["kind"] == "email":
-            item["rank"] = 1 if own and DATA_MAILBOX.match(local) else (2 if own else 4)
+            item["rank"] = 1 if own and DATA_MAILBOX.match(local) else (3 if own else 4)
         else:
-            item["rank"] = 3 if own else 5
+            item["rank"] = 2 if own else 5
         item["at_producer"] = own
     return sorted(unique.values(), key=lambda item: (item["rank"], item["value"]))
 
@@ -331,8 +356,8 @@ def contacts(step: str) -> str:
     out += ["", f"## Found ({len(ranked)}), best first", ""]
     labels = {
         1: "data mailbox at the producer",
-        2: "producer address",
-        3: "producer form or contact page",
+        2: "producer form or contact page",
+        3: "other producer address",
         4: "other address (an author? check the page)",
         5: "other form or page",
     }
