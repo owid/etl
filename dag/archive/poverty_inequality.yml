@@ -659,3 +659,12 @@ steps:
   # archived; last active in 56a286fad9f7 on 2026-11-18
   viz://explorer/lis/latest/poverty_lis:
     - data://grapher/lis/2026-09-18/luxembourg_income_study
+  # archived; last active in c83815786439 on 2026-11-25
+  data://garden/oecd/2024-04-30/affordable_housing_database:
+    - data://meadow/oecd/2024-04-30/affordable_housing_database
+  # archived; last active in c83815786439 on 2026-11-25
+  data://meadow/oecd/2024-04-30/affordable_housing_database:
+    - snapshot://oecd/2024-04-30/affordable_housing_database_homelessness.xlsx
+  # archived; last active in c83815786439 on 2026-11-25
+  data://grapher/oecd/2024-04-30/affordable_housing_database:
+    - data://garden/oecd/2024-04-30/affordable_housing_database

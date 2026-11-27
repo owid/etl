@@ -1,0 +1,26 @@
+# Known issues in the OECD Affordable Housing Database (HC3.1, September 2026 release), patched locally.
+# See etl/data_corrections.py for the format. Both are pending a reply from the OECD: revisit them then.
+- indicator: share
+  entity: United States
+  years: [2025]
+  action: override
+  value: 0.22
+  expect: {gt: 0.185, lt: 0.195} # still the 0.19% of the 2023 count; fails once the source changes it
+  reason: >-
+    Table HC3.1.A1 gives 0.19% for 2025, the share of the 2023 count. The 2025 headline estimate (745,652 people)
+    over the 2025 population gives 0.22%, which also matches the rate of 21.8 per 10,000 in Figure HC3.1.1.
+  producer: OECD
+  status: open
+- indicator: [number_ethos_light_2, number_ethos_light_3, number_ethos_light_4, number_ethos_light_5]
+  entity: Mexico
+  years: [2020]
+  action: override
+  value: null
+  expect: {gt: 0}
+  reason: >-
+    Mexico's headline estimate counts only people living rough (ETHOS Light 1). The OECD's country note for Mexico
+    (2026) says the other categories in Table HC3.1.A1 are census counts of people in institutions and
+    non-conventional dwellings, which Mexico doesn't count as homelessness, so they aren't a breakdown of its
+    headline estimate.
+  producer: OECD
+  status: open
