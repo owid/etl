@@ -39,6 +39,7 @@ import anomaly_scan  # noqa: E402
 BRIEF = "lane_anomalist.md"
 RESULT = "lane_anomalist.result.md"
 PREVIOUS_RESULT = "lane_anomalist.previous-result.md"
+NOT_ON_DISK = "not on disk (build the grapher step)"
 # MySQL's "table doesn't exist": the indicator upgrader has never run on this DB.
 NO_SUCH_TABLE = 1146
 TYPES = ("upgrade_change", "upgrade_missing", "time_change", "gp_outlier")
@@ -395,40 +396,51 @@ def add_values(rows: list[dict], data_dir: Path, new: str, old: tuple[str | None
             continue
         table, _, column = row["identity"].partition("#")
         year = int(row["year"]) if row["year"] else None
-        row["value"], row["previous"], row["next"] = neighbors(
-            read_series(cache, new_dir, table, column, row["entity"]), year
-        )
+        series, reason = read_series(cache, new_dir, table, column, row["entity"])
+        row["value"], row["previous"], row["next"] = neighbors(series, year, reason)
         if old_dir is None:
             row["old_value"] = no_old
             continue
         old_table, _, old_column = old_identities.get(row["indicator_id"], row["identity"]).partition("#")
-        old_series = read_series(cache, old_dir, old_table, old_column, row["entity"])
-        row["old_value"] = f"{old_path} not on disk" if old_series is None else value_at(old_series, year)
+        old_series, old_reason = read_series(cache, old_dir, old_table, old_column, row["entity"])
+        row["old_value"] = f"{old_path}: {old_reason}" if old_series is None else value_at(old_series, year)
 
 
-def read_series(cache: dict, directory: Path | None, table: str, column: str, entity: str) -> pd.Series | None:
-    """One entity's series of a grapher column, indexed by year; None when the dataset or column is missing."""
+def read_series(
+    cache: dict, directory: Path | None, table: str, column: str, entity: str
+) -> tuple[pd.Series | None, str]:
+    """One entity's series of a grapher column, indexed by year, or None and why it is unavailable.
+
+    A dataset that is not built, or lacks the table or column, is absent; a dataset that is there but fails to read
+    says so with its error, so a corrupt file is never reported as a missing one.
+    """
     if directory is None or not (directory / "index.json").exists():
-        return None
+        return None, NOT_ON_DISK
     key = (directory, table)
     if key not in cache:
-        try:
-            from owid.catalog import Dataset
+        from owid.catalog import Dataset
 
-            cache[key] = Dataset(directory).read(table, safe_types=False).reset_index()
-        except Exception:
-            cache[key] = None
+        try:
+            dataset = Dataset(directory)
+            if table in dataset.table_names:
+                cache[key] = dataset.read(table, safe_types=False).reset_index()
+            else:
+                cache[key] = f"no table `{table}` in the built dataset"
+        except Exception as error:
+            cache[key] = f"READ FAILED ({type(error).__name__}: {str(error)[:160]})"
     tb = cache[key]
-    if tb is None or column not in tb.columns or "year" not in tb.columns:
-        return None
+    if isinstance(tb, str):
+        return None, tb
+    if column not in tb.columns or "year" not in tb.columns:
+        return None, f"no column `{column}` in table `{table}`"
     entity_column = "country" if "country" in tb.columns else "entity"
     rows = tb[tb[entity_column].astype(str) == entity]
-    return rows.set_index("year")[column].dropna().sort_index()
+    return rows.set_index("year")[column].dropna().sort_index(), ""
 
 
-def neighbors(series: pd.Series | None, year: int | None) -> tuple:
+def neighbors(series: pd.Series | None, year: int | None, reason: str = "") -> tuple:
     if series is None:
-        return "not on disk (build the grapher step)", "", ""
+        return reason or NOT_ON_DISK, "", ""
     if year is None:
         return "", "", ""
     before, after = series[series.index < year], series[series.index > year]

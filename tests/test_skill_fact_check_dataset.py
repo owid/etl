@@ -795,6 +795,16 @@ def test_anomalist_neighbors_and_old_values():
     assert anomalist_candidates.neighbors(None, 2020)[0].startswith("not on disk")
 
 
+def test_anomalist_values_tell_a_corrupt_dataset_from_a_missing_one(tmp_path):
+    """A dataset that is on disk but fails to read must say so, not pass as "not on disk"."""
+    (tmp_path / "index.json").write_text("{not json")
+    series, reason = anomalist_candidates.read_series({}, tmp_path, "t", "gdp", "Chad")
+    assert series is None and reason.startswith("READ FAILED")
+    assert anomalist_candidates.neighbors(series, 2020, reason)[0] == reason
+    series, reason = anomalist_candidates.read_series({}, tmp_path / "absent", "t", "gdp", "Chad")
+    assert series is None and reason == anomalist_candidates.NOT_ON_DISK
+
+
 def test_anomalist_coverage_says_what_was_not_looked_at():
     stored = _stored([("time_change", 1, "Chad", 2020, 0.5)])
     notes = {"types": ["time_change"], "checksums": {"time_change": "old"}, "relevance": "KeyError: population"}

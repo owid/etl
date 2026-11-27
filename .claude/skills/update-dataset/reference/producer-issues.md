@@ -81,7 +81,8 @@ Record what you found in `previously_reported`. A connector that isn't available
 
 In this order, and say in the hand-off which route the contact came from:
 
-1. **OWID's producer contacts table** in Notion, with the Notion connector, read-only (never edit it). Its link is
+1. **OWID's producer contacts table** in Notion, read with the Notion connector. Change it only as the last paragraph
+   of this section says: a row added on the user's yes, nothing else. Its link is
    `NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL` in the repo's `.env`; when it is not set, ask the user for the link
    once and append that line to `.env`. Those contacts receive OWID's analytics reports, so ask the user whether the
    person is also the right one for a data question.
