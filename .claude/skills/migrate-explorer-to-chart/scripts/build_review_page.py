@@ -433,9 +433,10 @@ $("mtable").innerHTML = `<thead><tr><th>#</th>${dimNames.map(d=>`<th>${esc(d)}</
 document.querySelectorAll("#mtable tr.pick").forEach(tr => { tr.onclick = () => { go(+tr.dataset.id); $("compare").scrollIntoView({behavior:"smooth"}); }; tr.onkeydown = e => { if (e.key==="Enter") tr.click(); }; });
 
 // Links to replace.
-// WordPress rows need no edit: legacy posts and unused blocks reach no reader, and a block still
-// shown on another explorer only holds plain links, which the redirect covers.
-const isInfo = r => r.how==="legacy copy" || r.surface.startsWith("WordPress");
+// Rows that need no edit: legacy WordPress posts and unused blocks reach no reader, a block still
+// shown on another explorer only holds plain links (the redirect covers them), and narrative charts
+// always hide their related question.
+const isInfo = r => r.how==="legacy copy" || r.how==="hidden related question" || r.surface.startsWith("WordPress");
 const RA = D.refs.references, R = RA.filter(r=>!isInfo(r)), RI = RA.filter(isInfo);
 const breaks = R.filter(r=>r.breaks_on_redirect).length;
 const nDone = R.filter(r=>r.status==="done").length, pendBreak = R.filter(r=>r.status!=="done" && r.breaks_on_redirect).length;
@@ -449,7 +450,7 @@ const findCell = r => {
   return `${what}${r.context?`<div class="small">…${esc(r.context.trim())}</div>`:""}`;
 };
 const statusLabel = r => r.status==="done" ? '<span class="pill ok">✓ swapped</span> ' : r.status==="pending" ? '<span class="pill warn">to do</span> ' : r.status==="new" ? '<span class="pill bad">new since first scan</span> ' : "";
-const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : r.how==="legacy copy" ? `<span class="pill neutral">legacy copy · no reader sees it</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
+const howLabel = r => r.breaks_on_redirect ? `<span class="pill bad">${esc(r.how)} · breaks</span>` : r.how==="docs example" ? `<span class="pill neutral">docs example</span>` : r.how==="legacy copy" ? `<span class="pill neutral">legacy copy · no reader sees it</span>` : r.how==="hidden related question" ? `<span class="pill neutral">related question · narrative charts never show it</span>` : `<span class="pill neutral">${esc(r.how)} · redirect covers it</span>`;
 const renderGroups = (rows, empty) => {
 const groups = {};
 rows.forEach(r => { const k = r.surface + "|" + r.where.replace(/:\d+$/,""); (groups[k] = groups[k] || []).push(r); });
@@ -465,7 +466,7 @@ return order.length ? order.map(([k, rs]) => {
 const drawLinks = () => {
   const hide = $("hideDone").checked, shown = hide ? R.filter(r=>r.status!=="done") : R;
   $("linkgroups").innerHTML = renderGroups(shown, `<div class="okline">✓ Nothing ${hide && nDone ? "left " : ""}to replace.</div>`)
-    + (RI.length ? `<details class="info"><summary>WordPress: ${RI.length} link${RI.length===1?"":"s"}, nothing to do</summary><p class="small">Legacy WordPress posts are private copies of pages now served from Google Docs, and unused reusable blocks render nowhere, so no reader sees these. A block still shown on another explorer holds only plain links, which the redirect covers.</p>${renderGroups(RI, "")}</details>` : "");
+    + (RI.length ? `<details class="info"><summary>Nothing to do: ${RI.length} link${RI.length===1?"":"s"} no reader sees</summary><p class="small">Legacy WordPress posts are private copies of pages now served from Google Docs, and unused reusable blocks render nowhere. A block still shown on another explorer holds only plain links, which the redirect covers. Narrative charts keep their parent's related question in their stored config, but always render with it hidden.</p>${renderGroups(RI, "")}</details>` : "");
   document.querySelectorAll("#linkgroups button[data-copy]").forEach(b => b.onclick = async () => { try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; }catch(e){ b.textContent="Copy failed"; } });
 };
 $("hideDoneBox").hidden = !nDone;

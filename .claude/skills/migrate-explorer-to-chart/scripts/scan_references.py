@@ -422,6 +422,9 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
             # Missing joins come back as NaN, which is truthy: turn them into None.
             rows = rows.astype(object).where(rows.notna(), None)
             for r in rows.to_dict("records"):
+                # Narrative charts always render with `hideRelatedQuestion` (article and slideshow
+                # embeds), so a link there reaches no reader; it sits in their stored full config.
+                related = {q.get("url") for q in json.loads(r["txt"]).get("relatedQuestions") or []}
                 for m in pat.finditer(r["txt"]):
                     if r["chart_id"]:
                         add(
@@ -435,9 +438,9 @@ def main(mapping_dir: Path, prod_env_file: str, out: Path, grapher_repo: Path | 
                         add(
                             "Narrative chart",
                             r["narrative_name"],
-                            f"{ADMIN}/narrative-charts/{r['narrative_id']}/edit",
+                            f"{ADMIN}/narrative-charts/{int(r['narrative_id'])}/edit",
                             m.group(0),
-                            "config text",
+                            "hidden related question" if m.group(0) in related else "config text",
                         )
                     elif r["mdim_id"]:
                         add(
