@@ -414,9 +414,7 @@ def history(step: str) -> str:
     out = [f"# Earlier reports: {step}", "", "## Corrections already reported", ""]
     reported = []
     for path in sorted((paths.STEPS_DATA_DIR / "garden" / namespace).glob(f"*/{short_name}.corrections.yml")):
-        for line in path.read_text().splitlines():
-            if re.search(r"^\s*(reported|status|reason):", line):
-                reported.append(f"- `{path.relative_to(paths.BASE_DIR)}`: {line.strip()}")
+        reported += [f"- `{path.relative_to(paths.BASE_DIR)}`: {line}" for line in reported_lines(path.read_text())]
     out += reported or ["- none in any version's `corrections.yml`"]
     terms = [short_name, *producers]
     out += ["", "## owid-issues (open and closed)", ""]
@@ -461,6 +459,13 @@ def history(step: str) -> str:
         "",
     ]
     return "\n".join(out)
+
+
+def reported_lines(text: str) -> list[str]:
+    """The lines of a `corrections.yml` that record a report to the producer: a filled `reported:` date, or a
+    `status` past `open` (`reported`, `acknowledged`, `fixed_upstream`). An open correction was never sent."""
+    pattern = re.compile(r"^\s*(reported:\s*\S|status:\s*(reported|acknowledged|fixed_upstream)\b)")
+    return [line.strip() for line in text.splitlines() if pattern.match(line)]
 
 
 def gh(arguments: list[str]) -> list[str]:

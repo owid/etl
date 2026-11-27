@@ -123,6 +123,20 @@ def test_earlier_reports_must_be_searched_before_an_entry_is_ready():
         pi.draft({"issues": [issue]}, ["1"])
 
 
+def test_history_lists_only_corrections_that_were_reported():
+    text = (
+        "corrections:\n"
+        "  - reason: Chad 2023 is ten times 2022\n"
+        "    status: open\n"
+        "  - reason: Peru 2021 sign flipped\n"
+        "    reported: 2024-11-13\n"
+        "    status: acknowledged\n"
+        "  - reason: unreported\n"
+        "    reported:\n"
+    )
+    assert pi.reported_lines(text) == ["reported: 2024-11-13", "status: acknowledged"]
+
+
 def test_our_own_error_is_never_sent():
     state, reasons = pi.verdict(_issue(in_raw_snapshot=False))
     assert state == "ours" and "fix the step" in reasons[0]
