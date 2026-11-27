@@ -25,7 +25,7 @@ METRICS = {
         "title": "Data used to train notable AI models",
         "subtitle": "Each dot is a notable AI model, placed by its publication date and the number of data points used to train it.",
         "y_label": "Training dataset size (data points)",
-        "note": "What counts as a data point depends on the domain, such as words or tokens of text, images, or moves in a game, so compare models only within the same domain. About 40% of notable models have no dataset size and are not shown.",
+        "note": "About 40% of notable models have no dataset size and are not shown.",
     },
 }
 

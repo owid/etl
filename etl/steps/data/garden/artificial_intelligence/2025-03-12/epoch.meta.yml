@@ -53,7 +53,7 @@ tables:
       training_dataset_size__total:
         title: Training dataset size
         unit: 'data points'
-        description_short: Number of data points used to train an AI model. What counts as a data point depends on the domain, such as words or tokens of text, images, or moves in a game, so compare models only within the same domain.
+        description_short: Number of data points used to train an AI model.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
