@@ -44,7 +44,11 @@ def text_runs(doc: dict) -> list[dict]:
                                 "end": pe["endIndex"],
                                 "text": tr["content"],
                                 "link": (style.get("link") or {}).get("url"),
-                                "suggested": bool(tr.get("suggestedInsertionIds") or tr.get("suggestedDeletionIds")),
+                                "suggested": bool(
+                                    tr.get("suggestedInsertionIds")
+                                    or tr.get("suggestedDeletionIds")
+                                    or tr.get("suggestedTextStyleChanges")
+                                ),
                             }
                         )
             if "table" in el:
@@ -86,20 +90,25 @@ def build_requests(doc: dict, swaps: dict[str, str]) -> tuple[list[dict], list[d
             # Already part of an open suggestion (e.g. from an earlier run): leave it to the owner.
             continue
         for old, new in swaps.items():
-            if run["link"] == old:
+            # As text, a URL may be written with or without its scheme; keep the doc's form.
+            forms = {(old, new), (without_scheme(old), without_scheme(new))}
+            occurrences = [(o, n, off) for o, n in forms for off in text_occurrences(run, o)]
+            if run["link"] == old and not occurrences:
                 rng = {"startIndex": run["start"], "endIndex": run["end"], "tabId": run["tab"]}
                 req = {"updateTextStyle": {"range": rng, "textStyle": {"link": {"url": new}}, "fields": "link"}}
                 edits.append((run["start"], [req], {"kind": "link", "text": run["text"], "old": old, "new": new}))
-            # As text, a URL may be written with or without its scheme; keep the doc's form.
-            for old_text, new_text in {(old, new), (without_scheme(old), without_scheme(new))}:
-                for off in text_occurrences(run, old_text):
-                    start = run["start"] + off
-                    end = start + len(old_text)
-                    reqs = [
-                        {"insertText": {"text": new_text, "location": {"index": end, "tabId": run["tab"]}}},
-                        {"deleteContentRange": {"range": {"startIndex": start, "endIndex": end, "tabId": run["tab"]}}},
-                    ]
-                    edits.append((start, reqs, {"kind": "text", "old": old, "new": new_text}))
+            for old_text, new_text, off in occurrences:
+                start = run["start"] + off
+                end = start + len(old_text)
+                reqs = [{"insertText": {"text": new_text, "location": {"index": end, "tabId": run["tab"]}}}]
+                if run["link"]:
+                    # Inserted text takes the old link target: point it at the new URL when the run
+                    # linked to the old one (a bare URL), else keep the run's own link.
+                    target = new if run["link"] == old else run["link"]
+                    rng = {"startIndex": end, "endIndex": end + len(new_text), "tabId": run["tab"]}
+                    reqs.append({"updateTextStyle": {"range": rng, "textStyle": {"link": {"url": target}}, "fields": "link"}})
+                reqs.append({"deleteContentRange": {"range": {"startIndex": start, "endIndex": end, "tabId": run["tab"]}}})
+                edits.append((start, reqs, {"kind": "text", "old": old, "new": new_text}))
     edits.sort(key=lambda e: e[0], reverse=True)
     return [r for _, reqs, _ in edits for r in reqs], [log for _, _, log in edits]
 
