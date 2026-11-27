@@ -15,6 +15,7 @@ The main workflow:
 - Produces final tables suitable for charting and analysis
 """
 
+from fractions import Fraction
 from itertools import chain
 from typing import cast
 
@@ -83,8 +84,12 @@ REGIONS = {
 }
 
 # THRESHOLDS to consider a region as having enough data for aggregation.
-## Share of countries in region required to estimate regional averages
-THRESHOLD_SHARE_COUNTRIES = 2 / 3
+## Simple averages, per indicator: share of the region's countries in the data that year that must have a value, and the minimum number of them
+THRESHOLD_SHARE_COUNTRIES = Fraction(2, 3)
+MIN_COUNTRIES = 5
+## Simple averages: share of the region's countries in the data in REFERENCE_YEAR that must be in the data that year.
+## V-Dem covers few colonies before 1900, so this stops averages that rest on the few sovereign states of the time.
+THRESHOLD_SHARE_REFERENCE_COUNTRIES = 1 / 3
 ## Share of people living regions required to estimate regional averages
 THRESHOLD_SHARE_POPULATION = 2 / 3
 
@@ -175,6 +180,11 @@ INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES
 # For a sanity check on table shape
 N_EXPECTED = 196
 
+# Indicators that get no regional or World averages at all: turnout only has values in election years, so an average
+# would rest on whichever few countries voted that year. They stay in INDICATORS_REGION_AVERAGES so that they keep
+# their table (and their grapher variables), and their averages are blanked in `run`.
+INDICATORS_NO_AGG = ["turnout_total_vdem", "turnout_vdem"]
+
 # Indicators that should not have regional averages pre-1900 [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
 INDICATORS_NO_AGG_PRE_1900 = [
     "corruption_vdem",
@@ -224,6 +234,10 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, 
     )
 
     # Remove some regional aggregates [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+
+    # No regional or World averages at all for turnout
+    tb_countries_avg[INDICATORS_NO_AGG] = pd.NA
+    tb_population_avg[INDICATORS_NO_AGG] = pd.NA
 
     # World: no global data needed at all.
     tb_countries_avg.loc[tb_countries_avg["country"] == "World", INDICATORS_NO_AGG_PRE_1900] = pd.NA
@@ -375,8 +389,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
     tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
-    # Estimate the mean only if at least THRESHOLD_SHARE_COUNTRIES of the region's 1900 countries have data (10% for Europe)
-    # Get list of countries in regions in 1900
+    # Reference list: each continent's countries in the data in 1900
     tb_1900 = tb_.loc[tb_["year"] == REFERENCE_YEAR, ["country"]]
     countries_to_continent = geo.countries_to_continent_mapping(
         ds_regions=ds_regions,
@@ -387,12 +400,10 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
     # pandas 3 fails to aggregate a categorical column into lists.
     countries_must_have_data = tb_1900.astype({"country": object}).groupby("continent")["country"].agg(list).to_dict()
-    frac_must_have_data = {region: THRESHOLD_SHARE_COUNTRIES for region in countries_must_have_data.keys()} | {
-        "Europe": 0.1
-    }
+    frac_must_have_data = {region: THRESHOLD_SHARE_REFERENCE_COUNTRIES for region in countries_must_have_data.keys()}
 
-    # Estimate region aggregates
-    tb_ = add_regions_and_global_aggregates(
+    # Estimate region aggregates, only where at least a third of the continent's 1900 countries are in the data that year
+    tb_avg = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
         aggregations={k: "mean" for k in cols_indicators},  # ty: ignore
@@ -401,10 +412,69 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
         frac_must_have_data=frac_must_have_data,
     )
 
-    # Sanity check on output shape
-    assert tb_.shape[1] == N_EXPECTED, f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_.shape[1]}"
+    # Keep an average only where enough of the region's countries have a value for that indicator
+    reference_countries = set(tb_1900["country"].astype(str))
+    tb_avg = keep_averages_with_enough_countries(
+        tb_, tb_avg, cols_indicators, countries_to_continent, reference_countries
+    )
 
-    return tb_
+    # Sanity check on output shape
+    assert tb_avg.shape[1] == N_EXPECTED, (
+        f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_avg.shape[1]}"
+    )
+
+    return tb_avg
+
+
+def keep_averages_with_enough_countries(
+    tb: Table,
+    tb_avg: Table,
+    cols_indicators: list[str],
+    countries_to_continent: dict[str, str],
+    reference_countries: set[str],
+) -> Table:
+    """Blank the simple averages that rest on too few countries.
+
+    An average of an indicator for a region and year is kept only if, among the region's countries in the data that year:
+    - at least THRESHOLD_SHARE_COUNTRIES have a value for that indicator, and
+    - at least MIN_COUNTRIES have a value.
+    For the World, the countries are all countries in the data that year, and at least THRESHOLD_SHARE_REFERENCE_COUNTRIES
+    of the countries in the data in REFERENCE_YEAR must also be in the data (the continents get this check from
+    `add_regions_and_global_aggregates`).
+
+    Example: Europe 1789, electoral democracy index. 33 European states are in the data and 23 have a value (70%), so the
+    average is kept. For the liberal democracy index only 17 do (52%), so it's blanked.
+    """
+    tb_cov = tb.loc[:, ["year", "country"] + cols_indicators].copy()
+    tb_cov["region"] = tb_cov["country"].astype(str).map(countries_to_continent)
+    assert tb_cov["region"].notna().all(), "Some countries have no continent."
+    tb_cov = concat([tb_cov, tb_cov.assign(region="World")], ignore_index=True)
+
+    # Countries in the data, and countries with a value for each indicator, per region and year
+    num_in_data = tb_cov.groupby(["region", "year"], observed=True).size()
+    num_with_value = tb_cov.groupby(["region", "year"], observed=True)[cols_indicators].count()
+    # Compare counts as integers, so that e.g. 2 of 3 counts as two-thirds
+    share = THRESHOLD_SHARE_COUNTRIES
+    enough = num_with_value.mul(share.denominator).ge(num_in_data.mul(share.numerator), axis=0)
+    enough &= num_with_value >= MIN_COUNTRIES
+
+    # World: a third of the countries in the data in REFERENCE_YEAR must also be in the data that year
+    tb_world = tb_cov.loc[tb_cov["region"] == "World"]
+    num_reference = tb_world.loc[tb_world["country"].astype(str).isin(reference_countries)].groupby("year").size()
+    years_without_reference = num_reference.index[
+        num_reference < THRESHOLD_SHARE_REFERENCE_COUNTRIES * len(reference_countries)
+    ]
+    is_world = enough.index.get_level_values("region") == "World"
+    enough.loc[is_world & enough.index.get_level_values("year").isin(years_without_reference)] = False
+
+    # Blank the averages without enough countries
+    enough = enough.reset_index().rename(columns={"region": "country"})
+    tb_avg = tb_avg.merge(enough, on=["country", "year"], how="left", suffixes=("", "__enough"))
+    for col in cols_indicators:
+        tb_avg[col] = tb_avg[col].where(tb_avg[f"{col}__enough"].fillna(False).astype(bool))
+    tb_avg = tb_avg.drop(columns=[f"{col}__enough" for col in cols_indicators])
+
+    return tb_avg
 
 
 # %% POPULATION TABLES

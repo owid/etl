@@ -154,7 +154,7 @@ definitions:
       We classify a country as a closed autocracy in any year in which it had no regularly scheduled legislative elections on course (V-Dem's `v2xlg_elecreg` indicator), for example because the country had no elected legislature, the legislature was suspended, or elections were postponed. In those years, citizens could not choose the legislature through multi-party elections, which the classification requires of electoral autocracies. This follows Lührmann et al.'s definition, but V-Dem's own Regimes of the World (RoW) data codes some of these years as electoral autocracies, so our classification differs from V-Dem's in those years.
     description_processing_corruption: |-
       ### Region aggregates
-      The default regional aggregates are averages of the country values. They are only estimated since 1900. For each continent, we take the countries we have data for in 1900 as a reference, and only estimate an average when enough of them have data (usually two-thirds).
+      The default regional aggregates are averages of the country values. They are only estimated since 1900. We only estimate an average for a region and year when at least two-thirds of the region's countries in the data that year have a value for the indicator, and at least five do.
 
       In addition, regional aggregates with names like "Region (population-weighted)" are averages of the country values weighted by population, counting only the countries with data. We use Our World in Data's population data, which combines several sources ([learn more](https://ourworldindata.org/population-sources)). These averages are only estimated when the countries with data are home to at least two-thirds of the region's population in that year.
       Population estimates from 2024 onwards are projections released by the UN.
@@ -233,7 +233,7 @@ tables:
         numDecimalPlaces: 0
       description_processing: &processing_regions |-
         ### Region aggregates
-        The default regional aggregates (including values for the World) are averages of the country values. For each continent, we take the countries we have data for in 1900 as a reference, and only estimate an average when enough of them have data (usually two-thirds).
+        The default regional aggregates (including values for the World) are averages of the country values. We only estimate an average for a region and year when at least two-thirds of the region's countries in the data that year have a value for the indicator, and at least five do. V-Dem covers few colonies before 1900, so we also require at least a third of the region's countries in the 1900 data to be in the data that year. Otherwise, an average could rest on the few independent states of the time.
 
         In addition, regional aggregates with names like "Region (population-weighted)" (including values for World) are averages of the country values weighted by population, counting only the countries with data. We use Our World in Data's population data, which combines several sources ([learn more](https://ourworldindata.org/population-sources)). These averages are only estimated when the countries with data are home to at least two-thirds of the region's population in that year.
         Population estimates from 2024 onwards are projections released by the UN.
@@ -346,16 +346,26 @@ tables:
           - Measures the percentage of registered voters who cast a ballot in national elections, based on official results.
           - Reported as a continuous percentage; higher values indicate greater voter participation.
           - Data sourced from IPU, IFES, IDEA, and various electoral databases.
-          - *key_regions
-          - *key_regions_agg
+          - &key_no_regions_turnout We don't estimate regional or World averages for turnout. It only has values in years with a national election, so an average would rest on whichever few countries voted that year.
+        description_processing: &processing_no_regions_turnout |-
+          {definitions.aux.description_imputes}
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
           V-Dem indicator name: `v2eltrnout`
         unit: "%"
         presentation:
-          <<: *ppt_uni_w_regions
           title_public: Voter turnout of registered voters
+          grapher_config: &grapher_config_turnout
+            selectedEntityNames:
+              - "United States"
+              - "United Kingdom"
+              - "France"
+              - "Germany"
+              - "Japan"
+              - "India"
+              - "Brazil"
+              - "South Africa"
         display:
           numDecimalPlaces: 2
 
@@ -363,14 +373,17 @@ tables:
         title: "Voter turnout of voting-age population"
         description_short: |-
           Denotes the voter turnout as a share of the voting age population in the national election according to official results.
+        description_key:
+          - *key_no_regions_turnout
+        description_processing: *processing_no_regions_turnout
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
           V-Dem indicator name: `v2elvaptrn`
         unit: "%"
         presentation:
-          <<: *ppt_uni_w_regions
           title_public: Voter turnout of voting-age population
+          grapher_config: *grapher_config_turnout
         display:
           numDecimalPlaces: 2
 
