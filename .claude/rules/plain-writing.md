@@ -7,7 +7,7 @@ paths:
 
 # Writing plainly for OWID readers
 
-This rule covers text the public reads on ourworldindata.org: chart titles, subtitles and footnotes, `description_short`, `description_key`, `description_processing`, display names, the origin `description` in a snapshot `.dvc` (shown in the Sources tab), and public posts such as the /latest data update and data insights.
+This rule covers text the public reads on ourworldindata.org: chart titles, subtitles, footnotes, `description_short`, `description_key`, `description_processing`, display names, the origin `description` in a snapshot `.dvc` (shown in the Sources tab), and public posts such as the /latest data update and data insights.
 
 `description_from_producer` is exempt. It is the producer's own text, kept verbatim.
 
@@ -31,6 +31,7 @@ Read each sentence as if you were saying it to that friend. If you would never s
 - **Accuracy wins over plainness.** Keep the exact meaning and the qualifiers ("estimated", "adults only", "private construction"). Find plain words for them, even if that takes a few more.
 - **Use active voice and name who does what.** "We" is OWID; the producer goes by name. "We convert fiscal years to calendar years", not "Fiscal years were converted".
 - **In `description_key`, define terms as the data defines them.** A definition there says how this dataset counts something, not how things are in the world. Tie it to the data or to the producer: "In this data, a woman counts as married if…" or "The UN counts a woman as married if…", not "Married women are those whose…".
+- **Always use the Oxford comma.** In a list of three or more, put a comma before the final "and" or "or": "coal, oil, and gas", not "coal, oil and gas".
 - **Plain is not casual.** State the fact; don't tell the reader what to do ("be careful when comparing"). No chatty phrasing ("a bit", "pretty much", "basically"). Contractions are fine.
 
 ## Editing existing text
@@ -61,7 +62,7 @@ Why: the first version reads as a statement about the world. The definition belo
 >
 > After: Estimated greenhouse gas emissions from farming, measured in tonnes of CO₂-equivalents.
 
-Why: "aggregate quantity", "anthropogenic" and "attributable to" make the reader work for nothing. "Estimated" stays because it is true.
+Why: "aggregate quantity", "anthropogenic", and "attributable to" make the reader work for nothing. "Estimated" stays because it is true.
 
 **`description_processing`**
 
