@@ -519,7 +519,10 @@ def coverage_notes(stored: pd.DataFrame, indicators: pd.DataFrame, dataset: dict
     )
     missing = [t for t in TYPES if t not in notes["types"]]
     if missing:
-        out.append(f"No results stored for: {', '.join(missing)}.")
+        out.append(
+            f"No results stored for: {', '.join(missing)} (not run, or run with no anomaly found: "
+            "`etl anomalist` stores nothing then)."
+        )
     if any(t in missing for t in UPGRADE_TYPES):
         out.append(
             "The old-vs-new detectors are missing: they run only with a variable mapping and the old grapher "
@@ -598,7 +601,9 @@ def render(
         out += [
             f"{held_back:,} candidates come from Anomalist results of an earlier build and are not selected. Wait for "
             "the staging build of your latest push (or re-run `etl anomalist` with `--force`), then run this "
-            "script again before closing the Anomalist pass.",
+            "script again before closing the Anomalist pass. A type still stale after a forced re-run found no "
+            "anomaly on this build, and its old record stays: delete it as `/update-dataset` step 7 says "
+            '("Upgrade-detector coverage").',
             "",
         ]
     if selected:

@@ -850,13 +850,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```
      The script writes the file itself because the helper logs to stdout, and a log line in the file breaks the JSON. `--sample-n 0` turns off the CLI's default sample of 500 indicators per dataset, which would otherwise leave the rest of a large dataset uncompared. Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
 
+     When `anomalist-view` still calls a type stale after that forced re-run, the re-run found no anomaly of that type on the current build: `etl anomalist` then keeps the earlier build's record instead of replacing it, so re-running again changes nothing. Delete that record, so `anomalist_candidates.py` stops holding back its rows as stale, and run the script again:
+     ```bash
+     STAGING=<branch> .venv/bin/python -c "from sqlalchemy.orm import Session; from etl.db import get_engine; from etl.grapher import model as gm; s = Session(get_engine()); n = s.query(gm.Anomaly).filter(gm.Anomaly.datasetId == <new_dataset_id>, gm.Anomaly.anomalyType == '<type>').delete(synchronize_session=False); s.commit(); print(n, 'record(s) deleted')"
+     ```
+     The type then reads "no results stored", which here means it ran and found nothing on this build.
+
      **Read `upgrade_missing` flags before calling them data loss.** The detector pairs old and new indicators by shortName, so when the producer re-splits a dimension that is part of the shortName — comparability spells renumbered, a category recoded — the points move from one indicator to its sibling and every move is flagged as missing. Check whether the flagged points reappear under a sibling indicator with identical values before reporting a loss; if they do, it is a relabel to describe in the PR body (and, when the producer's release notes don't mention it, an entry in the producer-issue log).
 
-     The upgrade detectors also need the **old** grapher dataset in the local catalog (`data/grapher/<ns>/<old_version>/<short>`) — the `FileNotFoundError` names the *new* dataset id, but the missing files are usually the old version's. If the old chain has already been removed from the DAG (so `etlr` can't rebuild it), fetch its files straight from the public catalog (the table files are named after the tables, so read `index.json` first if unsure):
+     The upgrade detectors also need the **old** grapher dataset in the local catalog (`data/grapher/<ns>/<old_version>/<short>`) — the `FileNotFoundError` names the *new* dataset id, but the missing files are usually the old version's. If the old chain has already been removed from the DAG (so `etlr` can't rebuild it), download the whole dataset folder from the catalog's R2 bucket, as `PREFER_DOWNLOAD` does. That takes every table and its `.meta.json`, whatever their names: a dataset can hold several tables, and `index.json` does not list them. Use `config.R2_BUCKET_PRIVATE` instead for a private dataset:
      ```bash
-     mkdir -p data/grapher/<ns>/<old_v>/<short> && cd data/grapher/<ns>/<old_v>/<short> && \
-       for f in index.json <short>.feather <short>.meta.json; do \
-         curl -sL -O "https://catalog.ourworldindata.org/grapher/<ns>/<old_v>/<short>/$f"; done
+     .venv/bin/python -c "from pathlib import Path; from owid.catalog import s3_utils; from etl import config; p = 'grapher/<ns>/<old_v>/<short>'; s3_utils.download_s3_folder(f's3://{config.R2_BUCKET}/{p}/', Path('data') / p, client=s3_utils.connect_r2_cached())"
      ```
 
 8) Update context for public announcement

@@ -759,6 +759,8 @@ def test_anomalist_stale_types_are_never_selected():
     ]
     text = anomalist_candidates.render("ns/v/thing", "ai/fact-check/ns/v/thing", rows, [], NO_FIRST_PASS, 0.3)
     assert "earlier build and are not selected" in text
+    # A forced re-run that finds nothing keeps the stale record: the output says how to get out of that loop.
+    assert "still stale after a forced re-run" in text and "Upgrade-detector coverage" in text
 
 
 def test_anomalist_old_values_come_from_the_version_being_replaced():
