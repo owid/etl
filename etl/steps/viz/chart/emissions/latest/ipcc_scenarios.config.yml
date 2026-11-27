@@ -74,12 +74,12 @@ dimensions:
       - slug: agricultural_production
         name: Agricultural production
     presentation:
-      type: dropdown
+      type: dropdown-with-search
   - slug: sub_metric
     name: Sub-metric
     choices:
       - slug: na
-        name: ""
+        name: Not applicable
       - slug: total_radiative_forcing
         name: Total radiative forcing
       - slug: forcing_from_co2
@@ -220,11 +220,11 @@ dimensions:
       - slug: total
         name: Total
       - slug: na
-        name: ""
+        name: Not applicable
       - slug: share_of_total
         name: Share of total
     presentation:
-      type: toggle-buttons
+      type: dropdown
   - slug: world_region
     name: Region
     choices:
