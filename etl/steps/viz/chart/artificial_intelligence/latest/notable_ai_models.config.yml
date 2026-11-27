@@ -56,21 +56,21 @@ dimensions:
       - slug: reporting
         name: Reported or estimated
         description: Whether the developer reported the training computation, or Epoch AI estimated it
-      - slug: domain
-        name: Domain
-        description: Area of machine learning the model is designed for
-      - slug: affiliation
-        name: Researcher affiliation
-        description: Type of organization the model’s authors work for
-      - slug: weights
-        name: Availability of weights
-        description: Whether the model’s weights are open, available only online, or not released
       - slug: country
         name: Country
         description: Country of the organizations that developed the model
       - slug: developer
         name: Developer
         description: Company that developed the model
+      - slug: weights
+        name: Availability of weights
+        description: Whether the model’s weights are open, available only online, or not released
+      - slug: domain
+        name: Domain
+        description: Area of machine learning the model is designed for
+      - slug: affiliation
+        name: Researcher affiliation
+        description: Type of organization the model’s authors work for
 
 # Views are built in the .py: one per metric and coloring, except "reported or estimated", which only exists for
 # training computation.
