@@ -46,6 +46,15 @@ steps:
         - data://meadow/social_expenditure/2025-03-07/lindert:
           - snapshot://social_expenditure/2025-03-07/lindert.csv
 
+  # ISSA Country Profiles: types of old-age pension programs
+  data://grapher/issa/2026-11-11/old_age_pension_types:
+    - data://garden/issa/2026-11-11/old_age_pension_types:
+      - data://meadow/issa/2026-11-11/old_age_pension_types:
+        - snapshot://issa/2026-11-11/old_age_pension_types.html
+  # Types of old-age pension programs (multidim), authored in ETL.
+  viz://chart/issa/latest/old_age_pension_types:
+    - data://grapher/issa/2026-11-11/old_age_pension_types
+
   ##########
   # HEALTH
   ##########

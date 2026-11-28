@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "ISSA Country Profiles"
+    description: |-
+      The ISSA Country Profiles describe the national social security programs established by law in over 190 countries and territories. They cover old age, invalidity and death; sickness and maternity or paternity; work injury and occupational disease; unemployment; and family benefits.
+
+      The International Social Security Association (ISSA) collects the information through surveys of its correspondents in social security institutions, and updates it region by region over a two-year cycle. The scheme descriptions build on Social Security Programs Throughout the World, which the ISSA produced with the US Social Security Administration until 2019.
+    # The page states no publication date. Its most recent information (the Americas) is up to date as of July 2025.
+    # NOTE: At each update, set this to the year of the most recent reference date the page gives.
+    date_published: "2025"
+    title_snapshot: "Type of old-age pension(s)"
+    description_snapshot: |-
+      The table “Mandatory old-age benefits, programme type” shows which types of mandatory old-age programs exist in each country or territory: contributory flat-rate and earnings-related pensions, non-contributory means-tested and universal pensions, provident funds, mandatory occupational pensions, and individual accounts. Footnote letters next to a mark add detail, for example that a scheme is closed to new entrants. The page defines each type and footnote in a side panel.
+
+      The ISSA says the information is up to date as of July 2023 for most of Europe, January 2024 for Asia and the Pacific and Eurasia, July 2024 for Africa, and July 2025 for the Americas.
+
+    # Citation
+    producer: "International Social Security Association"
+    citation_full: |-
+      International Social Security Association (ISSA). Country Profiles: Type of old-age pension(s). Geneva: ISSA. https://www.issa.int/databases/country-profiles/pensions
+    attribution_short: "ISSA"
+
+    # Files
+    url_main: https://www.issa.int/databases/country-profiles/pensions
+    date_accessed: 2026-11-11
+
+    # License
+    license:
+      name: "© International Social Security Association (2025)"
+      url: https://www.issa.int/databases/country-profiles/about
+
+outs:
+  - md5: 508c177edb71881ab3587604a7b28ce7
+    size: 265100
+    path: old_age_pension_types.html
